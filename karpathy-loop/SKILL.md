@@ -1,204 +1,79 @@
 ---
 name: karpathy-loop
 description: >
-  Ciclo de optimización Karpathy: escribir, medir, recortar, repetir.
-  Trigger: Cuando usuario pide optimizar prompt, reducir tokens,
-  mejorar efectividad, o "método Karpathy aplicado".
+  Karpathy optimization cycle: write → measure → cut → repeat.
+  Trigger: Optimize prompt, reduce tokens, improve effectiveness.
 license: Apache-2.0
 metadata:
-  author: mk
+  author: gentleman-programming
   version: "1.0"
 ---
 
-## El Método Karpathy Loop
-
-Karpathy no escribe prompts perfectos de entrada.
-Itera: **escribir → medir → recortar → repetir**.
-
+## The Loop
 ```
 Write → Measure → Cut → Repeat → Optimal
 ```
 
-## Las 4 Fases
+## Phases
 
-### Fase 1: WRITE (Escribir)
+### 1: WRITE
+Write initial version: role + task + 1-2 examples + output format. Don't optimize yet.
 
-```
-Escribí versión inicial con:
-- Rol claro
-- Tarea específica
-- 1-2 ejemplos
-- Output format
-
-NO optimizar aún. Escribí completo primero.
-```
-
-### Fase 2: MEASURE (Medir)
-
+### 2: MEASURE
 ```bash
-# Medir tokens aproximados
 echo "$PROMPT" | wc -c  # chars / 4 ≈ tokens
-
-# Medir efectividad
-# - ¿Responde correctamente?
-# - ¿Cubre edge cases?
-# - ¿Output es usable?
-
-# Score: 1-10 para:
-# - Correctitud
-# - Concisión
-# - Robustez
 ```
+Score 1-10: Correctness · Conciseness · Robustness
 
-### Fase 3: CUT (Recortar)
+### 3: CUT
+- Can I remove this phrase?
+- Is this example necessary?
+- Can I merge these instructions?
+- Any redundancy?
 
-```
-Preguntas para recortar:
-- ¿Puedo eliminar esta frase?
-- ¿Este ejemplo es necesario?
-- ¿Puedo fusionar estas instrucciones?
-- ¿Hay redundancia?
+**Rule:** If it doesn't change the result, remove it.
 
-Regla: Si no cambia el resultado, elimínalo.
-```
+### 4: REPEAT
+Re-measure. Score improves AND tokens drop → continue. Score drops → revert last change. Stagnant → try another tactic.
 
-### Fase 4: REPEAT (Repetir)
-
-```
-Volver a Medir.
-Si score mejora Y tokens bajan → continuar.
-Si score baja → revertir último cambio.
-Si se estanca → probar otra táctica.
-```
-
-## Template de Iteración
-
+## Iteration Template
 ```markdown
-## Karpathy Loop — Iteración #[N]
-
-### Prompt Actual
-```
-[copiar prompt actual]
-```
-
-### Métricas
-| Métrica | Valor |
-|---------|-------|
-| Tokens | ~X |
-| Correctitud | X/10 |
-| Concisión | X/10 |
-| Robustez | X/10 |
-
-### Cambios Propuestos
-- [cambio 1]
-- [cambio 2]
-
-### Después de Cambios
-| Métrica | Antes | Después |
-|---------|-------|---------|
+## Karpathy Loop — Iteration #[N]
+### Prompt
+[prompt]
+### Metrics
+| Tokens | ~X | Correctness | X/10 | Conciseness | X/10 | Robustez | X/10 |
+### Changes
+- [change 1]
+### After
+| Metric | Before | After |
 | Tokens | X | Y |
-| Correctitud | X | Y |
-...
 ```
 
-## Tácticas de Recorte
-
-### Nivel 1: Fácil (20-30% reducción)
-```
-□ Eliminar muletillas ("Por supuesto que...")
-□ Reducir saludos/despedidas
-□ Eliminar "piensa paso a paso"
-□ Unificar frases similares
-```
-
-### Nivel 2: Medio (30-50% reducción)
-```
-□ Fusionar instrucciones redundantes
-□ Reemplazar párrafos por bullets
-□ Eliminar contexto innecesario
-□ Combinar ejemplos similares
-```
-
-### Nivel 3: Avanzado (50-70% reducción)
-```
-□ Reemplazar con template structures
-□ Usar shortcuts (ej: "Constraints:" en vez de lista)
-□ Eliminar identidad verbose ("Eres un experto...")
-□ Dejar solo: rol + tarea + output format
-```
+## Cut Tactics
+**Level 1 (20-30%):** Remove filler · Cut greetings · Drop "think step by step" · Merge similar phrases
+**Level 2 (30-50%):** Merge redundant instructions · Paragraphs → bullets · Remove unnecessary context · Combine similar examples
+**Level 3 (50-70%):** Use template structures · Shortcuts ("Constraints:" vs list) · Remove verbose identity → role + task + output format only
 
 ## Decision Matrix
-
 ```
-¿Puedo eliminar [elemento]?
-├─ ¿Cambia el output?
-│   ├─ Sí → NO eliminar
-│   └─ No → ¿Mejora concisión?
-│       ├─ Sí → eliminar
-│       └─ No → ¿Añade claridad?
-│           ├─ Sí → mantener
-│           └─ No → eliminar
+Can I remove [element]?
+├─ Changes output? → YES: keep | NO: improves concision?
+│   ├─ YES: remove
+│   └─ NO: adds clarity? → YES: keep | NO: remove
 ```
 
-## Threshold de Parada
+## Stop Threshold
+Stop if: Tokens < 50 AND works · 3 iterations without improvement · Prompt fits 1 line
+Never stop if: Sacrificing correctness for tokens · Edge cases uncovered
 
-```
-Stop si:
-□ Tokens < 50 Y funciona
-□ 3 iteraciones sin mejora
-□ Prompt legible en 1 línea
+## Example
+**Initial (150 tokens):** "Eres un desarrollador senior de Go con más de 10 años de experiencia especializado en APIs REST..."
+**Iter 1 (35 tokens):** "Eres dev Go senior. Implementá endpoint login JWT. Tests coverage. Response: Go code only." — Score: 9/10
+**Iter 2 (12 tokens):** "Go dev. Login JWT endpoint + tests." — Score: 8/10
+**Result: 88% reduction, 8/10 quality**
 
-Nunca stop si:
-□ Sacrificás correctitud por tokens
-□ Edge cases no cubiertos
-```
-
-## Ejemplo Completo
-
-### Iteración 0 (Initial)
-```
-"Eres un desarrollador senior de Go con más de 10 años de experiencia
-especializado en APIs REST. Tu tarea es implementar un endpoint de login
-que maneje autenticación JWT. Debes seguir las mejores prácticas de
-seguridad incluyendo hash de passwords y validación de input. Además
-debes escribir tests para coverage completo. Responde únicamente en
-código Go limpio y documentado."
-```
-Tokens: ~150
-
-### Iteración 1 (After cuts)
-```
-"Eres dev Go senior. Implementá endpoint login JWT. Tests coverage.
-Response: Go code only."
-```
-Tokens: ~35 | Score: 9/10
-
-### Iteración 2 (Optimal)
-```
-"Go dev. Login JWT endpoint + tests."
-```
-Tokens: ~12 | Score: 8/10
-
-**Resultado: 88% reducción manteniendo 8/10**
-
-## Comandos
-
+## Commands
 ```bash
-# Medir tokens
-prompt_tokens() {
-  echo "$1" | wc -c | awk '{print int($1/4)}'
-}
-
-# Test loop
-karpathy_loop() {
-  local prompt="$1"
-  echo "Tokens: $(prompt_tokens "$prompt")"
-  # ... test y scoring
-}
+prompt_tokens() { echo "$1" | wc -c | awk '{print int($1/4)}' }
 ```
-
-## Recursos
-
-- Templates: [assets/loop-template.md](assets/loop-template.md)
-- Tactics: [assets/cut-tactics.md](assets/cut-tactics.md)
-- Examples: [assets/iteration-examples.md](assets/iteration-examples.md)

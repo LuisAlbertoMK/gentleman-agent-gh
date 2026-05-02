@@ -1,169 +1,82 @@
 ---
 name: code-memory
 description: >
-  Persistencia de estado de código entre sesiones.
-  Trigger: Cuando usuario dice "continuá", "donde quedamos",
-  "recordá lo que hicimos", o necesita que recuerde código exacto.
+  Persist code state between sessions.
+  Trigger: "continuá", "donde quedamos", "recordá código", multi-session project state.
 license: Apache-2.0
 metadata:
   author: mk
   version: "1.0"
 ---
 
-## Cuando Usar
+## When
+Continue prior work · Need exact code recovery · Multi-session persistent state · "Dónde quedamos"
 
-- Usuario pide continuar trabajo anterior
-- Necesidad de recuperar código exacto
-- Proyecto multi-sesión con estado persistente
-- "Dónde quedamos" o "qué hicimos"
+## Problem
+LLMs have no code memory between sessions. Only short current conversation context.
 
-## El Problema
-
-LLMs no tienen memoria de código entre sesiones.
-Solo guardan contexto corto de conversación actual.
-
-## La Solución: Code State File
-
-Crear archivo `.agent-state.json` en el proyecto:
-
+## Solution: Code State File
+`.agent-state.json` in project root:
 ```json
 {
   "session_id": "uuid",
   "last_update": "ISO timestamp",
-  "project": {
-    "name": "nombre",
-    "path": "/path/to/project",
-    "language": "go|typescript|python",
-    "framework": "nombre"
-  },
-  "files": [
-    {
-      "path": "src/main.go",
-      "status": "in_progress|completed|blocked",
-      "last_edit": "ISO",
-      "content_hash": "sha256",
-      "summary": "qué hace este archivo",
-      "key_sections": {
-        "function_x": "líneas 10-25, hace Y",
-        "struct_z": "línea 30, definición"
-      }
-    }
-  ],
-  "todos": [
-    {
-      "id": 1,
-      "description": "implementar auth",
-      "status": "completed|pending|blocked",
-      "file": "src/auth.go",
-      "blocker": "necesito respuesta del usuario"
-    }
-  ],
-  "context": {
-    "current_task": "implementar login endpoint",
-    "next_step": "agregar validación de password",
-    "recent_changes": ["implementé handler", "agregué struct User"]
-  },
-  "artifacts": {
-    "descriptions": ["snippet para X", "template para Y"],
-    "content_hashes": ["hash1", "hash2"]
-  }
+  "project": { "name": "nombre", "path": "/path", "language": "go|ts|py", "framework": "name" },
+  "files": [{
+    "path": "src/main.go", "status": "in_progress|completed|blocked",
+    "last_edit": "ISO", "content_hash": "sha256", "summary": "what it does",
+    "key_sections": { "function_x": "lines 10-25, does Y" }
+  }],
+  "todos": [{ "id": 1, "description": "implement auth", "status": "completed|pending|blocked", "file": "src/auth.go" }],
+  "context": { "current_task": "login endpoint", "next_step": "password validation", "recent_changes": ["handler", "User struct"] }
 }
 ```
 
-## Estructura de Archivos
-
+## File Structure
 ```
 project/
-├── .agent-state.json          # Estado principal
-├── .agent-todos.md            # Lista de tareas en markdown
-├── .agent-context/            # Contexto compilado
-│   ├── index.md              # Mapa del proyecto
-│   ├── pending-changes.md    # Cambios sin aplicar
-│   └── questions.md          # Preguntas pendientes
-└── .agent-artifacts/         # Snippets guardados
-    ├── auth-template.go
-    └── api-handler.ts
+├── .agent-state.json          # Main state
+├── .agent-todos.md            # Task list
+├── .agent-context/            # Compiled context
+│   ├── index.md               # Project map
+│   ├── pending-changes.md     # Unapplied changes
+│   └── questions.md           # Pending questions
+└── .agent-artifacts/          # Saved snippets
 ```
 
-## Comandos
-
-### Guardar estado
+## Commands
 ```bash
-# Después de cada cambio significativo
-agent-state save --file src/main.go --status in_progress
-
-# Al terminar sesión
-agent-state save --session-end
-```
-
-### Recuperar estado
-```bash
-# Al iniciar sesión nueva
-agent-state load
-
-# Solo recuperar un archivo
-agent-state load --file src/main.go
-```
-
-### Ver todo
-```bash
-# Estado completo
-agent-state status
-
-# Solo pendientes
-agent-state pending
+agent-state save --file src/main.go --status in_progress   # After significant change
+agent-state save --session-end                              # End session
+agent-state load [--file src/main.go]                       # Load state
+agent-state status [--pending]                              # View state
 ```
 
 ## Workflow
+### Start Session
+1. Find `.agent-state.json`
+2. Exists → load + show summary
+3. Not found → create new
 
-### Al Iniciar Sesión
-1. Buscar `.agent-state.json` en proyecto
-2. Si existe: cargar y mostrar resumen
-3. Si no existe: crear nuevo
+### During Session
+1. Detect significant code changes
+2. Update `.agent-state.json`
+3. Completed tasks → update todos
 
-### Durante la Sesión
-1. Detectar cambios significativos en código
-2. Actualizar estado en `.agent-state.json`
-3. Detectar tareas completadas → actualizar todos
-
-### Al Cerrar Sesión
-1. Guardar estado completo
-2. Listar preguntas pendientes
-3. Resumir próximo paso
+### End Session
+1. Save full state
+2. List pending questions
+3. Summarize next step
 
 ## Auto-Save Triggers
+File created/deleted · >20 lines modified · Function/task completed · Non-obvious discovery (bug, edge case) · Important user question
 
-Guardar automáticamente cuando:
-- Se crea/elimina archivo
-- Se modifica >20 líneas
-- Se completa una función/tarea
-- Se descubre algo no obvio (bug, edge case)
-- Usuario hace pregunta importante
-
-## Template de Prompt para Cargar
-
+## Load Prompt Template
 ```
-## Estado del Proyecto
-
-### Último trabajo
-[resumen del estado actual]
-
-### Archivos activos
-- [archivo 1]: [estado] - [resumen]
-- [archivo 2]: [estado] - [resumen]
-
-### Pendientes
-- [ ] [tarea 1]
-- [ ] [tarea 2]
-
-### Próximo paso
-[qué hacer ahora]
-
-### Preguntas pendientes
-- [ ] [pregunta para usuario]
+## Project State
+### Last work: [summary]
+### Active files: [file]: [status] - [summary]
+### Pending: [ ] task 1 · [ ] task 2
+### Next step: [what to do now]
+### Pending questions: [ ] question for user
 ```
-
-## Recursos
-
-- Estados: [assets/state-examples.md](assets/state-examples.md)
-- Templates: [assets/load-template.md](assets/load-template.md)

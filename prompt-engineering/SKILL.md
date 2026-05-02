@@ -1,264 +1,93 @@
 ---
 name: prompt-engineering
 description: >
-  Ingeniería de prompts profesional siguiendo ciclo de vida de software.
-  Trigger: Cuando usuario pide mejorar un prompt, crear prompt robusto,
-  cubrir gaps, seguridad, escalabilidad. También: "ReAct", "Reflexion",
-  "DSPy", "multi-agent", "agentic workflow".
+  Professional prompt engineering via SPEAR framework + advanced patterns.
+  Trigger: Improve prompt, create robust prompt, cover gaps/security/scalability.
+  Also: "ReAct", "Reflexion", "DSPy", "multi-agent", "agentic workflow".
 license: Apache-2.0
 metadata:
-  author: mk
+  author: gentleman-programming
   version: "1.1"
 ---
 
-## Cuando Usar
+## When
+Improve existing prompt · Complex software dev prompts · Need security/scalability/edge cases · Agentic tasks
 
-- Mejorar prompt existente
-- Prompt para desarrollo de software complejo
-- Necesita: seguridad, escalabilidad, edge cases, producción
-- Tareas agentic con herramientas
+## SPEAR Framework
+**S — Scope:** "This prompt is for [context]. Input: [types]. Output: [format]."
+**P — Principles:** Max 4 non-negotiable rules (security, quality, performance, maintainability)
+**E — Examples:** 1 valid + 1 edge case + 1 counterexample
+**A — Assertions:** `ASSERT: [verifiable constraint]` · `NEVER: [prohibited]`
+**R — Refinements:** Post-implementation iterations
 
-## El Framework SPEAR
+## Advanced Patterns
 
-### S — Scope
+### ReAct
 ```
-Este prompt se usa para [contexto].
-Input: [tipos]
-Output: [formato]
-```
-
-### P — Principles
-Máximo 4 reglas no negociables:
-```
-Principios:
-1. [seguridad]
-2. [calidad]
-3. [rendimiento]
-4. [mantenibilidad]
+Thought: [reasoning about what to do]
+Action: [tool to use]
+Observation: [result]
+...repeat until resolved...
+Final Answer: [conclusion]
 ```
 
-### E — Examples
-1 válido + 1 edge case + 1 contraejemplo
-
-### A — Assertions
+### Reflexion
 ```
-ASSERT:
-- [constraint verificable]
-NUNCA:
-- [prohibido]
+Task: [task]
+Attempt: [response]
+Reflection: [critical evaluation]
+Revision: [improved]
+...repeat if needed...
 ```
 
-### R — Refinements
-Iteraciones post-implementación
-
-## Advanced Patterns (v1.1)
-
-### ReAct Pattern
-Reasoning + Acting en loops:
-
+### Multi-Agent Orchestration
 ```
-# ReAct Template
-Thought: [razonamiento sobre qué hacer]
-Action: [herramienta a usar]
-Observation: [resultado de la acción]
-...repetir hasta resolver...
-Final Answer: [conclusión]
-```
-
-### Reflexion Pattern
-Auto-mejora con feedback:
-
-```
-# Reflexion Template
-Task: [tarea]
-Attempt: [respuesta]
-Reflection: [evaluación crítica]
-Revision: [mejorada]
-...repetir si necesario...
-```
-
-### DSPy Integration
-Para optimización automatizada:
-
-```
-# Con DSPy
-- Declarar firma: dspy.Predict(Signature)
-- Compilar: dspy.teleprompt.Compiled
-- Optimizar: dspy.teleprompt.BootstrapFewShot
-```
-
-### Multi-Agent Orchestration (v1.1)
-
-```
-# Agentes especializados
 Router → Planner → Executor → Critic
 
-## Router
-[Evalúa input y distribuye a especializado]
+## Agent: [Name]
+Role: [specialization] | Scope: [handles] | Tools: [available] | Limits: [constraints]
 
-## Planner
-[Crea plan de acción stepwise]
-
-## Executor
-[Ejecuta con herramientas]
-
-## Critic
-[Valida output, detecta errores]
-```
-
-#### Multi-Agent Template
-```markdown
-# Sistema Multi-Agente
-
-## Agente: [Nombre]
-Rol: [especialización]
-Scope: [qué maneja]
-Herramientas: [tools disponibles]
-Límites: [constraints]
-
-## Comunicación
-- Request: [formato de mensaje]
-- Response: [formato de respuesta]
-- Errors: [cómo reportar]
+## Communication
+Request: [format] | Response: [format] | Errors: [report how]
 
 ## Orchestrator
-- Routing rules: [cómo decidir]
-- Fallback: [qué hacer si falla]
-- Timeout: [límite por paso]
+Routing: [how to decide] | Fallback: [if fails] | Timeout: [per step limit]
 ```
 
-## Security Checklist v1.1
-
-```
-INPUT:
-□ Tipos de datos especificados
-□ Rangos válidos definidos
-□ Longitudes máximas
-□ Formatos validados
-□ Sanitización para inyección
-
-OUTPUT:
-□ No ejecución automática
-□ Sanitización de output
-□ Rate limiting
-□ Timeout en respuestas
-
-DATA:
-□ No hardcoded credentials
-□ No PII en logs
-□ Tokens no en output
-
-AGENT:
-□ Least privilege en herramientas
-□ Tool schema validation
-□ Human-in-the-loop para sensibles
-□ Sandbox para código generado
-□ Audit log sin secretos
-```
+## Security Checklist
+**INPUT:** Types specified · Valid ranges · Max lengths · Formats validated · Sanitization for injection
+**OUTPUT:** No auto-execution · Output sanitization · Rate limiting · Response timeouts
+**DATA:** No hardcoded creds · No PII in logs · No tokens in output
+**AGENT:** Least privilege tools · Tool schema validation · Human-in-loop for sensitive · Sandbox generated code · Audit log without secrets
 
 ## Tool Definition Template
-
-```markdown
+```
 ## [tool_name]
-Descripción: [qué hace, cuándo usar]
-Input: [schema tipo]
-Output: [tipo de retorno]
-Constraints:
-- [límite 1]
-- [límite 2]
-Errors:
-- [código]: [acción]
+Description: [what, when to use]
+Input: [schema type]
+Output: [return type]
+Constraints: [limit 1, limit 2]
+Errors: [code]: [action]
 ```
 
 ## Lifecycle Coverage
+Requirements: input/output types, constraints
+Design: output format, errors defined, logging specs
+Implementation: edge cases explicit, error behavior, logging
+Testing: test cases, output validation, failure criteria
+Production: rate limits, timeouts, retry policies, metrics
 
-### Requirements
-□ Input/output tipos claros
-□ Constraints de entrada
-
-### Design
-□ Output format
-□ Errores definidos
-□ Logging specs
-
-### Implementation
-□ Edge cases explícitos
-□ Error behavior
-□ Logging necesario
-
-### Testing
-□ Casos de prueba
-□ Validación output
-□ Failure criteria
-
-### Production
-□ Rate limits
-□ Timeouts
-□ Retry policies
-□ Metrics
-
-## Template Profesional v1.1
-
+## Professional Template
 ```markdown
-# ROL
-Eres [rol] especializado en [dominio].
-
-# CONTEXTO
-- Sistema: [nombre]
-- Stack: [tecnologías]
-- Ubicación: [dónde opera]
-
-# TIPO DE PATTERN
-[ReAct / Reflexion / Standard / Multi-Agent]
-
-# TAREA
-[Descripción clara]
-
-# INPUT
-- Tipo: [datos]
-- Constraints: [límites]
-
-# OUTPUT
-[Formato + ejemplo]
-
-# PRINCIPIOS (max 4)
-1. [seguridad]
-2. [calidad]
-3. [rendimiento]
-
-# HERRAMIENTAS (si agentic)
-[tool definitions]
-
-# EDGE CASES
-| Caso | Manejo |
-|------|--------|
-
-# ERRORS
-| Error | Acción |
-|-------|--------|
-
-# ASSERT
-- [constraint verificable]
-NUNCA:
-- [prohibido]
+# ROL: [role] specialized in [domain]
+# CONTEXTO: System: [name] | Stack: [tech] | Location: [where]
+# PATTERN: [ReAct / Reflexion / Standard / Multi-Agent]
+# TAREA: [clear description]
+# INPUT: Type: [data] | Constraints: [limits]
+# OUTPUT: [format + example]
+# PRINCIPLES (max 4): 1. [security] 2. [quality] 3. [performance]
+# TOOLS (if agentic): [tool definitions]
+# EDGE CASES: | Case | Handling |
+# ERRORS: | Error | Action |
+# ASSERT: [verifiable constraint] | NEVER: [prohibited]
 ```
-
-## Comandos
-
-```bash
-# Verificar cobertura
-grep -E "□|✓|✗" prompt.md
-
-# Test ReAct
-# Usar: assets/react-template.md
-
-# Test Multi-Agent
-# Usar: assets/multi-agent-template.md
-```
-
-## Recursos
-
-- Templates: [assets/software-lifecycle-template.md](assets/software-lifecycle-template.md)
-- Security: [assets/security-checklist.md](assets/security-checklist.md)
-- ReAct: [assets/react-template.md](assets/react-template.md)
-- Multi-Agent: [assets/multi-agent-template.md](assets/multi-agent-template.md)

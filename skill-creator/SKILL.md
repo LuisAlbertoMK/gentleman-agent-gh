@@ -1,29 +1,8 @@
 ---
 name: skill-creator
 description: >
-  Crea skills AI. Triggers: "create skill", "new agent pattern", "document conventions".
----
-
-## When
-
-YES → patrón reusable, workflow complejo, decision tree
-NO → ya existe docs, trivial, one-off
-
-## Structure
-
-```
-skill/
-├── SKILL.md           # Required
-└── assets/           # Optional (templates, schemas)
-```
-
-## SKILL.md Template
-
-```markdown
----
-name: {name}
-description: >
-  {desc}. Trigger: {when load}.
+  Create new AI agent skills following the Agent Skills spec.
+  Trigger: User asks to create skill, add agent instructions, document patterns.
 license: Apache-2.0
 metadata:
   author: gentleman-programming
@@ -31,48 +10,85 @@ metadata:
 ---
 
 ## When
-{when use}
+Pattern repeated + AI needs guidance · Project-specific conventions · Complex workflows · Decision trees needed
 
-## Patterns
-{critical rules}
+**Don't create:** Documentation exists (reference instead) · Trivial pattern · One-off task
 
-## Examples
-{minimal code}
+## Structure
+```
+skills/{skill-name}/
+├── SKILL.md          # Required
+├── assets/           # Optional: templates, schemas, examples
+└── references/       # Optional: links to local docs
+```
+
+## SKILL.md Template
+```markdown
+---
+name: {skill-name}
+description: >
+  {One-line what it does}. Trigger: {When to load}.
+license: Apache-2.0
+metadata:
+  author: gentleman-programming
+  version: "1.0"
+---
+
+## When to Use
+{When to use}
+
+## Critical Patterns
+{Most important rules — what AI MUST know}
+
+## Code Examples
+{Minimal, focused}
 
 ## Commands
 ```bash
-{common cmds}
-```
+{Common commands}
 ```
 
-## Fields
-
-| Field | Req | Desc |
-|-------|-----|------|
-| name | Yes | lowercase, hyphens |
-| description | Yes | what + trigger |
-| license | Yes | Apache-2.0 |
-| metadata.author | Yes | gentleman-programming |
-| metadata.version | Yes | semver |
+## Resources
+- **Templates**: [assets/](assets/) for {description}
+- **Docs**: [references/](references/) for local docs
+```
 
 ## Naming
+| Type | Pattern | Examples |
+|------|---------|----------|
+| Generic | `{technology}` | `pytest`, `typescript` |
+| Project-specific | `{project}-{component}` | `myapp-api` |
+| Testing | `{project}-test-{component}` | `myapp-test-sdk` |
+| Workflow | `{action}-{target}` | `skill-creator` |
 
-| Type | Pattern | Example |
-|------|---------|---------|
-| Generic | tech | pytest |
-| Project | proj-component | myapp-api |
-| Test | proj-test-x | myapp-test-api |
-| Workflow | action-target | skill-creator |
+## Frontmatter
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | Yes | Lowercase, hyphens |
+| `description` | Yes | What + Trigger |
+| `license` | Yes | `Apache-2.0` |
+| `metadata.author` | Yes | `gentleman-programming` |
+| `metadata.version` | Yes | Semver as string |
+
+## Content Guidelines
+**DO:** Critical patterns first · Tables for decision trees · Minimal examples · Commands section
+**DON'T:** Keywords section · Duplicate docs · Lengthy explanations · Troubleshooting · Web URLs in references
+
+## assets/ vs references/
+Templates/schemas/configs → assets/ · Link to existing docs → references/ (local paths only)
+
+## Register
+Add to `AGENTS.md`:
+```markdown
+| `{skill-name}` | {Description} | [SKILL.md](skills/{skill-name}/SKILL.md) |
+```
 
 ## Checklist
-
-- [ ] No existe skill
-- [ ] Reusable
-- [ ] Nombre OK
-- [ ] Frontmatter completo
-- [ ] Patterns claros
-- [ ] Ejemplos mínimos
-- [ ] Commands
-- [ ] AGENTS.md actualizado
-
-* skill-creator v2.0 — Karpathy Optimized *
+- [ ] Skill doesn't already exist
+- [ ] Pattern is reusable (not one-off)
+- [ ] Name follows conventions
+- [ ] Frontmatter complete (description includes triggers)
+- [ ] Critical patterns clear
+- [ ] Examples minimal
+- [ ] Commands section exists
+- [ ] Added to AGENTS.md
