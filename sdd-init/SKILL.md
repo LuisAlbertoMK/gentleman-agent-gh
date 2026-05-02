@@ -1,123 +1,64 @@
 ---
 name: sdd-init
-description: >
-  Initialize SDD context: detect stack, conventions, testing, bootstrap persistence backend.
-  Trigger: "sdd init", "iniciar sdd", "openspec init".
+description: > Initialize SDD: detect stack/testing, bootstrap persistence.
+  Trigger: "sdd init", "openspec init".
 license: MIT
-metadata:
-  author: gentleman-programming
-  version: "3.0"
+metadata: author: gentleman-programming, version: "3.0"
 ---
 
-## Purpose
-Initialize SDD context. Detect project stack, conventions, testing capabilities. Bootstrap persistence backend. EXECUTOR — not orchestrator.
+## CONTEXT
+- Detect: package.json/go.mod/pyproject.toml, CI/linters, arch patterns
+- Test runner: package.json→vitest/jest, go.mod→go test, pyproject.toml→pytest
+- Layers: Unit/Integration/E2E · Coverage: vitest--coverage/pytest-cov/go test -cover
+- Quality: eslint/ruff/golangci-lint (linter), tsc/mypy/go vet (types), prettier/black (format)
 
-## Persistence Contract
-- **engram**: NO `openspec/` dir. `mem_save(title: "sdd-init/{project}", topic_key: same, type: "architecture")` + testing-capabilities observation
-- **openspec**: Run full bootstrap, write `openspec/config.yaml` + dir structure
-- **hybrid**: BOTH — openspec bootstrap + engram persist
-- **none**: Return context, no file ops
+## TDD MODE
+Priority: (1) system prompt `strict-tdd-mode` marker, (2) openspec/config.yaml, (3) test runner?→true, (4) no runner→false
 
-## Steps
-
-### 1: Detect Project Context
-Check: `package.json`, `go.mod`, `pyproject.toml`, CI configs, linters, architecture patterns.
-
-### 2: Detect Testing
-```
-Test Runner → package.json/pyproject.toml/go.mod/Cargo.toml/Makefile → {framework, command}
-Layers:
-  Unit: test runner exists? → ✅
-  Integration: @testing-library/httpx/httptest/WebApplicationFactory? → ✅
-  E2E: playwright/cypress/selenium/chromedp? → ✅
-Coverage: vitest/pytest-cov/go test -cover/coverlet → {command}
-Quality: eslint/ruff/golangci-lint (linter), tsc/mypy/go vet (types), prettier/black/gofmt (format)
-```
-
-### 3: Resolve Strict TDD
-Priority chain (first match wins):
-1. System prompt / agent config `strict-tdd-mode` marker → enabled/disabled
-2. `openspec/config.yaml` → `strict_tdd` field
-3. Test runner detected? → `strict_tdd: true` (can do TDD)
-4. No test runner → `strict_tdd: false`, note in summary
-
-**No interactive questions.** User changes via TUI or config.
-
-### 4: Init Persistence (openspec mode)
+## FILES (openspec)
 ```
 openspec/
-├── config.yaml
-├── specs/
-└── changes/archive/
+├── config.yaml        ← project SDD config
+├── specs/           ← source of truth
+└── changes/archive/  ← completed
 ```
 
-### 5: Generate Config (openspec)
+## CONFIG
 ```yaml
 schema: spec-driven
-context: |
-  Tech stack: {detected}
-  Architecture: {detected}
-  Testing: {detected}
-  Style: {detected}
+context: | Tech {stack} | Arch {patterns} | Testing {framework} | Style {lint}
 strict_tdd: {true/false}
 rules:
-  proposal: [Include rollback plan, Identify affected modules]
-  specs: [Given/When/Then, RFC 2119 keywords]
-  design: [Sequence diagrams, ADR rationale]
-  tasks: [Phase grouping, Hierarchical numbering, Small enough for one session]
-  apply: [Follow existing patterns, Load relevant skills]
-  verify: [Run tests, Compare vs spec scenarios]
-  archive: [Warn on destructive deltas]
+  proposal: [rollback, affected modules]
+  specs: [Given/When/Then, RFC 2119]
+  design: [seq diagrams, ADR]
+  tasks: [phase grouping, hierarchical, 1-session]
+  apply: [existing patterns, load skills]
+  verify: [run tests, compare vs specs]
+  archive: [warn destructive]
 ```
 
-### 6: Persist Testing Capabilities
+## SKILL REGISTRY
+Scan: ~/.config/opencode/skills/*/, ~/.claude/skills/, projectskills/
+Skip: sdd-*, _shared, skill-registry
+Write: `.atl/skill-registry.md` + `mem_save` to engram
+
+## STEPS
+1. Detect ctx → stack, conventions, testing
+2. TDD mode → resolve per priority chain
+3. Init dirs (openspec mode)
+4. Generate config
+5. Persist testing capabilities → engram/config.yaml
+6. Build skill registry
+7. Persist project ctx → engram/config
+8. Return summary
+
+## RETURN
 ```
-mem_save(title: "sdd/{project}/testing-capabilities", topic_key: same, type: "config")
-Format:
-  Strict TDD Mode: {enabled/disabled}
-  Test Runner: {command, framework}
-  Layers: Unit ✅/❌ | Integration ✅/❌ | E2E ✅/❌
-  Coverage: {command} ✅/❌
-  Quality: Linter ✅/❌ | Type checker ✅/❌ | Formatter ✅/❌
+SDD INIT
+Project: {name} | Stack: {detected} | Mode: {engram/openspec/hybrid/none}
+Strict TDD: {enabled/disabled/unavailable}
+Caps: {table of test runner, layers, coverage, quality tools}
+Saved: {engram IDs / file paths}
 ```
-openspec/hybrid → also write as `testing:` section in `openspec/config.yaml`.
-
-### 7: Build Skill Registry
-Follow `skill-registry` SKILL.md: scan user + project skills, conventions, write `.atl/skill-registry.md`, save to engram.
-
-### 8: Persist Project Context
-engram/hybrid → `mem_save(title: "sdd-init/{project}", topic_key: same, type: "architecture")`
-openspec/hybrid → config already written in Step 5.
-
-### 9: Return Summary
-```
-## SDD Initialized
-**Project**: {name} | **Stack**: {detected} | **Persistence**: {mode}
-**Strict TDD Mode**: {enabled ✅ / disabled ❌ / unavailable}
-
-### Testing Capabilities
-| Capability | Status |
-| Test Runner | {tool} ✅/❌ |
-| Unit | ✅/❌ | Integration | {tool} ✅/❌ |
-| E2E | {tool} ✅/❌ | Coverage | ✅/❌ |
-| Linter | {tool} ✅/❌ | Type Checker | {tool} ✅/❌ |
-
-### Context Saved
-{Engram IDs / File paths}
-
-### ⚠️ Engram Limitations
-Solo dev, fast iteration. No iteration history. Not shareable. Partial audit trail.
-For teams: use openspec or hybrid.
-
-### Next
-Ready for /sdd-explore or /sdd-new.
-```
-
-## Rules
-- NO placeholder specs
-- Detect real tech stack, don't guess
-- Execute directly, not orchestrator behavior
-- Existing `openspec/` → report + ask orchestrator if update
-- Config context ≤10 lines
-- Testing detection + persist: MANDATORY
-- Return envelope: `status`, `executive_summary`, `artifacts`, `next_recommended`, `risks`
+ENT: engram-only=no openspec/ | openspec=write dirs | hybrid=both | none=no file ops

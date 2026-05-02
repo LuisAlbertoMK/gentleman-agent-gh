@@ -1,209 +1,146 @@
 ---
 name: judgment-day
-description: >
-  Parallel adversarial review protocol: two blind judge sub-agents review the same target,
-  findings synthesized, fixes applied, re-judged until both pass or escalate after 2 iterations.
-  Trigger: "judgment day", "judgment-day", "review adversarial", "dual review",
-  "doble review", "juzgar", "que lo juzguen".
+description: > Dual adversarial review: 2 blind judges, verdict synthesis, fix/re-judge loops.
+  Trigger: "judgment day", "juzgar", "dual review".
 license: Apache-2.0
-metadata:
-  author: gentleman-programming
-  version: "1.4"
+metadata: author: gentleman-programming, version: "1.4"
 ---
 
-## When
-- User triggers with phrases above
-- After significant implementations pre-merge
-- High-confidence review needed; cost of production bug > cost of two review rounds
+## TRIGGERS
+- "judgment day"/"judgment-day"/"review adversarial"/"dual review"/"juzgar"/"que lo juzguen"
+- Post-implementation pre-merge · High-cost review · Single reviewer blindspots risk
 
-## Protocol
+## PROTOCOL
 
-### P0: Skill Resolution (BEFORE judges)
-Follow `_shared/skill-resolver.md`:
-1. `mem_search(query: "skill-registry", project: "{project}")` → fallback `.atl/skill-registry.md` → skip if none
-2. Match relevant skills by code context (extensions/paths) + task context
-3. Build `## Project Standards (auto-resolved)` block with compact rules
-4. Inject into BOTH Judge prompts AND Fix Agent prompt (identical)
+### P0: SKILL RESOLUTION
+`mem_search("skill-registry")` → fallback `.atl/skill-registry.md` → skip if none
+Match by code context (exts/paths) + task context → inject `## Project Standards (auto-resolved)` block into BOTH judge prompts.
 
-**No registry**: warn user, proceed with generic review.
+### P1: PARALLEL BLIND REVIEW
+- Launch 2 sub-agents via `delegate` (async, parallel) — same target, NO cross-contamination
+- NEVER self-review — only coordinate
 
-### P1: Parallel Blind Review
-- Launch TWO sub-agents via `delegate` (async, parallel)
-- Same target, work independently, neither knows about the other
-- NEVER review yourself — only coordinate
-
-### P2: Verdict Synthesis
-After both `delegation_read` return:
-
+### P2: VERDICT SYNTHESIS
 | Status | Meaning | Action |
-|--------|---------|--------|
-| Confirmed | Both agents found it | Fix immediately |
-| Suspect A/B | One agent only | Triage |
-| Contradiction | Disagree | Flag for manual decision |
+| Confirmed | Both found | Fix IMMEDIATE |
+| Suspect A/B | One only | Triage |
+| Contradiction | Disagree → manual |
 
-### P3: Warning Classification
+### P3: WARNING CLASS
 ```
-WARNING (real)        → Bug, data loss, security hole in normal usage → FIX
-WARNING (theoretical) → Contrived scenario, corrupted input → Report as INFO only
-```
-Question: "Can a normal user trigger this?" YES→real, NO→theoretical.
+WARNING (real) → bug/data loss/sec hole in NORMAL use → FIX
+WARNING (theoretical) → contrived scenario → REPORT as INFO only
+"Can normal user trigger?" → YES→real, NO→theoretical
 
-### P4: Fix and Re-judge
-1. Confirmed CRITICALs/real WARNINGs → delegate Fix Agent
-2. Fix complete → re-launch BOTH judges in parallel
-3. **After 2 fix iterations** → ask user: "Continue iterating?" YES→continue, NO→ESCALATED
+### P4: FIX + RE-JUDGE
+1. CONFIRMED → delegate Fix Agent
+2. Fix complete → re-launch BOTH judges (parallel)
+3. After 2 iterations → ASK user: continue? → YES/NO→ESCALATED
 4. Both clean → APPROVED ✅
 
-### P5: Convergence Threshold
-**Round 1**: Present verdict, ask user to confirm fixes. Re-judge with full scope.
+### P5: CONVERGENCE
+Round 1: present verdict → user confirms fixes → re-judge with full scope.
+Round 2+: re-judge only CONFIRMED CRITICALs.
+- Confirmed real WARNINGs → fix inline, NO re-judge
+- Theoretical WARNINGs → INFO, no fix
+- Suggestions → fix if trivial
 
-**Round 2+**: Re-judge only for confirmed CRITICALs.
-- Real WARNINGs (confirmed) → Fix inline, NO re-judge
-- Theoretical WARNINGs → Report as INFO, no fix
-- SUGGESTIONS → Fix inline if trivial
+APPROVED: 0 CRITICALs + 0 real WARNINGs.
 
-**APPROVED**: 0 confirmed CRITICALs + 0 confirmed real WARNINGs.
-
-## Decision Tree
+## DECISION TREE
 ```
 User: "judgment day"
-├─ Scope clear? → NO: ask user | YES: continue
-├─ P0: Resolve skills → build Project Standards block
-├─ Launch Judge A + Judge B (parallel delegate)
-├─ delegation_read both → synthesize verdict
+├─ Scope clear? → NO: ask | YES: continue
+├─ P0: resolve skills → build Project Standards
+├─ launch Judge A + B (parallel delegate)
+├─ wait both → synthesize verdict
 ├─ No issues? → APPROVED ✅
-└─ Issues found? → present verdict table
-    ├─ Ask: "Fix confirmed issues?" → YES: Fix Agent → re-launch judges (Round 2)
-    │   ├─ Clean → APPROVED ✅
-    │   └─ Still issues → Fix Agent (Round 3) → re-launch judges
-    │       ├─ Clean → APPROVED ✅
-    │       └─ Still issues → Ask user: continue?
-    └─ NO → ESCALATED ⚠️
+└─ Issues? → present table → ask fix → YES: Fix Agent → re-judge
+    ├─ clean → APPROVED ✅
+    └─ still → repeat fix+judge (max 2) → ASK user
 ```
 
-## Sub-Agent Prompts
+## SUB-AGENT PROMPTS
 
-### Judge Prompt (identical for A and B)
+### JUDGE (A=B)
 ```
-You are an adversarial code reviewer. Find problems ONLY.
+You are adversarial. Find problems ONLY.
+Target: {files/features}
+{Project Standards block from P0}
 
-## Target
-{files, feature, architecture, component}
+CRITERIA
+- correctness: bugs? · edge cases: unhandled inputs?
+- error handling: caught/propagated/logged?
+- performance: N+1/inefficient loops?
+- security: injection/secrets/auth?
+- naming: matches patterns?
 
-{if P0 resolved}
-## Project Standards (auto-resolved)
-{matching compact rules}
-
-## Criteria
-- Correctness: logical errors?
-- Edge cases: unhandled inputs/states?
-- Error handling: caught, propagated, logged?
-- Performance: N+1, inefficient loops, allocations?
-- Security: injection, secrets, auth?
-- Naming: matches project patterns + Project Standards?
-
-## Return
+RETURN (structured list, NO praise)
 Severity: CRITICAL | WARNING (real) | WARNING (theoretical) | SUGGESTION
-File: path (line N)
-Description: what + why
-Suggested fix: one-line intent
+File: {path} (line N) · Description: what+why
+Fix: one-line intent
 
-WARNING rule: "Can normal user trigger this?" YES→real, NO→theoretical.
-**Skill Resolution**: {injected|fallback-registry|fallback-path|none}
-
+WARNING rule → "Can normal user trigger?" → YES→real, NO→theoretical.
+Skill Resolution: {injected|fallback|path|none}
 No issues → "VERDICT: CLEAN"
-Be adversarial. No praise, no summary.
 ```
 
-### Fix Agent Prompt
+### FIX AGENT
 ```
-Surgical fix agent. Apply ONLY confirmed issues.
+Surgical. Apply ONLY confirmed issues.
 
-## Confirmed Issues
-{findings table}
+CONFIRMED ISSUES: {findings table}
+{Project Standards block from P0}
 
-{if P0 resolved}
-## Project Standards (auto-resolved)
-{matching compact rules}
+RULES
+- Fix ONLY confirmed — no refactor beyond scope
+- Same pattern → ALL affected files
+- After each: file:line: brief
 
-## Rules
-- Fix ONLY confirmed issues — no refactoring beyond scope
-- Scope rule: fix same pattern in ALL affected files
-- After each fix: file, line, what done
-
-## Fixes Applied
+FIXES APPLIED:
 - [file:line] — {what fixed}
 
-**Skill Resolution**: {injected|fallback-registry|fallback-path|none}
+Skill Resolution: {injected|fallback|path|none}
 ```
 
-## Output Format
+## OUTPUT (VERDICT)
 ```markdown
-## Judgment Day — {target}
-### Round {N} — Verdict
-
-| Finding | Judge A | Judge B | Severity | Status |
-|---------|---------|---------|----------|--------|
-| Missing null check in auth.go:42 | ✅ | ✅ | CRITICAL | Confirmed |
-| Race condition in worker.go:88 | ✅ | ❌ | WARNING | Suspect (A) |
-| Error swallowed in db.go:201 | ✅ | ✅ | WARNING | Confirmed |
-
-**Confirmed**: 1 CRITICAL, 1 WARNING | **Suspect**: 1 WARNING
-
-### Fixes Applied
-- `auth.go:42` — Added nil check before dereference
-- `db.go:201` — Propagated error
-
-### Re-judgment
-- Judge A: CLEAN ✅ | Judge B: CLEAN ✅
-
-### JUDGMENT: APPROVED ✅
+## JD — {target}
+### R{N} — Verdict
+| Finding | JA | JB | Sev | Status |
+| {ISSUE} | ✅ | ✅ | CRIT | Confirmed |
+**Confirmed**: {N} CRIT | **Suspect**: {N}
+### Fixes: [file:line] — {fix}
+### Re-judge: JA:CLEAN ✅ | JB:CLEAN ✅
+### JDGMNT: APPROVED ✅
 ```
-
-### Escalation Format
+### ESCALATION
 ```markdown
-## Judgment Day — {target}
-### JUDGMENT: ESCALATED ⚠️
-
-User stopped after {N} iterations. Manual review required.
-
-### Remaining
-| Finding | A | B | Severity |
-| {desc} | ✅ | ✅ | CRITICAL |
+## JD — {target}
+### JDGMNT: ESCALATED ⚠️
+User stopped after {N} iter. Manual review required.
+**Remaining**: {issues}
 ```
 
-## Skill Resolution Feedback
-After every delegation, check `**Skill Resolution**` field:
-- `injected` → ✅
-- `fallback-*` or `none` → re-read registry, inject in subsequent delegations
+## BLOCKING (MANDATORY)
+1. NEVER APPROVED until: R1 CLEAN OR R2: 0 CRIT + 0 real WARN
+2. NEVER push/commit after fixes until re-judge
+3. NEVER session summary/"done" until all JD terminal (APPROVED/ESCALATED)
+4. After Fix → IMMEDIATELY re-launch judges
+5. Multiple JDs → independent
 
-## Language
-- Spanish → Rioplatense: "Juicio iniciado", "Aprobado", "Escalado"
-- English: "Judgment initiated", "Approved", "Escalated"
+## SELF-CHECK (pre-terminal)
+1. List ALL active JD targets
+2. Each APPROVED/ESCALATED?
+3. Any with fixes → did R2 run?
+4. R2 issues → asked user? Respected?
 
-## Blocking Rules (MANDATORY)
-1. NO APPROVED until: Round 1 CLEAN, OR Round 2: 0 CRITICALs + 0 real WARNINGs
-2. NO git push/commit after fixes until re-judgment completes
-3. NO session summary/"done" until all JDs terminal (APPROVED/ESCALATED)
-4. After Fix Agent → IMMEDIATELY re-launch judges
-5. Multiple JDs independent — completion of one doesn't skip rounds on others
+Any NO → go back, complete step.
 
-## Self-Check (before terminal action)
-1. List every active JD target
-2. Each APPROVED or ESCALATED?
-3. Any JD with fixes → did Round 2 run?
-4. Round 2 found issues → asked user? Respected answer?
-
-Any "no" → go back, complete step.
-
-## Rules
-- Orchestrator NEVER reviews — only launches judges, reads results, synthesizes
-- Judges: `delegate` (async, parallel)
+## RULES
+- Orchestrator NEVER reviews —ONLY coordinates
+- Judges: delegate (async, parallel)
 - Fix Agent: separate delegation
-- Custom criteria → include in BOTH judges
-- Unclear scope → ask before launching
-- After 2 iterations → ASK user, never auto-escalate
-- Wait for BOTH judges before synthesizing
-
-## Commands
-Pure orchestration — `delegate()` + `delegation_read()` only.
+- Unclear scope → ask before launch
+- After 2 → ASK user, never auto-escalate
+- Wait BOTH before synthesizing
