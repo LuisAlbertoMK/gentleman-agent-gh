@@ -6,11 +6,11 @@ description: >
 license: Apache-2.0
 metadata:
   author: gentleman-programming
-  version: "1.0"
+  version: "1.1"
 ---
 
 ## When
-After new skill created · After skill modified · Pre-critical-task verification · Periodic active skill checks
+After skill created/modified · Pre-critical-task · Periodic checks
 
 ## Framework
 ```
@@ -18,77 +18,55 @@ Test → Verify → Score → Approve/Reject
 ```
 
 ## Test Types
-**1. Syntax:** frontmatter complete · Header structure correct · Assets exist · Triggers unique/clear
-**2. Coverage:** primary use case · domain edge cases · basic templates · anti-patterns documented
-**3. Integration:** Load skill via trigger → Apply to test case → Verify correct output
-**4. Tokens:** Avg prompt < X tokens · Longest template < Y tokens · Decision tree legible
+| Type | What | Example |
+|------|------|---------|
+| Syntax | Frontmatter, headers, triggers | `name:` present? headers match? |
+| Coverage | Use cases, edge cases, anti-patterns | All states handled? |
+| Integration | Load → apply → verify output | Trigger matches? output correct? |
+| Tokens | Within budget | Avg prompt <N, longest <M |
 
-## Checklist by Type
+## Checklist
 ### Prompt Skill
-□ Frontmatter complete □ Method/framework documented □ Templates per use case
-□ Anti-patterns □ Concrete examples □ Resources linked □ Triggers clear
+Frontmatter? □ Method documented? □ Templates per case? □ Anti-patterns? □ Examples? □ Resources? □ Triggers clear?
 
 ### Workflow Skill
-□ Sequential steps clear □ Decisions documented □ Error handling
-□ Example commands □ Test cases
+Steps sequential? □ Decisions documented? □ Error handling? □ Example commands? □
 
 ### Template Skill
-□ Complete structure □ Clear placeholders □ Usage examples □ Variations documented
+Complete structure? □ Clear placeholders? □ Usage examples? □ Variations? □
 
 ## Test Case Template
-```markdown
+```
 ## Test Case: [name]
-**Skill**: [name] | **Trigger**: [condition]
-**Input**: [test input]
-**Expected**: [expected output]
-**Actual**: [real output]
-**Result**: ✅ PASS / ❌ FAIL
-**Notes**: [observations]
+**Skill**: [n] | **Trigger**: [c]
+**Input**: [i] | **Expected**: [e] | **Actual**: [a]
+**Result**: ✅/❌ | **Notes**: [obs]
 ```
 
 ## Scoring
-| Criteria | Weight | Score |
-|----------|--------|-------|
-| Syntax | 20% | X/10 |
-| Coverage | 30% | X/10 |
-| Integration | 30% | X/10 |
-| Usability | 20% | X/10 |
-| **TOTAL** | 100% | X/10 |
+| Criteria | Weight |
+|----------|--------|
+| Syntax | 20% |
+| Coverage | 30% |
+| Integration | 30% |
+| Usability | 20% |
 
-**Thresholds:** 9-10: ✅ Production | 7-8: ⚠️ Needs improvement | <7: ❌ Do not use
+Thresholds: 9-10 ✅ Production · 7-8 ⚠️ Needs work · <7 ❌ Reject
 
-## Default Test Cases
-### All skills
-1. Syntax: frontmatter parsing
-2. Structure: required sections exist
-3. Links: referenced assets exist
-4. Triggers: clear and unique
-5. Format: valid markdown
+## Default Cases
+### Universal
+1. Syntax parsing 2. Required sections 3. Linked assets exist 4. Triggers unique 5. Valid markdown
 
 ### Prompt skills (+)
-6. Token budget: templates under limit
-7. Templates: ≥3 examples
-8. Anti-patterns: documented
-9. Decision tree: if applicable
+6. Token budget 7. ≥3 templates 8. Anti-patterns 9. Decision tree
 
 ### Workflow skills (+)
-6. Steps: sequential and clear
-7. Errors: handled explicitly
-8. Commands: executable
-9. Examples: ≥1
+6. Sequential steps 7. Error handling 8. Executable commands 9. ≥1 example
 
 ## Report Template
-```markdown
+```
 ## Skill Test Report
-**Skill**: [name] | **Date**: [ISO] | **Version**: [v1.X]
-### Results
-| Test | Status | Notes |
-| Syntax | ✅ | |
-### Coverage Matrix
-| Required | Covered | Missing |
-| [item] | ✅/❌ | [if missing] |
-### Recommendations
-- [rec 1]
-### Verdict
-✅ APPROVED / ⚠️ NEEDS WORK / ❌ REJECTED
+**Skill**: [n] | **Date**: [d] | **Version**: [v]
+### Results | Test | Status | Notes |
+### Verdict: ✅ APPROVED / ⚠️ NEEDS WORK / ❌ REJECTED
 ```

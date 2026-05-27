@@ -6,89 +6,62 @@ description: >
 license: Apache-2.0
 metadata:
   author: gentleman-programming
-  version: "1.0"
+  version: "1.1"
 ---
 
 ## When
 Pattern repeated + AI needs guidance · Project-specific conventions · Complex workflows · Decision trees needed
 
-**Don't create:** Documentation exists (reference instead) · Trivial pattern · One-off task
+**Don't create:** Docs exist (reference instead) · Trivial pattern · One-off task
 
 ## Structure
 ```
-skills/{skill-name}/
+skills/{name}/
 ├── SKILL.md          # Required
-├── assets/           # Optional: templates, schemas, examples
-└── references/       # Optional: links to local docs
+├── assets/           # Templates, schemas, examples
+└── references/       # Local doc links
 ```
 
 ## SKILL.md Template
 ```markdown
 ---
-name: {skill-name}
+name: {name}
 description: >
-  {One-line what it does}. Trigger: {When to load}.
+  {One-line}. Trigger: {when}.
 license: Apache-2.0
-metadata:
-  author: gentleman-programming
-  version: "1.0"
+metadata: author: gentleman-programming, version: "1.0"
 ---
 
-## When to Use
-{When to use}
+## When
+{when}
 
 ## Critical Patterns
-{Most important rules — what AI MUST know}
+{Must-know rules}
 
-## Code Examples
-{Minimal, focused}
-
-## Commands
-```bash
-{Common commands}
-```
+## Components
+{Minimal examples}
 
 ## Resources
-- **Templates**: [assets/](assets/) for {description}
-- **Docs**: [references/](references/) for local docs
+- **Assets**: [assets/](assets/)
+- **Docs**: [references/](references/)
 ```
 
 ## Naming
-| Type | Pattern | Examples |
-|------|---------|----------|
-| Generic | `{technology}` | `pytest`, `typescript` |
-| Project-specific | `{project}-{component}` | `myapp-api` |
-| Testing | `{project}-test-{component}` | `myapp-test-sdk` |
-| Workflow | `{action}-{target}` | `skill-creator` |
+| Pattern | Example |
+|---------|---------|
+| `{tech}` | `pytest`, `typescript` |
+| `{project}-{component}` | `myapp-api` |
+| `{action}-{target}` | `skill-creator` |
 
-## Frontmatter
-| Field | Required | Description |
-|-------|----------|-------------|
-| `name` | Yes | Lowercase, hyphens |
-| `description` | Yes | What + Trigger |
-| `license` | Yes | `Apache-2.0` |
-| `metadata.author` | Yes | `gentleman-programming` |
-| `metadata.version` | Yes | Semver as string |
-
-## Content Guidelines
-**DO:** Critical patterns first · Tables for decision trees · Minimal examples · Commands section
-**DON'T:** Keywords section · Duplicate docs · Lengthy explanations · Troubleshooting · Web URLs in references
-
-## assets/ vs references/
-Templates/schemas/configs → assets/ · Link to existing docs → references/ (local paths only)
+## Content Rules
+**DO:** Critical patterns first · Tables for decisions · Minimal examples · Commands section
+**DON'T:** Keywords · Duplicate docs · Verbose explanations · Web URLs
 
 ## Register
-Add to `AGENTS.md`:
-```markdown
-| `{skill-name}` | {Description} | [SKILL.md](skills/{skill-name}/SKILL.md) |
+Add to AGENTS.md:
+```
+| `{name}` | {desc} | [SKILL.md](skills/{name}/SKILL.md) |
 ```
 
 ## Checklist
-- [ ] Skill doesn't already exist
-- [ ] Pattern is reusable (not one-off)
-- [ ] Name follows conventions
-- [ ] Frontmatter complete (description includes triggers)
-- [ ] Critical patterns clear
-- [ ] Examples minimal
-- [ ] Commands section exists
-- [ ] Added to AGENTS.md
+Before creating: skill doesn't exist? reusable? name follows convention? frontmatter complete? critical patterns clear? examples minimal? commands exist? AGENTS.md updated?
