@@ -1,25 +1,24 @@
-# ROADMAP v2: Nuevos Gaps
+# ROADMAP v3: Estado Actual
 
-## GAPS IDENTIFICADOS
+## COMPLETADO
 
-| Gap | Estado | Priority |
-|-----|--------|----------|
-| lean-context/lean-context/ duplicado | 🔲 Pendiente | Alta |
-| skills/ directorio vacío | 🔲 Pendiente | Baja |
+| Feature | Commit | Description |
+|---------|--------|-------------|
+| 5 runtime skills | `75b7e09` | quality-gate, context-watchdog, decision-capture, recovery-protocol, pr-evidence |
+| lean-context duplicado | `0920509` | Moved lean-context/SKILL.md to root, removed nested dir |
+| skills/ vacío | `57072bb` | Removed empty skills/ directory |
+| Karpathy Loop I2 | `389b406` | -79.8% total token reduction (8,223 tokens) |
+| Karpathy Loop I1 | `3b8d54e` | -50.5% tokens across all 26 skills |
+
+## PRÓXIMOS (ideas)
+
+| Gap | Prioridad | Notas |
+|-----|-----------|-------|
+| README actualizado | ✅ Hecho | v3 con todos los skills |
+| skill-registry integrado | Media | Auto-descubrimiento de skills disponibles |
+| CI/CD para skills | Baja | GitHub Actions que valide SKILL.md consistency |
+| cross-references automaticas | Baja | Script que verifique que todos los ../ apunten bien |
 
 ---
 
-## IMPLEMENTACIÓN
-
-### 1. Mover lean-context/SKILL.md
-
-- [ ] Mover lean-context/lean-context/SKILL.md → lean-context/SKILL.md
-- [ ] Eliminar lean-context/lean-context/
-
-### 2. Limpiar directorio skills/
-
-- [ ] Eliminar skills/ (vacío)
-
----
-
-*Generado: 2026-04-28*
+*Generado: 2026-05-26*

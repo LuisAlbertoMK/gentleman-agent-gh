@@ -52,20 +52,45 @@ When you detect any of these contexts, IMMEDIATELY load the corresponding skill 
 
 | Context | Skill to load |
 | ------- | ------------- |
-| Go tests, Bubbletea TUI testing | go-testing |
-| Creating new AI skills | skill-creator |
+| **Prompting** | |
 | Método Karpathy, menos tokens, LLM Wiki, context compilation | karpathy-prompt |
 | Mejorar prompt, gaps, seguridad, escalabilidad, ReAct, multi-agent | prompt-engineering |
+| Karpathy loop, optimizar prompt, medir tokens, recortar repetir | karpathy-loop |
+| Ultra-compressed comms, caveman, /caveman | caveman |
+| Ultra-lean default, compact responses | lean-context |
+| **Self-Improvement** | |
 | Continuá, donde quedamos, recordá código, memoria proyecto | code-memory |
 | Reflexión, mejora continua, auto-corrección, detectar errores propios | self-reflection |
-| Karpathy loop, optimizar prompt, medir tokens, recortar repetir | karpathy-loop |
 | Test skill, verificar skill, coverage | skill-testing |
+| Dual adversarial review, judgment day, juzgar | judgment-day |
+| **Engineering** | |
 | Senior engineer, architect, trade-offs, system design, delegation | senior-engineer |
-| **Pre-commit, git commit, tests before commit, secrets scan, conventional commit** | **quality-gate** |
-| **Context explosion, >100K tokens, contexto grande, compression, session break** | **context-watchdog** |
-| **Decision técnica, arquitectura, trade-off, elegir librería, voy a usar X** | **decision-capture** |
-| **Error del agente, corrección, "no es eso", frustración, recovery, "wrong"** | **recovery-protocol** |
-| **PR con evidencia SDD, attach tests to PR, verificación en PR** | **pr-evidence** |
+| Go tests, Bubbletea TUI testing | go-testing |
+| Creating new AI skills | skill-creator |
+| Skill registry, catalog skills, list skills | skill-registry |
+| **Quality & Safety** | |
+| Pre-commit, git commit, tests before commit, secrets scan, conventional commit | quality-gate |
+| Context explosion, >100K tokens, contexto grande, compression, session break | context-watchdog |
+| Error del agente, corrección, "no es eso", frustración, recovery, "wrong" | recovery-protocol |
+| **SDD Cycle — Init** | |
+| SDD init, bootstrap project, spec-driven setup | sdd-init |
+| Explore codebase, investigate code, pre-design analysis | sdd-explore |
+| **SDD Cycle — Design** | |
+| Proposal, intent, scope, approach, change proposal | sdd-propose |
+| Write specs, requirements, scenarios, acceptance criteria | sdd-spec |
+| Technical design, architecture decisions, HOW | sdd-design |
+| Task breakdown, actionable steps, implementation plan | sdd-tasks |
+| **SDD Cycle — Implementation** | |
+| Apply tasks, implement code, write per specs | sdd-apply |
+| Validate implementation, verify against specs, quality gate | sdd-verify |
+| Archive changes, delta to main, persist artifacts | sdd-archive |
+| Guided SDD walkthrough, full cycle | sdd-onboard |
+| **PR & Workflow** | |
+| PR creation, issue-first, abrir PR, crear pull request | branch-pr |
+| PR con evidencia SDD, attach tests to PR, verificación en PR | pr-evidence |
+| Issue creation, issue-first workflow, crear issue | issue-creation |
+| **Decisions** | |
+| Decision técnica, arquitectura, trade-off, elegir librería, voy a usar X | decision-capture |
 
 Load skills BEFORE writing code. Apply ALL patterns. Multiple skills can apply simultaneously.
 <!-- /gentle-ai:persona -->
