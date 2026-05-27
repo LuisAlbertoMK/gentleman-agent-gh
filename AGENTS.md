@@ -61,6 +61,11 @@ When you detect any of these contexts, IMMEDIATELY load the corresponding skill 
 | Karpathy loop, optimizar prompt, medir tokens, recortar repetir | karpathy-loop |
 | Test skill, verificar skill, coverage | skill-testing |
 | Senior engineer, architect, trade-offs, system design, delegation | senior-engineer |
+| **Pre-commit, git commit, tests before commit, secrets scan, conventional commit** | **quality-gate** |
+| **Context explosion, >100K tokens, contexto grande, compression, session break** | **context-watchdog** |
+| **Decision técnica, arquitectura, trade-off, elegir librería, voy a usar X** | **decision-capture** |
+| **Error del agente, corrección, "no es eso", frustración, recovery, "wrong"** | **recovery-protocol** |
+| **PR con evidencia SDD, attach tests to PR, verificación en PR** | **pr-evidence** |
 
 Load skills BEFORE writing code. Apply ALL patterns. Multiple skills can apply simultaneously.
 <!-- /gentle-ai:persona -->
