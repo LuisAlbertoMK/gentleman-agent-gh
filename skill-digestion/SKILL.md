@@ -1,53 +1,34 @@
 ---
 name: skill-digestion
-description: > Compact skills on load + audit which skills resolve and their effectiveness.
-  Trigger: Loading skills, after task completion, "qué skills usaste", skill audit.
+description: > Compact skills on load + audit skill resolution effectiveness.
+  Trigger: Loading skills, after task completion, skill audit.
 license: Apache-2.0
 metadata: author: gentleman-programming, version: "1.0"
 ---
 
-## SKILL DIGESTION (compact on load)
+## DIGEST ON LOAD
+Extract only what's needed. Skip background/examples when context is tight.
 
-When loading a skill, extract ONLY what's needed — don't load the full skill into context.
+| Context | Load strategy |
+|---------|--------------|
+| <60% | Full skill |
+| 60-80% (YELLOW) | Rules + decision tree only |
+| >80% (RED) | 1-line summary + critical rules |
 
-### How to digest
-1. Match skill description to current task context
-2. Load only: **Critical Patterns** + **Decision Tree** + **Commands** (skip background, examples, philosophy)
-3. If skill has no explicit decision tree → extract the core rules only
-4. If token budget is tight → load only the Rules/Patterns section
+**How**: match skill→context → load Critical Patterns + Decision Tree + Commands.
 
-### Token preservation rules
-| If context is... | Load strategy |
-|-----------------|---------------|
-| <60% window | Load full skill |
-| 60-80% (YELLOW) | Load only: rules + decision tree (skip examples/background) |
-| >80% (RED) | Load only: 1-line summary + critical rules |
-
-## SKILL RESOLUTION FEEDBACK (audit)
-
-After completing a task, track which skills were loaded and their effectiveness.
-
-### Log format (Engram)
+## RESOLUTION FEEDBACK (post-task)
+Log to Engram after task if skill was loaded:
 ```
-title: "Skill resolution: {skill-name}"
+title: "Skill resolution: {name}"
 type: learning
-content:
-  **Skill**: {name}
-  **Trigger**: {context that loaded it}
-  **Applied**: YES/NO
-  **Effective**: YES/PARTIAL/NO
-  **Notes**: what worked, what didn't, what was missing
+content: Skill | Trigger | Applied(Y/N) | Effective(Y/P/N) | Notes
 ```
 
-### When to log
-- After task completion if a skill was loaded
-- When a skill was NOT helpful (indicates gap)
-- When you had to work around missing instructions (indicates need for new skill)
-
-### Auto-improvement triggers
+## AUTO-IMPROVEMENT TRIGGERS
 | Signal | Action |
 |--------|--------|
-| Skill loaded but NOT applied | Review trigger — too broad? |
-| Skill applied but NOT effective | Update skill with better patterns |
-| Had to improvise missing guidance | Create new skill |
-| Same skill loaded 3+ times in session | Flag as heavy — consider digesting more aggressively |
+| Loaded but NOT applied | Trigger too broad? narrow it |
+| Applied but NOT effective | Update skill patterns |
+| Improvised missing guidance | Create new skill |
+| Same skill loaded 3+ times | Flag heavy — digest more |

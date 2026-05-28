@@ -1,25 +1,36 @@
 ---
 name: code-memory
-description: > Persist code state between sessions (".agent-state.json").
-  Trigger: "continuá", "donde quedamos", multi-session state.
+description: > Persist code state between sessions + session handoff for continuity.
+  Trigger: "continuá", "donde quedamos", multi-session, session end, handoff.
 license: Apache-2.0
-metadata: author: mk, version: "1.0"
+metadata: author: gentleman-programming, version: "1.1"
 ---
 
-## WHEN
-Continue prior work · Exact code recovery · "Dónde quedamos"
+## SESSION HANDOFF (continuity)
+Before session end, save EXACT state so next session resumes without re-explaining.
 
-## STATE FILE
+### Handoff captures
+- **Current task**: what, why, where (files), status (blocked/ready/done)
+- **Next step**: exact next action (file:line, what to do)
+- **Context**: decisions made, rejected approaches, user preferences
+- **Open questions**: unresolved items for next session
+- **Files touched**: paths + what changed + pending changes
+
+### State format
 ```json
-{session_id,last_update,project:{name/path/lang/framework},
-files:[{path,status,summary,key_sections}],
-todos:[{id,description,status}],ctx:{current_task,next_step,recent_changes}}
+{session_id, last_update,
+ task:{description,status,blockers},
+ next_step:{file,action},
+ ctx:{decisions:[],preferences:[],rejected:[]},
+ files:[{path,status,summary}],
+ todos:[{id,desc,status}]}
 ```
 
 ## WORKFLOW
-Start: find .agent-state.json → load+show | new→create
-During: detect changes→update|sync todos
-End: save full state→pending questions→next step
+- **Start**: find agent-state → load + show handoff | new → create
+- **During**: detect changes → update state
+- **End**: save full state → handoff summary → next step
+- **Session resumption**: present handoff automatically before work
 
-## AUTO-SAVE
-file created/deleted · >20 line change · func completed · discovery · important Q
+## AUTO-SAVE TRIGGERS
+file created/deleted · >20 line change · discovery · important question · decision made

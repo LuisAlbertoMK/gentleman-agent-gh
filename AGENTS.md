@@ -101,6 +101,8 @@ When detecting these contexts, load skill BEFORE writing code:
 | SDD phase contracts, artifact dependencies, shared grammar | sdd-contracts |
 | Skill digestion, compact on load, resolution audit | skill-digestion |
 | Delivery harness, review workload, delivery strategy | delivery-harness |
+| Subagent isolation, context boundaries, clean delegation | subagent-isolation |
+| Command wrapper, error handling, output parsing | command-wrapper |
 
 Load skills BEFORE code. Apply ALL patterns. Multiple skills can apply.
 <!-- /gentle-ai:persona -->
