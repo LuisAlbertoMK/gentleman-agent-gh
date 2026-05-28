@@ -103,6 +103,8 @@ When detecting these contexts, load skill BEFORE writing code:
 | Delivery harness, review workload, delivery strategy | delivery-harness |
 | Subagent isolation, context boundaries, clean delegation | subagent-isolation |
 | Command wrapper, error handling, output parsing | command-wrapper |
+| Skill refresher, drift detection, auto-heal | skill-refresher |
+| CI/CD pipeline, GitHub Actions, quality gate | ci-cd |
 
 Load skills BEFORE code. Apply ALL patterns. Multiple skills can apply.
 <!-- /gentle-ai:persona -->
