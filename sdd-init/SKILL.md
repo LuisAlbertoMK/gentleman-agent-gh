@@ -3,49 +3,49 @@ name: sdd-init
 description: > Initialize SDD: detect stack/testing, bootstrap persistence.
   Trigger: "sdd init", "openspec init".
 license: MIT
-metadata: author: gentleman-programming, version: "3.0"
+metadata: author: gentleman-programming, version: "3.1"
 ---
 
-## CONTEXT
-- Detect: package.json/go.mod/pyproject.toml, CI/linters, arch patterns
-- Test runner: package.json→vitest/jest, go.mod→go test, pyproject.toml→pytest
-- Layers: Unit/Integration/E2E · Coverage: vitest--coverage/pytest-cov/go test -cover
-- Quality: eslint/ruff/golangci-lint (linter), tsc/mypy/go vet (types), prettier/black (format)
+## Context Detection
+- Stack: package.json/go.mod/pyproject.toml
+- Test runner: vitest/jest/go test/pytest
+- Layers: Unit/Integration/E2E · Coverage: --coverage/-cover/pytest-cov
+- Quality: eslint/ruff/golangci-lint (lint) · tsc/mypy/go vet (types) · prettier/black (fmt)
 
-## TDD MODE
-Priority: (1) system prompt `strict-tdd-mode` marker, (2) openspec/config.yaml, (3) test runner?→true, (4) no runner→false
+## TDD Mode
+Priority: (1) system prompt `strict-tdd-mode` marker → (2) openspec/config.yaml → (3) runner exists?→true → (4) no runner→false
 
-## FILES (openspec)
+## Files (openspec)
 ```
 openspec/
-├── config.yaml        ← project SDD config
+├── config.yaml       ← project SDD config
 ├── specs/           ← source of truth
-└── changes/archive/  ← completed
+└── changes/archive/ ← completed
 ```
 
-## CONFIG
+## Config
 ```yaml
 schema: spec-driven
-context: | Tech {stack} | Arch {patterns} | Testing {framework} | Style {lint}
+context: Tech {stack} | Arch {patterns} | Test {framework} | Style {lint}
 strict_tdd: {true/false}
 rules:
   proposal: [rollback, affected modules]
   specs: [Given/When/Then, RFC 2119]
   design: [seq diagrams, ADR]
-  tasks: [phase grouping, hierarchical, 1-session]
+  tasks: [phase grouping, 1-session]
   apply: [existing patterns, load skills]
-  verify: [run tests, compare vs specs]
+  verify: [run tests, compare specs]
   archive: [warn destructive]
 ```
 
-## SKILL REGISTRY
-Scan: ~/.config/opencode/skills/*/, ~/.claude/skills/, projectskills/
+## Skill Registry
+Scan: ~/.config/opencode/skills/*/, ~/.claude/skills/, project skills/
 Skip: sdd-*, _shared, skill-registry
-Write: `.atl/skill-registry.md` + `mem_save` to engram
+Write: `.atl/skill-registry.md` + `mem_save`
 
-## STEPS
+## Steps
 1. Detect ctx → stack, conventions, testing
-2. TDD mode → resolve per priority chain
+2. TDD mode → resolve per priority
 3. Init dirs (openspec mode)
 4. Generate config
 5. Persist testing capabilities → engram/config.yaml
@@ -53,12 +53,10 @@ Write: `.atl/skill-registry.md` + `mem_save` to engram
 7. Persist project ctx → engram/config
 8. Return summary
 
-## RETURN
+## Return
 ```
-SDD INIT
-Project: {name} | Stack: {detected} | Mode: {engram/openspec/hybrid/none}
-Strict TDD: {enabled/disabled/unavailable}
-Caps: {table of test runner, layers, coverage, quality tools}
-Saved: {engram IDs / file paths}
+SDD INIT | Project: {name} | Stack: {detected} | Mode: {engram/openspec/hybrid/none}
+Strict TDD: {enabled/disabled}
+Caps: {runner, layers, coverage, quality tools}
+Saved: {engram IDs / paths}
 ```
-ENT: engram-only=no openspec/ | openspec=write dirs | hybrid=both | none=no file ops

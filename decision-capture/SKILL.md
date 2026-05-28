@@ -1,48 +1,65 @@
 ---
 name: decision-capture
-description: >
-  Proactive architecture/design decision logging to Engram. Auto-triggers when agent makes a technical choice.
+description: > Proactive architecture/design decision logging to Engram. Auto-triggers when agent makes a technical choice.
   Trigger: "voy a usar", "decido", "la mejor opción", trade-off analysis, architecture choice, pattern selection.
 license: Apache-2.0
-metadata:
-  author: gentleman-programming
-  version: "1.1"
+metadata: author: gentleman-programming, version: "1.1"
 ---
 
 ## When
-Library/tool choice · Architecture decision · Trade-off eval · Pattern selection · Structure change · Any decision w/ alternatives
+Choosing library/framework · Architecture decision · Trade-off evaluation · Pattern selection · Structure change · Any decision with alternatives
 
-## Mandatory Capture
-ANY technical decision MUST call `mem_save` BEFORE continuing:
-- Lib selection · Architecture pattern · DB/storage choice · API design (REST vs GraphQL) · Test approach · Config/env setup · Project structure · Naming conventions
+## Rules
 
-## Capture Format
+### 1. Automatic Capture — EVERY technical decision logged
+MUST call `mem_save` BEFORE continuing for:
+- Library/tool selection
+- Architecture pattern (hexagonal/clean/microservices)
+- DB schema/storage choice
+- API design (REST vs GraphQL)
+- Testing approach
+- Config/env setup
+- Project structure/naming
+
+### 2. Format — mandatory structure
 ```
 title: "{Verb} {what} — {context}"
 type: decision
 content:
-  **What**: [one sentence]
-  **Why**: [problem + trade-offs]
-  **Options considered**: [max 3 alternatives]
+  **What**: [one sentence — decided]
+  **Why**: [problem solved, trade-offs]
+  **Options considered**: [alternatives, max 3]
   **Chosen**: [selected + why it won]
-  **Where affected**: [files/dirs/systems]
+  **Where affected**: [files/dirs impacted]
   **Learned**: [gotchas, caveats]
 ```
 
-## Retroactive Capture
-Previous decision NOT logged → capture BEFORE making dependent decisions. Mark `type: decision` w/ "retroactive" note.
+### 3. Retroactive Capture
+Past decision not logged? Capture before making NEW dependent decisions. Mark `type: decision` with "retroactive" note.
 
-## Session-end Check
-Before ending: `mem_search(type="decision")` → all captured? If missing → retroactive.
+### 4. Session-end Check
+Before ending session: were decisions made? ALL captured? If missing → capture now.
 
 ## Decision Tree
 ```
-About to decide:
-├── Decision w/ alternatives?
-│   ├── YES → mem_save BEFORE proceeding
-│   └── NO → trivial (var name) → skip
-├── Similar decision already logged this session?
-│   ├── YES → context changed? → update existing
-│   └── NO → fresh capture
-└── Session end → verify all captured
+Making technical choice:
+├── Decision with alternatives? → YES: mem_save | NO: skip (trivial)
+├── Similar decision logged this session? → YES: update existing | NO: new
+└── Session end → check journal → missing? → capture retroactively
+```
+
+## Examples
+```
+✅ title: "Chose SQLite over PostgreSQL for local agent memory"
+   Why: zero infra, single-file, no pool. Options: PG(overkill), SQLite(fits), BoltDB(less ecosystem)
+   Chosen: SQLite — best ecosystem, FTS5, Go drivers
+
+❌ title: "Used SQLite" | Why: "it's fine" — NO trade-offs, NO context
+```
+
+## Commands
+```bash
+mem_save(title="Chose {X} over {Y}", type="decision",
+  content="**What**: ...\n**Why**: ...\n**Options**: ...\n**Chosen**: ...\n**Where**: ...\n**Learned**: ...")
+# Session-end: mem_search(type="decision") → verify all captured
 ```
