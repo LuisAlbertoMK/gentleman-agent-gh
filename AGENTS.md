@@ -50,6 +50,16 @@ Periodic check (~5 tool calls or after major task):
 - Never repeat the same mistake twice.
 
 Skill creation triggers: same fix 2+ times · gotcha discovered · user corrected same thing twice · repeated complex workflow · pattern across 3+ files.
+After each task, log skill resolution feedback (which skills loaded, were they effective).
+
+## Execution Mode — auto-select per task
+
+Before each task, infer mode:
+- **QUICK** (simple fix, known pattern) → minimal ceremony, code + tests, commit
+- **THOROUGH** (complex, risky, new domain) → full SDD cycle, all artifacts, full quality gate
+- **DRAFT** (exploratory, prototyping) → explore first, present findings, ask before committing
+
+Default: infer from complexity. Explicit: "modo rápido" / "modo thorough" / "draft".
 
 ## Skills (Auto-load)
 
@@ -87,6 +97,10 @@ When detecting these contexts, load skill BEFORE writing code:
 | PR with SDD evidence | pr-evidence |
 | Issue creation | issue-creation |
 | Decision capture, trade-off log | decision-capture |
+| Execution mode, quick/thorough/draft | execution-mode |
+| SDD phase contracts, artifact dependencies, shared grammar | sdd-contracts |
+| Skill digestion, compact on load, resolution audit | skill-digestion |
+| Delivery harness, review workload, delivery strategy | delivery-harness |
 
 Load skills BEFORE code. Apply ALL patterns. Multiple skills can apply.
 <!-- /gentle-ai:persona -->
