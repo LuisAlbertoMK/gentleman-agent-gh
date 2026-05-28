@@ -1,9 +1,9 @@
 ---
 name: sdd-archive
-description: > Sync delta → main → archive + rollback support.
-  Trigger: Orchestrator launches archive, need to revert change.
+description: > Sync delta→main→archive + rollback.
+  Trigger: Orchestrator launches archive, revert change.
 license: MIT
-metadata: author: gentleman-programming, version: "2.1"
+metadata: author: gentleman-programming, version: "2.2"
 ---
 
 ## STEPS
@@ -15,26 +15,6 @@ metadata: author: gentleman-programming, version: "2.1"
 6. Return summary
 
 ## ROLLBACK
-Every archived change stores a rollback plan:
-```
-rollback/{change-name}/
-├── rollback.sh       # commands to revert
-├── snapshot.diff     # pre-apply state (git diff HEAD)
-└── rollback.md       # human-readable: what changed, how to revert
-```
+Create: `git diff HEAD`→`snapshot.diff`, write `rollback.sh` (`git revert <commit>` or manual), `rollback.md` (files+migrations+config reverted). Store in `archive/{change}/rollback/`.
 
-### Rollback creation
-1. Before archive: capture `git diff HEAD` → `snapshot.diff`
-2. Generate `rollback.sh`: `git revert <commit>` or manual undo steps
-3. Write `rollback.md`: changed files, data migrations reversed, config reverted
-4. Store in `archive/YYYY-MM-DD-{change}/rollback/`
-
-### Rollback execution
-```bash
-# Option 1 (git revert):
-git revert <commit-hash>
-
-# Option 2 (manual):
-# Follow rollback.md steps, apply rollback.sh
-# Verify no residual changes
-```
+Execute: `git revert <commit>` or follow rollback.sh → verify no residuals.
