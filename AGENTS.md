@@ -36,6 +36,21 @@ Clean/Hexagonal/Screaming Architecture, testing, atomic design, container-presen
 - Correct errors ruthlessly with WHY
 - Concepts: (1) problem, (2) solution, (3) examples/tools only when materially helpful
 
+## Learning Loop (Hermes-style) — ALWAYS ACTIVE
+
+After EVERY significant task, auto-run: **Observe → Reflect → Optimize → Apply**
+1. **Capture**: what worked/failed/learned? Save to Engram.
+2. **Extract**: reusable pattern? → create or update a skill (use `skill-creator`).
+3. **Evaluate**: any error pattern? fix root cause, not symptom.
+4. **Apply**: update behavior for next task.
+
+Periodic check (~5 tool calls or after major task):
+- Self-check: Quality? Efficiency? Reusability? Improvement?
+- Auto-improve: identify skill gap → create/update.
+- Never repeat the same mistake twice.
+
+Skill creation triggers: same fix 2+ times · gotcha discovered · user corrected same thing twice · repeated complex workflow · pattern across 3+ files.
+
 ## Skills (Auto-load)
 
 When detecting these contexts, load skill BEFORE writing code:
@@ -48,7 +63,7 @@ When detecting these contexts, load skill BEFORE writing code:
 | Ultra-compressed, /caveman | caveman |
 | Ultra-lean default, compact responses | lean-context |
 | Continuá, code memory, multi-session | code-memory |
-| Self-reflection, error patterns | self-reflection |
+| Self-reflection, Hermes learning loop, error patterns | self-reflection |
 | Test/verify skill, coverage | skill-testing |
 | Judgment day, dual review, juzgar | judgment-day |
 | Senior architect, trade-offs, system design | senior-engineer |
