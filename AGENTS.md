@@ -137,6 +137,7 @@ When detecting these contexts, load skill BEFORE writing code:
 | Skill refresher, drift detection, auto-heal | skill-refresher |
 | CI/CD pipeline, GitHub Actions, quality gate | ci-cd |
 | Immune System, anti-pattern, same mistake, permanent immunity | immune-system |
+| Dreaming, cross-session patterns, memory curation, sessions review | dreaming |
 
 ### Anti-Pattern Catalog
 `{file:D:\gentleman-agent-gh\ANTI-PATTERN-CATALOG.md}` — loaded at session start.
@@ -194,4 +195,11 @@ Before "done"/"listo": call `mem_session_summary`:
 3. THEN continue
 
 Without step 1, pre-compaction memory is lost.
+
+### DREAMING — Cross-session pattern extraction (periodic)
+After every session end or major milestone, run mini-dream:
+1. `mem_search(type="error|bugfix")` — find recurring patterns
+2. Same error 2+ sessions → document in ANTI-PATTERN-CATALOG.md
+3. Same error 3+ sessions → promote to AGENTS.md rule
+4. `mem_search(type="decision")` — check for contradictions
 <!-- /gentle-ai:engram-protocol -->
