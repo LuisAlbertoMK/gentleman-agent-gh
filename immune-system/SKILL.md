@@ -6,74 +6,64 @@ license: Apache-2.0
 metadata: author: gentleman-programming, version: "1.0"
 ---
 
-## Core Principle
-
-Every failure is an asset. Once documented → permanent immunity.
-
-Failure → Diagnose → Document → Immunize → Never repeat.
-
 ## Protocol
 
-### 1. DETECT — potential immunity event
-| Signal | What it means |
-|--------|---------------|
-| User says "ya te dije" | Prior context was lost — Engram miss |
-| Same error 2+ times | Pattern exists — needs documentation |
-| User corrects approach | Knowledge gap — document correct way |
-| Unexpected tool behavior | Tool/API quirk — document gotcha |
-| Failed approach that worked before | Context drift — something changed |
+Every failure = asset. Once documented → permanent immunity.
 
-### 2. DIAGNOSE — find root cause
-```
-Root cause categories:
-├── Context miss — didn't read/re-read Engram
-├── Pattern miss — applicable skill exists but wasn't loaded
-├── Knowledge gap — something the agent doesn't know
-├── Tool misuse — wrong params, missing args, wrong tool
-├── Hallucination — fabricated API, file, behavior
-├── Over-engineering — solved wrong problem
-└── Premature declaration — said "done" without evidence
-```
+### 1. DETECT — immunity event
+| Signal | Means |
+|--------|-------|
+| "ya te dije" | Engram miss — prior context lost |
+| Same error 2x | Pattern exists — needs doc |
+| User corrects approach | Knowledge gap — doc correct way |
+| Unexpected tool behavior | Tool/API quirk — doc gotcha |
 
-### 3. DOCUMENT — add to ANTI-PATTERN-CATALOG.md
-Entry format:
+### 2. DIAGNOSE — root cause
 ```
-## YYYY-MM-DD: Short title
-**Symptom**: What went wrong (1 sentence)
-**Root cause**: Why it happened
-**Fix**: What solved it
-**Prevention**: How to avoid (1 rule)
-**Files**: paths involved
+Context miss — didn't read Engram
+Pattern miss — skill exists, not loaded
+Knowledge gap — agent doesn't know
+Tool misuse — wrong params/tool
+Hallucination — fabricated API/file
+Over-engineering — wrong problem
+Premature declaration — "done" w/o evidence
 ```
 
-### 4. IMMUNIZE — update behavior
-- Pattern in ANTI-PATTERN-CATALOG.md = loaded at session start
-- If fix requires code/skill change → `mem_save` + update SKILL.md
-- If rule is general → add to AGENTS.md Rules section
+### 3. DOCUMENT → ANTI-PATTERN-CATALOG.md
+```
+## YYYY-MM-DD: title
+**Symptom**: 1 sentence
+**Root cause**: why
+**Fix**: what solved
+**Prevention**: 1 rule
+**Files**: paths
+```
 
-### 5. VERIFY — immunity confirmed
-Self-check: "Have I seen this before?" before executing similar task.
-If yes → apply prevention rule BEFORE starting.
+### 4. IMMUNIZE
+- Catalog entry = loaded at session start
+- Fix requires code/skill change → `mem_save` + update SKILL.md
+- General rule → AGENTS.md Rules
+
+### 5. VERIFY
+Pre-task: "Seen this before?" If yes → apply prevention BEFORE starting.
 
 ## Immunity Levels
-| Level | Meaning | Action |
-|-------|---------|--------|
-| 🟢 Session | Won't repeat in this session | In-memory rule |
-| 🔵 Skill | Pattern captured in SKILL.md | Auto-loaded when relevant |
-| 🟣 Catalog | In ANTI-PATTERN-CATALOG.md | Loaded at session start via AGENTS.md |
-| ⚫ AGENTS.md | In permanent persona | Always active, every session |
+| Level | Means | Action |
+|-------|-------|--------|
+| Session | In-memory rule | Won't repeat this session |
+| Skill | In SKILL.md | Auto-loaded when relevant |
+| Catalog | In ANTI-PATTERN-CATALOG.md | Loaded at session start |
+| AGENTS.md | In permanent persona | Always active |
 
 ## Workflow
 ```
-Error → STOP → Diagnose (which RC?) → Document (ANTI-PATTERN-CATALOG.md)
-→ Immunize (skill/AGENTS.md/mem_save) → Verify (prevention rule applied)
-→ Continue with corrected approach
+Error → STOP → Diagnose → Document (catalog) → Immunize (skill/AGENTS.md/mem_save) → Verify → Continue
 ```
 
 ## Anti-Patterns
 | ❌ Don't | ✅ Do |
 |----------|-------|
-| Silently retry same approach | Document failure first, then change approach |
-| Say "I'll remember next time" | Write it down in ANTI-PATTERN-CATALOG.md |
-| Fix symptom, not root cause | Trace to root cause category |
-| Only fix for current case | Generalize prevention rule |
+| Silent retry same approach | Document first, change approach |
+| "I'll remember next time" | Write it in catalog |
+| Fix symptom | Trace to root cause |
+| Only fix current case | Generalize prevention rule |
