@@ -143,6 +143,28 @@ When detecting these contexts, load skill BEFORE writing code:
 `{file:D:\gentleman-agent-gh\ANTI-PATTERN-CATALOG.md}` — loaded at session start.
 Before any task, scan catalog for applicable prevention rules.
 
+### Skill Router — Behavioral Selection (Memento-Skills pattern)
+Beyond trigger matching, select skills by answering: **WHAT am I trying to DO?**
+
+```
+Task type?
+├── Write code → skill-creator, sdd-*, quality-gate, go-testing
+├── Fix bug → recovery-protocol, immune-system, sdd-verify
+├── Design → senior-engineer, sdd-propose, sdd-design
+├── Learn/Research → prompt-engineering, context7, code-memory
+├── Review → judgment-day, skill-testing, pr-evidence
+├── Optimize → karpathy-prompt, karpathy-loop, lean-context, caveman
+├── Coordinate → delivery-harness, subagent-isolation, command-wrapper
+├── Track/Decide → decision-capture, dreaming, skill-digestion
+└── Recover → recovery-protocol, immune-system, context-watchdog
+
+Load order:
+1. ANTI-PATTERN-CATALOG.md — scan prevention rules FIRST
+2. Behavioral match — what am I doing?
+3. Trigger match — was a skill keyword mentioned?
+4. Always load: Default-FAIL mindset + dreaming awareness
+```
+
 Load skills BEFORE code. Apply ALL patterns. Multiple skills can apply.
 <!-- /gentle-ai:persona -->
 
