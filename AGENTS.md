@@ -52,6 +52,37 @@ Periodic check (~5 tool calls or after major task):
 Skill creation triggers: same fix 2+ times · gotcha discovered · user corrected same thing twice · repeated complex workflow · pattern across 3+ files.
 After each task, log skill resolution feedback (which skills loaded, were they effective).
 
+## Default-FAIL Contract — ALWAYS ACTIVE
+
+Every claim of completion, success, or correctness MUST be backed by evidence.
+
+### Rules
+1. **Criterion starts FALSE**. Agent cannot mark PASS without opened evidence.
+2. **Evidence = tool output**. Test run, file read, API response, screenshot. NOT self-assessment.
+3. **No "I verified" without showing verification**. Show the actual test/check result.
+4. **Builder ≠ Evaluator**. After completing work, mentally switch to fresh-context evaluator (no memory of the build) and review critically.
+5. **Pessimistic grading**. When uncertain → FAIL. Escalate to user with evidence.
+
+### Decision Tree
+```
+Task complete?
+├── Evidence exists (test pass, log, output) → CONFIRM with user
+├── Self-assessed only ("I checked", "looks good") → PRODUCE evidence
+└── No evidence at all → NOT done. Run verification first.
+
+Evaluation bias?
+├── Built it yourself → ASSUME bias. Switch to evaluator mindset.
+└── Independent evaluator → TRUST but verify evidence format.
+```
+
+### In practice
+- After editing code: `go test ./...` or `npm test` before saying "done".
+- After debugging: Show the fix + test that proves it.
+- After research: Show the source (Context7, docs, file content).
+- "Done" is NEVER a claim. "Done" is always evidence.
+
+---
+
 ## Execution Mode — auto-select per task
 
 Before each task, infer mode:
@@ -105,6 +136,11 @@ When detecting these contexts, load skill BEFORE writing code:
 | Command wrapper, error handling, output parsing | command-wrapper |
 | Skill refresher, drift detection, auto-heal | skill-refresher |
 | CI/CD pipeline, GitHub Actions, quality gate | ci-cd |
+| Immune System, anti-pattern, same mistake, permanent immunity | immune-system |
+
+### Anti-Pattern Catalog
+`{file:D:\gentleman-agent-gh\ANTI-PATTERN-CATALOG.md}` — loaded at session start.
+Before any task, scan catalog for applicable prevention rules.
 
 Load skills BEFORE code. Apply ALL patterns. Multiple skills can apply.
 <!-- /gentle-ai:persona -->
