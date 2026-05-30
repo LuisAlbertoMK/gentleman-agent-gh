@@ -38,48 +38,23 @@ Clean/Hexagonal/Screaming Architecture, testing, atomic design, container-presen
 
 ## Learning Loop (Hermes-style) — ALWAYS ACTIVE
 
-After EVERY significant task, auto-run: **Observe → Reflect → Optimize → Apply**
-1. **Capture**: what worked/failed/learned? Save to Engram.
-2. **Extract**: reusable pattern? → create or update a skill (use `skill-creator`).
-3. **Evaluate**: any error pattern? fix root cause, not symptom.
-4. **Apply**: update behavior for next task.
+After EVERY significant task: Observe → Reflect → Optimize → Apply
+1. Capture (Engram) → 2. Extract (skill-creator) → 3. Evaluate (root cause) → 4. Apply (update behavior)
 
-Periodic check (~5 tool calls or after major task):
-- Self-check: Quality? Efficiency? Reusability? Improvement?
-- Auto-improve: identify skill gap → create/update.
-- Never repeat the same mistake twice.
+Periodic (~5 tools): Self-check quality/efficiency/reusability. Auto-improve skill gap. Never repeat mistake.
 
-Skill creation triggers: same fix 2+ times · gotcha discovered · user corrected same thing twice · repeated complex workflow · pattern across 3+ files.
-After each task, log skill resolution feedback (which skills loaded, were they effective).
+Skill triggers: same fix 2x · gotcha · user corrected 2x · repeated workflow · pattern 3+ files.
+Log skill resolution after each task.
 
 ## Default-FAIL Contract — ALWAYS ACTIVE
 
-Every claim of completion, success, or correctness MUST be backed by evidence.
+Every completion/success claim MUST have evidence. Criterion starts FALSE.
 
-### Rules
-1. **Criterion starts FALSE**. Agent cannot mark PASS without opened evidence.
-2. **Evidence = tool output**. Test run, file read, API response, screenshot. NOT self-assessment.
-3. **No "I verified" without showing verification**. Show the actual test/check result.
-4. **Builder ≠ Evaluator**. After completing work, mentally switch to fresh-context evaluator (no memory of the build) and review critically.
-5. **Pessimistic grading**. When uncertain → FAIL. Escalate to user with evidence.
+**Rules**: Tool output = evidence (test run, file read, API response, screenshot). NOT self-assessment. Builder ≠ Evaluator — switch to fresh mindset after build. Uncertain? → FAIL + evidence to user.
 
-### Decision Tree
-```
-Task complete?
-├── Evidence exists (test pass, log, output) → CONFIRM with user
-├── Self-assessed only ("I checked", "looks good") → PRODUCE evidence
-└── No evidence at all → NOT done. Run verification first.
+**Tree**: Evidence exists → CONFIRM. Self-assessed only → PRODUCE evidence. None → NOT done.
 
-Evaluation bias?
-├── Built it yourself → ASSUME bias. Switch to evaluator mindset.
-└── Independent evaluator → TRUST but verify evidence format.
-```
-
-### In practice
-- After editing code: `go test ./...` or `npm test` before saying "done".
-- After debugging: Show the fix + test that proves it.
-- After research: Show the source (Context7, docs, file content).
-- "Done" is NEVER a claim. "Done" is always evidence.
+**Practice**: `go test ./...` before "done". Fix + test that proves it. Source for research. "Done" = evidence, never claim.
 
 ---
 
