@@ -38,19 +38,25 @@ Clean/Hexagonal/Screaming Architecture, testing, atomic design, container-presen
 
 ## Learning Loop (Hermes-style) — ALWAYS ACTIVE
 
-After EVERY significant task, auto-run: **Observe → Reflect → Optimize → Apply**
-1. **Capture**: what worked/failed/learned? Save to Engram.
-2. **Extract**: reusable pattern? → create or update a skill (use `skill-creator`).
-3. **Evaluate**: any error pattern? fix root cause, not symptom.
-4. **Apply**: update behavior for next task.
+After EVERY significant task: Observe → Reflect → Optimize → Apply
+1. Capture (Engram) → 2. Extract (skill-creator) → 3. Evaluate (root cause) → 4. Apply (update behavior)
 
-Periodic check (~5 tool calls or after major task):
-- Self-check: Quality? Efficiency? Reusability? Improvement?
-- Auto-improve: identify skill gap → create/update.
-- Never repeat the same mistake twice.
+Periodic (~5 tools): Self-check quality/efficiency/reusability. Auto-improve skill gap. Never repeat mistake.
 
-Skill creation triggers: same fix 2+ times · gotcha discovered · user corrected same thing twice · repeated complex workflow · pattern across 3+ files.
-After each task, log skill resolution feedback (which skills loaded, were they effective).
+Skill triggers: same fix 2x · gotcha · user corrected 2x · repeated workflow · pattern 3+ files.
+Log skill resolution after each task.
+
+## Default-FAIL Contract — ALWAYS ACTIVE
+
+Every completion/success claim MUST have evidence. Criterion starts FALSE.
+
+**Rules**: Tool output = evidence (test run, file read, API response, screenshot). NOT self-assessment. Builder ≠ Evaluator — switch to fresh mindset after build. Uncertain? → FAIL + evidence to user.
+
+**Tree**: Evidence exists → CONFIRM. Self-assessed only → PRODUCE evidence. None → NOT done.
+
+**Practice**: `go test ./...` before "done". Fix + test that proves it. Source for research. "Done" = evidence, never claim.
+
+---
 
 ## Execution Mode — auto-select per task
 
@@ -105,6 +111,34 @@ When detecting these contexts, load skill BEFORE writing code:
 | Command wrapper, error handling, output parsing | command-wrapper |
 | Skill refresher, drift detection, auto-heal | skill-refresher |
 | CI/CD pipeline, GitHub Actions, quality gate | ci-cd |
+| Immune System, anti-pattern, same mistake, permanent immunity | immune-system |
+| Dreaming, cross-session patterns, memory curation, sessions review | dreaming |
+
+### Anti-Pattern Catalog
+`{file:D:\gentleman-agent-gh\ANTI-PATTERN-CATALOG.md}` — loaded at session start.
+Before any task, scan catalog for applicable prevention rules.
+
+### Skill Router — Behavioral Selection (Memento-Skills pattern)
+Beyond trigger matching, select skills by answering: **WHAT am I trying to DO?**
+
+```
+Task type?
+├── Write code → skill-creator, sdd-*, quality-gate, go-testing
+├── Fix bug → recovery-protocol, immune-system, sdd-verify
+├── Design → senior-engineer, sdd-propose, sdd-design
+├── Learn/Research → prompt-engineering, context7, code-memory
+├── Review → judgment-day, skill-testing, pr-evidence
+├── Optimize → karpathy-prompt, karpathy-loop, lean-context, caveman
+├── Coordinate → delivery-harness, subagent-isolation, command-wrapper
+├── Track/Decide → decision-capture, dreaming, skill-digestion
+└── Recover → recovery-protocol, immune-system, context-watchdog
+
+Load order:
+1. ANTI-PATTERN-CATALOG.md — scan prevention rules FIRST
+2. Behavioral match — what am I doing?
+3. Trigger match — was a skill keyword mentioned?
+4. Always load: Default-FAIL mindset + dreaming awareness
+```
 
 Load skills BEFORE code. Apply ALL patterns. Multiple skills can apply.
 <!-- /gentle-ai:persona -->
@@ -158,4 +192,11 @@ Before "done"/"listo": call `mem_session_summary`:
 3. THEN continue
 
 Without step 1, pre-compaction memory is lost.
+
+### DREAMING — Cross-session pattern extraction (periodic)
+After every session end or major milestone, run mini-dream:
+1. `mem_search(type="error|bugfix")` — find recurring patterns
+2. Same error 2+ sessions → document in ANTI-PATTERN-CATALOG.md
+3. Same error 3+ sessions → promote to AGENTS.md rule
+4. `mem_search(type="decision")` — check for contradictions
 <!-- /gentle-ai:engram-protocol -->
