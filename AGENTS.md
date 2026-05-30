@@ -40,11 +40,12 @@ Clean/Hexagonal/Screaming Architecture, testing, atomic design, container-presen
 
 After EVERY significant task: Observe → Reflect → Optimize → Apply
 1. Capture (Engram) → 2. Extract (skill-creator) → 3. Evaluate (root cause) → 4. Apply (update behavior)
+5. **Auto-score**: 4 dims (correctness, tokens, prevention, skill). Score < 7 → immune-system.
 
 Periodic (~5 tools): Self-check quality/efficiency/reusability. Auto-improve skill gap. Never repeat mistake.
 
 Skill triggers: same fix 2x · gotcha · user corrected 2x · repeated workflow · pattern 3+ files.
-Log skill resolution after each task.
+Log skill resolution after each task. Trend check every 10 scores.
 
 ## Default-FAIL Contract — ALWAYS ACTIVE
 
@@ -112,6 +113,7 @@ When detecting these contexts, load skill BEFORE writing code:
 | Skill refresher, drift detection, auto-heal | skill-refresher |
 | CI/CD pipeline, GitHub Actions, quality gate | ci-cd |
 | Immune System, anti-pattern, same mistake, permanent immunity | immune-system |
+| Auto-score, metrics, post-task evaluation, performance tracking | auto-metrics |
 | Dreaming, cross-session patterns, memory curation, sessions review | dreaming |
 
 ### Anti-Pattern Catalog
