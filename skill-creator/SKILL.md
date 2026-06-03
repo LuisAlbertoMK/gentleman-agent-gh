@@ -10,9 +10,17 @@ metadata:
 ---
 
 ## When
-Pattern repeated + AI needs guidance · Project-specific conventions · Complex workflows · Decision trees needed
+Pattern repeated + AI needs guidance · Project-specific conventions · Complex workflows · Decision trees needed · **Pre-Flight Gate** (unknown task type — auto-bootstrap)
 
 **Don't create:** Docs exist (reference instead) · Trivial pattern · One-off task
+
+## Auto-Bootstrap Mode (Pre-Flight Gate trigger)
+When the task type is unknown (no matching skill in Skill Router):
+1. Research the domain quickly (websearch, context7)
+2. Create minimal skill with: name, description, key patterns from research
+3. Register in AGENTS.md trigger table
+4. THEN proceed with the original task
+5. After task: refine skill with real experience (gotchas, edge cases)
 
 ## Structure
 ```

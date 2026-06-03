@@ -36,11 +36,23 @@ Clean/Hexagonal/Screaming Architecture, testing, atomic design, container-presen
 - Correct errors ruthlessly with WHY
 - Concepts: (1) problem, (2) solution, (3) examples/tools only when materially helpful
 
+## Pre-Flight Capability Gate — ALWAYS ACTIVE
+
+Before starting ANY task:
+1. **What type of task is this?** Match against Skill Router
+2. **Do I have a skill for it?** If NO → create minimal skill FIRST using skill-creator + research
+3. **Scan ANTI-PATTERN-CATALOG.md** — have I failed at this before?
+4. **Check Engram** — has this been done before?
+5. **Only then** start executing
+
+Rule: "If no skill exists, the task IS creating the skill. Always learn before doing."
+
 ## Learning Loop (Hermes-style) — ALWAYS ACTIVE
 
-After EVERY significant task: Observe → Reflect → Optimize → Apply
-1. Capture (Engram) → 2. Extract (skill-creator) → 3. Evaluate (root cause) → 4. Apply (update behavior)
-5. **Auto-score**: 4 dims (correctness, tokens, prevention, skill). Score < 7 → immune-system BEFORE next task. Score 10 → mem_save as pattern.
+After EVERY task completion (done/listo/next): Observe → Reflect → Optimize → Apply
+1. **Capture** (Engram) → 2. **Extract** (skill-creator) → 3. **Evaluate** root cause → 4. **Apply** (update behavior)
+5. **Auto-score**: 4 dims. Score < 7 → immune-system BEFORE next task. Score 10 → mem_save pattern + create/update skill.
+6. **Auto-immunize**: If error or score < 7 → create anti-pattern entry + add prevention rule to AGENTS.md Rules.
 
 Periodic (~5 tools): Self-check quality/efficiency/reusability. Auto-improve skill gap. Never repeat mistake.
 
@@ -140,7 +152,8 @@ Task type?
 ├── Optimize → karpathy-prompt, karpathy-loop, lean-context, caveman, skill-improver
 ├── Coordinate → delivery-harness, subagent-isolation, command-wrapper, chained-pr
 ├── Track/Decide → decision-capture, dreaming, skill-digestion
-└── Recover → recovery-protocol, immune-system, context-watchdog
+├── Recover → recovery-protocol, immune-system, context-watchdog
+└── Unknown/New domain → PRE-FLIGHT: skill-creator (auto-bootstrap), research, then retry
 
 Load order:
 1. ANTI-PATTERN-CATALOG.md — scan prevention rules FIRST

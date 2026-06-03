@@ -8,13 +8,15 @@ metadata: author: gentleman-programming, version: "2.0"
 
 ## CLOSED LEARNING LOOP (Hermes-style)
 
-**Observe → Reflect → Optimize → Apply** — automatic after every significant task.
+**Observe → Reflect → Optimize → Apply** — automatic after EVERY task completion.
 
-### PER-TASK: After each significant completion
-1. **CAPTURE**: what worked? what failed? what non-obvious learning?
-2. **EXTRACT**: is this pattern reusable? → `skill-creator` or update existing SKILL.md
-3. **EVALUATE**: any error pattern? → fix root cause, not symptom
-4. **APPLY**: update behavior for next task (Engram save + skill patch)
+### PER-TASK: After EACH completion (done/listo/next)
+1. **CAPTURE**: what worked? what failed? what non-obvious learning? → Engram
+2. **EXTRACT**: reusable pattern? → `skill-creator` or update SKILL.md
+3. **EVALUATE**: root cause of any error → `immune-system` doc + prevention rule
+4. **APPLY**: update behavior for next task (Engram + skill patch + AGENTS.md rule if general)
+5. **SCORE**: `auto-metrics` (4 dims) — always
+6. **IMMUNIZE**: if error or score < 7 → anti-pattern entry + AGENTS.md Rules prevention
 
 ### PERIODIC: Every ~5 tool calls or after major task
 1. **SELF-CHECK**: performance consistent? repeating mistakes? underutilized skills?

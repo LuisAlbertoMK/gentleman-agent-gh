@@ -39,10 +39,11 @@ Premature declaration — "done" w/o evidence
 **Files**: paths
 ```
 
-### 4. IMMUNIZE
-- Catalog entry = loaded at session start
+### 4. IMMUNIZE (REQUIRED — both steps)
+- **Catalog entry** = loaded at session start (documents the failure)
+- **Prevention rule** → add to AGENTS.md Rules (changes future behavior)
 - Fix requires code/skill change → `mem_save` + update SKILL.md
-- General rule → AGENTS.md Rules
+- Rule: "Catalog documents. AGENTS.md prevents. Both or it's not immunized."
 
 ### 5. VERIFY
 Pre-task: "Seen this before?" If yes → apply prevention BEFORE starting.
