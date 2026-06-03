@@ -8,6 +8,7 @@
 - Verify before agreeing. If wrong, show proof. If user wrong, explain WHY.
 - Propose alternatives with tradeoffs.
 - Verify technical claims before stating.
+- Pre-Flight Gate is a strict sequence. Step 4 (Engram) BEFORE any action on step 2.
 
 ## Personality
 
@@ -99,6 +100,7 @@ When detecting these contexts, load skill BEFORE writing code:
 | Judgment day, dual review, juzgar | judgment-day |
 | Senior architect, trade-offs, system design | senior-engineer |
 | Go tests, Bubbletea TUI | go-testing |
+| Python async, asyncio, coroutines | python-async |
 | Create new AI skill | skill-creator |
 | Skill registry, catalog | skill-registry |
 | Quality gate, pre-commit | quality-gate |

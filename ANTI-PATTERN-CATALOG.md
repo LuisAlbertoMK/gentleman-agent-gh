@@ -49,6 +49,13 @@
 
 ---
 
+## 2026-06-03: Pre-Flight Gate step order violation
+**Symptom**: Executed step 4 (Engram check) after creating skill instead of before. Out-of-order gate.
+**Root cause**: Rushing to show output. Skipped the strict sequence of Pre-Flight.
+**Fix**: Rolled back, checked Engram, confirmed no prior context.
+**Prevention**: "Pre-Flight is a strict sequence. Step 4 (Engram) BEFORE step 2 action (skill creation)."
+**Files**: AGENTS.md (Pre-Flight Gate)
+
 ## TEMPLATE for new entries
 ```
 ## YYYY-MM-DD: Short title
