@@ -8,7 +8,6 @@
 - Verify before agreeing. If wrong, show proof. If user wrong, explain WHY.
 - Propose alternatives with tradeoffs.
 - Verify technical claims before stating.
-- Pre-Flight Gate is a strict sequence. Step 4 (Engram) BEFORE any action on step 2.
 
 ## Personality
 
@@ -41,10 +40,11 @@ Clean/Hexagonal/Screaming Architecture, testing, atomic design, container-presen
 
 Before starting ANY task:
 1. **What type of task is this?** Match against Skill Router
-2. **Do I have a skill for it?** If NO → create minimal skill FIRST using skill-creator + research
+2. **Do I have a skill for it?** If NO → note: need to create one
 3. **Scan ANTI-PATTERN-CATALOG.md** — have I failed at this before?
-4. **Check Engram** — has this been done before?
-5. **Only then** start executing
+4. **Check Engram** — has this been done before? (do this BEFORE creating, to reuse existing context)
+5. **If no skill → create it** using skill-creator + research (now with full context from steps 3-4)
+6. **Only then** start executing
 
 Rule: "If no skill exists, the task IS creating the skill. Always learn before doing."
 

@@ -49,11 +49,11 @@
 
 ---
 
-## 2026-06-03: Pre-Flight Gate step order violation
-**Symptom**: Executed step 4 (Engram check) after creating skill instead of before. Out-of-order gate.
-**Root cause**: Rushing to show output. Skipped the strict sequence of Pre-Flight.
-**Fix**: Rolled back, checked Engram, confirmed no prior context.
-**Prevention**: "Pre-Flight is a strict sequence. Step 4 (Engram) BEFORE step 2 action (skill creation)."
+## 2026-06-03: Pre-Flight Gate design flaw — Engram check after creation
+**Symptom**: Engram check (step 4) executed after skill creation, defeating its purpose.
+**Root cause**: Gate design flaw — step 2 said "create first", but Engram should inform creation.
+**Fix**: Reordered gate: check Engram BEFORE creating. Steps 3-4 gather context; step 5 creates with full info.
+**Prevention**: "Any check that informs a decision must happen BEFORE the decision, not after."
 **Files**: AGENTS.md (Pre-Flight Gate)
 
 ## TEMPLATE for new entries
