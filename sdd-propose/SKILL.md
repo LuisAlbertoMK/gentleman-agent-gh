@@ -3,8 +3,12 @@ name: sdd-propose
 description: > Proposal: intent, scope, approach.
   Trigger: Orchestrator launches proposal creation.
 license: MIT
-metadata: author: gentleman-programming, version: "2.0"
+metadata: author: gentleman-programming, version: "2.1"
 ---
+
+## GATE
+Orchestrator loaded this? → STOP, delegate to `sdd-propose` sub-agent.
+Executor sub-agent? → proceed.
 
 ## SECTIONS
 - Intent: WHY needed

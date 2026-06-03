@@ -22,7 +22,21 @@ metadata: author: gentleman-programming, version: "2.1"
 7. Wait for checks
 
 ## Branch Naming
-`feat/<desc>` · `fix/<desc>` · `chore/<desc>` · `docs/<desc>` · `refactor/<desc>` · `perf/<desc>` · `test/<desc>` · `build/<desc>` · `ci/<desc>` · `revert/<desc>`
+Regex: `^(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)\/[a-z0-9._-]+$`
+
+| Type | Pattern | Example |
+|------|---------|---------|
+| Feature | `feat/<desc>` | `feat/user-login` |
+| Bug fix | `fix/<desc>` | `fix/zsh-glob-error` |
+| Chore | `chore/<desc>` | `chore/update-ci-actions` |
+| Docs | `docs/<desc>` | `docs/installation-guide` |
+| Style | `style/<desc>` | `style/format-scripts` |
+| Refactor | `refactor/<desc>` | `refactor/extract-shared-logic` |
+| Perf | `perf/<desc>` | `perf/reduce-startup-time` |
+| Test | `test/<desc>` | `test/add-setup-coverage` |
+| Build | `build/<desc>` | `build/update-shellcheck` |
+| CI | `ci/<desc>` | `ci/add-branch-validation` |
+| Revert | `revert/<desc>` | `revert/broken-setup-change` |
 
 ## PR Body Format
 ```markdown
@@ -37,32 +51,46 @@ Summary: 1-3 bullets
 | `{path}` | {what} |
 
 Test Plan:
-- [ ] Scripts pass shellcheck
-- [ ] Manually tested
-- [ ] Skills load correctly
+- [x] Scripts pass shellcheck
+- [x] Manually tested affected functionality
+- [x] Skills load correctly in target agent
 
-Checklist: Linked approved issue · One type:label · Shellcheck · Tests · Docs updated · Conventional commits · No Co-Authored-By
+Checklist (all must pass):
+- Linked approved issue (`status:approved`)
+- Exactly one `type:*` label
+- Shellcheck on modified scripts
+- Skills tested in at least one agent
+- Docs updated if behavior changed
+- Conventional commit format
+- No `Co-Authored-By` trailers
 ```
 
 ## Conventional Commits
+Format: `type(scope): description` | `type: description` | `type!:` for breaking
 Regex: `^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9\._-]+\))?!?: .+`
 
-| Commit type | PR label |
-|-------------|----------|
-| `feat` | `type:feature` |
-| `fix` / `revert` | `type:bug` |
-| `docs` | `type:docs` |
-| `refactor` | `type:refactor` |
-| `chore/style/perf/test/build/ci` | `type:chore` |
-| `feat!` / `fix!` | `type:breaking-change` |
+| Commit type | PR label | Examples |
+|-------------|----------|----------|
+| `feat` | `type:feature` | `feat(scripts): add Codex support` |
+| `fix` | `type:bug` | `fix(skills): correct topic key format` |
+| `docs` | `type:docs` | `docs(readme): update config guide` |
+| `refactor` | `type:refactor` | `refactor(skills): extract shared logic` |
+| `chore` | `type:chore` | `chore(ci): add shellcheck to PR validation` |
+| `style` | `type:chore` | `style(skills): fix markdown formatting` |
+| `perf` | `type:feature` | `perf(scripts): reduce setup.sh time` |
+| `test` | `type:chore` | `test(scripts): add integration tests` |
+| `build` | `type:chore` | `build(ci): pin actions to SHAs` |
+| `ci` | `type:chore` | `ci(workflows): add branch validation` |
+| `revert` | `type:bug` | `revert: undo broken setup change` |
+| `feat!` / `fix!` | `type:breaking-change` | `feat!: redesign skill loading` |
 
 ## Automated Checks
-| Check | Verifies |
-|-------|----------|
-| Issue Reference | Body has `Closes/Fixes/Resolves #N` |
-| Issue Approved | Linked issue has `status:approved` |
-| type: Label | Exactly one type label |
-| Shellcheck | Scripts pass |
+| Check | Job | Verifies |
+|-------|-----|----------|
+| Issue Reference | Check Issue Reference | Body has `Closes/Fixes/Resolves #N` |
+| Issue Approved | Check Issue Has status:approved | Linked issue has `status:approved` |
+| type: Label | Check PR Has type:\* Label | Exactly one type label |
+| Shellcheck | Shellcheck | Scripts pass `shellcheck` |
 
 ## Commands
 ```bash

@@ -3,8 +3,12 @@ name: sdd-archive
 description: > Sync delta→main→archive + rollback.
   Trigger: Orchestrator launches archive, revert change.
 license: MIT
-metadata: author: gentleman-programming, version: "2.2"
+metadata: author: gentleman-programming, version: "2.3"
 ---
+
+## GATE
+Orchestrator loaded this? → STOP, delegate to `sdd-archive` sub-agent.
+Executor sub-agent? → proceed.
 
 ## STEPS
 1. Sync: add→append, modify→replace, remove→delete
