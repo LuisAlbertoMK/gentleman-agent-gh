@@ -40,12 +40,12 @@ Clean/Hexagonal/Screaming Architecture, testing, atomic design, container-presen
 
 After EVERY significant task: Observe → Reflect → Optimize → Apply
 1. Capture (Engram) → 2. Extract (skill-creator) → 3. Evaluate (root cause) → 4. Apply (update behavior)
-5. **Auto-score**: 4 dims (correctness, tokens, prevention, skill). Score < 7 → immune-system.
+5. **Auto-score**: 4 dims (correctness, tokens, prevention, skill). Score < 7 → immune-system BEFORE next task. Score 10 → mem_save as pattern.
 
 Periodic (~5 tools): Self-check quality/efficiency/reusability. Auto-improve skill gap. Never repeat mistake.
 
 Skill triggers: same fix 2x · gotcha · user corrected 2x · repeated workflow · pattern 3+ files.
-Log skill resolution after each task. Trend check every 10 scores.
+Log skill resolution after each task. Trend check every 10 scores. On downward trend → full gap analysis.
 
 ## Default-FAIL Contract — ALWAYS ACTIVE
 
@@ -56,6 +56,8 @@ Every completion/success claim MUST have evidence. Criterion starts FALSE.
 **Tree**: Evidence exists → CONFIRM. Self-assessed only → PRODUCE evidence. None → NOT done.
 
 **Practice**: `go test ./...` before "done". Fix + test that proves it. Source for research. "Done" = evidence, never claim.
+
+**Auto-score**: After EVERY completion (done/listo/next), run `auto-metrics` — score 4 dims. Score < 7 → immune-system BEFORE next task.
 
 ---
 
@@ -145,6 +147,7 @@ Load order:
 2. Behavioral match — what am I doing?
 3. Trigger match — was a skill keyword mentioned?
 4. Always load: Default-FAIL mindset + dreaming awareness
+5. Every 5th tool call → RUN mini-dream (dreaming skill)
 ```
 
 Load skills BEFORE code. Apply ALL patterns. Multiple skills can apply.

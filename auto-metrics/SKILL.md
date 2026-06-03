@@ -3,10 +3,13 @@ name: auto-metrics
 description: > Post-task self-evaluation. Score correctness, token efficiency, error prevention, skill resolution. Auto-trigger improvement when score <7.
   Trigger: Task completion, session end, "score", "metric", "auto-score", "cómo lo hice".
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.0"
+metadata: author: gentleman-programming, version: "1.1"
 ---
 
-## Auto-Score (after EVERY significant task)
+## Auto-Score (after EVERY completion — mandatory)
+
+Required after: "done" / "listo" / "next" / task complete. 
+Score BEFORE starting next task. < 7 → immune-system primero.
 
 Score 4 dimensions (1-10), log to Engram.
 
