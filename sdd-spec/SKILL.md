@@ -17,17 +17,16 @@ Executor sub-agent? → proceed.
 ## REMOVED | ### Requirement | (Reason:)
 ```
 
-## MODIFIED WORKFLOW (critical)
-1. LOCATE req in main spec → COPY ENTIRE BLOCK (req + ALL scenarios)
-2. PASTE under MODIFIED → EDIT for new behavior
+## MODIFIED (critical)
+1. COPY ENTIRE req block (req + ALL scenarios) from main spec
+2. PASTE under MODIFIED → EDIT
 3. ADD `(Previously: one-liner)`
-Why copy-full? Archive step REPLACES the block — partial loses scenarios.
+Why full block? Archive REPLACES — partial loses scenarios.
 
-## NEW SPEC (no existing spec)
-Full spec: Purpose → Requirements (MUST/SHOULD/MAY) → G/W/T scenarios
+## NEW SPEC (no existing)
+Purpose → Requirements (MUST/SHOULD/MAY) → G/W/T scenarios
 
 ## RULES
-- G/W/T per scenario · RFC 2119: MUST/SHALL/SHOULD/MAY
-- Every req ≥1 scenario (happy+edge) · Testable · No impl details
-- MODIFIED = FULL block (not partial)
-- Size budget: <650 words, prefer tables over narrative
+- G/W/T · RFC 2119: MUST/SHALL/SHOULD/MAY
+- Every req ≥1 scenario (happy+edge) · Testable · No impl
+- MODIFIED = FULL block · Budget: <650 words

@@ -6,25 +6,20 @@ license: Apache-2.0
 metadata: author: gentleman-programming, version: "1.0"
 ---
 
-## HARD RULES
-- Split PRs >400 lines unless maintainer accepts `size:exception`
-- Each PR ≤60min review budget · one deliverable work unit per PR
-- Tests/docs stay with the unit they verify
-- State: start, end, prior deps, follow-up, out-of-scope in every chained PR
-- Every child PR includes dependency diagram marking current PR with 📍
-- Never mix chain strategies after user chooses
+## RULES
+- Split >400 lines unless `size:exception` accepted
+- ≤60min review budget · one work unit per PR
+- Tests/docs with unit · state start/end/deps/follow-up/OoS
+- Every child PR: dependency diagram marking current 📍
+- Never mix strategies
 
-## DECISION GATES
-| Condition | Action |
+## GATES
+| PR condition | Strategy |
 |---|---|
-| PR ≤400 lines, focused | Single PR |
-| PR >400, each slice independent | Stacked PRs to main |
-| PR >400, feature must integrate before main | Feature Branch Chain with tracker PR |
-| Vendor/migration diff can't split | Ask maintainer for `size:exception` |
-
-## STRATEGIES
-**Stacked PRs (to main)**: PR#1→main, PR#2→main, PR#3→main. Each independent.
-**Feature Branch Chain**: draft tracker PR (no-merge). PR#1→tracker, PR#2→PR#1, PR#3→PR#2. Tracker merges to main last.
+| ≤400 lines | Single PR |
+| >400, slices independent | Stacked (PR#i→main) |
+| >400, needs integration | Feature Branch Chain (tracker→PR#1→PR#2…) |
+| Can't split | Ask `size:exception` |
 
 ## OUTPUT
-Strategy, PR order, current PR boundary, dependency diagram, review budget (`adds+dels`), verification plan.
+Strategy, PR order, boundary, dep diagram, review budget (`adds+dels`), verification.

@@ -11,38 +11,34 @@ Orchestrator loaded this? → STOP, delegate to `sdd-verify` sub-agent.
 Executor sub-agent? → proceed.
 
 ## CONTRACT
-Read proposal/spec/design/tasks before judging. Persist per mode:
-- **engram**: `mem_save(topic_key: sdd/{change}/verify-report)`
-- **openspec**: save to `openspec/changes/{change}/verify-report.md`
-- **hybrid**: both | **none**: return only
+Read proposal/spec/design/tasks. Persist:
+| Mode | Action |
+|------|--------|
+| engram | `mem_save(topic_key:sdd/{change}/verify-report)` |
+| openspec | `openspec/changes/{change}/verify-report.md` |
+| hybrid | both | none | return only |
 
-## DECISION GATES
+## GATES
 | Condition | Action |
 |---|---|
-| Orchestrator says `STRICT TDD MODE IS ACTIVE` | Load strict-tdd-verify.md |
-| strict_tdd:true + runner exists | Strict TDD verify |
-| Test exits non-zero | CRITICAL |
-| Spec scenario no passing test | CRITICAL (UNTESTED/FAILING) |
+| strict_tdd:true + runner | Strict TDD verify (load strict-tdd-verify.md) |
+| Test fails | CRITICAL |
+| Spec scenario untested/failing | CRITICAL |
 | Design deviation (non-breaking) | WARNING |
 
 ## STEPS
-1. Load skills
-2. Retrieve artifacts (proposal/spec/design/tasks)
-3. Resolve TDD mode
-4. Completeness: tasks total/[x]/remaining
-5. Correctness: map EACH spec scenario → implementation evidence + test result
-6. Coherence: design decisions followed?
-7. Testing: run tests → build → coverage
-8. Compliance: test PASS = COMPLIANT (not static analysis)
-9. Persist verify-report
-10. Return summary
+1. Load skills · 2. Retrieve artifacts
+3. Resolve TDD mode · 4. Completeness: tasks [x]/total
+5. Spec→impl→test mapping per scenario
+6. Design coherence check
+7. Test → build → coverage
+8. Compliance: test PASS = COMPLIANT
+9. Persist · 10. Return
 
 ## RETURN
 ```
-VERIFY | {name} | {TDD/STANDARD}
-DONE: {N}/{total} tasks
-BUILD: {PASS/FAIL} | TESTS: {N}p/{N}f | COVERAGE: {N}%
-COMPLIANCE: {N}/{total}
-ISSUES: CRITICAL:{list} WARNING:{list}
-VERDICT: {PASS/PASS-WARNINGS/FAIL}
+{name} | {TDD/STANDARD}
+Tasks:{N}/{total} | Build:{P/FAIL} | Tests:{Np}/{Nf} | Cov:{N}%
+Compliance:{N}/{total} | CRIT:{list} | WARN:{list}
+VERDICT:{PASS|PASS-WARNINGS|FAIL}
 ```

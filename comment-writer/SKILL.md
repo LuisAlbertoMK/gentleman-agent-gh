@@ -6,31 +6,19 @@ license: Apache-2.0
 metadata: author: gentleman-programming, version: "1.0"
 ---
 
-## VOICE RULES
-- Start with actionable point — don't recap the whole PR
-- Warm + direct (teammate, not bot) · 1-3 paragraphs max
-- Explain WHY when asking for change
-- Avoid pile-ons — highest-value issue only
-- Match target context language (Spanish thread → Spanish reply)
-- Regional tone: defer to persona (Rioplatense or neutral)
+## VOICE
+Actionable first · Warm+direct (teammate) · 1-3¶ max · Explain WHY
+No pile-ons · Match thread language · Regional tone → persona
 
 ## FORMULA
-```text
-<Direct observation or request>
+`<observation/request>` → `<why (optional)>` → `<next action>`
 
-<Why it matters — only if needed>
+## QUICK REFS
+**Request change**: "Good approach. I'd split this because it mixes validation with UI wiring — keeps focus narrow and rollback cleaner."
+**Approve**: "Approved. Well-contained. Next PR: link chain PRs."
+**Split**: "This exceeds 400 lines. Split or justify size:exception. Order: foundation+tests → integration → docs."
 
-<Concrete next action>
-```
-
-## EXAMPLES
-**Request change**: "Good approach overall. I'd split this into a separate commit because it mixes validation with UI wiring. That keeps focus narrow and rollback cleaner."
-
-**Approve with note**: "Approved. Scope is clear and change is well-contained. For next PR, add links to previous/following PRs so the chain stays navigable."
-
-**Ask for split**: "This PR exceeds 400 lines. We need to split it or justify size:exception. Suggested order: foundation+tests first, then integration, then docs."
-
-## COMMANDS
+## CMD
 ```bash
 gh pr view <PR> --json title,body,additions,deletions,changedFiles
 ```

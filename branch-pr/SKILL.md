@@ -7,36 +7,25 @@ metadata: author: gentleman-programming, version: "2.1"
 ---
 
 ## Rules
-1. Every PR MUST link approved issue (`status:approved`) — no exceptions
-2. Every PR MUST have exactly one `type:*` label
-3. Automated checks must pass before merge
-4. Blank PRs without issue linkage blocked by GitHub Actions
+1. PR MUST link approved issue (`status:approved`)
+2. PR MUST have exactly one `type:*` label
+3. Automated checks must pass
+4. Blank PRs without issue linkage blocked
 
 ## Workflow
-1. Verify issue has `status:approved`
-2. Create branch: `type/description` (regex: `^(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)\/[a-z0-9._-]+$`)
+1. Verify issue `status:approved`
+2. Create branch per naming rules below
 3. Implement with conventional commits
-4. Run shellcheck on modified scripts
+4. Run shellcheck
 5. Open PR using template
-6. Add exactly one `type:*` label
+6. Add one `type:*` label
 7. Wait for checks
 
 ## Branch Naming
-Regex: `^(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)\/[a-z0-9._-]+$`
+`^(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)\/[a-z0-9._-]+$`
 
-| Type | Pattern | Example |
-|------|---------|---------|
-| Feature | `feat/<desc>` | `feat/user-login` |
-| Bug fix | `fix/<desc>` | `fix/zsh-glob-error` |
-| Chore | `chore/<desc>` | `chore/update-ci-actions` |
-| Docs | `docs/<desc>` | `docs/installation-guide` |
-| Style | `style/<desc>` | `style/format-scripts` |
-| Refactor | `refactor/<desc>` | `refactor/extract-shared-logic` |
-| Perf | `perf/<desc>` | `perf/reduce-startup-time` |
-| Test | `test/<desc>` | `test/add-setup-coverage` |
-| Build | `build/<desc>` | `build/update-shellcheck` |
-| CI | `ci/<desc>` | `ci/add-branch-validation` |
-| Revert | `revert/<desc>` | `revert/broken-setup-change` |
+`feat/<desc>` · `fix/<desc>` · `chore/<desc>` · `docs/<desc>` · `style/<desc>`
+`refactor/<desc>` · `perf/<desc>` · `test/<desc>` · `build/<desc>` · `ci/<desc>` · `revert/<desc>`
 
 ## PR Body Format
 ```markdown
@@ -50,39 +39,21 @@ Summary: 1-3 bullets
 | File | Change |
 | `{path}` | {what} |
 
-Test Plan:
-- [x] Scripts pass shellcheck
-- [x] Manually tested affected functionality
-- [x] Skills load correctly in target agent
+Test Plan: shellcheck · manual test · skills load
 
-Checklist (all must pass):
-- Linked approved issue (`status:approved`)
-- Exactly one `type:*` label
-- Shellcheck on modified scripts
-- Skills tested in at least one agent
-- Docs updated if behavior changed
-- Conventional commit format
-- No `Co-Authored-By` trailers
+Checklist: approved issue · type:label · shellcheck · skills tested · docs updated · conventional commits · no Co-Authored-By
 ```
 
 ## Conventional Commits
-Format: `type(scope): description` | `type: description` | `type!:` for breaking
+Format: `type(scope): desc` | `type: desc` | `type!:` = breaking
 Regex: `^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9\._-]+\))?!?: .+`
 
-| Commit type | PR label | Examples |
-|-------------|----------|----------|
-| `feat` | `type:feature` | `feat(scripts): add Codex support` |
-| `fix` | `type:bug` | `fix(skills): correct topic key format` |
-| `docs` | `type:docs` | `docs(readme): update config guide` |
-| `refactor` | `type:refactor` | `refactor(skills): extract shared logic` |
-| `chore` | `type:chore` | `chore(ci): add shellcheck to PR validation` |
-| `style` | `type:chore` | `style(skills): fix markdown formatting` |
-| `perf` | `type:feature` | `perf(scripts): reduce setup.sh time` |
-| `test` | `type:chore` | `test(scripts): add integration tests` |
-| `build` | `type:chore` | `build(ci): pin actions to SHAs` |
-| `ci` | `type:chore` | `ci(workflows): add branch validation` |
-| `revert` | `type:bug` | `revert: undo broken setup change` |
-| `feat!` / `fix!` | `type:breaking-change` | `feat!: redesign skill loading` |
+| Type | Label | Type | Label |
+|------|-------|------|-------|
+| `feat` | feature | `fix`/`revert` | bug |
+| `docs` | docs | `refactor` | refactor |
+| `chore`/`style`/`build`/`ci` | chore | `perf`/`feat!`/`fix!` | feature/breaking |
+| `test` | chore | | |
 
 ## Automated Checks
 | Check | Job | Verifies |
