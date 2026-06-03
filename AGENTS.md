@@ -105,13 +105,18 @@ When detecting these contexts, load skill BEFORE writing code:
 | Issue creation | issue-creation |
 | Decision capture, trade-off log | decision-capture |
 | Execution mode, quick/thorough/draft | execution-mode |
+| Chained PRs, >400 lines, review slices | chained-pr |
+| Cognitive load, docs for reviewers | cognitive-doc-design |
+| PR comments, issue replies, feedback | comment-writer |
 | SDD phase contracts, artifact dependencies, shared grammar | sdd-contracts |
 | Skill digestion, compact on load, resolution audit | skill-digestion |
 | Delivery harness, review workload, delivery strategy | delivery-harness |
 | Subagent isolation, context boundaries, clean delegation | subagent-isolation |
 | Command wrapper, error handling, output parsing | command-wrapper |
 | Skill refresher, drift detection, auto-heal | skill-refresher |
+| Skill improvement, audit skills, refactor skills | skill-improver |
 | CI/CD pipeline, GitHub Actions, quality gate | ci-cd |
+| Work-unit commits, commit organization | work-unit-commits |
 | Immune System, anti-pattern, same mistake, permanent immunity | immune-system |
 | Auto-score, metrics, post-task evaluation, performance tracking | auto-metrics |
 | Dreaming, cross-session patterns, memory curation, sessions review | dreaming |
@@ -125,13 +130,13 @@ Beyond trigger matching, select skills by answering: **WHAT am I trying to DO?**
 
 ```
 Task type?
-├── Write code → skill-creator, sdd-*, quality-gate, go-testing
+├── Write code → skill-creator, sdd-*, quality-gate, go-testing, work-unit-commits
 ├── Fix bug → recovery-protocol, immune-system, sdd-verify
-├── Design → senior-engineer, sdd-propose, sdd-design
+├── Design → senior-engineer, sdd-propose, sdd-design, cognitive-doc-design
 ├── Learn/Research → prompt-engineering, context7, code-memory
-├── Review → judgment-day, skill-testing, pr-evidence
-├── Optimize → karpathy-prompt, karpathy-loop, lean-context, caveman
-├── Coordinate → delivery-harness, subagent-isolation, command-wrapper
+├── Review → judgment-day, skill-testing, pr-evidence, comment-writer
+├── Optimize → karpathy-prompt, karpathy-loop, lean-context, caveman, skill-improver
+├── Coordinate → delivery-harness, subagent-isolation, command-wrapper, chained-pr
 ├── Track/Decide → decision-capture, dreaming, skill-digestion
 └── Recover → recovery-protocol, immune-system, context-watchdog
 
@@ -148,57 +153,35 @@ Load skills BEFORE code. Apply ALL patterns. Multiple skills can apply.
 <!-- gentle-ai:engram-protocol -->
 ## Engram Protocol — ALWAYS ACTIVE
 
-### SAVE TRIGGERS (proactive — do NOT wait)
-Call `mem_save` AFTER: arch decision · convention · workflow change · tool choice · bug fix (include root cause) · feature with non-obvious approach · config change · discovery · pattern established · user preference learned.
+### SAVE (proactive)
+`mem_save` AFTER: arch decision · convention · workflow · tool choice · bug fix (incl root cause) · feature · config · discovery · pattern · preference
+Self-check: "Decision, fix, discovery, convention? → mem_save NOW."
 
-Self-check: "Decision, fix, discovery, or convention? → mem_save NOW."
+**Format**: title(Verb+what) · type(bugfix|decision|architecture|discovery|pattern|config|preference) · scope(project|personal) · topic_key(stable, optional) · content(**What**|**Why**|**Where**|**Learned**)
+Topic: diff topics≠overwrite · same topic_key→upsert · Unsure→`mem_suggest_topic_key` · Know ID→`mem_update`
 
-Format:
-- **title**: Verb + what — short, searchable
-- **type**: bugfix | decision | architecture | discovery | pattern | config | preference
-- **scope**: project (default) | personal
-- **topic_key** (recommended): stable key for evolving topics (e.g. `architecture/auth-model`)
-- **content**: **What** (one sentence) | **Why** | **Where** (files) | **Learned** (gotchas)
-
-Topic rules: diff topics ≠ overwrite · same topic_key → upsert · Unsure? → `mem_suggest_topic_key` · Know ID? → `mem_update`
-
-### SEARCH MEMORY
-On "remember"/"recall"/"qué hicimos": 1) `mem_context` (fast) 2) `mem_search` (keywords) 3) `mem_get_observation` (full text)
-
-Proactive: BEFORE working on something with prior context, search Engram.
+### SEARCH
+"remember"/"recall"/"qué hicimos": 1)`mem_context`(fast) 2)`mem_search`(keywords) 3)`mem_get_observation`(full)
+Proactive: search BEFORE working on prior context.
 
 ### SESSION CLOSE (mandatory)
-Before "done"/"listo": call `mem_session_summary`:
-
-## Goal
-[What we worked on]
-
-## Instructions
-[Preferences discovered — skip if none]
-
-## Discoveries
-- [Gotchas, non-obvious learnings]
-
-## Accomplished
-- [Completed items with details]
-
-## Next Steps
-- [What remains]
-
-## Relevant Files
-- path — [what it does or changed]
+Before "done"/"listo": `mem_session_summary` with:
+## Goal [what]
+## Instructions [prefs — skip if none]
+## Discoveries - [gotchas]
+## Accomplished - [done items]
+## Next Steps - [remaining]
+## Relevant Files - path — [what it does]
 
 ### AFTER COMPACTION
 1. IMMEDIATELY `mem_session_summary` with compacted content
 2. `mem_context` for additional context
 3. THEN continue
-
 Without step 1, pre-compaction memory is lost.
 
-### DREAMING — Cross-session pattern extraction (periodic)
-After every session end or major milestone, run mini-dream:
-1. `mem_search(type="error|bugfix")` — find recurring patterns
-2. Same error 2+ sessions → document in ANTI-PATTERN-CATALOG.md
-3. Same error 3+ sessions → promote to AGENTS.md rule
-4. `mem_search(type="decision")` — check for contradictions
+### DREAMING (periodic)
+After session end or milestones:
+1. `mem_search(type="error|bugfix")` → recurring patterns
+2. Same error 2x→ANTI-PATTERN-CATALOG.md · 3x→AGENTS.md rule
+3. `mem_search(type="decision")` → check contradictions
 <!-- /gentle-ai:engram-protocol -->
