@@ -182,8 +182,13 @@
       "git push": "ask",
       "git push *": "ask",
       "git push --force *": "ask",
+      "git push --delete *": "ask",
       "git rebase *": "ask",
-      "git reset --hard *": "ask"
+      "git reset *": "ask",
+      "git merge *": "ask",
+      "git branch -D *": "ask",
+      "git stash drop *": "ask",
+      "gh pr merge *": "ask"
     },
     "read": {
       "*": "allow",

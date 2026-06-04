@@ -138,7 +138,7 @@ When detecting these contexts, load skill BEFORE writing code:
 | Dreaming, cross-session patterns, memory curation, sessions review | dreaming |
 
 ### Anti-Pattern Catalog
-`{file:D:\gentleman-agent-gh\ANTI-PATTERN-CATALOG.md}` — loaded at session start.
+`{file:C:\Users\MK\.config\opencode\ANTI-PATTERN-CATALOG.md}` — loaded at session start.
 Before any task, scan catalog for applicable prevention rules.
 
 ### Skill Router — Behavioral Selection (Memento-Skills pattern)
