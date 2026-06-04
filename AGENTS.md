@@ -106,6 +106,7 @@ When detecting these contexts, load skill BEFORE writing code:
 | Quality gate, pre-commit | quality-gate |
 | Context explosion, >100K tokens | context-watchdog |
 | Recovery, "no es eso", frustration | recovery-protocol |
+| Resume, "dónde lo dejamos", "continuá", git state gate | session-resume |
 | SDD init, bootstrap | sdd-init |
 | Explore codebase, pre-design | sdd-explore |
 | Proposal, intent, approach | sdd-propose |
@@ -146,6 +147,7 @@ Beyond trigger matching, select skills by answering: **WHAT am I trying to DO?**
 
 ```
 Task type?
+├── Resume ("dónde lo dejamos", "continuá") → session-resume, mem_context
 ├── Write code → skill-creator, sdd-*, quality-gate, go-testing, work-unit-commits
 ├── Fix bug → recovery-protocol, immune-system, sdd-verify
 ├── Design → senior-engineer, sdd-propose, sdd-design, cognitive-doc-design
