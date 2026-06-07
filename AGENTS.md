@@ -32,64 +32,27 @@ Explicit: "modo rápido" / "modo thorough" / "draft"
 
 ## Skills (Auto-load)
 
+Top 15 most-used (full table in `SKILLS-INDEX.md`, read on demand):
+
 | Trigger | Skill |
 |---------|-------|
-| Karpathy·less tokens·context comp | karpathy-prompt |
-| Improve prompt·security·ReAct | prompt-engineering |
-| Karpathy loop·optimize prompt·tokens | karpathy-loop |
-| Ultra-compressed·caveman | caveman |
-| Lean default·compact | lean-context |
-| Continuá·code memory·multi-session | code-memory |
-| Self-reflection·Hermes·error patterns | self-reflection |
-| Test/verify skill·coverage | skill-testing |
-| Judgment day·dual review·juzgar | judgment-day |
-| Senior arch·trade-offs·system design | senior-engineer |
-| Go tests·Bubbletea TUI | go-testing |
-| Python async·asyncio | python-async |
-| Create AI skill | skill-creator |
-| Skill registry·catalog | skill-registry |
+| Karpathy·less tokens | karpathy-prompt |
+| Karpathy loop·optimize | karpathy-loop |
+| Caveman·ultra-compressed | caveman |
+| Lean·compact | lean-context |
 | Quality gate·pre-commit | quality-gate |
-| Context >100K tokens | context-watchdog |
-| Recovery·"no es eso"·frustration | recovery-protocol |
-| Resume·continuá·git state gate | session-resume |
-| SDD init·bootstrap | sdd-init |
-| Explore codebase·pre-design | sdd-explore |
-| Proposal·intent·approach | sdd-propose |
-| Specs·Given/When/Then | sdd-spec |
-| Technical design·HOW | sdd-design |
-| Tasks·breakdown·implement | sdd-tasks |
-| Apply·implement | sdd-apply |
-| Validate vs specs·verify | sdd-verify |
-| Archive·delta to main | sdd-archive |
-| Guided SDD walkthrough | sdd-onboard |
-| PR creation·issue-first | branch-pr |
-| PR w/ evidence | pr-evidence |
-| Issue creation | issue-creation |
-| Decision·trade-off log | decision-capture |
-| Execution mode·quick/thorough/draft | execution-mode |
-| Chained PRs·>400 lines | chained-pr |
-| Cognitive load·docs for reviewers | cognitive-doc-design |
-| PR comments·feedback | comment-writer |
-| SDD phase contracts·artifact deps | sdd-contracts |
-| Skill digestion·compact on load | skill-digestion |
-| Delivery harness·review workload | delivery-harness |
-| Subagent isolation·context boundaries | subagent-isolation |
-| Command wrapper·error handling | command-wrapper |
-| Skill refresher·drift·auto-heal | skill-refresher |
-| Skill audit·improve·refactor | skill-improver |
-| CI/CD·GitHub Actions | ci-cd |
-| Work-unit commits | work-unit-commits |
-| Immune system·anti-pattern·immunity | immune-system |
-| Auto-score·metrics·post-task eval | auto-metrics |
-| Metricas·before/after·%·tokenization | metricas |
-| Code review·CR·criticar | code-review-agent |
-| Refactor·reestructurar·migrate | refactoring-planner |
-| Commit·mensaje·conventional | commit-crafter |
-| Mapear·project map·estructura | project-mapper |
-| Security·seguridad·vulnerabilidad | security-scanner |
-| Doc sync·sincronizar docs | doc-sync |
-| Bitacora·historial·qué pedí | bitacora |
-| Dreaming·cross-session patterns | dreaming |
+| Auto-score·metrics | auto-metrics |
+| Resume·continuá | session-resume |
+| Code memory·multi-session | code-memory |
+| Create skill | skill-creator |
+| Immune·anti-pattern | immune-system |
+| Dreaming·patterns | dreaming |
+| Metricas·before/after·% | metricas |
+| Commit·conventional | commit-crafter |
+| Code review·CR | code-review-agent |
+| Bitacora·historial | bitacora |
+
+**Trigger not here?** → `read SKILLS-INDEX.md` for full 57-skill table.
 
 ### Anti-Pattern Catalog
 `{file:C:\Users\MK\.config\opencode\ANTI-PATTERN-CATALOG.md}` — scan BEFORE any task.
