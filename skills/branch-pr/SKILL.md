@@ -24,8 +24,7 @@ metadata: author: gentleman-programming, version: "2.1"
 ## Branch Naming
 `^(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)\/[a-z0-9._-]+$`
 
-`feat/<desc>` · `fix/<desc>` · `chore/<desc>` · `docs/<desc>` · `style/<desc>`
-`refactor/<desc>` · `perf/<desc>` · `test/<desc>` · `build/<desc>` · `ci/<desc>` · `revert/<desc>`
+`feat` · `fix` · `chore` · `docs` · `style` · `refactor` · `perf` · `test` · `build` · `ci` · `revert`
 
 ## PR Body Format
 ```markdown

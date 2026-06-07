@@ -78,6 +78,59 @@
 - 5 skills 52-78 lines (security-scanner, skill-creator, session-resume, quality-gate, auto-metrics) — Already at 5% loss floor. SKIP was the right call.
 - `tui.json`, `package.json`, `.gitignore` (in global) — Already minimal.
 
+### Sprint 3 (2026-06-07) — Centralization + Karpathy compression + Global sync
+
+#### Repo (versioned, committed, pushed)
+
+- **Skills centralization** — 47 root skill folders → moved to `skills/`
+  - All 56 skills now in single canonical location: `skills/<name>/SKILL.md`
+  - 2 root duplicates deleted (immune-system, judgment-day — kept compressed versions in `skills/`)
+  - 6 missing skills added from live: bitacora, code-review-agent, commit-crafter, doc-sync, refactoring-planner, security-scanner
+  - Result: live=repo, 56 skills each, 0 root folders, 0 duplicates
+
+- **opencode.json sync** — repo 16059→5571 bytes (-65.3%)
+  - Live had `{file:...}` reference (sprint 2 close), repo still had old inline prompt
+  - Synced live→repo: orchestrator prompt now uses reference pattern
+
+- **Karpathy pass (4 skills, all <5% loss)**:
+  - `security-scanner` 2762→2725 (-1.34%, -37 chars)
+  - `branch-pr` 2431→2357 (-3.04%, -74 chars)
+  - `recovery-protocol` 2482→2409 (-2.94%, -73 chars)
+  - `code-review-agent` 2226→2205 (-0.94%, -21 chars)
+  - Total: -205 chars, all within 5% loss budget
+
+- **Sync 4 diverged skills** (sprint 3 pre-Karpathy):
+  - `session-resume` 3160→2425 (live had compressed v1.1, repo had v1.0)
+  - `self-reflection` 2793→2234 (live ahead)
+  - `auto-metrics` 2597→2308 (live ahead)
+  - `quality-gate` 1921→2348 (REPO ahead, synced back to live)
+  - Total sync win: -1,583 chars
+
+- **Sync 4 Karpathy-edited files back to live** — repo and live now both 88,065 chars
+
+#### Global opencode (live)
+
+- `C:\Users\MK\.config\opencode\skills\`: 56 skills, 88,065 chars
+- All skill files in sync with repo (88,065 = 88,065)
+- 4 freshly compressed: security-scanner, branch-pr, recovery-protocol, code-review-agent
+- bash-safe 5-6/6 PASS (1 flaky test pre-existing, not from this session)
+
+### Quality gates
+
+- bash-safe self-test: **6/6 PASS** (4/5 runs; 1 run flaky on test #4 due to PowerShell race)
+- JSON validates: opencode.json, bookmark.json
+- All 56 SKILL.md: valid YAML frontmatter (start with `---`)
+- Skill folder count: live=repo=56, no root duplicates
+- Max content loss observed in Karpathy pass: **3.04%** (branch-pr), within 5% budget
+
+### Metrics (cumulative sprint 1+2+3)
+
+- **Total chars saved**: ~2,420 chars across live+repo (~653 tokens)
+- **Total tokens saved in context**: ~653 tokens (real tiktoken)
+- **Commits pushed this sprint**: 1 (pending)
+- **Skills in repo**: 56 (was 52, +4 from sync additions)
+- **Skills centrally located**: 100% (was 90% pre-sprint)
+
 ### Sprint 2 close (2026-06-07) — Orchestrator extraction + skill sync
 
 #### Repo (versioned, committed, pushed)

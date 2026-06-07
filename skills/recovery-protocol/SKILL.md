@@ -1,7 +1,7 @@
 ---
 name: recovery-protocol
-description: > Standardized error recovery when agent is wrong or user shows frustration.
-  Trigger: "ya te dije", "no es eso", "no funciona", "otra vez", "wrong", "that's not what I asked", user repeats same correction 2+ times.
+description: > Standardized error recovery when wrong or user shows frustration.
+  Trigger: "ya te dije", "no es eso", "no funciona", "otra vez", "wrong", "not what I asked", repeated correction 2x.
 license: Apache-2.0
 metadata: author: gentleman-programming, version: "1.1"
 ---
@@ -12,7 +12,7 @@ User corrects agent · Frustration signals · Agent detects incorrect output · 
 ## Protocol
 
 ### 1. STOP — IMMEDIATELY
-Do NOT: continue explaining · justify · suggest alternatives · generate more code.
+Do NOT: explain · justify · suggest alt · generate more code.
 Do: "Tenés razón, me equivoqué. Vamos de nuevo." Acknowledge specifically.
 
 ### 2. DIAGNOSE — root cause
@@ -41,7 +41,7 @@ content: **What**: mistake | **Correct approach**: | **Root cause**: | **Prevent
 
 ### 5. ESCALATION — after 2 failed attempts
 - STOP generating code
-- Ask: "¿Podés mostrarme exactamente qué esperás?" / "Let me step back — show me expected output"
+- Ask: "¿Podés mostrarme exactamente qué esperás?" / "show me expected output"
 - Offer restart with clear spec
 
 ## Frustration Signals
