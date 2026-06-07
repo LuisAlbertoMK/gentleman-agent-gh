@@ -1,0 +1,32 @@
+{
+  "name": "gentleman-agent-gh",
+  "version": "1.0.0",
+  "description": "Curated opencode agent config: 56 skills, prompts, scripts, and protocols. Synchronized with global opencode at C:\\Users\\MK\\.config\\opencode\\",
+  "private": true,
+  "author": "Luis Alberto",
+  "license": "UNLICENSED",
+  "scripts": {
+    "test:bash-safe": "powershell -NoProfile -Command \"& { . .\\scripts\\bash-safe.ps1; $r=0; foreach (\\$t in @('echo a','echo a && echo b','echo a || echo b','echo hi | Select-String h')) { try { Invoke-Bash \\$t -ErrorAction Stop; 'PASS' } catch { 'FAIL'; \\$r=1 } }; exit \\$r }\"",
+    "tokenize": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\.metricas\\tokenize-all-skills.ps1"
+  },
+  "engines": {
+    "opencode": ">=1.0.0"
+  },
+  "files": [
+    "AGENTS.md",
+    "ANTI-PATTERN-CATALOG.md",
+    "BITACORA.md",
+    "CHANGELOG.md",
+    "SKILLS-INDEX.md",
+    "commands/",
+    "prompts/",
+    "scripts/",
+    "skills/"
+  ],
+  "keywords": [
+    "opencode",
+    "agent-config",
+    "karpathy-compression",
+    "sdd"
+  ]
+}

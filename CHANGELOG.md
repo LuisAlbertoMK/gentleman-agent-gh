@@ -5,6 +5,36 @@
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-06-07 — Sprint 3 APPLIED to live
+
+**First stable release.** Sprint 3 results applied to `C:\Users\MK\.config\opencode\`. All divergences resolved, anti-pattern learnings merged, scripts deployed.
+
+### Applied to global opencode (live)
+
+- **AGENTS.md** — appended `gentle-ai:agent-protocol` (v1.0, 7 sections: A-G) from live; agent-version 1.3 unified
+  - Live: 9078 B → 9212 B (+1.5%, +134 B from version comment + Protocol section)
+  - Repo: 6327 B → 9212 B (+45.5%, +2885 B from Protocol section)
+  - Result: live = repo, both 9212 B
+- **ANTI-PATTERN-CATALOG.md** — merged 2 live-only entries into repo (now v1.1)
+  - Live: 87 lines / 6850 B
+  - Repo: 87 lines / 6850 B (was 67 lines / 3239 B pre-merge)
+  - Added entries: `2026-06-05 TDZ bug` (Render production down), `2026-06-07 PowerShell string sort+join` (TS2724)
+- **scripts/bash-safe.ps1** — deployed to live `C:\Users\MK\.config\opencode\scripts\`
+  - 3676 B, 6/6 PASS verified in live
+- **scripts/auto-clean.ps1** — deployed to live
+  - 1082 B, temp file cleanup
+- **Backup created** at `C:\Users\MK\.config\opencode\.bak\pre-sprint3-apply-20260607-005330\`
+  - Contains: AGENTS.md, ANTI-PATTERN-CATALOG.md, opencode.json, skills/ (81 files)
+
+### Repo additions for this release
+
+- **package.json** (NEW) — v1.0.0, defines scripts (test:bash-safe, tokenize), files manifest, engines
+- **.metricas/bookmark.json** — v3 → v4, added `applied_to_live` block
+- **ANTI-PATTERN-CATALOG.md** — 67 → 87 lines (merged live entries)
+- **AGENTS.md** — 109 → 167 lines (appended Protocol section from live)
+
+### Pre-release state (sprint 3 commit `8f3cb6c`)
+
 ### Sprint 2 (2026-06-07) — Global opencode optimization
 
 #### Global opencode (live, not in repo)

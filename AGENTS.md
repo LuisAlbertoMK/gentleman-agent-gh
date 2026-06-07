@@ -107,3 +107,61 @@ Without step 1, pre-compaction memory is lost.
 **DREAMING** (periodic): `mem_search(type="error|bugfix")` for patterns. Same error 2x→catalog. 3x→AGENTS.md rule.
 **AUTO-CLEAN**: Delete temp files in `C:\Users\MK\AppData\Local\Temp\opencode\` older than 24h at session start.
 <!-- /gentle-ai:engram-protocol -->
+
+<!-- gentle-ai:agent-protocol -->
+## Protocol — agente-optimizado v1.0
+
+> Orquestador de skills + presupuesto de tokens + persistencia + seguridad.
+> Cambios futuros: `mem_update` sobre `topic_key=protocol/agente-optimizado`, no edit ciego.
+> Review: cada 2 semanas o 20 sesiones, lo que ocurra primero.
+
+### A. Skill combo por tipo de tarea
+
+| Tarea | Cargá | No cargues |
+|-------|-------|------------|
+| Quick Q&A / charla | `karpathy-prompt`, `lean-context` | sdd-*, `judgment-day` |
+| Setup proyecto nuevo | `sdd-init`, `senior-engineer` | `caveman`, `judgment-day` |
+| Bug fix | `recovery-protocol`, `immune-system`, `sdd-verify` | `sdd-propose` |
+| Decisión arquitectura | `senior-engineer`, `sdd-propose` | — |
+| Code review | `code-review-agent`, `judgment-day` | — |
+| Refactor / optimizar | `karpathy-prompt`, `lean-context`, `metricas` | — |
+| Commit / PR | `commit-crafter`, `quality-gate`, `pr-evidence` | — |
+| Auditoría seguridad | `security-scanner` | — |
+| Sesión larga / thorough | sdd-* + `quality-gate` | `caveman` |
+
+### B. Presupuesto de tokens
+- Respuesta >500 tokens sin pedir detalle → resumen primero, expandí on-demand.
+- 5 turnos sin progreso → switch a `caveman lite`.
+- 10 turnos → `mem_session_summary` + reset.
+- Self-check cada 5 tool calls (verificar que no estés redundando).
+
+### C. Persistencia (Engram, NO archivos en `D:\`)
+- Decisión de arquitectura → `mem_save` con `topic_key` estable.
+- Bug fix → `mem_save` type=`bugfix`.
+- Cierre de sesión → `mem_session_summary` OBLIGATORIO antes de "listo".
+- Mismo error 2x → `immune-system` + catalog update.
+- Mismo flujo 3+ veces → consolidar en skill o AGENTS.md rule.
+
+### D. Seguridad (no opt-in)
+- Pre-commit / pre-PR → `quality-gate` + `security-scanner` (sin pedirlo).
+- PS 5.1 → Git Bash (nunca `&&` / `||` / `@{u}` directo).
+- Commit / push / `--force` / `-i` → solo con pedido EXPLÍCITO del usuario.
+- Nunca commit secrets; nunca `git config` sin pedirlo.
+
+### E. Subagent-first (ahorra 2-5K tokens por exploración)
+- Read-heavy (>3 archivos, scan, codebase map) → `delegate` a subagent `explore`.
+- Main context = síntesis + decisiones, NUNCA bulk reads.
+- Independent tool calls → un solo mensaje con múltiples invokes.
+
+### F. Reglas duras (no negociables)
+- UNA pregunta → STOP. Default: short. Verify before agree.
+- Show tradeoffs cuando hay >1 opción viable.
+- Cero filler ("Sure!", "Let me...", "Great question!").
+- No code w/o context → push back si lo piden.
+- Default-FAIL: tool output = evidencia, no auto-assessment.
+
+### G. Auto-evaluación post-task
+- Al cerrar tarea: `auto-metrics` 6 dims (correctness, tokens, error prevention, skill, speed, breadth).
+- Score <7 → trigger `immune-system` + ajuste de protocolo.
+- Score ≥9 → considerar `mem_save` del patrón como reusable.
+<!-- /gentle-ai:agent-protocol -->

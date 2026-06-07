@@ -56,6 +56,26 @@
 **Prevention**: "Any check that informs a decision must happen BEFORE the decision, not after."
 **Files**: AGENTS.md (Pre-Flight Gate)
 
+## 2026-06-05: TDZ bug — require placed AFTER its first use
+**Symptom**: Render deploy failed with `ReferenceError: Cannot access 'initSentry' before initialization` on `backend-misServicios/index.js:32`. Service exited before binding port. Production down.
+**Root cause**: Latent bug from commit `d164436` (feat Sentry). `const { initSentry } = require('./utils/sentry')` was placed BELOW the line that called `initSentry(env.NODE_ENV)`. In CommonJS, `const` is NOT hoisted (only the binding is created on scope entry; initialization happens at the require line). The bug only manifested in clean installs — Render's `pnpm install` triggered it, local dev's cached `node_modules` hid it for weeks.
+**Fix**: Move ALL `require()` calls to the top of the file. If a function uses a module at module scope (not inside a callback), that module's `require` MUST be above the function definition AND above any call to it.
+**Prevention**:
+1. **Order rule**: imports/requires → schema/types → constants → top-level calls. Never the reverse.
+2. **Self-check before committing any file with top-level calls**: `grep -n "^[a-z_].*(" file.js | head -5` and verify all referenced names appear in `require()` lines above.
+3. **Smoke test**: a `node --require <mock>` pre-commit script that loads `index.js` with external deps stubbed.
+**Files**: `backend-misServicios/index.js` (lines 15-16 require moved to top; warning comment added)
+
+## 2026-06-07: PowerShell string sort+join concatenates names without separator
+**Symptom**: After bulk-applying `ChangeDetectionStrategy` import to 19 files via PowerShell regex+sort+join, 5 files had `import { ComponentChangeDetectionStrategy } from '@angular/core';` — symbol names concatenated without comma. Build failed with TS2724.
+**Root cause**: Used `Sort-Object -Unique` to dedupe import members, then `($items -join ', ')`. When the original import had a single member like `Component` and the regex captured only that one token, the join logic produced the correct result for that path — but the FALLBACK branch (when no `@angular/core` import existed) used a different replacement that REPLACED the first import of ANY package and inserted the new import line after, leaving the old single-member import to be processed by the same dedupe logic. PowerShell's `-split` on a single-token string returns the token as-is, but the regex capture `$Matches[1]` for files with `import { Component } from '@angular/core'` lost the comma boundary, causing the join to glue tokens directly.
+**Fix**: Manual `Edit` tool applied to the 5 corrupted files. Replaced `ComponentChangeDetectionStrategy` with `ChangeDetectionStrategy, Component` in each. Build green.
+**Prevention**:
+1. **NEVER use `Sort-Object -Unique` + `-join` to manipulate TypeScript import statements.** PowerShell's string handling is hostile to comma-separated lists with spaces. Use the `Edit` tool with a precise `oldString`/`newString` per file, or write a one-shot sed/awk command, or use `ts-morph` if doing this systematically.
+2. **Build INCREMENTALLY when applying bulk changes**: after editing 2-3 files, run `pnpm build` to catch syntax errors before propagating them to 19 files. Detecting TS2724 at file 5 of 19 is OK; detecting it at file 19 means 14 wasted operations.
+3. **Pre-bulk-change smoke test**: if a script MUST be used, dry-run on 1 file first, read the diff manually, THEN apply to the rest.
+**Files**: `misServicios/src/app/{shared/footer,pages/pedidos,pages/pedidos-shein,pages/personalizados,admin/register-service}/*.ts` (5 files corrupted, all fixed).
+
 ## TEMPLATE for new entries
 ```
 ## YYYY-MM-DD: Short title
