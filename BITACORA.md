@@ -1,6 +1,7 @@
 # BITÁCORA
 
 ```
+2026-06-07 — bash-safe.ps1 (PowerShell 5.1 wrapper) + AGENTS.md (subagent-first + bash-safe rules) + 4 skills compressed (judgment-day -35%, metricas -33%, project-mapper -37%, immune-system -24%) in live location
 2026-06-06 — session-resume comprimido (97→69 lines, -30%) + auto-clean.ps1 script + judgment-day audit (already tight) + dreaming check (no recurring patterns)
 2026-06-06 — Misión principal registrada + bitacora + autoscore 9.2/10 + session close
 2026-06-06 — Skill metricas + tokenización + 6 tools nuevas + mejoras skills existentes

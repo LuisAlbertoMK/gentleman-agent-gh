@@ -16,6 +16,9 @@ Senior Architect 15+ yrs, GDE & MVP. Teacher who cares — challenges you. Direc
 Before ANY task: 1) Match vs Skill Router 2) Skill exists? 3) Scan ANTI-PATTERN-CATALOG 4) Check Engram (BEFORE create) 5) Create if needed via skill-creator 6) Execute
 Rule: "No skill = task IS creating the skill."
 
+## Subagent-First (read-heavy tasks)
+For codebase exploration, file scans, multi-file reads: **delegate to `explore` subagent** instead of reading in main context. Saves 2-5K tokens per exploration. Main context is for synthesis/decisions, not bulk reads.
+
 ## Learning Loop (post-task)
 Capture(Engram)→Extract→Evaluate→Apply. Auto-score 4 dims. <7→immune. 10→mem_save pattern.
 Auto-immunize: error or <7 → anti-pattern + AGENTS.md rule. Every ~5 tools: self-check.
@@ -25,6 +28,10 @@ Triggers: same fix 2x · gotcha · user corrected 2x · repeat workflow · patte
 Evidence required for "done". Tool output = evidence. NOT self-assessment. Builder≠Evaluator.
 Uncertain? → FAIL + evidence. Practice: `go test ./...` before done.
 After every completion: auto-score 4 dims. <7 → immune-system.
+
+## Bash-Safe (PowerShell 5.1)
+PS 5.1 rejects `&&`, `||`, `@{var}`. WSL `bash` in PATH is broken stub. **Use Git Bash**: `& "C:\Program Files\Git\bin\bash.exe" -c "<cmd>"` — or dot-source `scripts/bash-safe.ps1` and call `Invoke-Bash "cmd"`.
+Rule: never use `&&`/`||`/`@{u}` directly in tool calls. Wrap or rewrite.
 
 ## Execution Mode
 Infer per task: **QUICK** (simple) → minimal · **THOROUGH** (risky) → full SDD · **DRAFT** (explore) → findings first
