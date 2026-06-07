@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "git_ref": "opencode-efficiency-sprint-2",
+  "timestamp": "2026-06-07T03:30:00Z",
+  "label": "opencode global optimization - post-state",
+  "metrics": {
+    "global_AGENTS_md_chars": 6106,
+    "global_AGENTS_md_lines": 91,
+    "global_AGENTS_md_delta_pct": -40.3,
+    "global_ANTI_PATTERN_chars": 4682,
+    "global_ANTI_PATTERN_lines": 77,
+    "global_ANTI_PATTERN_delta_pct": 0.0,
+    "repo_AGENTS_md_chars": 6230,
+    "repo_AGENTS_md_lines": 109,
+    "repo_AGENTS_md_delta_pct": 10.2,
+    "repo_BITACORA_chars": 641,
+    "repo_SKILLS_INDEX_chars": 4089,
+    "repo_SKILLS_INDEX_lines": 75,
+    "repo_SKILLS_INDEX_delta_pct": -4.5,
+    "opencode_json_chars": 16059,
+    "tui_json_chars": 136,
+    "total_skills_chars": 88700,
+    "total_skills_count": 57,
+    "skills_compressed_so_far": 4,
+    "scripts_bash_safe_chars": 3592,
+    "auto_clean_chars": 1082,
+    "test_bash_safe_pass": "6/6",
+    "content_loss_threshold_pct": 5.0,
+    "max_actual_loss_pct_observed": 0.0
+  }
+}

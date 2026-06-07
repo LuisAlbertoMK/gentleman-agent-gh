@@ -1,7 +1,7 @@
 # SKILLS INDEX
 
-> Full trigger table for all 57 skills. **Read this file when the AGENTS.md compact table doesn't match your trigger**, or when you need the full list.
-> Located at project root, loaded on-demand via `read` tool.
+> Full trigger table for all 57 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Located at project root.
 
 ## Triggers → Skill
 
@@ -64,19 +64,17 @@
 | Bitacora, historial, histórico, qué pedí, request log | bitacora |
 | Dreaming, cross-session patterns, memory curation | dreaming |
 
-## Quick reference: most used
-
+## Quick groups
 - **Compression/style**: karpathy-prompt, karpathy-loop, caveman, lean-context
 - **Quality**: quality-gate, auto-metrics, immune-system, code-review-agent
-- **Memory**: session-resume, code-memory, dreaming, engram-protocol
+- **Memory**: session-resume, code-memory, dreaming
 - **Skills meta**: skill-creator, skill-registry, skill-improver, skill-digestion
 - **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner
-- **SDD** (full cycle): sdd-{init,explore,propose,spec,design,tasks,apply,verify,archive}
+- **SDD**: sdd-{init,explore,propose,spec,design,tasks,apply,verify,archive}
 - **PR/Issues**: branch-pr, pr-evidence, issue-creation, comment-writer
 - **Specialized**: metricas, doc-sync, bitacora, context-watchdog, recovery-protocol
 
 ## Load rule
-When trigger not in compact AGENTS.md table:
 1. `read` this file
-2. Find match in table
-3. `skill` tool with skill name
+2. Find match
+3. `skill` tool with name
