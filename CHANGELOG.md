@@ -78,20 +78,52 @@
 - 5 skills 52-78 lines (security-scanner, skill-creator, session-resume, quality-gate, auto-metrics) — Already at 5% loss floor. SKIP was the right call.
 - `tui.json`, `package.json`, `.gitignore` (in global) — Already minimal.
 
+### Sprint 2 close (2026-06-07) — Orchestrator extraction + skill sync
+
+#### Repo (versioned, committed, pushed)
+
+- **prompts/sdd-orchestrator.md** — `version: 1.0 (NEW)`
+  - Extracted from `opencode.json` inline prompt (10105 chars)
+  - New file: 10263 chars (with version metadata header)
+  - Inline size removed from opencode.json: **-10488 bytes (-65.3% on agent block)**
+  - Pattern matches all other sdd-* agents (file:... reference)
+  - Enables git diff, version control, CHANGELOG
+
+- **skills/{judgment-day,metricas,project-mapper,immune-system}/SKILL.md** — sync from live
+  - Was only `session-resume/` in repo
+  - Now: 4 compressed skills + tier 3 tiktoken script
+  - All match live versions (sprint 1 compression)
+
+- **.gitignore** — added `.metricas/` (working artifacts)
+
+#### Global opencode (live, not in repo)
+
+- **opencode.json** — `version: 1.0 → 1.1`
+  - Char count: 16059 → 5571 (-65.3%)
+  - Replaced inline `sdd-orchestrator.prompt` (10105 chars) with `{file:...}` reference
+  - All other sections preserved (MCP, permissions, agent defs)
+  - JSON validates: keys=[description, mode, permission, prompt, tools]
+
+- **prompts/sdd/sdd-orchestrator.md** — `version: 1.0 (NEW)` (live)
+  - Source: extracted from `opencode.json` line 103
+  - 10263 chars, includes version metadata header
+
 ### Quality gates
 
 - bash-safe self-test: **6/6 PASS** (verified post-edit, post-commit, post-push)
 - Max content loss observed: **4.5%** (SKILLS-INDEX), within 5% budget
 - MISION PRINCIPAL + 7 critical rules + 15 top skills + Skill Router + Engram Protocol: all preserved
+- opencode.json JSON validates: reparse OK, all keys preserved
 - Conventional commits, no AI attribution
+- **Commits pushed this close**: 1 (`abc7b4e`)
 
 ### Metrics (cumulative)
 
-- **Total chars saved**: ~7,000 (sprint 1 + sprint 2)
-- **Total tokens saved in context**: ~2,000 (at 3.5 chars/token)
-- **Commits pushed**: 3 (`83f40e7`, `e18e0af`, `b8ea4a8`)
-- **Files globally touched**: 7
-- **Files in repo touched**: 6
+- **Total chars saved**: ~14,500 (sprint 1 + sprint 2 + sprint 2 close)
+- **Total tokens saved in context**: ~4,100 (at 3.5 chars/token)
+- **Commits pushed**: 4 (`83f40e7`, `e18e0af`, `b8ea4a8`, `2a90b47`, `abc7b4e`)
+- **Files globally touched**: 9
+- **Files in repo touched**: 11
 
 ---
 
