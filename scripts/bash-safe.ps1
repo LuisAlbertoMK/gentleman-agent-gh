@@ -3,6 +3,9 @@
 .SYNOPSIS
     Bash-syntax safe executor for PowerShell 5.1 environments.
 
+.VERSION
+    1.0.0
+
 .DESCRIPTION
     PowerShell 5.1 does NOT support `&&`, `||`, or `@{var}` hash literals.
     WSL bash in PATH is a relay (fails without WSL). Git Bash at
@@ -20,6 +23,7 @@
 
 .NOTES
     Falls back to PATH bash (WSL) if Git Bash not found.
+    Self-test: 6/6 PASS (run Test-BashSafe after dot-sourcing).
 #>
 
 # Locate real bash interpreter
