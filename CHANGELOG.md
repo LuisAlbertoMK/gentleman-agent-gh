@@ -5,6 +5,48 @@
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-06-07 — Cleanup: untrack .metricas, remove historical docs, harden .gitignore
+
+### Removed (historical docs, content preserved in CHANGELOG/AGENTS)
+
+- `gentle-ai-gaps-analysis.md` (3.9 KB) — 2026-05-26 ecosystem analysis snapshot
+- `KARPATHY-IMPROVEMENT-LOG.md` (21.6 KB) — 2026-05-26 Karpathy loop log
+- `SELF-IMPROVEMENT-V2-REPORT.md` (3.5 KB) — 2026-05-29 self-improvement report
+- `SELF-IMPROVEMENT-V2-TESTS.md` (6.6 KB) — 2026-05-29 self-improvement test suite
+- **Total removed**: 35.5 KB historical docs (still in git history if needed)
+
+### Untracked
+
+- `.metricas/bookmark.json` — working artifacts (was tracked, now `.gitignore`'d)
+  - File preserved on disk (3.8 KB) for local sprint metrics
+  - Pattern `.metricas/` already in .gitignore; this fixes retroactive tracking
+
+### Hardened `.gitignore`
+
+- Expanded from 142 B → 1.6 KB
+- Added: `*.bak`, `*.tmp`, `*.orig`, `*.rej`, `.bak/`, `.backup/`, `*.pre-*`
+- Added: `scripts/*.local.ps1`, `scripts/.env`
+- Added: Node tooling (defensive — not used but ready)
+- Added: Build artifacts (defensive — not used)
+- Added: Secrets (`.env`, `*.pem`, `*.key`, `secrets/`) — defensive
+- Added: Engram runtime cache patterns
+
+### Kept (essential)
+
+- `README.md` (2.4 KB) — public repo description
+- `ROADMAP.md` (1.1 KB) — project state (completed + next ideas)
+- `AGENTS.md` (9.2 KB), `ANTI-PATTERN-CATALOG.md` (6.8 KB), `BITACORA.md` (1.9 KB)
+- `CHANGELOG.md`, `SKILLS-INDEX.md` — documentation
+- `opencode.json`, `package.json` — config
+- `commands/`, `prompts/`, `scripts/`, `skills/` — runtime assets
+
+### Metrics
+
+- Tracked file count: 111 → 105 (-6 files)
+- Root `.md` files: 12 → 7 (-5 files)
+- Repo root size (without .git): reduced by ~35.5 KB
+- `git status` after commit: clean
+
 ## [1.0.0] - 2026-06-07 — Sprint 3 APPLIED to live
 
 **First stable release.** Sprint 3 results applied to `C:\Users\MK\.config\opencode\`. All divergences resolved, anti-pattern learnings merged, scripts deployed.
