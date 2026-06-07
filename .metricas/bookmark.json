@@ -24,8 +24,11 @@
     "skills_compressed_so_far": 4,
     "scripts_bash_safe_chars": 3592,
     "auto_clean_chars": 1082,
+    "sdd_apply_cmd_chars": 2081,
+    "sdd_apply_cmd_delta_pct": -19.1,
     "test_bash_safe_pass": "6/6",
     "content_loss_threshold_pct": 5.0,
-    "max_actual_loss_pct_observed": 0.0
+    "max_actual_loss_pct_observed": 4.5,
+    "push_status": "pushed to origin/master @ e18e0af"
   }
 }
