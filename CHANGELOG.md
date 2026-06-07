@@ -94,6 +94,11 @@
   - Now: 4 compressed skills + tier 3 tiktoken script
   - All match live versions (sprint 1 compression)
 
+- **commands/sdd-{apply,archive,continue,explore,ff,init,new,onboard,verify}.md** — sync from live
+  - 9 commands total, versioned 1.0 with changelog metadata
+  - Pattern: `agent: sdd-orchestrator, subtask: true`
+  - Total: 12179 chars / 256 lines
+
 - **.gitignore** — added `.metricas/` (working artifacts)
 
 #### Global opencode (live, not in repo)
@@ -107,6 +112,14 @@
 - **prompts/sdd/sdd-orchestrator.md** — `version: 1.0 (NEW)` (live)
   - Source: extracted from `opencode.json` line 103
   - 10263 chars, includes version metadata header
+
+#### Dreaming audit (post-close)
+
+- 15 engram memories on opencode searched
+- 0 bugfix memories (clean, no recurring errors)
+- 6 sprint-2 memories with overlap (197, 198, 199, 201, 202) — could be consolidated
+- 1 pending conflict on old #108 (session-resume, working correctly, not actionable)
+- 0 contradictions in active work
 
 ### Quality gates
 
