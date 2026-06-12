@@ -9,7 +9,7 @@
 
 | Métrica | Antes | Después | Δ |
 |---------|-------|---------|---|
-| Skills total | 56 (decía 57) | 56 + _shared | fixed |
+| Skills total | 56 (decía 57) | 57 + _shared | fixed |
 | SDD commands | 7/9 | **13** (cycle complete) | +6 |
 | Broken refs | 1 | **0** ✅ | fixed |
 | TDD docs weight | 31.4 KB | 14.1 KB ✅ | -55.2% |
@@ -51,7 +51,7 @@
 | Tarea | Resultado |
 |-------|-----------|
 | Model fields | `opencode.json` → `sdd-orchestrator.model` added |
-| Test suite | `scripts/skill-test-suite.ps1` → 56 skills, 98.2% PASS |
+| Test suite | `scripts/skill-test-suite.ps1` → 57 skills, 100% PASS |
 
 ---
 
@@ -60,7 +60,7 @@
 | Activo | Detalle |
 |--------|---------|
 | 0 broken refs ✅ | Todas las referencias internas resueltas |
-| 56 skills + _shared | SKILLS-INDEX sincronizado |
+| 57 skills + _shared | SKILLS-INDEX sincronizado |
 | 13 commands | SDD cycle completo |
 | ~213 KB | -7.9% del peso original |
 | `scripts/` | 4 scripts: auto-clean, bash-safe, tokenize-all, cross-ref-check, skill-test-suite |
