@@ -62,7 +62,7 @@ Top 15 most-used (full table in `SKILLS-INDEX.md`, read on demand):
 **Trigger not here?** → `read SKILLS-INDEX.md` for full 57-skill table.
 
 ### Anti-Pattern Catalog
-`{file:C:\Users\MK\.config\opencode\ANTI-PATTERN-CATALOG.md}` — scan BEFORE any task.
+`{file:ANTI-PATTERN-CATALOG.md}` — scan BEFORE any task.
 
 ### Skill Router
 Task? → Behavioral match (primary) + Trigger match (secondary).
@@ -105,7 +105,7 @@ Proactive: search BEFORE working on prior context.
 Without step 1, pre-compaction memory is lost.
 
 **DREAMING** (periodic): `mem_search(type="error|bugfix")` for patterns. Same error 2x→catalog. 3x→AGENTS.md rule.
-**AUTO-CLEAN**: Delete temp files in `C:\Users\MK\AppData\Local\Temp\opencode\` older than 24h at session start.
+**AUTO-CLEAN**: Delete temp files in `$env:LOCALAPPDATA\Temp\opencode\` older than 24h at session start.
 <!-- /gentle-ai:engram-protocol -->
 
 <!-- gentle-ai:agent-protocol -->
