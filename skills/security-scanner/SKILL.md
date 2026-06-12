@@ -4,26 +4,23 @@ description: >
   Pre-commit security scan: secrets, injection patterns, dependency vulns, dangerous APIs.
   Trigger: "security", "seguridad", "vulnerabilidad", "auditar", "safe check", "harden".
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.0"
+metadata: author: gentleman-programming, version: "1.1", changelog: "1.0->1.1 (sprint 5: 78->60 lines, -23.1%, compacted grep patterns)"
 ---
 
 ## When
-Before committing sensitive code, before deploying, user asks "is this secure".
+Before committing sensitive code, deploying, or user asks "is this secure"
 
-## Critical Patterns
+## Scan Dimensions
+| Category | Detection |
+|----------|-----------|
+| **Secrets** | `grep: sk-[a-zA-Z0-9]+, BEGIN.*KEY, password\s*=` |
+| **Injection** | Concatenated queries, raw `exec()` |
+| **Sensitive APIs** | `eval()`, `exec()`, `unsafe`, `os/exec` |
+| **Dependencies** | `go list -m` + `npm audit` + safety check |
+| **Config** | Debug mode, permissive CORS, no HTTPS |
+| **File access** | Path traversal, symlink attacks |
 
-### Scan dimensions
-
-| Category | What to check | Detection method |
-|----------|--------------|------------------|
-| **Secrets** | API keys, tokens, passwords | `grep` patterns: `sk-[a-zA-Z0-9]+`, `BEGIN.*KEY`, `password\s*=` |
-| **Injection** | SQL, command, path injection | `grep` for concatenated queries, raw `exec()` |
-| **Sensitive APIs** | `eval()`, `exec()`, `unsafe`, `os/exec` | Language-specific dangerous fn calls |
-| **Dependencies** | Known vulns | `go list -m` + `npm audit` + safety check |
-| **Config** | Debug mode, permissive CORS, no HTTPS | Check env vars, middleware setup |
-| **File access** | Path traversal, symlink attacks | Check file read patterns, user-provided paths |
-
-### Quick patterns by language
+## Quick patterns by language
 
 **Go:**
 ```
@@ -34,7 +31,7 @@ grep -rn "os/exec" --include="*.go"
 
 **JS/TS:**
 ```
-grep -rn "process\.env\.\|apiKey\|password" --include="*.{js,ts,jsx,tsx}" | grep -v "\.env\|\.config\|test"
+grep -rn "process\.env\.\|apiKey\|password" --include="*.{js,ts}" | grep -v "\.env\|\.config\|test"
 grep -rn "eval(\|exec(\|shelljs\|child_process" --include="*.{js,ts}"
 npm audit --json
 ```
@@ -45,34 +42,20 @@ grep -rn "os\.environ\[\|password\|secret\|api_key" --include="*.py" | grep -v "
 grep -rn "eval(\|exec(\|subprocess\." --include="*.py"
 ```
 
-### Output format
+## Output
 ```
 ## Security Scan: {scope}
-
 ### Summary
-- Secrets found: 2 ⚠️
-- Injection risks: 0 ✅
-- Dangerous APIs: 0 ✅
-- Vuln dependencies: 0 ✅
+- Secrets: {N} | Injection: {N} | Dangerous APIs: {N} | Vuln deps: {N}
 
-### Issues (severity: CRITICAL / HIGH / MEDIUM / LOW)
-
-#### CRITICAL: API key in source code
-- File: src/config.go:15
-- Pattern: `apiKey := "sk-..."`  
-- Fix: Use env var. `apiKey := os.Getenv("API_KEY")`
-
-#### MEDIUM: Raw SQL query
-- File: src/db/users.go:42
-- Pattern: `db.Exec("SELECT * FROM users WHERE id = " + userID)`
-- Fix: Use parameterized query: `db.Exec("SELECT * FROM users WHERE id = $1", userID)`
-
-### ✅ No issues found in: auth, middleware, routes
+### Issues (CRITICAL/HIGH/MEDIUM/LOW)
+#### CRITICAL: {type} in {file:line}
+- Pattern: `{found}` → Fix: `{suggested fix}`
 ```
 
-### Rules
-1. Run `grep` patterns BEFORE manual inspection. Tool first.
-2. Critical + High → must fix before commit. Medium → suggest fix.
-3. Verify false positives manually — don't auto-flag env var assignments
-4. If issues found: always provide the fix, not just the warning
-5. At end: "Remaining risk: NONE / LOW / MED / HIGH (explain why)"
+## Rules
+1. Run `grep` BEFORE manual inspection. Tool first.
+2. Critical+High → must fix before commit. Medium → suggest.
+3. Verify false positives — don't auto-flag env vars
+4. Issues found? Always provide fix, not just warning
+5. End with: "Remaining risk: NONE/LOW/MED/HIGH (why)"

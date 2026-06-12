@@ -4,11 +4,11 @@ description: >
   Dual adversarial review: 2 blind judges, verdict synthesis, fix/re-judge loops.
   Trigger: "judgment day", "juzgar", "dual review", "que lo juzguen".
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.7", changelog: "1.6->1.7 (sprint 1: 101->66 lines, -34.7%, removed redundant Decision Tree, condensed Rules)"
+metadata: author: gentleman-programming, version: "1.8", changelog: "1.7->1.8 (sprint 5: 80->65 lines, -18.8%, compacted protocol)"
 ---
 
 ## Triggers
-"judgment day"/"juzgar"/"dual review"/"que lo juzguen" · post-impl pre-merge · high-risk review
+"judgment day"/"juzgar"/"dual review"/"que lo juzguen" · post-impl pre-merge · high-risk
 
 ## Protocol
 
@@ -29,16 +29,16 @@ Launch 2 delegates (async, parallel) — same target, NO cross-contamination. NE
 **Real**: bug/data-loss/sec in NORMAL use → FIX. **Theoretical**: contrived → INFO. Test: "Can normal user trigger?" YES=real / NO=theoretical.
 
 ### P4: Fix + Re-Judge
-Confirmed → delegate Fix Agent → re-launch BOTH judges. After 2 iter → ASK user. Both clean → APPROVED ✅.
+Confirmed → delegate Fix Agent → re-launch BOTH. After 2 iter → ASK user. Both clean → APPROVED ✅.
 
 ### P5: Convergence
 R1: present → user confirms → re-judge full. R2+: re-judge CONFIRMED CRITICALs only. Real WARN fix inline. Theoretical → INFO. **APPROVED** = 0 CRIT + 0 real WARN.
 
 ## Flow
 ```
-User triggers JD → P0 skills → Launch A+B (parallel) → Wait → Synthesize
+Trigger → P0 skills → Launch A+B (parallel) → Wait → Synthesize
 ├─ Clean → APPROVED ✅
-└─ Issues → present → ask fix → Fix Agent → re-judge (max 2 iter) → ASK user
+└─ Issues → present → ask fix → Fix Agent → re-judge (max 2)
 ```
 
 ## Sub-Agent Prompts
@@ -46,10 +46,8 @@ User triggers JD → P0 skills → Launch A+B (parallel) → Wait → Synthesize
 ### Judge (A=B)
 ```
 Adversarial review. Find problems ONLY.
-Target: {files}
-{Project Standards}
-Criteria: correctness, edge cases, error handling, performance, security, naming.
-Return structured list (NO praise):
+Target: {files} | {Project Standards}
+Criteria: correctness, edge cases, error handling, perf, security, naming.
 Severity: CRITICAL | WARNING(real) | WARNING(theoretical) | SUGGESTION
 File:{path}(line N) · Description: what+why · Fix: one-line intent
 No issues → "VERDICT: CLEAN"
@@ -57,9 +55,9 @@ No issues → "VERDICT: CLEAN"
 
 ### Fix Agent
 ```
-Surgical. Apply ONLY confirmed issues. CONFIRMED: {findings} · {Project Standards}
+Surgical. Apply ONLY confirmed: {findings} | {Project Standards}
 Rules: fix ONLY confirmed · same pattern → ALL affected files
-FIXES APPLIED: [file:line] — {what fixed}
+FIXES: [file:line] — {what fixed}
 ```
 
 ## Output
@@ -70,7 +68,7 @@ FIXES APPLIED: [file:line] — {what fixed}
 ### Re-judge: A:CLEAN ✅ | B:CLEAN ✅
 ### JDGMNT: APPROVED ✅
 ```
-ESCALATED: `JDGMNT: ESCALATED ⚠️ — User stopped after {N} iter. Manual review required.`
+ESCALATED: `JDGMNT: ESCALATED ⚠️ — Manual review after {N} iter.`
 
 ## Blocking
 1. NEVER APPROVED until: R1 clean OR R2: 0 CRIT + 0 real WARN
