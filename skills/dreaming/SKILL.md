@@ -1,57 +1,35 @@
 ---
 name: dreaming
-description: > Cross-session pattern extraction. Review Engram memory, find recurring patterns, curate memory, update skills.
-  Trigger: Session start, session end, periodic self-check, "dream", "patrones", "memory review", every ~5 tool calls.
+description: Cross-session pattern extraction via Engram. Curate memory, update skills.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.0"
+metadata: version: "1.2"
+triggers: session start/end, ~5 tool calls, "dream/patrones/memory review"
 ---
 
-## Protocol
+## Protocol (5 modes — same pattern: scan→cluster→act)
 
-### SESSION START — quick scan
-```
-1. `mem_context` — last session context
-2. `mem_search(query="error|bug|fix|wrong|mistake")` — unresolved?
-3. Scan ANTI-PATTERN-CATALOG.md — active immunizations
-4. Current task similar to past failure? → apply prevention
-```
+| Mode | When | Action |
+|------|------|--------|
+| **Quick scan** | Session start | MANDATORY before any work. `mem_context` + `mem_search(keywords=user first msg)` + `mem_search(error|bug)` + scan anti-patterns. Past failure like current?→prevent. |
+| **Project fingerprint** | First interaction | Save project fingerprint: `mem_save(type="architecture", title="project:{name}", topic_key="project/{name}", content="**Tech**:{lang/framework/db}**Structure**:{dirs}**Patterns**:{arch}**Tests**:{count}**Gaps**:{known issues}")` |
+| **Harvest** | Session end | `mem_session_summary` + extract patterns (error→catalog, workflow→skill, arch→mem_save). Same error 2+ sessions→AGENTS.md. |
+| **Mini-dream** | ~5 tools | Self-check quality/efficiency/reusability. Skill gap→create/update. Error repeated→catalog. |
+| **Full dream** | Milestone | `mem_search(type="error|bugfix")` across ALL sessions. ≥2→anti-pattern. ≥3→AGENTS.md rule. Check decision contradictions. Curate stale obs. |
 
-### SESSION END — reflection harvest
-```
-1. `mem_session_summary` — structured close
-2. Extract patterns: recurring error? → catalog. New workflow? → skill. Arch decision? → mem_save.
-3. Cross-session: same error 2+ sessions? → AGENTS.md rule. Same tool misuse 2x? → update skill.
-```
+## Proactive Recall (NEW — mandatory)
+BEFORE any task execution:
+1. Extract 3-5 keywords from user's message
+2. `mem_search(query="<keywords>", limit=5)` — check if similar work was done before
+3. If found → `mem_get_observation` for details → apply past learnings
+4. If no results → proceed fresh, save results for future
 
-### PERIODIC (~5 tool calls) — mini-dream
-```
-Self-check: Quality? Efficiency? Reusability? Improvement?
-Auto-improve: skill gap → create/update
-Immune check: error repeated? → catalog
-```
-
-### FULL DREAM (after milestone) — deep curation
-```
-1. `mem_search(type="error|bugfix")` across ALL sessions
-2. Cluster by root cause: ≥2 → anti-pattern. ≥3 → AGENTS.md rule.
-3. `mem_search(type="decision|architecture")`: contradictions? → flag. Recurring? → extract to skill.
-4. Curation: stale obs → note cleanup. Critical obs → ensure topic_key.
-```
-
-## Triggers
-| Trigger | Action |
-|---------|--------|
-| Session start | Quick scan: context + anti-patterns |
-| Session end | Harvest + catalog update |
-| Every 5 tools | Mini-dream self-check |
-| Major milestone | Full dream curation |
-| Same error 2x | Anti-pattern entry |
-| Same error 3x | AGENTS.md rule |
+## Project Fingerprint (NEW — first interaction per project)
+When entering a project for the first time (or after long gap):
+1. Detect: lang, framework, test tool, arch pattern, dir layout
+2. Save to engram with `topic_key="project/{name}"`
+3. On subsequent sessions: `mem_search(topic_key="project/{name}")` to reload context
+4. Update when project structure changes significantly
 
 ## Anti-Patterns
-| ❌ Don't | ✅ Do |
-|----------|-------|
-| Isolated sessions | Cross-session pattern extraction |
-| Fix current error only | Document for permanent immunity |
-| Engram grows unbounded | Curate: promote signal, drop noise |
-| Treat every session as new | Scan memory before starting |
+❌ Isolated sessions · fix-only-no-document · every session fresh · no memory scan before work · project context lost between sessions
+✅ Cross-session patterns · permanent immunity · curate signal/drop noise · scan memory first · project fingerprint persisted

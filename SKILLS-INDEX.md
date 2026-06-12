@@ -65,6 +65,7 @@
 | Doc sync, documentación, readme, sincronizar docs | doc-sync |
 | Bitacora, historial, histórico, qué pedí, request log | bitacora |
 | Dreaming, cross-session patterns, memory curation | dreaming |
+| Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
 
 ## Quick groups
 - **Compression/style**: karpathy-prompt, karpathy-loop, caveman, lean-context

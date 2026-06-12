@@ -1,59 +1,39 @@
 ---
 name: self-reflection
-description: >
-  Hermes-style closed learning loop. Auto-reflect after tasks, self-evaluate periodically, create/update skills from experience.
-  Trigger: Task completion, session end, error patterns, "reflexioná", "aprendé de esto".
+description: Hermes closed learning loop. Reflect→learn→improve after tasks.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "2.1"
+metadata: version: "2.2"
+triggers: task completion, session end, error patterns, "reflexioná", "aprendé de esto"
 ---
 
-## CLOSED LOOP (Hermes-style)
-**Observe → Reflect → Optimize → Apply** — auto after EVERY task.
+## CLOSED LOOP
+**Observe → Reflect → Optimize → Apply** — after EVERY task.
 
-### Per-Task (after done/listo/next)
-1. **CAPTURE**: worked? failed? non-obvious? → Engram
+### Per-Task
+1. **CAPTURE**: worked? failed? → Engram
 2. **EXTRACT**: reusable? → `skill-creator` or update SKILL.md
-3. **EVALUATE**: error root cause → `immune-system` + prevention rule
-4. **APPLY**: update behavior (Engram + skill + AGENTS.md if general)
-5. **SCORE**: `auto-metrics` (6 dims) — always
-6. **IMMUNIZE**: if error or <7 → anti-pattern + AGENTS.md Rules
+3. **EVALUATE**: root cause → `immune-system` + prevention
+4. **APPLY**: update behavior (Engram + skill + AGENTS.md)
+5. **SCORE**: `auto-metrics` 6 dims
+6. **IMMUNIZE**: error or <7 → anti-pattern + AGENTS.md Rules
 
-### Periodic (~5 tools or after major task)
-1. **SELF-CHECK**: consistent? repeating? underused skills?
-2. **AUTO-IMPROVE**: skill to create/update → delegate `skill-creator`
-3. **VERIFY**: measurable? (less errors, faster, concise)
+### Periodic (~5 tools)
+Self-check: consistent? repeating? underused? → auto-improve (delegate `skill-creator`) → verify (less errors, faster?)
 
-## Skill Creation Triggers
-| Pattern | Action |
-|---------|--------|
-| Same fix 2+ times | Create skill with pattern |
-| Non-obvious gotcha | Doc in skill/update existing |
-| User corrected 2x | Recovery-skill or update protocol |
-| Repeated complex workflow | Workflow skill |
-| Pattern across 3+ files | Extract to reusable skill |
+## Skill Triggers
+Same fix 2x→skill · gotcha→doc skill · user corrected 2x→protocol · complex workflow→skill · pattern 3+ files→extract
 
-## Checkpoint (every major interaction)
-```
-├─ Quality: solved problem?
-├─ Efficiency: too many tokens? verbose?
-├─ Learning: didn't know before?
-├─ Reusability: need again? → skill?
-└─ Improvement: differently next time?
-```
+## Checkpoint
+Quality? Efficiency? Learning? Reusability→skill? Different next time?
 
 ## Type Reflection
-- **Coding**: pattern? maintainable? tested?
-- **Troubleshoot**: enough info? correct diagnosis? root cause?
-- **Design**: reqs understood? tradeoffs? scalable?
-- **Skill**: deserves own? update existing?
+- Code: pattern? maintainable? tested?
+- Troubleshoot: enough info? correct diagnosis?
+- Design: reqs? tradeoffs? scalable?
+- Skill: own skill? update existing?
 
 ## Frustration Signals
-"ya te dije" · "no es eso" · "otra vez" · short tone
-→ STOP → acknowledge → diagnose root → LEARN → update prevention
+See `recovery-protocol` frustration signals table.
 
 ## Commands
-```bash
-# Reflect after task
-mem_save(type="learning", content="**What**: ...\n**Learned**: ...")
-# If pattern: delegate(skill-creator) or edit SKILL.md
-```
+`mem_save(type="learning", content="**What**:...\n**Learned**:...")` — if pattern: `skill-creator` or edit SKILL.md

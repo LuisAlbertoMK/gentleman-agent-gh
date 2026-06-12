@@ -1,68 +1,45 @@
 ---
 name: session-resume
-description: >
-  Safe session resume: gate non-blocking that checks git state (uncommitted + unpushed)
-  BEFORE continuing any "where did we leave off" / "continuá" request.
-  Triggers: "dónde lo dejamos", "continuá", "qué hicimos", "where did we leave off",
-  "en que nos quedamos", session start in git repo.
+description: Safe session resume — git state gate (uncommitted + unpushed) BEFORE "continuá".
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.1"
+metadata: version: "1.3"
+triggers: "dónde lo dejamos", "continuá", session start in git repo
 ---
 
-## When
-Resume prior work OR session start in git repo. NOT for frustration → `recovery-protocol`.
+## Gate
+1. **is git repo?** NO → `mem_context` only. YES → check 2 states.
+2. **Dirty** (uncommitted)? WARN+ask: commit/stash/continue.
+3. **Ahead** (unpushed)? WARN+ask: push/keep/continue.
+4. **Both clean** → silent, `mem_context` only.
+5. **One question, max 4 options.** Terse output (numbers+paths).
 
-## Critical Patterns
-1. **Non-blocking gate** — INFORM, ASK, never auto-commit silently
-2. **Two states**: uncommitted (dirty) + unpushed (ahead of remote)
-3. **Skip git if not a repo** → Engram-only recovery
-4. **Skip output if clean** → silent Engram restore
-5. **One question, max 4 options** — commit/push/stash/continue
-6. **Terse output** — numbers+paths, not narrative
+## Proactive Recall (post-gate, pre-resume)
+After git gate passes, BEFORE resuming work:
+1. `mem_search(query="<last session keywords>", limit=5)` — find related past work
+2. If user message has keywords → search for matching observations
+3. Present relevant past decisions/bugfixes as context snapshot
+4. Check project fingerprint exists: `mem_search(topic_key="project/{name}")`
+5. If missing → trigger Project fingerprint mode (dreaming skill)
 
-## Detection (parallel, <100ms each)
+## Commands
 ```bash
 git status --porcelain                    # dirty if non-empty
 git log @{u}.. --oneline 2>/dev/null      # unpushed if non-empty
-git branch --show-current
-git log -1 --oneline
+git branch --show-current; git log -1 --oneline
 ```
 
-## Decision Tree
+## Output (dirty only)
 ```
-is git repo? NO → skip → mem_context
-YES → dirty? WARN+ask: commit/stash/continue
-     → unpushed? WARN+ask: push/keep/continue
-     → both clean → silent → mem_context
+⚠️ {branch}: {N} uncommitted ({paths}) + {M} unpushed ({sha} {msg})
+Action: commit/push/stash/continue?
 ```
+Actions: commit→`git add -A`+msg · push→`git push` (quality-gate) · stash→`git stash push -m "auto-stash session-resume"` · continue→Engram.
 
-## Output (when dirty)
-```
-**Git state**: ⚠️ dirty
-- Branch: {branch}
-- Uncommitted: {N} files
-  - {path1}, {path2}, … +X more (max 5)
-- Unpushed: {M} commits
-  - {short-sha} {msg}
-**Action**: commit now / push first / stash / continue without
-```
-
-Actions: commit → `git add -A` + conv msg · push → `git push` (quality-gate first) · stash → `git stash push -m "auto-stash session-resume"` · continue → Engram recovery.
-
-## Side-State Hooks
-- `.refactor/steps.json` exists → ask: continue from incomplete OR restart
-- `.metricas/bookmark.json` exists → report label+ts, ask: compare or discard
-
-## After Check (always)
-`mem_context` to restore session summary. **THIS is the actual resume** — git check is just the safety gate.
+## Post-Check
+`mem_context` = actual resume. Git check is just the safety gate.
 
 ## Anti-Patterns
-- ❌ Auto-commit/push without asking
-- ❌ Run mid-task (only on resume/start)
-- ❌ Output > 10 lines
-- ❌ Skip check because "small project"
+❌ Auto-commit/push · mid-task runs · output >10 lines · skip because "small project"
 
 ## Resources
-- **Engram**: `mem_context` (actual resume)
-- **Quality gate**: required before commit/push
-- **Recovery protocol**: for frustration (different intent)
+Engram: `mem_context` · quality-gate · recovery-protocol (frustration, not resume)
