@@ -1,6 +1,8 @@
 ---
 name: code-memory
-description: > Persist code state between sessions + session handoff for continuity.
+description: >
+  code-memory skill
+triggers: "Continuá, code memory, multi-session"
   Trigger: "continuá", "donde quedamos", multi-session, session end, handoff.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1"
@@ -34,3 +36,4 @@ Before session end, save EXACT state so next session resumes without re-explaini
 
 ## AUTO-SAVE TRIGGERS
 file created/deleted · >20 line change · discovery · important question · decision made
+

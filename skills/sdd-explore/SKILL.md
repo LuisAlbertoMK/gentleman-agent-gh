@@ -1,6 +1,8 @@
 ---
 name: sdd-explore
-description: > Explore codebase before change.
+description: >
+  sdd-explore skill
+triggers: "Explore codebase, pre-design"
   Trigger: Orchestrator launches exploration.
 license: MIT
 metadata: author: gentleman-vMK, version: "2.1"

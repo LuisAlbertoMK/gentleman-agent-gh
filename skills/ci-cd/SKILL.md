@@ -1,6 +1,8 @@
 ---
 name: ci-cd
-description: > GitHub Actions CI + quality gate + tests + lint (#27).
+description: >
+  ci-cd skill
+triggers: "CI/CD pipeline, GitHub Actions, quality gate"
   Trigger: CI setup, failed PR checks, pipeline config.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1"
@@ -32,3 +34,4 @@ Quality gate before tests (fail fast) · Tests on every push (catch regressions)
 PR → CI → quality gate → tests → lint → merge if green
 SDD mode: CI validates spec coverage (tests vs specs)
 Auto-gen `.github/workflows/ci.yml` if missing
+

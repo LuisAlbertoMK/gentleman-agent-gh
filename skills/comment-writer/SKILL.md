@@ -1,6 +1,8 @@
 ---
 name: comment-writer
-description: > Write warm, direct collaboration comments.
+description: >
+  comment-writer skill
+triggers: "PR comments, issue replies, feedback"
   Trigger: PR feedback, issue replies, reviews, GitHub comments.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.0"
@@ -22,3 +24,4 @@ No pile-ons · Match thread language · Regional tone → persona
 ```bash
 gh pr view <PR> --json title,body,additions,deletions,changedFiles
 ```
+

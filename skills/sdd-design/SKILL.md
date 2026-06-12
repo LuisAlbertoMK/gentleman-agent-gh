@@ -1,6 +1,8 @@
 ---
 name: sdd-design
-description: > Technical design: HOW, architecture decisions.
+description: >
+  sdd-design skill
+triggers: "Technical design, HOW"
   Trigger: Orchestrator launches design.
 license: MIT
 metadata: author: gentleman-vMK, version: "2.1"

@@ -1,6 +1,8 @@
 ---
 name: sdd-contracts
-description: > Phase contracts: artifact dependencies, result contracts, shared grammar.
+description: >
+  sdd-contracts skill
+triggers: "SDD phase contracts, artifact dependencies"
   Trigger: Starting SDD cycle, between phases, artifact validation.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.0"
@@ -38,3 +40,4 @@ explore → propose → spec → design → tasks → apply → verify → archi
 | Input stale | FLAG → ask re-validation |
 | Bad output | Return schema violations |
 | Phase skipped | BLOCK → ask user |
+

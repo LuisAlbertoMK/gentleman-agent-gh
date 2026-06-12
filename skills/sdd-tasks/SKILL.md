@@ -1,6 +1,8 @@
 ---
 name: sdd-tasks
-description: > Task breakdown: concrete actionable steps.
+description: >
+  sdd-tasks skill
+triggers: "Task breakdown, implementation plan"
   Trigger: Orchestrator launches tasks.
 license: MIT
 metadata: author: gentleman-vMK, version: "2.2"

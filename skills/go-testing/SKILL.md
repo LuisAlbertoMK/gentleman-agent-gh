@@ -1,6 +1,8 @@
 ---
 name: go-testing
-description: > Go testing patterns, Bubbletea TUI.
+description: >
+  go-testing skill
+triggers: "Go tests, Bubbletea TUI"
   Trigger: Go tests, teatest, test coverage.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1"
@@ -50,3 +52,4 @@ Exec: Mock→intfc | Real→--short | Files→t.TempDir()
 go test ./...     go test -v ./...    go test -run TestX
 go test -cover   go test -update    go test -short
 ```
+

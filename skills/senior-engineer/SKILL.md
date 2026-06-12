@@ -1,6 +1,8 @@
 ---
 name: senior-engineer
-description: > Staff+ competencies: architecture, trade-offs, delegation.
+description: >
+  senior-engineer skill
+triggers: "Senior architect, trade-offs, system design"
   Trigger: Arch decisions, trade-offs, "system thinking", delegation.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1"
@@ -38,3 +40,4 @@ RED: security, sensitive data, breaking changes, deploys
 - Delegate: scope/constraints/lane/review needed?
 - Decide: evidence? tradeoffs? explainable? own it?
 - Review AI: compiles? edge cases? real tests? patterns?
+

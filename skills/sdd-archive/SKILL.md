@@ -1,6 +1,8 @@
 ---
 name: sdd-archive
-description: > Sync delta→main→archive + rollback.
+description: >
+  sdd-archive skill
+triggers: "Archive changes, delta to main"
   Trigger: Orchestrator launches archive, revert change.
 license: MIT
 metadata: author: gentleman-vMK, version: "2.3"
@@ -22,3 +24,4 @@ Executor sub-agent? → proceed.
 Create: `git diff HEAD`→`snapshot.diff`, write `rollback.sh` (`git revert <commit>` or manual), `rollback.md` (files+migrations+config reverted). Store in `archive/{change}/rollback/`.
 
 Execute: `git revert <commit>` or follow rollback.sh → verify no residuals.
+

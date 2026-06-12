@@ -1,6 +1,8 @@
 ---
 name: quality-gate
-description: > Pre-commit quality gate: TDD pass, secrets scan, conventional commits.
+description: >
+  quality-gate skill
+triggers: "Quality gate, pre-commit"
   Trigger: Before any "git commit", "git push", "gh pr create".
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1"
@@ -51,3 +53,4 @@ pytest                           # Python
 git diff --cached | Select-String -Pattern '(api[_-]?key|secret|token|-----BEGIN)'
 echo "{message}" | Select-String -Pattern '^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9\._-]+\))?!?: .+'
 ```
+

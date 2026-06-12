@@ -1,6 +1,8 @@
 ---
 name: sdd-spec
-description: > Write delta specs: reqs + G/W/T scenarios.
+description: >
+  sdd-spec skill
+triggers: "Specs, Given/When/Then"
   Trigger: Orchestrator launches specs.
 license: MIT
 metadata: author: gentleman-vMK, version: "2.3"
@@ -30,3 +32,4 @@ Purpose → Requirements (MUST/SHOULD/MAY) → G/W/T scenarios
 - G/W/T · RFC 2119: MUST/SHALL/SHOULD/MAY
 - Every req ≥1 scenario (happy+edge) · Testable · No impl
 - MODIFIED = FULL block · Budget: <650 words
+

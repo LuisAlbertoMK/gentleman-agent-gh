@@ -1,6 +1,8 @@
 ---
 name: chained-pr
-description: > Split oversized changes into chained PRs.
+description: >
+  chained-pr skill
+triggers: "Chained PRs, >400 lines, review slices"
   Trigger: PR >400 lines, stacked PRs, review slices, SDD workload forecast.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.0"
@@ -23,3 +25,4 @@ metadata: author: gentleman-vMK, version: "1.0"
 
 ## OUTPUT
 Strategy, PR order, boundary, dep diagram, review budget (`adds+dels`), verification.
+

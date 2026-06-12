@@ -1,6 +1,8 @@
 ---
 name: refactoring-planner
 description: >
+  refactoring-planner skill
+triggers: "Refactor, refactoring, reestructurar, migrate"
   Plan refactoring with impact analysis, dependency mapping, and step-by-step migration.
   Trigger: "refactor", "refactoring", "reestructurar", "migrate", "reorganizar".
 license: Apache-2.0
@@ -62,3 +64,4 @@ User asks to refactor, restructure, migrate, or reorganize code.
 3. After EACH step: `go test ./...` (or equivalent). Never batch steps before testing.
 4. Track progress: `[x] Step 1` `[ ] Step 2`
 5. If a step fails → stop, analyze, fix or rollback that step
+

@@ -1,6 +1,8 @@
 ---
 name: branch-pr
-description: > PR creation workflow for Agent Teams Lite (issue-first enforcement).
+description: >
+  branch-pr skill
+triggers: "PR creation, issue-first"
   Trigger: Creating PR, opening PR, preparing changes for review.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "2.1"
@@ -70,3 +72,4 @@ git push -u origin feat/my-feature
 gh pr create --title "feat(scope): desc" --body "Closes #N"
 gh pr edit <pr> --add-label "type:feature"
 ```
+

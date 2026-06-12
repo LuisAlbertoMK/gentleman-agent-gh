@@ -1,6 +1,8 @@
 ---
 name: karpathy-loop
-description: > Write→Measure→Cut→Repeat optimization.
+description: >
+  karpathy-loop skill
+triggers: "Karpathy loop, optimize prompt, measure tokens"
   Trigger: "optimize prompt", "reduce tokens".
 license: Apache-2.0
 metadata: author: mk, version: "1.0"

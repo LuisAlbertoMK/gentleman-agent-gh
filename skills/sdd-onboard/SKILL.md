@@ -1,6 +1,8 @@
 ---
 name: sdd-onboard
-description: > Guided SDD walkthrough (real codebase).
+description: >
+  sdd-onboard skill
+triggers: "Guided SDD walkthrough"
   Trigger: Orchestrator launches onboarding.
 license: MIT
 metadata: author: gentleman-vMK, version: "1.1"

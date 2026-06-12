@@ -1,6 +1,8 @@
 ---
 name: command-wrapper
-description: > Consistent error handling, logging, and validation for bash commands.
+description: >
+  command-wrapper skill
+triggers: "Command wrapper, error handling, output parsing"
   Trigger: Running bash commands, detecting errors, command output parsing.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.0"
@@ -46,3 +48,4 @@ title: "Command: {command-summary}"
 type: discovery  (if gotcha) or config (if setup)
 content: **What**: command | **Exit code**: N | **Output**: summary | **Learned**: gotchas
 ```
+

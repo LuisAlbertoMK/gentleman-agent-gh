@@ -1,6 +1,8 @@
 ---
 name: context-watchdog
-description: > Runtime context monitor. Detects context explosion and triggers compression or session break.
+description: >
+  context-watchdog skill
+triggers: "Context >100K tokens, context explosion"
   Trigger: Agent detects context growing, >100K tokens, repeated hallucinations, or "context" mention.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1"
@@ -55,3 +57,4 @@ mem_session_summary(content="## Goal\n...")
 - **Lean mode**: [lean-context/](../lean-context/SKILL.md)
 - **Token cutting**: [karpathy-loop/](../karpathy-loop/SKILL.md)
 - **State persistence**: [code-memory/](../code-memory/SKILL.md)
+

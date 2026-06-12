@@ -1,6 +1,8 @@
 ---
 name: skill-registry
-description: > Create/update skill registry. Scan skills+conventions, write .atl/skill-registry.md.
+description: >
+  skill-registry skill
+triggers: "Skill registry, catalog"
   Trigger: "update skills", after install/remove skills.
 license: MIT
 metadata: author: gentleman-vMK, version: "1.0"

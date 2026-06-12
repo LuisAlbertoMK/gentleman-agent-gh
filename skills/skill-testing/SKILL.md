@@ -1,6 +1,8 @@
 ---
 name: skill-testing
-description: > Test/verify created skills.
+description: >
+  skill-testing skill
+triggers: "Test/verify skill, coverage"
   Trigger: After creating/modifying skill, before production use.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1"
@@ -52,3 +54,4 @@ After new/edited skill · Pre-critical-task verification · Periodic active skil
 | Syntax | ✅/❌ |
 ### Verdict: ✅ APPROVED / ⚠️ NEEDS WORK / ❌ REJECTED
 ```
+

@@ -1,6 +1,8 @@
 ---
 name: decision-capture
-description: > Proactive architecture/design decision logging to Engram. Auto-triggers when agent makes a technical choice.
+description: >
+  decision-capture skill
+triggers: "Decision capture, trade-off log"
   Trigger: "voy a usar", "decido", "la mejor opción", trade-off analysis, architecture choice, pattern selection.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1"
@@ -63,3 +65,4 @@ mem_save(title="Chose {X} over {Y}", type="decision",
   content="**What**: ...\n**Why**: ...\n**Options**: ...\n**Chosen**: ...\n**Where**: ...\n**Learned**: ...")
 # Session-end: mem_search(type="decision") → verify all captured
 ```
+

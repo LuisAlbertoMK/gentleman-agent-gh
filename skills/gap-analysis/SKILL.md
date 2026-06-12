@@ -1,6 +1,8 @@
 ---
 name: gap-analysis
 description: >
+  gap-analysis skill
+triggers: "Gap analysis, system audit, identificar gaps, evaluar software"
   Complete project intake + gap analysis for any system (SaaS, ERP, web, mobile, API, desktop).
   8-dimension quality framework, project classification, intake checklist (roadmap/PR/PRD),
   and depth levels. Trigger: "gap analysis", "auditar sistema", "identificar gaps",
@@ -360,3 +362,4 @@ Per-type weighted checklists → `assets/{type}-template.md`
 ❌ Infrastructure as afterthought — non-functional reqs need proactive design
 ❌ Score without evidence — Default-FAIL applies
 ❌ One-shot analysis — gaps need tracking; use engram
+

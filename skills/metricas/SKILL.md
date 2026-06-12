@@ -1,6 +1,8 @@
 ---
 name: metricas
 description: >
+  metricas skill
+triggers: "Metricas, before/after, % improvement, tokenization, delta"
   On-demand before/after comparison w/ % improvement.
   Trigger: "metricas", "métricas", "comparar", "mejora", "delta", "token", "tokenizar".
 license: Apache-2.0
@@ -60,3 +62,4 @@ Corrupt → warn + delete/re-init. Commands: `metricas clear` / `metricas list`
 4. Verify EACH metric with tool output. No self-assessment
 5. No bookmark + no git base → ask user
 6. Anti-pattern: claim w/o evidence · unrelated baselines · skip "too complex" · Δ% w/o absolute
+

@@ -1,6 +1,8 @@
 ---
 name: lean-context
 description: >
+  lean-context skill
+triggers: "Ultra-lean default, compact responses"
   ULTRA-LEAN default. Disable: "modo normal". Reactivate: new session.
   Trigger: "modo normal", /lean-off.
 license: Apache-2.0

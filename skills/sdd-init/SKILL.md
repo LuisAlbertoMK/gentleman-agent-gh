@@ -1,6 +1,8 @@
 ---
 name: sdd-init
-description: > Init SDD: detect stack/test/persist.
+description: >
+  sdd-init skill
+triggers: "SDD init, bootstrap"
   Trigger: "sdd init", "openspec init".
 license: MIT
 metadata: author: gentleman-vMK, version: "3.2"
@@ -50,3 +52,4 @@ Strict TDD: {enabled/disabled}
 Caps: {runner, layers, coverage, quality tools}
 Saved: {engram IDs / paths}
 ```
+

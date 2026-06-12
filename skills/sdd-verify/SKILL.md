@@ -1,6 +1,8 @@
 ---
 name: sdd-verify
-description: > Validate impl vs specs/design/tasks.
+description: >
+  sdd-verify skill
+triggers: "Validate vs specs, verify"
   Trigger: Orchestrator launches verify.
 license: MIT
 metadata: author: gentleman-vMK, version: "3.4"
@@ -42,3 +44,4 @@ Tasks:{N}/{total} | Build:{P/FAIL} | Tests:{Np}/{Nf} | Cov:{N}%
 Compliance:{N}/{total} | CRIT:{list} | WARN:{list}
 VERDICT:{PASS|PASS-WARNINGS|FAIL}
 ```
+

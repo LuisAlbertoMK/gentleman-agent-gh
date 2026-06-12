@@ -1,6 +1,8 @@
 ---
 name: subagent-isolation
-description: > Context boundary rules for subagents — prevent cross-contamination.
+description: >
+  subagent-isolation skill
+triggers: "Subagent isolation, context boundaries"
   Trigger: Delegating tasks, spawning subagents, multi-agent workflows.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.0"
@@ -46,3 +48,4 @@ After delegation completes:
 | Subagent times out | Retry once with cleaner prompt, then escalate |
 | Subagent returns wrong output | Log to Engram, re-delegate with corrected context |
 | Subagent hallucinates | Flag as context contamination → check isolation rules |
+

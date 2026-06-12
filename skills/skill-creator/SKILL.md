@@ -1,6 +1,8 @@
 ---
 name: skill-creator
 description: >
+  skill-creator skill
+triggers: "Create AI skill"
   Create new AI agent skills following the Agent Skills spec.
   Trigger: User asks to create skill, add agent instructions, document patterns.
 license: Apache-2.0
@@ -35,6 +37,8 @@ skills/{name}/
 ---
 name: {name}
 description: >
+  skill-creator skill
+triggers: "Create AI skill"
   {One-line}. Trigger: {when}.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.0"
@@ -73,3 +77,4 @@ Add to AGENTS.md:
 
 ## Checklist
 Before creating: skill doesn't exist? reusable? name follows convention? frontmatter complete? critical patterns clear? examples minimal? commands exist? AGENTS.md updated?
+

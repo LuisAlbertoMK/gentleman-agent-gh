@@ -1,6 +1,8 @@
 ---
 name: issue-creation
-description: > Issue creation workflow (issue-first).
+description: >
+  issue-creation skill
+triggers: "Issue creation"
   Trigger: Creating GitHub issue, bug report, feature request.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.0"

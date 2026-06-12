@@ -1,6 +1,8 @@
 ---
 name: pr-evidence
-description: > Extends branch-pr with SDD evidence: test results, spec coverage, verify output.
+description: >
+  pr-evidence skill
+triggers: "PR with SDD evidence"
   Trigger: Creating PR after SDD cycle, "pr evidence", "PR con evidencia".
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1"
@@ -66,3 +68,4 @@ gh pr create --title "{type}({scope}): {desc}" --body "{body with evidence}"
 - **TDD evidence**: [sdd-apply/strict-tdd.md](../sdd-apply/strict-tdd.md)
 - **Verify output**: [sdd-verify/strict-tdd-verify.md](../sdd-verify/strict-tdd-verify.md)
 - **Quality gate**: [quality-gate/](../quality-gate/SKILL.md)
+

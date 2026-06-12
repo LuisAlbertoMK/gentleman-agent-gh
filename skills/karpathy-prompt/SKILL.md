@@ -1,6 +1,8 @@
 ---
 name: karpathy-prompt
-description: > Minimal prompts: "explain to smart junior dev next to you".
+description: >
+  karpathy-prompt skill
+triggers: "Karpathy, less tokens, context compilation"
   Trigger: "método Karpathy", "less tokens".
 license: Apache-2.0
 metadata: author: mk, version: "1.1"

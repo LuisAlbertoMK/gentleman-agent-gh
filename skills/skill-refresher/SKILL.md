@@ -1,6 +1,8 @@
 ---
 name: skill-refresher
-description: > Auto-review skills for drift, obsolescence, healing (#23).
+description: >
+  skill-refresher skill
+triggers: "Skill refresher, drift detection, auto-heal"
   Trigger: Repeated bug, skill unused 5+ sessions, user repeats correction, Karpathy loss >5%.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1"
@@ -27,3 +29,4 @@ Loaded but didn't help â†’ Engram log (skill, session, why not, suggested fix) â
 
 ## SELF-TEST
 Verify loads (`skill name: skill-refresher`), YAML valid, triggers fire.
+

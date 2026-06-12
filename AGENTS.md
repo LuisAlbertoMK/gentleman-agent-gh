@@ -79,21 +79,22 @@ Task? → Behavioral match (primary) + Trigger match (secondary).
 ```
 Resume ("continuá") → session-resume
 Session start/unknown project → project-mapper + gap-analysis (auto-chain)
-Write code → skill-creator, sdd-*, quality-gate, go-testing, work-unit-commits
+Write code → skill-creator, quality-gate, go-testing, work-unit-commits
 Fix bug → recovery-protocol, immune-system, sdd-verify
-Design → senior-engineer, sdd-propose, sdd-design, cognitive-doc-design
-Learn/Research → prompt-engineering, context7, code-memory
-Review → judgment-day, skill-testing, pr-evidence, comment-writer, code-review-agent
+Design → senior-engineer, sdd-propose, sdd-design, cognitive-doc-design, execution-mode
+Learn/Research → prompt-engineering, python-async, code-memory
+Review → judgment-day, skill-testing, pr-evidence, comment-writer, code-review-agent, branch-pr, issue-creation
 Measure ("metricas") → metricas, auto-metrics
-Optimize → karpathy-*, lean-context, caveman, skill-improver, refactoring-planner
+Optimize → karpathy-*, lean-context, caveman, skill-improver, refactoring-planner, skill-refresher
 Coordinate → delivery-harness, subagent-isolation, command-wrapper, chained-pr
-Commit ("commit") → commit-crafter
+Commit ("commit") → commit-crafter, quality-gate, ci-cd
 Audit ("gap analysis", "auditar sistema", "evaluar") → gap-analysis
 Map ("mapear") → project-mapper
 Secure ("security") → security-scanner
 Sync docs → doc-sync
 Log ("bitacora") → bitacora
-Track/Decide → decision-capture, dreaming, skill-digestion
+Track/Decide → decision-capture, dreaming, skill-digestion, skill-registry
+Self-reflect → self-reflection
 Recover → recovery-protocol, immune-system, context-watchdog
 Unknown → Pre-Flight: skill-creator, research, retry
 ```

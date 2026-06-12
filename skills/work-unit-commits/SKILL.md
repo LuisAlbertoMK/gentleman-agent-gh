@@ -1,6 +1,8 @@
 ---
 name: work-unit-commits
-description: > Plan commits as reviewable work units.
+description: >
+  work-unit-commits skill
+triggers: "Work-unit commits, commit organization"
   Trigger: Implementation, commit splitting, chained PRs.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.0"
@@ -23,3 +25,4 @@ Rollback without reverting unrelated · message = outcome, not files
 ## SDD
 Low→one PR · Medium→monitor · High→follow `delivery_strategy`
 Each unit: start → finish → verification → clean rollback
+

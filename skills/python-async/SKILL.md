@@ -1,6 +1,8 @@
 ---
 name: python-async
-description: > Python asyncio patterns: async/await, concurrency, deadlock prevention.
+description: >
+  python-async skill
+triggers: "Python async, asyncio"
   Trigger: Python async, asyncio, coroutines, event loop.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.2", changelog: "1.1->1.2 (sprint 5: 78->56 lines, -28.2%, compacted patterns)"
@@ -67,3 +69,4 @@ async with asyncio.timeout(5.0):
 python -m asyncio pstree <pid>         # detect await graph cycles
 python -c "import asyncio; asyncio.run(main())"  # single entry
 ```
+

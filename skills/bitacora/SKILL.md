@@ -1,6 +1,8 @@
 ---
 name: bitacora
 description: >
+  bitacora skill
+triggers: "Bitacora, historial, histórico, qué pedí, request log"
   Historical log of user requests per session. Auto-append on session end.
   Trigger: "bitacora", "historial", "histórico", "peticiones", "qué pedí", "request log".
 license: Apache-2.0
@@ -33,3 +35,4 @@ After session end: prepend new entry to `BITACORA.md`.
 1. 1 line per entry. If more detail needed → engram has it.
 2. Never edit past entries — only prepend new ones.
 3. `mem_save_prompt` is for Engram (machine-readable). BITACORA.md is summary (human-readable). Both coexist.
+

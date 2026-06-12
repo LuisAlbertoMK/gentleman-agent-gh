@@ -1,6 +1,8 @@
 ---
 name: security-scanner
 description: >
+  security-scanner skill
+triggers: "Security, seguridad, vulnerabilidad, auditar"
   Pre-commit security scan: secrets, injection patterns, dependency vulns, dangerous APIs.
   Trigger: "security", "seguridad", "vulnerabilidad", "auditar", "safe check", "harden".
 license: Apache-2.0
@@ -59,3 +61,4 @@ grep -rn "eval(\|exec(\|subprocess\." --include="*.py"
 3. Verify false positives — don't auto-flag env vars
 4. Issues found? Always provide fix, not just warning
 5. End with: "Remaining risk: NONE/LOW/MED/HIGH (why)"
+

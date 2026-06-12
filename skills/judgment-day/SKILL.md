@@ -1,6 +1,8 @@
 ---
 name: judgment-day
 description: >
+  judgment-day skill
+triggers: "Judgment day, dual review, juzgar"
   Dual adversarial review: 2 blind judges, verdict synthesis, fix/re-judge loops.
   Trigger: "judgment day", "juzgar", "dual review", "que lo juzguen".
 license: Apache-2.0
@@ -76,3 +78,4 @@ ESCALATED: `JDGMNT: ESCALATED ⚠️ — Manual review after {N} iter.`
 3. Orchestrator NEVER reviews — coordinates only
 4. Judges: delegate (async, parallel) · Fix Agent: separate delegation
 5. Unclear scope → ask before launch · After 2 iter → ASK user
+

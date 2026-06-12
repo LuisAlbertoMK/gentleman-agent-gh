@@ -1,6 +1,8 @@
 ---
 name: code-review-agent
 description: >
+  code-review-agent skill
+triggers: "Code review, CR, revisar código, criticar"
   Structured code review with checklist, acceptance criteria, and evidence gates.
   Trigger: "code review", "revisar código", "review this", "cr", "criticar", "code-review".
 license: Apache-2.0
@@ -68,3 +70,4 @@ Request → read diff/file → evaluate 6 dims → assign scores → verdict →
 | Vague "looks good" | Score + evidence |
 | Only praise, no critique | Balance: what's good + what needs work |
 | Nitpicking style | Only substantive concerns |
+

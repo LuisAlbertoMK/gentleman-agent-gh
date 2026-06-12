@@ -1,6 +1,8 @@
 ---
 name: project-mapper
 description: >
+  project-mapper skill
+triggers: "Mapear, project map, estructura, tech stack, arquitectura"
   Scan project structure, detect tech stack, architecture, and generate dependency map.
   Trigger: "mapear", "project map", "estructura", "tech stack", "arquitectura", "project structure".
 license: Apache-2.0
@@ -117,3 +119,4 @@ Present as: "Project classified as **{tech layer}** / **{business type}**. Auto-
 5. If project >50 files → show summary counts, not full tree
 6. Adapt Output format to project size — examples are templates, not mandates
 7. After mapping → auto-suggest gap-analysis with matching template + 8-dim intake
+

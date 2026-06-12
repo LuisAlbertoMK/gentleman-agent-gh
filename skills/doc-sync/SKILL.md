@@ -1,6 +1,8 @@
 ---
 name: doc-sync
 description: >
+  doc-sync skill
+triggers: "Doc sync, documentación, readme, sincronizar docs"
   Detect API/signature/config changes and suggest doc updates.
   Trigger: "doc sync", "documentación", "docs", "readme", "sincronizar docs".
 license: Apache-2.0
@@ -52,3 +54,4 @@ After changing public APIs, routes, exports, config — before closing task.
 3. Don't suggest updating docs for private/internal code
 4. If no doc changes needed → say "No doc sync required"
 5. Always check if a `.md` file exists for the changed component before suggesting
+

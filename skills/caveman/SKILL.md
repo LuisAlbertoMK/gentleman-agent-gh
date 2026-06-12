@@ -1,6 +1,8 @@
 ---
 name: caveman
 description: >
+  caveman skill
+triggers: "Ultra-compressed, caveman, /caveman"
   Ultra-compressed comms (~75% cut). Levels: lite/full/ultra.
   Trigger: "caveman", "less tokens", /caveman. Off: "stop caveman".
 license: Apache-2.0

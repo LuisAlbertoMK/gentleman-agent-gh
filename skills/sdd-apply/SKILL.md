@@ -1,6 +1,8 @@
 ---
 name: sdd-apply
-description: > Implement tasks per specs/design.
+description: >
+  sdd-apply skill
+triggers: "Apply tasks, implement"
   Trigger: Orchestrator launches implementation.
 license: MIT
 metadata: author: gentleman-vMK, version: "3.3"
@@ -40,3 +42,4 @@ Status:{Ready|Blocked by X}
 - NEVER overwrite progress — MERGE
 - Missing workload decision → STOP before code
 - Strict TDD overrides step 5
+

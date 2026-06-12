@@ -1,6 +1,8 @@
 ---
 name: delivery-harness
-description: > Review workload optimization + delivery strategy + chain strategy.
+description: >
+  delivery-harness skill
+triggers: "Delivery harness, review workload"
   Trigger: Before PR, planning delivery, "cómo entrego esto", PR size.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.0"
@@ -55,3 +57,4 @@ main ← PR#1 (feat/auth) ← PR#2 (feat/dashboard) ← PR#3 (feat/settings)
 # git diff --stat main..HEAD → count files to estimate size
 # gh pr create --title "feat(x): part 1/N" --body "Depends on #N"
 ```
+

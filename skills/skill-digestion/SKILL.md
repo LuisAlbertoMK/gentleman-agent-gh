@@ -1,6 +1,8 @@
 ---
 name: skill-digestion
-description: > Compact skills on load + audit skill resolution effectiveness.
+description: >
+  skill-digestion skill
+triggers: "Skill digestion, compact on load"
   Trigger: Loading skills, after task completion, skill audit.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.0"
@@ -32,3 +34,4 @@ content: Skill | Trigger | Applied(Y/N) | Effective(Y/P/N) | Notes
 | Applied but NOT effective | Update skill patterns |
 | Improvised missing guidance | Create new skill |
 | Same skill loaded 3+ times | Flag heavy — digest more |
+

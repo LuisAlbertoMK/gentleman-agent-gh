@@ -1,6 +1,8 @@
 ---
 name: skill-improver
-description: > Audit and upgrade existing skills.
+description: >
+  skill-improver skill
+triggers: "Skill improvement, audit skills, refactor skills"
   Trigger: "improve skills", "audit skills", "refactor skills".
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.0"
@@ -45,3 +47,4 @@ Track which skills are actively used vs stale. Run on audit.
 3. Check usage tracking → flag deprecated skills
 4. Return audit report grouped by skill with severity
 5. In apply mode: edit safe issues, create supporting files, preserve content
+

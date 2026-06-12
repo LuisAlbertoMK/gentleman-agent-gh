@@ -1,6 +1,8 @@
 ---
 name: sdd-propose
-description: > Proposal: intent, scope, approach.
+description: >
+  sdd-propose skill
+triggers: "Proposal, intent, approach"
   Trigger: Orchestrator launches proposal creation.
 license: MIT
 metadata: author: gentleman-vMK, version: "2.1"

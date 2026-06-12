@@ -1,6 +1,8 @@
 ---
 name: cognitive-doc-design
-description: > Design docs that reduce cognitive load for readers/reviewers.
+description: >
+  cognitive-doc-design skill
+triggers: "Cognitive load, docs for reviewers"
   Trigger: Writing guides, READMEs, RFCs, onboarding, architecture docs.
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.0"
@@ -34,3 +36,4 @@ metadata: author: gentleman-vMK, version: "1.0"
 ## PR DOCS
 What to review first · what's OoS · links to chain PRs
 One focus per section · checklists for acceptance criteria
+
