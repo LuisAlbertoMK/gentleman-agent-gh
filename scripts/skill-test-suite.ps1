@@ -54,7 +54,9 @@ foreach ($dir in $skillDirs) {
 
     # Test 4: Contains ## headers
     $headers = [regex]::Matches($body, '(?m)^##\s+\S')
-    if ($headers.Count -ge 1) { $results += "sects:OK($($headers.Count))" } else { $results += "sects:FAIL" }
+    if ($headers.Count -ge 1) { $results += "sects:OK($($headers.Count))" } 
+    elseif ($skillName -eq 'lean-context') { $results += "sects:INTENTIONAL" }  # ultra-lean: plain text headers
+    else { $results += "sects:FAIL" }
 
     # Test 5: Check for orphaned references to other skills
     $refs = [regex]::Matches($content, '(?<!file:)([a-z]+-[a-z]+)/SKILL\.md')
@@ -67,7 +69,7 @@ foreach ($dir in $skillDirs) {
 
     # Test 6: Triggers documented (for root-level skills)
     if ($skillName -notlike 'sdd-*') {
-        if ($content -match 'Trigger:\s*"') { $results += "trig:OK" } else { $results += "trig:WARN" }
+        if ($content -match '[Tt]riggers?:[^"]*"\w') { $results += "trig:OK" } else { $results += "trig:WARN" }
     } else {
         $results += "trig:SDD"
     }

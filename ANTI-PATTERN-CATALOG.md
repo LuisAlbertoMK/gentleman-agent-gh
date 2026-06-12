@@ -76,6 +76,23 @@
 3. **Pre-bulk-change smoke test**: if a script MUST be used, dry-run on 1 file first, read the diff manually, THEN apply to the rest.
 **Files**: `misServicios/src/app/{shared/footer,pages/pedidos,pages/pedidos-shein,pages/personalizados,admin/register-service}/*.ts` (5 files corrupted, all fixed).
 
+## 2026-06-11: PS 5.1 Join-Path positional limit
+**Symptom**: `Join-Path $repo 'prompts' 'sdd'` fails with "No positional parameter found". Script crashes with null $sddDir.
+**Root cause**: PowerShell 5.1 `Join-Path` only accepts 2 positional parameters (Path + ChildPath). Passing 3 args throws ParameterBindingException. Common on cross-platform scripts written with PS 7 assumptions (where `-AdditionalChildPaths` exists).
+**Fix**: Use `Join-Path -Path $repo -ChildPath 'prompts\sdd'` with named parameters, or use `"$repo\prompts\sdd"`, or chain `Join-Path (Join-Path $repo 'prompts') 'sdd'`.
+**Prevention**:
+1. Always use named parameters with `Join-Path`: `-Path` and `-ChildPath`
+2. Never pass more than 2 positional args to any PS cmdlet unless you've verified it supports it in 5.1
+3. Test cross-platform scripts on the actual target shell before relying on them
+**Files**: N/A (pattern, no specific file)
+
+## 2026-06-11: Trigger regex assumes quote immediately after colon
+**Symptom**: Test suite shows `trig:WARN` for skills that clearly have `Trigger: Task completion, "score"...`. Regex `Trigger:\s*"` returns False.
+**Root cause**: The regex `Trigger:\s*"` matches `Trigger:` + whitespace + `"`. But trigger text is `Trigger: Task completion, "score"` — the `"` is NOT immediately after whitespace; there's text between. `\s*` only matches whitespace, then `"` expects the next character to be a quote, but it's `T` (from `Task`).
+**Fix**: Use `Trigger:[^"]*"\w` — "Trigger:" then any non-quote chars, then a quote, then a word char.
+**Prevention**: When writing regex to find a pattern after `Key:`, always consider that there may be text between the colon and the target token. Use `.*?` or `[^"]*` to bridge the gap.
+**Files**: scripts/skill-test-suite.ps1 (line 70)
+
 ## TEMPLATE for new entries
 ```
 ## YYYY-MM-DD: Short title

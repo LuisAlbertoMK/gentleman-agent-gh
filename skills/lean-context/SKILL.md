@@ -1,6 +1,10 @@
 ---
 name: lean-context
-description: > ULTRA-LEAN default. Disable: "modo normal". Reactivate: new session.
+description: >
+  ULTRA-LEAN default. Disable: "modo normal". Reactivate: new session.
+  Trigger: "modo normal", /lean-off.
+license: Apache-2.0
+metadata: author: gentleman-programming, version: "1.1", style: ultra-compact-plain-headers
 ---
 
 LEVELS
