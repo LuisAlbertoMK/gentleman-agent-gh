@@ -3,7 +3,7 @@ name: skill-registry
 description: > Create/update skill registry. Scan skills+conventions, write .atl/skill-registry.md.
   Trigger: "update skills", after install/remove skills.
 license: MIT
-metadata: author: gentleman-programming, version: "1.0"
+metadata: author: gentleman-vMK, version: "1.0"
 ---
 
 ## STEPS

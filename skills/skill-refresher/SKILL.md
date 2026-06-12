@@ -3,7 +3,7 @@ name: skill-refresher
 description: > Auto-review skills for drift, obsolescence, healing (#23).
   Trigger: Repeated bug, skill unused 5+ sessions, user repeats correction, Karpathy loss >5%.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.1"
+metadata: author: gentleman-vMK, version: "1.1"
 ---
 
 ## HEALTH SIGNALS

@@ -3,7 +3,7 @@ name: context-watchdog
 description: > Runtime context monitor. Detects context explosion and triggers compression or session break.
   Trigger: Agent detects context growing, >100K tokens, repeated hallucinations, or "context" mention.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.1"
+metadata: author: gentleman-vMK, version: "1.1"
 ---
 
 ## When

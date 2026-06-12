@@ -3,7 +3,7 @@ name: sdd-propose
 description: > Proposal: intent, scope, approach.
   Trigger: Orchestrator launches proposal creation.
 license: MIT
-metadata: author: gentleman-programming, version: "2.1"
+metadata: author: gentleman-vMK, version: "2.1"
 ---
 
 ## GATE

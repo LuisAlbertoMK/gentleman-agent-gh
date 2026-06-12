@@ -3,7 +3,7 @@ name: python-async
 description: > Python asyncio patterns: async/await, concurrency, deadlock prevention.
   Trigger: Python async, asyncio, coroutines, event loop.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.2", changelog: "1.1->1.2 (sprint 5: 78->56 lines, -28.2%, compacted patterns)"
+metadata: author: gentleman-vMK, version: "1.2", changelog: "1.1->1.2 (sprint 5: 78->56 lines, -28.2%, compacted patterns)"
 ---
 
 ## When

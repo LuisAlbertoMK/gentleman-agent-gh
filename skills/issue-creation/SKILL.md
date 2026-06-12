@@ -3,7 +3,7 @@ name: issue-creation
 description: > Issue creation workflow (issue-first).
   Trigger: Creating GitHub issue, bug report, feature request.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.0"
+metadata: author: gentleman-vMK, version: "1.0"
 ---
 
 ## RULES

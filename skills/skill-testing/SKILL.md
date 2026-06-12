@@ -3,7 +3,7 @@ name: skill-testing
 description: > Test/verify created skills.
   Trigger: After creating/modifying skill, before production use.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.1"
+metadata: author: gentleman-vMK, version: "1.1"
 ---
 
 ## When

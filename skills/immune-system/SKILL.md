@@ -3,7 +3,7 @@ name: immune-system
 description: > Failures → permanent immunity. Document error patterns, root causes, fixes. Never repeat same mistake twice.
   Trigger: Repeated errors, failure patterns, "same mistake", user says "ya te dije", frustration signals, post-error recovery.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.1", changelog: "1.0->1.1 (sprint 1: 72->55 lines, -23.6%, condensed Immunity Levels table, inlined Anti-patterns)"
+metadata: author: gentleman-vMK, version: "1.1", changelog: "1.0->1.1 (sprint 1: 72->55 lines, -23.6%, condensed Immunity Levels table, inlined Anti-patterns)"
 ---
 
 ## Protocol

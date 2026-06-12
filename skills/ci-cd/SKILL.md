@@ -3,7 +3,7 @@ name: ci-cd
 description: > GitHub Actions CI + quality gate + tests + lint (#27).
   Trigger: CI setup, failed PR checks, pipeline config.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.1"
+metadata: author: gentleman-vMK, version: "1.1"
 ---
 
 ## CI PIPELINE

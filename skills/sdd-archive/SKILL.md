@@ -3,7 +3,7 @@ name: sdd-archive
 description: > Sync delta→main→archive + rollback.
   Trigger: Orchestrator launches archive, revert change.
 license: MIT
-metadata: author: gentleman-programming, version: "2.3"
+metadata: author: gentleman-vMK, version: "2.3"
 ---
 
 ## GATE

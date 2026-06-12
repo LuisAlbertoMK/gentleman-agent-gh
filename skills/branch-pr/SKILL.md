@@ -3,7 +3,7 @@ name: branch-pr
 description: > PR creation workflow for Agent Teams Lite (issue-first enforcement).
   Trigger: Creating PR, opening PR, preparing changes for review.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "2.1"
+metadata: author: gentleman-vMK, version: "2.1"
 ---
 
 ## Rules

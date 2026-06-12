@@ -4,7 +4,7 @@ description: >
   Structured code review with checklist, acceptance criteria, and evidence gates.
   Trigger: "code review", "revisar código", "review this", "cr", "criticar", "code-review".
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.0"
+metadata: author: gentleman-vMK, version: "1.0"
 ---
 
 ## When

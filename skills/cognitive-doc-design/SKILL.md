@@ -3,7 +3,7 @@ name: cognitive-doc-design
 description: > Design docs that reduce cognitive load for readers/reviewers.
   Trigger: Writing guides, READMEs, RFCs, onboarding, architecture docs.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.0"
+metadata: author: gentleman-vMK, version: "1.0"
 ---
 
 ## PATTERNS

@@ -3,7 +3,7 @@ name: command-wrapper
 description: > Consistent error handling, logging, and validation for bash commands.
   Trigger: Running bash commands, detecting errors, command output parsing.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.0"
+metadata: author: gentleman-vMK, version: "1.0"
 ---
 
 ## COMMAND CONTRACT

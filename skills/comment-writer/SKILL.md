@@ -3,7 +3,7 @@ name: comment-writer
 description: > Write warm, direct collaboration comments.
   Trigger: PR feedback, issue replies, reviews, GitHub comments.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.0"
+metadata: author: gentleman-vMK, version: "1.0"
 ---
 
 ## VOICE

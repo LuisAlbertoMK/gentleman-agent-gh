@@ -3,7 +3,7 @@ name: pr-evidence
 description: > Extends branch-pr with SDD evidence: test results, spec coverage, verify output.
   Trigger: Creating PR after SDD cycle, "pr evidence", "PR con evidencia".
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.1"
+metadata: author: gentleman-vMK, version: "1.1"
 ---
 
 ## When

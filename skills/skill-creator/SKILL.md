@@ -5,7 +5,7 @@ description: >
   Trigger: User asks to create skill, add agent instructions, document patterns.
 license: Apache-2.0
 metadata:
-  author: gentleman-programming
+  author: gentleman-vMK
   version: "1.1"
 ---
 
@@ -37,7 +37,7 @@ name: {name}
 description: >
   {One-line}. Trigger: {when}.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.0"
+metadata: author: gentleman-vMK, version: "1.0"
 ---
 
 ## When

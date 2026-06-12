@@ -4,7 +4,7 @@ description: >
   Scan project structure, detect tech stack, architecture, and generate dependency map.
   Trigger: "mapear", "project map", "estructura", "tech stack", "arquitectura", "project structure".
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.2", changelog: "1.1->1.2: auto-chain gap-analysis trigger after mapping"
+metadata: author: gentleman-vMK, version: "1.2", changelog: "1.1->1.2: auto-chain gap-analysis trigger after mapping"
 ---
 
 ## When

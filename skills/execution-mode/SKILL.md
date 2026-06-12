@@ -3,7 +3,7 @@ name: execution-mode
 description: > Execution modes: quick/thorough/draft. Define speed vs control per task.
   Trigger: Starting task, "modo rápido", "modo thorough", "draft mode".
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.1", changelog: "1.0->1.1: auto-detection mode infer from task signals"
+metadata: author: gentleman-vMK, version: "1.1", changelog: "1.0->1.1: auto-detection mode infer from task signals"
 ---
 
 ## MODES

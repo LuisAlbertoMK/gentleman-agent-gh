@@ -3,7 +3,7 @@ name: sdd-init
 description: > Init SDD: detect stack/test/persist.
   Trigger: "sdd init", "openspec init".
 license: MIT
-metadata: author: gentleman-programming, version: "3.2"
+metadata: author: gentleman-vMK, version: "3.2"
 ---
 
 ## DETECT

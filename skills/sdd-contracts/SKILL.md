@@ -3,7 +3,7 @@ name: sdd-contracts
 description: > Phase contracts: artifact dependencies, result contracts, shared grammar.
   Trigger: Starting SDD cycle, between phases, artifact validation.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.0"
+metadata: author: gentleman-vMK, version: "1.0"
 ---
 
 ## PHASE CONTRACTS

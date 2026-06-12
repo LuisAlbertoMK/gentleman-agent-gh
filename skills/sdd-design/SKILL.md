@@ -3,7 +3,7 @@ name: sdd-design
 description: > Technical design: HOW, architecture decisions.
   Trigger: Orchestrator launches design.
 license: MIT
-metadata: author: gentleman-programming, version: "2.1"
+metadata: author: gentleman-vMK, version: "2.1"
 ---
 
 ## GATE

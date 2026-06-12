@@ -4,7 +4,7 @@ description: >
   On-demand before/after comparison w/ % improvement.
   Trigger: "metricas", "métricas", "comparar", "mejora", "delta", "token", "tokenizar".
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.3", changelog: "1.2->1.3 (sprint 5: 67->58 lines, -13.4%, tightened tables)"
+metadata: author: gentleman-vMK, version: "1.3", changelog: "1.2->1.3 (sprint 5: 67->58 lines, -13.4%, tightened tables)"
 ---
 
 ## Flow

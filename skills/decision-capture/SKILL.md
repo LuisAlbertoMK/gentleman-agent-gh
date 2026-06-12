@@ -3,7 +3,7 @@ name: decision-capture
 description: > Proactive architecture/design decision logging to Engram. Auto-triggers when agent makes a technical choice.
   Trigger: "voy a usar", "decido", "la mejor opción", trade-off analysis, architecture choice, pattern selection.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.1"
+metadata: author: gentleman-vMK, version: "1.1"
 ---
 
 ## When

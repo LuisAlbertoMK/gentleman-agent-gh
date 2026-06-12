@@ -1,4 +1,4 @@
-# cross-ref-check.ps1 — Validate internal references in gentleman-agent-gh
+# cross-ref-check.ps1 — Validate internal references in gentleman-vMK-agent-gh
 # Usage: powershell -File scripts\cross-ref-check.ps1 [-RepoRoot <path>]
 # Returns: 0 = clean, 1 = issues found
 

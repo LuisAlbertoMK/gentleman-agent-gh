@@ -1,4 +1,4 @@
-# CHANGELOG — gentleman-agent-gh + global opencode
+# CHANGELOG — gentleman-vMK-agent-gh + global opencode
 
 > All notable changes to this repo and the live opencode config (`C:\Users\MK\.config\opencode\`).
 > Format based on [Keep a Changelog](https://keepachangelog.com/), semver-ish for skills/scripts.

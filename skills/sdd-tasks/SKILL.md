@@ -3,7 +3,7 @@ name: sdd-tasks
 description: > Task breakdown: concrete actionable steps.
   Trigger: Orchestrator launches tasks.
 license: MIT
-metadata: author: gentleman-programming, version: "2.2"
+metadata: author: gentleman-vMK, version: "2.2"
 ---
 
 ## GATE

@@ -4,7 +4,7 @@ description: >
   Historical log of user requests per session. Auto-append on session end.
   Trigger: "bitacora", "historial", "histórico", "peticiones", "qué pedí", "request log".
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.0"
+metadata: author: gentleman-vMK, version: "1.0"
 ---
 
 ## When

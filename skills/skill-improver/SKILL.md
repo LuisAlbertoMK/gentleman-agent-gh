@@ -3,7 +3,7 @@ name: skill-improver
 description: > Audit and upgrade existing skills.
   Trigger: "improve skills", "audit skills", "refactor skills".
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.0"
+metadata: author: gentleman-vMK, version: "1.0"
 ---
 
 ## HARD RULES

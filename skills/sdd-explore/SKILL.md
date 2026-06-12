@@ -3,7 +3,7 @@ name: sdd-explore
 description: > Explore codebase before change.
   Trigger: Orchestrator launches exploration.
 license: MIT
-metadata: author: gentleman-programming, version: "2.1"
+metadata: author: gentleman-vMK, version: "2.1"
 ---
 
 ## GATE

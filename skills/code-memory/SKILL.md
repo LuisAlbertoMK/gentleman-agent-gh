@@ -3,7 +3,7 @@ name: code-memory
 description: > Persist code state between sessions + session handoff for continuity.
   Trigger: "continuá", "donde quedamos", multi-session, session end, handoff.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.1"
+metadata: author: gentleman-vMK, version: "1.1"
 ---
 
 ## SESSION HANDOFF (continuity)

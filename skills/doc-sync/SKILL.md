@@ -4,7 +4,7 @@ description: >
   Detect API/signature/config changes and suggest doc updates.
   Trigger: "doc sync", "documentación", "docs", "readme", "sincronizar docs".
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.0"
+metadata: author: gentleman-vMK, version: "1.0"
 ---
 
 ## When

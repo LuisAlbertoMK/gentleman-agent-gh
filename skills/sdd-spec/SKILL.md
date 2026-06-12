@@ -3,7 +3,7 @@ name: sdd-spec
 description: > Write delta specs: reqs + G/W/T scenarios.
   Trigger: Orchestrator launches specs.
 license: MIT
-metadata: author: gentleman-programming, version: "2.3"
+metadata: author: gentleman-vMK, version: "2.3"
 ---
 
 ## GATE

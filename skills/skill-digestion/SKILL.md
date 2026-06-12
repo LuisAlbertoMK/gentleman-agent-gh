@@ -3,7 +3,7 @@ name: skill-digestion
 description: > Compact skills on load + audit skill resolution effectiveness.
   Trigger: Loading skills, after task completion, skill audit.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.0"
+metadata: author: gentleman-vMK, version: "1.0"
 ---
 
 ## DIGEST ON LOAD

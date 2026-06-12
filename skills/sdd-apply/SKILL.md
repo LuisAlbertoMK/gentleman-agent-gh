@@ -3,7 +3,7 @@ name: sdd-apply
 description: > Implement tasks per specs/design.
   Trigger: Orchestrator launches implementation.
 license: MIT
-metadata: author: gentleman-programming, version: "3.3"
+metadata: author: gentleman-vMK, version: "3.3"
 ---
 
 ## GATE

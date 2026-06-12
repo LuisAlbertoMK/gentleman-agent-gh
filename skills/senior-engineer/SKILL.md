@@ -3,7 +3,7 @@ name: senior-engineer
 description: > Staff+ competencies: architecture, trade-offs, delegation.
   Trigger: Arch decisions, trade-offs, "system thinking", delegation.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.1"
+metadata: author: gentleman-vMK, version: "1.1"
 ---
 
 ## 15 COMPETENCIES (2026)

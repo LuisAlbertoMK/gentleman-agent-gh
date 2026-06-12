@@ -3,7 +3,7 @@ name: sdd-onboard
 description: > Guided SDD walkthrough (real codebase).
   Trigger: Orchestrator launches onboarding.
 license: MIT
-metadata: author: gentleman-programming, version: "1.1"
+metadata: author: gentleman-vMK, version: "1.1"
 ---
 
 ## GATE

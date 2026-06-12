@@ -3,7 +3,7 @@ name: subagent-isolation
 description: > Context boundary rules for subagents — prevent cross-contamination.
   Trigger: Delegating tasks, spawning subagents, multi-agent workflows.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.0"
+metadata: author: gentleman-vMK, version: "1.0"
 ---
 
 ## ISOLATION RULES

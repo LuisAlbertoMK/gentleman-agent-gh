@@ -1,4 +1,4 @@
-# Gentleman Agent Skills — OpenCode AI Agent Skills
+# gentleman-vMK Agent Skills — OpenCode AI Agent Skills
 
 Colección de **56 skills profesionales** para OpenCode AI agent. Diseñadas para desarrollo de software con arquitectura limpia, TDD real, y principios SR Engineer.
 
@@ -20,8 +20,8 @@ Colección de **56 skills profesionales** para OpenCode AI agent. Diseñadas par
 
 ```bash
 # Clonar
-git clone https://github.com/LuisAlbertoMK/gentleman-agent-gh
-cd gentleman-agent-gh
+git clone https://github.com/LuisAlbertoMK/gentleman-vMK-agent-gh
+cd gentleman-vMK-agent-gh
 
 # Copiar skills a OpenCode
 cp -r */ ~/.config/opencode/skills/

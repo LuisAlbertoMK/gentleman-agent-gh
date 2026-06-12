@@ -4,7 +4,7 @@ description: >
   Pre-commit security scan: secrets, injection patterns, dependency vulns, dangerous APIs.
   Trigger: "security", "seguridad", "vulnerabilidad", "auditar", "safe check", "harden".
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.1", changelog: "1.0->1.1 (sprint 5: 78->60 lines, -23.1%, compacted grep patterns)"
+metadata: author: gentleman-vMK, version: "1.1", changelog: "1.0->1.1 (sprint 5: 78->60 lines, -23.1%, compacted grep patterns)"
 ---
 
 ## When

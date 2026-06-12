@@ -3,7 +3,7 @@ name: recovery-protocol
 description: > Standardized error recovery when wrong or user shows frustration.
   Trigger: "ya te dije", "no es eso", "no funciona", "otra vez", "wrong", "not what I asked", repeated correction 2x.
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.1"
+metadata: author: gentleman-vMK, version: "1.1"
 ---
 
 ## When

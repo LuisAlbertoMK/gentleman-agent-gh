@@ -3,7 +3,7 @@ name: sdd-verify
 description: > Validate impl vs specs/design/tasks.
   Trigger: Orchestrator launches verify.
 license: MIT
-metadata: author: gentleman-programming, version: "3.4"
+metadata: author: gentleman-vMK, version: "3.4"
 ---
 
 ## GATE

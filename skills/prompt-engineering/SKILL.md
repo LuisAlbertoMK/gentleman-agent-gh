@@ -3,7 +3,7 @@ name: prompt-engineering
 description: > SPEAR framework, ReAct/Reflexion multi-agent patterns.
   Trigger: "improve prompt", "ReAct", "security", "multi-agent".
 license: Apache-2.0
-metadata: author: gentleman-programming, version: "1.1"
+metadata: author: gentleman-vMK, version: "1.1"
 ---
 
 ## SPEAR
