@@ -1,53 +1,53 @@
 # Gap Analysis: ERP
 
-> Weighted checklist for enterprise resource planning systems.
+> Enterprise Resource Planning. Weights: Functional 50% · Security 35%.
 
-## Layer Weights
-Functional ██████████ 50% · Security ████████ 35% · Technical ██████ 25%
-UX █████ 20% · Ops ██████ 25% · Business ███████ 30%
+## 🎨 UI/UX
+- [ ] Complex forms: progress saved? Validation per field? Bulk entry?
+- [ ] Data tables: sort, filter, export, column customization?
+- [ ] Navigation: role-based menu? Recent items? Favorites?
+- [ ] Dashboards: configurable? Real-time vs periodic refresh?
+- [ ] Reports: export (PDF/CSV/Excel)? Scheduled? Templates?
+- [ ] WCAG 2.2 AA: enterprise compliance required?
 
-## Functional
-- [ ] Core modules: accounting, inventory, sales, purchasing, HR, payroll?
-- [ ] Regulatory compliance: tax codes, fiscal reports, local regulations?
-- [ ] Multi-currency? Multi-company? Multi-warehouse?
-- [ ] Approval workflows: configurable? audit trail?
-- [ ] Reporting: balance sheet, P&L, cash flow, custom reports?
-- [ ] Reconciliation: bank? inter-company? period closing?
-- [ ] Batch operations: mass updates, scheduled jobs, nightly processing?
+## 🔒 Security
+- [ ] RBAC: granular permissions? Role hierarchy? Audit of role changes?
+- [ ] Data: row-level security? Multi-org isolation?
+- [ ] Audit log: ALL mutations logged? Immutable? Searchable?
+- [ ] Compliance: SOX? GAAP? IFRS? Local regulations?
+- [ ] Session management: idle timeout? Concurrent sessions? IP restrictions?
+- [ ] API: internal only? Service-to-service auth?
 
-## Technical
-- [ ] Transactional consistency across modules?
-- [ ] Batch processing: scheduled, retry, error handling?
-- [ ] Data migration: import from legacy? mapping? validation?
-- [ ] Integration: REST APIs? webhooks? ETL? file exchange (EDI, XML)?
-- [ ] Extensibility: custom fields? modules? scripts?
-- [ ] Reporting engine: configurable dashboards? export (PDF, Excel, CSV)?
-- [ ] Audit trail: who changed what when? immutable log?
+## ⚡ Optimization
+- [ ] Report generation: async? Cached? Paginated?
+- [ ] Large datasets: virtual scrolling? Lazy loading? Server-side processing?
+- [ ] Import/export: batch processing? Progress indicator? Error report?
 
-## Security
-- [ ] Segregation of duties: incompatible roles blocked?
-- [ ] Access control: by module, company, warehouse, document type?
-- [ ] Sensitive data: salaries, pricing, bank accounts encrypted?
-- [ ] Audit log: tamper-proof? retention policy?
-- [ ] Session: timeout? concurrent session control?
-- [ ] Fiscal compliance: data retention by law?
+## 📈 Performance
+- [ ] Dashboard load < 3s even with large datasets?
+- [ ] Search across entities: full-text? Filters? < 2s?
+- [ ] Reports: time-series? Aggregation pre-computed?
+- [ ] Database: indexes maintained? Query plans reviewed?
 
-## UX
-- [ ] Data entry efficiency: tab order? auto-complete? barcode scan?
-- [ ] Bulk operations: select multiple → apply action?
-- [ ] Keyboard shortcuts for power users?
-- [ ] Reports: filters saved? drill-down? export?
-- [ ] Multi-monitor support? (common in ERP desks)
+## 💾 Resource Usage
+- [ ] Document storage: versioning? Retention policy? Archival?
+- [ ] DB size: growth rate? Partitioning? Archival strategy?
+- [ ] Background jobs: queue depth? Worker scaling?
 
-## Ops
-- [ ] Maintenance windows: zero-downtime vs scheduled?
-- [ ] Backup: full + incremental? point-in-time recovery?
-- [ ] Migration: version upgrades? rollback plan?
-- [ ] Monitoring: job health? integration failures? data sync errors?
-- [ ] On-premise deployment optional? Hybrid?
+## 🚀 Project Velocity
+- [ ] Customization: configurable without code changes?
+- [ ] Modules: independently deployable?
+- [ ] Migration: data migration between versions tested?
+- [ ] CI/CD: enterprise-grade? Rollback tested?
 
-## Business
-- [ ] Implementation methodology? Partner ecosystem?
-- [ ] Training materials? Certification program?
-- [ ] Support SLAs? Response times?
-- [ ] TCO: license + implementation + maintenance + customization?
+## 📱 Responsive Design
+- [ ] Mobile: field worker access? Offline mode? Photo capture?
+- [ ] Approvals: approve/reject from mobile?
+- [ ] Notifications: push for approvals, alerts?
+
+## 🏗️ Infrastructure
+- [ ] Deployment: on-prem? Cloud? Hybrid? Multi-tenant?
+- [ ] High availability: clustering? Failover? < 5min RTO?
+- [ ] Backup: full + incremental? Point-in-time recovery?
+- [ ] Monitoring: system health? SLA monitoring?
+- [ ] DR plan: tested? Documented? RTO/RPO defined?
