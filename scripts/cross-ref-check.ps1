@@ -13,9 +13,9 @@ Write-Host "=== Cross-Ref Check: $RepoRoot ===" -ForegroundColor Cyan
 
 # 1. Check _shared references resolve
 Write-Host "`n[1/5] Shared refs..." -NoNewline
-$sharedRefs = Select-String -Path "$RepoRoot\prompts\sdd-orchestrator.md" -Pattern "_shared/skill-resolver.md" -SimpleMatch
+$sharedRefs = Select-String -Path "$RepoRoot\prompts\sdd\sdd-orchestrator.md" -Pattern "_shared/skill-resolver.md" -SimpleMatch
 $sharedFile = Test-Path "$RepoRoot\skills\_shared\skill-resolver.md"
-if ($sharedRefs -and $sharedFile) { Write-Host " ✅" } else { Write-Host " ❌"; if (-not $sharedRefs) { $errors += "prompts/sdd-orchestrator.md: missing _shared ref" }; if (-not $sharedFile) { $errors += "skills/_shared/skill-resolver.md: file not found" } }
+if ($sharedRefs -and $sharedFile) { Write-Host " ✅" } else { Write-Host " ❌"; if (-not $sharedRefs) { $errors += "prompts/sdd/sdd-orchestrator.md: missing _shared ref" }; if (-not $sharedFile) { $errors += "skills/_shared/skill-resolver.md: file not found" } }
 
 # 2. Check commands match skills
 Write-Host "[2/5] Commands vs skills..." -NoNewline
