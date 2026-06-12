@@ -4,88 +4,96 @@
     "gentleman": {
       "description": "Senior Architect mentor - helpful first, challenging when it matters",
       "mode": "primary",
-      "prompt": "{file:C:\\Users\\MK\\.config\\opencode\\AGENTS.md}",
-      "tools": {
-        "edit": true,
-        "write": true
+      "prompt": "{file:AGENTS.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow"
       }
     },
     "sdd-apply": {
       "description": "Implement code changes from task definitions",
       "hidden": true,
       "mode": "subagent",
-      "prompt": "{file:C:\\Users\\MK\\.config\\opencode\\prompts\\sdd\\sdd-apply.md}",
-      "tools": {
-        "bash": true,
-        "edit": true,
-        "read": true,
-        "write": true
+      "prompt": "{file:prompts/sdd/sdd-apply.md}",
+      "permission": {
+        "bash": "allow",
+        "edit": "allow",
+        "read": "allow",
+        "write": "allow"
       }
     },
     "sdd-archive": {
       "description": "Archive completed change artifacts",
       "hidden": true,
       "mode": "subagent",
-      "prompt": "{file:C:\\Users\\MK\\.config\\opencode\\prompts\\sdd\\sdd-archive.md}",
-      "tools": {
-        "bash": true,
-        "edit": true,
-        "read": true,
-        "write": true
+      "prompt": "{file:prompts/sdd/sdd-archive.md}",
+      "permission": {
+        "bash": "allow",
+        "edit": "allow",
+        "read": "allow",
+        "write": "allow"
       }
     },
     "sdd-design": {
       "description": "Create technical design from proposals",
       "hidden": true,
       "mode": "subagent",
-      "prompt": "{file:C:\\Users\\MK\\.config\\opencode\\prompts\\sdd\\sdd-design.md}",
-      "tools": {
-        "bash": true,
-        "edit": true,
-        "read": true,
-        "write": true
+      "prompt": "{file:prompts/sdd/sdd-design.md}",
+      "permission": {
+        "bash": "allow",
+        "edit": "allow",
+        "read": "allow",
+        "write": "allow"
       }
     },
     "sdd-explore": {
       "description": "Investigate codebase and think through ideas",
       "hidden": true,
       "mode": "subagent",
-      "prompt": "{file:C:\\Users\\MK\\.config\\opencode\\prompts\\sdd\\sdd-explore.md}",
-      "tools": {
-        "bash": true,
-        "edit": true,
-        "read": true,
-        "write": true
+      "prompt": "{file:prompts/sdd/sdd-explore.md}",
+      "permission": {
+        "bash": "allow",
+        "edit": "allow",
+        "read": "allow",
+        "write": "allow"
       }
     },
     "sdd-init": {
       "description": "Bootstrap SDD context and project configuration",
       "hidden": true,
       "mode": "subagent",
-      "prompt": "{file:C:\\Users\\MK\\.config\\opencode\\prompts\\sdd\\sdd-init.md}",
-      "tools": {
-        "bash": true,
-        "edit": true,
-        "read": true,
-        "write": true
+      "prompt": "{file:prompts/sdd/sdd-init.md}",
+      "permission": {
+        "bash": "allow",
+        "edit": "allow",
+        "read": "allow",
+        "write": "allow"
       }
     },
     "sdd-onboard": {
       "description": "Guide user through a complete SDD cycle using their real codebase",
       "hidden": true,
       "mode": "subagent",
-      "prompt": "{file:C:\\Users\\MK\\.config\\opencode\\prompts\\sdd\\sdd-onboard.md}",
-      "tools": {
-        "bash": true,
-        "edit": true,
-        "read": true,
-        "write": true
+      "prompt": "{file:prompts/sdd/sdd-onboard.md}",
+      "permission": {
+        "bash": "allow",
+        "edit": "allow",
+        "read": "allow",
+        "write": "allow"
       }
     },
     "sdd-orchestrator": {
       "description": "SDD Orchestrator - coordinates sub-agents, never does work inline",
+      "model": "",
       "mode": "primary",
       "permission": {
+        "bash": "allow",
+        "delegate": "allow",
+        "delegation_list": "allow",
+        "delegation_read": "allow",
+        "edit": "allow",
+        "read": "allow",
+        "write": "allow",
         "task": {
           "*": "deny",
           "sdd-apply": "allow",
@@ -100,63 +108,54 @@
           "sdd-verify": "allow"
         }
       },
-      "prompt": "{file:C:\\Users\\MK\\.config\\opencode\\prompts\\sdd\\sdd-orchestrator.md}",
-      "tools": {
-        "bash": true,
-        "delegate": true,
-        "delegation_list": true,
-        "delegation_read": true,
-        "edit": true,
-        "read": true,
-        "write": true
-      }
+      "prompt": "{file:prompts/sdd/sdd-orchestrator.md}"
     },
     "sdd-propose": {
       "description": "Create change proposals from explorations",
       "hidden": true,
       "mode": "subagent",
-      "prompt": "{file:C:\\Users\\MK\\.config\\opencode\\prompts\\sdd\\sdd-propose.md}",
-      "tools": {
-        "bash": true,
-        "edit": true,
-        "read": true,
-        "write": true
+      "prompt": "{file:prompts/sdd/sdd-propose.md}",
+      "permission": {
+        "bash": "allow",
+        "edit": "allow",
+        "read": "allow",
+        "write": "allow"
       }
     },
     "sdd-spec": {
       "description": "Write detailed specifications from proposals",
       "hidden": true,
       "mode": "subagent",
-      "prompt": "{file:C:\\Users\\MK\\.config\\opencode\\prompts\\sdd\\sdd-spec.md}",
-      "tools": {
-        "bash": true,
-        "edit": true,
-        "read": true,
-        "write": true
+      "prompt": "{file:prompts/sdd/sdd-spec.md}",
+      "permission": {
+        "bash": "allow",
+        "edit": "allow",
+        "read": "allow",
+        "write": "allow"
       }
     },
     "sdd-tasks": {
       "description": "Break down specs and designs into implementation tasks",
       "hidden": true,
       "mode": "subagent",
-      "prompt": "{file:C:\\Users\\MK\\.config\\opencode\\prompts\\sdd\\sdd-tasks.md}",
-      "tools": {
-        "bash": true,
-        "edit": true,
-        "read": true,
-        "write": true
+      "prompt": "{file:prompts/sdd/sdd-tasks.md}",
+      "permission": {
+        "bash": "allow",
+        "edit": "allow",
+        "read": "allow",
+        "write": "allow"
       }
     },
     "sdd-verify": {
       "description": "Validate implementation against specs",
       "hidden": true,
       "mode": "subagent",
-      "prompt": "{file:C:\\Users\\MK\\.config\\opencode\\prompts\\sdd\\sdd-verify.md}",
-      "tools": {
-        "bash": true,
-        "edit": true,
-        "read": true,
-        "write": true
+      "prompt": "{file:prompts/sdd/sdd-verify.md}",
+      "permission": {
+        "bash": "allow",
+        "edit": "allow",
+        "read": "allow",
+        "write": "allow"
       }
     }
   },
