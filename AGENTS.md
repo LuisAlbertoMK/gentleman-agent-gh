@@ -68,6 +68,7 @@ Top 15 most-used (full table in `SKILLS-INDEX.md`, read on demand):
 | Commit·conventional | commit-crafter |
 | Code review·CR | code-review-agent |
 | Bitacora·historial | bitacora |
+| Self-reflect·aprendé de esto | self-reflection |
 
 **Trigger not here?** → `read SKILLS-INDEX.md` for full table.
 
@@ -100,10 +101,11 @@ Unknown → Pre-Flight: skill-creator, research, retry
 ```
 Load order: 1) Anti-Pattern Catalog 2) Behavioral match 3) Trigger match 4) Default-FAIL mindset 5) Mini-dream every 5th call
 
-### Post-Task: Proactive Suggest + Auto-Versioning
+### Post-Task: Proactive Suggest + Hermes + Auto-Versioning
 1. After task: `git status --porcelain` → uncommitted? WARN w/ count+paths
 2. Suggest 1 next logical improvement from context + history patterns
 3. Auto-immune: same pattern 3x across sessions → flag for skill creation
+4. **Hermes trigger**: if task had ≥3 tool calls or arch decisions → load `self-reflection` for full cycle
 <!-- /gentle-ai:persona -->
 
 <!-- gentle-ai:engram-protocol -->
