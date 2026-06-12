@@ -1,6 +1,6 @@
 # SKILLS INDEX
 
-> Full trigger table for all 57 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 56 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
 > **Version**: 1.0 | **Changelog**: 1.0 (sprint 2: 4281->4089 chars, -4.5%, removed redundant Quick reference + Load rule sections)
