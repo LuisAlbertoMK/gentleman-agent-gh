@@ -354,6 +354,7 @@ Per-type weighted checklists → `assets/{type}-template.md`
 - **security-scanner**: pre-audit security
 - **code-review-agent**: code-level gap detection
 - **senior-engineer**: trade-off analysis, fix prioritization
+- **performance-tracker**: dedicated mobile/desktop/web perf scoring (dims 3-5)
 
 ## Anti-Patterns
 ❌ Skip intake phase — classification prevents wrong template

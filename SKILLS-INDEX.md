@@ -1,9 +1,9 @@
 # SKILLS INDEX
 
-> Full trigger table for all 57 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 58 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 1.0 | **Changelog**: 1.0 (sprint 2: 4281->4089 chars, -4.5%, removed redundant Quick reference + Load rule sections)
+> **Version**: 1.1 | **Changelog**: 1.1 (added performance-tracker)
 
 ## Triggers → Skill
 
@@ -65,11 +65,12 @@
 | Doc sync, documentación, readme, sincronizar docs | doc-sync |
 | Bitacora, historial, histórico, qué pedí, request log | bitacora |
 | Dreaming, cross-session patterns, memory curation | dreaming |
+| Performance score, mobile perf, desktop perf, rendimiento, app score, lighthouse, benchmark | performance-tracker |
 | Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
 
 ## Quick groups
 - **Compression/style**: karpathy-prompt, karpathy-loop, caveman, lean-context
-- **Quality**: quality-gate, auto-metrics, immune-system, code-review-agent
+- **Quality**: quality-gate, auto-metrics, immune-system, code-review-agent, performance-tracker
 - **Memory**: session-resume, code-memory, dreaming
 - **Skills meta**: skill-creator, skill-registry, skill-improver, skill-digestion
 - **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner

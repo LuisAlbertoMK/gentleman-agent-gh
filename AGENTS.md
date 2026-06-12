@@ -86,6 +86,7 @@ Design → senior-engineer, sdd-propose, sdd-design, cognitive-doc-design, execu
 Learn/Research → prompt-engineering, python-async, code-memory
 Review → judgment-day, skill-testing, pr-evidence, comment-writer, code-review-agent, branch-pr, issue-creation
 Measure ("metricas") → metricas, auto-metrics
+Performance ("performance", "rendimiento", "benchmark", "lighthouse", "perf score") → performance-tracker
 Optimize → karpathy-*, lean-context, caveman, skill-improver, refactoring-planner, skill-refresher
 Coordinate → delivery-harness, subagent-isolation, command-wrapper, chained-pr
 Commit ("commit") → commit-crafter, quality-gate, ci-cd
