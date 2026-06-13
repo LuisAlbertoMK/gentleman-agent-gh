@@ -1,0 +1,3441 @@
+﻿{
+    "nodeCount":  256,
+    "name":  "skills",
+    "edges":  [
+                  {
+                      "from":  "bitacora",
+                      "to":  "bitacora/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "bitacora",
+                      "to":  "keyword:Bitacora",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "bitacora",
+                      "to":  "keyword:historial",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "bitacora",
+                      "to":  "keyword:histÃ³rico",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "bitacora",
+                      "to":  "keyword:quÃ© pedÃ­",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "bitacora",
+                      "to":  "keyword:request log",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "branch-pr",
+                      "to":  "branch-pr/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "branch-pr",
+                      "to":  "keyword:PR creation",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "branch-pr",
+                      "to":  "keyword:issue-first",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "caveman",
+                      "to":  "caveman/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "caveman",
+                      "to":  "keyword:Ultra-compressed",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "caveman",
+                      "to":  "keyword:caveman",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "caveman",
+                      "to":  "keyword:/caveman",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "chained-pr",
+                      "to":  "chained-pr/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "chained-pr",
+                      "to":  "keyword:Chained PRs",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "chained-pr",
+                      "to":  "keyword:\u003e400 lines",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "chained-pr",
+                      "to":  "keyword:review slices",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "ci-cd",
+                      "to":  "ci-cd/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "ci-cd",
+                      "to":  "keyword:CI/CD pipeline",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "ci-cd",
+                      "to":  "keyword:GitHub Actions",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "ci-cd",
+                      "to":  "keyword:quality gate",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "code-memory",
+                      "to":  "code-memory/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "code-memory",
+                      "to":  "keyword:ContinuÃ¡",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "code-memory",
+                      "to":  "keyword:code memory",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "code-memory",
+                      "to":  "keyword:multi-session",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "code-review-agent",
+                      "to":  "code-review-agent/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "code-review-agent",
+                      "to":  "keyword:Code review",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "code-review-agent",
+                      "to":  "keyword:CR",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "code-review-agent",
+                      "to":  "keyword:revisar cÃ³digo",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "code-review-agent",
+                      "to":  "keyword:criticar",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "cognitive-doc-design",
+                      "to":  "cognitive-doc-design/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "cognitive-doc-design",
+                      "to":  "keyword:Cognitive load",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "cognitive-doc-design",
+                      "to":  "keyword:docs for reviewers",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "command-wrapper",
+                      "to":  "command-wrapper/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "command-wrapper",
+                      "to":  "keyword:Command wrapper",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "command-wrapper",
+                      "to":  "keyword:error handling",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "command-wrapper",
+                      "to":  "keyword:output parsing",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "comment-writer",
+                      "to":  "comment-writer/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "comment-writer",
+                      "to":  "keyword:PR comments",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "comment-writer",
+                      "to":  "keyword:issue replies",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "comment-writer",
+                      "to":  "keyword:feedback",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "commit-crafter",
+                      "to":  "commit-crafter/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "commit-crafter",
+                      "to":  "keyword:commit/mensaje/commit message/conventional commit",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "context-watchdog",
+                      "to":  "context-watchdog/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "context-watchdog",
+                      "to":  "keyword:Context \u003e100K tokens",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "context-watchdog",
+                      "to":  "keyword:context explosion",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "decision-capture",
+                      "to":  "decision-capture/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "decision-capture",
+                      "to":  "keyword:Decision capture",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "decision-capture",
+                      "to":  "keyword:trade-off log",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "delivery-harness",
+                      "to":  "delivery-harness/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "delivery-harness",
+                      "to":  "keyword:Delivery harness",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "delivery-harness",
+                      "to":  "keyword:review workload",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "doc-sync",
+                      "to":  "doc-sync/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "doc-sync",
+                      "to":  "keyword:Doc sync",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "doc-sync",
+                      "to":  "keyword:documentaciÃ³n",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "doc-sync",
+                      "to":  "keyword:readme",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "doc-sync",
+                      "to":  "keyword:sincronizar docs",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "execution-mode",
+                      "to":  "execution-mode/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "execution-mode",
+                      "to":  "keyword:Execution mode",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "execution-mode",
+                      "to":  "keyword:quick/thorough/draft",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "gap-analysis",
+                      "to":  "gap-analysis/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "gap-analysis",
+                      "to":  "keyword:Gap analysis",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "gap-analysis",
+                      "to":  "keyword:system audit",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "gap-analysis",
+                      "to":  "keyword:identificar gaps",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "gap-analysis",
+                      "to":  "keyword:evaluar software",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "go-testing",
+                      "to":  "go-testing/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "go-testing",
+                      "to":  "keyword:Go tests",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "go-testing",
+                      "to":  "keyword:Bubbletea TUI",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "immune-system",
+                      "to":  "immune-system/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "immune-system",
+                      "to":  "keyword:Immune System",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "immune-system",
+                      "to":  "keyword:anti-pattern",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "immune-system",
+                      "to":  "keyword:permanent immunity",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "issue-creation",
+                      "to":  "issue-creation/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "issue-creation",
+                      "to":  "keyword:Issue creation",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "judgment-day",
+                      "to":  "judgment-day/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "judgment-day",
+                      "to":  "skill-registry",
+                      "type":  "references",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "judgment-day",
+                      "to":  "skill-registry",
+                      "type":  "references",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "judgment-day",
+                      "to":  "keyword:Judgment day",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "judgment-day",
+                      "to":  "keyword:dual review",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "judgment-day",
+                      "to":  "keyword:juzgar",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "karpathy-loop",
+                      "to":  "karpathy-loop/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "karpathy-loop",
+                      "to":  "keyword:Karpathy loop",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "karpathy-loop",
+                      "to":  "keyword:optimize prompt",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "karpathy-loop",
+                      "to":  "keyword:measure tokens",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "karpathy-prompt",
+                      "to":  "karpathy-prompt/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "karpathy-prompt",
+                      "to":  "keyword:Karpathy",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "karpathy-prompt",
+                      "to":  "keyword:less tokens",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "karpathy-prompt",
+                      "to":  "keyword:context compilation",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "lean-context",
+                      "to":  "lean-context/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "lean-context",
+                      "to":  "keyword:Ultra-lean default",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "lean-context",
+                      "to":  "keyword:compact responses",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "metricas",
+                      "to":  "metricas/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "metricas",
+                      "to":  "keyword:Metricas",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "metricas",
+                      "to":  "keyword:before/after",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "metricas",
+                      "to":  "keyword:% improvement",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "metricas",
+                      "to":  "keyword:tokenization",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "metricas",
+                      "to":  "keyword:delta",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "performance-tracker",
+                      "to":  "performance-tracker/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "performance-tracker",
+                      "to":  "keyword:performance score",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "performance-tracker",
+                      "to":  "keyword:mobile perf",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "performance-tracker",
+                      "to":  "keyword:desktop perf",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "performance-tracker",
+                      "to":  "keyword:rendimiento",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "performance-tracker",
+                      "to":  "keyword:performance-tracker",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "pr-evidence",
+                      "to":  "pr-evidence/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "pr-evidence",
+                      "to":  "keyword:PR with SDD evidence",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "project-mapper",
+                      "to":  "project-mapper/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "project-mapper",
+                      "to":  "keyword:Mapear",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "project-mapper",
+                      "to":  "keyword:project map",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "project-mapper",
+                      "to":  "keyword:estructura",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "project-mapper",
+                      "to":  "keyword:tech stack",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "project-mapper",
+                      "to":  "keyword:arquitectura",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "prompt-engineering",
+                      "to":  "prompt-engineering/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "prompt-engineering",
+                      "to":  "keyword:Improve prompt",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "prompt-engineering",
+                      "to":  "keyword:security",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "prompt-engineering",
+                      "to":  "keyword:ReAct",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "prompt-engineering",
+                      "to":  "keyword:multi-agent",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "python-async",
+                      "to":  "python-async/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "python-async",
+                      "to":  "keyword:Python async",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "python-async",
+                      "to":  "keyword:asyncio",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "quality-gate",
+                      "to":  "quality-gate/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "quality-gate",
+                      "to":  "keyword:Quality gate",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "quality-gate",
+                      "to":  "keyword:pre-commit",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "recovery-protocol",
+                      "to":  "recovery-protocol/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "recovery-protocol",
+                      "to":  "keyword:Recovery",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "recovery-protocol",
+                      "to":  "keyword:\u0027no es eso\u0027",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "recovery-protocol",
+                      "to":  "keyword:frustration",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "refactoring-planner",
+                      "to":  "refactoring-planner/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "refactoring-planner",
+                      "to":  "keyword:Refactor",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "refactoring-planner",
+                      "to":  "keyword:refactoring",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "refactoring-planner",
+                      "to":  "keyword:reestructurar",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "refactoring-planner",
+                      "to":  "keyword:migrate",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-apply",
+                      "to":  "sdd-apply/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-apply",
+                      "to":  "keyword:Apply tasks",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-apply",
+                      "to":  "keyword:implement",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-archive",
+                      "to":  "sdd-archive/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-archive",
+                      "to":  "keyword:Archive changes",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-archive",
+                      "to":  "keyword:delta to main",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-contracts",
+                      "to":  "sdd-contracts/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-contracts",
+                      "to":  "keyword:SDD phase contracts",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-contracts",
+                      "to":  "keyword:artifact dependencies",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-design",
+                      "to":  "sdd-design/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-design",
+                      "to":  "keyword:Technical design",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-design",
+                      "to":  "keyword:HOW",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-explore",
+                      "to":  "sdd-explore/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-explore",
+                      "to":  "keyword:Explore codebase",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-explore",
+                      "to":  "keyword:pre-design",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-init",
+                      "to":  "sdd-init/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-init",
+                      "to":  "skill-registry",
+                      "type":  "references",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-init",
+                      "to":  "skill-registry",
+                      "type":  "references",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-init",
+                      "to":  "keyword:SDD init",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-init",
+                      "to":  "keyword:bootstrap",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-onboard",
+                      "to":  "sdd-onboard/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-onboard",
+                      "to":  "keyword:Guided SDD walkthrough",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-propose",
+                      "to":  "sdd-propose/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-propose",
+                      "to":  "keyword:Proposal",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-propose",
+                      "to":  "keyword:intent",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-propose",
+                      "to":  "keyword:approach",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-spec",
+                      "to":  "sdd-spec/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-spec",
+                      "to":  "keyword:Specs",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-spec",
+                      "to":  "keyword:Given/When/Then",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-tasks",
+                      "to":  "sdd-tasks/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-tasks",
+                      "to":  "keyword:Task breakdown",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-tasks",
+                      "to":  "keyword:implementation plan",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-verify",
+                      "to":  "sdd-verify/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-verify",
+                      "to":  "keyword:Validate vs specs",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "sdd-verify",
+                      "to":  "keyword:verify",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "security-scanner",
+                      "to":  "security-scanner/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "security-scanner",
+                      "to":  "keyword:Security",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "security-scanner",
+                      "to":  "keyword:seguridad",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "security-scanner",
+                      "to":  "keyword:vulnerabilidad",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "security-scanner",
+                      "to":  "keyword:auditar",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "self-reflection",
+                      "to":  "skill-creator",
+                      "type":  "references",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "self-reflection",
+                      "to":  "skill-creator",
+                      "type":  "references",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "self-reflection",
+                      "to":  "skill-creator",
+                      "type":  "references",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "self-reflection",
+                      "to":  "skill-creator",
+                      "type":  "references",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "self-reflection",
+                      "to":  "skill-creator",
+                      "type":  "references",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "self-reflection",
+                      "to":  "skill-creator",
+                      "type":  "references",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "senior-engineer",
+                      "to":  "senior-engineer/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "senior-engineer",
+                      "to":  "keyword:Senior architect",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "senior-engineer",
+                      "to":  "keyword:trade-offs",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "senior-engineer",
+                      "to":  "keyword:system design",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "session-resume",
+                      "to":  "session-resume/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "session-resume",
+                      "to":  "keyword:dÃ³nde lo dejamos",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-creator",
+                      "to":  "skill-creator/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-creator",
+                      "to":  "keyword:Create AI skill",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-digestion",
+                      "to":  "skill-digestion/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-digestion",
+                      "to":  "keyword:Skill digestion",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-digestion",
+                      "to":  "keyword:compact on load",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-improver",
+                      "to":  "skill-improver/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-improver",
+                      "to":  "skill-name",
+                      "type":  "references",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-improver",
+                      "to":  "skill-name",
+                      "type":  "references",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-improver",
+                      "to":  "skill-name",
+                      "type":  "references",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-improver",
+                      "to":  "keyword:Skill improvement",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-improver",
+                      "to":  "keyword:audit skills",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-improver",
+                      "to":  "keyword:refactor skills",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-refresher",
+                      "to":  "skill-refresher/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-refresher",
+                      "to":  "keyword:Skill refresher",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-refresher",
+                      "to":  "keyword:drift detection",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-refresher",
+                      "to":  "keyword:auto-heal",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-registry",
+                      "to":  "skill-registry/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-registry",
+                      "to":  "keyword:Skill registry",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-registry",
+                      "to":  "keyword:catalog",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-testing",
+                      "to":  "skill-testing/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-testing",
+                      "to":  "keyword:Test/verify skill",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "skill-testing",
+                      "to":  "keyword:coverage",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "subagent-isolation",
+                      "to":  "subagent-isolation/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "subagent-isolation",
+                      "to":  "keyword:Subagent isolation",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "subagent-isolation",
+                      "to":  "keyword:context boundaries",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "work-unit-commits",
+                      "to":  "work-unit-commits/triggers",
+                      "type":  "has-triggers",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "work-unit-commits",
+                      "to":  "keyword:Work-unit commits",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  },
+                  {
+                      "from":  "work-unit-commits",
+                      "to":  "keyword:commit organization",
+                      "type":  "triggered-by",
+                      "weight":  1
+                  }
+              ],
+    "edgeCount":  211,
+    "nodes":  [
+                  {
+                      "label":  "True",
+                      "id":  "immune-system/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Mapear",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "branch-pr/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:desktop perf",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "session-resume",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\session-resume",
+                                       "created":  "2026-06-03",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:before/after",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:vulnerabilidad",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:historial",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "gap-analysis",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\gap-analysis",
+                                       "created":  "2026-06-12",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:delta",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "skill-refresher/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-onboard/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "commit-crafter",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\commit-crafter",
+                                       "created":  "2026-06-07",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "recovery-protocol/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "pr-evidence/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "delivery-harness/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:multi-agent",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:/caveman",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "ci-cd/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Karpathy loop",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:performance score",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "skill-registry",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\skill-registry",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-verify",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\sdd-verify",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Decision capture",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Karpathy",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "gap-analysis/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "performance-tracker/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "skill-creator",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\skill-creator",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Ultra-compressed",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:asyncio",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "subagent-isolation",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\subagent-isolation",
+                                       "created":  "2026-05-28",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:tokenization",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "karpathy-prompt",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\karpathy-prompt",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "doc-sync",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\doc-sync",
+                                       "created":  "2026-06-07",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Go tests",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:system design",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-archive",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\sdd-archive",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "quality-gate/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Guided SDD walkthrough",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:mobile perf",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:project map",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:quÃ© pedÃ­",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-apply/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "quality-gate",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\quality-gate",
+                                       "created":  "2026-05-26",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:issue-first",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "immune-system",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\immune-system",
+                                       "created":  "2026-06-06",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:feedback",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "prompt-engineering/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:SDD init",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "work-unit-commits/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "chained-pr",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\chained-pr",
+                                       "created":  "2026-06-03",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Given/When/Then",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "skill-name",
+                      "type":  "skill-ref",
+                      "metadata":  {
+                                       "type":  "skill-ref"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:auditar",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "skill-improver",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\skill-improver",
+                                       "created":  "2026-06-03",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "skill-refresher",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\skill-refresher",
+                                       "created":  "2026-05-28",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:reestructurar",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "lean-context",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\lean-context",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:permanent immunity",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-design",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\sdd-design",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "bitacora/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "self-reflection",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\self-reflection",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:request log",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-tasks",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\sdd-tasks",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:tech stack",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:review workload",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:compact on load",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Specs",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:histÃ³rico",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:ContinuÃ¡",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:quality gate",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:multi-session",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "karpathy-prompt/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "skill-digestion",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\skill-digestion",
+                                       "created":  "2026-05-28",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "skill-digestion/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:audit skills",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "security-scanner",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\security-scanner",
+                                       "created":  "2026-06-07",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:pre-design",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:delta to main",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "cognitive-doc-design/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-init/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:pre-commit",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:context boundaries",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "project-mapper/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:review slices",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:performance-tracker",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:\u003e400 lines",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Cognitive load",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "branch-pr",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\branch-pr",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:context explosion",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:refactoring",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Gap analysis",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "python-async/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "ci-cd",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\ci-cd",
+                                       "created":  "2026-05-28",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-propose/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Execution mode",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Task breakdown",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "subagent-isolation/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:PR comments",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:CI/CD pipeline",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "code-memory/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Archive changes",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "pr-evidence",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\pr-evidence",
+                                       "created":  "2026-05-26",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-apply",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\sdd-apply",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "auto-metrics",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\auto-metrics",
+                                       "created":  "2026-05-29",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Validate vs specs",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "senior-engineer",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\senior-engineer",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "code-memory",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\code-memory",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-explore",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\sdd-explore",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "refactoring-planner",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\refactoring-planner",
+                                       "created":  "2026-06-07",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Apply tasks",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "issue-creation/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:error handling",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "code-review-agent",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\code-review-agent",
+                                       "created":  "2026-06-07",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:context compilation",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Create AI skill",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-init",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\sdd-init",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "command-wrapper/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-explore/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:system audit",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:coverage",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Issue creation",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "go-testing/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "caveman/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "judgment-day",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\judgment-day",
+                                       "created":  "2026-06-06",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "python-async",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\python-async",
+                                       "created":  "2026-06-03",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:bootstrap",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:verify",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:artifact dependencies",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "context-watchdog",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\context-watchdog",
+                                       "created":  "2026-05-26",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:implementation plan",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:dÃ³nde lo dejamos",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "chained-pr/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Delivery harness",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "metricas",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\metricas",
+                                       "created":  "2026-06-06",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:GitHub Actions",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "dreaming",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\dreaming",
+                                       "created":  "2026-05-29",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "command-wrapper",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\command-wrapper",
+                                       "created":  "2026-05-28",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "comment-writer/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "skill-improver/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-design/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:juzgar",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-verify/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:measure tokens",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:revisar cÃ³digo",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "project-mapper",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\project-mapper",
+                                       "created":  "2026-06-06",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:output parsing",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "skill-testing/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Doc sync",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:HOW",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "delivery-harness",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\delivery-harness",
+                                       "created":  "2026-05-28",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "context-watchdog/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:arquitectura",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:PR creation",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Senior architect",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:implement",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Judgment day",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:SDD phase contracts",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "execution-mode",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\execution-mode",
+                                       "created":  "2026-05-28",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "caveman",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\caveman",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:commit organization",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:estructura",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-spec/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Metricas",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Command wrapper",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Recovery",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Code review",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "karpathy-loop",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\karpathy-loop",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:issue replies",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "session-resume/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Subagent isolation",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:intent",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "prompt-engineering",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\prompt-engineering",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "comment-writer",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\comment-writer",
+                                       "created":  "2026-06-03",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "skill-registry/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:\u0027no es eso\u0027",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "bitacora",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\bitacora",
+                                       "created":  "2026-06-07",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:anti-pattern",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "decision-capture",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\decision-capture",
+                                       "created":  "2026-05-26",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "skill-creator/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:migrate",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "go-testing",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\go-testing",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "senior-engineer/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:documentaciÃ³n",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "doc-sync/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Bubbletea TUI",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:refactor skills",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:CR",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "performance-tracker",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\performance-tracker",
+                                       "created":  "2026-06-12",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-onboard",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\sdd-onboard",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:less tokens",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Technical design",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-contracts",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\sdd-contracts",
+                                       "created":  "2026-05-28",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Immune System",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:caveman",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:PR with SDD evidence",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:rendimiento",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Proposal",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:identificar gaps",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:optimize prompt",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Skill refresher",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "karpathy-loop/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:sincronizar docs",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Skill registry",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Improve prompt",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:commit/mensaje/commit message/conventional commit",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:dual review",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:readme",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:seguridad",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-propose",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\sdd-propose",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Context \u003e100K tokens",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Bitacora",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Python async",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "code-review-agent/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Skill improvement",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Chained PRs",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Refactor",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "lean-context/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:docs for reviewers",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Test/verify skill",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "issue-creation",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\issue-creation",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Explore codebase",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:compact responses",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "judgment-day/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:% improvement",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:auto-heal",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "execution-mode/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:evaluar software",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "recovery-protocol",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\recovery-protocol",
+                                       "created":  "2026-05-26",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "work-unit-commits",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\work-unit-commits",
+                                       "created":  "2026-06-03",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:ReAct",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "_shared",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\_shared",
+                                       "created":  "2026-06-11",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Skill digestion",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "cognitive-doc-design",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\cognitive-doc-design",
+                                       "created":  "2026-06-03",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "commit-crafter/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-archive/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:code memory",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "skill-testing",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\skill-testing",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:criticar",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:trade-off log",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:drift detection",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Ultra-lean default",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:catalog",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:trade-offs",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:quick/thorough/draft",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "decision-capture/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:frustration",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "refactoring-planner/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:approach",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "metricas/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:security",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "security-scanner/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-contracts/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-tasks/triggers",
+                      "type":  "triggers",
+                      "metadata":  {
+                                       "type":  "triggers"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "sdd-spec",
+                      "type":  "skill-dir",
+                      "metadata":  {
+                                       "path":  "D:\\gentleman-agent-gh\\skills\\sdd-spec",
+                                       "created":  "2026-05-02",
+                                       "type":  "skill-dir"
+                                   }
+                  },
+                  {
+                      "label":  "True",
+                      "id":  "keyword:Work-unit commits",
+                      "type":  "keyword",
+                      "metadata":  {
+                                       "type":  "keyword"
+                                   }
+                  }
+              ]
+}

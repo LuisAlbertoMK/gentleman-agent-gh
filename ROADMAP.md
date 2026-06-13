@@ -9,7 +9,7 @@
 
 | Métrica | Antes | Después | Δ |
 |---------|-------|---------|---|
-| Skills total | 56 (decía 57) | 57 + _shared | fixed |
+| Skills total | 56 (decía 57) | 58 + _shared | fixed |
 | SDD commands | 7/9 | **13** (cycle complete) | +6 |
 | Broken refs | 1 | **0** ✅ | fixed |
 | TDD docs weight | 31.4 KB | 14.1 KB ✅ | -55.2% |
@@ -60,7 +60,7 @@
 | Activo | Detalle |
 |--------|---------|
 | 0 broken refs ✅ | Todas las referencias internas resueltas |
-| 57 skills + _shared | SKILLS-INDEX sincronizado |
+| 58 skills + _shared | SKILLS-INDEX sincronizado |
 | 13 commands | SDD cycle completo |
 | ~213 KB | -7.9% del peso original |
 | `scripts/` | 4 scripts: auto-clean, bash-safe, tokenize-all, cross-ref-check, skill-test-suite |
