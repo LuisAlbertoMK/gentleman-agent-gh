@@ -55,8 +55,7 @@ Top 15 most-used (full table in `SKILLS-INDEX.md`, read on demand):
 |---------|-------|
 | Karpathy·less tokens | karpathy-prompt |
 | Karpathy loop·optimize | karpathy-loop |
-| Caveman·ultra-compressed | caveman |
-| Lean·compact | lean-context |
+| Lean·compact·caveman | lean-context |
 | Quality gate·pre-commit | quality-gate |
 | Auto-score·metrics | auto-metrics |
 | Resume·continuá·session start | session-resume |
@@ -87,7 +86,7 @@ Learn/Research → prompt-engineering, python-async, code-memory
 Review → judgment-day, skill-testing, pr-evidence, comment-writer, code-review-agent, branch-pr, issue-creation
 Measure ("metricas") → metricas, auto-metrics
 Performance ("performance", "rendimiento", "benchmark", "lighthouse", "perf score") → performance-tracker
-Optimize → karpathy-*, lean-context, caveman, skill-improver, refactoring-planner, skill-refresher
+Optimize → karpathy-*, lean-context, skill-improver, refactoring-planner, skill-refresher
 Coordinate → delivery-harness, subagent-isolation, command-wrapper, chained-pr
 Commit ("commit") → commit-crafter, quality-gate, ci-cd
 Audit ("gap analysis", "auditar sistema", "evaluar") → gap-analysis
@@ -135,7 +134,7 @@ Quick Q&A: karpathy-prompt, lean-context | Bug: recovery-protocol, immune-system
 
 ### B. Token Budget
 - Resp >500t sin pedir detalle→resumí primero, expandí on-demand.
-- 5 turnos sin progreso→caveman lite. 10 turnos→mem_session_summary+reset.
+- 5 turnos sin progreso→lean-context (CAVEMAN). 10 turnos→mem_session_summary+reset.
 
 ### C. Persistence
 - Arch decision/bugfix→mem_save topic_key. Session close→mem_session_summary mandatory.

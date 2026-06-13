@@ -13,40 +13,8 @@ metadata: author: gentleman-vMK, version: "1.3", changelog: "1.2->1.3: project t
 New project, unfamiliar codebase, user asks "how is this structured".
 
 ## Project Type Classification
-Detect BOTH tech layer AND business type. This drives template selection in gap-analysis.
-
-### Tech Layer Detection
-
-| Signal | Layer | Detected Type |
-|--------|-------|---------------|
-| `package.json` + react/vue/angular/svelte/next | Frontend | Web SPA/SSR |
-| `package.json` + electron/tauri | Desktop | Electron/Tauri |
-| `pubspec.yaml`, `Podfile`, `build.gradle` (android) | Mobile | Flutter/Native/RN |
-| `go.mod` + `cmd/` `internal/` | Backend | Go API/Monolith |
-| `package.json` + express/fastify/nest | Backend | Node API |
-| `main.py` + django/fastapi/flask | Backend | Python API |
-| `*.csproj` + Program.cs | Backend | C# API |
-| `Cargo.toml` (no tauri) | Backend | Rust API |
-| `prisma/schema`, `migrations/`, `*.sql` | Database | SQL/NoSQL |
-| `Dockerfile` + no app code | Infra | Container |
-| `terraform/`, `k8s/`, `ansible/` | Infra | IaC |
-
-### Business Type Detection
-
-| Signal in code/docs | Business Type |
-|---------------------|---------------|
-| tenant, subscription, billing, plan | SaaS |
-| invoice, order, stock, inventory, vendor | ERP |
-| product, cart, checkout, payment, shipping | E-commerce |
-| content, page, blog, post, article | CMS |
-| api, endpoint (no UI) | API |
-| landing, marketing, blog (public) | Web |
-| window, dialog, tray, menu | Desktop App |
-| screen, navigator, push notification | Mobile App |
-
-### Full Stack Detection
-If both frontend and backend signals found → classify as full-stack.
-Detect FE/BE framework pairs: Next.js, Nuxt, Remix, Laravel, Django+template.
+> Classification tables live in `gap-analysis` skill to avoid duplication.
+> See `~/.config/opencode/skills/gap-analysis/SKILL.md` → Phase 0.1 Classify Project Type.
 
 ## Stack detection
 
@@ -95,21 +63,9 @@ Detect FE/BE framework pairs: Next.js, Nuxt, Remix, Laravel, Django+template.
 
 ## Auto-Chain: gap-analysis trigger
 After generating project map, AUTO-trigger gap-analysis matching project type.
-Use detected tech layer + business type to select template:
+gap-analysis handles template selection (see its Phase 0). Pass detected tech layer + business type.
 
-| Tech Layer | Business Type | Template | Intake includes |
-|------------|---------------|----------|-----------------|
-| Frontend | Web / CMS | web-template | 8 dims + responsive design |
-| Full-stack | SaaS | saas-template | 8 dims + infra + velocity |
-| Backend | API | api-template | Security + perf + infra |
-| Backend | ERP | erp-template | Functional + security + infra |
-| Full-stack | E-commerce | ecom-template | UX + security + perf |
-| Desktop | Desktop App | desktop-template | UX + resource + infra |
-| Mobile | Mobile App | mobile-template | UX + perf + resource |
-| Any | Unknown | generic → all 6 layers | Basic intake |
-| Database | Any | N/A (component, not system) | Skip, focus on host system |
-
-Present as: "Project classified as **{tech layer}** / **{business type}**. Auto-gap-analysis with **{template}**? Includes intake checklist + 8 quality dimensions. (Y/n)"
+Present as: "Project classified as **{tech layer}** / **{business type}**. Run gap-analysis? Includes intake checklist + 8 quality dimensions. (Y/n)"
 
 ## Rules
 1. Start with `ls` / `Get-ChildItem` of root → top-level detection

@@ -6,7 +6,7 @@ Colección de **58 skills profesionales** para OpenCode AI agent. Diseñadas par
 
 | Categoría | Skills | Versión |
 |-----------|--------|---------|
-| **Prompting** | karpathy-prompt, prompt-engineering, karpathy-loop, caveman, lean-context | v1.x |
+| **Prompting** | karpathy-prompt, prompt-engineering, karpathy-loop, lean-context | v1.x |
 | **Self-Improvement** | code-memory, self-reflection, skill-testing, judgment-day | v1.x |
 | **Engineering** | senior-engineer, go-testing, skill-creator, skill-registry | v1.x |
 | **Quality & Safety** | quality-gate, context-watchdog, recovery-protocol | v1.0 |

@@ -1,9 +1,9 @@
 # SKILLS INDEX
 
-> Full trigger table for all 58 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 57 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 1.1 | **Changelog**: 1.1 (added performance-tracker)
+> **Version**: 1.2 | **Changelog**: 1.2 (merged caveman?lean-context, trimmed project-mapper dupe tables)
 
 ## Triggers → Skill
 
@@ -12,8 +12,7 @@
 | Karpathy, less tokens, context compilation | karpathy-prompt |
 | Improve prompt, security, ReAct, multi-agent | prompt-engineering |
 | Karpathy loop, optimize prompt, measure tokens | karpathy-loop |
-| Ultra-compressed, caveman, /caveman | caveman |
-| Ultra-lean default, compact responses | lean-context |
+| Compact, less tokens, caveman, /caveman, ultra-lean | lean-context |
 | Continuá, code memory, multi-session | code-memory |
 | Self-reflection, Hermes, error patterns | self-reflection |
 | Test/verify skill, coverage | skill-testing |
@@ -69,7 +68,7 @@
 | Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
 
 ## Quick groups
-- **Compression/style**: karpathy-prompt, karpathy-loop, caveman, lean-context
+- **Compression/style**: karpathy-prompt, karpathy-loop, lean-context
 - **Quality**: quality-gate, auto-metrics, immune-system, code-review-agent, performance-tracker
 - **Memory**: session-resume, code-memory, dreaming
 - **Skills meta**: skill-creator, skill-registry, skill-improver, skill-digestion
