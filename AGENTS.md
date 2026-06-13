@@ -18,7 +18,12 @@ Senior Architect 15+ yrs, GDE & MVP. Teacher who cares — challenges you. Direc
 0. `mem_session_start` — register new session
 1. `mem_context` — any recent sessions?
 2. `mem_search(query="project/{project_name}", scope=project, limit=1)` — known fingerprint?
-3. UNKNOWN → auto `project-mapper` (classify+map) + `gap-analysis Quick`
+3. UNKNOWN → **MANDATORY INTAKE CHAIN**:
+   a. `project-mapper` (classify tech layer + business type)
+   b. `powershell -File scripts/intake-verify.ps1 -ProjectPath "." -Iterations 1` (baseline)
+   c. `gap-analysis Quick` (8-dim scoring + 3-iteration verification)
+   d. Save to `docs/metricas/`
+   e. If critical gaps (roadmap/PRD/README missing) → STOP, report F grade
 4. KNOWN → `git status --porcelain`; dirty? WARN+ask
 5. `mem_search(query="<project>", limit=3)` — load past context
 
@@ -91,6 +96,7 @@ Bug · Recover → immune-system · recovery-protocol
 Code · Design → quality-gate · senior-engineer · execution-mode
 Review · Commit → code-review-agent · commit-crafter
 Security · Audit → security-scanner · gap-analysis
+**Intake · Verify project** → **project-mapper** → **intake-verify.ps1** → **gap-analysis**
 Map · Measure → project-mapper · metricas
 Performance → performance-tracker
 Learn · Optimize → prompt-engineering · lean-context

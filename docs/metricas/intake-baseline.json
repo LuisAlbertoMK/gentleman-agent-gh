@@ -1,0 +1,38 @@
+﻿{
+    "delta":  {
+                  "roadmap":  0,
+                  "monitoring":  0,
+                  "prd":  0,
+                  "tests":  0,
+                  "readme":  0,
+                  "pr":  0,
+                  "cicd":  0
+              },
+    "iterations":  1,
+    "type":  "be",
+    "critical_gaps":  [
+
+                      ],
+    "project":  "D:\\gentleman-agent-gh",
+    "overall_pct":  62.9,
+    "timestamp":  "2026-06-13 15:00:04",
+    "baseline":  {
+                     "roadmap":  10,
+                     "monitoring":  0,
+                     "prd":  10,
+                     "tests":  8,
+                     "readme":  8,
+                     "pr":  8,
+                     "cicd":  0
+                 },
+    "elapsedSeconds":  4.1,
+    "current":  {
+                    "roadmap":  10,
+                    "monitoring":  0,
+                    "prd":  10,
+                    "tests":  8,
+                    "readme":  8,
+                    "pr":  8,
+                    "cicd":  0
+                }
+}

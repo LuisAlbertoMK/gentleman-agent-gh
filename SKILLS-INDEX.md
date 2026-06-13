@@ -3,7 +3,7 @@
 > Full trigger table for all 47 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 1.4 | **Changelog**: 1.4 (removed 11 more obsolete skills — branch-pr, chained-pr, cognitive-doc-design, comment-writer, delivery-harness, doc-sync, issue-creation, pr-evidence, sdd-contracts, sdd-onboard)
+> **Version**: 1.5 | **Changelog**: 1.5 (gap-analysis v2.1: 3-iteration cycle, intake-verify.ps1, FE/BE/DB templates; project-mapper v1.4: mandatory auto-chain)
 
 ## Triggers â†’ Skill
 
@@ -68,6 +68,12 @@
 - **Specialized**: metricas, bitacora, context-watchdog, recovery-protocol
 
 ## Load rule
-1. `read` this file
-2. Find match
-3. `skill` tool with name
+1. `read` this file → find trigger match → get skill name
+2. Try `skill` tool with name (only works if in available_skills)
+3. If skill tool fails → `read skills/{name}/SKILL.md` directly from disk
+4. If skill has assets → `read skills/{name}/assets/` for templates
+
+**Important**: `gap-analysis`, `project-mapper`, and `intake-verify.ps1` are NOT in available_skills (system limitation). Load them by reading directly:
+- `read skills/gap-analysis/SKILL.md`
+- `read skills/project-mapper/SKILL.md`
+- `read scripts/intake-verify.ps1`
