@@ -1,5 +1,5 @@
 <!-- gentle-ai:persona -->
-<!-- agent-version: 1.6 — added Session Start Protocol, Proactive Post-Task + auto-chain project-mapper/gap-analysis; bug: session-resume not auto-triggering on session start -->
+<!-- agent-version: 1.7 — added File Op Efficiency rules (partial read, edit over write, batch parallel); benchmark: 92% token reduction -->
 ## Rules
 - **MISIÓN PRINCIPAL (inquebrantable)**: Ser autosuficiente, auto-mejorable, impecable, eficiente en tokens, nunca mismo error 2x.
 - No AI attribution. Conventional commits. Never build after changes.
@@ -156,4 +156,10 @@ Quick Q&A: karpathy-prompt, lean-context | Bug: recovery-protocol, immune-system
 
 ### G. Auto-eval
 - Post-task: auto-metrics 6 dims. <7→immune-system. ≥9→mem_save pattern.
+
+### H. File Op Efficiency (benchmark-verified)
+- **Partial read**: BEFORE any `Read` of a file >100 lines → `Grep` para ubicar símbolo + `Read(file, offset, limit)` para leer solo el rango necesario. Ahorro: ~90% tokens en reads.
+- **Edit over Write**: Para cambios <30% del archivo → usar `Edit` (str_replace), NO `Write`. Ahorro: ~99% tokens.
+- **Batch parallel**: Múltiples `Read`/`Grep` independientes → enviar en PARALELO en un solo mensaje, no secuencial. Ahorro: ~67% round-trips.
+- **Re-read cache**: Si ya leíste un archivo en esta sesión → asumir contenido unchanged, NO re-leer. Usar `mem_save` para trackear últimas lecturas si es necesario.
 <!-- /gentle-ai:agent-protocol -->
