@@ -6,7 +6,7 @@ triggers: "Mapear, project map, estructura, tech stack, arquitectura"
   Scan project structure, detect tech stack, architecture, and generate dependency map.
   Trigger: "mapear", "project map", "estructura", "tech stack", "arquitectura", "project structure".
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.3", changelog: "1.2->1.3: project type classification (tech layer + business type), 8-dim auto-chain"
+metadata: author: gentleman-vMK, version: "1.4", changelog: "1.3->1.4: auto-chain now MANDATORY (not optional), direct linkage to intake-verify.ps1, FE/BE/DB template routing"
 ---
 
 ## When
@@ -58,14 +58,30 @@ New project, unfamiliar codebase, user asks "how is this structured".
 ### Quick Stats
 - Tests: N (X% coverage) | Lint: clean | Docker: M MB
 ### Suggested Next Step
-→ gap-analysis with {template} (8 dims: UI/UX, Security, Optimization, Performance, Resource Usage, Project Velocity, Responsive Design, Infrastructure)
+→ **MANDATORY**: gap-analysis with {template} (8 dims: UI/UX, Security, Optimization, Performance, Resource Usage, Project Velocity, Responsive Design, Infrastructure)
+→ `powershell -File scripts/intake-verify.ps1 -ProjectPath "{path}" -Iterations 3`
+→ Save results to `docs/metricas/`
 ```
 
-## Auto-Chain: gap-analysis trigger
-After generating project map, AUTO-trigger gap-analysis matching project type.
-gap-analysis handles template selection (see its Phase 0). Pass detected tech layer + business type.
+## Auto-Chain: gap-analysis (MANDATORY)
+After generating project map, MUST trigger gap-analysis with matching project type.
+gap-analysis handles the 3-iteration intake verification cycle (roadmap, PR, PRD, README, Tests, CI/CD, Monitoring).
 
-Present as: "Project classified as **{tech layer}** / **{business type}**. Run gap-analysis? Includes intake checklist + 8 quality dimensions. (Y/n)"
+**Flow**:
+1. project-mapper classifies tech layer + business type
+2. Auto-runs `powershell -File scripts/intake-verify.ps1 -ProjectPath "..." -Iterations 1` for baseline
+3. Loads gap-analysis skill with matching template (type + layer)
+4. Gap-analysis runs 8-dim scoring + 3-iteration verification
+5. Results saved to `docs/metricas/`
+
+**THIS IS NOT OPTIONAL.** Every project MUST go through intake verification.
+Projects without roadmap, PRD, or README get grade F and must fix before feature work.
+
+Pass detected tech layer + business type to gap-analysis. Use templates:
+- `fe-template.md` for frontend projects
+- `be-template.md` for backend projects
+- `db-template.md` for database projects
+- Plus business-specific templates from gap-analysis/assets/
 
 ## Rules
 1. Start with `ls` / `Get-ChildItem` of root → top-level detection
