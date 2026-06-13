@@ -18,7 +18,7 @@ After git gate passes, BEFORE resuming work:
 1. `mem_search(query="<last session keywords>", limit=5)` — find related past work
 2. If user message has keywords → search for matching observations
 3. Present relevant past decisions/bugfixes as context snapshot
-4. Check project fingerprint exists: `mem_search(topic_key="project/{name}")`
+4. Check project fingerprint exists: `mem_search(query="project/{name}", scope=project, limit=1)`
 5. If missing → trigger Project fingerprint mode (dreaming skill)
 
 ## Commands

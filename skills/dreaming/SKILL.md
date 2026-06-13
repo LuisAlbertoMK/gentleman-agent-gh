@@ -27,7 +27,7 @@ BEFORE any task execution:
 When entering a project for the first time (or after long gap):
 1. Detect: lang, framework, test tool, arch pattern, dir layout
 2. Save to engram with `topic_key="project/{name}"`
-3. On subsequent sessions: `mem_search(topic_key="project/{name}")` to reload context
+3. On subsequent sessions: `mem_search(query="project/{name}", scope=project, limit=1)` to reload context
 4. Update when project structure changes significantly
 
 ## Anti-Patterns
