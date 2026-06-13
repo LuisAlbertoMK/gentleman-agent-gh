@@ -7,7 +7,7 @@
 
 | Metric | Before | After | Δ |
 |--------|--------|-------|---|
-| C: free space | 19.0 GB (16.1%) | 25.7 GB (21.7%) | +6.7 GB 🟢 |
+| C: free space | 19.0 GB (16.1%) | 27.5 GB (23.3%) | +8.5 GB 🟢 |
 | NVMe seq write | ~104 MB/s¹ | 639 MB/s² | ~6x 🚀 |
 | NVMe seq read | ~6 MB/s¹ | 1827 MB/s² | ~300x 🚀 |
 | D: free space | 201.2 GB (90%) | 201.2 GB (90%) | — |
@@ -21,10 +21,11 @@
 
 ## Actions Executed
 
-### ✅ PRIO 1 — Freed 6.7 GB on C: (NVMe)
+### ✅ PRIO 1 — Freed 8.5 GB on C: (NVMe)
 - Cleaned TEMP: ~3.2 GB
 - Cleaned pnpm cache: 2.4 GB
-- Cleaned bun cache: ~4.9 GB (partial)
+- Cleaned bun cache: ~4.9 GB (incl. residual after retry with .NET)
+- Cleaned browser caches (Brave + Chrome + Edge): ~0.4 GB
 - Cleaned old Downloads (>6 months)
 - Cleaned opencode temp
 
@@ -48,7 +49,7 @@
 
 1. Run `scripts/optimize-system.ps1` as Administrator
 2. Reboot to apply registry changes
-3. After reboot, expected C: free: ~35-40 GB (30-34%)
+3. After reboot + admin script, expected C: free: ~37-42 GB (31-36%)
 4. Consider moving `.bun` and `.ollama` to D: (SATA) if they're not needed on C:
 
 ## Files Changed

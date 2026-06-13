@@ -1,6 +1,7 @@
 # BITÁCORA
 
 ```
+2026-06-13 — Performance session: C: 16%→23% libre (+8.5GB), NVMe 639/1827 MB/s, browser caches + bun .NET cleanup, opencode compaction+prune, script admin optimize-system.ps1. Hermes reflection 8.0/10. Commit 1f6037b.
 2026-06-13 — Graph CRUD sprint: 10 enfoques benchmarkeados, gaps corregidos (57→58), research TokenMizer + memory/token optimization. Experiments en experiments/graph-crud/. Pendiente: crear skill unificada.
 2026-06-07 — Cleanup: untrack .metricas/, remove 4 historical docs (35.5KB), harden .gitignore (142B→1.6KB). v1.0.1. Tracked files 111→105.
 2026-06-07 — Sprint 3 APPLIED to live: AGENTS.md + ANTI-PATTERN-CATALOG.md synced (9212B + 6850B), scripts/bash-safe.ps1 + auto-clean.ps1 deployed to C:\Users\MK\.config\opencode\scripts\. bash-safe 6/6 PASS in live. Pre-apply backup at .bak\pre-sprint3-apply-20260607-005330\. v1.0.0 tag.
