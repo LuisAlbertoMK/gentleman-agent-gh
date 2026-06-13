@@ -3,7 +3,7 @@
 > Full trigger table for all 47 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 1.3 | **Changelog**: 1.3 (removed 10 dead workflow skills)
+> **Version**: 1.4 | **Changelog**: 1.4 (removed 11 more obsolete skills — branch-pr, chained-pr, cognitive-doc-design, comment-writer, delivery-harness, doc-sync, issue-creation, pr-evidence, sdd-contracts, sdd-onboard)
 
 ## Triggers â†’ Skill
 

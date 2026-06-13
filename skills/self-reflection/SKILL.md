@@ -31,10 +31,10 @@ Hermes se carga automáticamente cuando:
 | Pregunta | Sí → | No → |
 |----------|------|------|
 | ¿Es un patrón que repetiste ≥2 veces? | skill-creator | update Engram |
-| ¿Es una workflow con ≥3 pasos? | skill-creator | update Engram |
+| ¿Es una workflow con ≥2 pasos? | skill-creator | update Engram |
 | ¿Otros agentes se beneficiarían? | skill-creator | update Engram |
 
-Si **≥2 respuestas Sí** → `skill-creator`. Si no → `mem_save(type="learning")`.
+Si **≥1 respuesta Sí** → `skill-creator`. Si no → `mem_save(type="learning")`.
 
 ### Reflection Template
 Al final de cada sesión o task grande:
