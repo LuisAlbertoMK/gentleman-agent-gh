@@ -8,14 +8,14 @@
                   "pr":  0,
                   "cicd":  0
               },
-    "iterations":  1,
+    "iterations":  3,
     "type":  "be",
     "critical_gaps":  [
 
                       ],
-    "project":  "D:\\gentleman-agent-gh",
+    "project":  ".",
     "overall_pct":  62.9,
-    "timestamp":  "2026-06-13 15:00:04",
+    "timestamp":  "2026-06-13 15:32:36",
     "baseline":  {
                      "roadmap":  10,
                      "monitoring":  0,
@@ -25,7 +25,7 @@
                      "pr":  8,
                      "cicd":  0
                  },
-    "elapsedSeconds":  4.1,
+    "elapsedSeconds":  15.1,
     "current":  {
                     "roadmap":  10,
                     "monitoring":  0,
