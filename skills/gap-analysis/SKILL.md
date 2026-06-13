@@ -8,7 +8,7 @@ triggers: "Gap analysis, system audit, identificar gaps, evaluar software"
   and depth levels. Trigger: "gap analysis", "auditar sistema", "identificar gaps",
   "system audit", "software assessment", "project intake".
 license: Apache-2.0
-metadata: version: "2.0", changelog: "1.1→2.0: project intake + verification commands, 8-dim coverage, 3 new templates (ecom/api/mobile), auto-recommendation engine, priority scoring formula"
+metadata: version: "2.1", changelog: "2.0→2.1: 3-iteration verification cycle, intake-verify.ps1 automation, FE/BE/DB templates, PR desambiguation (Pull Request + Problem Report), forced project-mapper chain, metrics tracking in docs/metricas/"
 ---
 
 ## Phase 0: Project Intake (NEW — mandatory before scoring)
@@ -39,53 +39,33 @@ Detect BOTH tech layer AND business type:
 | **Desktop App** | Native UI, offline-first | window, menu, dialog, tray |
 | **Mobile App** | Touch UI, push notifications | screen, navigator, gesture |
 
-### 0.2 Intake Verification Commands
-Run these BEFORE scoring. Each artifact gets ✅/❌/⚠️ (exists / missing / partial).
+### 0.2 Intake Verification (automated)
+Run the dedicated script for ALL 7 artifact checks. Saves metrics to `docs/metricas/`.
 
-```bash
-# 📋 Roadmap — check multiple locations
-if (Test-Path "ROADMAP.md") { "✅ Roadmap: ROADMAP.md" } `
-elseif (Test-Path "docs/roadmap.md") { "✅ Roadmap: docs/roadmap.md" } `
-elseif (Test-Path "roadmap/") { "✅ Roadmap: roadmap/ dir exists" } `
-else { "❌ Roadmap: not found. Check project board or create ROADMAP.md" }
+```powershell
+# Quick check (1 iteration)
+powershell -File scripts/intake-verify.ps1 -ProjectPath "D:\project"
 
-# 📝 PR — check recent activity
-$prs = git log --oneline -10 2>$null; if ($prs) { "✅ PRs: Active ($(git log --oneline -5 | Measure-Object | %{$_.Count}) commits in HEAD)" } `
-else { "❌ PRs: No git history found" }
+# Standard (3 iterations with before/after comparison)
+powershell -File scripts/intake-verify.ps1 -ProjectPath "D:\project" -Iterations 3
 
-# 📄 PRD — check requirements docs
-$found = Get-ChildItem -Recurse -Include "*PRD*","*spec*","*requirements*","*srs*" -Exclude "*node_modules*","*.git*" | Select-Object -First 3
-if ($found) { "✅ PRD: Found ($($found.Count) files: $($found[0].Name)...)" } `
-else { "❌ PRD: Not found. Check docs/ or specs/ directory" }
-
-# 🏗️ README
-if (Test-Path "README.md") { "✅ README: exists ($((Get-Item README.md).Length / 1KB -as [int])KB)" } `
-else { "❌ README: missing" }
-
-# 🧪 Test strategy — check multiple patterns
-$testDir = Get-ChildItem -Directory -Include "tests","__tests__","spec","test" -ErrorAction SilentlyContinue | Select-Object -First 1
-$testScripts = Get-ChildItem -Recurse -Include "*test*","*spec*","*suite*" -File -Exclude "*node_modules*",".git" -ErrorAction SilentlyContinue | Select-Object -First 5
-if ($testDir) { "✅ Tests: $($testDir.Name) dir exists" } `
-elseif ($testScripts) { "✅ Tests: Found $($testScripts.Count) test files (e.g., $($testScripts[0].Name))" } `
-else { "⚠️ Tests: No test files found" }
-
-# 🔧 CI/CD — check multiple CI providers
-$ciFiles = @()
-$ciFiles += Get-ChildItem -Path ".github/workflows" -Filter "*.yml" -ErrorAction SilentlyContinue
-if (-not $ciFiles) { $ciFiles += Get-ChildItem -Name -Filter "Jenkinsfile" -ErrorAction SilentlyContinue }
-if (-not $ciFiles) { $ciFiles += Get-ChildItem -Name -Filter ".gitlab-ci.yml" -ErrorAction SilentlyContinue }
-if (-not $ciFiles) { $ciFiles += Get-ChildItem -Name -Filter "azure-pipelines.yml" -ErrorAction SilentlyContinue }
-if (-not $ciFiles) { $ciFiles += Get-ChildItem -Name -Filter ".circleci/config.yml" -ErrorAction SilentlyContinue }
-if (-not $ciFiles) { $ciFiles += Get-ChildItem -Recurse -Name -Filter "Dockerfile" -ErrorAction SilentlyContinue | Select-Object -First 1 }
-if ($ciFiles) { "✅ CI/CD: Found $($ciFiles.Count) config(s) (e.g., $($ciFiles[0]))" } `
-else { "⚠️ CI/CD: No config found" }
-
-# 📊 Monitoring — check known APM/config files
-$monPatterns = @("*sentry*","*datadog*","*newrelic*","*grafana*","*prometheus*","*openTelemetry*","*appinsights*","*bugsnag*")
-$mon = $monPatterns | ForEach-Object { Get-ChildItem -Recurse -Include $_ -File -Exclude "*node_modules*",".git" -ErrorAction SilentlyContinue } | Select-Object -First 1
-if ($mon) { "✅ Monitoring: $($mon.Name)" } `
-else { "⚠️ Monitoring: No APM/tracing config found" }
+# Full deep (5 iterations for critical projects)
+powershell -File scripts/intake-verify.ps1 -ProjectPath "D:\project" -Iterations 5 -ProjectType "saas"
 ```
+
+The script checks these 7 artifacts:
+1. **📋 Roadmap** — ROADMAP.md, docs/roadmap.md, roadmap/ dir
+2. **📝 PR** — git commits + gh pr list (Pull Request) + *PROBLEM-REPORT* (Problem Report)
+3. **📄 PRD** — *PRD*, *spec*, *requirements*, *srs* files
+4. **🏗️ README** — exists + quality score (8 criteria)
+5. **🧪 Tests** — test dirs + test files + test configs
+6. **🔧 CI/CD** — GitHub Actions, Jenkins, GitLab CI, CircleCI, Azure Pipelines
+7. **📊 Monitoring** — Sentry, Datadog, New Relic, Grafana, Prometheus, OpenTelemetry, AppInsights, Bugsnag
+
+Output: console table + `docs/metricas/intake-baseline.json` + `docs/metricas/intake-report-{timestamp}.md`
+
+**Legacy manual commands** (fallback if script unavailable):
+See `scripts/intake-verify.ps1` source for individual PS commands.
 
 ### 0.4 Intake Checklist
 BEFORE any layer scoring, verify project artifacts exist:
@@ -93,7 +73,7 @@ BEFORE any layer scoring, verify project artifacts exist:
 | Artifact | Why it matters | How to check |
 |----------|---------------|--------------|
 | **📋 Roadmap** | Defines direction, priorities, milestones | Look for: ROADMAP.md, roadmap.*, docs/roadmap*, project board |
-| **📝 PR (Pull Request)** | Shows active development, code review quality | Check recent PRs: `gh pr list`, git log, open PRs |
+| **📝 PR (Pull Request + Problem Report)** | Shows active dev + code review quality + incident tracking | Check recent commits: `git log`, open PRs: `gh pr list`, problem reports: *PROBLEM-REPORT* |
 | **📄 PRD (Product Requirements Doc)** | Documents what and why, not just how | Look for: PRD.md, spec/, requirements/, *.spec.* |
 | **🏗️ README** | Project entry point, setup, architecture | README.md exists? Has: setup, arch, tech stack, how to run? |
 | **🧪 Test Strategy** | Quality approach documented | Look for: test/, __tests__, testing strategy in docs |
@@ -115,6 +95,39 @@ The user's 8 dimensions map across the 6 layers:
 | 6 | 🚀 **Project Velocity** | Business | Ops | Build time, dev loop, CI/CD speed, code generation |
 | 7 | 📱 **Responsive Design** | UX | Technical | Mobile-first, breakpoints, touch, print, cross-browser |
 | 8 | 🏗️ **Infrastructure** | Ops | Security | Docker, cloud, scaling, DR, monitoring, logging |
+
+### 0.6 3-Iteration Verification Cycle (CRITICAL)
+Every identified gap MUST go through 3 iterations of verification before closure:
+
+```
+Iteration 1 (Detect):
+  ├─ Run intake-verify.ps1 → establish BASELINE
+  ├─ Classify project type → select template
+  ├─ Score all 8 dims → identify gaps
+  ├─ SAVE to docs/metricas/intake-baseline.json
+  └─ Output: Gap Report v1 + Quick-fix suggestions
+
+Iteration 2 (Verify Fix):
+  ├─ Apply suggested fixes for each gap
+  ├─ Re-run intake-verify.ps1 with -Iterations 2
+  ├─ Compare CURRENT vs BASELINE (delta per artifact)
+  ├─ If score improved → proceed
+  ├─ If same/worse → escalate: "Gap persists — need deeper fix"
+  └─ Output: Gap Report v2 with delta
+
+Iteration 3 (Confirm Closure):
+  ├─ Final run: intake-verify.ps1 -Iterations 3
+  ├─ Verify ALL gaps scored ≥7/10 OR have plan
+  ├─ If gap remains → document as DEBT with owner+timeline
+  ├─ SAVE final report to docs/metricas/
+  └─ SAVE to engram: what was fixed, what remains
+```
+
+**Rules**:
+- CRITICAL gaps (roadmap, PRD, README missing) need 3 iterations BEFORE any feature work
+- Non-critical gaps can proceed with 2 iterations but must have documented plan
+- After each iteration, save to `docs/metricas/intake-report-{round}-{timestamp}.md`
+- If same gap persists across 3+ sessions → add to ANTI-PATTERN-CATALOG
 
 ---
 
@@ -223,22 +236,34 @@ The user's 8 dimensions map across the 6 layers:
 
 ---
 
-## Workflow (8 steps)
+## Workflow (11 steps — includes 3-iteration verification)
 
 ```
-0. INTAKE
-   ├─ Classify: tech layer + business type (project-mapper)
-   ├─ Verify artifacts: roadmap? PR? PRD? README? Tests? CI/CD? Monitoring?
-   └─ Select template matching type
-   
-1. DEPTH → Quick (5-10min) / Standard (30-60min) / Deep (2-4hrs)
-2. MAP → project-mapper (structure, stack, deps, arch)
-3. SCORE → per layer (1-10) + per dim (1-8) with evidence
-4. CHECKS → run auto-commands from each layer section
-5. DOCUMENT → per gap: symptom → root cause → impact → fix
-6. PRIORITIZE → Formula: (10 - Score) × Impact × Urgency
-7. RECOMMEND → Auto-generate fixes per dim scored ≤6
-8. TRACK → engram for recurring gaps + anti-pattern catalog
+PHASE A — INTAKE (mandatory)
+ 0. INTAKE
+    ├─ Classify: tech layer + business type (project-mapper)
+    ├─ Run: scripts/intake-verify.ps1 -Iterations 1
+    ├─ Verify artifacts: roadmap? PR? PRD? README? Tests? CI/CD? Monitoring?
+    └─ Select template matching type (business + tech layer)
+    
+ 1. DEPTH → Quick (5-10min) / Standard (30-60min) / Deep (2-4hrs)
+
+PHASE B — ANALYSIS
+ 2. MAP → project-mapper (structure, stack, deps, arch)
+ 3. SCORE → per layer (1-10) + per dim (1-8) with evidence
+ 4. CHECKS → run auto-commands from each layer section
+ 5. DOCUMENT → per gap: symptom → root cause → impact → fix
+ 6. PRIORITIZE → Formula: (10 - Score) × Impact × Urgency
+ 7. RECOMMEND → Auto-generate fixes per dim scored ≤6
+
+PHASE C — 3-ITERATION VERIFICATION (new)
+ 8. ITERATE-1 → Apply quick fixes → re-run intake-verify.ps1
+ 9. ITERATE-2 → Verify improvements → compare delta
+10. ITERATE-3 → Confirm closure → save to docs/metricas/
+
+PHASE D — PERSIST
+11. TRACK → engram for recurring gaps + anti-pattern catalog
+       → save report to docs/metricas/intake-report-{timestamp}.md
 ```
 
 ## Auto-Recommendation Engine
@@ -294,13 +319,15 @@ Default weights when type unknown:
 - **Project**: {name}
 - **Tech Layer**: {frontend|backend|db|mobile|desktop|full-stack|infra}
 - **Business Type**: {saas|erp|ecom|cms|api|web|desktop|mobile}
-- **Template**: {saas|erp|ecom|web|api|mobile|desktop}-template.md
+- **Template**: {saas|erp|ecom|web|api|mobile|desktop|fe|be|db}-template.md
 - **Depth Level**: {Quick|Standard|Deep}
+- **Intake Cmd**: `powershell -File scripts/intake-verify.ps1 -ProjectPath "..." -Iterations {N}`
+- **Metrics**: docs/metricas/intake-report-{timestamp}.md
 - **Artifacts Found**:
   ├─ 📋 Roadmap: ✅/❌/⚠️ {path if found}
-  ├─ 📝 PR/Commits: ✅ ({N} recent commits)
+  ├─ 📝 PR+ProblemReport: ✅ ({N} commits, {M} PRs, {K} problem reports)
   ├─ 📄 PRD/Specs: ✅/❌ ({N} files)
-  ├─ 🏗️ README: ✅ ({size})
+  ├─ 🏗️ README: ✅ ({size}, quality {X}/10)
   ├─ 🧪 Tests: ✅/⚠️/❌ ({details})
   ├─ 🔧 CI/CD: ✅/⚠️/❌ ({provider})
   └─ 📊 Monitoring: ✅/⚠️/❌ ({tool})
@@ -348,9 +375,13 @@ Per-type weighted checklists → `assets/{type}-template.md`
 | API | api-template | Security 40%, Technical 35%, Ops 25% |
 | Desktop | desktop-template | UX 40%, Functional 30%, Ops 30% |
 | Mobile | mobile-template | UX 45%, Performance 35%, Resource 20% |
+| **Frontend** | fe-template | UI/UX 35%, Responsive 20%, Performance 20%, Security 10%, Opt. 15% |
+| **Backend** | be-template | Security 30%, Performance 25%, Optimization 20%, Infra 15%, Rest 10% |
+| **Database** | db-template | Performance 30%, Security 25%, Resource 20%, Infra 15%, Rest 10% |
 
 ## Cross-References
-- **project-mapper**: structure + stack + type detection
+- **project-mapper**: structure + stack + type detection (auto-chains to gap-analysis)
+- **intake-verify.ps1**: `scripts/intake-verify.ps1` — automated 7-artifact check with 3-iteration cycle
 - **security-scanner**: pre-audit security
 - **code-review-agent**: code-level gap detection
 - **senior-engineer**: trade-off analysis, fix prioritization
@@ -362,5 +393,7 @@ Per-type weighted checklists → `assets/{type}-template.md`
 ❌ Skip responsive design for "internal tools" — mobile-first is default in 2026
 ❌ Infrastructure as afterthought — non-functional reqs need proactive design
 ❌ Score without evidence — Default-FAIL applies
-❌ One-shot analysis — gaps need tracking; use engram
+❌ **One-shot analysis** — 3-iteration cycle is MANDATORY; without it gaps persist undetected
+❌ **Skip metrics save** — every intake must save to docs/metricas/ for trend tracking
+❌ **PR ambigüedad** — verificar BOTH Pull Request (gh pr list) AND Problem Report (*PROBLEM-REPORT*)
 
