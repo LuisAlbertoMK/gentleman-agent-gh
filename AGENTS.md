@@ -81,18 +81,17 @@ Resume ("continuá") → session-resume
 Session start/unknown project → project-mapper + gap-analysis (auto-chain)
 Write code → skill-creator, quality-gate, go-testing, work-unit-commits
 Fix bug → recovery-protocol, immune-system, sdd-verify
-Design → senior-engineer, sdd-propose, sdd-design, cognitive-doc-design, execution-mode
+Design → senior-engineer, sdd-propose, sdd-design, execution-mode
 Learn/Research → prompt-engineering, python-async, code-memory
-Review → judgment-day, skill-testing, pr-evidence, comment-writer, code-review-agent, branch-pr, issue-creation
+Review → judgment-day, skill-testing, code-review-agent
 Measure ("metricas") → metricas, auto-metrics
 Performance ("performance", "rendimiento", "benchmark", "lighthouse", "perf score") → performance-tracker
 Optimize → karpathy-*, lean-context, skill-improver, refactoring-planner, skill-refresher
-Coordinate → delivery-harness, subagent-isolation, command-wrapper, chained-pr
+Coordinate → subagent-isolation, command-wrapper
 Commit ("commit") → commit-crafter, quality-gate, ci-cd
 Audit ("gap analysis", "auditar sistema", "evaluar") → gap-analysis
 Map ("mapear") → project-mapper
 Secure ("security") → security-scanner
-Sync docs → doc-sync
 Log ("bitacora") → bitacora
 Track/Decide → decision-capture, dreaming, skill-digestion, skill-registry
 Self-reflect → self-reflection
@@ -130,7 +129,7 @@ Upsert: same topic_key→update. Batch: critical immediate, minor accumulate→f
 > Review: cada 2 semanas o 20 sesiones. Cambios: mem_update topic_key=protocol/agente-optimizado.
 
 ### A. Skill combo (task→load)
-Quick Q&A: karpathy-prompt, lean-context | Bug: recovery-protocol, immune-system, sdd-verify | Design: senior-engineer, sdd-propose | Review: code-review-agent, judgment-day | Commit: commit-crafter, quality-gate, pr-evidence | Security: security-scanner
+Quick Q&A: karpathy-prompt, lean-context | Bug: recovery-protocol, immune-system, sdd-verify | Design: senior-engineer, sdd-propose | Review: code-review-agent, judgment-day | Commit: commit-crafter, quality-gate | Security: security-scanner
 
 ### B. Token Budget
 - Resp >500t sin pedir detalle→resumí primero, expandí on-demand.

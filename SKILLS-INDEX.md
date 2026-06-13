@@ -1,11 +1,11 @@
-# SKILLS INDEX
+﻿# SKILLS INDEX
 
-> Full trigger table for all 57 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 47 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 1.2 | **Changelog**: 1.2 (merged caveman?lean-context, trimmed project-mapper dupe tables)
+> **Version**: 1.3 | **Changelog**: 1.3 (removed 10 dead workflow skills)
 
-## Triggers → Skill
+## Triggers â†’ Skill
 
 | Trigger keywords | Skill |
 |------------------|-------|
@@ -13,7 +13,7 @@
 | Improve prompt, security, ReAct, multi-agent | prompt-engineering |
 | Karpathy loop, optimize prompt, measure tokens | karpathy-loop |
 | Compact, less tokens, caveman, /caveman, ultra-lean | lean-context |
-| Continuá, code memory, multi-session | code-memory |
+| ContinuÃ¡, code memory, multi-session | code-memory |
 | Self-reflection, Hermes, error patterns | self-reflection |
 | Test/verify skill, coverage | skill-testing |
 | Judgment day, dual review, juzgar | judgment-day |
@@ -25,7 +25,7 @@
 | Quality gate, pre-commit | quality-gate |
 | Context >100K tokens, context explosion | context-watchdog |
 | Recovery, "no es eso", frustration | recovery-protocol |
-| Resume, "dónde lo dejamos", "continuá", git state gate | session-resume |
+| Resume, "dÃ³nde lo dejamos", "continuÃ¡", git state gate | session-resume |
 | SDD init, bootstrap | sdd-init |
 | Explore codebase, pre-design | sdd-explore |
 | Proposal, intent, approach | sdd-propose |
@@ -35,18 +35,9 @@
 | Apply tasks, implement | sdd-apply |
 | Validate vs specs, verify | sdd-verify |
 | Archive changes, delta to main | sdd-archive |
-| Guided SDD walkthrough | sdd-onboard |
-| PR creation, issue-first | branch-pr |
-| PR with SDD evidence | pr-evidence |
-| Issue creation | issue-creation |
 | Decision capture, trade-off log | decision-capture |
 | Execution mode, quick/thorough/draft | execution-mode |
-| Chained PRs, >400 lines, review slices | chained-pr |
-| Cognitive load, docs for reviewers | cognitive-doc-design |
-| PR comments, issue replies, feedback | comment-writer |
-| SDD phase contracts, artifact dependencies | sdd-contracts |
 | Skill digestion, compact on load | skill-digestion |
-| Delivery harness, review workload | delivery-harness |
 | Subagent isolation, context boundaries | subagent-isolation |
 | Command wrapper, error handling, output parsing | command-wrapper |
 | Skill refresher, drift detection, auto-heal | skill-refresher |
@@ -56,13 +47,12 @@
 | Immune System, anti-pattern, permanent immunity | immune-system |
 | Auto-score, metrics, post-task evaluation | auto-metrics |
 | Metricas, before/after, % improvement, tokenization, delta | metricas |
-| Code review, CR, revisar código, criticar | code-review-agent |
+| Code review, CR, revisar cÃ³digo, criticar | code-review-agent |
 | Refactor, refactoring, reestructurar, migrate | refactoring-planner |
 | Commit, mensaje, commit message, conventional commit | commit-crafter |
 | Mapear, project map, estructura, tech stack, arquitectura | project-mapper |
 | Security, seguridad, vulnerabilidad, auditar | security-scanner |
-| Doc sync, documentación, readme, sincronizar docs | doc-sync |
-| Bitacora, historial, histórico, qué pedí, request log | bitacora |
+| Bitacora, historial, histÃ³rico, quÃ© pedÃ­, request log | bitacora |
 | Dreaming, cross-session patterns, memory curation | dreaming |
 | Performance score, mobile perf, desktop perf, rendimiento, app score, lighthouse, benchmark | performance-tracker |
 | Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
@@ -74,8 +64,8 @@
 - **Skills meta**: skill-creator, skill-registry, skill-improver, skill-digestion
 - **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner
 - **SDD**: sdd-{init,explore,propose,spec,design,tasks,apply,verify,archive}
-- **PR/Issues**: branch-pr, pr-evidence, issue-creation, comment-writer
-- **Specialized**: metricas, doc-sync, bitacora, context-watchdog, recovery-protocol
+
+- **Specialized**: metricas, bitacora, context-watchdog, recovery-protocol
 
 ## Load rule
 1. `read` this file
