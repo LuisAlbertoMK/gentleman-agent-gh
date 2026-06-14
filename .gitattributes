@@ -1,5 +1,5 @@
-# Auto-detect text files and normalize to LF in the repo
-* text=auto
+# Force LF in working tree (write tool outputs LF, avoids CRLF noise)
+* text=auto eol=lf
 
 # Specific binary files
 *.png binary

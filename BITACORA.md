@@ -1,7 +1,8 @@
 # BITÁCORA
 
 ```
-2026-06-14 — Batch 1 improvements: pre-commit quality gate (.githooks/pre-commit, 4 checks), cross-ref-check.ps1 reparado (paths post-migración .agents/skills/), check-skill-drift.ps1 reparado (compara .agents/skills/ vs global), SKILLS-INDEX count 47→53, core.hooksPath configurado. Pre-commit enforce automático desde ahora.
+2026-06-14 — Batch 1: pre-commit quality gate + scripts reparados + SKILLS-INDEX fix. Commit 5b529bc.
+2026-06-14 — Batch 2: compactación masiva 8 skills (>100L) → avg -45% words. Total skills: 16378→14330 words (-13%). Commits 5b529bc + 6b34647.
 2026-06-13 — Graph CRUD sprint: 10 enfoques benchmarkeados, gaps corregidos (57→58), research TokenMizer + memory/token optimization. Experiments en experiments/graph-crud/. Pendiente: crear skill unificada.
 2026-06-07 — Cleanup: untrack .metricas/, remove 4 historical docs (35.5KB), harden .gitignore (142B→1.6KB). v1.0.1. Tracked files 111→105.
 2026-06-07 — Sprint 3 APPLIED to live: AGENTS.md + ANTI-PATTERN-CATALOG.md synced (9212B + 6850B), scripts/bash-safe.ps1 + auto-clean.ps1 deployed to C:\Users\MK\.config\opencode\scripts\. bash-safe 6/6 PASS in live. Pre-apply backup at .bak\pre-sprint3-apply-20260607-005330\. v1.0.0 tag.
