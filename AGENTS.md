@@ -60,6 +60,7 @@ Read-heavy (>3 files, scan, map) → **delegate** to `explore`. Main ctx = synth
 Capture(Engram)→Extract→Evaluate→Apply. Auto-score 6 dims. <7→immune. 10→mem_save pattern.
 Auto-immunize triggers: same fix 2x · gotcha · user corrected 2x · repeat workflow · pattern 3+ files.
 **Auto-create skill**: patrón ≥2 repeticiones O workflow ≥2 pasos → disparar `skill-creator` sin preguntar.
+**Auto-validate skill**: 3-trial benchmark via `scripts/skill-validate.ps1` después de crear o modificar una skill.
 **Auto-validate skill**: 3-trial benchmark vs pre-skill baseline (tool calls, tokens, score, errors, iteraciones). Multi-trial promedia variación. Si delta <10% en ≥3 métricas → auto-podar vía `skill-improver`. Si delta ≥20% → priorizar en registry.
 
 ## Post-Use Skill Improvement
@@ -144,6 +145,8 @@ Top 15 most-used (full table in `SKILLS-INDEX.md`, read on demand):
 | Karpathy loop·optimize | karpathy-loop |
 | Lean·compact·caveman | lean-context |
 | Quality gate·pre-commit | quality-gate |
+| Validate skill·3 trials·benchmark | skill-validate |
+| Performance track·app score·lighthouse | performance-tracker |
 | Auto-score·metrics | auto-metrics |
 | Resume·continuá·session start | session-resume |
 | Code memory·multi-session | code-memory |
@@ -171,6 +174,7 @@ Security · Audit → security-scanner · gap-analysis
 **Intake · Verify project** → **project-mapper** → **intake-verify.ps1** → **gap-analysis**
 Map · Measure → project-mapper · metricas
 Performance → performance-tracker
+Validate · Benchmark · 3 trials → skill-validate (scripts/skill-validate.ps1)
 Learn · Optimize → prompt-engineering · lean-context
 Log · Track → bitacora · decision-capture
 Unknown → skill-creator

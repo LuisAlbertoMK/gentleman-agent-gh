@@ -3,7 +3,7 @@
 > Full trigger table for all 47 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 1.5 | **Changelog**: 1.5 (gap-analysis v2.1: 3-iteration cycle, intake-verify.ps1, FE/BE/DB templates; project-mapper v1.4: mandatory auto-chain)
+> **Version**: 1.6 | **Changelog**: 1.6 (skill-validate.ps1 automation, skills.paths registered in opencode.json, performance-tracker compacted 190L→114L)
 
 ## Triggers â†’ Skill
 
@@ -61,6 +61,7 @@
 | Core Web Vitals, LCP, INP, CLS, layout shift, page experience | core-web-vitals |
 | Best practices, security audit, modernize code, code quality review | best-practices |
 | Web quality audit, lighthouse audit, review web quality, check page quality | web-quality-audit |
+| Skill validation, benchmark, multi-trial, validate skill, 3 trials, medir skill | skill-validate |
 | Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
 
 ## Quick groups
@@ -75,16 +76,10 @@
 
 ## Load rule
 1. `read` this file → find trigger match → get skill name
-2. Try `skill` tool with name (only works if in available_skills)
-3. If skill tool fails → `read skills/{name}/SKILL.md` directly from disk
-4. If skill has assets → `read skills/{name}/assets/` for templates
+2. `skill` tool with name (skills.paths now registered in opencode.json — 55 skills globally discoverable)
+3. If `skill` tool fails → `read skills/{name}/SKILL.md` directly from disk
+4. If skill has assets → `read skills/{name}/references/` or `read skills/{name}/assets/` for templates
 
-**Important**: `gap-analysis`, `project-mapper`, and `intake-verify.ps1` are NOT in available_skills (system limitation). Load them by reading directly:
-- `read skills/gap-analysis/SKILL.md`
-- `read skills/project-mapper/SKILL.md`
-- `read scripts/intake-verify.ps1`
+**Skill validation**: use `scripts/skill-validate.ps1` for 3-trial benchmark on any skill change
 
-**Web-quality skills** (`accessibility`, `performance`, `seo`, `core-web-vitals`, `best-practices`, `web-quality-audit`) are installed at `.agents/skills/` but NOT in `available_skills`. Load them:
-- `read .agents/skills/{name}/SKILL.md`
-- Or `read skills/{name}/SKILL.md` (mirrored copy in project root)
-- References are at `.agents/skills/{name}/references/`
+**Web-quality skills** mirror: `.agents/skills/{name}/` ←→ `skills/{name}/` (synced via junction)
