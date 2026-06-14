@@ -1,80 +1,25 @@
----
+﻿---
 name: skill-creator
-description: >
-  skill-creator skill
+description: >  skill-creator skill
 triggers: "Create AI skill"
-  Create new AI agent skills following the Agent Skills spec.
-  Trigger: User asks to create skill, add agent instructions, document patterns.
 license: Apache-2.0
-metadata:
-  author: gentleman-vMK
-  version: "1.1"
+metadata: author: gentleman-vMK  version: "1.1"
 ---
 
-## When
-Pattern repeated + AI needs guidance · Project-specific conventions · Complex workflows · Decision trees needed · **Pre-Flight Gate** (unknown task type — auto-bootstrap)
-
-**Don't create:** Docs exist (reference instead) · Trivial pattern · One-off task
-
-## Auto-Bootstrap Mode (Pre-Flight Gate trigger)
-When the task type is unknown (no matching skill in Skill Router):
-1. Research the domain quickly (websearch, context7)
-2. Create minimal skill with: name, description, key patterns from research
-3. Register in AGENTS.md trigger table
-4. THEN proceed with the original task
-5. After task: refine skill with real experience (gotchas, edge cases)
-
+Create new AI agent skills following the Agent Skills spec.Trigger: User asks to create skill, add agent instructions, document patterns.
+## WhenPattern repeated + AI needs guidance Â· Project-specific conventions Â· Complex workflows Â· Decision trees needed Â· **Pre-Flight Gate** (unknown task type â€” auto-bootstrap)**Don't create:** Docs exist (reference instead) Â· Trivial pattern Â· One-off task
+## Auto-Bootstrap Mode (Pre-Flight Gate trigger)When the task type is unknown (no matching skill in Skill Router):1. Research the domain quickly (websearch, context7)2. Create minimal skill with: name, description, key patterns from research3. Register in AGENTS.md trigger table4. THEN proceed with the original task5. After task: refine skill with real experience (gotchas, edge cases)
 ## Structure
-```
-skills/{name}/
-├── SKILL.md          # Required
-├── assets/           # Templates, schemas, examples
-└── references/       # Local doc links
-```
-
+```skills/{name}/â”œâ”€â”€ SKILL.md          # Requiredâ”œâ”€â”€ assets/           # Templates, schemas, examplesâ””â”€â”€ references/       # Local doc links```
 ## SKILL.md Template
-```markdown
----
-name: {name}
-description: >
-  skill-creator skill
-triggers: "Create AI skill"
-  {One-line}. Trigger: {when}.
-license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.0"
----
-
-## When
-{when}
-
-## Critical Patterns
-{Must-know rules}
-
-## Components
-{Minimal examples}
-
-## Resources
-- **Assets**: [assets/](assets/)
-- **Docs**: [references/](references/)
+```markdown---name: {name}description: >  skill-creator skilltriggers: "Create AI skill"  {One-line}. Trigger: {when}.license: Apache-2.0metadata: author: gentleman-vMK, version: "1.0"---
+## When{when}
+## Critical Patterns{Must-know rules}
+## Components{Minimal examples}
+## Resources- **Assets**: [assets/](assets/)- **Docs**: [references/](references/)
 ```
-
-## Naming
-| Pattern | Example |
-|---------|---------|
-| `{tech}` | `pytest`, `typescript` |
-| `{project}-{component}` | `myapp-api` |
-| `{action}-{target}` | `skill-creator` |
-
-## Content Rules
-**DO:** Critical patterns first · Tables for decisions · Minimal examples · Commands section
-**DON'T:** Keywords · Duplicate docs · Verbose explanations · Web URLs
-
-## Register
-Add to AGENTS.md:
-```
-| `{name}` | {desc} | [SKILL.md](skills/{name}/SKILL.md) |
-```
-
-## Checklist
-Before creating: skill doesn't exist? reusable? name follows convention? frontmatter complete? critical patterns clear? examples minimal? commands exist? AGENTS.md updated?
-
+## Naming| Pattern | Example ||---------|---------|| `{tech}` | `pytest`, `typescript` || `{project}-{component}` | `myapp-api` || `{action}-{target}` | `skill-creator` |
+## Content Rules**DO:** Critical patterns first Â· Tables for decisions Â· Minimal examples Â· Commands section**DON'T:** Keywords Â· Duplicate docs Â· Verbose explanations Â· Web URLs
+## RegisterAdd to AGENTS.md:
+```| `{name}` | {desc} | [SKILL.md](skills/{name}/SKILL.md) |```
+## ChecklistBefore creating: skill doesn't exist? reusable? name follows convention? frontmatter complete? critical patterns clear? examples minimal? commands exist? AGENTS.md updated?

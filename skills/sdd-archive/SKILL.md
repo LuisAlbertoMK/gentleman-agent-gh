@@ -1,27 +1,12 @@
----
+﻿---
 name: sdd-archive
-description: >
-  sdd-archive skill
+description: >  sdd-archive skill
 triggers: "Archive changes, delta to main"
-  Trigger: Orchestrator launches archive, revert change.
 license: MIT
 metadata: author: gentleman-vMK, version: "2.3"
 ---
 
-## GATE
-Orchestrator loaded this? → STOP, delegate to `sdd-archive` sub-agent.
-Executor sub-agent? → proceed.
-
-## STEPS
-1. Sync: add→append, modify→replace, remove→delete
-2. Move: change→archive/YYYY-MM-DD-{change}/
-3. Verify: specs updated, folder moved, artifacts present
-4. Create rollback snapshot: git diff HEAD
-5. Persist archive report + rollback data
-6. Return summary
-
-## ROLLBACK
-Create: `git diff HEAD`→`snapshot.diff`, write `rollback.sh` (`git revert <commit>` or manual), `rollback.md` (files+migrations+config reverted). Store in `archive/{change}/rollback/`.
-
-Execute: `git revert <commit>` or follow rollback.sh → verify no residuals.
-
+Trigger: Orchestrator launches archive, revert change.
+## GATEOrchestrator loaded this? â†’ STOP, delegate to `sdd-archive` sub-agent.Executor sub-agent? â†’ proceed.
+## STEPS1. Sync: addâ†’append, modifyâ†’replace, removeâ†’delete2. Move: changeâ†’archive/YYYY-MM-DD-{change}/3. Verify: specs updated, folder moved, artifacts present4. Create rollback snapshot: git diff HEAD5. Persist archive report + rollback data6. Return summary
+## ROLLBACKCreate: `git diff HEAD`â†’`snapshot.diff`, write `rollback.sh` (`git revert <commit>` or manual), `rollback.md` (files+migrations+config reverted). Store in `archive/{change}/rollback/`.Execute: `git revert <commit>` or follow rollback.sh â†’ verify no residuals.

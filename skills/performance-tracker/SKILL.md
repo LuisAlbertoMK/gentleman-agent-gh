@@ -2,7 +2,7 @@
 name: performance-tracker
 description: Score and track mobile/desktop/web app performance across 6 dimensions. Continuous scoring with trend analysis.
 license: Apache-2.0
-metadata: version: "1.0"
+metadata: version: "1.1"
 triggers: "performance score, mobile perf, desktop perf, rendimiento, performance-tracker, app score, lighthouse, benchmark"
 ---
 
@@ -27,7 +27,7 @@ Covers: Mobile (Android/iOS), Desktop (Win/Mac/Linux), Web.
 | 9-10 | 60fps sustained, 0 drops | 60fps, vsync | CLS <0.1, INP <200ms |
 | 7-8 | 55fps avg, <2% drops | 55fps, smooth | CLS <0.25, INP <350ms |
 | 5-6 | 45fps avg, <5% drops | 45fps, minor jank | CLS <0.5, INP <500ms |
-| 3-4 | 30fps avg, <10% drops | 30fps, noticeable jank | CLS <0.75, INP <700ms |
+| 3-4 | 30fps avg, <10% drops | 30fps, jank | CLS <0.75, INP <700ms |
 | 1-2 | <30fps, stutter | <30fps, freezing | CLS >0.75, INP >700ms |
 
 ### Memory
@@ -66,96 +66,43 @@ Covers: Mobile (Android/iOS), Desktop (Win/Mac/Linux), Web.
 | 3-4 | 8% battery/hr, CPU <50% | Idle <20% CPU | Frequent throttle |
 | 1-2 | >8% battery/hr, CPU >50% | Idle >20% CPU | Constant throttle |
 
-## Quick Score (5 min)
-Run from workspace root. Only checks available tools.
+## Quick Checks
 
+### Bundle size
 ```powershell
-# Web
-if (Get-Command npx -ErrorAction SilentlyContinue) {
-  npx lighthouse http://localhost:3000 --quiet --output json | ConvertFrom-Json | Select-Object -ExpandProperty categories | ForEach-Object { "$($_.id): $($_.score*100)" }
-}
-
-# APK size (Android)
-if (Test-Path "*.apk") {
-  Get-ChildItem *.apk | Select-Object Name, @{N="SizeMB";E={$_.Length/1MB -as [int]}}
-}
-if (Test-Path "*.aab") {
-  Get-ChildItem *.aab | Select-Object Name, @{N="SizeMB";E={$_.Length/1MB -as [int]}}
-}
-
-# IPA size (iOS)
-if (Test-Path "*.ipa") {
-  Get-ChildItem *.ipa | Select-Object Name, @{N="SizeMB";E={$_.Length/1MB -as [int]}}
-}
-
-# Bundle web
-if (Test-Path "build/static/js/") {
-  Get-ChildItem build/static/js/*.js -Recurse | Measure-Object -Property Length -Sum | % { "JS Bundle: $($_.Sum/1KB -as [int])KB" }
-}
+if (Test-Path "build/static/js/") { Get-ChildItem build/static/js/*.js -Recurse | Measure-Object -Property Length -Sum | % { "JS: $($_.Sum/1KB -as [int])KB" } }
+if (Get-ChildItem *.apk,*.aab,*.ipa,*.exe,*.dmg -ErrorAction SilentlyContinue) { Get-ChildItem *.apk,*.aab,*.ipa,*.exe,*.dmg | Select-Object Name, @{N="SizeMB";E={$_.Length/1MB -as [int]}} }
 ```
 
-## Standard Score (30 min)
-Run per-dimension auto-checks + manual verify.
-
-### Mobile (Android)
+### Lighthouse (web)
 ```powershell
-# APK analyzer
-if (Get-Command aapt2 -ErrorAction SilentlyContinue) {
-  aapt2 dump resources app-release.apk 2>$null | Select-Object -First 5
-}
-
-# Startup tracking (needs device)
-# adb shell am start -W com.example/.MainActivity
+if (Get-Command npx -ErrorAction SilentlyContinue) { npx lighthouse http://localhost:3000 --quiet --output json | ConvertFrom-Json | Select-Object -ExpandProperty categories | ForEach-Object { "$($_.id): $($_.score*100)" } }
 ```
 
-### Mobile (iOS)
+### Render-blocking resources (web)
 ```powershell
-# IPA analysis
-# otool -l app.ipa | head -20
-# xcrun xcodebuild -showBuildSettings
+if (Test-Path "build/index.html") { Select-String -Path build/index.html -Pattern "script|link|style" | Select-Object -First 10 }
 ```
 
-### Desktop
+### Source map explorer (web)
 ```powershell
-# Binary size
-if (Test-Path "*.exe") {
-  Get-ChildItem *.exe | Sort-Object Length -Descending | Select-Object Name, @{N="SizeMB";E={$_.Length/1MB -as [int]}}
-}
-if (Test-Path "*.dmg") {
-  Get-ChildItem *.dmg | Sort-Object Length -Descending | Select-Object Name, @{N="SizeMB";E={$_.Length/1MB -as [int]}}
-}
+if (Test-Path "build/static/js/") { Get-ChildItem build/static/js/*.js | Sort-Object Length -Descending | Select-Object -First 5 Name, @{N="SizeKB";E={$_.Length/1KB -as [int]}} }
 ```
 
-### Web
+## Score Storage & Trend
+
+### Save
 ```powershell
-# Source map explorer
-if (Test-Path "build/static/js/") {
-  # Check for large chunks
-  Get-ChildItem build/static/js/*.js | Sort-Object Length -Descending | Select-Object -First 5 Name, @{N="SizeKB";E={$_.Length/1KB -as [int]}}
-}
-
-# Check for render-blocking resources
-if (Test-Path "build/index.html") {
-  Select-String -Path build/index.html -Pattern "script|link|style" | Select-Object -First 10
-}
-```
-
-## Storage & Trend
-Same format as auto-metrics trend tracking.
-
-```powershell
-# Save score
 mem_save(type="learning", title="perf-score:{app}", content="**Load**:X/10|**Render**:X/10|**Memory**:X/10|**Network**:X/10|**Bundle**:X/10|**Energy**:X/10|**Avg**:X.X/10|**Platform**:{mobile|desktop|web}|**App**:{name}")
 ```
 
-### Trend Check (every 10 scores OR at session end)
-1. `mem_search(query="perf-score:", limit=20)`
-2. Parse → per-dim means, prev vs recent delta
-3. Report and act if declining
+### Trend Check (every 10 scores OR session end)
+1. `mem_search(query="perf-score:", limit=20)` → collect, parse per-dim means, compare prev(5) vs recent(5)
+2. If dim drops >0.5 → `gap-analysis` on perf + diagnose
 
+### Template
 ```
-## Performance Trend: {date}
-Period: {oldest} → {newest} ({N} scores) | Platform: {majority}
+## Performance Trend: {date} | {N} scores | Platform: {majority}
 | Dim | Prev | Recent | Delta |
 |-----|------|--------|-------|
 | Load | X.X | X.X | +X.X |
@@ -168,20 +115,17 @@ Period: {oldest} → {newest} ({N} scores) | Platform: {majority}
 Verdict: improving/stable/declining
 ```
 
-If any dim drops >0.5 → `gap-analysis` on perf dims + diagnose.
-
 ## Action by Avg
 | Avg | Action |
 |:---:|--------|
-| ≥8 | Maintain — monitor next release |
+| ≥8 | Maintain |
 | 6-7.9 | Light review — profile hotspots |
-| 4-5.9 | Improvement cycle — gap-analysis + fix |
-| <4 | Critical — stop features, perf sprint |
+| 4-5.9 | Improvement — gap-analysis + fix |
+| <4 | Critical — perf sprint, stop features |
 
 ## Cross-References
 - **gap-analysis**: dims 3 (Optimization), 4 (Performance), 5 (Resource Usage)
 - **auto-metrics**: for agent behavior scoring (not app perf)
-- **metricas**: token-level before/after (irrelevant here)
 
 ## Anti-Patterns
 ❌ Score without real data — guesswork is noise
