@@ -9,85 +9,50 @@ metadata:
 
 # Accessibility (a11y)
 
-Audit checklist basado en WCAG 2.2. Para ejemplos completos, ver [`references/`](references/).
+Audit checklist basado en WCAG 2.2. Ejemplos completos en [`references/`](references/).
 
-## WCAG Principles: POUR
-
+## POUR Principles
 | Principle | Description |
 |-----------|-------------|
-| **P**erceivable | Content can be perceived through different senses |
-| **O**perable | Interface can be operated by all users |
-| **U**nderstandable | Content and interface are understandable |
-| **R**obust | Content works with assistive technologies |
+| **P**erceivable | Content perceivable through different senses |
+| **O**perable | Interface operable by all users |
+| **U**nderstandable | Content + interface understandable |
+| **R**obust | Works with assistive technologies |
 
-## Conformance levels
-
-| Level | Requirement |
-|-------|-------------|
-| **A** | Minimum — must pass |
-| **AA** | Standard — legal req. in many jurisdictions |
-| **AAA** | Enhanced — nice to have |
+**Levels**: A (minimum), AA (standard/legal), AAA (enhanced)
 
 ---
 
 ## Perceivable
+**1.1.1 Text alternatives**: `<img>` needs `alt` (decorative → `alt="" role="presentation"`). Icon buttons → `aria-label` or visually-hidden text. Complex images → `aria-describedby`.
 
-### Text alternatives (1.1.1)
-- Every `<img>` needs `alt` (decorative → `alt=""` + `role="presentation"`)
-- Icon buttons need `aria-label` or visually-hidden text
-- Complex images use `aria-describedby` linking to description
-- See [A11Y-PATTERNS.md](references/A11Y-PATTERNS.md) for full patterns
-
-### Color contrast (1.4.3 AA, 1.4.6 AAA)
-| Text Size | AA | AAA |
-|-----------|----|------|
+**1.4.3/1.4.6 Color contrast**:
+| Text | AA | AAA |
+|------|----|------|
 | Normal (<18px / <14px bold) | 4.5:1 | 7:1 |
 | Large (≥18px / ≥14px bold) | 3:1 | 4.5:1 |
-| UI components & graphics | 3:1 | 3:1 |
-- Focus states need ≥3:1 against background (1.4.11)
-- Don't rely on color alone — add icon/text indicator (1.4.1)
+| UI/graphics | 3:1 | 3:1 |
 
-### Media alternatives (1.2)
-- Video: captions (1.2.2) + audio description (1.2.3/1.2.5)
-- Audio: transcript
-- Live: captions (1.2.4 AA)
-- See [A11Y-PATTERNS.md](references/A11Y-PATTERNS.md)
+Focus states ≥3:1 vs bg (1.4.11). Don't rely on color alone — add icon/text (1.4.1).
+
+**1.2 Media**: Video → captions (1.2.2) + audio description (1.2.3/1.2.5). Audio → transcript. Live → captions (1.2.4 AA).
 
 ---
 
 ## Operable
+**2.1.1 Keyboard**: Prefer native `<button>`, `<a href>`, form controls. `<div onclick>` → `role="button" tabindex="0"` + keydown. No keyboard traps (2.1.2).
 
-### Keyboard accessible (2.1.1)
-- All functionality via keyboard. Prefer native `<button>`, `<a href>`, form controls
-- `<div onclick>` → needs `role="button"` + `tabindex="0"` + keydown handler
-- No keyboard traps (2.1.2) — native `<dialog>` handles focus trap
-- See [modal focus trap](references/A11Y-PATTERNS.md#modal-focus-trap)
+**2.4.7 Focus**: Never `outline:none` without `:focus-visible`. Focused element not hidden by sticky headers — use `scroll-margin-top`.
 
-### Focus visible (2.4.7) + Focus not obscured (2.4.11 AA, 2.4.12 AAA)
-- Never `outline: none` without `:focus-visible` replacement
-- Use `:focus-visible` for keyboard-only focus indicators
-- Focused element must not be hidden by sticky headers. Use `scroll-margin`:
-  ```css
-  :focus { scroll-margin-top: 80px; }
-  ```
+**2.4.1 Skip links**: First focusable element, targets `#main-content`.
 
-### Skip links (2.4.1)
-- "Skip to main content" link as first focusable element
-- See [skip link pattern](references/A11Y-PATTERNS.md#skip-link)
+**2.5.8 AA Target size** (new in 2.2): ≥24×24 CSS px. Recommended 44×44 for touch.
 
-### Target size (2.5.8 AA) — new in 2.2
-- Interactive targets ≥24×24 CSS px. Exceptions: inline text, browser-controlled, non-overlapping
-- Recommended: 44×44px for touch
+**2.5.7 AA Dragging** (new in 2.2): Single-pointer alternative (buttons).
 
-### Dragging movements (2.5.7 AA) — new in 2.2
-- Drag actions need single-pointer alternative (buttons)
-- See [dragging pattern](references/A11Y-PATTERNS.md#dragging-movements)
+**2.2 Timing**: Time limits → allow extend/off. Auto-updating content → pause on hover/focus + button.
 
-### Timing (2.2.1, 2.2.2)
-- Time limits: allow extend or turn off
-- Auto-updating content (carousels, sliders): pause on focus/hover, provide pause button
-
-### Motion (2.3)
+**2.3 Motion**:
 ```css
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -101,88 +66,40 @@ Audit checklist basado en WCAG 2.2. Para ejemplos completos, ver [`references/`]
 ---
 
 ## Understandable
+**3.1.1 Language**: `<html lang="...">`. Mark changes with `<span lang="...">`.
 
-### Page language (3.1.1)
-- `<html lang="...">` required. Mark language changes with `<span lang="...">`
+**3.2.3/3.2.6 AA**: Navigation + help in same relative order across pages.
 
-### Consistent navigation (3.2.3) + Consistent help (3.2.6 AA)
-- Navigation and help mechanisms in same relative order across pages
+**3.3.2/3.3.1/3.3.3 Forms**: Every input → `<label for="id">` or `aria-label`. Errors → `aria-invalid="true" aria-describedby="error-id" role="alert"`. Focus first error on submit.
 
-### Form labels (3.3.2) + Error handling (3.3.1, 3.3.3)
-- Every input needs `<label for="id">` or `aria-label`
-- Errors: `aria-invalid="true"`, `aria-describedby="error-id"`, `role="alert"`
-- Focus first error on submit
-- See [form labels](references/A11Y-PATTERNS.md#form-labels) and [error handling](references/A11Y-PATTERNS.md#error-handling) patterns
+**3.3.7 A Redundant entry** (new in 2.2): Auto-populate previously entered data.
 
-### Redundant entry (3.3.7 A) — new in 2.2
-- Auto-populate previously entered data. Exceptions: security re-confirmation, expired content
-
-### Accessible authentication (3.3.8 AA) — new in 2.2
-- No cognitive function test (password recall, puzzle) unless: copy-paste/autofill available, alternative method (passkey, SSO, email link), or object recognition
+**3.3.8 AA Auth** (new in 2.2): No cognitive function test unless copy-paste/autofill available, alternative method (passkey, SSO, email link), or object recognition.
 
 ---
 
 ## Robust
+**4.1.2 ARIA**: Prefer native elements. Semantic HTML5: `<header>`, `<nav>`, `<main>`, `<section>`, `<article>`.
 
-### ARIA usage (4.1.2)
-- **Prefer native elements** before ARIA roles. Native `<button>` > `<div role="button">`
-- Use semantic HTML5: `<header>`, `<nav>`, `<main>`, `<section>`, `<article>`
-- See [ARIA tabs pattern](references/A11Y-PATTERNS.md#aria-tabs)
-
-### Live regions (4.1.3)
-- Dynamic content: `aria-live="polite"` for status, `role="alert"` for errors
-- See [live regions pattern](references/A11Y-PATTERNS.md#live-regions-and-notifications)
+**4.1.3 Live regions**: Dynamic content → `aria-live="polite"`. Errors → `role="alert"`.
 
 ---
 
-## Testing checklist
+## Testing
+**Automated**: `npx lighthouse <url> --only-categories=accessibility` · `npx @axe-core/cli <url>`
 
-### Automated
-```bash
-npx lighthouse https://example.com --only-categories=accessibility
-npx @axe-core/cli https://example.com
-```
+**Manual**: Keyboard tab → no traps · Screen reader (VoiceOver/NVDA/TalkBack) · 200% zoom · High contrast mode · Reduced motion · Logical focus order · ≥24×24px targets
 
-### Manual
-- [ ] **Keyboard:** Tab through page, Enter/Space to activate, no traps
-- [ ] **Screen reader:** VoiceOver (Mac), NVDA (Windows), TalkBack (Android)
-- [ ] **Zoom:** Usable at 200%
-- [ ] **High contrast:** Windows High Contrast Mode
-- [ ] **Reduced motion:** `prefers-reduced-motion: reduce`
-- [ ] **Focus order:** Logical, follows visual order
-- [ ] **Target size:** ≥24×24px interactive elements
-- See [screen reader commands](references/A11Y-PATTERNS.md#screen-reader-commands)
+## Common issues
+**Critical**: Missing form labels / image alt / color contrast · Keyboard traps · No focus indicators
 
----
+**Serious**: Missing page lang / heading structure / skip links · Non-descriptive link text · Auto-playing media
 
-## Common issues by impact
-
-### Critical (fix immediately)
-1. Missing form labels
-2. Missing image alt text
-3. Insufficient color contrast
-4. Keyboard traps
-5. No focus indicators
-
-### Serious (fix before launch)
-1. Missing page language
-2. Missing heading structure
-3. Non-descriptive link text
-4. Auto-playing media
-5. Missing skip links
-
-### Moderate (fix soon)
-1. Missing ARIA labels on icons
-2. Inconsistent navigation
-3. Missing error identification
-4. Timing without controls
-5. Missing landmark regions
+**Moderate**: Missing ARIA on icons · Inconsistent nav · Missing error ID · Timing w/o controls · Missing landmarks
 
 ## References
-
 - [WCAG 2.2 Quick Reference](https://www.w3.org/WAI/WCAG22/quickref/)
 - [WAI-ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/)
 - [Deque axe Rules](https://dequeuniversity.com/rules/axe/)
-- [Web Quality Audit](../web-quality-audit/SKILL.md)
 - [WCAG criteria reference](references/WCAG.md)
 - [Accessibility code patterns](references/A11Y-PATTERNS.md)
