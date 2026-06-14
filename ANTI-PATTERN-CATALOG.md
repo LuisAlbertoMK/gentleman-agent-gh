@@ -93,6 +93,17 @@
 **Prevention**: When writing regex to find a pattern after `Key:`, always consider that there may be text between the colon and the target token. Use `.*?` or `[^"]*` to bridge the gap.
 **Files**: scripts/skill-test-suite.ps1 (line 70)
 
+## 2026-06-13: Knowledge skills with verbose inline examples waste context
+**Symptom**: Loading a web-quality skill (accessibility, performance, SEO) consumes +67% tokens without proportional quality gain. 70% of skill content is redundant code examples that duplicate reference files.
+**Root cause**: Skills from addyosmani/web-quality-skills were designed as standalone tutorials, not as runtime agent skills. Every criterion has 3-5 code variations inline when 1 example + reference link suffices.
+**Fix**: Compact SKILL.md by moving verbose code examples to `references/`. Keep only: POUR/framework structure, criterion numbers, threshold tables, checklists, and severity matrices. Verified via 3-trial validation: quality loss -1.2% (within ≤5% threshold), lines reduced -67.6%.
+**Prevention**: 
+1. Before adding any skill, compact it first: max 150 lines for knowledge skills, 80 lines for utility skills
+2. Code examples belong in `references/`, not inline. One illustrative snippet per criterion max
+3. Run Skill Validation Protocol (3-trial benchmark) before/after compaction to verify ≤5% loss
+4. Update both `.agents/skills/{name}/SKILL.md` and `skills/{name}/SKILL.md` to keep in sync
+**Files**: `.agents/skills/{accessibility,performance,best-practices,seo,core-web-vitals}/SKILL.md`, `auto-metrics/SKILL.md` (Skill Validation Protocol)
+
 ## TEMPLATE for new entries
 ```
 ## YYYY-MM-DD: Short title

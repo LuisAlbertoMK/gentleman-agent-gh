@@ -55,6 +55,12 @@
 | Bitacora, historial, histÃ³rico, quÃ© pedÃ­, request log | bitacora |
 | Dreaming, cross-session patterns, memory curation | dreaming |
 | Performance score, mobile perf, desktop perf, rendimiento, app score, lighthouse, benchmark | performance-tracker |
+| Accessibility, a11y, WCAG, screen reader, keyboard nav, make accessible | accessibility |
+| Web performance, speed up, reduce load time, page speed, performance audit | performance |
+| SEO, search engine, meta tags, structured data, sitemap, search optimization | seo |
+| Core Web Vitals, LCP, INP, CLS, layout shift, page experience | core-web-vitals |
+| Best practices, security audit, modernize code, code quality review | best-practices |
+| Web quality audit, lighthouse audit, review web quality, check page quality | web-quality-audit |
 | Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
 
 ## Quick groups
@@ -77,3 +83,8 @@
 - `read skills/gap-analysis/SKILL.md`
 - `read skills/project-mapper/SKILL.md`
 - `read scripts/intake-verify.ps1`
+
+**Web-quality skills** (`accessibility`, `performance`, `seo`, `core-web-vitals`, `best-practices`, `web-quality-audit`) are installed at `.agents/skills/` but NOT in `available_skills`. Load them:
+- `read .agents/skills/{name}/SKILL.md`
+- Or `read skills/{name}/SKILL.md` (mirrored copy in project root)
+- References are at `.agents/skills/{name}/references/`
