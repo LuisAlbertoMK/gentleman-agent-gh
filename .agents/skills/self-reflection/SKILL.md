@@ -2,7 +2,7 @@
 name: self-reflection
 description: Hermes closed learning loop. Reflect→learn→improve after tasks.
 license: Apache-2.0
-metadata: version: "2.3"
+metadata: version: "2.4"
 triggers: task completion, session end, error patterns, "reflexioná", "aprendé de esto"
 ---
 
@@ -10,68 +10,49 @@ triggers: task completion, session end, error patterns, "reflexioná", "aprendé
 **Observe → Reflect → Optimize → Apply** — after EVERY task + session end.
 
 ### Auto-Load Triggers
-Hermes se carga automáticamente cuando:
 - **Session end** → siempre (step 0 de Session Close Protocol)
-- **Post-task** → después de tasks con ≥3 tool calls o arch decisions
+- **Post-task** → tasks con ≥3 tool calls o arch decisions
 - **Error recovery** → después de bugfix + immune-system
 - **Same error 2x** → before cataloging (capturar root cause primero)
-- **User dice "reflexioná" o "aprendé de esto"** → manual
+- **User: "reflexioná" o "aprendé de esto"** → manual
 
 ### Per-Task
-1. **CAPTURE**: worked? failed? → `mem_save` 
-2. **EXTRACT**: reusable? → decision tree abajo
+1. **CAPTURE**: worked? failed? → `mem_save`
+2. **EXTRACT**: reusable? → decision tree
 3. **EVALUATE**: root cause → `immune-system` + prevention
 4. **APPLY**: update behavior (Engram + skill + AGENTS.md)
 5. **SCORE**: `auto-metrics` 6 dims
 6. **IMMUNIZE**: error or <7 → anti-pattern + AGENTS.md Rules
 
 ### EXTRACT Decision Tree
-¿Esto merece un skill nuevo? Respondé estas 3 preguntas:
+| Pregunta | Sí | No |
+|----------|----|----|
+| ¿Patrón repetido ≥2 veces? | skill-creator | update Engram |
+| ¿Workflow ≥2 pasos? | skill-creator | update Engram |
+| ¿Otros agentes beneficiados? | skill-creator | update Engram |
+≥1 Sí → `skill-creator`. Si no → `mem_save(type="learning")`.
 
-| Pregunta | Sí → | No → |
-|----------|------|------|
-| ¿Es un patrón que repetiste ≥2 veces? | skill-creator | update Engram |
-| ¿Es una workflow con ≥2 pasos? | skill-creator | update Engram |
-| ¿Otros agentes se beneficiarían? | skill-creator | update Engram |
-
-Si **≥1 respuesta Sí** → `skill-creator`. Si no → `mem_save(type="learning")`.
-
-### Reflection Template
-Al final de cada sesión o task grande:
-
+### Template (session/task end)
 ```
 ## Reflection
-**Type**: [bugfix/design/audit/learning]
-**Outcome**: [worked/partial/failed]
-**Root cause** (if failed): [qué salió mal]
-**Extracted**: [new skill? update? nothing]
+**Type**: [bugfix/design/audit/learning] · **Outcome**: [worked/partial/failed]
+**Root cause**: [qué salió mal] · **Extracted**: [new skill? update? nothing]
 **Score**: auto-metrics [X/100]
 **Would change**: [qué harías diferente]
 ```
-
-Memorizalo como `type="learning"` con `topic_key="reflection/{date}"`.
+Save: `mem_save(type="learning", topic_key="reflection/{date}")`
 
 ### Periodic (~5 tools)
-Self-check: consistent? repeating? underused? → auto-improve (delegate `skill-creator`) → verify (less errors, faster?)
+Self-check: consistent? repeating? underused? → auto-improve (delegate `skill-creator`)
 
-## Skill Triggers
+## Triggers
 Same fix 2x→skill · gotcha→doc skill · user corrected 2x→protocol · complex workflow→skill · pattern 3+ files→extract
 
-## Checkpoint
-Quality? Efficiency? Learning? Reusability→skill? Different next time?
-
 ## Type Reflection
-- Code: pattern? maintainable? tested?
-- Troubleshoot: enough info? correct diagnosis?
-- Design: reqs? tradeoffs? scalable?
-- Skill: own skill? update existing?
+Code: pattern? maintainable? tested? · Troubleshoot: enough info? correct diagnosis? · Design: reqs? tradeoffs? scalable? · Skill: own? update existing?
 
 ## Frustration Signals
 See `recovery-protocol` frustration signals table.
 
-## Commands
-`mem_save(type="learning", content="**What**:...\n**Learned**:...")` — if pattern: `skill-creator` or edit SKILL.md
-
-## Connection to Post-Task Flow
-AGENTS.md Post-Task section ejecuta steps 1-3 (git status, suggest, immune).
-Hermes se ejecuta DESPUÉS como step 4 (reflection) si el task fue ≥3 tool calls.
+## Post-Task Flow
+AGENTS.md Post-Task: steps 1-3 (git status, suggest, immune). Hermes = step 4 (reflection) si task ≥3 tool calls.
