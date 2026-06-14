@@ -32,6 +32,12 @@ ehthumbs_vista.db
 *.backup
 *.pre-*
 
+# ============================================
+# Skills workspace (all junctions → .agents/skills/)
+# Canonical source: .agents/skills/ is git-tracked
+# ============================================
+skills/
+
 # Local scripts
 scripts/*.local.ps1
 scripts/*.local.sh
