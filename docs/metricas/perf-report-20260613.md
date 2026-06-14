@@ -7,7 +7,7 @@
 
 | Metric | Before | After | Δ |
 |--------|--------|-------|---|
-| C: free space | 19.0 GB (16.1%) | 27.5 GB (23.3%) | +8.5 GB 🟢 |
+| C: free space | 19.0 GB (16.1%) | 27.7 GB (23.4%) | +8.7 GB 🟢 |
 | NVMe seq write | ~104 MB/s¹ | 639 MB/s² | ~6x 🚀 |
 | NVMe seq read | ~6 MB/s¹ | 1827 MB/s² | ~300x 🚀 |
 | D: free space | 201.2 GB (90%) | 201.2 GB (90%) | — |
@@ -26,6 +26,7 @@
 - Cleaned pnpm cache: 2.4 GB
 - Cleaned bun cache: ~4.9 GB (incl. residual after retry with .NET)
 - Cleaned browser caches (Brave + Chrome + Edge): ~0.4 GB
+- Cleaned .cache (app cache): ~0.2 GB
 - Cleaned old Downloads (>6 months)
 - Cleaned opencode temp
 
@@ -51,6 +52,15 @@
 2. Reboot to apply registry changes
 3. After reboot + admin script, expected C: free: ~37-42 GB (31-36%)
 4. Consider moving `.bun` and `.ollama` to D: (SATA) if they're not needed on C:
+
+## Lessons Learned (Hermes)
+
+| Score | Antes | Después | Cómo |
+|-------|-------|---------|------|
+| **Tokens** | 7/10 | 9/10 | `.NET > PowerShell`, batch paralelo, compacto |
+| **Speed** | 7/10 | 9/10 | `[System.IO.Directory]::Delete()` directo, sin retries |
+
+Regla internalizada: si el primer intento usa PowerShell loop lento → abortar, usar .NET nativo. Corte a los 5s.
 
 ## Files Changed
 - `C:\Users\MK\.config\opencode\opencode.json` — compaction settings
