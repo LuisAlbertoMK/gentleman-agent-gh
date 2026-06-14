@@ -1,6 +1,6 @@
 ﻿# SKILLS INDEX
 
-> Full trigger table for all 47 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 53 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
 > **Version**: 1.6 | **Changelog**: 1.6 (skill-validate.ps1 automation, skills.paths registered in opencode.json, performance-tracker compacted 190L→114L)

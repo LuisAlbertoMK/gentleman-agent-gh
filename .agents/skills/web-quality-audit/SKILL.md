@@ -4,169 +4,64 @@ description: Comprehensive web quality audit covering performance, accessibility
 license: MIT
 metadata:
   author: web-quality-skills
-  version: "1.0"
+  version: "1.1"
 ---
 
 # Web quality audit
 
-Comprehensive quality review based on Google Lighthouse audits. Covers Performance, Accessibility, SEO, and Best Practices across 150+ checks.
+Comprehensive quality audit (150+ checks) across Performance, Accessibility, SEO, Best Practices.
 
-> **Lighthouse v13 note (Oct 2025+).** Lighthouse has migrated the Performance category from per-opportunity audits to **Performance Insight Audits** ([announcement](https://developer.chrome.com/blog/moving-lighthouse-to-insights)). Several individual audit names this skill historically referenced — *First Meaningful Paint*, *No Document Write*, *Uses Passive Event Listeners*, *Uses Rel Preload* — have been removed or merged. The underlying *advice* is unchanged and still applies; only the report format moved. The CLS-related audits ("layout shifts", "non-composited animations", "unsized images") are now consolidated into a single `cls-culprits-insight`, and image audits are merged into `image-delivery-insight`. Treat older Lighthouse JSON output as a superset, not a contradiction.
-
-## How it works
-
-1. Analyze the provided code/project for quality issues
-2. Categorize findings by severity (Critical, High, Medium, Low)
-3. Provide specific, actionable recommendations
-4. Include code examples for fixes
+> **Lighthouse v13 (Oct 2025+).** Performance migrated to **Performance Insight Audits**. Individual audits (First Meaningful Paint, No Document Write, Uses Passive Event Listeners, Uses Rel Preload) removed/merged. CLS audits consolidated into `cls-culprits-insight`, image audits into `image-delivery-insight`. Older JSON output is a superset, not a contradiction.
 
 ## Audit categories
 
-### Performance (40% of typical issues)
+### Performance — 40% of issues
+**Core Web Vitals**: LCP <2.5s · INP <200ms · CLS <0.1
+**Resources**: WebP/AVIF images, code-split JS, critical CSS inline, `font-display: swap`
+**Loading**: Preconnect origins, preload LCP/fonts, lazy-load below-fold, immutable cache TTLs
 
-**Core Web Vitals** — Must pass for good page experience:
-* **LCP (Largest Contentful Paint) < 2.5s.** The largest visible element must render quickly. Optimize images, fonts, and server response time.
-* **INP (Interaction to Next Paint) < 200ms.** User interactions must feel instant. Reduce JavaScript execution time and break up long tasks.
-* **CLS (Cumulative Layout Shift) < 0.1.** Content must not jump around. Set explicit dimensions on images, embeds, and ads.
+### Accessibility — 30% of issues
+**Perceivable**: alt text (deco→`alt=""`), color contrast 4.5:1 / 3:1, captions+transcripts
+**Operable**: Keyboard nav, focus visible, skip links, no time limits without controls
+**Understandable**: `lang` attr, consistent nav, form errors+labels
+**Robust**: Valid HTML, correct ARIA (prefer native elements), accessible names+roles
 
-**Resource Optimization:**
-* **Compress images.** Use WebP/AVIF with fallbacks. Serve correctly sized images via `srcset`.
-* **Minimize JavaScript.** Remove unused code. Use code splitting. Defer non-critical scripts.
-* **Optimize CSS.** Extract critical CSS. Remove unused styles. Avoid `@import`.
-* **Efficient fonts.** Use `font-display: swap`. Preload critical fonts. Subset to needed characters.
+### SEO — 15% of issues
+**Crawlability**: robots.txt, XML sitemap, canonical URLs, no noindex on important pages
+**On-Page**: Unique titles (50-60ch), meta desc (150-160ch), H1 hierarchy, descriptive link text
+**Technical**: Mobile-friendly, HTTPS, fast loading, JSON-LD structured data
 
-**Loading Strategy:**
-* **Preconnect to origins.** Add `<link rel="preconnect">` for third-party domains.
-* **Preload critical assets.** LCP images, fonts, and above-fold CSS.
-* **Lazy load below-fold content.** Images, iframes, and heavy components.
-* **Cache effectively.** Long cache TTLs for static assets. Immutable caching for hashed files.
-
-### Accessibility (30% of typical issues)
-
-**Perceivable:**
-* **Text alternatives.** Every `<img>` has meaningful `alt` text. Decorative images use `alt=""`.
-* **Color contrast.** Minimum 4.5:1 for normal text, 3:1 for large text (WCAG AA).
-* **Don't rely on color alone.** Use icons, patterns, or text alongside color indicators.
-* **Captions and transcripts.** Video has captions. Audio has transcripts.
-
-**Operable:**
-* **Keyboard accessible.** All functionality available via keyboard. No keyboard traps.
-* **Focus visible.** Clear focus indicators on all interactive elements.
-* **Skip links.** Provide "Skip to main content" for keyboard users.
-* **Sufficient time.** Users can extend time limits. No auto-advancing content without controls.
-
-**Understandable:**
-* **Page language.** Set `lang` attribute on `<html>`.
-* **Consistent navigation.** Same navigation structure across pages.
-* **Error identification.** Form errors clearly described and associated with fields.
-* **Labels and instructions.** All form inputs have associated labels.
-
-**Robust:**
-* **Valid HTML.** No duplicate IDs. Properly nested elements.
-* **ARIA used correctly.** Prefer native elements. ARIA roles match behavior.
-* **Name, role, value.** Interactive elements have accessible names and correct roles.
-
-### SEO (15% of typical issues)
-
-**Crawlability:**
-* **Valid robots.txt.** Doesn't block important resources.
-* **XML sitemap.** Lists all important pages. Submitted to Search Console.
-* **Canonical URLs.** Prevent duplicate content issues.
-* **No noindex on important pages.** Check meta robots and headers.
-
-**On-Page SEO:**
-* **Unique title tags.** 50-60 characters. Primary keyword included.
-* **Meta descriptions.** 150-160 characters. Compelling and unique.
-* **Heading hierarchy.** Single `<h1>`. Logical heading structure.
-* **Descriptive link text.** Not "click here" or "read more".
-
-**Technical SEO:**
-* **Mobile-friendly.** Responsive design. Tap targets ≥ 48px.
-* **HTTPS.** Secure connection required.
-* **Fast loading.** Performance directly impacts ranking.
-* **Structured data.** JSON-LD for rich snippets (Article, Product, FAQ, etc.).
-
-### Best practices (15% of typical issues)
-
-**Security:**
-* **HTTPS everywhere.** No mixed content. HSTS enabled.
-* **No vulnerable libraries.** Keep dependencies updated.
-* **CSP headers.** Content Security Policy to prevent XSS.
-* **No exposed source maps.** In production builds.
-
-**Modern Standards:**
-* **No deprecated APIs.** Replace `document.write`, synchronous XHR, etc.
-* **Valid doctype.** Use `<!DOCTYPE html>`.
-* **Charset declared.** `<meta charset="UTF-8">` as first element in `<head>`.
-* **No browser errors.** Clean console. No CORS issues.
-
-**UX Patterns:**
-* **No intrusive interstitials.** Especially on mobile.
-* **Clear permission requests.** Only ask when needed, with context.
-* **No misleading buttons.** Buttons do what they say.
+### Best practices — 15% of issues
+**Security**: HTTPS, no vulnerable deps, CSP headers, no exposed source maps
+**Standards**: No deprecated APIs, `<!DOCTYPE html>`, UTF-8 charset, clean console
+**UX**: No intrusive interstitials, contextual permission requests, honest buttons
 
 ## Severity levels
+| Level | Action |
+|-------|--------|
+| **Critical** | Security vulns, complete failures — fix immediately |
+| **High** | CWV failures, major a11y barriers — fix before launch |
+| **Medium** | Perf opportunities, SEO improvements — fix within sprint |
+| **Low** | Minor optimizations, code quality — fix when convenient |
 
-| Level | Description | Action |
-|-------|-------------|--------|
-| **Critical** | Security vulnerabilities, complete failures | Fix immediately |
-| **High** | Core Web Vitals failures, major a11y barriers | Fix before launch |
-| **Medium** | Performance opportunities, SEO improvements | Fix within sprint |
-| **Low** | Minor optimizations, code quality | Fix when convenient |
-
-## Audit output format
-
-When performing an audit, structure findings as:
-
+## Output format
+When auditing, structure as:
 ```markdown
 ## Audit results
-
-### Critical issues (X found)
-- **[Category]** Issue description. File: `path/to/file.js:123`
-  - **Impact:** Why this matters
-  - **Fix:** Specific code change or recommendation
-
-### High priority (X found)
-...
+### Critical (X) · High (X) · Medium (X) · Low (X)
+- **[Category]** Issue. File: `path:123` — Impact + Fix
 
 ### Summary
-- Performance: X issues (Y critical)
-- Accessibility: X issues (Y critical)
-- SEO: X issues
-- Best Practices: X issues
+Perf: X (Y crit) · A11y: X (Y crit) · SEO: X · BestPrac: X
 
-### Recommended priority
-1. First fix this because...
-2. Then address...
-3. Finally optimize...
+### Priority
+1. [most impactful fix first]
 ```
 
 ## Quick checklist
-
-### Before every deploy
-- [ ] Core Web Vitals passing
-- [ ] No accessibility errors (axe/Lighthouse)
-- [ ] No console errors
-- [ ] HTTPS working
-- [ ] Meta tags present
-
-### Weekly review
-- [ ] Check Search Console for issues
-- [ ] Review Core Web Vitals trends
-- [ ] Update dependencies
-- [ ] Test with screen reader
-
-### Monthly deep dive
-- [ ] Full Lighthouse audit
-- [ ] Performance profiling
-- [ ] Accessibility audit with real users
-- [ ] SEO keyword review
+**Pre-deploy**: CWV pass · a11y 0 errors · no console errors · HTTPS · meta tags
+**Weekly**: Search Console · CWV trends · deps update · screen reader test
+**Monthly**: Full Lighthouse · perf profile · a11y with real users · SEO keywords
 
 ## References
-
-For detailed guidelines on specific areas:
-- [Performance Optimization](../performance/SKILL.md)
-- [Core Web Vitals](../core-web-vitals/SKILL.md)
-- [Accessibility](../accessibility/SKILL.md)
-- [SEO](../seo/SKILL.md)
-- [Best Practices](../best-practices/SKILL.md)
+- [Perf](../performance/SKILL.md) · [Core Web Vitals](../core-web-vitals/SKILL.md) · [A11y](../accessibility/SKILL.md) · [SEO](../seo/SKILL.md) · [Best Prac](../best-practices/SKILL.md)

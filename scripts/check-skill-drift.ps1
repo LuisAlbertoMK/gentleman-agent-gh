@@ -1,21 +1,18 @@
 <#
 .SYNOPSIS
-  Check skill drift between project skills/ and global config (~/.config/opencode/skills/).
-  Detects stale copies before they cause issues.
+  Check skill drift between canonical source (.agents/skills/) and global config (~/.config/opencode/skills/).
+  Detects stale junctions or missing global links.
 
 .DESCRIPTION
-  Compares line counts (quick) or content hashes (thorough) between:
-  - D:\gentleman-agent-gh\skills\ (project mirror)
-  - C:\Users\MK\.config\opencode\skills\ (global config)
-
-  Flags any skill where project != global.
+  Verifies that all skills in the canonical directory (.agents/skills/) have
+  corresponding junctions in the global OpenCode config.
   Returns exit code 0 = all in sync, 1 = drift detected.
 
 .PARAMETER Thorough
   Use content hash comparison (slower but accurate). Default: line count comparison (fast).
 
 .PARAMETER AutoFix
-  Copy global version to project for any drift found.
+  Create missing global junctions for any skills not linked.
 
 .PARAMETER Json
   Output results as JSON.
@@ -33,96 +30,79 @@ param(
   [switch]$Json
 )
 
-$projectDir = "D:\gentleman-agent-gh\skills"
-$globalDir = "C:\Users\MK\.config\opencode\skills"
+$canonicalDir = Join-Path -Path $PSScriptRoot -ChildPath "..\.agents\skills"
+$globalDir = "$env:USERPROFILE\.config\opencode\skills"
 $errors = @()
 $drifted = @()
 
-if (-not (Test-Path $projectDir)) { Write-Error "Project skills dir not found: $projectDir"; exit 2 }
+if (-not (Test-Path $canonicalDir)) { Write-Error "Canonical skills dir not found: $canonicalDir"; exit 2 }
 if (-not (Test-Path $globalDir)) { Write-Error "Global skills dir not found: $globalDir"; exit 2 }
 
-$projectSkills = Get-ChildItem $projectDir -Directory
+$canonicalSkills = Get-ChildItem $canonicalDir -Directory | Where-Object { $_.Name -ne '_shared' }
 
-foreach ($skill in $projectSkills) {
-  $projPath = Join-Path -Path $projectDir -ChildPath "$($skill.Name)\SKILL.md"
-  $globPath = Join-Path -Path $globalDir -ChildPath "$($skill.Name)\SKILL.md"
+foreach ($skill in $canonicalSkills) {
+  $skillName = $skill.Name
+  $canonPath = Join-Path -Path $skill.FullName -ChildPath "SKILL.md"
+  $globPath = Join-Path -Path $globalDir -ChildPath "$skillName\SKILL.md"
 
-  if (-not (Test-Path $globPath)) {
-    $errors += [PSCustomObject]@{ Skill=$skill.Name; Status="GLOBAL_MISSING"; Detail="Global has no $($skill.Name)/SKILL.md" }
+  if (-not (Test-Path $canonPath)) {
+    $errors += [PSCustomObject]@{ Skill=$skillName; Status="CANON_MISSING"; Detail="Canonical has no SKILL.md" }
     continue
   }
 
-  if (-not (Test-Path $projPath)) {
-    $errors += [PSCustomObject]@{ Skill=$skill.Name; Status="PROJECT_MISSING"; Detail="Project has no $($skill.Name)/SKILL.md" }
+  $globalItem = Get-Item (Join-Path -Path $globalDir -ChildPath $skillName) -ErrorAction SilentlyContinue
+
+  if (-not $globalItem) {
+    $errors += [PSCustomObject]@{ Skill=$skillName; Status="GLOBAL_MISSING"; Detail="No global dir exists" }
     continue
   }
 
-  if ($skill.LinkType -eq "Junction") {
-    # Junction skills are auto-synced by definition - verify target exists
-    $target = $skill.Target
-    $targetOk = Test-Path (Join-Path -Path $target -ChildPath "SKILL.md")
-    if (-not $targetOk) {
-      $errors += [PSCustomObject]@{ Skill=$skill.Name; Status="JUNCTION_BROKEN"; Detail="Junction target missing: $target" }
+  if ($globalItem.LinkType -ne "Junction") {
+    $warnings += [PSCustomObject]@{ Skill=$skillName; Status="GLOBAL_NOT_JUNCTION"; Detail="Global is a real file, not a junction" }
+  }
+
+  # Compare content if not a junction (real file copy could drift)
+  if ($globalItem.LinkType -ne "Junction") {
+    if ($Thorough) {
+      $canonHash = (Get-FileHash -LiteralPath $canonPath -Algorithm MD5).Hash
+      $globHash = (Get-FileHash -LiteralPath $globPath -Algorithm MD5).Hash
+      $match = $canonHash -eq $globHash
+    } else {
+      $canonLines = (Get-Content $canonPath | Measure-Object -Line).Lines
+      $globLines = (Get-Content $globPath | Measure-Object -Line).Lines
+      $match = $canonLines -eq $globLines
     }
-    continue  # junctions are always in sync, skip comparison
-  }
-
-  # Compare real files
-  if ($Thorough) {
-    $projHash = (Get-FileHash -LiteralPath $projPath -Algorithm MD5).Hash
-    $globHash = (Get-FileHash -LiteralPath $globPath -Algorithm MD5).Hash
-    $match = $projHash -eq $globHash
-  } else {
-    $projLines = (Get-Content $projPath | Measure-Object -Line).Lines
-    $globLines = (Get-Content $globPath | Measure-Object -Line).Lines
-    $match = $projLines -eq $globLines
-  }
-
-  if (-not $match) {
-    $projSize = (Get-Item $projPath).Length
-    $globSize = (Get-Item $globPath).Length
-    $drifted += [PSCustomObject]@{
-      Skill = $skill.Name
-      ProjectSize = if ($Thorough) { $projHash } else { "$projLines lines" }
-      GlobalSize  = if ($Thorough) { $globHash } else { "$globLines lines" }
-      Status = "DRIFT"
+    if (-not $match) {
+      $drifted += [PSCustomObject]@{
+        Skill = $skillName
+        Status = "DRIFT"
+        Detail = if ($Thorough) { "Hash mismatch" } else { "Line count: canonical=$canonLines global=$globLines" }
+      }
     }
   }
 }
 
-# AutoFix: copy global to project for drifted files
-if ($AutoFix -and $drifted.Count -gt 0) {
-  Write-Output "Auto-fixing $($drifted.Count) drifted skills..."
-  foreach ($d in $drifted) {
-    $src = Join-Path -Path $globalDir -ChildPath "$($d.Skill)\SKILL.md"
-    $dst = Join-Path -Path $projectDir -ChildPath "$($d.Skill)\SKILL.md"
-    Copy-Item -LiteralPath $src -Destination $dst -Force
-    Write-Output "  Fixed: $($d.Skill)"
-  }
-  # Re-scan to confirm
-  $drifted = @()
-  # Re-run the check logic (simplified inline)
-  foreach ($skill in $projectSkills) {
-    if ($skill.LinkType -eq "Junction") { continue }
-    $projPath = Join-Path -Path $projectDir -ChildPath "$($skill.Name)\SKILL.md"
-    $globPath = Join-Path -Path $globalDir -ChildPath "$($skill.Name)\SKILL.md"
-    if ((Test-Path $projPath) -and (Test-Path $globPath)) {
-      $projLines = (Get-Content $projPath | Measure-Object -Line).Lines
-      $globLines = (Get-Content $globPath | Measure-Object -Line).Lines
-      if ($projLines -ne $globLines) {
-        $drifted += $skill.Name
-      }
+# AutoFix: create missing global junctions
+if ($AutoFix) {
+  $errorsToFix = $errors | Where-Object { $_.Status -eq "GLOBAL_MISSING" }
+  if ($errorsToFix.Count -gt 0) {
+    Write-Output "Creating $($errorsToFix.Count) missing global junctions..."
+    foreach ($e in $errorsToFix) {
+      $target = Join-Path -Path $canonicalDir -ChildPath $e.Skill
+      $link = Join-Path -Path $globalDir -ChildPath $e.Skill
+      New-Item -ItemType Junction -Path $link -Target $target -Force | Out-Null
+      Write-Output "  Created: $link -> $target"
     }
+    $errors = $errors | Where-Object { $_.Status -ne "GLOBAL_MISSING" }
   }
-  if ($drifted.Count -eq 0) { Write-Output "  All fixed!" }
 }
 
 # --- Output ---
 $result = @{
   timestamp = (Get-Date -Format "o")
-  totalSkills = $projectSkills.Count
-  junctionSkills = ($projectSkills | Where-Object { $_.LinkType -eq "Junction" }).Count
-  realFileSkills = ($projectSkills | Where-Object { $_.LinkType -ne "Junction" }).Count
+  totalSkills = $canonicalSkills.Count
+  junctionSkills = ($canonicalSkills | ForEach-Object { $globalItem = Get-Item (Join-Path -Path $globalDir -ChildPath $_.Name) -ErrorAction SilentlyContinue; if ($globalItem -and $globalItem.LinkType -eq "Junction") { $_ } else { $null } } | Measure-Object).Count
+  realFileSkills = ($canonicalSkills | ForEach-Object { $globalItem = Get-Item (Join-Path -Path $globalDir -ChildPath $_.Name) -ErrorAction SilentlyContinue; if ($globalItem -and $globalItem.LinkType -ne "Junction") { $_ } else { $null } } | Measure-Object).Count
   drifted = $drifted
   errors = $errors
   allSynced = ($drifted.Count -eq 0 -and $errors.Count -eq 0)
@@ -132,15 +112,15 @@ if ($Json) {
   Write-Output ($result | ConvertTo-Json -Depth 3)
 } else {
   if ($result.allSynced) {
-    Write-Output "`n✅ ALL $($result.totalSkills) skills in sync!"
-    Write-Output "   ($($result.junctionSkills) junctions auto-synced, $($result.realFileSkills) real files verified)"
+    Write-Output "`nOK ALL $($result.totalSkills) skills in sync!"
+    Write-Output "   ($($result.junctionSkills) junctions OK, $($result.realFileSkills) real files verified)"
   } else {
     if ($drifted.Count -gt 0) {
-      Write-Output "`n⚠️ DRIFT DETECTED: $($drifted.Count) skills out of sync"
-      $drifted | Format-Table Skill, ProjectSize, GlobalSize, Status -AutoSize
+      Write-Output "`nDRIFT: $($drifted.Count) skills out of sync"
+      $drifted | Format-Table Skill, Status, Detail -AutoSize
     }
     if ($errors.Count -gt 0) {
-      Write-Output "`n❌ ERRORS: $($errors.Count)"
+      Write-Output "`nERRORS: $($errors.Count)"
       $errors | Format-Table Skill, Status, Detail -AutoSize
     }
     exit 1
