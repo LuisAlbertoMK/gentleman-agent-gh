@@ -11,29 +11,16 @@ metadata:
 
 Audit checklist basado en WCAG 2.2. Ejemplos completos en [`references/`](references/).
 
-## POUR Principles
-| Principle | Description |
-|-----------|-------------|
-| **P**erceivable | Content perceivable through different senses |
-| **O**perable | Interface operable by all users |
-| **U**nderstandable | Content + interface understandable |
-| **R**obust | Works with assistive technologies |
-
-**Levels**: A (minimum), AA (standard/legal), AAA (enhanced)
+## POUR + Levels
+**P**erceivable · **O**perable · **U**nderstandable · **R**obust
+Levels: A (min), AA (standard), AAA (enhanced)
 
 ---
 
 ## Perceivable
-**1.1.1 Text alternatives**: `<img>` needs `alt` (decorative → `alt="" role="presentation"`). Icon buttons → `aria-label` or visually-hidden text. Complex images → `aria-describedby`.
+**1.1.1 Text alternatives**: `<img>` needs `alt`. Decorative → `alt="" role="presentation"`. Icon buttons → `aria-label`. Complex → `aria-describedby`.
 
-**1.4.3/1.4.6 Color contrast**:
-| Text | AA | AAA |
-|------|----|------|
-| Normal (<18px / <14px bold) | 4.5:1 | 7:1 |
-| Large (≥18px / ≥14px bold) | 3:1 | 4.5:1 |
-| UI/graphics | 3:1 | 3:1 |
-
-Focus states ≥3:1 vs bg (1.4.11). Don't rely on color alone — add icon/text (1.4.1).
+**1.4.3/1.4.6 Color contrast**: Normal text ≥4.5:1 (AA) / 7:1 (AAA). Large (≥18px/≥14px bold) ≥3:1 (AA) / 4.5:1 (AAA). UI ≥3:1. Focus ≥3:1 vs bg (1.4.11). Don't rely on color alone — add icon/text (1.4.1).
 
 **1.2 Media**: Video → captions (1.2.2) + audio description (1.2.3/1.2.5). Audio → transcript. Live → captions (1.2.4 AA).
 
@@ -42,7 +29,7 @@ Focus states ≥3:1 vs bg (1.4.11). Don't rely on color alone — add icon/text 
 ## Operable
 **2.1.1 Keyboard**: Prefer native `<button>`, `<a href>`, form controls. `<div onclick>` → `role="button" tabindex="0"` + keydown. No keyboard traps (2.1.2).
 
-**2.4.7 Focus**: Never `outline:none` without `:focus-visible`. Focused element not hidden by sticky headers — use `scroll-margin-top`.
+**2.4.7 Focus**: Never `outline:none` without `:focus-visible`. Sticky headers → `scroll-margin-top`.
 
 **2.4.1 Skip links**: First focusable element, targets `#main-content`.
 
@@ -87,15 +74,12 @@ Focus states ≥3:1 vs bg (1.4.11). Don't rely on color alone — add icon/text 
 
 ## Testing
 **Automated**: `npx lighthouse <url> --only-categories=accessibility` · `npx @axe-core/cli <url>`
-
-**Manual**: Keyboard tab → no traps · Screen reader (VoiceOver/NVDA/TalkBack) · 200% zoom · High contrast mode · Reduced motion · Logical focus order · ≥24×24px targets
+**Manual**: Keyboard tab · Screen reader (VoiceOver/NVDA/TalkBack) · 200% zoom · High contrast · Reduced motion · Focus order · ≥24×24px targets
 
 ## Common issues
-**Critical**: Missing form labels / image alt / color contrast · Keyboard traps · No focus indicators
-
-**Serious**: Missing page lang / heading structure / skip links · Non-descriptive link text · Auto-playing media
-
-**Moderate**: Missing ARIA on icons · Inconsistent nav · Missing error ID · Timing w/o controls · Missing landmarks
+**Critical**: Missing form labels / alt / contrast · Keyboard traps · No focus indicators
+**Serious**: Missing page lang / headings / skip links · Non-descriptive link text
+**Moderate**: Missing ARIA on icons · Inconsistent nav · Missing error ID · Timing controls
 
 ## References
 - [WCAG 2.2 Quick Reference](https://www.w3.org/WAI/WCAG22/quickref/)

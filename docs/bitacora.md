@@ -44,3 +44,21 @@
 - NVMe 256MB sequential read: 1432.3 MB/s
 - ReadAllBytes 100MB: 960.9 MB/s
 - Context Engineering: −63.9% tokens (arXiv verificado)
+
+## 2026-06-14 — Tools + compresión skills
+
+### Cambios
+- **scripts/ensure-tools.ps1**: verificación triple de rg/sg/gh con dot-source PATH. 3/3 passes.
+- **scripts/token-count.ps1**: conteo de tokens aproximado (~4 chars/token).
+- **scripts/bench-file-io.ps1**: benchmark 3 métodos × N runs. StreamReader > Get-Content (6.7×).
+- **.agents/skills/development-mode/SKILL.md**: comprimido 1421→976 tokens (−31.3%).
+- **.agents/skills/accessibility/SKILL.md**: comprimido 1008→892 tokens (−11.5%).
+
+### Benchmarks
+- rg 3×3 benchmark: ~157ms avg en codebase (literal 169ms, regex 141ms, regex+ctx 162ms)
+- File I/O: StreamReader 5.9ms, ReadAllText 9ms, Get-Content 40ms (en archivo 2.3KB)
+
+### Decisiones
+1. **StreamReader > Get-Content**: 6.7× más rápido para lectura de archivos. Usar en scripts críticos.
+2. **Compresión skills**: solo si delta >5%. Ambos skills pasaron el threshold.
+3. **rg vía full path en scripts**: no confiar en PATH entre sesiones PS.

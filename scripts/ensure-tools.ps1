@@ -1,0 +1,89 @@
+# ensure-tools.ps1 — Verifica y expone herramientas esenciales en PATH
+# Uso: . .\scripts\ensure-tools.ps1  (dot-source)
+# Triple verificacion: (1) existe (2) --version (3) funcion basica
+
+$tools = @{
+  rg = @{
+    label = "ripgrep (busqueda rapida)"
+    paths = @(
+      "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\BurntSushi.ripgrep.MSVC_Microsoft.Winget.Source_8wekyb3d8bbwe\ripgrep-15.1.0-x86_64-pc-windows-msvc\rg.exe",
+      "$env:ProgramFiles\ripgrep\rg.exe"
+    )
+  }
+  sg = @{
+    label = "ast-grep (AST structural search)"
+    paths = @(
+      "$env:APPDATA\npm\sg.ps1",
+      "$env:APPDATA\npm\sg.cmd"
+    )
+  }
+  gh = @{
+    label = "GitHub CLI"
+    paths = @(
+      "$env:ProgramFiles\GitHub CLI\gh.exe",
+      "${env:ProgramFiles(x86)}\GitHub CLI\gh.exe"
+    )
+  }
+}
+
+$allOk = $true
+
+foreach ($key in $tools.Keys) {
+  $t = $tools[$key]
+  $exe = Get-Command $key -ErrorAction SilentlyContinue
+  $fullPath = $null
+
+  if ($exe) {
+    $fullPath = $exe.Source
+  } else {
+    foreach ($p in $t.paths) {
+      if (Test-Path $p) {
+        $fullPath = $p
+        break
+      }
+    }
+  }
+
+  if ($fullPath) {
+    $parent = Split-Path $fullPath -Parent
+    if ($parent -notin ($env:Path -split ';')) {
+      $env:Path = "${parent};$env:Path"
+    }
+    Write-Host "[$key] OK - $($t.label)"
+    Write-Host "       $fullPath"
+
+    # V1: --version (check output, not exit code — PS scripts don't set LASTEXITCODE)
+    $ver = & $fullPath --version 2>&1 | Select-Object -First 1
+    if ($ver) {
+      Write-Host "       version: $ver"
+    } else {
+      Write-Host "       version: FAIL (no output)"
+      $allOk = $false
+    }
+
+    # V2: basic function (rg only — native binary)
+    if ($key -eq 'rg') {
+      $testFile = Join-Path $env:TEMP "ensure-tools-test.txt"
+      "hello world" | Set-Content $testFile -Encoding utf8
+      $result = & $fullPath "hello" $testFile 2>$null
+      if ($LASTEXITCODE -eq 0) {
+        Write-Host "       search: OK"
+      } else {
+        Write-Host "       search: FAIL"
+        $allOk = $false
+      }
+      Remove-Item $testFile -Force -ErrorAction SilentlyContinue
+    }
+  } else {
+    Write-Host "[$key] NOT FOUND - $($t.label)"
+    $allOk = $false
+  }
+}
+
+if ($allOk) {
+  Write-Host "ALL TOOLS OK"
+} else {
+  Write-Host "SOME TOOLS MISSING"
+}
+
+return $allOk
