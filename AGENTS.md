@@ -16,6 +16,6 @@
 | Metrics | `docs/metricas/` — before/after scoring for tasks ≥3 steps |
 
 ## Inheritance
-Full persona, rules, protocol, skills table, router, and all policies inherited from:
+Full persona, rules, protocol, policies inherited from (skills+router → SKILLS-INDEX.md):
 **Global**: `C:\Users\MK\.config\opencode\AGENTS.md`
 <!-- /gentle-ai:persona -->

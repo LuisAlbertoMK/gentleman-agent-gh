@@ -1,9 +1,9 @@
 ﻿# SKILLS INDEX
 
-> Full trigger table for all 53 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 54 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 1.7 | **Changelog**: 1.7 (fix skill count 58→53 in docs, fix scripts paths, fix uninitialized var, add #requires guards)
+> **Version**: 1.8 | **Changelog**: 1.8 (added development-mode skill: resource prioritization + file read optimization)
 
 ## Triggers â†’ Skill
 
@@ -62,6 +62,7 @@
 | Best practices, security audit, modernize code, code quality review | best-practices |
 | Web quality audit, lighthouse audit, review web quality, check page quality | web-quality-audit |
 | Skill validation, benchmark, multi-trial, validate skill, 3 trials, medir skill | skill-validate |
+| Performance mode, dev mode, modo desarrollo, resource priority, high performance | development-mode |
 | Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
 
 ## Quick groups

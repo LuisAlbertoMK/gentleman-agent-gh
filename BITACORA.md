@@ -1,6 +1,11 @@
 # BITÁCORA
 
 ```
+2026-06-14 — Batch 5: Created `development-mode` skill: resource prioritization (RAM/CPU/GPU) + file read optimization (memory-mapped, streaming, parallel). Triggers on "modo desarrollo/dev mode". Registered in SKILLS-INDEX v1.7→1.8. Junctions created.
+2026-06-15 — Batch 6: 3 plugins instalados (dcp v3.1.12, skillful v1.2.5, lazy-loader v1.0.3) + context-mode MCP configurado. AGENTS.md Phase 1: -540 tokens/sesión (skills table, router, persistence, rubric → SKILLS-INDEX.md). Git optimizado (feature.manyfiles, fsmonitor). TCP heuristics disabled. NODE_OPTIONS set. .wslconfig creado. Net: 10+ cambios, 0 regresiones.
+2026-06-14 — Batch 5b: Research Jun 2026 — 4 plugins descubiertos (opencode-skillful, opencode-dcp, context-mode, opencode-lazy-loader) integrados en development-mode skill. +14.4% NVMe IOPS ya aplicado.
+2026-06-14 — Batch 4: System optimization — Ryzen 7 3700U/16GB/NVMe+SATA. 20+ enfoques: startup apps (8→0), services (5 disabled), NVMe native driver hack (+14.4% read), TEMP→NVMe, visual perf mode, CPU scheduling, power plan tweaks, npm cache→NVMe. BITACORA+metricas.
+2026-06-14 — Batch 3: fix doc skill count 58→53, scripts paths, uninit var, #requires guards, stale .metricas cleanup. Commit 9adaa8d.
 2026-06-14 — Batch 1: pre-commit quality gate + scripts reparados + SKILLS-INDEX fix. Commit 5b529bc.
 2026-06-14 — Batch 2: compactación masiva 8 skills (>100L) → avg -45% words. Total skills: 16378→14330 words (-13%). Commits 5b529bc + 6b34647.
 2026-06-13 — Graph CRUD sprint: 10 enfoques benchmarkeados, gaps corregidos (57→58), research TokenMizer + memory/token optimization. Experiments en experiments/graph-crud/. Pendiente: crear skill unificada.
