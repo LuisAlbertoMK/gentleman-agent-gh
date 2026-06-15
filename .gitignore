@@ -24,10 +24,11 @@ ehthumbs_vista.db
 # Working artifacts (NOT for distribution)
 # ============================================
 # Metrics, backups, and runtime state.
-# Live state is at C:\Users\MK\.config\opencode\
+# Live state is at $env:USERPROFILE\.config\opencode\
 
 .metricas/
 .bak/
+.atl/
 .backup/
 *.backup
 *.pre-*
