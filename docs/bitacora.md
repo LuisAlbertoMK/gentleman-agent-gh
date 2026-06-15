@@ -31,6 +31,8 @@
 - **ROADMAP**: agregado Sprint 8 Phase 1 Compactación
 - **review-gentleman-agent-gh.md**: eliminado
 - **Model hardcode revert**: gentleman-vMK + global sdd-orch — los modelos van como sugerencia, no fijos
+- **Métricas corregidas**: eliminados números inflados (33.3× → 24.4× real, AGENTS.md before→❌ no verificable)
+- **Lección**: solo métricas verificables con fuente. Estimar != medir.
 
 ### Benchmarks
 - NVMe 256MB sequential read: 1432.3 MB/s
