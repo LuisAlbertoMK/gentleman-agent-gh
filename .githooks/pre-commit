@@ -37,26 +37,27 @@ fi
 # --- [2/4] PS5.1 safety check on changed .ps1 files ---
 echo "[2/4] PS5.1 safety (staged .ps1)..."
 STAGED_PS1=$(git diff --cached --name-only --diff-filter=ACM | grep '\.ps1$')
+PS5_BLOCK=""
 if [ -n "$STAGED_PS1" ]; then
   HAZARD_FILES=""
   for f in $STAGED_PS1; do
     FULL="$REPO_ROOT/$f"
     [ ! -f "$FULL" ] && continue
-    # Skip bash-safe.ps1 — it intentionally contains &&/|| in strings
     case "$f" in *bash-safe*) continue ;; esac
-    # Check for && and || operators outside comment lines
-    if grep -nE '(^|[^=])\&\&([^=]|$)' "$FULL" 2>/dev/null | grep -v '^[0-9]*:#' | head -5 >/dev/null; then
+    # Use -F (fixed strings) not -E to avoid ERE alternation bug: || in ERE matches everything
+    if grep -Fn '&&' "$FULL" 2>/dev/null | grep -v '^[0-9]*:#' | head -5 >/dev/null; then
       HAZARD_FILES="$HAZARD_FILES $f(&&)"
     fi
-    if grep -nE '(^|[^=])\|\|([^=]|$)' "$FULL" 2>/dev/null | grep -v '^[0-9]*:#' | head -5 >/dev/null; then
+    if grep -Fn '||' "$FULL" 2>/dev/null | grep -v '^[0-9]*:#' | head -5 >/dev/null; then
       HAZARD_FILES="$HAZARD_FILES $f(||)"
     fi
   done
   if [ -z "$HAZARD_FILES" ]; then
     green "  OK"
   else
-    yellow "  WARN: PS5.1 hazard detected in:$HAZARD_FILES"
-    echo "  PowerShell 5.1 does not support && or ||. Use: cmd1; if (\$?) { cmd2 }"
+    red "  BLOCKING: PS5.1 hazard in:$HAZARD_FILES"
+    echo "  PS5.1 does not support &&/||. Use: cmd1; if (\$?) { cmd2 }"
+    PS5_BLOCK="yes"
   fi
 else
   green "  OK (no .ps1 staged)"
@@ -100,7 +101,7 @@ fi
 echo ""
 TOTAL=$((CHECKS_PASSED + CHECKS_FAILED))
 echo "=== Gate: $CHECKS_PASSED/$TOTAL passed ==="
-if [ $CHECKS_FAILED -gt 0 ]; then
+if [ $CHECKS_FAILED -gt 0 ] || [ -n "$PS5_BLOCK" ]; then
   red "  BLOCKED: fix errors above and stage again"
   exit 1
 else

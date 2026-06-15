@@ -12,54 +12,23 @@ Covers: Mobile (Android/iOS), Desktop (Win/Mac/Linux), Web.
 
 ## 6 Dimensions (1-10)
 
-### Load Time
-| Score | Mobile | Desktop | Web |
-|-------|--------|---------|-----|
-| 9-10 | Cold <1.5s | Launch <1s | LCP <1.5s, TTI <2s |
-| 7-8 | Cold <2.5s | Launch <2s | LCP <2.5s, TTI <3.5s |
-| 5-6 | Cold <4s | Launch <3.5s | LCP <4s, TTI <5s |
-| 3-4 | Cold <6s | Launch <5s | LCP <6s, TTI <7s |
-| 1-2 | Cold >6s | Launch >5s | LCP >6s, TTI >7s |
+### Load
+Score 9-10: M <1.5s / D <1s / W LCP<1.5 TTI<2 | 7-8: <2.5s/<2s/<2.5/<3.5 | 5-6: <4s/<3.5/<4/<5 | 3-4: <6s/<5/<6/<7 | 1-2: >6s/>5/>6/>7
 
 ### Render
-| Score | Mobile | Desktop | Web |
-|-------|--------|---------|-----|
-| 9-10 | 60fps, 0 drops | 60fps, vsync | CLS <0.1, INP <200ms |
-| 7-8 | 55fps, <2% drops | 55fps, smooth | CLS <0.25, INP <350ms |
-| 5-6 | 45fps, <5% drops | 45fps, jank | CLS <0.5, INP <500ms |
-| 3-4 | 30fps, <10% drops | 30fps, jank | CLS <0.75, INP <700ms |
-| 1-2 | <30fps, stutter | <30fps, freeze | CLS >0.75, INP >700ms |
+9-10: M 60fps/0drop / D 60fps vsync / W CLS<0.1 INP<200 | 7-8: 55fps/<2% / smooth / <0.25 <350 | 5-6: 45fps/<5% / jank / <0.5 <500 | 3-4: 30fps/<10% / jank / <0.75 <700 | 1-2: <30fps / freeze / >0.75 >700
 
 ### Memory
-| Score | Mobile | Desktop | Web |
-|-------|--------|---------|-----|
-| 9-10 | <50MB, no leaks | <100MB, stable | <30MB, GC rare |
-| 7-8 | <100MB, min GC | <200MB, stable | <60MB, GC ok |
-| 5-6 | <200MB, GC visible | <400MB, GC pressure | <100MB, leaks possible |
-| 3-4 | <350MB, OOM risk | <800MB, high usage | <200MB, leaks likely |
-| 1-2 | >350MB, OOM | >800MB, swapping | >200MB, major leaks |
+9-10: M <50MB / D <100MB / W <30MB | 7-8: <100 / <200 / <60 | 5-6: <200 / <400 / <100 | 3-4: <350/OOM / <800 / <200 | 1-2: >350 / >800 / >200
 
 ### Network
-9-10: API p95 <200ms, payload <50KB, cache hit >80% · 7-8: <500ms, <150KB, >60%
-5-6: <1s, <500KB, >40% · 3-4: <2s, <1MB, >20% · 1-2: >2s, >1MB, <20%
+9-10: p95<200ms payload<50KB cache>80% | 7-8: <500ms/<150KB/>60% | 5-6: <1s/<500KB/>40% | 3-4: <2s/<1MB/>20% | 1-2: >2s/>1MB/<20%
 
 ### Bundle
-| Score | Mobile | Desktop | Web |
-|-------|--------|---------|-----|
-| 9-10 | APK <30MB | <50MB installer | JS <100KB gzip |
-| 7-8 | APK <50MB | <100MB | JS <200KB |
-| 5-6 | APK <80MB | <200MB | JS <400KB |
-| 3-4 | APK <120MB | <400MB | JS <800KB |
-| 1-2 | >120MB | >400MB | >800KB |
+9-10: M APK<30MB / D <50MB / W JS<100KB | 7-8: <50 / <100 / <200 | 5-6: <80 / <200 / <400 | 3-4: <120 / <400 / <800 | 1-2: >120/>400/>800KB
 
 ### Energy/CPU
-| Score | Mobile | Desktop | Web |
-|-------|--------|---------|-----|
-| 9-10 | 1%/hr bg, CPU <10% | Idle <2% CPU | No throttle, <10% CPU |
-| 7-8 | 2%/hr, CPU <20% | Idle <5% | Minimal throttle |
-| 5-6 | 4%/hr, CPU <30% | Idle <10% | Occasional throttle |
-| 3-4 | 8%/hr, CPU <50% | Idle <20% | Frequent throttle |
-| 1-2 | >8%/hr, CPU >50% | Idle >20% | Constant throttle |
+9-10: M 1%/hr CPU<10% / D idle<2% / W no throttle<10% | 7-8: 2%/hr<20% / <5% / min | 5-6: 4%/hr<30% / <10% / occ | 3-4: 8%/hr<50% / <20% / freq | 1-2: >8%/>50% / >20% / const
 
 ## Quick Checks
 **Bundle**: `Get-ChildItem build/static/js/*.js -Recurse | Measure-Object -Property Length -Sum` · `Get-ChildItem *.apk,*.aab,*.ipa`

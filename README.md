@@ -58,3 +58,14 @@ Soporte transversal: `quality-gate` (pre-commit), `context-watchdog` (memoria), 
 - Competencias Staff+ Engineer (2026)
 - SkillsBench Benchmark
 - Engram Persistent Memory (Go + SQLite + FTS5)
+
+## Utilidades
+
+| Script | Propósito |
+|--------|-----------|
+| `scripts/ensure-tools.ps1` | Verifica rg/sg/gh en PATH con triple verificación |
+| `scripts/token-count.ps1` | Cuenta tokens aproximados en archivos |
+| `scripts/bench-file-io.ps1` | Benchmark de 3 métodos de lectura de archivos |
+| `scripts/skill-validate.ps1` | Validación multi-trial de skills |
+| `scripts/cross-ref-check.ps1` | Verifica consistencia entre skills y SKILLS-INDEX |
+| `scripts/auto-clean.ps1` | Limpia temp files >24h al inicio de sesión |

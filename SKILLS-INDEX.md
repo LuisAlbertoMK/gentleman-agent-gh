@@ -3,7 +3,7 @@
 > Full trigger table for all 54 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 1.8 | **Changelog**: 1.8 (added development-mode skill: resource prioritization + file read optimization)
+> **Version**: 1.9 | **Changelog**: 1.9 (new scripts: ensure-tools, token-count, bench-file-io; compressed gap-analysis -67%, perf-tracker -26%)
 
 ## Triggers â†’ Skill
 
@@ -83,5 +83,10 @@
 4. If skill has assets → `read skills/{name}/references/` or `read skills/{name}/assets/` for templates
 
 **Skill validation**: use `scripts/skill-validate.ps1` for 3-trial benchmark on any skill change
+
+**Utility scripts**:
+- `scripts/ensure-tools.ps1` — verify rg/sg/gh are in PATH
+- `scripts/token-count.ps1` — count ~tokens in files (4 chars/token)
+- `scripts/bench-file-io.ps1` — benchmark 3 file I/O methods × N runs
 
 **Web-quality skills** mirror: `.agents/skills/{name}/` ←→ `skills/{name}/` (synced via junction)

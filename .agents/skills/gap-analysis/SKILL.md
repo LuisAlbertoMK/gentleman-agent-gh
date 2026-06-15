@@ -1,46 +1,111 @@
 ﻿---
 name: gap-analysis
-description: >  gap-analysis skill
-triggers: "Gap analysis, system audit, identificar gaps, evaluar software"
+description: Complete gap analysis for any system — 8-dim quality framework, project intake, priority scoring
+triggers: "Gap analysis, system audit, identificar gaps, evaluar software, project intake"
 license: Apache-2.0
-metadata: version: "2.0", changelog: "1.1â†’2.0: project intake + verification commands, 8-dim coverage, 3 new templates (ecom/api/mobile), auto-recommendation engine, priority scoring formula"
+metadata: version: "2.1", changelog: "2.1: compressed 67%"
 ---
 
-Complete project intake + gap analysis for any system (SaaS, ERP, web, mobile, API, desktop).8-dimension quality framework, project classification, intake checklist (roadmap/PR/PRD),and depth levels. Trigger: "gap analysis", "auditar sistema", "identificar gaps","system audit", "software assessment", "project intake".
-## Phase 0: Project Intake (NEW â€” mandatory before scoring)
-### 0.1 Classify Project TypeDetect BOTH tech layer AND business type:**Tech Layer** (how it runs):| Layer | Detected by | Examples ||-------|-------------|---------|| **Frontend** | package.json (react/vue/angular), index.html, .jsx/.tsx | React SPA, Next.js SSG, Vue SPA || **Backend** | go.mod, package.json (express/fastify), main.py, *.csproj | REST API, GraphQL, Monolith || **Database** | prisma/schema, migrations/, *.sql, docker-compose (db service) | PostgreSQL, MongoDB, Redis || **Mobile** | pubspec.yaml, Podfile, build.gradle (android) | Flutter, React Native, SwiftUI || **Desktop** | package.json (electron/tauri), *.csproj (WPF), Cargo.toml (tauri) | Electron, Tauri, WPF || **Infra** | Dockerfile, terraform/, k8s/, ansible/ | Docker Compose, K8s, IaC || **Full-stack** | Frontend + Backend signals together | Next.js, Nuxt, Remix |**Business Type** (what it does):| Type | Signals | Keywords in code/docs ||------|---------|----------------------|| **SaaS** | Multi-tenant, subscription, API-first | tenant, subscription, plan, billing || **ERP** | Inventory, invoices, CRM, logistics | invoice, order, stock, customer, vendor || **E-commerce** | Products, cart, checkout, payments | product, cart, checkout, payment, shipping || **CMS** | Content, pages, posts, users | content, page, blog, post, article || **API** | REST/GraphQL endpoints, no UI | api, endpoint, route, controller || **Web** | Public site, marketing, landing | page, landing, blog, seo || **Desktop App** | Native UI, offline-first | window, menu, dialog, tray || **Mobile App** | Touch UI, push notifications | screen, navigator, gesture |
-### 0.2 Intake Verification CommandsRun these BEFORE scoring. Each artifact gets âœ…/âŒ/âš ï¸ (exists / missing / partial).
-```bash# ðŸ“‹ Roadmap â€” check multiple locationsif (Test-Path "ROADMAP.md") { "âœ… Roadmap: ROADMAP.md" } `elseif (Test-Path "docs/roadmap.md") { "âœ… Roadmap: docs/roadmap.md" } `elseif (Test-Path "roadmap/") { "âœ… Roadmap: roadmap/ dir exists" } `else { "âŒ Roadmap: not found. Check project board or create ROADMAP.md" }# ðŸ“ PR â€” check recent activity$prs = git log --oneline -10 2>$null; if ($prs) { "âœ… PRs: Active ($(git log --oneline -5 | Measure-Object | %{$_.Count}) commits in HEAD)" } `else { "âŒ PRs: No git history found" }# ðŸ“„ PRD â€” check requirements docs$found = Get-ChildItem -Recurse -Include "*PRD*","*spec*","*requirements*","*srs*" -Exclude "*node_modules*","*.git*" | Select-Object -First 3if ($found) { "âœ… PRD: Found ($($found.Count) files: $($found[0].Name)...)" } `else { "âŒ PRD: Not found. Check docs/ or specs/ directory" }# ðŸ—ï¸ READMEif (Test-Path "README.md") { "âœ… README: exists ($((Get-Item README.md).Length / 1KB -as [int])KB)" } `else { "âŒ README: missing" }# ðŸ§ª Test strategy â€” check multiple patterns$testDir = Get-ChildItem -Directory -Include "tests","__tests__","spec","test" -ErrorAction SilentlyContinue | Select-Object -First 1$testScripts = Get-ChildItem -Recurse -Include "*test*","*spec*","*suite*" -File -Exclude "*node_modules*",".git" -ErrorAction SilentlyContinue | Select-Object -First 5if ($testDir) { "âœ… Tests: $($testDir.Name) dir exists" } `elseif ($testScripts) { "âœ… Tests: Found $($testScripts.Count) test files (e.g., $($testScripts[0].Name))" } `else { "âš ï¸ Tests: No test files found" }# ðŸ”§ CI/CD â€” check multiple CI providers$ciFiles = @()$ciFiles += Get-ChildItem -Path ".github/workflows" -Filter "*.yml" -ErrorAction SilentlyContinueif (-not $ciFiles) { $ciFiles += Get-ChildItem -Name -Filter "Jenkinsfile" -ErrorAction SilentlyContinue }if (-not $ciFiles) { $ciFiles += Get-ChildItem -Name -Filter ".gitlab-ci.yml" -ErrorAction SilentlyContinue }if (-not $ciFiles) { $ciFiles += Get-ChildItem -Name -Filter "azure-pipelines.yml" -ErrorAction SilentlyContinue }if (-not $ciFiles) { $ciFiles += Get-ChildItem -Name -Filter ".circleci/config.yml" -ErrorAction SilentlyContinue }if (-not $ciFiles) { $ciFiles += Get-ChildItem -Recurse -Name -Filter "Dockerfile" -ErrorAction SilentlyContinue | Select-Object -First 1 }if ($ciFiles) { "âœ… CI/CD: Found $($ciFiles.Count) config(s) (e.g., $($ciFiles[0]))" } `else { "âš ï¸ CI/CD: No config found" }# ðŸ“Š Monitoring â€” check known APM/config files$monPatterns = @("*sentry*","*datadog*","*newrelic*","*grafana*","*prometheus*","*openTelemetry*","*appinsights*","*bugsnag*")$mon = $monPatterns | ForEach-Object { Get-ChildItem -Recurse -Include $_ -File -Exclude "*node_modules*",".git" -ErrorAction SilentlyContinue } | Select-Object -First 1if ($mon) { "âœ… Monitoring: $($mon.Name)" } `else { "âš ï¸ Monitoring: No APM/tracing config found" }```
-### 0.4 Intake ChecklistBEFORE any layer scoring, verify project artifacts exist:| Artifact | Why it matters | How to check ||----------|---------------|--------------|| **ðŸ“‹ Roadmap** | Defines direction, priorities, milestones | Look for: ROADMAP.md, roadmap.*, docs/roadmap*, project board || **ðŸ“ PR (Pull Request)** | Shows active development, code review quality | Check recent PRs: `gh pr list`, git log, open PRs || **ðŸ“„ PRD (Product Requirements Doc)** | Documents what and why, not just how | Look for: PRD.md, spec/, requirements/, *.spec.* || **ðŸ—ï¸ README** | Project entry point, setup, architecture | README.md exists? Has: setup, arch, tech stack, how to run? || **ðŸ§ª Test Strategy** | Quality approach documented | Look for: test/, __tests__, testing strategy in docs || **ðŸ”§ CI/CD Config** | Automation pipeline | Check: .github/, Jenkinsfile, .gitlab-ci.yml, docker-compose.yml || **ðŸ“Š Monitoring** | Observability in place | Look for: metrics, alerts, dashboards, APM config |Missing artifacts = gaps to document in output. Save missing artifacts to engram for next session.
-### 0.5 8 Quality Dimensions (cross-cutting)The user's 8 dimensions map across the 6 layers:| # | Dimension | Primary Layer | Secondary | What it evaluates ||---|-----------|--------------|-----------|-------------------|| 1 | ðŸŽ¨ **UI/UX** | UX | Functional | Visual design, interaction, user flows, accessibility || 2 | ðŸ”’ **Security** | Security | Technical | Auth, encryption, vulns, secrets, compliance || 3 | âš¡ **Optimization** | Technical | Ops | Bundle size, code splitting, caching, lazy loading || 4 | ðŸ“ˆ **Performance** | Technical | Ops | Load time, render time, API latency, DB queries || 5 | ðŸ’¾ **Resource Usage** | Ops | Technical | Memory, CPU, storage, network efficiency || 6 | ðŸš€ **Project Velocity** | Business | Ops | Build time, dev loop, CI/CD speed, code generation || 7 | ðŸ“± **Responsive Design** | UX | Technical | Mobile-first, breakpoints, touch, print, cross-browser || 8 | ðŸ—ï¸ **Infrastructure** | Ops | Security | Docker, cloud, scaling, DR, monitoring, logging |---
-## Depth Levels| Level | When | Time ||-------|------|------|| **Quick** (1) | Daily standup, code review pre-check | 5-10 min â†’ Intake only + 2 dims || **Standard** (2) | New feature, sprint planning | 30-60 min â†’ Intake + all 8 dims || **Deep** (3) | Pre-launch, DD, platform migration | 2-4 hrs â†’ Full intake + all 8 dims verified |
-## Quantitative Scoring (1-10)| Score | Meaning ||-------|---------|| 9-10 | Mature â€” industry-leading || 7-8 | Solid â€” minor gaps, no blockers || 5-6 | Functional â€” gaps exist, need attention || 3-4 | Weak â€” systemic issues || 1-2 | Critical â€” needs rebuild |
-## Core Framework (6 Layers) + 8-Dim Coverage
-### 1. ðŸŽ¯ Functional**Covers dims**: UI/UX (flows), Project Velocity (logic complexity)- [ ] Core flows mapped vs requirements/competitors?- [ ] Edge cases: empty, error, limit states documented?- [ ] Business rules: in code only vs documented?- [ ] Roadmap alignment: current features match roadmap?- **Quick**: walk top 3 user journeys. **Deep**: full feature matrix + competitor diff.- **ISO 25010**: Functional Suitability (completeness, correctness, appropriateness)
-### 2. ðŸ—ï¸ Technical**Covers dims**: Optimization, Performance, Resource Usage- [ ] Modularity? Deploy independence? Tech debt visible?- [ ] Data: schema normalized? migrations safe? backup/restore tested?- [ ] âš¡ **Optimization**: bundle size? code splitting? tree shaking? lazy loading?- [ ] ðŸ“ˆ **Performance**: N+1 queries? API latency p95? caching strategy? connection pooling?- [ ] ðŸ’¾ **Resource Usage**: memory leaks? CPU hotspots? storage bloat? network calls minimized?- [ ] Testing: unit+integration+e2e coverage on critical paths?- **Auto checks**:
-```bash  # Coverage  go test ./... -coverprofile=cover.out && go tool cover -func=cover.out | tail -1  npx jest --coverage --silent 2>/dev/null | grep "Statements" | tail -1  # Anti-patterns  grep -rn "TODO\|FIXME\|HACK\|XXX\|BUG" --include="*.go" --include="*.ts" process . | wc -l  grep -rn "console.log\|fmt.Print" --include="*.go" --include="*.ts" . | grep -v "_test" | wc -l  # Bundle size (web)  npx source-map-explorer build/static/js/*.js 2>/dev/null | head -5```- **ISO 25010**: Performance Efficiency, Maintainability, Reliability
-### 3. ðŸ”’ Security**Covers dims**: Security, Infrastructure (network security)- [ ] Auth: MFA? RBAC? rate limiting? session management? OAuth2? SSO?- [ ] Data: encryption at rest (AES-256) + transit (TLS 1.3)? PII handling?- [ ] Secrets: hardcoded? vault? rotated? .env in git?- [ ] Dependencies: known vulns? (`npm audit`, `go mod verify`, `pip audit`)- [ ] Input validation: ALL user inputs? SQL injection? XSS? CSRF?- [ ] API security: rate limiting? JWT rotation? CORS configured?- [ ] ðŸ—ï¸ **Infrastructure security**: network segmentation? firewall? WAF? DDoS protection?- **Reference**: OWASP ASVS 5.0 L1 minimum. L2 for fintech/health.- **Auto checks**:
-```bash  security-scanner  # built-in skill  npm audit 2>/dev/null | grep "critical\|high" | head -5  go list -json -u all 2>/dev/null | grep "Vulnerability" | head -5  grep -rn "secret\|password\|api_key\|token\|credential" --include="*.go" --include="*.ts" . --exclude-dir={node_modules,.git,vendor} | head -10```
-### 4. ðŸ§­ UX**Covers dims**: UI/UX, Responsive Design- [ ] ðŸŽ¨ **UI/UX**: primary task friction points? steps to complete? feedback on actions?- [ ] Loading/empty/error states for EVERY state?- [ ] ðŸŽ¨ **UI/UX**: visual design consistent? design system? component library?- [ ] ðŸ“± **Responsive Design**: mobile-first? breakpoints defined? touch targets â‰¥48px?- [ ] ðŸ“± **Responsive Design**: tested on real devices? print styles? cross-browser?- [ ] Accessibility: WCAG 2.2 AA? Keyboard nav? Focus visible? Screen reader?- **Reference**: WCAG 2.2 AA (86 criteria, 4 principles: POUR)- **Quick**: tab through entire flow (focus visible? skip links?), check contrast, test without mouse.- **Auto checks**:
-```bash  # If web app  npx lighthouse {url} --view 2>/dev/null | grep -E "accessibility|Accessibility|performance|Performance" | head -5  npx axe {url} 2>/dev/null | grep "Violations" | head -3```
-### 5. ðŸš€ Ops**Covers dims**: Resource Usage, Infrastructure, Project Velocity- [ ] Deploy: CI/CD? rollback? blue/green? feature flags? zero-downtime?- [ ] ðŸ—ï¸ **Infrastructure**: Docker? orchestration? cloud provider? auto-scaling?- [ ] ðŸ—ï¸ **Infrastructure**: monitoring? logging? metrics? alerts? dashboards? SLAs/SLOs?- [ ] ðŸ’¾ **Resource Usage**: cost monitoring? reserved instances? right-sizing?- [ ] ðŸš€ **Project Velocity**: build time? CI pipeline speed? dev loop? hot reload?- [ ] Documentation: API docs? runbooks? architecture diagrams current?- **Quick**: check CI status, deploy script, error tracking. **Deep**: DR test, load test, restore test.- **ISO 25010**: Reliability (maturity, availability, fault tolerance, recoverability)
-### 6. ðŸ’° Business**Covers dims**: Project Velocity- [ ] Pricing aligned with value? Feature adoption data?- [ ] Competitor comparison: what they have that you don't?- [ ] ðŸš€ **Project Velocity**: Time-to-market? Release cadence? Feature throughput?- [ ] TCO: dev hours? infra? maintenance burden?- [ ] Roadmap: defined and tracked? Stakeholder buy-in?- **Quick**: pricing page, competitor matrix. **Deep**: unit economics, churn, LTV/CAC.---
-## Workflow (8 steps)
-```0. INTAKE   â”œâ”€ Classify: tech layer + business type (project-mapper)   â”œâ”€ Verify artifacts: roadmap? PR? PRD? README? Tests? CI/CD? Monitoring?   â””â”€ Select template matching type   1. DEPTH â†’ Quick (5-10min) / Standard (30-60min) / Deep (2-4hrs)2. MAP â†’ project-mapper (structure, stack, deps, arch)3. SCORE â†’ per layer (1-10) + per dim (1-8) with evidence4. CHECKS â†’ run auto-commands from each layer section5. DOCUMENT â†’ per gap: symptom â†’ root cause â†’ impact â†’ fix6. PRIORITIZE â†’ Formula: (10 - Score) Ã— Impact Ã— Urgency7. RECOMMEND â†’ Auto-generate fixes per dim scored â‰¤68. TRACK â†’ engram for recurring gaps + anti-pattern catalog```
-## Auto-Recommendation EngineAfter scoring, auto-generate recommendations based on scores and project type:| Score | Label | Auto-recommendation ||-------|-------|---------------------|| 1-3 | Critical | ðŸ”´ IMMEDIATE: Blocking issue. Stop other work. || 4-5 | Weak | ðŸŸ  This sprint: Plan fix in current/next sprint. || 6-7 | Fair | ðŸŸ¡ Next quarter: Schedule improvement. || 8-10 | Mature | âœ… Monitor: Maintain, check in next review. |**Priority Score Formula**: `Priority = (10 - Score) Ã— (Impact Weight / 10) Ã— Urgency Multiplier`Where:- **Impact Weight**: 1.0 (Critical path) Â· 0.7 (Important) Â· 0.4 (Nice to have) Â· 0.1 (Minor)- **Urgency Multiplier**: 2.0 (Now) Â· 1.0 (Soon) Â· 0.5 (Later)**Auto-output** (for each dim scored â‰¤6):
-```
-## Recommendation: {dim}**Current Score**: X/10 | **Target**: 7/10**Priority**: {CRITICAL|HIGH|MEDIUM|LOW} (score: {formula result})**Why**: {evidence from checks}**Fix**: {concrete next step}**Effort Estimate**: {hours/days}**Depends On**: {other gaps to fix first}
-```
-## Per-Type Priority MatrixWeights vary by business type (see templates for full weights).Default weights when type unknown:| Layer | Weight | Maps to dims ||-------|--------|--------------|| Functional | 20% | UI/UX (flows) || Technical | 25% | Optimization, Performance || Security | 20% | Security, Infrastructure || UX | 15% | UI/UX, Responsive Design || Ops | 10% | Resource Usage, Infrastructure || Business | 10% | Project Velocity |
-## Prioritization Matrix| Impact â†“ \ Urgency â†’ | Now | Soon | Later ||----------------------|-----|------|-------|| **Critical** | ðŸ”´ DO NOW | ðŸŸ  Plan sprint | ðŸŸ¡ Backlog || **High** | ðŸŸ  Sprint | ðŸŸ¡ Next sprint | âšª Icebox || **Medium** | ðŸŸ¡ This month | âšª Next quarter | âšª Watch || **Low** | âšª When possible | âšª If overlaps | âšª Ignore |
-## Output Format
-```
-## Project Intake Report- **Project**: {name}- **Tech Layer**: {frontend|backend|db|mobile|desktop|full-stack|infra}- **Business Type**: {saas|erp|ecom|cms|api|web|desktop|mobile}- **Template**: {saas|erp|ecom|web|api|mobile|desktop}-template.md- **Depth Level**: {Quick|Standard|Deep}- **Artifacts Found**:  â”œâ”€ ðŸ“‹ Roadmap: âœ…/âŒ/âš ï¸ {path if found}  â”œâ”€ ðŸ“ PR/Commits: âœ… ({N} recent commits)  â”œâ”€ ðŸ“„ PRD/Specs: âœ…/âŒ ({N} files)  â”œâ”€ ðŸ—ï¸ README: âœ… ({size})  â”œâ”€ ðŸ§ª Tests: âœ…/âš ï¸/âŒ ({details})  â”œâ”€ ðŸ”§ CI/CD: âœ…/âš ï¸/âŒ ({provider})  â””â”€ ðŸ“Š Monitoring: âœ…/âš ï¸/âŒ ({tool})
-## 8-Dimension Summary| Dim | Score | Key Gap ||-----|-------|---------|| ðŸŽ¨ UI/UX | X/10 | {one-liner} || ðŸ”’ Security | X/10 | {one-liner} || âš¡ Optimization | X/10 | {one-liner} || ðŸ“ˆ Performance | X/10 | {one-liner} || ðŸ’¾ Resource Usage | X/10 | {one-liner} || ðŸš€ Project Velocity | X/10 | {one-liner} || ðŸ“± Responsive Design | X/10 | {one-liner} || ðŸ—ï¸ Infrastructure | X/10 | {one-liner} |
-## Gap Details**Gap**: {one-liner}**Layer**: {1-6} | **Dim**: {1-8} | **Score**: {X/10}**Symptom**: {evidence}**Root cause**: {why exists}**Fix**: {how to solve} | **Effort**: {S/M/L/XL}**Priority**: {color}
-## Auto-Recommendations| Dim | Score | Priority | Fix ||-----|-------|----------|-----|| {dim} | {X/10} | {CRITICAL/HIGH/MEDIUM/LOW} | {one-liner fix} |
-## Next Steps1. {immediate action} â€” Priority: {P1/P2/P3}2. {short-term action} â€” Priority: {P1/P2/P3}3. {medium-term action} â€” Priority: {P1/P2/P3}
-```
-## TemplatesPer-type weighted checklists â†’ `assets/{type}-template.md`| Type | Template | Priority Weight ||------|----------|----------------|| SaaS | saas-template | Ops 40%, Security 35%, Business 25% || ERP | erp-template | Functional 50%, Security 35% || E-commerce | ecom-template | UX 40%, Security 30%, Performance 30% || Web | web-template | UX 40%, Technical 30%, Security 25% || API | api-template | Security 40%, Technical 35%, Ops 25% || Desktop | desktop-template | UX 40%, Functional 30%, Ops 30% || Mobile | mobile-template | UX 45%, Performance 35%, Resource 20% |
-## Cross-References- **project-mapper**: structure + stack + type detection- **security-scanner**: pre-audit security- **code-review-agent**: code-level gap detection- **senior-engineer**: trade-off analysis, fix prioritization- **performance-tracker**: dedicated mobile/desktop/web perf scoring (dims 3-5)
-## Anti-PatternsâŒ Skip intake phase â€” classification prevents wrong templateâŒ Ignore project velocity â€” slow dev loop kills productivity regardless of code qualityâŒ Skip responsive design for "internal tools" â€” mobile-first is default in 2026âŒ Infrastructure as afterthought â€” non-functional reqs need proactive designâŒ Score without evidence â€” Default-FAIL appliesâŒ One-shot analysis â€” gaps need tracking; use engram
+# Gap Analysis
+
+Complete intake + 8-dim quality audit for SaaS/ERP/web/mobile/API/desktop.
+
+## Phase 0: Project Intake
+
+### 0.1 Classify
+**Tech Layer**: Frontend (react/vue/angular/.jsx) | Backend (go.mod/express/main.py) | Database (prisma/migrations/.sql) | Mobile (pubspec.yaml/Podfile) | Desktop (electron/tauri/WPF) | Infra (Dockerfile/terraform/k8s) | Full-stack (frontend+backend signals)
+**Business Type**: SaaS (tenant/subscription/billing) | ERP (invoice/order/stock) | E-commerce (product/cart/checkout) | CMS (content/page/post) | API (endpoint/route/controller) | Web (landing/page/seo) | Desktop (window/menu) | Mobile (screen/navigator/gesture)
+
+### 0.2 Intake Verification
+`Test-Path ROADMAP.md` | `git log --oneline -10` | `Get-ChildItem *PRD*,*spec*,*requirements*` | `Test-Path README.md` | `Get-ChildItem tests,__tests__,spec -Directory` | `Get-ChildItem .github/workflows, Jenkinsfile, .gitlab-ci.yml` | `Get-ChildItem *monitor*,*grafana*,*datadog*`
+
+### 0.3 Artifact Checklist
+| Artifact | Why | Check |
+|----------|-----|-------|
+| Roadmap | Direction, priorities | ROADMAP.md, docs/roadmap/, project board |
+| PR/Commits | Active dev, review quality | `gh pr list`, git log |
+| PRD/Specs | What and why | PRD.md, spec/, requirements/ |
+| README | Entry point, setup | Has setup/arch/stack/how-to-run? |
+| Tests | Quality approach | test/, __tests__, coverage config |
+| CI/CD | Automation | .github/, Jenkinsfile, .gitlab-ci.yml |
+| Monitoring | Observability | Metrics, alerts, dashboards, APM |
+
+### 0.4 8 Quality Dimensions
+| # | Dim | Primary | What |
+|---|-----|---------|------|
+| 1 | UI/UX | UX | Visual design, interaction, flows, a11y |
+| 2 | Security | Security | Auth, encryption, vulns, secrets, compliance |
+| 3 | Optimization | Technical | Bundle size, code splitting, caching, lazy loading |
+| 4 | Performance | Technical | Load time, render time, API latency, DB queries |
+| 5 | Resource Usage | Ops | Memory, CPU, storage, network efficiency |
+| 6 | Project Velocity | Business | Build time, dev loop, CI/CD speed |
+| 7 | Responsive Design | UX | Mobile-first, breakpoints, touch, cross-browser |
+| 8 | Infrastructure | Ops | Docker, cloud, scaling, DR, monitoring |
+
+## Depth Levels
+**Quick** (5-10min): Intake + 2 dims · **Standard** (30-60min): Intake + 8 dims · **Deep** (2-4hrs): Full intake + verified 8 dims
+
+## Scoring (1-10)
+9-10: Industry-leading | 7-8: Minor gaps | 5-6: Needs attention | 3-4: Systemic issues | 1-2: Needs rebuild
+
+## Core Framework (6 Layers + 8 Dims)
+
+### 1. Functional (UI/UX flows + biz logic)
+- Core flows mapped vs requirements? Edge cases (empty/error/limit)? Business rules documented? Roadmap alignment?
+- **Quick**: walk top 3 journeys. **Deep**: full feature matrix + competitor diff.
+- **ISO 25010**: Functional Suitability
+
+### 2. Technical (Optimization + Performance + Resource Usage)
+- Modularity? Schema migrations? Bundle size (source-map-explorer)? N+1 queries? API p95? Caching? Memory leaks?
+- **Auto**: `go test ./... -cover` | `npx jest --coverage` | `grep -rn "TODO|FIXME|HACK" --include="*.go,*.ts" . | wc -l`
+- **ISO 25010**: Performance Efficiency, Maintainability, Reliability
+
+### 3. Security (Security + Infra security)
+- MFA/RBAC/rate limiting? Encryption at rest+transit? Secrets in vault? `npm audit` criticals? Input validation?
+- **Auto**: `npm audit | grep "critical|high"` | `grep -rn "secret|password|api_key|token" --include="*.go,*.ts" .`
+- **Reference**: OWASP ASVS 5.0 L1
+
+### 4. UX (UI/UX + Responsive)
+- Task friction points? Loading/empty/error states? Design system? Touch targets >=48px? WCAG 2.2 AA?
+- **Quick**: tab through flow (focus visible? skip links?), check contrast, test without mouse.
+- **Auto**: `npx lighthouse {url}` | `npx axe {url} | grep Violations`
+
+### 5. Ops (Resource Usage + Infra + Velocity)
+- CI/CD + rollback? Docker/k8s? Monitoring/logging/alerts? Build time? Dev loop speed?
+- **Quick**: CI status, deploy script, error tracking. **Deep**: DR test, load test.
+- **ISO 25010**: Reliability (maturity, availability, fault tolerance)
+
+### 6. Business (Project Velocity)
+- Pricing aligned? Feature adoption? Competitor diffs? TCO? Roadmap tracked?
+- **Quick**: pricing page, competitor matrix. **Deep**: unit economics, churn, LTV/CAC.
+
+## Workflow
+1. INTAKE → classify + verify artifacts + select template
+2. DEPTH → Quick/Standard/Deep
+3. MAP → project-mapper (structure/deps/arch)
+4. SCORE → per layer (1-10) + per dim (1-8) with evidence
+5. CHECKS → auto-commands from each layer
+6. DOCUMENT → symptom → root cause → impact → fix
+7. PRIORITIZE → (10-Score) x Impact x Urgency
+8. RECOMMEND → auto-fixes for dims <=6
+
+## Auto-Recommendation
+Score 1-3: CRITICAL — stop other work | 4-5: THIS SPRINT | 6-7: NEXT QUARTER | 8-10: Monitor
+**Priority** = (10 - Score) x (Impact/10) x Urgency where Impact 1.0(critical)/0.7/0.4/0.1 and Urgency 2.0(now)/1.0(soon)/0.5(later)
+
+## Templates
+| Type | Weight Distribution |
+|------|-------------------|
+| SaaS | Ops 40%, Security 35%, Business 25% |
+| ERP | Functional 50%, Security 35% |
+| E-commerce | UX 40%, Security 30%, Performance 30% |
+| Web | UX 40%, Technical 30%, Security 25% |
+| API | Security 40%, Technical 35%, Ops 25% |
+| Desktop | UX 40%, Functional 30%, Ops 30% |
+| Mobile | UX 45%, Performance 35%, Resource 20% |
+
+## Cross-References
+- **project-mapper**: structure + stack detection | **security-scanner**: pre-audit | **code-review-agent**: code-level gaps | **senior-engineer**: trade-off analysis | **performance-tracker**: dedicated perf scoring
+
+## Anti-Patterns
+Skip intake · Ignore velocity · Skip responsive for "internal tools" · Infra as afterthought · Score without evidence · One-shot analysis
