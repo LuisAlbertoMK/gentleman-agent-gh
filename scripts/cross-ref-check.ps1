@@ -1,3 +1,5 @@
+#requires -Version 5.1
+
 <#
 .SYNOPSIS
   Validate internal references in gentleman-agent-gh repo.

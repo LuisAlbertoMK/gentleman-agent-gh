@@ -1,4 +1,6 @@
-﻿<#
+﻿#requires -Version 5.1
+
+<#
 .SYNOPSIS
   Skill Validation Protocol — multi-trial benchmark vs baseline.
 .DESCRIPTION

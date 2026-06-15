@@ -1,3 +1,5 @@
+#requires -Version 5.1
+
 # skill-test-suite.ps1 — Comprehensive skill validation
 # Usage: powershell -File scripts\skill-test-suite.ps1 [-RepoRoot <path>]
 # Returns: 0 = all pass, 1 = failures
@@ -6,7 +8,7 @@ param(
     [string]$RepoRoot = (Split-Path $PSScriptRoot -Parent)
 )
 
-$skillsDir = "$RepoRoot\skills"
+$skillsDir = "$RepoRoot\.agents\skills"
 $total = 0; $pass = 0; $fail = 0; $errors = @()
 
 Write-Host "=== Skill Test Suite ===" -ForegroundColor Cyan

@@ -1,3 +1,5 @@
+#requires -Version 5.1
+
 <#
 .SYNOPSIS
   Check skill drift between canonical source (.agents/skills/) and global config (~/.config/opencode/skills/).
@@ -33,6 +35,7 @@ param(
 $canonicalDir = Join-Path -Path $PSScriptRoot -ChildPath "..\.agents\skills"
 $globalDir = "$env:USERPROFILE\.config\opencode\skills"
 $errors = @()
+$warnings = @()
 $drifted = @()
 
 if (-not (Test-Path $canonicalDir)) { Write-Error "Canonical skills dir not found: $canonicalDir"; exit 2 }
@@ -103,14 +106,19 @@ $result = @{
   totalSkills = $canonicalSkills.Count
   junctionSkills = ($canonicalSkills | ForEach-Object { $globalItem = Get-Item (Join-Path -Path $globalDir -ChildPath $_.Name) -ErrorAction SilentlyContinue; if ($globalItem -and $globalItem.LinkType -eq "Junction") { $_ } else { $null } } | Measure-Object).Count
   realFileSkills = ($canonicalSkills | ForEach-Object { $globalItem = Get-Item (Join-Path -Path $globalDir -ChildPath $_.Name) -ErrorAction SilentlyContinue; if ($globalItem -and $globalItem.LinkType -ne "Junction") { $_ } else { $null } } | Measure-Object).Count
+  warnings = $warnings
   drifted = $drifted
   errors = $errors
-  allSynced = ($drifted.Count -eq 0 -and $errors.Count -eq 0)
+  allSynced = ($drifted.Count -eq 0 -and $errors.Count -eq 0 -and $warnings.Count -eq 0)
 }
 
 if ($Json) {
   Write-Output ($result | ConvertTo-Json -Depth 3)
 } else {
+  if ($result.warnings.Count -gt 0) {
+    Write-Output "`nWARNINGS: $($result.warnings.Count)"
+    $result.warnings | Format-Table Skill, Status, Detail -AutoSize
+  }
   if ($result.allSynced) {
     Write-Output "`nOK ALL $($result.totalSkills) skills in sync!"
     Write-Output "   ($($result.junctionSkills) junctions OK, $($result.realFileSkills) real files verified)"

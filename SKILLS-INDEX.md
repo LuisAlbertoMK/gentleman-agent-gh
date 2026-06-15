@@ -3,7 +3,7 @@
 > Full trigger table for all 53 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 1.6 | **Changelog**: 1.6 (skill-validate.ps1 automation, skills.paths registered in opencode.json, performance-tracker compacted 190L→114L)
+> **Version**: 1.7 | **Changelog**: 1.7 (fix skill count 58→53 in docs, fix scripts paths, fix uninitialized var, add #requires guards)
 
 ## Triggers â†’ Skill
 

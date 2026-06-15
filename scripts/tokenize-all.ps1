@@ -1,9 +1,11 @@
+#requires -Version 5.1
+
 # tokenize-all.ps1 — Tokenize every SKILL.md in repo
 # Usage: powershell -File scripts\tokenize-all.ps1 [-Path <skills_dir>] [-OutCsv <output.csv>]
 # Dep: pip install tiktoken (optional, fallback to heuristic chars/3.5)
 
 param(
-    [string]$Path = (Join-Path (Split-Path $PSScriptRoot -Parent) "skills"),
+    [string]$Path = (Join-Path (Split-Path $PSScriptRoot -Parent) ".agents\skills"),
     [string]$OutCsv = ""
 )
 

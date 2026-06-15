@@ -104,12 +104,9 @@
 4. Update both `.agents/skills/{name}/SKILL.md` and `skills/{name}/SKILL.md` to keep in sync
 **Files**: `.agents/skills/{accessibility,performance,best-practices,seo,core-web-vitals}/SKILL.md`, `auto-metrics/SKILL.md` (Skill Validation Protocol)
 
-## TEMPLATE for new entries
-```
-## YYYY-MM-DD: Short title
-**Symptom**: 
-**Root cause**: 
-**Fix**: 
-**Prevention**: 
-**Files**: 
-```
+## 2026-06-14: Uninitialized `$warnings` in check-skill-drift.ps1
+**Symptom**: `$warnings += ...` on line 61 throws null-assignment error when GLOBAL_NOT_JUNCTION branch executes.
+**Root cause**: Variable `$warnings` was never initialized with `$warnings = @()` before the append operation.
+**Fix**: Added `$warnings = @()` alongside existing `$errors = @()` and `$drifted = @()` initializers.
+**Prevention**: Always initialize all accumulator arrays before first use. Lint PS5.1 scripts with PSScriptAnalyzer before committing.
+**Files**: `scripts/check-skill-drift.ps1`

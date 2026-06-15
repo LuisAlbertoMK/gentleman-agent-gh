@@ -1,3 +1,5 @@
+#requires -Version 5.1
+
 # intake-verify.ps1 - Project Intake Verification (7 checks + 3-iteration cycle)
 # Usage:
 #   powershell -File scripts\intake-verify.ps1 -ProjectPath "D:\myproject"

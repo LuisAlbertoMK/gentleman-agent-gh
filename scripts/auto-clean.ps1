@@ -1,3 +1,5 @@
+#requires -Version 5.1
+
 # auto-clean.ps1 — Delete temp files older than 24h in opencode temp dir
 # Usage: powershell -File auto-clean.ps1 [-MaxAgeHours 24]
 # Should run at session start per AGENTS.md "AUTO-CLEAN" rule

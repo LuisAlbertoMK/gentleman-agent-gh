@@ -21,7 +21,7 @@
     "commands/",
     "prompts/",
     "scripts/",
-    "skills/"
+    ".agents/skills/"
   ],
   "keywords": [
     "opencode",

@@ -84,7 +84,7 @@
     },
     "sdd-orchestrator": {
       "description": "SDD Orchestrator - coordinates sub-agents, never does work inline",
-      "model": "",
+      "model": null,
       "mode": "primary",
       "permission": {
         "bash": "allow",
