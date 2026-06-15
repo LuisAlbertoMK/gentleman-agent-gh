@@ -54,6 +54,16 @@
 | Test suite | `scripts/skill-test-suite.ps1` → 54 skills, 100% PASS |
 
 ### Sprint 8: Phase 1 Compactación ✅ (2026-06-14)
+
+### Sprint 9: Sparse Loading ✅ (2026-06-14)
+| Tarea | Resultado |
+|-------|-----------|
+| `scripts/skill-graph.ps1` | Resolvedor de dependencias vía BFS — 55 skills, 10 categorías, 1-hop expansion |
+| `skill-graph` skill | SKILL.md con sparse loading protocol, −85-92% tokens de skill |
+| SKILLS-INDEX.md v2.0 | skill-graph entry + dep categories, count 54→55 |
+| session-resume v2.0 | Integrado skill-graph para pre-loading contextual al resume |
+| Junction global | skill-graph registrado en `~/.config/opencode/skills/` |
+| Métricas | `docs/metricas/sparse-loading-20260614.md` — 3 tasks verificados (task→resolve→load)
 | Tarea | Resultado |
 |-------|-----------|
 | AGENTS.md Phase 1 | −44L (−21%), ~540 tokens/sesión ahorrados |
@@ -73,11 +83,12 @@
 | Activo | Detalle |
 |--------|---------|
 | 0 broken refs ✅ | Todas las referencias internas resueltas |
-| 54 skills + _shared | SKILLS-INDEX sincronizado |
+| 55 skills + _shared | SKILLS-INDEX sincronizado (v2.0) |
 | Phase 1 Compactación | ✅ Sprint 8 completado — AGENTS.md −540t/sesión, anti-pattern −67% |
+| Sparse Loading | ✅ Sprint 9 completado — skill-graph con BFS resolver, −85-92% tokens |
 | 13 commands | SDD cycle completo |
 | ~213 KB | -7.9% del peso original |
-| `scripts/` | 9 scripts: auto-clean, bash-safe, check-skill-drift, cross-ref-check, intake-verify, skill-test-suite, skill-validate, sync-junctions, tokenize-all |
+| `scripts/` | 10 scripts: auto-clean, bash-safe, check-skill-drift, cross-ref-check, intake-verify, skill-graph, skill-test-suite, skill-validate, sync-junctions, tokenize-all |
 | paths | Relativos/env — portable a otra máquina |
 | model config | `sdd-orchestrator.model` disponible en `opencode.json` |
 | test suite | 98.2% skills pass — PRODUCTION READY |

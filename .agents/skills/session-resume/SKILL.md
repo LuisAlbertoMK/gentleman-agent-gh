@@ -1,8 +1,8 @@
 ---
 name: session-resume
-description: Safe session resume — git state gate (uncommitted + unpushed) BEFORE "continuá".
+description: Safe session resume — git state gate + sparse skill pre-load + Engram recall.
 license: Apache-2.0
-metadata: version: "1.3"
+metadata: version: "2.0"
 triggers: "dónde lo dejamos", "continuá", session start in git repo
 ---
 
@@ -20,6 +20,22 @@ After git gate passes, BEFORE resuming work:
 3. Present relevant past decisions/bugfixes as context snapshot
 4. Check project fingerprint exists: `mem_search(query="project/{name}", scope=project, limit=1)`
 5. If missing → trigger Project fingerprint mode (dreaming skill)
+
+## Skill Pre-load (incremental context)
+After recall, resolve which skills are relevant to the resumed task:
+
+```powershell
+.\scripts\skill-graph.ps1 -Task "<session keywords from mem_context>" -Format Json
+```
+
+Use the output to pre-load only the resolved skills via `skill_use`. This avoids loading all 55 skills when only 3-5 are needed. Typical reduction: 55 → 4-8 (−85-92%).
+
+Example flow:
+```
+mem_context → finds "working on auth refactoring"
+→ skill-graph.ps1 -Task "auth refactoring" → [sdd-tasks, code-review-agent, refactoring-planner]
+→ skill_use @("sdd-tasks","refactoring-planner","code-review-agent")
+```
 
 ## Commands
 ```bash
@@ -40,6 +56,8 @@ Actions: commit→`git add -A`+msg · push→`git push` (quality-gate) · stash�
 
 ## Anti-Patterns
 ❌ Auto-commit/push · mid-task runs · output >10 lines · skip because "small project"
+❌ Load all skills at resume — use skill-graph for sparse pre-load
 
 ## Resources
 Engram: `mem_context` · quality-gate · recovery-protocol (frustration, not resume)
+Skill graph: `scripts/skill-graph.ps1` · `.agents/skills/skill-graph/SKILL.md`

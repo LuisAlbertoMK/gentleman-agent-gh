@@ -157,3 +157,25 @@
 - Compresión repetitiva de archivos ya compactos tiene retorno marginal decreciente (<5% Δ)
 - El bottleneck ahora no son los skills, sino el runtime (context-mode, dcp ya instalados)
 - Próximo ciclo de mejora debe enfocarse en sparse loading + incremental context retrieval
+
+---
+
+## 2026-06-14 — Sparse loading + skill-graph
+
+### Cambios
+- **`scripts/skill-graph.ps1`** — Nuevo resolvedor de dependencias: dado un task description, encuentra skills matching + 1-hop de dependencias vía BFS. Registry completo de 55 skills con triggers, categorías, dependencias.
+- **`.agents/skills/skill-graph/SKILL.md`** — Nueva skill de sparse loading. Resolución: 55 skills → 4-8 (−85-92% tokens de skill).
+- **`SKILLS-INDEX.md` v2.0** — Agregada entrada skill-graph + dep categories. Skill count: 54→55.
+- **`session-resume/SKILL.md` v2.0** — Integrado skill-graph para pre-loading de skills al reanudar sesión.
+- **Junction global** — `C:\Users\MK\.config\opencode\skills\skill-graph` → `.agents/skills/skill-graph/`
+
+### Arquitectura
+- `scripts/skill-graph.ps1`: 337L, contiene registry + grafo (adj list) + BFS resolver + output formateado
+- 10 categorías: compression, quality, memory, meta, code-ops, SDD, web-quality, specialized
+- Edge types: `depends_on` (carga obligatoria), `related` (carga sugerida)
+- Output: matched skills + expanded dependencies por separado
+
+### Lecciones
+- `@()` arrays con `-Description` que contiene `(comma, args)` rompen PS5.1 parser. Solución: evitar comma-separated lists en paréntesis dentro de strings descriptivos.
+- `Format-Table` requiere PSCustomObject (no hashtable) para columnas correctas. Hashtables muestran keys como filas.
+- ctx_batch_execute corre en shell, no PowerShell — comandos PS nativos fallan.

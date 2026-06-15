@@ -1,9 +1,9 @@
 ﻿# SKILLS INDEX
 
-> Full trigger table for all 54 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 55 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 1.9 | **Changelog**: 1.9 (new scripts: ensure-tools, token-count, bench-file-io; compressed gap-analysis -67%, perf-tracker -26%)
+> **Version**: 2.0 | **Changelog**: 2.0 (new skill: skill-graph — sparse loading resolver; added dep categories)
 
 ## Triggers â†’ Skill
 
@@ -65,12 +65,13 @@
 | Performance mode, dev mode, modo desarrollo, resource priority, high performance | development-mode |
 | SDD onboard, onboarding, nuevo proyecto SDD, guía SDD | sdd-onboard |
 | Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
+| Sparse loading, skill resolution, relevant skills, which skill, resolver skill, minimo skills | skill-graph |
 
 ## Quick groups
 - **Compression/style**: karpathy-prompt, karpathy-loop, lean-context
 - **Quality**: quality-gate, auto-metrics, immune-system, code-review-agent, performance-tracker
 - **Memory**: session-resume, code-memory, dreaming
-- **Skills meta**: skill-creator, skill-registry, skill-improver, skill-digestion
+- **Skills meta**: skill-creator, skill-registry, skill-improver, skill-digestion, skill-graph
 - **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner
 - **SDD**: sdd-{init,explore,propose,spec,design,tasks,apply,verify,archive}
 
@@ -88,5 +89,6 @@
 - `scripts/ensure-tools.ps1` — verify rg/sg/gh are in PATH
 - `scripts/token-count.ps1` — count ~tokens in files (4 chars/token)
 - `scripts/bench-file-io.ps1` — benchmark 3 file I/O methods × N runs
+- `scripts/skill-graph.ps1` — sparse loading resolver: find relevant skills + deps for any task
 
 **Web-quality skills** mirror: `.agents/skills/{name}/` ←→ `skills/{name}/` (synced via junction)
