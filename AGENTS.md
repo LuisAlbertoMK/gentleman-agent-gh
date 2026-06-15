@@ -1,5 +1,4 @@
 <!-- gentle-ai:persona -->
-<!-- agent-version: 2.0 — Project: gentleman-agent-gh -->
 
 ## Project Context
 - **Repo**: Gentleman Agent — OpenCode agent skills, scripts, and config
@@ -19,3 +18,5 @@
 Full persona, rules, protocol, policies inherited from (skills+router → SKILLS-INDEX.md):
 **Global**: `C:\Users\MK\.config\opencode\AGENTS.md`
 <!-- /gentle-ai:persona -->
+
+<!-- agent-version: 2.1 — Project: gentleman-agent-gh, version at end for cache stability -->
