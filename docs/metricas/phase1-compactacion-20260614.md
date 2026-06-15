@@ -64,6 +64,25 @@
 | Plugins+MCP | done | 0% | global config ✅ |
 | Quality gate + commit | done | 0% | git log ✅ |
 
+## Auto-mejora AGENTS.md (post-Phase 1)
+
+| Métrica | Before | After | Delta | Fuente |
+|---------|--------|-------|-------|--------|
+| Version position | char 27 (~8t) | char 8963 (~2561t) | movido al fin | `grep "agent-version"` |
+| Cache patterns in 1K | 2 | 0 | −2 | `Select-String` |
+| Total chars | 9191 | 9067 | −124 | `Length` |
+| Tokens est | ~2626t | ~2591t | −35t | chars/3.5 |
+| HTML comments | 7/7 | 7/7 | balanced | count |
+
+### Líneas comprimidas
+
+| Línea | Before chars | After chars | Δ |
+|-------|-------------|-------------|---|
+| STABILITY FIRST | 153 | 100 | −53 |
+| UNKNOWN intake | 168 | 120 | −48 |
+| Quality Standard | 141 | 118 | −23 |
+| **Total** | **462** | **338** | **−124** |
+
 ## Lección aprendida
 
 > **Sesión actual**: Varios números fueron inflados sin verificación (AGENTS.md before, ratio 33.3×).

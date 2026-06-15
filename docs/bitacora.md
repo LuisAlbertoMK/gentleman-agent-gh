@@ -34,6 +34,12 @@
 - **Métricas corregidas**: eliminados números inflados (33.3× → 24.4× real, AGENTS.md before→❌ no verificable)
 - **Lección**: solo métricas verificables con fuente. Estimar != medir.
 
+### Auto-mejora AGENTS.md (2026-06-14)
+- **Version marker**: movido de línea 2 a línea 167 (fin del prompt). Asegura prompt cache estable (~2561t).
+- **Cache stability**: 0 version patterns en primeros 1K chars (antes 2). Prompt caching más efectivo.
+- **Token savings**: 124 chars (−35t) comprimiendo 3 líneas verbosas.
+- **Líneas comprimidas**: STABILITY FIRST (−53 chars), UNKNOWN intake (−48 chars), Quality Standard (−23 chars).
+
 ### Benchmarks
 - NVMe 256MB sequential read: 1432.3 MB/s
 - ReadAllBytes 100MB: 960.9 MB/s
