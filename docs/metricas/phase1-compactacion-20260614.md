@@ -15,7 +15,7 @@
 | Skill count (SKILLS-INDEX) | inconsistente | 54 | unificado |
 | Skill count (ROADMAP) | inconsistente | 54 | unificado |
 | opencode.json hardcode | C:\Users\MK\... | portable (PATH) | eliminado |
-| Model config | null | claude-sonnet-4-6 | pinned |
+| Model config | null | sugerencia (no hardcode) | documentado |
 | sdd-onboard trigger | ausente | presente | agregado |
 | Plugins | 0 | 3 (dcp, skillful, lazy-loader) | +3 |
 | MCP servers | 0 | 3 (context7, engram, context-mode) | +3 |

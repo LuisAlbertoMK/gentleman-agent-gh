@@ -27,6 +27,11 @@
 3. **ReadAllBytes > Get-Content**: 33.3x más rápido para archivos grandes.
 4. **engram via PATH**: evitar hardcode de rutas de usuario.
 
+### Fixes post-commit (2026-06-14)
+- **ROADMAP**: agregado Sprint 8 Phase 1 Compactación
+- **review-gentleman-agent-gh.md**: eliminado
+- **Model hardcode revert**: gentleman-vMK + global sdd-orch — los modelos van como sugerencia, no fijos
+
 ### Benchmarks
 - NVMe 256MB sequential read: 1432.3 MB/s
 - ReadAllBytes 100MB: 960.9 MB/s
