@@ -84,7 +84,7 @@
     },
     "sdd-orchestrator": {
       "description": "SDD Orchestrator - coordinates sub-agents, never does work inline",
-      "model": null,
+      "model": "claude-sonnet-4-6",
       "mode": "primary",
       "permission": {
         "bash": "allow",
@@ -167,7 +167,7 @@
     },
     "engram": {
       "command": [
-        "C:\\Users\\MK\\AppData\\Local\\engram\\bin\\engram.exe",
+        "engram",
         "mcp",
         "--tools=agent"
       ],

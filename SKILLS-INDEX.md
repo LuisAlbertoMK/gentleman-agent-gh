@@ -63,6 +63,7 @@
 | Web quality audit, lighthouse audit, review web quality, check page quality | web-quality-audit |
 | Skill validation, benchmark, multi-trial, validate skill, 3 trials, medir skill | skill-validate |
 | Performance mode, dev mode, modo desarrollo, resource priority, high performance | development-mode |
+| SDD onboard, onboarding, nuevo proyecto SDD, guía SDD | sdd-onboard |
 | Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
 
 ## Quick groups

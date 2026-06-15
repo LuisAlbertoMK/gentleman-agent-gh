@@ -51,7 +51,7 @@
 | Tarea | Resultado |
 |-------|-----------|
 | Model fields | `opencode.json` → `sdd-orchestrator.model` added |
-| Test suite | `scripts/skill-test-suite.ps1` → 57 skills, 100% PASS |
+| Test suite | `scripts/skill-test-suite.ps1` → 54 skills, 100% PASS |
 
 ---
 
@@ -60,7 +60,7 @@
 | Activo | Detalle |
 |--------|---------|
 | 0 broken refs ✅ | Todas las referencias internas resueltas |
-| 53 skills + _shared | SKILLS-INDEX sincronizado |
+| 54 skills + _shared | SKILLS-INDEX sincronizado |
 | 13 commands | SDD cycle completo |
 | ~213 KB | -7.9% del peso original |
 | `scripts/` | 9 scripts: auto-clean, bash-safe, check-skill-drift, cross-ref-check, intake-verify, skill-test-suite, skill-validate, sync-junctions, tokenize-all |
