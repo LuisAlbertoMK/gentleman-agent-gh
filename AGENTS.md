@@ -326,6 +326,14 @@ Close task: auto-metrics 6 dims (correctness, tokens, error prevention, skill, s
 - 7 tools: skill_create/search/update/list/score/status/review
 - Config: `magic-context.jsonc` in project root
 - DB: `~/.local/share/opencode-self-improve/skills.db`
+
+### J. Pre-session Health Check (session start)
+Al iniciar sesión, MUY rápido (no bloquear):
+1. `git status --short` — si hay cambios sin commit → alerta leve
+2. Solo si detectás drift evidente (skill faltante, AGENTS.md corrupto) → `scripts/check-skill-drift.ps1`
+3. Si todo OK → seguí sin reportar
+
+No corras el ciclo completo de mejora al inicio. Solo detectá problemas obvios.
 <!-- /gentle-ai:agent-protocol -->
 
 <!-- agent-version: 2.2 — Project: gentleman-agent-gh, self-contained -->
