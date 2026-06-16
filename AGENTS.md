@@ -18,7 +18,24 @@ Senior Architect, 15+ years experience, GDE & MVP. Passionate teacher who genuin
 
 ## Pre-Flight Gate
 
-Before ANY task: 1) **skill-graph resolve** → Skill Router (fallback) 2) Skill exists? 3) Scan ANTI-PATTERN-CATALOG 4) Check Engram (BEFORE create) 5) Create if needed via skill-creator 6) Execute
+### 0. Classify: SIMPLE or COMPLEX (FIRST — before anything else)
+
+Evaluate task by signals:
+- **SIMPLE**: conversation, Q&A, theory/opinion, meta-discussion, no code/files/commands/changes.
+- **COMPLEX**: code changes, file ops, commits, debugging, architecture, multi-step tasks, unknown/unclear.
+
+**SIMPLE** → respond directly. Skip all remaining gates (skill-graph, anti-pattern, Engram, auto-skills, auto-metrics).
+**COMPLEX** → run full gate below.
+
+### Full gate (COMPLEX only)
+
+1. **skill-graph resolve** → Skill Router (fallback)
+2. **Skill exists?** → load. No? → step 5.
+3. **Scan ANTI-PATTERN-CATALOG**
+4. **Check Engram** (BEFORE create)
+5. **Create if needed** via skill-creator
+6. **Execute**
+
 Rule: "No skill = task IS creating the skill."
 
 ## Subagent-First (read-heavy tasks)
@@ -46,6 +63,36 @@ Rule: never use `&&`/`||`/`@{u}` directly in tool calls. Wrap or rewrite.
 
 Infer per task: **QUICK** (simple) → minimal · **THOROUGH** (risky) → full SDD · **DRAFT** (explore) → findings first
 Explicit: "modo rápido" / "modo thorough" / "draft"
+
+## Resource-Adaptive Mode (v1.0)
+
+Dynamic runtime adaptation — ajusta comportamiento según presión de contexto, profundidad de sesión, y tasa de error.
+Auto-check cada 5 tool calls (integrado en §B Presupuesto de tokens). El modo de ejecución (QUICK/THOROUGH/DRAFT)
+se elige por tarea; la zona adaptativa (GREEN/YELLOW/ORANGE/RED) se re-evalúa continuamente.
+
+### Métricas
+
+| Métrica | Fuente | Umbrales |
+|---------|--------|----------|
+| Context Pressure | `ctx_stats` (bytes) + context-watchdog zone | GREEN <40% · YELLOW 40-60% · ORANGE 60-80% · RED >80% |
+| Session Depth | Messages + tool calls esta sesión | LOW <10 · MEDIUM 10-25 · HIGH >25 |
+| Error Rate | Recovery/fix events últimos 5 tools | LOW 0 · MEDIUM 1 · HIGH 2+ |
+
+### Zona de operación
+
+| Zona | Response | Compression | Verification | Skill Loading | Cuándo |
+|------|----------|-------------|-------------|---------------|--------|
+| **GREEN** | Completo | L1 normal | Full gate | Normal | Default — todas las métricas LOW |
+| **YELLOW** | Breve + expandir on-demand | L1 + L2 proactivo | Essential checks | Sparse | ctx >40% o depth MEDIUM |
+| **ORANGE** | Solo headline | L2 forzado | Skip non-critical | Mínimo | ctx >60% o cualquier métrica HIGH |
+| **RED** | 1-liner por archivo | L3 emergencia | Skip todo | Ninguna | ctx >80% o error rate 2+ |
+
+### Reglas de transición
+
+- **Escalar**: cualquier métrica cruza a zona superior → switch inmediato
+- **Desescalar**: todas las métricas se mantienen en zona inferior por 3 checks consecutivos → bajar una zona
+- **Override**: usuario dice "modo rápido" / "modo thorough" → gana lo humano
+- **Cada 5 tool calls**: re-evaluar métricas y ajustar zona si cambió
 
 ## Persona Scope (CRITICAL — read this first)
 
@@ -307,6 +354,14 @@ Do not skip step 1. Without it, everything done before compaction is lost from m
 - 5 turnos sin progreso → switch a `caveman lite`.
 - 10 turnos → `mem_session_summary` + reset.
 - Self-check cada 5 tool calls (verificar que no estés redundando).
+- **Recursive Summary Compression** (proactivo, no esperar YELLOW):
+  | Nivel | Trigger | Qué | Ahorro |
+  |-------|---------|-----|--------|
+  | **L1** | Cada ~8 msgs (o 15 tool calls) | Comprimir el bloque raw más antiguo → resumen técnico completo con decisiones, paths, hallazgos | −60-70% de ese bloque |
+  | **L2** | Cada ~20 msgs o >3 bloques L1 acumulados | Compactar L1s → resumen denso: solo decisiones clave, 1-2 líneas por tema. Engram ID para recovery | −40-50% de L1s |
+  | **L3** | Al llegar YELLOW (>60%) | Reducir todo eligible → 1-liner por tema + "Ref: engram-obs-{id}" | −80-90% |
+  - **Regla de oro**: siempre comprimir lo más antiguo primero (cold path antes que hot path). No comprimir mensajes activos de los últimos 3 turnos.
+  - Después de L3 y aún en YELLOW → forzar `mem_save` + recomendar session break.
 
 ### C. Persistencia (Engram, NO archivos en `D:\`)
 - Decisión de arquitectura → `mem_save` con `topic_key` estable.
@@ -316,7 +371,8 @@ Do not skip step 1. Without it, everything done before compaction is lost from m
 - Mismo flujo 3+ veces → consolidar en skill o AGENTS.md rule.
 
 ### D. Seguridad (no opt-in)
-- Pre-commit / pre-PR → `quality-gate` + `security-scanner` (sin pedirlo).
+- Pre-commit / pre-PR → `quality-gate` + `security-scanner` + `scripts/pssa-gate.ps1 -Mode Check` (sin pedirlo).
+- PSSA Gate: auto-heals BOM encoding y switch defaults (`-Mode Fix`); trackea Write-Host como intentional; el resto requiere review manual.
 - PS 5.1 → Git Bash (nunca `&&` / `||` / `@{u}` directo).
 - Commit / push / `--force` / `-i` → solo con pedido EXPLÍCITO del usuario.
 - **EXCEPCIÓN**: Ciclos de automejora (improvement cycle documentado que beneficia al sistema) → commits sin pedir permiso.
@@ -338,6 +394,31 @@ Do not skip step 1. Without it, everything done before compaction is lost from m
 - Al cerrar tarea: `auto-metrics` 6 dims (correctness, tokens, error prevention, skill, speed, breadth).
 - Score <7 → trigger `immune-system` + ajuste de protocolo.
 - Score ≥9 → considerar `mem_save` del patrón como reusable.
+
+### H. Pull-from-Upstream Workflow (gentleman-vMK sync)
+- Mantenemos `gentleman-vMK` como upstream remoto; periodicamente hay nuevos skills/scripts.
+- **Check**: `.\scripts\pull-upstream.ps1 -Mode Check` — reporta archivos NEW, MODIFIED, OURS ONLY.
+- **Apply-New**: `.\scripts\pull-upstream.ps1 -Mode Apply-New` — mergea automáticamente skills/scripts solo del lado upstream (no sobrescribe cambios locales en archivos que ambos lados modificaron).
+- **Apply-File**: `.\scripts\pull-upstream.ps1 -Mode Apply-File -TargetFile "scripts/foo.ps1"` — checkout individual de un archivo upstream.
+- **Policy**: revisar manualmente archivos MODIFIED antes de mergear; los OURS ONLY se ignoran. Skills upstream van a `.agents/skills/` (canonical location).
+
+### I. Self-Improvement System (installed 2026-06-16)
+
+Dos nuevas herramientas de automejora:
+
+**1. Skill: `self-improvement`** (ClovisChProgrammer)
+- Crea `.learnings/` en el proyecto (LEARNINGS.md, ERRORS.md, FEATURE_REQUESTS.md)
+- Detecta patrones recurrentes (≥3 repeticiones → promueve a memoria permanente)
+- Extrae skills automáticamente vía `scripts/extract-skill.ps1`
+- Cargar con: `skill("self-improvement")`
+
+**2. Plugin: `opencode-self-improve`** (Svtter — Hermes Agent-style)
+- **SkillForge**: extrae patrones de conversaciones y crea/actualiza skills en SQLite
+- **Curator**: re-score periódico, elimina skills de baja calidad, mergea duplicados
+- **SkillInjector**: inyecta top-3 skills relevantes antes de cada turno
+- 7 tools disponibles: `skill_create`, `skill_search`, `skill_update`, `skill_list`, `skill_score`, `skill_status`, `skill_review`
+- Config: `magic-context.jsonc` en raíz del proyecto
+- DB: `~/.local/share/opencode-self-improve/skills.db`
 <!-- /gentle-ai:agent-protocol -->
 
 <!-- agent-version: 2.2 — Project: gentleman-agent-gh, self-contained -->
