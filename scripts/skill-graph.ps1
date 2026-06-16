@@ -56,7 +56,7 @@ function Add-Skill {
         [string[]]$Related = @(),
         [string]$Description = ""
     )
-    $script:skillRegistry += @{
+    $script:skillRegistry += [PSCustomObject]@{
         Name        = $Name
         Triggers    = $Triggers
         Category    = $Category
@@ -76,7 +76,7 @@ Add-Skill -Name "skill-digestion" -Category "compression" -Triggers @("skill dig
 # --- Quality ---
 Add-Skill -Name "quality-gate" -Category "quality" -Triggers @("quality gate","pre-commit","validate commit") -Description "Pre-commit quality gate with 4 checks" -Related @("auto-metrics","commit-crafter")
 Add-Skill -Name "auto-metrics" -Category "quality" -Triggers @("auto-score","metrics","post-task","evaluate","self-evaluate") -Description "Post-task self-evaluation with 7-dim scoring" -DependsOn @("skill-validate")
-Add-Skill -Name "immune-system" -Category "quality" -Triggers @("immune system","anti-pattern","permanent immunity","nunca mas") -Description "Permanent immunity catalog for repeated errors"
+Add-Skill -Name "immune-system" -Category "quality" -Triggers @("immune system","anti-pattern","permanent immunity","nunca mas","bug","fix","error") -Description "Permanent immunity catalog for repeated errors"
 Add-Skill -Name "code-review-agent" -Category "quality" -Triggers @("code review","CR","revisar codigo","review code") -Description "Automated code review with standards" -DependsOn @("best-practices")
 Add-Skill -Name "skill-testing" -Category "quality" -Triggers @("test skill","verify skill","coverage","skill test") -Description "Test and verify skill coverage"
 Add-Skill -Name "skill-validate" -Category "quality" -Triggers @("skill validation","benchmark","multi-trial","validate skill","3 trials") -Description "3-trial benchmark validation for skills"
@@ -126,7 +126,7 @@ Add-Skill -Name "web-quality-audit" -Category "web-quality" -Triggers @("web qua
 Add-Skill -Name "development-mode" -Category "web-quality" -Triggers @("performance mode","dev mode","modo desarrollo","high performance","modo rendimiento") -Description "System resource prioritization mode"
 
 # --- General / Specialized ---
-Add-Skill -Name "recovery-protocol" -Category "specialized" -Triggers @("recovery","no es eso","frustration","stuck","bloqueado") -Description "Recovery protocol for frustration and errors"
+Add-Skill -Name "recovery-protocol" -Category "specialized" -Triggers @("recovery","no es eso","frustration","stuck","bloqueado","bug","fix","error") -Description "Recovery protocol for frustration and errors"
 Add-Skill -Name "context-watchdog" -Category "specialized" -Triggers @("context overflow","token limit","context explosion") -Description "Monitor and prevent context window overflow"
 Add-Skill -Name "ci-cd" -Category "specialized" -Triggers @("CI/CD","pipeline","GitHub Actions","continuous integration") -Description "CI/CD pipeline automation"
 Add-Skill -Name "work-unit-commits" -Category "specialized" -Triggers @("work-unit","commit organization") -Description "Organize commits into logical work units"
@@ -254,19 +254,38 @@ $graph = New-Graph
 
 if ($ListAll) {
     $groups = $script:skillRegistry | Group-Object Category
-    $output = @()
-    foreach ($g in $groups) {
-        $output += [PSCustomObject]@{ Category = $g.Name; SkillCount = $g.Count }
-        foreach ($s in $g.Group | Sort-Object Name) {
-            $deps = if ($s.DependsOn.Count -gt 0) { $s.DependsOn -join ", " } else { "none" }
-            $rels = if ($s.Related.Count -gt 0) { $s.Related -join ", " } else { "none" }
-            $output += [PSCustomObject]@{ Category = ""; Skill = $s.Name; DependsOn = $deps; Related = $rels }
-        }
-    }
     switch ($Format) {
-        "Json" { $output | ConvertTo-Json -Depth 2 }
-        "Csv"  { $output | ConvertTo-Csv -NoTypeInformation }
-        "Text" { $output | Format-Table -AutoSize -Wrap }
+        "Json" {
+            $groups | ForEach-Object {
+                $g = $_
+                @{ Category = $g.Name; Skills = $g.Group | Sort-Object Name | ForEach-Object {
+                    @{ Name = $_.Name; DependsOn = $_.DependsOn; Related = $_.Related }
+                }}
+            } | ConvertTo-Json -Depth 3
+        }
+        "Csv" {
+            $flat = foreach ($g in $groups) {
+                foreach ($s in $g.Group | Sort-Object Name) {
+                    [PSCustomObject]@{
+                        Category   = $g.Name
+                        Skill      = $s.Name
+                        DependsOn  = if ($s.DependsOn.Count -gt 0) { $s.DependsOn -join "; " } else { "" }
+                        Related    = if ($s.Related.Count -gt 0) { $s.Related -join "; " } else { "" }
+                    }
+                }
+            }
+            $flat | ConvertTo-Csv -NoTypeInformation
+        }
+        "Text" {
+            foreach ($g in $groups) {
+                Write-Host ("`n[" + $g.Name.ToUpper() + "]  (" + $g.Count + " skills)") -ForegroundColor Green
+                $g.Group | Sort-Object Name | ForEach-Object {
+                    $deps = if ($_.DependsOn.Count -gt 0) { "  deps: " + ($_.DependsOn -join ", ") } else { "" }
+                    Write-Host ("  " + $_.Name.PadRight(22) + $deps) -ForegroundColor White
+                }
+            }
+            Write-Host ("`nTotal: " + $script:skillRegistry.Count + " skills in " + $groups.Count + " categories") -ForegroundColor Cyan
+        }
     }
     exit 0
 }

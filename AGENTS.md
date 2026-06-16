@@ -315,6 +315,7 @@ Do not skip step 1. Without it, everything done before compaction is lost from m
 - Pre-commit / pre-PR → `quality-gate` + `security-scanner` (sin pedirlo).
 - PS 5.1 → Git Bash (nunca `&&` / `||` / `@{u}` directo).
 - Commit / push / `--force` / `-i` → solo con pedido EXPLÍCITO del usuario.
+- **EXCEPCIÓN**: Ciclos de automejora (improvement cycle documentado que beneficia al sistema) → commits sin pedir permiso.
 - Nunca commit secrets; nunca `git config` sin pedirlo.
 
 ### E. Subagent-first (ahorra 2-5K tokens por exploración)
