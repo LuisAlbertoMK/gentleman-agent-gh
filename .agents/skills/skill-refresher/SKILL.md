@@ -3,7 +3,11 @@ name: skill-refresher
 description: "Detect skill drift and auto-heal — monitor health signals, regenerate stale skills, and track usage patterns"
 triggers: "Skill refresher, drift detection, auto-heal"
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.1"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "1.1"
 ---
 
 Trigger: Repeated bug, skill unused 5+ sessions, user repeats correction, Karpathy loss >5%.

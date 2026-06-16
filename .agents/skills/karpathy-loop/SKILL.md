@@ -3,7 +3,11 @@ name: karpathy-loop
 description: "Iterative prompt optimization loop — write, measure, cut, repeat with progressive compression levels and decision gates"
 triggers: "Karpathy loop, optimize prompt, measure tokens"
 license: Apache-2.0
-metadata: author: mk, version: "1.0"
+metadata:
+  tags:
+    - engineering
+  author: mk
+  version: "1.0"
 ---
 
 Trigger: "optimize prompt", "reduce tokens".

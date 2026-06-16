@@ -1,6 +1,7 @@
 # ensure-tools.ps1 — Verifica y expone herramientas esenciales en PATH
 # Uso: . .\scripts\ensure-tools.ps1  (dot-source)
 # Triple verificacion: (1) existe (2) --version (3) funcion basica
+#requires -Version 5.1
 
 Set-StrictMode -Version Latest
 

@@ -3,7 +3,11 @@ name: quality-gate
 description: "Pre-commit quality gate — TDD tests pass, secrets scan, and conventional commit validation before commit/push/PR"
 triggers: "Quality gate, pre-commit"
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.1"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "1.1"
 ---
 
 Trigger: Before any "git commit", "git push", "gh pr create".

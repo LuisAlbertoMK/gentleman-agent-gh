@@ -3,7 +3,11 @@ name: prompt-engineering
 description: "Design effective prompts using SPEARS framework — scope, principles, examples, assertions, refinements, with ReAct and multi-agent patterns"
 triggers: "Improve prompt, security, ReAct, multi-agent"
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.1"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "1.1"
 ---
 
 Trigger: "improve prompt", "ReAct", "security", "multi-agent".

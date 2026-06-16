@@ -3,7 +3,12 @@ name: gap-analysis
 description: Complete gap analysis for any system — 8-dim quality framework, project intake, priority scoring
 triggers: "Gap analysis, system audit, identificar gaps, evaluar software, project intake"
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "2.1", changelog: "2.1: compressed 67%"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "2.1"
+  changelog: "2.1: compressed 67%"
 ---
 
 # Gap Analysis

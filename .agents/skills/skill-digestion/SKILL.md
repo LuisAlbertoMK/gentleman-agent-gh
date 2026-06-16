@@ -3,7 +3,11 @@ name: skill-digestion
 description: "Digest skills on load — load only critical sections based on context budget, log resolution feedback, trigger auto-improvement"
 triggers: "Skill digestion, compact on load"
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.0"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "1.0"
 ---
 
 Trigger: Loading skills, after task completion, skill audit.

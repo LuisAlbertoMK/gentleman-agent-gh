@@ -3,7 +3,11 @@ name: context-watchdog
 description: "Monitor context window usage — YELLOW/RED zones, hallucination detection, session break recommendations"
 triggers: "Context >100K tokens, context explosion"
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.1"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "1.1"
 ---
 
 Trigger: Agent detects context growing, >100K tokens, repeated hallucinations, or "context" mention.

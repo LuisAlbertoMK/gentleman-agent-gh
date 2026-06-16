@@ -3,7 +3,11 @@ name: work-unit-commits
 description: "Organize implementation into focused work-unit commits — one deliverable per commit, tests/docs included, clean rollback capability"
 triggers: "Work-unit commits, commit organization"
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.0"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "1.0"
 ---
 
 Trigger: Implementation, commit splitting, chained PRs.

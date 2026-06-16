@@ -2,7 +2,11 @@
 name: auto-metrics
 description: Post-task self-evaluation. Score 7 dims + skill validation with multi-trial benchmark.
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "3.1"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "3.1"
 triggers: task completion, "score/metric/auto-score/cómo lo hice", session end, skill validation, benchmark
 ---
 

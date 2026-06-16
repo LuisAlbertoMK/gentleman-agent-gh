@@ -3,7 +3,11 @@ name: sdd-design
 description: "Create technical design documents with architecture decisions, data flow diagrams, file change plans, and testing approach"
 triggers: "Technical design, HOW"
 license: MIT
-metadata: author: gentleman-vMK, version: "2.1"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "2.1"
 ---
 
 Trigger: Orchestrator launches design.

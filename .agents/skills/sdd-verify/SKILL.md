@@ -3,7 +3,11 @@ name: sdd-verify
 description: "Validate implementation against specs — compliance checking, build verification, scenario mapping, and structured reports"
 triggers: "Validate vs specs, verify"
 license: MIT
-metadata: author: gentleman-vMK, version: "3.4"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "3.4"
 ---
 
 Trigger: Orchestrator launches verify.

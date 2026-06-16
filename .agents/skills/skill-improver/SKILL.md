@@ -3,7 +3,11 @@ name: skill-improver
 description: "Audit and improve skills — preserve author intent, fix frontmatter, convert tutorial prose to actionable rules, track usage"
 triggers: "Skill improvement, audit skills, refactor skills"
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.0"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "1.0"
 ---
 
 Trigger: "improve skills", "audit skills", "refactor skills".

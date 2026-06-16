@@ -3,7 +3,12 @@ name: development-mode
 description: System resource prioritization mode — RAM, CPU, GPU, file I/O optimization. Asks before activating.
 triggers: "modo desarrollo, dev mode, development mode, performance mode, resource priority, high performance, dar prioridad, maximizar rendimiento"
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.1", changelog: "1.1: compressed"
+metadata:
+  tags:
+    - tools
+  author: gentleman-vMK
+  version: "1.1"
+  changelog: "1.1: compressed"
 ---
 
 Trigger: "modo desarrollo", "dev mode", "resource priority", "modo rendimiento"

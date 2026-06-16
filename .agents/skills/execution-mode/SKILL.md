@@ -3,7 +3,12 @@ name: execution-mode
 description: "Auto-detect task execution mode — QUICK, THOROUGH, or DRAFT — based on scope, risk, familiarity, and keywords"
 triggers: "Execution mode, quick/thorough/draft"
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.1", changelog: "1.0->1.1: auto-detection mode infer from task signals"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "1.1"
+  changelog: "1.0->1.1: auto-detection mode infer from task signals"
 ---
 
 Trigger: Starting task, "modo rÃ¡pido", "modo thorough", "draft mode".

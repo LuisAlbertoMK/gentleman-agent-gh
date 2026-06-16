@@ -3,7 +3,11 @@ name: sdd-init
 description: "Bootstrap SDD project context — detect stack, init config structure, build skill registry, and persist testing capabilities"
 triggers: "SDD init, bootstrap"
 license: MIT
-metadata: author: gentleman-vMK, version: "3.2"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "3.2"
 ---
 
 Trigger: "sdd init", "openspec init".

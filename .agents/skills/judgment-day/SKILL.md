@@ -3,7 +3,12 @@ name: judgment-day
 description: "Dual adversarial code review — 2 blind judges in parallel, verdict synthesis, fix/re-judge loops until approval"
 triggers: "Judgment day, dual review, juzgar"
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.8", changelog: "1.7->1.8 (sprint 5: 80->65 lines, -18.8%, compacted protocol)"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "1.8"
+  changelog: "1.7->1.8 (sprint 5: 80->65 lines
 ---
 
 Dual adversarial review: 2 blind judges, verdict synthesis, fix/re-judge loops.Trigger: "judgment day", "juzgar", "dual review", "que lo juzguen".

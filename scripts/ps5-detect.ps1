@@ -30,12 +30,9 @@ foreach ($f in $FilePath) {
         continue
     }
 
-    $hasOp = $false
-    $foundOp = ""
     for ($i = 0; $i -lt $bytes.Length - 1; $i++) {
         if ($bytes[$i] -eq 0x26 -and $i -lt $bytes.Length - 1 -and $bytes[$i+1] -eq 0x26) {
             $hazards += "$f($([char]0x26)$([char]0x26))"
-            $hasOp = $true
             break
         }
         if ($bytes[$i] -eq 0x7C -and $bytes[$i+1] -eq 0x7C) {

@@ -3,7 +3,11 @@ name: sdd-propose
 description: "Define change proposals with scope, capabilities, approach, risks, rollback plan, and success criteria"
 triggers: "Proposal, intent, approach"
 license: MIT
-metadata: author: gentleman-vMK, version: "2.1"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "2.1"
 ---
 
 Trigger: Orchestrator launches proposal creation.

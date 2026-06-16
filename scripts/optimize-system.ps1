@@ -2,6 +2,7 @@
 # REQUIRES: PowerShell as Administrator
 # USAGE:    Right-click → "Run with PowerShell" (as Admin)
 #           OR: Start-Process powershell -Verb RunAs -ArgumentList "-File optimize-system.ps1"
+#requires -Version 5.1
 #
 # WHAT THIS DOES:
 #   1. Fix page file to 4GB (recovers ~8-10 GB on C:)
@@ -38,10 +39,10 @@ if ($SetPageFile) {
     Write-Host "`n[1/5] Setting page file to fixed 4GB..." -ForegroundColor Green
     if (-not $DryRun) {
         try {
-            $cs = Get-WmiObject Win32_ComputerSystem
+            $cs = Get-CimInstance Win32_ComputerSystem
             $cs.AutomaticManagedPagefile = $false
-            $cs.Put() | Out-Null
-            Set-WmiInstance -Class Win32_PageFileSetting -Arguments @{
+            Set-CimInstance -InputObject $cs | Out-Null
+            New-CimInstance -Namespace "root/cimv2" -ClassName Win32_PageFileSetting -Property @{
                 Name = "C:\pagefile.sys"
                 InitialSize = 4096
                 MaximumSize = 4096
@@ -73,7 +74,7 @@ if ($RunDism) {
 
     Write-Host "`n[3/5] DISM component cleanup (AnalyzeComponentStore)..." -ForegroundColor Green
     if (-not $DryRun) {
-        $dismCheck = Dism.exe /online /Cleanup-Image /AnalyzeComponentStore 2>&1
+        Dism.exe /online /Cleanup-Image /AnalyzeComponentStore 2>&1 | Out-Null
         Write-Host "  Component store analysis output above" -ForegroundColor Gray
     }
 }
@@ -109,7 +110,7 @@ if (-not $DryRun) {
 
     # Disable 8.3 filename creation (reduces directory enumeration overhead)
     try {
-        $fsutilResult = fsutil behavior set disable8dot3 1 2>&1
+        fsutil behavior set disable8dot3 1 2>&1 | Out-Null
         Write-Host "  ✓ 8.3 name creation: disabled" -ForegroundColor Green
     } catch { Write-Host "  - 8.3 tweak skipped" -ForegroundColor Gray }
 

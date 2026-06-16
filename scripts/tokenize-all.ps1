@@ -25,7 +25,7 @@ foreach ($s in $skills) {
         try {
             $escaped = $md -replace "'", "''"
             $tokens = & python -c "import tiktoken; e=tiktoken.get_encoding('cl100k_base'); print(len(e.encode(open(r'$escaped',encoding='utf-8').read())))" 2>$null
-        } catch {}
+        } catch { Write-Warning "[tokenize] tiktoken not available for $($s.Name), using heuristic" }
         $rows += [PSCustomObject]@{
             Skill = $s.Name
             Chars = $chars

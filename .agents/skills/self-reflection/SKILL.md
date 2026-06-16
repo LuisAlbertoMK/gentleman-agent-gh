@@ -2,7 +2,11 @@
 name: self-reflection
 description: Hermes closed learning loop. Reflect→learn→improve after tasks.
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "2.4"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "2.4"
 triggers: task completion, session end, error patterns, "reflexioná", "aprendé de esto"
 ---
 

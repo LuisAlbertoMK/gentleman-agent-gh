@@ -3,7 +3,12 @@ name: decision-capture
 description: "Capture every technical decision with structured format — alternatives, trade-offs, rationale, retroactive logging, and trend analysis"
 triggers: "Decision capture, trade-off log, 'voy a usar', 'decido', architecture choice"
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "2.0", changelog: "1.1->2.0: added scoring framework, trend analysis, retroactive prompts, conflict detection"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "2.0"
+  changelog: "1.1->2.0: added scoring framework
 ---
 
 Trigger: "voy a usar", "decido", "la mejor opción", trade-off analysis, architecture choice, pattern selection, "por qué X y no Y", technology comparison.

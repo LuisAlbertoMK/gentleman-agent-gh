@@ -2,6 +2,7 @@
 # Uso: .\scripts\token-count.ps1 [path1] [path2...]
 #       .\scripts\token-count.ps1 -Dir .\skills\
 #       .\scripts\token-count.ps1 -Recurse
+#requires -Version 5.1
 
 param(
   [string[]]$Path = @(),

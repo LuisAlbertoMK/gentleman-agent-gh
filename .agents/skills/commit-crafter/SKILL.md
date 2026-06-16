@@ -2,7 +2,11 @@
 name: commit-crafter
 description: Craft conventional commit messages from diff analysis.
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.1"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "1.1"
 triggers: "commit/mensaje/commit message/conventional commit"
 ---
 

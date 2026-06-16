@@ -3,7 +3,11 @@ name: command-wrapper
 description: "Run commands safely — description, error handling, output parsing, and safety wrappers for destructive operations"
 triggers: "Command wrapper, error handling, output parsing"
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.0"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "1.0"
 ---
 
 Trigger: Running bash commands, detecting errors, command output parsing.

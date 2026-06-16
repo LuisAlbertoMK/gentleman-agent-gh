@@ -4,6 +4,9 @@ description: >
   Internal shared references for SDD skills. Not an invokable skill.
 license: MIT
 metadata:
+  tags:
+    - engineering
+metadata:
   author: gentleman-programming
   version: "1.0"
 ---

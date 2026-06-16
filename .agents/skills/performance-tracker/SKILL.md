@@ -2,7 +2,11 @@
 name: performance-tracker
 description: Score and track mobile/desktop/web app performance across 6 dimensions. Continuous scoring with trend analysis.
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.2"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "1.2"
 triggers: "performance score, mobile perf, desktop perf, rendimiento, performance-tracker, app score, lighthouse, benchmark"
 ---
 

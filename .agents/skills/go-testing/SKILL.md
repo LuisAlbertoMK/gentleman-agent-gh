@@ -3,7 +3,11 @@ name: go-testing
 description: "Go testing patterns — table-driven tests, Bubbletea TUI testing with teatest, golden files, and mock strategies"
 triggers: "Go tests, Bubbletea TUI"
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.1"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "1.1"
 ---
 
 Trigger: Go tests, teatest, test coverage.

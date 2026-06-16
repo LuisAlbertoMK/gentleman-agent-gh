@@ -3,7 +3,12 @@ name: python-async
 description: "Python async/await patterns — gather vs create_task vs TaskGroup, deadlock prevention, and common asyncio pitfalls"
 triggers: "Python async, asyncio"
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.2", changelog: "1.1->1.2 (sprint 5: 78->56 lines, -28.2%, compacted patterns)"
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "1.2"
+  changelog: "1.1->1.2 (sprint 5: 78->56 lines
 ---
 
 Trigger: Python async, asyncio, coroutines, event loop.
