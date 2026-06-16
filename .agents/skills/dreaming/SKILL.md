@@ -2,7 +2,7 @@
 name: dreaming
 description: Cross-session pattern extraction via Engram. Curate memory, update skills.
 license: Apache-2.0
-metadata: version: "1.2"
+metadata: author: gentleman-vMK, version: "1.2"
 triggers: session start/end, ~5 tool calls, "dream/patrones/memory review"
 ---
 

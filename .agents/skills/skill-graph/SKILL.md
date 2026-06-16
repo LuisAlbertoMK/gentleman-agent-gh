@@ -3,7 +3,7 @@ name: skill-graph
 description: Sparse loading — resolve only relevant skills + dependencies for any task using dependency graph.
 triggers: "sparse loading, skill resolution, relevant skills, skill dependencies, which skill, skill-graph, resolver skill, minimo skills, solo skills needed"
 license: Apache-2.0
-metadata: version: "1.0"
+metadata: author: gentleman-vMK, version: "1.0"
 ---
 
 # Skill Graph — Sparse Loading Resolver

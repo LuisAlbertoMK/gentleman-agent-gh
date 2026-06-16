@@ -2,7 +2,7 @@
 name: session-resume
 description: Safe session resume — git state gate + sparse skill pre-load + Engram recall.
 license: Apache-2.0
-metadata: version: "2.0"
+metadata: author: gentleman-vMK, version: "2.0"
 triggers: ["dónde lo dejamos", "continuá", "session start in git repo"]
 ---
 
