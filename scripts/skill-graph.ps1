@@ -79,7 +79,7 @@ Add-Skill -Name "execution-mode" -Category "compression" -Triggers @("execution 
 Add-Skill -Name "skill-digestion" -Category "compression" -Triggers @("skill digestion","compact on load","compress skill") -Description "Digest and compact skills when loaded"
 
 # --- Quality ---
-Add-Skill -Name "quality-gate" -Category "quality" -Triggers @("quality gate","pre-commit","validate commit") -Description "Pre-commit quality gate with 4 checks" -Related @("auto-metrics","commit-crafter")
+Add-Skill -Name "quality-gate" -Category "quality" -Triggers @("quality gate","pre-commit","validate commit") -Description "Pre-commit quality gate with 5 checks" -Related @("auto-metrics","commit-crafter")
 Add-Skill -Name "auto-metrics" -Category "quality" -Triggers @("auto-score","metrics","post-task","evaluate","self-evaluate") -Description "Post-task self-evaluation with 7-dim scoring" -DependsOn @("skill-validate")
 Add-Skill -Name "immune-system" -Category "quality" -Triggers @("immune system","anti-pattern","permanent immunity","nunca mas","bug","fix","error") -Description "Permanent immunity catalog for repeated errors"
 Add-Skill -Name "code-review-agent" -Category "quality" -Triggers @("code review","CR","revisar codigo","review code") -Description "Automated code review with standards" -DependsOn @("best-practices")
@@ -121,6 +121,12 @@ Add-Skill -Name "sdd-verify" -Category "SDD" -Triggers @("validate vs specs","ve
 Add-Skill -Name "sdd-archive" -Category "SDD" -Triggers @("archive changes","delta to main","archivar") -Description "Archive completed changes with lineage" -DependsOn @("sdd-verify","sdd-apply")
 Add-Skill -Name "sdd-onboard" -Category "SDD" -Triggers @("SDD onboard","onboarding","nuevo proyecto SDD","guia SDD") -Description "Guide users through complete SDD cycle"
 
+# --- Coordination ---
+Add-Skill -Name "delivery-harness" -Category "coordination" -Triggers @("coordinate","orchestrate","multi-agent","delegate work") -Description "Orchestrate multi-agent work delivery" -DependsOn @("subagent-isolation","work-unit-commits") -Related @("chained-pr")
+Add-Skill -Name "chained-pr" -Category "coordination" -Triggers @("stacked PR","chained PR","sequential branches","PR chain") -Description "Manage stacked sequential PRs" -DependsOn @("work-unit-commits") -Related @("delivery-harness")
+Add-Skill -Name "subagent-isolation" -Category "coordination" -Triggers @("subagent isolation","context boundaries","delegation") -Description "Isolate subagent contexts and prevent contamination"
+Add-Skill -Name "command-wrapper" -Category "coordination" -Triggers @("command wrapper","safe execution","error handling","output parse") -Description "Safe command execution with error handling"
+
 # --- Web Quality ---
 Add-Skill -Name "accessibility" -Category "web-quality" -Triggers @("accessibility","a11y","WCAG","screen reader","keyboard nav","make accessible") -Description "Audit and improve web accessibility"
 Add-Skill -Name "performance" -Category "web-quality" -Triggers @("web performance","speed up","reduce load time","page speed","performance audit") -Description "Optimize web performance for faster loading"
@@ -140,8 +146,6 @@ Add-Skill -Name "ci-cd" -Category "specialized" -Triggers @("CI/CD","pipeline","
 Add-Skill -Name "work-unit-commits" -Category "specialized" -Triggers @("work-unit","commit organization") -Description "Organize commits into logical work units"
 Add-Skill -Name "self-reflection" -Category "specialized" -Triggers @("self-reflection","Hermes","error patterns","reflexion") -Description "Hermes closed learning loop"
 Add-Skill -Name "senior-engineer" -Category "specialized" -Triggers @("senior architect","trade-offs","system design","arquitectura") -Description "Senior engineer persona for architecture decisions"
-Add-Skill -Name "command-wrapper" -Category "specialized" -Triggers @("command wrapper","error handling","output parsing") -Description "Command wrapper with error handling"
-Add-Skill -Name "subagent-isolation" -Category "specialized" -Triggers @("subagent isolation","context boundaries") -Description "Subagent context isolation and boundaries"
 Add-Skill -Name "prompt-engineering" -Category "specialized" -Triggers @("improve prompt","ReAct","multi-agent","prompt engineering") -Description "Advanced prompt engineering techniques"
 Add-Skill -Name "go-testing" -Category "specialized" -Triggers @("Go tests","Bubbletea TUI","golang test") -Description "Go testing patterns and tools"
 Add-Skill -Name "python-async" -Category "specialized" -Triggers @("Python async","asyncio") -Description "Python async/await patterns"

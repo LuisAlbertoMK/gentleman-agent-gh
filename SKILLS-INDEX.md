@@ -1,9 +1,9 @@
 ﻿# SKILLS INDEX
 
-> Full trigger table for all 56 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 58 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 2.0 | **Changelog**: 2.0 (new skill: skill-graph — sparse loading resolver; added dep categories)
+> **Version**: 2.1 | **Changelog**: 2.1 (new skills: delivery-harness, chained-pr — coordination group)
 
 ## Triggers â†’ Skill
 
@@ -39,6 +39,8 @@
 | Execution mode, resource-adaptive zones, quick/thorough/draft | execution-mode |
 | Skill digestion, compact on load | skill-digestion |
 | Subagent isolation, context boundaries | subagent-isolation |
+| Delivery harness, orchestrate, multi-agent, delegate work | delivery-harness |
+| Chained PR, stacked PR, sequential branches, PR chain | chained-pr |
 | Command wrapper, error handling, output parsing | command-wrapper |
 | Skill refresher, drift detection, auto-heal | skill-refresher |
 | Skill improvement, audit skills, refactor skills | skill-improver |
@@ -72,6 +74,7 @@
 - **Quality**: quality-gate, auto-metrics, immune-system, code-review-agent, performance-tracker
 - **Memory**: session-resume, code-memory, dreaming
 - **Skills meta**: skill-creator, skill-registry, skill-improver, skill-digestion, skill-graph
+- **Coordination**: delivery-harness, chained-pr, subagent-isolation, command-wrapper
 - **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner
 - **SDD**: sdd-{init,explore,propose,spec,design,tasks,apply,verify,archive}
 

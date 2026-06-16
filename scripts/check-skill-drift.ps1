@@ -36,14 +36,18 @@ Set-StrictMode -Version Latest
 
 $canonicalDir = Join-Path -Path $PSScriptRoot -ChildPath "..\.agents\skills"
 $globalDir = "$env:USERPROFILE\.config\opencode\skills"
-$errors = @()
-$warnings = @()
+$errors = @( $null )
+$errors.Clear()
+$warnings = @( $null )
+$warnings.Clear()
+$drifted = @( $null )
+$drifted.Clear()
 $drifted = @()
 
 if (-not (Test-Path $canonicalDir)) { Write-Error "Canonical skills dir not found: $canonicalDir"; exit 2 }
 if (-not (Test-Path $globalDir)) { Write-Error "Global skills dir not found: $globalDir"; exit 2 }
 
-$canonicalSkills = Get-ChildItem $canonicalDir -Directory | Where-Object { $_.Name -ne '_shared' }
+$canonicalSkills = @(Get-ChildItem $canonicalDir -Directory | Where-Object { $_.Name -ne '_shared' })
 
 foreach ($skill in $canonicalSkills) {
   $skillName = $skill.Name
@@ -89,8 +93,8 @@ foreach ($skill in $canonicalSkills) {
 
 # AutoFix: create missing global junctions
 if ($AutoFix) {
-  $errorsToFix = $errors | Where-Object { $_.Status -eq "GLOBAL_MISSING" }
-  if ($errorsToFix.Count -gt 0) {
+  $errorsToFix = @($errors) | Where-Object { $_ -and $_.Status -eq "GLOBAL_MISSING" }
+  if (@($errorsToFix).Count -gt 0) {
     Write-Output "Creating $($errorsToFix.Count) missing global junctions..."
     foreach ($e in $errorsToFix) {
       $target = Join-Path -Path $canonicalDir -ChildPath $e.Skill
@@ -98,7 +102,7 @@ if ($AutoFix) {
       New-Item -ItemType Junction -Path $link -Target $target -Force | Out-Null
       Write-Output "  Created: $link -> $target"
     }
-    $errors = $errors | Where-Object { $_.Status -ne "GLOBAL_MISSING" }
+    $errors = @($errors) | Where-Object { $_ -and $_.Status -ne "GLOBAL_MISSING" }
   }
 }
 
@@ -117,21 +121,25 @@ $result = @{
 if ($Json) {
   Write-Output ($result | ConvertTo-Json -Depth 3)
 } else {
-  if ($result.warnings.Count -gt 0) {
-    Write-Output "`nWARNINGS: $($result.warnings.Count)"
-    $result.warnings | Format-Table Skill, Status, Detail -AutoSize
+  $warnCount = @($null); $warnCount.Clear(); try { $warnCount = @($result.warnings) } catch {}
+  $driftCount = @($null); $driftCount.Clear(); try { $driftCount = @($drifted) } catch {}
+  $errCount = @($null); $errCount.Clear(); try { $errCount = @($errors) } catch {}
+
+  if ($warnCount.Count -gt 0) {
+    Write-Output "`nWARNINGS: $($warnCount.Count)"
+    $result.warnings | Format-Table Skill, Status, Detail -AutoSize -ErrorAction SilentlyContinue
   }
   if ($result.allSynced) {
     Write-Output "`nOK ALL $($result.totalSkills) skills in sync!"
     Write-Output "   ($($result.junctionSkills) junctions OK, $($result.realFileSkills) real files verified)"
   } else {
-    if ($drifted.Count -gt 0) {
-      Write-Output "`nDRIFT: $($drifted.Count) skills out of sync"
-      $drifted | Format-Table Skill, Status, Detail -AutoSize
+    if ($driftCount.Count -gt 0) {
+      Write-Output "`nDRIFT: $($driftCount.Count) skills out of sync"
+      $drifted | Format-Table Skill, Status, Detail -AutoSize -ErrorAction SilentlyContinue
     }
-    if ($errors.Count -gt 0) {
-      Write-Output "`nERRORS: $($errors.Count)"
-      $errors | Format-Table Skill, Status, Detail -AutoSize
+    if ($errCount.Count -gt 0) {
+      Write-Output "`nERRORS: $($errCount.Count)"
+      $errors | Format-Table Skill, Status, Detail -AutoSize -ErrorAction SilentlyContinue
     }
     exit 1
   }
