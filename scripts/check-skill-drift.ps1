@@ -36,12 +36,8 @@ Set-StrictMode -Version Latest
 
 $canonicalDir = Join-Path -Path $PSScriptRoot -ChildPath "..\.agents\skills"
 $globalDir = "$env:USERPROFILE\.config\opencode\skills"
-$errors = @( $null )
-$errors.Clear()
-$warnings = @( $null )
-$warnings.Clear()
-$drifted = @( $null )
-$drifted.Clear()
+$errors = @()
+$warnings = @()
 $drifted = @()
 
 if (-not (Test-Path $canonicalDir)) { Write-Error "Canonical skills dir not found: $canonicalDir"; exit 2 }
@@ -121,9 +117,9 @@ $result = @{
 if ($Json) {
   Write-Output ($result | ConvertTo-Json -Depth 3)
 } else {
-  $warnCount = @($null); $warnCount.Clear(); try { $warnCount = @($result.warnings) } catch {}
-  $driftCount = @($null); $driftCount.Clear(); try { $driftCount = @($drifted) } catch {}
-  $errCount = @($null); $errCount.Clear(); try { $errCount = @($errors) } catch {}
+  $warnCount = try { @($result.warnings) } catch { @() }
+  $driftCount = try { @($drifted) } catch { @() }
+  $errCount = try { @($errors) } catch { @() }
 
   if ($warnCount.Count -gt 0) {
     Write-Output "`nWARNINGS: $($warnCount.Count)"

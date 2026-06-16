@@ -47,7 +47,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 # ============================================================
-# SKILL REGISTRY — 56 skills with triggers, categories, deps
+# SKILL REGISTRY — 60 skills with triggers, categories, deps
 # ============================================================
 
 $skillRegistry = @()
@@ -123,7 +123,9 @@ Add-Skill -Name "sdd-onboard" -Category "SDD" -Triggers @("SDD onboard","onboard
 
 # --- Coordination ---
 Add-Skill -Name "delivery-harness" -Category "coordination" -Triggers @("coordinate","orchestrate","multi-agent","delegate work") -Description "Orchestrate multi-agent work delivery" -DependsOn @("subagent-isolation","work-unit-commits") -Related @("chained-pr")
-Add-Skill -Name "chained-pr" -Category "coordination" -Triggers @("stacked PR","chained PR","sequential branches","PR chain") -Description "Manage stacked sequential PRs" -DependsOn @("work-unit-commits") -Related @("delivery-harness")
+Add-Skill -Name "chained-pr" -Category "coordination" -Triggers @("stacked PR","chained PR","sequential branches","PR chain") -Description "Manage stacked sequential PRs (refs: chaining-details.md)" -DependsOn @("work-unit-commits") -Related @("delivery-harness","branch-pr")
+Add-Skill -Name "branch-pr" -Category "coordination" -Triggers @("branch PR","branch naming","create PR","open pull request") -Description "Branch creation and PR workflow for gentle-ai" -Related @("chained-pr","issue-creation")
+Add-Skill -Name "issue-creation" -Category "coordination" -Triggers @("create issue","GitHub issue","bug report","feature request") -Description "GitHub issue creation with issue-first workflow for gentle-ai" -Related @("branch-pr")
 Add-Skill -Name "subagent-isolation" -Category "coordination" -Triggers @("subagent isolation","context boundaries","delegation") -Description "Isolate subagent contexts and prevent contamination"
 Add-Skill -Name "command-wrapper" -Category "coordination" -Triggers @("command wrapper","safe execution","error handling","output parse") -Description "Safe command execution with error handling"
 
@@ -145,6 +147,8 @@ Add-Skill -Name "context-watchdog" -Category "specialized" -Triggers @("context 
 Add-Skill -Name "ci-cd" -Category "specialized" -Triggers @("CI/CD","pipeline","GitHub Actions","continuous integration") -Description "CI/CD pipeline automation"
 Add-Skill -Name "work-unit-commits" -Category "specialized" -Triggers @("work-unit","commit organization") -Description "Organize commits into logical work units"
 Add-Skill -Name "self-reflection" -Category "specialized" -Triggers @("self-reflection","Hermes","error patterns","reflexion") -Description "Hermes closed learning loop"
+Add-Skill -Name "cognitive-doc-design" -Category "specialized" -Triggers @("doc design","documentation patterns","cognitive load","progressive disclosure") -Description "Design docs that reduce cognitive load"
+Add-Skill -Name "comment-writer" -Category "specialized" -Triggers @("comment writer","PR feedback","review comment","write feedback") -Description "Write warm, direct collaboration comments"
 Add-Skill -Name "senior-engineer" -Category "specialized" -Triggers @("senior architect","trade-offs","system design","arquitectura") -Description "Senior engineer persona for architecture decisions"
 Add-Skill -Name "prompt-engineering" -Category "specialized" -Triggers @("improve prompt","ReAct","multi-agent","prompt engineering") -Description "Advanced prompt engineering techniques"
 Add-Skill -Name "go-testing" -Category "specialized" -Triggers @("Go tests","Bubbletea TUI","golang test") -Description "Go testing patterns and tools"
