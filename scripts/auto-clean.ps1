@@ -20,6 +20,8 @@ param(
     [string]$TempDir = "$env:LOCALAPPDATA\Temp\opencode"
 )
 
+Set-StrictMode -Version Latest
+
 # Verify dir exists
 if (-not (Test-Path $TempDir)) {
     Write-Host "[auto-clean] No temp dir: $TempDir" -ForegroundColor Yellow

@@ -1,4 +1,5 @@
 #requires -Version 5.1
+Set-StrictMode -Version Latest
 <#
 .SYNOPSIS
     Bash-syntax safe executor for PowerShell 5.1 environments.

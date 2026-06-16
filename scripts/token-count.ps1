@@ -9,6 +9,8 @@ param(
   [switch]$Recurse
 )
 
+Set-StrictMode -Version Latest
+
 # Rough token counter: ~4 chars per token for code/text
 function Get-TokenCount {
   param([string]$Content)

@@ -2,6 +2,8 @@
 # Uso: . .\scripts\ensure-tools.ps1  (dot-source)
 # Triple verificacion: (1) existe (2) --version (3) funcion basica
 
+Set-StrictMode -Version Latest
+
 $tools = @{
   rg = @{
     label = "ripgrep (busqueda rapida)"

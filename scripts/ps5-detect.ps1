@@ -14,6 +14,8 @@ param(
     [string[]]$FilePath
 )
 
+Set-StrictMode -Version Latest
+
 $hazards = @()
 
 foreach ($f in $FilePath) {

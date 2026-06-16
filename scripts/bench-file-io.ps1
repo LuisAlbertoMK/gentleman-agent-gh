@@ -10,6 +10,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+Set-StrictMode -Version Latest
 
 if (-not $Path -and $Dir) {
   # Find the largest PS1 file in the project

@@ -6,10 +6,6 @@
 # WHAT THIS DOES:
 #   1. Fix page file to 4GB (recovers ~8-10 GB on C:)
 #   2. DISM component cleanup (recovers ~2-4 GB from winsxs)
-#   3. Disable hibernation (recovers hiberfil.sys = ~8 GB)
-#   4. Clean WinSxS via DISM
-#   5. Optimize services for dev workstation
-#   6. Registry tweaks for NTFS and I/O
 #
 # BASELINE before running: C: 25.7 GB free (21.7%)
 # TARGET after running:    C: ~35-40 GB free (~30-34%)
@@ -20,6 +16,8 @@ param(
     [switch]$RunDism = $true,
     [switch]$DryRun = $false
 )
+
+Set-StrictMode -Version Latest
 
 # ---- VERIFY ADMIN ----
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)

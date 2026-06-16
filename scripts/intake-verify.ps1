@@ -24,6 +24,8 @@ param(
     [bool]$SaveMetrics = $true
 )
 
+Set-StrictMode -Version Latest
+
 $script:startTime = Get-Date
 $script:roundResults = @()
 

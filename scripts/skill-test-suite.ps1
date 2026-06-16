@@ -9,6 +9,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+Set-StrictMode -Version Latest
 $skillsDir = "$RepoRoot\.agents\skills"
 $total = 0; $pass = 0; $fail = 0; $errors = @()
 

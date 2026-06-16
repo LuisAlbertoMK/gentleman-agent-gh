@@ -42,6 +42,8 @@ param(
     [string]$Format = "Text"
 )
 
+Set-StrictMode -Version Latest
+
 $ErrorActionPreference = 'Stop'
 
 # ============================================================

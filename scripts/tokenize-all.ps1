@@ -9,6 +9,8 @@ param(
     [string]$OutCsv = ""
 )
 
+Set-StrictMode -Version Latest
+
 if (-not (Test-Path $Path)) { Write-Host "[tokenize] Skills dir not found: $Path" -ForegroundColor Red; exit 1 }
 
 $rows = @()

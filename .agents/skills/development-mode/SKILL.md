@@ -93,3 +93,4 @@ powercfg /GETACTIVESCHEME
 - Reversible: EXIT restores Normal + Balanced
 - Safe for all file types (binary/text/large/small)
 - Activate before large file processing, deactivate after
+- Complementary: run `scripts/optimize-system.ps1` once per machine for persistent OS-level tuning

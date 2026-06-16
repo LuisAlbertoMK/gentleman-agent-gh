@@ -22,6 +22,8 @@ param(
     [switch]$Json
 )
 
+Set-StrictMode -Version Latest
+
 $ErrorActionPreference = 'Stop'
 $errors = @()
 $warnings = @()
@@ -87,7 +89,7 @@ $sharedFiles = @{
     'persistence-contract.md' = Test-Path (Join-Path -Path $canonicalDir -ChildPath "_shared\persistence-contract.md")
     'engram-convention.md' = Test-Path (Join-Path -Path $canonicalDir -ChildPath "_shared\engram-convention.md")
 }
-$missingShared = $sharedFiles.GetEnumerator() | Where-Object { -not $_.Value } | ForEach-Object { $_.Key }
+$missingShared = @($sharedFiles.GetEnumerator() | Where-Object { -not $_.Value } | ForEach-Object { $_.Key })
 if ($missingShared.Count -eq 0) { Write-Host " OK" } else { $errors += "Missing _shared files: $($missingShared -join ', ')"; Write-Host " FAIL" }
 
 # --- Summary ---
