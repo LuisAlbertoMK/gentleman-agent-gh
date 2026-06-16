@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 
 # skill-test-suite.ps1 — Comprehensive skill validation
 # Usage: powershell -File scripts\skill-test-suite.ps1 [-RepoRoot <path>]

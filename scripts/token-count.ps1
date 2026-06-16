@@ -1,4 +1,4 @@
-# token-count.ps1 — Cuenta tokens aproximados en archivos (4 chars = 1 token)
+﻿# token-count.ps1 — Cuenta tokens aproximados en archivos (4 chars = 1 token)
 # Uso: .\scripts\token-count.ps1 [path1] [path2...]
 #       .\scripts\token-count.ps1 -Dir .\skills\
 #       .\scripts\token-count.ps1 -Recurse

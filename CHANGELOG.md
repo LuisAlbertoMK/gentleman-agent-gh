@@ -5,11 +5,17 @@
 
 ## [Unreleased]
 
+### Rebrand — gentleman-ai → gentleman-vMK
+
+- **Rebrand completo**: todas las referencias al proyecto original `gentle-ai` / `gentleman-ai` se unificaron bajo `gentleman-vMK` como la versión customizada definitiva.
+- El agente `gentleman-vMK` ahora es la fuente de verdad única. Los markers internos del framework (`<!-- gentle-ai:* -->`) se mantienen por compatibilidad del sistema OpenCode.
+- Los 4 frentes de runtime improvement (Recursive Compression, Resource-Adaptive Mode, PSSA Gate, Pull-from-Upstream) ya aplicados globalmente.
+
 ## [1.0.1] - 2026-06-07 — Cleanup: untrack .metricas, remove historical docs, harden .gitignore
 
 ### Removed (historical docs, content preserved in CHANGELOG/AGENTS)
 
-- `gentle-ai-gaps-analysis.md` (3.9 KB) — 2026-05-26 ecosystem analysis snapshot
+- `gentleman-vMK-gaps-analysis.md` (3.9 KB) — 2026-05-26 ecosystem analysis snapshot (renombrado en rebrand)
 - `KARPATHY-IMPROVEMENT-LOG.md` (21.6 KB) — 2026-05-26 Karpathy loop log
 - `SELF-IMPROVEMENT-V2-REPORT.md` (3.5 KB) — 2026-05-29 self-improvement report
 - `SELF-IMPROVEMENT-V2-TESTS.md` (6.6 KB) — 2026-05-29 self-improvement test suite

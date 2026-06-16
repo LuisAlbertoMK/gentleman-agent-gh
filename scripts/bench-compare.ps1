@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Benchmark comparativo: backup pre-sprint3 vs gentleman-agent-gh (actual)
 .DESCRIPTION
@@ -39,7 +39,7 @@ $backupAgents = Join-Path $BackupDir "AGENTS.md"
 $repoAgents = Join-Path $RepoDir "AGENTS.md"
 $globalAgents = "$env:USERPROFILE\.config\opencode\AGENTS.md"
 
-Write-Host ("  gentle-ai template (Go): ? lines (no disponible localmente)")
+Write-Host ("  gentleman-vMK template (Go): ? lines (no disponible localmente)")
 Write-Host ("  Backup pre-sprint3:      " + (Get-Lines $backupAgents) + " lines, " + (Get-Bytes $backupAgents) + " bytes")
 Write-Host ("  gentleman-agent-gh:      " + (Get-Lines $repoAgents) + " lines, " + (Get-Bytes $repoAgents) + " bytes")
 if (Test-Path $globalAgents) {

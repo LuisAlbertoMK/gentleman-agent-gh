@@ -5,15 +5,15 @@
 
 ## Contexto
 
-- **gentle-ai** (upstream): https://github.com/Gentleman-Programming/gentle-ai — Go 1.24+ binary, ecosistema configurador
-- **Backup pre-sprint3**: snapshot del output instalado de gentle-ai ANTES de las optimizaciones de gentleman-VMK
+- **gentleman-vMK** (fork customizado): basado en el ecosistema gentleman original — Go 1.24+ binary, ecosistema configurador
+- **Backup pre-sprint3**: snapshot del output instalado de gentleman-vMK ANTES de las optimizaciones de la versión actual
 - **gentleman-agent-gh**: repo con todas las mejoras aplicadas
 
 ## AGENTS.md (3 vías)
 
 | Fuente | Líneas | Bytes | Nota |
 |--------|--------|-------|------|
-| gentle-ai template (Go) | 23 | 1.6 KB | Código fuente, no runtime |
+| gentleman-vMK template (Go) | 23 | 1.6 KB | Código fuente, no runtime |
 | **Backup pre-sprint3** | **139** | **9.1 KB** | ⭐ **Baseline oficial** |
 | gentleman-agent-gh | 259 | 17.9 KB | Self-contained (engram, persona, sdd-orch embebidos) |
 | Global ~/.config/opencode/ | 246 | — | Sync del repo |

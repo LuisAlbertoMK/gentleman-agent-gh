@@ -36,7 +36,7 @@
 | Validate vs specs, verify | sdd-verify |
 | Archive changes, delta to main | sdd-archive |
 | Decision capture, trade-off log | decision-capture |
-| Execution mode, quick/thorough/draft | execution-mode |
+| Execution mode, resource-adaptive zones, quick/thorough/draft | execution-mode |
 | Skill digestion, compact on load | skill-digestion |
 | Subagent isolation, context boundaries | subagent-isolation |
 | Command wrapper, error handling, output parsing | command-wrapper |
@@ -90,5 +90,6 @@
 - `scripts/token-count.ps1` — count ~tokens in files (4 chars/token)
 - `scripts/bench-file-io.ps1` — benchmark 3 file I/O methods × N runs
 - `scripts/skill-graph.ps1` — sparse loading resolver: find relevant skills + deps for any task
+- `scripts/pull-upstream.ps1` — sync new/modified skills & scripts from upstream (gentleman-vMK) via git merge. 3 modes: `Check` (drift report), `Apply-New` (safe auto-merge), `Apply-File` (checkout individual file)
 
 **Web-quality skills** mirror: `.agents/skills/{name}/` ←→ `skills/{name}/` (synced via junction)

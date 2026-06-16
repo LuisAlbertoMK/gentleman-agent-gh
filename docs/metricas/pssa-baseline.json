@@ -1,0 +1,171 @@
+﻿{
+    "trackedCount":  370,
+    "autoFixableCount":  23,
+    "timestamp":  "2026-06-16T13:25:45",
+    "total":  449,
+    "byFile":  [
+                   {
+                       "count":  72,
+                       "file":  "tokenize.ps1"
+                   },
+                   {
+                       "count":  5,
+                       "file":  "approach-01-adjacency.ps1"
+                   },
+                   {
+                       "count":  2,
+                       "file":  "approach-02-sqlite-cte.ps1"
+                   },
+                   {
+                       "count":  4,
+                       "file":  "approach-03-json-property.ps1"
+                   },
+                   {
+                       "count":  3,
+                       "file":  "approach-04-dag-sort.ps1"
+                   },
+                   {
+                       "count":  4,
+                       "file":  "approach-05-cross-ref.ps1"
+                   },
+                   {
+                       "count":  4,
+                       "file":  "approach-06-hypergraph.ps1"
+                   },
+                   {
+                       "count":  3,
+                       "file":  "approach-07-bfs-impact.ps1"
+                   },
+                   {
+                       "count":  3,
+                       "file":  "approach-08-change-propagation.ps1"
+                   },
+                   {
+                       "count":  6,
+                       "file":  "approach-09-bloom-index.ps1"
+                   },
+                   {
+                       "count":  6,
+                       "file":  "approach-10-mcp-graph-server.ps1"
+                   },
+                   {
+                       "count":  13,
+                       "file":  "benchmark-all.ps1"
+                   },
+                   {
+                       "count":  31,
+                       "file":  "benchmark-final.ps1"
+                   },
+                   {
+                       "count":  9,
+                       "file":  "graph-engine.ps1"
+                   },
+                   {
+                       "count":  3,
+                       "file":  "auto-clean.ps1"
+                   },
+                   {
+                       "count":  19,
+                       "file":  "bash-safe.ps1"
+                   },
+                   {
+                       "count":  42,
+                       "file":  "bench-compare.ps1"
+                   },
+                   {
+                       "count":  16,
+                       "file":  "bench-file-io.ps1"
+                   },
+                   {
+                       "count":  2,
+                       "file":  "check-skill-drift.ps1"
+                   },
+                   {
+                       "count":  26,
+                       "file":  "cross-ref-check.ps1"
+                   },
+                   {
+                       "count":  11,
+                       "file":  "ensure-tools.ps1"
+                   },
+                   {
+                       "count":  55,
+                       "file":  "intake-verify.ps1"
+                   },
+                   {
+                       "count":  31,
+                       "file":  "optimize-system.ps1"
+                   },
+                   {
+                       "count":  3,
+                       "file":  "ps5-detect.ps1"
+                   },
+                   {
+                       "count":  26,
+                       "file":  "pssa-gate.ps1"
+                   },
+                   {
+                       "count":  28,
+                       "file":  "skill-graph.ps1"
+                   },
+                   {
+                       "count":  14,
+                       "file":  "skill-test-suite.ps1"
+                   },
+                   {
+                       "count":  4,
+                       "file":  "token-count.ps1"
+                   },
+                   {
+                       "count":  4,
+                       "file":  "tokenize-all.ps1"
+                   }
+               ],
+    "byRule":  [
+                   {
+                       "rule":  "PSUseBOMForUnicodeEncodedFile",
+                       "count":  20
+                   },
+                   {
+                       "rule":  "PSAvoidUsingWriteHost",
+                       "count":  370
+                   },
+                   {
+                       "rule":  "PSAvoidUsingEmptyCatchBlock",
+                       "count":  4
+                   },
+                   {
+                       "rule":  "PSUseSingularNouns",
+                       "count":  13
+                   },
+                   {
+                       "rule":  "PSUseApprovedVerbs",
+                       "count":  19
+                   },
+                   {
+                       "rule":  "PSUseShouldProcessForStateChangingFunctions",
+                       "count":  7
+                   },
+                   {
+                       "rule":  "PSReviewUnusedParameter",
+                       "count":  3
+                   },
+                   {
+                       "rule":  "PSAvoidAssignmentToAutomaticVariable",
+                       "count":  1
+                   },
+                   {
+                       "rule":  "PSUseDeclaredVarsMoreThanAssignments",
+                       "count":  7
+                   },
+                   {
+                       "rule":  "PSAvoidUsingBrokenHashAlgorithms",
+                       "count":  2
+                   },
+                   {
+                       "rule":  "PSAvoidDefaultValueSwitchParameter",
+                       "count":  3
+                   }
+               ],
+    "manualCount":  56
+}

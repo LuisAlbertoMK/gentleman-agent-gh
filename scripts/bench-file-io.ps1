@@ -1,4 +1,4 @@
-# bench-file-io.ps1 — Benchmark de 3 métodos de file I/O × 3 runs
+﻿# bench-file-io.ps1 — Benchmark de 3 métodos de file I/O × 3 runs
 # Uso: .\scripts\bench-file-io.ps1 [target.ps1]
 #       .\scripts\bench-file-io.ps1 -Dir D:\project -Runs 5
 #requires -Version 5.1

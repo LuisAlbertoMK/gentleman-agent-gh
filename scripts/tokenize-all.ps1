@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 
 # tokenize-all.ps1 — Tokenize every SKILL.md in repo
 # Usage: powershell -File scripts\tokenize-all.ps1 [-Path <skills_dir>] [-OutCsv <output.csv>]

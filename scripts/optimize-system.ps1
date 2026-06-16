@@ -1,4 +1,4 @@
-# optimize-system.ps1 — Admin-level system optimizations for Ryzen 3700U + NVMe
+﻿# optimize-system.ps1 — Admin-level system optimizations for Ryzen 3700U + NVMe
 # REQUIRES: PowerShell as Administrator
 # USAGE:    Right-click → "Run with PowerShell" (as Admin)
 #           OR: Start-Process powershell -Verb RunAs -ArgumentList "-File optimize-system.ps1"
@@ -12,9 +12,9 @@
 # TARGET after running:    C: ~35-40 GB free (~30-34%)
 
 param(
-    [switch]$DisableHibernation = $true,
-    [switch]$SetPageFile = $true,
-    [switch]$RunDism = $true,
+    [switch]$DisableHibernation,
+    [switch]$SetPageFile,
+    [switch]$RunDism,
     [switch]$DryRun = $false
 )
 
