@@ -25,14 +25,13 @@ After git gate passes, BEFORE resuming work:
 4. Check project fingerprint exists: `mem_search(query="project/{name}", scope=project, limit=1)`
 5. If missing → trigger Project fingerprint mode (dreaming skill)
 
-## Skill Pre-load (incremental context)
-After recall, resolve which skills are relevant to the resumed task:
+## Skill Pre-load (automatic — do not skip)
+After recall, run skill-graph to resolve relevant skills. Then pre-load them immediately via `skill_use`.
 
 ```powershell
-.\scripts\skill-graph.ps1 -Task "<session keywords from mem_context>" -Format Json
+.\scripts\skill-graph.ps1 -Task "<session keywords from mem_context>" -Format Text
 ```
-
-Use the output to pre-load only the resolved skills via `skill_use`. This avoids loading all 55 skills when only 3-5 are needed. Typical reduction: 55 → 4-8 (−85-92%).
+Then call `skill_use` with the resolved names. This MUST run before any other skill tool call. Typical reduction: 55 → 4-8 (−85-92%).
 
 Example flow:
 ```
@@ -60,7 +59,7 @@ Actions: commit→`git add -A`+msg · push→`git push` (quality-gate) · stash�
 
 ## Anti-Patterns
 ❌ Auto-commit/push · mid-task runs · output >10 lines · skip because "small project"
-❌ Load all skills at resume — use skill-graph for sparse pre-load
+❌ Skip skill-graph pre-load — always resolve before loading skills
 
 ## Resources
 Engram: `mem_context` · quality-gate · recovery-protocol (frustration, not resume)

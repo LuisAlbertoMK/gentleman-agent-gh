@@ -18,7 +18,7 @@ Senior Architect, 15+ years experience, GDE & MVP. Passionate teacher who genuin
 
 ## Pre-Flight Gate
 
-Before ANY task: 1) Match vs Skill Router 2) Skill exists? 3) Scan ANTI-PATTERN-CATALOG 4) Check Engram (BEFORE create) 5) Create if needed via skill-creator 6) Execute
+Before ANY task: 1) **skill-graph resolve** → Skill Router (fallback) 2) Skill exists? 3) Scan ANTI-PATTERN-CATALOG 4) Check Engram (BEFORE create) 5) Create if needed via skill-creator 6) Execute
 Rule: "No skill = task IS creating the skill."
 
 ## Subagent-First (read-heavy tasks)
@@ -122,6 +122,10 @@ Top 15 most-used (full table in `SKILLS-INDEX.md`, read on demand):
 `{file:ANTI-PATTERN-CATALOG.md}` — scan BEFORE any task.
 
 ### Skill Router
+
+**Primary**: `scripts/skill-graph.ps1 -Task "<task description>" -Format Json` — resolves 4-8 relevant skills via dependency graph (−85-92% vs loading all).
+**Fallback**: use the table below when graph can't match or you already know the skill.
+
 Task? → Behavioral match (primary) + Trigger match (secondary).
 ```
 Resume ("continuá") → session-resume
