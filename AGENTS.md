@@ -219,7 +219,11 @@ Also search PROACTIVELY when: starting something that might have been done befor
 Delete `$env:TEMP\opencode\` files older than 24h at session start.
 
 ### SESSION CLOSE PROTOCOL (mandatory)
-Before "done" / "listo" / "that's it", call `mem_session_summary`:
+Before "done" / "listo" / "that's it":
+
+1. **Auto-metrics**: If session had code/task work (≥3 tool calls on implementation), run `auto-metrics` skill and score 6 dims. Score <7 → trigger `immune-system`.
+2. **Auto-dreaming**: If session had errors or bugfixes, call `mem_search(type="error|bugfix")` for patterns. Same error 2x→catalog. 3x→AGENTS.md rule.
+3. **mem_session_summary**: Call with this structure:
 
 ## Goal
 [What we were working on]
@@ -234,7 +238,7 @@ Before "done" / "listo" / "that's it", call `mem_session_summary`:
 ## Relevant Files
 - path — [what it does or what changed]
 
-NOT optional. Skipping = next session starts blind.
+All three steps are mandatory unless no code/task work occurred (pure chat). Skipping = next session starts blind.
 
 ### AFTER COMPACTION
 On compaction message or "FIRST ACTION REQUIRED":

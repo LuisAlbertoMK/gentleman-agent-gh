@@ -22,6 +22,7 @@
 | 11 | 2026-06-11 | Trigger regex assumes quote after colon | Regex `Trigger:\s*"` fails on `Trigger: Task, "score"` | `\s*` only matches whitespace, not intervening text | `Trigger:[^"]*"\w` — colon then non-quote chars then quote. | After `Key:`, use `.*?` or `[^"]*` to bridge text. |
 | 12 | 2026-06-13 | Verbose inline examples waste context | +67% tokens on web-quality skills, 70% redundant | Skills designed as tutorials, not runtime agent skills | Move examples to `references/`. Keep 1 snippet per criterion max. | Compact before adding: ≤150L knowledge, ≤80L utility. |
 | 13 | 2026-06-14 | Uninitialized $warnings | `$warnings += ...` null error in drift script | Missing `$warnings = @()` before append | Always init all accumulators before first +=. | Lint PS5.1 with PSScriptAnalyzer before commit. |
+| 14 | 2026-06-16 | Case-insensitive -match filter | `One-shot` passes `^[a-z]` regex in PS5.1 | PS5.1 -match is case-insensitive by default | Use `-cmatch` for case-sensitive filters. | Never trust `-match` for casing — use `-cmatch` explicitly. |
 
 ## Prevention cheat sheet
 1. **No code before user confirms understanding** — "¿Entendí bien?" gate
@@ -34,3 +35,4 @@
 8. **Build incrementally** after 2-3 files, not after 19
 9. **Name all positional args** — never >2 without verification
 10. **Init all accumulators** before first `+=`
+11. **Use `-cmatch`** for case-sensitive filters in PowerShell
