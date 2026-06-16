@@ -41,6 +41,7 @@ param(
     [string]$Remote = 'upstream'
 )
 
+Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repoRoot = Resolve-Path "$PSScriptRoot/.."
 Push-Location $repoRoot
@@ -117,32 +118,32 @@ foreach ($map in $pathMap) {
 
     if ([string]::IsNullOrEmpty($upPrefix)) {
         # Root files — compare root-level files (no .md, no hidden)
-        $upFiles = git ls-tree -r --name-only $remoteRef | Where-Object {
+        $upFiles = @(git ls-tree -r --name-only $remoteRef | Where-Object {
             $_ -notmatch '^skills/|^scripts/|^\.' -and $_ -notlike '*/'
-        }
-        $locFiles = git ls-tree -r --name-only $localRef | Where-Object {
+        })
+        $locFiles = @(git ls-tree -r --name-only $localRef | Where-Object {
             $_ -notmatch '^\.agents/skills/|^scripts/|^\.' -and $_ -notlike '*/'
-        }
+        })
     } else {
-        $upFiles = git ls-tree -r --name-only $remoteRef -- "$upPrefix" | ForEach-Object {
+        $upFiles = @(git ls-tree -r --name-only $remoteRef -- "$upPrefix" | ForEach-Object {
             if (-not [string]::IsNullOrEmpty($locPrefix) -and $locPrefix -ne $upPrefix) {
                 # Path mapping: replace upstream prefix with local prefix
                 $_.Replace($upPrefix, $locPrefix)
             } else { $_ }
-        }
-        $locFiles = git ls-tree -r --name-only $localRef -- "$locPrefix" | ForEach-Object { $_ }
+        })
+        $locFiles = @(git ls-tree -r --name-only $localRef -- "$locPrefix" | ForEach-Object { $_ })
     }
 
     # Ensure distinct sets
-    $upSet = $upFiles | Sort-Object -Unique
-    $locSet = $locFiles | Sort-Object -Unique
+    $upSet = @($upFiles | Sort-Object -Unique)
+    $locSet = @($locFiles | Sort-Object -Unique)
 
     # NEW: in upstream but not locally
-    $new = $upSet | Where-Object { $_ -notin $locSet }
+    $new = @($upSet | Where-Object { $_ -notin $locSet })
     # MODIFIED: in both — check content hash
-    $common = $upSet | Where-Object { $_ -in $locSet }
+    $common = @($upSet | Where-Object { $_ -in $locSet })
     # OURS ONLY: in local but not upstream
-    $ours = $locSet | Where-Object { $_ -notin $upSet }
+    $ours = @($locSet | Where-Object { $_ -notin $upSet })
 
     if ($label -eq 'Root files') {
         # For root files, show a sample
@@ -156,13 +157,13 @@ foreach ($map in $pathMap) {
         # Upstream hash
         $upHashes = @{}
         if ([string]::IsNullOrEmpty($upPrefix)) {
-            $rootItems = git ls-tree $remoteRef | ForEach-Object {
+            $rootItems = @(git ls-tree $remoteRef | ForEach-Object {
                 $parts = $_ -split '\s+'
                 @{ Hash = $parts[2]; Path = $parts[3] }
-            }
+            })
             $rootItems | ForEach-Object { $upHashes[$_.Path] = $_.Hash }
         } else {
-            $upItems = git ls-tree -r $remoteRef -- "$upPrefix" | ForEach-Object {
+            $upItems = @(git ls-tree -r $remoteRef -- "$upPrefix" | ForEach-Object {
                 # Map path
                 $path = ($_ -split '\s+')[3]
                 $localPath = $path
@@ -170,23 +171,23 @@ foreach ($map in $pathMap) {
                     $localPath = $path.Replace($upPrefix, $locPrefix)
                 }
                 @{ Hash = ($_ -split '\s+')[2]; Path = $localPath }
-            }
+            })
             $upItems | ForEach-Object { $upHashes[$_.Path] = $_.Hash }
         }
 
         # Local hash
         $locHashes = @{}
         if ([string]::IsNullOrEmpty($locPrefix)) {
-            $locItems = git ls-tree $localRef | ForEach-Object {
+            $locItems = @(git ls-tree $localRef | ForEach-Object {
                 $parts = $_ -split '\s+'
                 @{ Hash = $parts[2]; Path = $parts[3] }
-            }
+            })
             $locItems | ForEach-Object { $locHashes[$_.Path] = $_.Hash }
         } else {
-            $locItems = git ls-tree -r $localRef -- "$locPrefix" | ForEach-Object {
+            $locItems = @(git ls-tree -r $localRef -- "$locPrefix" | ForEach-Object {
                 $parts = $_ -split '\s+'
                 @{ Hash = $parts[2]; Path = $parts[3] }
-            }
+            })
             $locItems | ForEach-Object { $locHashes[$_.Path] = $_.Hash }
         }
 
@@ -234,7 +235,7 @@ if ($Mode -eq 'Apply-New') {
     $safeFiles = $newUpstreamFiles | Where-Object {
         $_ -match '^\.agents/skills/' -or $_ -match '^scripts/'
     }
-    $skipped = $newUpstreamFiles | Where-Object { $_ -notin $safeFiles }
+    $skipped = @($newUpstreamFiles | Where-Object { $_ -notin $safeFiles })
 
     if ($skipped.Count -gt 0) {
         Write-Host "Skipping $($skipped.Count) upstream source files (Go code, tests, config)."

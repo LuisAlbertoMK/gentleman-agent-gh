@@ -46,6 +46,7 @@ param(
     [string]$BaselineFile = (Join-Path $Path 'docs\metricas\pssa-baseline.json')
 )
 
+Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 # -- helpers ----------------------------------------------------------
