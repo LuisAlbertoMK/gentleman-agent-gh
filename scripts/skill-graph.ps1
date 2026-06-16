@@ -45,7 +45,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 # ============================================================
-# SKILL REGISTRY — 55 skills with triggers, categories, deps
+# SKILL REGISTRY — 56 skills with triggers, categories, deps
 # ============================================================
 
 $skillRegistry = @()
@@ -127,6 +127,9 @@ Add-Skill -Name "core-web-vitals" -Category "web-quality" -Triggers @("Core Web 
 Add-Skill -Name "best-practices" -Category "web-quality" -Triggers @("best practices","security audit","modernize code","code quality review") -Description "Apply modern web development best practices"
 Add-Skill -Name "web-quality-audit" -Category "web-quality" -Triggers @("web quality audit","lighthouse audit","review web quality") -Description "Comprehensive web quality audit" -DependsOn @("accessibility","performance","seo","core-web-vitals","best-practices")
 Add-Skill -Name "development-mode" -Category "web-quality" -Triggers @("performance mode","dev mode","modo desarrollo","high performance","modo rendimiento") -Description "System resource prioritization mode"
+
+# --- Research ---
+Add-Skill -Name "research" -Category "research" -Triggers @("research","investigar","technical investigation","learn","compare solutions","evaluate") -Description "Structured research workflow for technical investigations"
 
 # --- General / Specialized ---
 Add-Skill -Name "recovery-protocol" -Category "specialized" -Triggers @("recovery","no es eso","frustration","stuck","bloqueado","bug","fix","error") -Description "Recovery protocol for frustration and errors"

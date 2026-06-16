@@ -128,7 +128,7 @@ Resume ("continuá") → session-resume
 Write code → skill-creator, sdd-*, quality-gate, go-testing, work-unit-commits
 Fix bug → recovery-protocol, immune-system, sdd-verify
 Design → senior-engineer, sdd-propose, sdd-design, cognitive-doc-design
-Learn/Research → prompt-engineering, context7, code-memory
+Learn/Research → research, prompt-engineering, context7, code-memory
 Review → judgment-day, skill-testing, pr-evidence, comment-writer, code-review-agent
 Measure ("metricas") → metricas, auto-metrics
 Optimize → karpathy-*, lean-context, caveman, skill-improver, refactoring-planner

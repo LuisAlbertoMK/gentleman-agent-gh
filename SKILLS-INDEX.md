@@ -1,6 +1,6 @@
 ﻿# SKILLS INDEX
 
-> Full trigger table for all 55 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 56 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
 > **Version**: 2.0 | **Changelog**: 2.0 (new skill: skill-graph — sparse loading resolver; added dep categories)
@@ -66,6 +66,7 @@
 | SDD onboard, onboarding, nuevo proyecto SDD, guía SDD | sdd-onboard |
 | Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
 | Sparse loading, skill resolution, relevant skills, which skill, resolver skill, minimo skills | skill-graph |
+| Research, technical investigation, investigar, learn tech, compare solutions, evaluate options | research |
 
 ## Quick groups
 - **Compression/style**: karpathy-prompt, karpathy-loop, lean-context
