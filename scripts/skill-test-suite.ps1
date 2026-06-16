@@ -71,7 +71,7 @@ foreach ($dir in $skillDirs) {
     else { $results += "sects:FAIL" }
 
     # Test 5: Check for orphaned references to other skills
-    $refs = [regex]::Matches($content, '(?<!file:)([a-z]+-[a-z]+)/SKILL\.md')
+    $refs = [regex]::Matches($content, '(?<!file:)([a-z][a-z-]+)/SKILL\.md')
     $badRefs = @()
     foreach ($ref in $refs) {
         $target = $ref.Groups[1].Value
