@@ -1,6 +1,6 @@
 ﻿---
 name: quality-gate
-description: >  quality-gate skill
+description: "Pre-commit quality gate — TDD tests pass, secrets scan, and conventional commit validation before commit/push/PR"
 triggers: "Quality gate, pre-commit"
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1"

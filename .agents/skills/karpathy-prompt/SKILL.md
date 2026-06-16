@@ -1,6 +1,6 @@
 ﻿---
 name: karpathy-prompt
-description: >  karpathy-prompt skill
+description: "Ultra-concise prompt engineering — role+task only, minimal identity, strict formatting, implicit CoT, budget ~50-300 tokens"
 triggers: "Karpathy, less tokens, context compilation"
 license: Apache-2.0
 metadata: author: mk, version: "1.1"

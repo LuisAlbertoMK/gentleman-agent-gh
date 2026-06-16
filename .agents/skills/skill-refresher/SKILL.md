@@ -1,6 +1,6 @@
 ﻿---
 name: skill-refresher
-description: >  skill-refresher skill
+description: "Detect skill drift and auto-heal — monitor health signals, regenerate stale skills, and track usage patterns"
 triggers: "Skill refresher, drift detection, auto-heal"
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1"

@@ -1,6 +1,6 @@
 ﻿---
 name: bitacora
-description: >  bitacora skill
+description: "Historical log of user requests per session — auto-append to BITACORA.md, search, date filtering"
 triggers: "Bitacora, historial, histÃ³rico, quÃ© pedÃ­, request log"
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.0"

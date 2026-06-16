@@ -1,6 +1,6 @@
 ﻿---
 name: decision-capture
-description: >  decision-capture skill
+description: "Capture every technical decision with structured format — alternatives, trade-offs, rationale, and retroactive logging"
 triggers: "Decision capture, trade-off log"
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1"

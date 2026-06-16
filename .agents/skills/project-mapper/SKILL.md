@@ -1,6 +1,6 @@
 ﻿---
 name: project-mapper
-description: >  project-mapper skill
+description: "Scan project structure, detect tech stack, classify architecture, and generate dependency map with auto-chain to gap-analysis"
 triggers: "Mapear, project map, estructura, tech stack, arquitectura"
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.3", changelog: "1.2->1.3: project type classification (tech layer + business type), 8-dim auto-chain"

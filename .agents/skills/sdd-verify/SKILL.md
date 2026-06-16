@@ -1,6 +1,6 @@
 ﻿---
 name: sdd-verify
-description: >  sdd-verify skill
+description: "Validate implementation against specs — compliance checking, build verification, scenario mapping, and structured reports"
 triggers: "Validate vs specs, verify"
 license: MIT
 metadata: author: gentleman-vMK, version: "3.4"

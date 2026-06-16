@@ -1,6 +1,6 @@
 ﻿---
 name: sdd-init
-description: >  sdd-init skill
+description: "Bootstrap SDD project context — detect stack, init config structure, build skill registry, and persist testing capabilities"
 triggers: "SDD init, bootstrap"
 license: MIT
 metadata: author: gentleman-vMK, version: "3.2"

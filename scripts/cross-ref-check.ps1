@@ -22,11 +22,17 @@ param(
     [switch]$Json
 )
 
+$ErrorActionPreference = 'Stop'
 $errors = @()
 $warnings = @()
 
 $canonicalDir = Join-Path -Path $RepoRoot -ChildPath ".agents\skills"
 $globalDir = "$env:USERPROFILE\.config\opencode\skills"
+
+if (-not (Test-Path $canonicalDir)) {
+    Write-Host "FATAL: Skills directory not found: $canonicalDir" -ForegroundColor Red
+    exit 1
+}
 
 Write-Host "=== Cross-Ref Check: $RepoRoot ===" -ForegroundColor Cyan
 
@@ -38,7 +44,13 @@ if ($apc) { Write-Host " OK" } else { $errors += "ANTI-PATTERN-CATALOG.md not fo
 # --- [2/5] All skills have SKILL.md ---
 Write-Host "[2/5] SKILL.md files..." -NoNewline
 $missingSkillMd = @()
-Get-ChildItem (Join-Path -Path $canonicalDir -ChildPath "*") -Directory | ForEach-Object {
+try {
+    $skillDirs = Get-ChildItem (Join-Path -Path $canonicalDir -ChildPath "*") -Directory
+} catch {
+    Write-Host " FAIL`nFATAL: Cannot list skill directories: $_" -ForegroundColor Red
+    exit 1
+}
+$skillDirs | ForEach-Object {
     $skillName = $_.Name
     if ($skillName -eq '_shared') { return }
     $mdPath = Join-Path -Path $_.FullName -ChildPath "SKILL.md"
@@ -48,7 +60,7 @@ if ($missingSkillMd.Count -eq 0) { Write-Host " OK (all have SKILL.md)" } else {
 
 # --- [3/5] SKILLS-INDEX count matches canonical ---
 Write-Host "[3/5] SKILLS-INDEX count..." -NoNewline
-$actualCount = (Get-ChildItem $canonicalDir -Directory | Where-Object { $_.Name -ne '_shared' }).Count
+$actualCount = ($skillDirs | Where-Object { $_.Name -ne '_shared' }).Count
 $headerLine = Select-String -Path (Join-Path -Path $RepoRoot -ChildPath "SKILLS-INDEX.md") -Pattern "all \d+ skills"
 if ($headerLine -match "all (\d+) skills") {
     $declared = [int]$Matches[1]

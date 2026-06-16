@@ -1,6 +1,6 @@
 ﻿---
 name: code-memory
-description: >  code-memory skill
+description: "Multi-session memory — save exact task state, handoff format, auto-save triggers for seamless session resumption"
 triggers: "ContinuÃ¡, code memory, multi-session"
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1"

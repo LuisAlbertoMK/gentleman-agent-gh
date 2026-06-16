@@ -1,6 +1,6 @@
 ﻿---
 name: sdd-spec
-description: >  sdd-spec skill
+description: "Write detailed specifications with Given/When/Then scenarios using RFC 2119 requirements language (MUST/SHOULD/MAY)"
 triggers: "Specs, Given/When/Then"
 license: MIT
 metadata: author: gentleman-vMK, version: "2.3"

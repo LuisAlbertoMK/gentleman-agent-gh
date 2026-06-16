@@ -1,6 +1,6 @@
 ﻿---
 name: immune-system
-description: >  immune-system skill
+description: "Permanent immunity against repeated errors — detect, diagnose, document to anti-pattern catalog, immunize in AGENTS.md rules"
 triggers: "Immune System, anti-pattern, permanent immunity"
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1", changelog: "1.0->1.1 (sprint 1: 72->55 lines, -23.6%, condensed Immunity Levels table, inlined Anti-patterns)"

@@ -8,6 +8,7 @@ param(
     [string]$RepoRoot = (Split-Path $PSScriptRoot -Parent)
 )
 
+$ErrorActionPreference = 'Stop'
 $skillsDir = "$RepoRoot\.agents\skills"
 $total = 0; $pass = 0; $fail = 0; $errors = @()
 
@@ -15,7 +16,12 @@ Write-Host "=== Skill Test Suite ===" -ForegroundColor Cyan
 Write-Host "Repo: $RepoRoot" -ForegroundColor Gray
 
 # Collect all skill directories (exclude _shared)
-$skillDirs = Get-ChildItem $skillsDir -Directory | Where-Object { $_.Name -ne '_shared' } | Sort-Object Name
+try {
+    $skillDirs = Get-ChildItem $skillsDir -Directory | Where-Object { $_.Name -ne '_shared' } | Sort-Object Name
+} catch {
+    Write-Host "FATAL: Cannot access skills directory '$skillsDir': $_" -ForegroundColor Red
+    exit 1
+}
 
 Write-Host "`nFound $($skillDirs.Count) skills to test`n" -ForegroundColor Yellow
 
@@ -36,8 +42,12 @@ foreach ($dir in $skillDirs) {
     }
 
     # Test 2: Frontmatter (starts with ---)
-    $fmStart = $content.IndexOf('---')
-    $fmEnd = $content.IndexOf('---', $fmStart + 3)
+    try {
+        $fmStart = $content.IndexOf('---')
+        $fmEnd = $content.IndexOf('---', $fmStart + 3)
+    } catch {
+        $results += "fm:FAIL"; $errors += "$skillName : cannot parse frontmatter"; continue
+    }
     if ($fmStart -eq 0 -and $fmEnd -gt 3) {
         $results += "fm:OK"
         $fm = $content.Substring($fmStart + 3, $fmEnd - $fmStart - 3)
@@ -68,6 +78,14 @@ foreach ($dir in $skillDirs) {
         if (-not (Test-Path "$skillsDir\$target\SKILL.md")) { $badRefs += $target }
     }
     if ($badRefs.Count -eq 0) { $results += "refs:OK" } else { $results += "refs:BAD ($($badRefs -join ','))"; $errors += "$skillName : orphan refs to $($badRefs -join ',')" }
+
+    # Test 7: Description is not a placeholder
+    if ($fm -match 'description: >  \S+ skill') {
+        $results += "desc:PLACEHOLDER"
+        $errors += "$skillName : description is placeholder text"
+    } else {
+        $results += "desc:OK"
+    }
 
     # Test 6: Triggers documented (for root-level skills)
     if ($skillName -notlike 'sdd-*') {

@@ -1,6 +1,6 @@
 ﻿---
 name: work-unit-commits
-description: >  work-unit-commits skill
+description: "Organize implementation into focused work-unit commits — one deliverable per commit, tests/docs included, clean rollback capability"
 triggers: "Work-unit commits, commit organization"
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.0"

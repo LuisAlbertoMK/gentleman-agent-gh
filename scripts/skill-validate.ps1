@@ -39,6 +39,8 @@ param(
   [switch]$OutputJson
 )
 
+$ErrorActionPreference = 'Stop'
+
 if ($TrialToolCalls.Count -ne 3 -or $TrialTokens.Count -ne 3 -or $TrialScores.Count -ne 3 -or $TrialErrors.Count -ne 3 -or $TrialIterations.Count -ne 3) {
   Write-Error "Each Trial* parameter must have exactly 3 values."
   exit 1

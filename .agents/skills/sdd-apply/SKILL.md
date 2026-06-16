@@ -1,6 +1,6 @@
 ﻿---
 name: sdd-apply
-description: >  sdd-apply skill
+description: "Implement code changes from task definitions — spec-first execution with strict TDD support, progress persistence, and structured completion reports"
 triggers: "Apply tasks, implement"
 license: MIT
 metadata: author: gentleman-vMK, version: "3.3"

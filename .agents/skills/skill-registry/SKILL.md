@@ -1,6 +1,6 @@
 ﻿---
 name: skill-registry
-description: >  skill-registry skill
+description: "Build and maintain skill registry — scan skill directories, deduplicate across sources, compact rules, and persist to engram"
 triggers: "Skill registry, catalog"
 license: MIT
 metadata: author: gentleman-vMK, version: "1.0"

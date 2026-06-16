@@ -1,6 +1,6 @@
 ﻿---
 name: command-wrapper
-description: >  command-wrapper skill
+description: "Run commands safely — description, error handling, output parsing, and safety wrappers for destructive operations"
 triggers: "Command wrapper, error handling, output parsing"
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.0"

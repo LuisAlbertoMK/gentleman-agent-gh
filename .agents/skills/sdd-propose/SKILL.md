@@ -1,6 +1,6 @@
 ﻿---
 name: sdd-propose
-description: >  sdd-propose skill
+description: "Define change proposals with scope, capabilities, approach, risks, rollback plan, and success criteria"
 triggers: "Proposal, intent, approach"
 license: MIT
 metadata: author: gentleman-vMK, version: "2.1"

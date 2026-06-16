@@ -1,6 +1,6 @@
 ﻿---
 name: karpathy-loop
-description: >  karpathy-loop skill
+description: "Iterative prompt optimization loop — write, measure, cut, repeat with progressive compression levels and decision gates"
 triggers: "Karpathy loop, optimize prompt, measure tokens"
 license: Apache-2.0
 metadata: author: mk, version: "1.0"

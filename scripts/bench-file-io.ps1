@@ -5,8 +5,11 @@
 param(
   [string]$Path = "",
   [string]$Dir = "D:\gentleman-agent-gh",
+  [ValidateRange(1,10)]
   [int]$Runs = 3
 )
+
+$ErrorActionPreference = 'Stop'
 
 if (-not $Path -and $Dir) {
   # Find the largest PS1 file in the project
@@ -40,8 +43,11 @@ $methods = @(
   @{name="StreamReader"; script={
     param($f)
     $sr = New-Object System.IO.StreamReader($f, [System.Text.Encoding]::UTF8)
-    $content = $sr.ReadToEnd()
-    $sr.Close()
+    try {
+      $content = $sr.ReadToEnd()
+    } finally {
+      $sr.Close()
+    }
     $content
   }}
 )
@@ -86,5 +92,7 @@ Write-Host "=== I/O BENCHMARK SUMMARY ===" -ForegroundColor Cyan
 $allResults | Format-Table Method, AvgMs, MinMs, MaxMs, AvgKB -AutoSize
 
 # Identify fastest
-$fastest = $allResults | Sort-Object AvgMs | Select-Object -First 1
-Write-Host "Fastest: $($fastest.Method) @ $($fastest.AvgMs)ms" -ForegroundColor Green
+if ($allResults.Count -gt 0) {
+  $fastest = $allResults | Sort-Object AvgMs | Select-Object -First 1
+  Write-Host "Fastest: $($fastest.Method) @ $($fastest.AvgMs)ms" -ForegroundColor Green
+}

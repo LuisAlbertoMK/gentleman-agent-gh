@@ -1,6 +1,6 @@
 ﻿---
 name: ci-cd
-description: >  ci-cd skill
+description: "CI/CD pipeline setup — GitHub Actions, local pre-push quality gate, auto-detect test runner, SDD spec coverage"
 triggers: "CI/CD pipeline, GitHub Actions, quality gate"
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1"

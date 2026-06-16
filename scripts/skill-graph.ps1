@@ -35,11 +35,14 @@
 
 param(
     [string]$Task = "",
+    [ValidateRange(0,3)]
     [int]$Expand = 1,
     [switch]$ListAll,
     [ValidateSet("Text","Json","Csv")]
     [string]$Format = "Text"
 )
+
+$ErrorActionPreference = 'Stop'
 
 # ============================================================
 # SKILL REGISTRY — 55 skills with triggers, categories, deps
@@ -251,17 +254,17 @@ function Expand-Hops {
 # ============================================================
 
 $graph = New-Graph
+$resolved = $null
 
 if ($ListAll) {
     $groups = $script:skillRegistry | Group-Object Category
     switch ($Format) {
-        "Json" {
-            $groups | ForEach-Object {
+        "Json" { try { $groups | ForEach-Object {
                 $g = $_
                 @{ Category = $g.Name; Skills = $g.Group | Sort-Object Name | ForEach-Object {
                     @{ Name = $_.Name; DependsOn = $_.DependsOn; Related = $_.Related }
                 }}
-            } | ConvertTo-Json -Depth 3
+            } | ConvertTo-Json -Depth 3; } catch { Write-Host "Error generating JSON: $_" -ForegroundColor Red; exit 1 }
         }
         "Csv" {
             $flat = foreach ($g in $groups) {
@@ -301,6 +304,11 @@ if ([string]::IsNullOrWhiteSpace($Task)) {
 
 $resolved = Resolve-Skills -Graph $graph -Task $Task -MaxHops $Expand
 
+if ($null -eq $resolved) {
+    Write-Host "Resolution error for task: '$Task'" -ForegroundColor Red
+    exit 1
+}
+
 if ($resolved.Count -eq 0) {
     Write-Host "No skills matched task: '$Task'" -ForegroundColor Yellow
     Write-Host "Try broader keywords or check: .\scripts\skill-graph.ps1 -ListAll" -ForegroundColor Cyan
@@ -312,7 +320,12 @@ $expandedCount = ($resolved | Where-Object { -not $_.Matched }).Count
 
 switch ($Format) {
     "Json" {
-        $resolved | ConvertTo-Json -Depth 2
+        try {
+            $resolved | ConvertTo-Json -Depth 2
+        } catch {
+            Write-Host "Error converting results to JSON: $_" -ForegroundColor Red
+            exit 1
+        }
     }
     "Csv" {
         $resolved | ConvertTo-Csv -NoTypeInformation

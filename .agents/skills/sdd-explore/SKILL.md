@@ -1,6 +1,6 @@
 ﻿---
 name: sdd-explore
-description: >  sdd-explore skill
+description: "Investigate codebase to understand requirements, entry points, patterns, and dependencies before design decisions"
 triggers: "Explore codebase, pre-design"
 license: MIT
 metadata: author: gentleman-vMK, version: "2.1"

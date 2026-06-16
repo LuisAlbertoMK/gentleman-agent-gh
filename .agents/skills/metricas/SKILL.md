@@ -1,6 +1,6 @@
 ﻿---
 name: metricas
-description: >  metricas skill
+description: "On-demand before/after comparison with delta and % improvement — git diff or bookmark mode, tokenization, multi-language auto-detect"
 triggers: "Metricas, before/after, % improvement, tokenization, delta"
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.3", changelog: "1.2->1.3 (sprint 5: 67->58 lines, -13.4%, tightened tables)"

@@ -1,6 +1,6 @@
 ﻿---
 name: sdd-tasks
-description: >  sdd-tasks skill
+description: "Break down specs into phased, actionable implementation tasks with workload forecasting and PR splitting guidance"
 triggers: "Task breakdown, implementation plan"
 license: MIT
 metadata: author: gentleman-vMK, version: "2.2"

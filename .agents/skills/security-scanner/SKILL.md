@@ -1,6 +1,6 @@
 ﻿---
 name: security-scanner
-description: >  security-scanner skill
+description: "Pre-commit security scan — detect secrets, injection patterns, dependency vulnerabilities, and dangerous API usage"
 triggers: "Security, seguridad, vulnerabilidad, auditar"
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1", changelog: "1.0->1.1 (sprint 5: 78->60 lines, -23.1%, compacted grep patterns)"

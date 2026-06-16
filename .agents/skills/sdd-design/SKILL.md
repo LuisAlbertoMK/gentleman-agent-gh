@@ -1,6 +1,6 @@
 ﻿---
 name: sdd-design
-description: >  sdd-design skill
+description: "Create technical design documents with architecture decisions, data flow diagrams, file change plans, and testing approach"
 triggers: "Technical design, HOW"
 license: MIT
 metadata: author: gentleman-vMK, version: "2.1"

@@ -1,6 +1,6 @@
 ﻿---
 name: code-review-agent
-description: >  code-review-agent skill
+description: "Structured code review with 6-dimension scoring, evidence gates, and actionable fix recommendations"
 triggers: "Code review, CR, revisar cÃ³digo, criticar"
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.0"

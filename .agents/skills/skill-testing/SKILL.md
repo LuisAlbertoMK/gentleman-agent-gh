@@ -1,6 +1,6 @@
 ﻿---
 name: skill-testing
-description: >  skill-testing skill
+description: "Test and verify skill quality — syntax, coverage, integration, and token budget assessment before production use"
 triggers: "Test/verify skill, coverage"
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "1.1"

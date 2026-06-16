@@ -1,6 +1,6 @@
 ﻿---
 name: lean-context
-description: >  lean-context skill â€” unified compression (LEANâ†’ULTRAâ†’CAVEMAN)
+description: "Unified compression levels — LEAN, ULTRA, and CAVEMAN modes for token-efficient responses with acronyms and budget gates"
 triggers: "Ultra-lean default, compact responses, caveman, /caveman"
 license: Apache-2.0
 metadata: author: gentleman-vMK, version: "2.0", changelog: "1.1â†’2.0: merged caveman as CAVEMAN level, added acronyms"
