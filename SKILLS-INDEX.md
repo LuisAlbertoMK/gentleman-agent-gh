@@ -61,9 +61,8 @@
 | Core Web Vitals, LCP, INP, CLS, layout shift, page experience | core-web-vitals |
 | Best practices, security audit, modernize code, code quality review | best-practices |
 | Web quality audit, lighthouse audit, review web quality, check page quality | web-quality-audit |
-| Skill validation, benchmark, multi-trial, validate skill, 3 trials, medir skill | skill-validate |
 | Performance mode, dev mode, modo desarrollo, resource priority, high performance | development-mode |
-| SDD onboard, onboarding, nuevo proyecto SDD, guía SDD | sdd-onboard |
+| Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
 | Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
 | Sparse loading, skill resolution, relevant skills, which skill, resolver skill, minimo skills | skill-graph |
 | Research, technical investigation, investigar, learn tech, compare solutions, evaluate options | research |

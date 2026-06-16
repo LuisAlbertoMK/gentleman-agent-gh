@@ -7,7 +7,7 @@ metadata:
     - engineering
   author: gentleman-vMK
   version: "2.0"
-triggers: ["dónde lo dejamos", "continuá", "session start in git repo"]
+triggers: "dónde lo dejamos, continuá, session start in git repo"
 ---
 
 ## Gate

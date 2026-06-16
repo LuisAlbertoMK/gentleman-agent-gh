@@ -36,8 +36,9 @@ Get-Process -Name "opencode*","node*","bun*" -ErrorAction SilentlyContinue |
 Get-Process -Name "opencode*" -ErrorAction SilentlyContinue |
   ForEach-Object { $_.ProcessorAffinity = [IntPtr]::new([int]::MaxValue) }
 ```
-### 3. Power Plan
+### 3. Power Plan (requires Admin)
 ```powershell
+# NOTE: powercfg requires Admin. Run: Start-Process powershell -Verb RunAs
 powercfg /SETACTIVE "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"
 powercfg -setacvalueindex SCHEME_CURRENT SUB_PROCESSOR PROCTHROTTLEMIN 100
 powercfg -setacvalueindex SCHEME_CURRENT SUB_PROCESSOR PROCTHROTTLEMAX 100

@@ -1,6 +1,7 @@
 ---
 name: web-quality-audit
 description: Comprehensive web quality audit covering performance, accessibility, SEO, and best practices. Use when asked to "audit my site", "review web quality", "run lighthouse audit", "check page quality", or "optimize my website".
+triggers: "audit, review web quality, lighthouse, page quality, optimize website"
 license: MIT
 metadata:
   tags:
