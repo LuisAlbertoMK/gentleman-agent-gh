@@ -117,9 +117,9 @@ $result = @{
 if ($Json) {
   Write-Output ($result | ConvertTo-Json -Depth 3)
 } else {
-  $warnCount = try { @($result.warnings) } catch { @() }
-  $driftCount = try { @($drifted) } catch { @() }
-  $errCount = try { @($errors) } catch { @() }
+  $warnCount = @($result.warnings)
+  $driftCount = @($drifted)
+  $errCount = @($errors)
 
   if ($warnCount.Count -gt 0) {
     Write-Output "`nWARNINGS: $($warnCount.Count)"
