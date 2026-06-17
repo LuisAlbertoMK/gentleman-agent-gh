@@ -37,7 +37,7 @@ Set-StrictMode -Version Latest
 # throw IOException ("handle is invalid") in non-console hosts (ISE, remoting,
 # some CI pipelines) and abort the whole install. Safe to swallow.
 $null = & chcp 65001 2>$null
-try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
+try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch { # encoding fallback OK }
 
 $GITHUB_OWNER = "Gentleman-Programming"
 $GITHUB_REPO = "gentle-ai"

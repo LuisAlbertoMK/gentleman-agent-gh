@@ -26,3 +26,4 @@
 2026-05-28 — Quality gate + pre-commit + seguridad
 2026-05-26 — Karpathy compresión + anti-patrones
 ```
+2026-06-17 - Automejora 3 enfoques: (1) Karpathy compress 4 skills -49.5% (-10KB, -7.3% total). (2) PSSA empty catch fix. (3) Deltas medidos. Skill Effectiveness 9->10. Commits: 6a24486 + next.
