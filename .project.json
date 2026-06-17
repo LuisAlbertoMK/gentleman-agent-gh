@@ -4,24 +4,21 @@
   "name": "gentleman-agent-gh",
   "description": "Gentleman Agent — OpenCode agent skills, scripts & config",
   "score": {
-    "current": 8.5,
+    "current": 9.2,
     "dimensions": {
-      "Project Artifacts": 9,
-      "Security": 8,
-      "Performance": 8,
-      "Optimization": 8,
+      "Project Artifacts": 10,
+      "Security": 9,
       "Dead Code": 9,
       "Clean Code": 9,
       "Best Practices": 9,
-      "UI/UX": 7,
-      "Responsive": 7,
-      "SEO": 5,
-      "Orthography": 8,
-      "Bitácora": 9,
-      "Metrics": 9
+      "Orthography": 9,
+      "Bitácora": 10,
+      "Metrics": 9,
+      "Script Performance": 9,
+      "Skill Effectiveness": 9
     },
     "last_updated": "2026-06-17",
-    "trend": "stable"
+    "trend": "up"
   },
   "repos": {
     "upstream": "gentleman-programming/gentleman-vMK",

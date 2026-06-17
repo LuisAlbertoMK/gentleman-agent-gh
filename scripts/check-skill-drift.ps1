@@ -69,8 +69,8 @@ foreach ($skill in $canonicalSkills) {
   # Compare content if not a junction (real file copy could drift)
   if ($globalItem.LinkType -ne "Junction") {
     if ($Thorough) {
-      $canonHash = (Get-FileHash -LiteralPath $canonPath -Algorithm MD5).Hash
-      $globHash = (Get-FileHash -LiteralPath $globPath -Algorithm MD5).Hash
+      $canonHash = (Get-FileHash -LiteralPath $canonPath -Algorithm SHA256).Hash
+      $globHash = (Get-FileHash -LiteralPath $globPath -Algorithm SHA256).Hash
       $match = $canonHash -eq $globHash
     } else {
       $canonLines = (Get-Content $canonPath | Measure-Object -Line).Lines
