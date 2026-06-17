@@ -193,7 +193,9 @@ foreach ($File in $SkillFiles) {
       }
     }
     if ($Corrupted) { $CorruptedCount++ }
-  } catch { }
+  } catch {
+    # Silencio intencional: fallo de lectura de bytes no crítico para el score
+  }
 }
 
 $OrthoScore = 10

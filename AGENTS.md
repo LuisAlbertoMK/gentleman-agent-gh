@@ -197,7 +197,7 @@ Close task: auto-metrics 6 dims (correctness, tokens, error prevention, skill, s
 ### J. Pre-session Health Check (session start) + Project Score
 Al iniciar sesión, MUY rápido (no bloquear):
 1. `git status --short` — si hay cambios sin commit → alerta leve
-2. Solo si detectás drift evidente (skill faltante, AGENTS.md corrupto) → `scripts/check-skill-drift.ps1`
+2. Ejecutá `scripts/check-skill-drift.ps1` — verifica que todas las skills tengan sus junctions globales. Si hay drift, reportalo como warning.
 3. Si todo OK → seguí sin reportar
 
 ### K. Project Score Auto-Report (first user request)

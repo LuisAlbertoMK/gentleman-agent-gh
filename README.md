@@ -1,6 +1,6 @@
 # gentleman-vMK Agent Skills — OpenCode AI Agent Skills
 
-Colección de **54 skills profesionales** para OpenCode AI agent. Diseñadas para desarrollo de software con arquitectura limpia, TDD real, y principios SR Engineer.
+Colección de **63 skills profesionales** para OpenCode AI agent. Diseñadas para desarrollo de software con arquitectura limpia, TDD real, y principios SR Engineer.
 
 ## Skills Incluidas
 
@@ -15,7 +15,7 @@ Colección de **54 skills profesionales** para OpenCode AI agent. Diseñadas par
 | **Decisions** | decision-capture | v1.0 |
 | **Performance** | performance-tracker | v1.0 |
 
-**Total: 54 skills + _shared** — todas con SKILL.md, frontmatter YAML y licencia Apache-2.0.
+**Total: 63 skills + _shared** — todas con SKILL.md, frontmatter YAML y licencia Apache-2.0.
 
 ## Instalación
 

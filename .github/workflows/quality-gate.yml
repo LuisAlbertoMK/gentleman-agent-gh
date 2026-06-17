@@ -19,6 +19,9 @@ jobs:
       - name: Cross-ref validation — skills, index, junctions, references
         run: ./scripts/cross-ref-check.ps1
 
+      - name: Skill drift check — canonical vs global junctions
+        run: ./scripts/check-skill-drift.ps1
+
       - name: PS5.1 safety scan — detect &&/|| hazards in all .ps1
         run: |
           $files = Get-ChildItem -Recurse -Filter *.ps1 | Where-Object { $_.FullName -notmatch 'bash-safe|experiments|node_modules' } | Select-Object -ExpandProperty FullName
