@@ -167,6 +167,34 @@ foreach ($s in $snapshots) {
     (Fmt-Pct $s.RulesPct))
 }
 
+# --- Error Trends (from docs/metricas/errors/) ---
+$errorDir = Join-Path $repoRoot "docs\metricas\errors"
+$errorFiles = @(Get-ChildItem -Path $errorDir -Filter "*_error.json" -ErrorAction SilentlyContinue | Where-Object { $_.Name -ne "LATEST_error.json" } | Sort-Object LastWriteTime)
+
+if ($errorFiles.Count -gt 0) {
+  $report += ""
+  $report += "## Error Trends"
+  $report += ""
+  $report += "| Date | Commit | Source | Pass | Fail | Errors | Blocked |"
+  $report += "|------|--------|--------|------|------|--------|---------|"
+
+  $errorEntries = $errorFiles | ForEach-Object {
+    try { Get-Content $_.FullName -Raw | ConvertFrom-Json } catch { $null }
+  } | Where-Object { $_ }
+
+  foreach ($e in $errorEntries) {
+    $dateStr = (Get-Date $e.timestamp).ToString("MM-dd HH:mm")
+    $report += ("| {0} | {1} | {2} | {3} | {4} | {5} | {6} |" -f
+      $dateStr,
+      $e.commit,
+      $e.source,
+      $e.passed,
+      $e.failed,
+      $e.totalErrors,
+      $e.blocked)
+  }
+}
+
 $report += ""
 
 Write-Output ($report -join $nl)
