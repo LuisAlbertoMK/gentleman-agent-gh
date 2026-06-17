@@ -11,6 +11,6 @@ metadata:
 ---
 
 Trigger: Orchestrator launches design.
-## GATEOrchestrator loaded this? â†’ STOP, delegate to `sdd-design` sub-agent.Executor sub-agent? â†’ proceed.
-## SECTIONS- Technical Approach: strategyâ†’proposal- Decisions: choice/alternatives/rationale- Data Flow: ASCII diagram- File Changes: path/action/description- Interfaces: new APIs/types- Testing: layerâ†’whatâ†’approach- Migration: data/feature flags/rollout (or "none")- Open Questions: unresolved
+## GATEOrchestrator loaded this? → STOP, delegate to `sdd-design` sub-agent.Executor sub-agent? → proceed.
+## SECTIONS- Technical Approach: strategy→proposal- Decisions: choice/alternatives/rationale- Data Flow: ASCII diagram- File Changes: path/action/description- Interfaces: new APIs/types- Testing: layer→what→approach- Migration: data/feature flags/rollout (or "none")- Open Questions: unresolved
 ## RULES- Read actual code, not guess- Every decision rationale- Use project ACTUAL patterns- ASCII: clarity>beauty

@@ -12,10 +12,10 @@ metadata:
 ---
 
 Trigger: Python async, asyncio, coroutines, event loop.
-## WhenDebugging async deadlocks Â· Concurrent tasks Â· Fire-and-forget Â· Event loop management
+## WhenDebugging async deadlocks · Concurrent tasks · Fire-and-forget · Event loop management
 ## gather vs create_task vs TaskGroup| **gather** | **create_task** | **TaskGroup (3.11+)** ||-----------|-----------------|---------------------|| Ordered results | Unordered | Ordered (by add) || Auto-exception propagate | Manual handle | First fail cancels rest || Cancels all on one fail | Independent | ExceptionGroups || Use: known coro set | Use: dynamic/fire-forget | Use: related tasks |
-## Deadlock prevention- NEVER block event loop with sync calls (`time.sleep` â†’ `asyncio.sleep`)- `asyncio.timeout()` or `wait_for()` to avoid hangs- `gather(return_exceptions=True)` for graceful error handling- Maintain strong refs: `background_tasks.add(task); task.add_done_callback(background_tasks.discard)`- Detect cycles: `python -m asyncio pstree <pid>`
-## Common pitfalls- Forgetting `await` â†’ returns coroutine, not result- Mixing sync/async libs â†’ blocks event loop- GC-collected tasks â†’ cancelled silently â†’ keep strong refs- `asyncio.run()` called multiple times â†’ RuntimeError (single entry point)
+## Deadlock prevention- NEVER block event loop with sync calls (`time.sleep` → `asyncio.sleep`)- `asyncio.timeout()` or `wait_for()` to avoid hangs- `gather(return_exceptions=True)` for graceful error handling- Maintain strong refs: `background_tasks.add(task); task.add_done_callback(background_tasks.discard)`- Detect cycles: `python -m asyncio pstree <pid>`
+## Common pitfalls- Forgetting `await` → returns coroutine, not result- Mixing sync/async libs → blocks event loop- GC-collected tasks → cancelled silently → keep strong refs- `asyncio.run()` called multiple times → RuntimeError (single entry point)
 ## Components
 ### gather
 ```pythonresults = await asyncio.gather(    fetch("a"), fetch("b"), fetch("c"),    return_exceptions=True  # don't cancel all on first error)```

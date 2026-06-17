@@ -11,9 +11,9 @@ metadata:
 ---
 
 Trigger: Orchestrator launches verify.
-## GATEOrchestrator loaded this? â†’ STOP, delegate to `sdd-verify` sub-agent.Executor sub-agent? â†’ proceed.
+## GATEOrchestrator loaded this? → STOP, delegate to `sdd-verify` sub-agent.Executor sub-agent? → proceed.
 ## CONTRACTRead proposal/spec/design/tasks. Persist:| Mode | Action ||------|--------|| engram | `mem_save(topic_key:sdd/{change}/verify-report)` || openspec | `openspec/changes/{change}/verify-report.md` || hybrid | both | none | return only |
 ## GATES| Condition | Action ||---|---|| strict_tdd:true + runner | Strict TDD verify (load strict-tdd-verify.md) || Test fails | CRITICAL || Spec scenario untested/failing | CRITICAL || Design deviation (non-breaking) | WARNING |
-## STEPS1. Load skills Â· 2. Retrieve artifacts3. Resolve TDD mode Â· 4. Completeness: tasks [x]/total5. Specâ†’implâ†’test mapping per scenario6. Design coherence check7. Test â†’ build â†’ coverage8. Compliance: test PASS = COMPLIANT9. Persist Â· 10. Return
+## STEPS1. Load skills · 2. Retrieve artifacts3. Resolve TDD mode · 4. Completeness: tasks [x]/total5. Spec→impl→test mapping per scenario6. Design coherence check7. Test → build → coverage8. Compliance: test PASS = COMPLIANT9. Persist · 10. Return
 ## RETURN
 ```{name} | {TDD/STANDARD}Tasks:{N}/{total} | Build:{P/FAIL} | Tests:{Np}/{Nf} | Cov:{N}%Compliance:{N}/{total} | CRIT:{list} | WARN:{list}VERDICT:{PASS|PASS-WARNINGS|FAIL}```

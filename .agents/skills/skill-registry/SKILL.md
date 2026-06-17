@@ -11,7 +11,7 @@ metadata:
 ---
 
 Trigger: "update skills", after install/remove skills.
-## STEPS1. Scan: ~/.config/opencode/skills/*/, ~/.claude/skills/, project .claude/.gemini/.agent/skills/   Skip: sdd-*, _shared, skill-registry   Dedupe: project-level wins2. Compact rules: 5-15 lines, actionable, NO fluff3. Conventions: agents.md/CLAUDE.md/.cursorrules/GEMINI.md â†’ extract paths4. Write: .atl/skill-registry.md + mem_save
+## STEPS1. Scan: ~/.config/opencode/skills/*/, ~/.claude/skills/, project .claude/.gemini/.agent/skills/   Skip: sdd-*, _shared, skill-registry   Dedupe: project-level wins2. Compact rules: 5-15 lines, actionable, NO fluff3. Conventions: agents.md/CLAUDE.md/.cursorrules/GEMINI.md → extract paths4. Write: .atl/skill-registry.md + mem_save
 ## OUTPUT
 ```markdown# Registry
 ## Skills | Trigger | Skill | Path |
@@ -19,4 +19,4 @@ Trigger: "update skills", after install/remove skills.
 ### {name} - Rule1 |
 ## Conventions | File | Path |
 ```
-## RULES- ALWAYS write .atl/skill-registry.md- ALWAYS mem_save if available- Compact rules: 5-15 lines each- NO skills â†’ write empty registry
+## RULES- ALWAYS write .atl/skill-registry.md- ALWAYS mem_save if available- Compact rules: 5-15 lines each- NO skills → write empty registry

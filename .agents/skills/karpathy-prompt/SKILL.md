@@ -10,7 +10,7 @@ metadata:
   version: "1.1"
 ---
 
-Trigger: "mÃ©todo Karpathy", "less tokens".
+Trigger: "método Karpathy", "less tokens".
 ## FUNDAMENTAL"Write like explaining to smart junior dev sitting next to you." Less=more.
 ## 5 RULES1.ID+TASK=ENOUGH: "Eres [role]. Task:[t]"2.MINIMAL: no 10+ lists, no paragraphs. Yes 1-2 examples, output format.3.FORMAT=INSTRUCT: "Respond ONLY in JSON:{...}"4.CONSTRAINTS=FORMAT: max X, code only, ignore all except X5.IMPLICIT CoT: no "think step by step". If needed:"Reason ONLY if ambiguous."
 ## WIKIL1 Raw sources | L2 LLM-compiled | L3 index.md (~200t)Pre-compiled: 1)files, 2)~3-5K map, 3)use as input

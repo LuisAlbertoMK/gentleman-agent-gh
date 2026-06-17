@@ -21,6 +21,6 @@ Pre-commit security scan: secrets, injection patterns, dependency vulns, dangero
 ## Security Scan: {scope}
 ### Summary- Secrets: {N} | Injection: {N} | Dangerous APIs: {N} | Vuln deps: {N}
 ### Issues (CRITICAL/HIGH/MEDIUM/LOW)#
-### CRITICAL: {type} in {file:line}- Pattern: `{found}` â†’ Fix: `{suggested fix}
+### CRITICAL: {type} in {file:line}- Pattern: `{found}` → Fix: `{suggested fix}
 ````
-## Rules1. Run `grep` BEFORE manual inspection. Tool first.2. Critical+High â†’ must fix before commit. Medium â†’ suggest.3. Verify false positives â€” don't auto-flag env vars4. Issues found? Always provide fix, not just warning5. End with: "Remaining risk: NONE/LOW/MED/HIGH (why)"
+## Rules1. Run `grep` BEFORE manual inspection. Tool first.2. Critical+High → must fix before commit. Medium → suggest.3. Verify false positives — don't auto-flag env vars4. Issues found? Always provide fix, not just warning5. End with: "Remaining risk: NONE/LOW/MED/HIGH (why)"

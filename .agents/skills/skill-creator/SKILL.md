@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: "Create new AI agent skills following Agent Skills spec — auto-bootstrap unknown tasks, define structure, register in AGENTS.md"
+description: "Create new AI agent skills following Agent Skills spec â€” auto-bootstrap unknown tasks, define structure, register in AGENTS.md"
 triggers: "Create AI skill"
 license: Apache-2.0
 metadata:

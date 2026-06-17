@@ -11,9 +11,9 @@ metadata:
 ---
 
 Trigger: "improve prompt", "ReAct", "security", "multi-agent".
-## SPEARS: Scope â€” "for [ctx], in:[types], out:[format]"P: Principles â€” max 4 non-negotiable (security/quality/performance)E: Examples â€” 1 valid + 1 edge + 1 contraA: Assertions â€” ASSERT constraints | NEVER prohibitedR: Refinements â€” post-impl iterations
+## SPEARS: Scope — "for [ctx], in:[types], out:[format]"P: Principles — max 4 non-negotiable (security/quality/performance)E: Examples — 1 valid + 1 edge + 1 contraA: Assertions — ASSERT constraints | NEVER prohibitedR: Refinements — post-impl iterations
 ## PATTERNS
-### ReActThought:[reason]â†’Action:[tool]â†’Observation:[result]...repeatâ†’Final Answer
-### ReflexionTask:[task]â†’Attempt:[attempt]â†’Reflection:[crit]â†’Revision:[improved]...repeat
-### Multi-AgentRouterâ†’Plannerâ†’Executorâ†’CriticAgent: role, scope, tools, limitsComm: requestâ†’response, errorsâ†’reportingOrchestrator: routingâ†’fallbackâ†’timeout
+### ReActThought:[reason]→Action:[tool]→Observation:[result]...repeat→Final Answer
+### ReflexionTask:[task]→Attempt:[attempt]→Reflection:[crit]→Revision:[improved]...repeat
+### Multi-AgentRouter→Planner→Executor→CriticAgent: role, scope, tools, limitsComm: request→response, errors→reportingOrchestrator: routing→fallback→timeout
 ## SECURITYINPUT: types/ranges/sanitizationOUTPUT: no-autoexec/rate limits/timeoutsDATA: no-creds/no-PII/no-tokensAGENT: least-privilege/tools schema/sandbox/human-in-loop
