@@ -3,6 +3,7 @@ param(
     [string]$Mode = 'report'
 )
 
+Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $learningsDir = Join-Path $repoRoot '.learnings'
