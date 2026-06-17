@@ -29,6 +29,7 @@
 #>
 
 $ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
 
 # Ensure UTF-8 output so Unicode characters render correctly on all terminals.
 # chcp 65001 sets the console code page; OutputEncoding makes .NET match it.
@@ -220,6 +221,10 @@ function Get-LatestVersion {
 
 function Install-ViaBinary {
     param([string]$Arch)
+
+    # Inherited from Main scope — declare local defaults for StrictMode
+    $Insecure = $false
+    $InstallDir = ""
 
     Write-Step "Installing pre-built binary"
 
