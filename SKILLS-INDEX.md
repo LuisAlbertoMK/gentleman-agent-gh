@@ -1,9 +1,9 @@
 ﻿# SKILLS INDEX
 
-> Full trigger table for all 63 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 64 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 2.3 | **Changelog**: 2.3 (4R framework: code-review-agent v2.0, judgment-day v2.0, review-pipeline v1.0 — skill stacking pipeline)
+> **Version**: 2.4 | **Changelog**: 2.4 (Added triple-verify — 3-enfoque verification, thresholds, !ship/!fast/!listo/!draft keywords)
 
 ## Triggers â†’ Skill
 
@@ -73,10 +73,11 @@
 | Sparse loading, skill resolution, relevant skills, which skill, resolver skill, minimo skills | skill-graph |
 | Research, technical investigation, investigar, learn tech, compare solutions, evaluate options | research |
 | Review pipeline, skill stacking, full review, preparar commit, ready to ship, listo para commit | review-pipeline |
+| Triple verify, triangulate, 3 enfoques, verificación profunda, !ship, !listo, !fast, !draft | triple-verify |
 
 ## Quick groups
 - **Compression/style**: karpathy-prompt, karpathy-loop, lean-context
-- **Quality**: quality-gate, auto-metrics, immune-system, code-review-agent, performance-tracker
+- **Quality**: quality-gate, auto-metrics, immune-system, code-review-agent, performance-tracker, triple-verify
 - **Memory**: session-resume, code-memory, dreaming
 - **Skills meta**: skill-creator, skill-registry, skill-improver, skill-digestion, skill-graph
 - **Coordination**: delivery-harness, chained-pr, branch-pr, issue-creation, subagent-isolation, command-wrapper

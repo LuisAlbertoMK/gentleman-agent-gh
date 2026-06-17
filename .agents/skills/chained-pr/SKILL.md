@@ -10,7 +10,7 @@ metadata:
 ---
 
 ## When
-- PR may exceed **400 changed lines** · SDD forecasts `400-line budget risk: High` · user asks for chained/stacked PRs · multi-commit features needing sequential deliverable PRs
+PR >400 lines · SDD `400-line budget risk: High` · user asks for stacked PRs · multi-commit sequential deliverables
 
 ## Hard Rules
 - **Split PRs over 400 lines** unless maintainer accepts `size:exception`
@@ -30,7 +30,7 @@ metadata:
 | SDD has `delivery_strategy` | Follow it |
 
 ## Workflow
-1. Estimate lines → split into units → branch `feat/{prefix}-{n}-{slug}` targeting predecessor → commit per work-unit-commits → `gh pr create --base {parent}` → declare `Depends on: #N` + Chain Context → verify each PR independently → merge in order → rebase cascade
+Estimate → split → branch `feat/{prefix}-{n}-{slug}` targeting predecessor → `gh pr create --base {parent}` → declare `Depends on: #N` + Chain Context → verify each PR → merge in order → rebase cascade
 
 ### Stacked PRs to Main
 ```
@@ -77,9 +77,9 @@ Return: chosen strategy · PR order/deps · boundaries · dependency diagram · 
 ### Overview
 main └── #N Prev └── 📍 #N This └── #N Next
 
-### Scope | Autonomy
+### Scope
 - Includes: <unit> · Excludes: <deferred>
-- [x] CI passes · [x] One deliverable · [x] Rollback-safe · [x] Tests/docs cover it
+- [x] CI passes · [x] One deliverable · [x] Rollback-safe · [x] Tests/docs
 ```
 
 ## Deps

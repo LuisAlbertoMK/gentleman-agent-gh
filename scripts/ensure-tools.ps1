@@ -4,8 +4,14 @@
 .DESCRIPTION
   Triple verificación para cada herramienta: (1) existe en PATH (2) --version
   (3) función básica. Dot-source para exponer en sesión actual.
+.PARAMETER Quiet
+  Suprime output detallado, solo muestra resultado final.
 #>
 #requires -Version 5.1
+
+param(
+  [switch]$Quiet
+)
 
 Set-StrictMode -Version Latest
 
@@ -35,6 +41,8 @@ $tools = @{
 
 $allOk = $true
 
+function Write-VerboseOutput($msg) { if (-not $Quiet) { Write-Host $msg } }
+
 foreach ($key in $tools.Keys) {
   $t = $tools[$key]
   $exe = Get-Command $key -ErrorAction SilentlyContinue
@@ -56,15 +64,15 @@ foreach ($key in $tools.Keys) {
     if ($parent -notin ($env:Path -split ';')) {
       $env:Path = "${parent};$env:Path"
     }
-    Write-Host "[$key] OK - $($t.label)"
-    Write-Host "       $fullPath"
+    Write-VerboseOutput "[$key] OK - $($t.label)"
+    Write-VerboseOutput "       $fullPath"
 
     # V1: --version (check output, not exit code — PS scripts don't set LASTEXITCODE)
     $ver = & $fullPath --version 2>&1 | Select-Object -First 1
     if ($ver) {
-      Write-Host "       version: $ver"
+      Write-VerboseOutput "       version: $ver"
     } else {
-      Write-Host "       version: FAIL (no output)"
+      Write-VerboseOutput "       version: FAIL (no output)"
       $allOk = $false
     }
 
@@ -72,25 +80,25 @@ foreach ($key in $tools.Keys) {
     if ($key -eq 'rg') {
       $testFile = Join-Path $env:TEMP "ensure-tools-test.txt"
       "hello world" | Set-Content $testFile -Encoding utf8
-      $result = & $fullPath "hello" $testFile 2>$null
+      $null = & $fullPath "hello" $testFile 2>$null
       if ($LASTEXITCODE -eq 0) {
-        Write-Host "       search: OK"
+        Write-VerboseOutput "       search: OK"
       } else {
-        Write-Host "       search: FAIL"
+        Write-VerboseOutput "       search: FAIL"
         $allOk = $false
       }
       Remove-Item $testFile -Force -ErrorAction SilentlyContinue
     }
   } else {
-    Write-Host "[$key] NOT FOUND - $($t.label)"
+    Write-VerboseOutput "[$key] NOT FOUND - $($t.label)"
     $allOk = $false
   }
 }
 
 if ($allOk) {
-  Write-Host "ALL TOOLS OK"
+  Write-VerboseOutput "ALL TOOLS OK"
 } else {
-  Write-Host "SOME TOOLS MISSING"
+  Write-VerboseOutput "SOME TOOLS MISSING"
 }
 
 return $allOk
