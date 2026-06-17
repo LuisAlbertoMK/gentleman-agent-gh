@@ -1,0 +1,48 @@
+name: Quality Gate
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  quality-gate:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cross-ref validation — skills, index, junctions, references
+        run: ./scripts/cross-ref-check.ps1
+
+      - name: PS5.1 safety scan — detect &&/|| hazards in all .ps1
+        run: |
+          $files = Get-ChildItem -Recurse -Filter *.ps1 | Where-Object { $_.FullName -notmatch 'bash-safe|experiments|node_modules' } | Select-Object -ExpandProperty FullName
+          if ($files.Count -gt 0) { & ./scripts/ps5-detect.ps1 -FilePath $files }
+          else { Write-Output "No .ps1 files to scan" }
+
+      - name: Downstream tests — delivery-harness, chained-pr, subagent-isolation
+        run: ./scripts/test-downstream.ps1
+
+      - name: Benchmark report — system health snapshot
+        run: ./scripts/benchmark.ps1
+
+      - name: Overweight skill check — warn if any skill >3KB
+        run: |
+          $overweight = Get-ChildItem .agents/skills -Directory | Where-Object { $_.Name -ne '_shared' } | ForEach-Object {
+            $md = Join-Path $_.FullName 'SKILL.md'
+            if (Test-Path $md) {
+              $len = (Get-Content $md -Raw).Length
+              if ($len -gt 3072) { Write-Output "$($_.Name) ($($len)B)" }
+            }
+          }
+          if ($overweight) {
+            Write-Output "::warning title=Overweight Skills::Skills exceeding 3KB limit"
+            $overweight
+          } else {
+              Write-Output "OK: All skills ≤3KB"
+          }
