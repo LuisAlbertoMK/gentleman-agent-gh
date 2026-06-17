@@ -1,0 +1,36 @@
+{
+  "$schema": "https://raw.githubusercontent.com/LuisAlbertoMK/gentleman-agent-gh/main/.project.schema.json",
+  "project": true,
+  "name": "gentleman-agent-gh",
+  "description": "Gentleman Agent — OpenCode agent skills, scripts & config",
+  "score": {
+    "current": 8.5,
+    "dimensions": {
+      "Project Artifacts": 9,
+      "Security": 8,
+      "Performance": 8,
+      "Optimization": 8,
+      "Dead Code": 9,
+      "Clean Code": 9,
+      "Best Practices": 9,
+      "UI/UX": 7,
+      "Responsive": 7,
+      "SEO": 5,
+      "Orthography": 8,
+      "Bitácora": 9,
+      "Metrics": 9
+    },
+    "last_updated": "2026-06-17",
+    "trend": "stable"
+  },
+  "repos": {
+    "upstream": "gentleman-programming/gentleman-vMK",
+    "origin": "LuisAlbertoMK/gentleman-agent-gh"
+  },
+  "prefs": {
+    "commit_convention": "conventional",
+    "quality_gate": true,
+    "auto_metrics": true,
+    "language": "es-AR"
+  }
+}

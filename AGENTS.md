@@ -194,13 +194,36 @@ Close task: auto-metrics 6 dims (correctness, tokens, error prevention, skill, s
 **1. Skill: `self-improvement`** — creates `.learnings/` (LEARNINGS.md, ERRORS.md, FEATURE_REQUESTS.md), ≥3 reps→permanent memory, extracts via `scripts/extract-skill.ps1`. Load: `skill("self-improvement")`.
 **2. Plugin: `opencode-self-improve`** (Hermes Agent-style) — SkillForge extracts patterns→SQLite skills, Curator re-scores/merges/removes low-quality, SkillInjector injects top-3 pre-turn. 7 tools. Config: `magic-context.jsonc` root. DB: `~/.local/share/opencode-self-improve/skills.db`.
 
-### J. Pre-session Health Check (session start)
+### J. Pre-session Health Check (session start) + Project Score
 Al iniciar sesión, MUY rápido (no bloquear):
 1. `git status --short` — si hay cambios sin commit → alerta leve
 2. Solo si detectás drift evidente (skill faltante, AGENTS.md corrupto) → `scripts/check-skill-drift.ps1`
 3. Si todo OK → seguí sin reportar
 
-No corras el ciclo completo de mejora al inicio. Solo detectá problemas obvios.
+### K. Project Score Auto-Report (first user request)
+En el **primer mensaje del usuario** de cada sesión (antes de responder su consulta):
+1. Buscá `.project.json` en la raíz del repo
+2. **Si existe**:
+   - Es un proyecto → leé `score.current` y `score.dimensions`
+   - Si pasaron >7 días desde `score.last_updated` → tomá metricas frescas y actualizá `.project.json`
+   - Creá/actualizá `PROJECT-SCORE.md` en la raíz con:
+     ```markdown
+     # Project Score: {name}
+     **Current**: {score.current}/10
+     **Last updated**: {score.last_updated}
+     **Trend**: {score.trend}
+
+     ## Dimensions
+     | Dimensión | Score |
+     |-----------|-------|
+     | {dim1} | {score} |
+     | ... | ... |
+     ```
+   - Informá al usuario: "✅ Proyecto detectado: **{name}** — Score actual: **{score.current}/10** (última actualización: {last_updated})"
+3. **Si no existe** → no es proyecto. No informe.
+4. Guardá en Engram: `mem_save` con `topic_key=project/score` y el score actual.
+
+No corras esto en cada mensaje — solo en el PRIMERO de la sesión.
 <!-- /gentle-ai:agent-protocol -->
 
 <!-- agent-version: 2.2 — Project: gentleman-agent-gh, self-contained -->
