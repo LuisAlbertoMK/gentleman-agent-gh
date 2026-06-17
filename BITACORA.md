@@ -18,6 +18,7 @@
 2026-06-06 — session-resume comprimido (97→69 lines, -30%) + auto-clean.ps1 script + judgment-day audit (already tight) + dreaming check (no recurring patterns)
 2026-06-06 — Misión principal registrada + bitacora + autoscore 9.2/10 + session close
 2026-06-06 — Skill metricas + tokenización + 6 tools nuevas + mejoras skills existentes
+2026-06-17 — Upstream sync: 5 MODIFIED files revisados — branch-pr, issue-creation reemplazados con upstream (name gentile-ai-*); work-unit-commits reemplazado (corrupto); chained-pr v2.0 mergeado (split logic upstream + dependency chain nuestro); install.ps1 StrictMode fixes verificados.
 2026-06-03 — Karpathy loop 60 iteraciones + automejora agente
 2026-06-03 — Revisión de proyecto gentleman-vMK-agent-gh
 2026-05-30 — SDD cycle completo con subagentes

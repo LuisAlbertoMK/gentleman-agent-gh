@@ -37,57 +37,23 @@ Steps:
 Use when each slice can land on `main` in order.
 
 ```text
-main <- PR 1: foundation
+main <-- PR 1: foundation
           └── PR 2: feature slice built on PR 1
                 └── PR 3: docs/tests built on PR 2
 ```
 
 After a parent PR merges, rebase/retarget the next PR so GitHub shows only the current slice.
 
-## Chain Context Section
-
-Append this section to the repo PR template; do not replace required issue/checklist sections.
-
-```markdown
-## Chain Context
-
-| Field | Value |
-|-------|-------|
-| Chain | <feature or stack name> |
-| Tracker PR | <#NNN or "Not needed"> |
-| Position | <N of total> |
-| Base | `<target branch>` |
-| Depends on | <PR/issue/link or "None"> |
-| Follow-up | <next PR or "None"> |
-| Review budget | <changed lines> / 400 |
-| Starts at | <branch, PR, or state this builds on> |
-| Ends with | <standalone result delivered by this PR> |
-
-### Chain Overview
-
-```text
-main
- └── #NNN Previous PR
-      └── 📍 #NNN This PR
-           └── #NNN Next PR
-```
-
-### Scope
-- Includes: <focused unit>
-- Excludes: <deferred work>
-
-### Autonomy
-- [ ] CI is expected to pass for this PR branch
-- [ ] This PR has one deliverable scope
-- [ ] This PR can be rolled back without unrelated changes
-- [ ] Tests, docs, or manual verification cover this unit
-```
-
 ## Commands
 
 ```bash
+# View PR stats
 gh pr view <PR_NUMBER> --json additions,deletions,changedFiles,title,url
+
+# Create PR targeting parent branch
 gh pr create --base feat/my-feature --title "feat(scope): focused slice" --body-file pr-body.md
+
+# Create next child PR
 gh pr create --base feat/my-feature-01-core --title "feat(scope): next focused slice" --body-file pr-body.md
 ```
 
