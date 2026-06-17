@@ -1,9 +1,9 @@
 ﻿# SKILLS INDEX
 
-> Full trigger table for all 62 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 63 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 2.2 | **Changelog**: 2.2 (upstream sync: branch-pr, cognitive-doc-design, comment-writer, issue-creation — new skills from gentle-ai)
+> **Version**: 2.3 | **Changelog**: 2.3 (4R framework: code-review-agent v2.0, judgment-day v2.0, review-pipeline v1.0 — skill stacking pipeline)
 
 ## Triggers â†’ Skill
 
@@ -72,6 +72,7 @@
 | Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
 | Sparse loading, skill resolution, relevant skills, which skill, resolver skill, minimo skills | skill-graph |
 | Research, technical investigation, investigar, learn tech, compare solutions, evaluate options | research |
+| Review pipeline, skill stacking, full review, preparar commit, ready to ship, listo para commit | review-pipeline |
 
 ## Quick groups
 - **Compression/style**: karpathy-prompt, karpathy-loop, lean-context

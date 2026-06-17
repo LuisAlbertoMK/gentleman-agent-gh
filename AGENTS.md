@@ -76,7 +76,7 @@ Load order: 1) Anti-Pattern Catalog 2) Behavioral match 3) Trigger match 4) Defa
 
 ## Project Context
 - **Repo**: Gentleman Agent — OpenCode agent skills, scripts & config
-- **Skills**: `.agents/skills/` (62 skills, git-tracked) · workspace `skills/` (junctions, git-ignored)
+- **Skills**: `.agents/skills/` (63 skills, git-tracked) · workspace `skills/` (junctions, git-ignored)
 - **Global config**: junctions `$env:USERPROFILE\.config\opencode\skills/` → `.agents/skills/{name}`
 
 ## Project Overrides
