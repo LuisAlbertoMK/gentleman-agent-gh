@@ -1,33 +1,124 @@
-{
-  "$schema": "https://raw.githubusercontent.com/LuisAlbertoMK/gentleman-agent-gh/main/.project.schema.json",
-  "project": true,
-  "name": "gentleman-agent-gh",
-  "description": "Gentleman Agent — OpenCode agent skills, scripts & config",
-  "score": {
-    "current": 9.4,
-    "dimensions": {
-      "Project Artifacts": 10,
-      "Security": 9,
-      "Dead Code": 9,
-      "Clean Code": 9,
-      "Best Practices": 9,
-      "Orthography": 10,
-      "Bitácora": 10,
-      "Metrics": 9,
-      "Script Performance": 9,
-      "Skill Effectiveness": 10
-    },
-    "last_updated": "2026-06-17",
-    "trend": "up"
-  },
-  "repos": {
-    "upstream": "gentleman-programming/gentleman-vMK",
-    "origin": "LuisAlbertoMK/gentleman-agent-gh"
-  },
-  "prefs": {
-    "commit_convention": "conventional",
-    "quality_gate": true,
-    "auto_metrics": true,
-    "language": "es-AR"
-  }
+﻿{
+    "dimensions_detail":  {
+                              "Script Performance":  {
+                                                         "evidence":  {
+                                                                          "avg_size_kb":  7.5,
+                                                                          "over_50kb":  0,
+                                                                          "script_count":  25
+                                                                      },
+                                                         "score":  10,
+                                                         "rationale":  "Scripts: 25, avg: 7.5KB, \u003e50KB: 0",
+                                                         "max":  10
+                                                     },
+                              "Best Practices":  {
+                                                     "evidence":  {
+                                                                      "trycatch":  14,
+                                                                      "param_coverage":  24
+                                                                  },
+                                                     "score":  9.6,
+                                                     "rationale":  "Params: 24/25, try/catch: 14/25",
+                                                     "max":  10
+                                                 },
+                              "Security":  {
+                                               "evidence":  {
+                                                                "secrets":  false,
+                                                                "weak_crypto":  true
+                                                            },
+                                               "score":  7,
+                                               "rationale":  "Weak crypto: True, secrets: False",
+                                               "max":  10
+                                           },
+                              "Clean Code":  {
+                                                 "evidence":  {
+                                                                  "with_params":  24,
+                                                                  "with_help":  17,
+                                                                  "total_scripts":  25,
+                                                                  "with_strictmode":  25
+                                                              },
+                                                 "score":  8.8,
+                                                 "rationale":  "Scripts: 25, help: 17, params: 24, strict: 25",
+                                                 "max":  10
+                                             },
+                              "Project Artifacts":  {
+                                                        "evidence":  {
+                                                                         "skills":  63,
+                                                                         "project_json":  true,
+                                                                         "roadmap":  true,
+                                                                         "readme":  true,
+                                                                         "changelog":  true,
+                                                                         "cross_ref":  true
+                                                                     },
+                                                        "score":  10,
+                                                        "rationale":  "Cross-ref True, 63 skills (excl _shared)",
+                                                        "max":  10
+                                                    },
+                              "Orthography":  {
+                                                  "evidence":  {
+                                                                   "corrupted_files":  0,
+                                                                   "total_scanned":  64
+                                                               },
+                                                  "score":  10,
+                                                  "rationale":  "Encoding corruption: 0/64 files",
+                                                  "max":  10
+                                              },
+                              "Metrics":  {
+                                              "evidence":  {
+                                                               "errors_dir":  true,
+                                                               "error_json":  true,
+                                                               "metrics_dir":  true,
+                                                               "has_reports":  true
+                                                           },
+                                              "score":  10,
+                                              "rationale":  "Metrics dir: True, error json: True",
+                                              "max":  10
+                                          },
+                              "Skill Effectiveness":  {
+                                                          "evidence":  {
+                                                                           "over_5kb":  0,
+                                                                           "avg_size_kb":  2,
+                                                                           "total_skills":  63,
+                                                                           "total_bytes":  126223,
+                                                                           "over_3kb":  1
+                                                                       },
+                                                          "score":  10,
+                                                          "rationale":  "Skills: 63, \u003e3KB: 1, \u003e5KB: 0, avg: 2KB",
+                                                          "max":  10
+                                                      },
+                              "Dead Code":  {
+                                                "evidence":  {
+                                                                 "commented_out":  1,
+                                                                 "orphans":  0,
+                                                                 "dead_junctions":  0
+                                                             },
+                                                "score":  9,
+                                                "rationale":  "Orphans: 0, dead junctions: 0",
+                                                "max":  10
+                                            },
+                              "Bitácora":  {
+                                               "evidence":  {
+                                                                "lines":  30,
+                                                                "exists":  true
+                                                            },
+                                               "score":  10,
+                                               "rationale":  "BITACORA.md exists: True",
+                                               "max":  10
+                                           }
+                          },
+    "score":  {
+                  "current":  9.4,
+                  "dimensions":  {
+                                     "Project Artifacts":  10,
+                                     "Security":  7,
+                                     "Dead Code":  9,
+                                     "Clean Code":  8.8,
+                                     "Best Practices":  9.6,
+                                     "Orthography":  10,
+                                     "Bitácora":  10,
+                                     "Metrics":  10,
+                                     "Script Performance":  10,
+                                     "Skill Effectiveness":  10
+                                 },
+                  "last_updated":  "2026-06-17",
+                  "trend":  "unknown"
+              }
 }

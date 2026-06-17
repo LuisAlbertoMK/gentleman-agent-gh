@@ -19,6 +19,7 @@
 2026-06-06 — Misión principal registrada + bitacora + autoscore 9.2/10 + session close
 2026-06-06 — Skill metricas + tokenización + 6 tools nuevas + mejoras skills existentes
 2026-06-17 — Encoding corruption bulk fix: Windows-1252→UTF-8 double encoding reparado en 26 skills (207 chars: flechas, em dash, emoji, acentos). Score Orthography 8→10. Score total 9.2→9.4.
+2026-06-17 — Scoring protocol: SCORING-PROTOCOL.md + scripts/score-auto.ps1 (autónomo, reproducible desde 0, 10 dims). Score: 9.4/10
 2026-06-17 — Upstream sync: 5 MODIFIED files revisados — branch-pr, issue-creation reemplazados con upstream; work-unit-commits reemplazado (corrupto); chained-pr v2.0 mergeado; install.ps1 StrictMode fixes verificados. Commit 20847dc.
 2026-06-17 — Score push 8.5→9.2: re-dimensionado a 10 dims relevantes. Fixed: MD5→SHA256, command-wrapper + go-testing arrows corruptos. .project.json + PROJECT-SCORE.md actualizados.
 2026-06-03 — Karpathy loop 60 iteraciones + automejora agente
