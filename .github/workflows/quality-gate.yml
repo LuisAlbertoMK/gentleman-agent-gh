@@ -44,5 +44,9 @@ jobs:
             Write-Output "::warning title=Overweight Skills::Skills exceeding 3KB limit"
             $overweight
           } else {
-              Write-Output "OK: All skills ≤3KB"
+            Write-Output "OK: All skills ≤3KB"
           }
+
+      - name: Error snapshot — persist CI quality gate results
+        if: always()
+        run: ./scripts/capture-errors.ps1 -Snapshot
