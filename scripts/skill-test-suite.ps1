@@ -1,8 +1,13 @@
-﻿#requires -Version 5.1
-
-# skill-test-suite.ps1 — Comprehensive skill validation
-# Usage: powershell -File scripts\skill-test-suite.ps1 [-RepoRoot <path>]
-# Returns: 0 = all pass, 1 = failures
+﻿<#
+.SYNOPSIS
+  Comprehensive skill validation suite
+.DESCRIPTION
+  Runs syntax checks, frontmatter validation, dependency resolution, and
+  content quality checks across all skills in the registry.
+.PARAMETER RepoRoot
+  Ruta raíz del repositorio (default: parent of scripts/).
+#>
+#requires -Version 5.1
 
 param(
     [string]$RepoRoot = (Split-Path $PSScriptRoot -Parent)

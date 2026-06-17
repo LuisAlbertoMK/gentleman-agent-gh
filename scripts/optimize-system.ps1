@@ -1,7 +1,10 @@
-﻿# optimize-system.ps1 — Admin-level system optimizations for Ryzen 3700U + NVMe
-# REQUIRES: PowerShell as Administrator
-# USAGE:    Right-click → "Run with PowerShell" (as Admin)
-#           OR: Start-Process powershell -Verb RunAs -ArgumentList "-File optimize-system.ps1"
+﻿<#
+.SYNOPSIS
+  Admin-level system optimizations for Ryzen 3700U + NVMe
+.DESCRIPTION
+  REQUIRES: PowerShell as Administrator. Fix page file to 4GB, DISM component
+  cleanup, scheduled tasks tuning, services optimization, and registry tweaks.
+#>
 #requires -Version 5.1
 #
 # WHAT THIS DOES:

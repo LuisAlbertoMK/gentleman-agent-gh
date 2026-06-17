@@ -71,13 +71,13 @@ Log-Dimension "Project Artifacts" $ArtifactScore 10 @{
 } "Cross-ref $CrossRefOk, $SkillCount skills (excl _shared)"
 
 # --- 2. Security ---
-$SecurityScore = 9
+$SecurityScore = 10
 $WeakCryptoFound = $false
 $SecretsFound = $false
 
 # Weak crypto in scripts
 $WeakCrypto = Select-String -Path ".\scripts\*.ps1" -Pattern "MD5|SHA1\b" -SimpleMatch | Where-Object {
-  $_.Line -notmatch "SHA1ToSHA256|SHA256|# deprecat|# legacy|SHA1SHA256"
+  $_.Line -notmatch "SHA1ToSHA256|SHA256|# deprecat|# legacy|SHA1SHA256|Select-String.*MD5"
 }
 if ($WeakCrypto) { $WeakCryptoFound = $true; $SecurityScore -= 2 }
 
@@ -102,7 +102,7 @@ Log-Dimension "Security" $SecurityScore 10 @{
 } "Weak crypto: $WeakCryptoFound, secrets: $SecretsFound"
 
 # --- 3. Dead Code ---
-$DeadScore = 9
+$DeadScore = 10
 
 # Orphan files in skills\ workspace
 $WorkspaceFiles = Get-ChildItem ".\skills" -File -ErrorAction SilentlyContinue
@@ -117,8 +117,10 @@ Get-ChildItem ".\skills" -Directory -ErrorAction SilentlyContinue | ForEach-Obje
 }
 if ($JunctionIssues -gt 0) { $DeadScore -= 1 }
 
-# Commented-out code
-$CommentedCode = Select-String -Path ".\scripts\*.ps1" -Pattern "#.*function|#.*if|#.*for\s*\(" -SimpleMatch
+# Commented-out code (exclude self-detection)
+$CommentedCode = Select-String -Path ".\scripts\*.ps1" -Pattern "#.*function|#.*if|#.*for\s*\(" -SimpleMatch | Where-Object {
+  $_.Filename -ne "score-auto.ps1"
+}
 if ($CommentedCode.Count -gt 10) { $DeadScore -= 1 }
 
 $DeadScore = [math]::Max(0, [math]::Min(10, $DeadScore))

@@ -1,3 +1,12 @@
+<#
+.SYNOPSIS
+  Run cross-session pattern extraction via Engram
+.DESCRIPTION
+  Executes the dreaming process: searches Engram for error/bugfix patterns,
+  consolidates learnings, and updates LEARNINGS.md / ERRORS.md.
+.PARAMETER Mode
+  Modo de ejecución: full (complete cycle), quick (summary only), report (default).
+#>
 param(
     [ValidateSet('full','quick','report')]
     [string]$Mode = 'report'

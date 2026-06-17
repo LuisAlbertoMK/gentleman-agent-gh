@@ -1,12 +1,17 @@
+<#
+.SYNOPSIS
+  Project Intake Verification — 7 checks + 3-iteration cycle
+.DESCRIPTION
+  Evalúa un proyecto contra el framework de gap-analysis. Corre 7 checks y
+  opcionalmente itera para mejora progresiva. Output en texto o JSON.
+.PARAMETER ProjectPath
+  Ruta al proyecto a verificar.
+.PARAMETER Iterations
+  Cantidad de ciclos de mejora (default: 3).
+.PARAMETER OutputFormat
+  Formato de salida: text (default) o json.
+#>
 #requires -Version 5.1
-
-# intake-verify.ps1 - Project Intake Verification (7 checks + 3-iteration cycle)
-# Usage:
-#   powershell -File scripts\intake-verify.ps1 -ProjectPath "D:\myproject"
-#   powershell -File scripts\intake-verify.ps1 -ProjectPath "D:\myproject" -Iterations 3
-#   powershell -File scripts\intake-verify.ps1 -ProjectPath "D:\myproject" -OutputFormat json
-#
-# Returns: 0 = all pass, 1 = gaps found, 2 = critical gaps found
 
 param(
     [Parameter(Mandatory=$true)]

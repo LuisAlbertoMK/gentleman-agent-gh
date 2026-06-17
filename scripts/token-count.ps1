@@ -1,7 +1,16 @@
-﻿# token-count.ps1 — Cuenta tokens aproximados en archivos (4 chars = 1 token)
-# Uso: .\scripts\token-count.ps1 [path1] [path2...]
-#       .\scripts\token-count.ps1 -Dir .\skills\
-#       .\scripts\token-count.ps1 -Recurse
+﻿<#
+.SYNOPSIS
+  Cuenta tokens aproximados en archivos (4 chars = 1 token)
+.DESCRIPTION
+  Estimación rápida de tokens usando heurística chars/4. Soporta múltiples
+  archivos, directorios y búsqueda recursiva.
+.PARAMETER Path
+  Archivo(s) específico(s) a contar.
+.PARAMETER Dir
+  Directorio a escanear (default: skills/).
+.PARAMETER Recurse
+  Buscar recursivamente en subdirectorios.
+#>
 #requires -Version 5.1
 
 param(

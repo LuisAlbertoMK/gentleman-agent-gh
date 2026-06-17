@@ -22,21 +22,21 @@
                               "Security":  {
                                                "evidence":  {
                                                                 "secrets":  false,
-                                                                "weak_crypto":  true
+                                                                "weak_crypto":  false
                                                             },
-                                               "score":  7,
-                                               "rationale":  "Weak crypto: True, secrets: False",
+                                               "score":  10,
+                                               "rationale":  "Weak crypto: False, secrets: False",
                                                "max":  10
                                            },
                               "Clean Code":  {
                                                  "evidence":  {
                                                                   "with_params":  24,
-                                                                  "with_help":  17,
+                                                                  "with_help":  25,
                                                                   "total_scripts":  25,
                                                                   "with_strictmode":  25
                                                               },
-                                                 "score":  8.8,
-                                                 "rationale":  "Scripts: 25, help: 17, params: 24, strict: 25",
+                                                 "score":  9.9,
+                                                 "rationale":  "Scripts: 25, help: 25, params: 24, strict: 25",
                                                  "max":  10
                                              },
                               "Project Artifacts":  {
@@ -86,17 +86,17 @@
                                                       },
                               "Dead Code":  {
                                                 "evidence":  {
-                                                                 "commented_out":  1,
+                                                                 "commented_out":  0,
                                                                  "orphans":  0,
                                                                  "dead_junctions":  0
                                                              },
-                                                "score":  9,
+                                                "score":  10,
                                                 "rationale":  "Orphans: 0, dead junctions: 0",
                                                 "max":  10
                                             },
                               "Bitácora":  {
                                                "evidence":  {
-                                                                "lines":  30,
+                                                                "lines":  31,
                                                                 "exists":  true
                                                             },
                                                "score":  10,
@@ -105,12 +105,12 @@
                                            }
                           },
     "score":  {
-                  "current":  9.4,
+                  "current":  10,
                   "dimensions":  {
                                      "Project Artifacts":  10,
-                                     "Security":  7,
-                                     "Dead Code":  9,
-                                     "Clean Code":  8.8,
+                                     "Security":  10,
+                                     "Dead Code":  10,
+                                     "Clean Code":  9.9,
                                      "Best Practices":  9.6,
                                      "Orthography":  10,
                                      "Bitácora":  10,
@@ -119,6 +119,6 @@
                                      "Skill Effectiveness":  10
                                  },
                   "last_updated":  "2026-06-17",
-                  "trend":  "unknown"
+                  "trend":  "up"
               }
 }

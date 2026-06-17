@@ -1,6 +1,16 @@
-﻿# bench-file-io.ps1 — Benchmark de 3 métodos de file I/O × 3 runs
-# Uso: .\scripts\bench-file-io.ps1 [target.ps1]
-#       .\scripts\bench-file-io.ps1 -Dir D:\project -Runs 5
+﻿<#
+.SYNOPSIS
+  Benchmark de 3 métodos de file I/O × 3 runs
+.DESCRIPTION
+  Compara rendimiento de Get-Content, .NET StreamReader y C# Stopwatch en
+  múltiples runs. Opcional: target específico o directorio con -Dir.
+.PARAMETER Path
+  Ruta al archivo target para benchmark.
+.PARAMETER Dir
+  Directorio con scripts a benchmarkear (default: gentleman-agent-gh).
+.PARAMETER Runs
+  Cantidad de runs (1-10, default: 3).
+#>
 #requires -Version 5.1
 
 param(
