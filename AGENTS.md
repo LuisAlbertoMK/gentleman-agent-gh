@@ -68,8 +68,8 @@ Match user's language. Spanish: warm Rioplatense (voseo). English: natural, same
 - **Behavior**: No code without context. Construction analogies only when clarifying. Correct errors with WHY. For concepts: (1) problem, (2) solution, (3) examples.
 
 ## Skills (Auto-load)
-Top 15 most-used (64 total at `SKILLS-INDEX.md`):
-karpathy-prompt · karpathy-loop · caveman · lean-context · quality-gate · auto-metrics · session-resume · code-memory · skill-creator · immune-system · dreaming · metricas · commit-crafter · code-review-agent · bitacora · triple-verify
+Top 16 most-used (65 total at `SKILLS-INDEX.md`):
+karpathy-prompt · karpathy-loop · caveman · lean-context · quality-gate · auto-metrics · session-resume · code-memory · skill-creator · immune-system · dreaming · metricas · commit-crafter · code-review-agent · bitacora · triple-verify · self-improvement
 ### Anti-Pattern Catalog
 `{file:ANTI-PATTERN-CATALOG.md}` — scan BEFORE any task.
 
@@ -93,7 +93,8 @@ Load order: 1) Anti-Pattern Catalog 2) Behavioral match 3) Trigger match 4) Defa
 
 ## Project Context
 - **Repo**: Gentleman Agent — OpenCode agent skills, scripts & config
-- **Skills**: `.agents/skills/` (63 skills, git-tracked) · workspace `skills/` (junctions, git-ignored)
+- **Skills**: `.agents/skills/` (65 skills, git-tracked) · workspace `skills/` (junctions, git-ignored)
+- **Cycle manifest**: `CYCLE.md` — defines self-improvement objectives, metrics, difficulty mapping
 - **Global config**: junctions `$env:USERPROFILE\.config\opencode\skills/` → `.agents/skills/{name}`
 
 ## Project Overrides
@@ -207,10 +208,24 @@ Close task: auto-metrics 6 dims (correctness, tokens, error prevention, skill, s
 - **Apply-File**: `pull-upstream.ps1 -Mode Apply-File -TargetFile "path"`
 - **Policy**: review MODIFIED manually; OURS ONLY ignored. Skills → `.agents/skills/`
 
-### I. Self-Improvement System (installed 2026-06-16)
+### I. Self-Improvement System (active 2026-06-17)
 
-**1. Skill: `self-improvement`** — creates `.learnings/` (LEARNINGS.md, ERRORS.md, FEATURE_REQUESTS.md), ≥3 reps→permanent memory, extracts via `scripts/extract-skill.ps1`. Load: `skill("self-improvement")`.
-**2. Plugin: `opencode-self-improve`** (Hermes Agent-style) — SkillForge extracts patterns→SQLite skills, Curator re-scores/merges/removes low-quality, SkillInjector injects top-3 pre-turn. 7 tools. Config: `magic-context.jsonc` root. DB: `~/.local/share/opencode-self-improve/skills.db`.
+**Manifest**: `CYCLE.md` — defines current cycle objective, metrics, difficulty mapping, and loop behavior. Inspired by autoresearch `program.md`.
+
+**1. Skill: `self-improvement`** — orquestra ciclo completo: diagnose, fix with triple-verify by difficulty, log (bitácora + inter-track), verify, learn (engram + anti-patterns), propagate. Load: `skill("self-improvement")`.
+
+**2. Scripts**:
+   - `scripts/inter-track.ps1` — tracks inter(30) metric (minimum 30 meaningful interactions per cycle)
+   - `scripts/extract-skill.ps1` — extracts patterns with ≥3 reps from `.learnings/` into reusable skills
+   - `scripts/run-improvement-cycle.ps1` — measure, audit, compress, learn (existing, enhanced)
+
+**3. Plugin: `opencode-self-improve`** (Hermes Agent-style) — SkillForge extracts patterns→SQLite skills, Curator re-scores/merges/removes low-quality, SkillInjector injects top-3 pre-turn. 7 tools. Config: `magic-context.jsonc` root. DB: `~/.local/share/opencode-self-improve/skills.db`.
+
+**4. Process**:
+   - Every cycle: read CYCLE.md → check external repos (Engram #645) → diagnose → execute fixes with triple-verify → verify → learn → propagate
+   - inter(30): minimum 30 fix+verify+log iterations per cycle
+   - Difficulty levels (6): Fácil→Muy Complejo, each with progressive verification depth
+   - Exit: inter≥30 + no dim below 9.0 → SUCCESS; time budget exhausted → STOP; score drop >0.5 → full revert
 
 ### J. Pre-session Health Check (session start) + Project Score
 Al iniciar sesión, MUY rápido (no bloquear):
