@@ -66,10 +66,11 @@ LOOP:
   7. If score improved → Keep changes, advance baseline
   8. If score equal/worse → Review and revert
   9. LEARN: engram, anti-patterns, CYCLE.md notes
-  10. PROPAGATE: opencode → opencode-vmk → gentleman-vMK
-  11. Auto-metrics + session-summary
-  12. If inter≥30 OR time budget exhausted → STOP cycle
-  13. If improvements still possible → CONTINUE
+  10. SCORE AUTO-UPDATE: `score-auto.ps1 -Json | Set-Content .project.json -Encoding UTF8` + update PROJECT-SCORE.md changelog
+  11. PROPAGATE: opencode → opencode-vmk → gentleman-vMK
+  12. Auto-metrics + session-summary
+  13. If inter≥30 OR time budget exhausted → STOP cycle
+  14. If improvements still possible → CONTINUE
 ```
 
 ## Exceptions

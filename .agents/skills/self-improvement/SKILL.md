@@ -34,6 +34,7 @@ Read `.project.json` + `PROJECT-SCORE.md` → identify lowest dimension or gap �
 
 ### 3: Verify Cycle
 Re-score → compare delta → inter≥30? → score improved? keep; else revert.
+**Score auto-update**: Run `score-auto.ps1 -Json | Set-Content .project.json -Encoding UTF8` to persist. Update PROJECT-SCORE.md with changelog entry.
 
 ### 4: Learn
 Engram (`self-improvement/cycle-results`) · anti-patterns if introduced · CYCLE.md notes · auto-metrics 6-dim.

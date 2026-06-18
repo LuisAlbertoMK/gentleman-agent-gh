@@ -1,20 +1,124 @@
-{
-  "score": {
-    "current": 10.0,
-    "dimensions": {
-      "Project Artifacts": 10.0,
-      "Security": 10.0,
-      "Dead Code": 10.0,
-      "Clean Code": 10.0,
-      "Best Practices": 10.0,
-      "Orthography": 10.0,
-      "Bitácora": 10.0,
-      "Metrics": 10.0,
-      "Script Performance": 10.0,
-      "Skill Effectiveness": 10.0
-    },
-    "lastUpdated": "2026-06-17T18:00:00.000Z",
-    "trend": "up",
-    "scoreType": "10-dim-project"
-  }
+﻿{
+    "dimensions_detail":  {
+                              "Script Performance":  {
+                                                         "evidence":  {
+                                                                          "avg_size_kb":  7.3,
+                                                                          "over_50kb":  0,
+                                                                          "script_count":  27
+                                                                      },
+                                                         "score":  10,
+                                                         "rationale":  "Scripts: 27, avg: 7.3KB, \u003e50KB: 0",
+                                                         "max":  10
+                                                     },
+                              "Best Practices":  {
+                                                     "evidence":  {
+                                                                      "trycatch":  14,
+                                                                      "param_coverage":  27
+                                                                  },
+                                                     "score":  10,
+                                                     "rationale":  "Params: 27/27, try/catch: 14/27",
+                                                     "max":  10
+                                                 },
+                              "Security":  {
+                                               "evidence":  {
+                                                                "secrets":  false,
+                                                                "weak_crypto":  false
+                                                            },
+                                               "score":  10,
+                                               "rationale":  "Weak crypto: False, secrets: False",
+                                               "max":  10
+                                           },
+                              "Clean Code":  {
+                                                 "evidence":  {
+                                                                  "with_params":  27,
+                                                                  "with_help":  27,
+                                                                  "total_scripts":  27,
+                                                                  "with_strictmode":  27
+                                                              },
+                                                 "score":  10,
+                                                 "rationale":  "Scripts: 27, help: 27, params: 27, strict: 27",
+                                                 "max":  10
+                                             },
+                              "Project Artifacts":  {
+                                                        "evidence":  {
+                                                                         "skills":  65,
+                                                                         "project_json":  true,
+                                                                         "roadmap":  true,
+                                                                         "readme":  true,
+                                                                         "changelog":  true,
+                                                                         "cross_ref":  true
+                                                                     },
+                                                        "score":  10,
+                                                        "rationale":  "Cross-ref True, 65 skills (excl _shared)",
+                                                        "max":  10
+                                                    },
+                              "Orthography":  {
+                                                  "evidence":  {
+                                                                   "corrupted_files":  0,
+                                                                   "total_scanned":  66
+                                                               },
+                                                  "score":  10,
+                                                  "rationale":  "Encoding corruption: 0/66 files",
+                                                  "max":  10
+                                              },
+                              "Metrics":  {
+                                              "evidence":  {
+                                                               "errors_dir":  true,
+                                                               "error_json":  true,
+                                                               "metrics_dir":  true,
+                                                               "has_reports":  true
+                                                           },
+                                              "score":  10,
+                                              "rationale":  "Metrics dir: True, error json: True",
+                                              "max":  10
+                                          },
+                              "Skill Effectiveness":  {
+                                                          "evidence":  {
+                                                                           "over_5kb":  0,
+                                                                           "avg_size_kb":  2,
+                                                                           "total_skills":  65,
+                                                                           "total_bytes":  131875,
+                                                                           "over_3kb":  1
+                                                                       },
+                                                          "score":  10,
+                                                          "rationale":  "Skills: 65, \u003e3KB: 1, \u003e5KB: 0, avg: 2KB",
+                                                          "max":  10
+                                                      },
+                              "Dead Code":  {
+                                                "evidence":  {
+                                                                 "commented_out":  0,
+                                                                 "orphans":  0,
+                                                                 "dead_junctions":  0
+                                                             },
+                                                "score":  10,
+                                                "rationale":  "Orphans: 0, dead junctions: 0",
+                                                "max":  10
+                                            },
+                              "Bitácora":  {
+                                               "evidence":  {
+                                                                "lines":  31,
+                                                                "exists":  true
+                                                            },
+                                               "score":  10,
+                                               "rationale":  "BITACORA.md exists: True",
+                                               "max":  10
+                                           }
+                          },
+    "score":  {
+                  "current":  10,
+                  "dimensions":  {
+                                     "Project Artifacts":  10,
+                                     "Security":  10,
+                                     "Dead Code":  10,
+                                     "Clean Code":  10,
+                                     "Best Practices":  10,
+                                     "Orthography":  10,
+                                     "Bitácora":  10,
+                                     "Metrics":  10,
+                                     "Script Performance":  10,
+                                     "Skill Effectiveness":  10
+                                 },
+                  "last_updated":  "2026-06-17",
+                  "trend":  "stable"
+              }
 }

@@ -56,12 +56,16 @@ E3 falla? compilación → FIX · warning → user decide
 ¿Override? !ship --no-verify → emergencia (no recomendado)
 ```
 
+## Difficulty (self-improvement override)
+From `self-improvement` cycle: Fácil=E2 · Medio=E1+E2 · Medio-Dif=E1+E2+E3 · Difícil=Full+4R · Complejo=Full+judgment-day · Muy Compl=Full+SDD. Full table in CYCLE.md.
+
 ## Reglas
 1. **3 enfoques DISTINTOS**: comportamiento + calidad + compilación (no 3 tests iguales)
 2. **Thresholds**: Verde jamás, Roja siempre, Amarilla por tamaño
 3. **Default-FAIL**: sin evidencia de 3 pasos → no verificado
 4. **Build obligatorio** para código compilable
-5. **!ship = responsabilidad**: verify + quality-gate + commit + push
+5. **Level override**: self-improvement cycle puede override el verify depth
+6. **!ship = responsabilidad**: verify + quality-gate + commit + push
 
 ## Referencias
-quality-gate · code-review-agent · judgment-day · commit-crafter
+quality-gate · code-review-agent · judgment-day · commit-crafter · CYCLE.md

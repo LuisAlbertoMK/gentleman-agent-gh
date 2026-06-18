@@ -6,7 +6,7 @@
   Part of the self-improvement cycle.
 
 .DESCRIPTION
-  Scans .learnings/LEARNINGS.md for patterns with ≥3 repetitions
+  Scans .learnings/LEARNINGS.md for patterns with >=3 repetitions
   (identified by same Pattern-Key) and generates a skill skeleton
   in .agents/skills/{name}/SKILL.md.
 
@@ -14,7 +14,7 @@
   Extract a specific pattern by key (e.g. "improvement/cycle").
 
 .PARAMETER List
-  List all patterns with repetition count ≥ threshold.
+  List all patterns with repetition count >= threshold.
 
 .PARAMETER Threshold
   Minimum repetitions to auto-extract (default: 3).
@@ -41,37 +41,34 @@ $repoRoot = Split-Path $PSScriptRoot -Parent
 $learnPath = Join-Path -Path $repoRoot -ChildPath ".learnings\LEARNINGS.md"
 $skillsDir = Join-Path -Path $repoRoot -ChildPath ".agents\skills"
 
-$results = @()
+$results = New-Object System.Collections.ArrayList
 
 if (-not (Test-Path -LiteralPath $learnPath)) {
     Write-Host "[extract-skill] No .learnings/LEARNINGS.md found" -ForegroundColor Yellow
     exit 0
 }
 
-# Read learnings and extract Pattern-Key lines
 $content = Get-Content -LiteralPath $learnPath -Raw
-$patternLines = [regex]::Matches($content, '- \*\*Pattern-Key\*\*: (\S+)')
-$allKeys = @()
-foreach ($m in $patternLines) {
-    $allKeys += $m.Groups[1].Value
+$allKeys = New-Object System.Collections.ArrayList
+$matches = [regex]::Matches($content, '- \*\*Pattern-Key\*\*: (\S+)')
+foreach ($m in $matches) {
+    $null = $allKeys.Add($m.Groups[1].Value)
 }
 
 if ($List) {
-    # Count repetitions
-    $grouped = $allKeys | Group-Object | Where-Object { $_.Count -ge $Threshold } | Sort-Object Count -Descending
+    $grouped = @($allKeys | Group-Object | Where-Object { $_.Count -ge $Threshold } | Sort-Object Count -Descending)
     if ($grouped.Count -eq 0) {
         if (-not $Quiet) {
-            Write-Host "[extract-skill] No patterns with ≥$Threshold repetitions found" -ForegroundColor Yellow
+            Write-Host "[extract-skill] No patterns with >=$Threshold repetitions found" -ForegroundColor Yellow
         }
         exit 0
     }
     if (-not $Quiet) {
-        Write-Host "Patterns with ≥$Threshold repetitions:" -ForegroundColor Cyan
+        Write-Host "Patterns with >=$Threshold repetitions:" -ForegroundColor Cyan
         foreach ($g in $grouped) {
             Write-Host "  $($g.Name) ($($g.Count)x)" -ForegroundColor Green
         }
     }
-    $results = $grouped
     if ($Quiet) {
         $grouped | Select-Object Name, Count | ConvertTo-Json
     }
@@ -79,83 +76,81 @@ if ($List) {
 }
 
 if ($PatternKey -ne "") {
-    $allKeys = @($PatternKey)
+    $allKeys.Clear()
+    $null = $allKeys.Add($PatternKey)
 }
 
 foreach ($key in $allKeys) {
-    # Check if skill already exists
     $safeName = $key -replace '/', '-'
     $skillPath = Join-Path -Path $skillsDir -ChildPath "$safeName\SKILL.md"
 
     if (Test-Path -LiteralPath $skillPath) {
         if (-not $Quiet) {
-            Write-Host "[extract-skill] Skill already exists: $safeName — skipping" -ForegroundColor Yellow
+            Write-Host "[extract-skill] Skill already exists: $safeName" -ForegroundColor Yellow
         }
         continue
     }
 
-    # Find learnings with this Pattern-Key
-    $entries = [regex]::Matches($content, "(?s)## \[.*?\].*?\n.*?\*\*Pattern-Key\*\*: $key.*?\n(.*?)(?=\n## |\Z)")
+    $rx = "(?s)## \[.*?\].*?\n.*?\*\*Pattern-Key\*\*: " + $key + ".*?\n(.*?)(?=\n## |\Z)"
+    $entries = [regex]::Matches($content, $rx)
     $entryCount = $entries.Count
 
     if ($entryCount -lt $Threshold) {
         if (-not $Quiet) {
-            Write-Host "[extract-skill] '$key': $entryCount reps (< $Threshold), skipping" -ForegroundColor DarkYellow
+            Write-Host "[extract-skill] $key only $entryCount reps, skipping" -ForegroundColor DarkYellow
         }
         continue
     }
 
     if ($DryRun) {
         Write-Host "[DRY-RUN] Would create skill: $safeName ($entryCount entries)" -ForegroundColor Cyan
-        $results += [PSCustomObject]@{
+        $null = $results.Add([PSCustomObject]@{
             PatternKey = $key
             SkillName  = $safeName
             Entries    = $entryCount
             Path       = $skillPath
-        }
+        })
         continue
     }
 
-    # Generate skill
     $skillDir = Join-Path -Path $skillsDir -ChildPath $safeName
     New-Item -ItemType Directory -Path $skillDir -Force | Out-Null
 
-    $description = "Auto-extracted pattern: $key ($entryCount occurrences in .learnings)"
+    $desc = "Auto-extracted pattern: $key ($entryCount occurrences in .learnings)"
 
-    $skillContent = @"---
-name: $safeName
-description: "$description"
-triggers: "$key"
-license: Apache-2.0
-metadata:
-  tags: [auto-extracted, pattern]
-  author: gentleman-vMK
-  version: "1.0"
-  source: extract-skill.ps1
----
-
-## When
-Pattern `$key` with $entryCount repetitions detected in .learnings.
-
-## Critical Patterns
-- See `.learnings/LEARNINGS.md` entries with Pattern-Key: `$key`
-- Extracted automatically by `scripts/extract-skill.ps1`
-- Review and refine this skill on first use
-"@
-
-    Set-Content -LiteralPath $skillPath -Value $skillContent -Encoding UTF8
+    $sb = New-Object System.Text.StringBuilder
+    $null = $sb.AppendLine("---")
+    $null = $sb.AppendLine("name: $safeName")
+    $null = $sb.AppendLine('description: "' + $desc + '"')
+    $null = $sb.AppendLine('triggers: "' + $key + '"')
+    $null = $sb.AppendLine("license: Apache-2.0")
+    $null = $sb.AppendLine("metadata:")
+    $null = $sb.AppendLine("  tags: [auto-extracted, pattern]")
+    $null = $sb.AppendLine("  author: gentleman-vMK")
+    $null = $sb.AppendLine('  version: "1.0"')
+    $null = $sb.AppendLine("  source: extract-skill.ps1")
+    $null = $sb.AppendLine("---")
+    $null = $sb.AppendLine("")
+    $null = $sb.AppendLine("## When")
+    $null = $sb.AppendLine("Pattern $key with $entryCount repetitions detected in .learnings.")
+    $null = $sb.AppendLine("")
+    $null = $sb.AppendLine("## Critical Patterns")
+    $null = $sb.AppendLine("- See .learnings/LEARNINGS.md entries with Pattern-Key: $key")
+    $null = $sb.AppendLine("- Extracted automatically by scripts/extract-skill.ps1")
+    $null = $sb.AppendLine("- Review and refine this skill on first use")
+    Set-Content -LiteralPath $skillPath -Value $sb.ToString() -Encoding UTF8
 
     if (-not $Quiet) {
-        Write-Host "[extract-skill] ✅ Created skill: $safeName ($entryCount entries)" -ForegroundColor Green
+        Write-Host "[extract-skill] Created skill: $safeName ($entryCount entries)" -ForegroundColor Green
     }
 
-    $results += [PSCustomObject]@{
+    $null = $results.Add([PSCustomObject]@{
         PatternKey = $key
         SkillName  = $safeName
         Entries    = $entryCount
         Path       = $skillPath
         Status     = "created"
-    }
+    })
 }
 
 if ($results.Count -eq 0 -and -not $Quiet) {
