@@ -54,11 +54,11 @@
                                                     },
                               "Cycle Progress":  {
                                                      "evidence":  {
-                                                                      "inter_count":  8,
+                                                                      "inter_count":  9,
                                                                       "inter_target":  30
                                                                   },
                                                      "score":  3,
-                                                     "rationale":  "inter: 8/30",
+                                                     "rationale":  "inter: 9/30",
                                                      "max":  10
                                                  },
                               "Orthography":  {
@@ -84,13 +84,13 @@
                               "Skill Effectiveness":  {
                                                           "evidence":  {
                                                                            "over_5kb":  0,
-                                                                           "avg_size_kb":  1.9,
-                                                                           "total_skills":  68,
-                                                                           "total_bytes":  130076,
-                                                                           "over_3kb":  2
-                                                                       },
-                                                          "score":  10,
-                                                          "rationale":  "Skills: 68, >3KB: 2, >5KB: 0, avg: 1.9KB",
+"avg_size_kb":  1.8,
+                                                                            "total_skills":  68,
+                                                                            "total_bytes":  126184,
+                                                                            "over_3kb":  0
+                                                                        },
+                                                           "score":  10,
+                                                           "rationale":  "Skills: 68, >3KB: 0, >5KB: 0, avg: 1.8KB",
                                                           "max":  10
                                                       },
                               "Dead Code":  {
@@ -105,7 +105,7 @@
                                             },
                               "Bitácora":  {
                                                "evidence":  {
-                                                                "lines":  47,
+                                                                "lines":  48,
                                                                 "exists":  true
                                                             },
                                                "score":  10,
@@ -129,6 +129,6 @@
                                      "Cycle Progress":  3
                                  },
                   "last_updated":  "2026-06-19",
-                  "trend":  "up"
+                  "trend":  "stable"
               }
 }
