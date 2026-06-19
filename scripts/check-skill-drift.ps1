@@ -32,6 +32,7 @@ param(
   [switch]$Json
 )
 
+$ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $canonicalDir = Join-Path -Path $PSScriptRoot -ChildPath "..\.agents\skills"

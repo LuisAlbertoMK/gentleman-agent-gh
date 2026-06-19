@@ -20,6 +20,7 @@ param(
   [string]$SnapshotsDir = ""
 )
 
+$ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 # --- Resolve paths ---

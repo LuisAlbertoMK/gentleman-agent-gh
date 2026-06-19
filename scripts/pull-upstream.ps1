@@ -1,4 +1,6 @@
-﻿<#
+﻿#requires -Version 5.1
+
+<#
 .SYNOPSIS
     Pull-from-Upstream Workflow — detect, classify, and selectively apply upstream changes.
 .DESCRIPTION
@@ -41,8 +43,8 @@ param(
     [string]$Remote = 'upstream'
 )
 
-Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+Set-StrictMode -Version Latest
 $repoRoot = Resolve-Path "$PSScriptRoot/.."
 Push-Location $repoRoot
 

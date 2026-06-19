@@ -20,6 +20,7 @@ param(
     [string]$TempDir = "$env:LOCALAPPDATA\Temp\opencode"
 )
 
+$ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 # Verify dir exists

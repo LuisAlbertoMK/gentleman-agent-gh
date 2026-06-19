@@ -53,6 +53,7 @@ param(
   [switch]$Json
 )
 
+$ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $repoRoot = (Resolve-Path "$PSScriptRoot\..").Path

@@ -7,11 +7,11 @@
 ## Objective
 
 **Cycle 2**: Mantener score 10.0 y automatizar procesos manuales restantes:
-- Corregir encoding corruption en SKILLS-INDEX.md (mojibake â†' → →)
-- Automatizar trigger de session-miner.ps1 en DREAMING (AGENTS.md)
-- Reducir PSSA violations en scripts de producción (<49 → <20 manual)
-- Limpiar experiments/graph-crud/ (referencias de investigación obsoletas)
-- Decidir y ejecutar PR a upstream gentle-ai con cambios genéricos
+- ✅ Corregir encoding corruption en SKILLS-INDEX.md (mojibake)
+- ✅ Automatizar trigger de session-miner.ps1 en DREAMING (AGENTS.md)
+- ✅ Reducir PSSA violations en scripts de producción (<49 → 0 manual)
+- 🔲 Limpiar experiments/graph-crud/ (referencias de investigación obsoletas)
+- 🔲 Decidir y ejecutar PR a upstream gentle-ai con cambios genéricos
 
 ## Metrics
 

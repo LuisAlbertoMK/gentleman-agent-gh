@@ -25,6 +25,7 @@ param(
   [switch]$Json
 )
 
+$ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $exitCode = 0
 $results = @()

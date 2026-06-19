@@ -1,4 +1,6 @@
-﻿<#
+﻿#requires -Version 5.1
+
+<#
 .SYNOPSIS
   Admin-level system optimizations for Ryzen 3700U + NVMe
 .DESCRIPTION
@@ -17,7 +19,6 @@
 .PARAMETER DryRun
   Show what would be done without making changes. Default: $false.
 #>
-#requires -Version 5.1
 #
 # WHAT THIS DOES:
 #   1. Fix page file to 4GB (recovers ~8-10 GB on C:)
@@ -33,6 +34,7 @@ param(
     [switch]$DryRun = $false
 )
 
+$ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 # ---- VERIFY ADMIN ----

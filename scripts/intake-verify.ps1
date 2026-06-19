@@ -1,4 +1,6 @@
-﻿<#
+﻿#requires -Version 5.1
+
+<#
 .SYNOPSIS
   Project Intake Verification — 7 checks + 3-iteration cycle
 .DESCRIPTION
@@ -17,7 +19,6 @@
 .PARAMETER SaveMetrics
   Guardar métricas en docs/metricas/ (default: $true).
 #>
-#requires -Version 5.1
 
 param(
     [Parameter(Mandatory=$true)]
@@ -35,6 +36,7 @@ param(
     [string]$OutputFormat = "text"
 )
 
+$ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 # Explicit script-scope reference for Write-Result function (PSSA false positive suppression)
 $Script:OutputFormat = $OutputFormat

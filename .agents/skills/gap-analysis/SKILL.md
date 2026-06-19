@@ -24,3 +24,6 @@ metadata:
 ## Templates: ERP (Func50%/Sec35%) · Ecom (UX40%/Sec30%/Perf30%) · Web (UX40%/Tech30%/Sec25%) · API (Sec40%/Tech35%/Ops25%) · Desktop (UX40%/Func30%/Ops30%) · Mobile (UX45%/Perf35%/Res20%)
 ## Cross-Ref: project-mapper · security-scanner · code-review-agent · senior-engineer · performance-tracker
 ## Anti-Patterns: Skip intake · Ignore velocity · Skip responsive · Infra afterthought · Score w/o evidence
+
+## Templates
+See [assets/](assets/) for per-project-type intake templates: api, desktop, ecom, erp, mobile, saas, web.

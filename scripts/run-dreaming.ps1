@@ -1,4 +1,6 @@
-﻿<#
+﻿#requires -Version 5.1
+
+<#
 .SYNOPSIS
   Run cross-session pattern extraction via Engram
 .DESCRIPTION
@@ -12,8 +14,8 @@ param(
     [string]$Mode = 'report'
 )
 
-Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+Set-StrictMode -Version Latest
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $learningsDir = Join-Path $repoRoot '.learnings'
 $logFile = Join-Path $learningsDir 'LEARNINGS.md'
