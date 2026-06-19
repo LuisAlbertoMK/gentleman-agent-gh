@@ -38,3 +38,4 @@
 2026-06-18 - inter: 6/30. PSSA cleanup: gate exclusion for experiments/skills, bench-compare (Get-Lines→Line, Get-Bytes→Byte), benchmark (Stats→Stat), install (Prerequisites→Prerequisite, NextSteps→NextStep), bench-file-io (capturedOutput→hashtable), tokenize (empty catch fix). PSSA manual: 0. Gate: PASSED.
 2026-06-18 - inter: 7/30. SKILLS-INDEX.md duplicate gap-analysis removed. PSSA gate cleanup continued.
 2026-06-18 - inter: 10/30. Skill compression: gap-analysis 2.9→2.6KB, triple-verify 2.9→2.0KB, performance 2.8→2.1KB. SKILLS-INDEX dup fixed. Temp cleanup.
+2026-06-19 — Score restored 10.0 (was stale 5/10 at session start). experiments/graph-crud/ deleted (19 files, 10 obsolete research approaches). CYCLE.md ✅ 4/5 objectives complete. Pending: upstream PR scope decision.
