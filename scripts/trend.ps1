@@ -90,11 +90,11 @@ function Format-Delta($firstVal, $lastVal) {
 }
 
 # --- Helpers: format numbers ---
-function Fmt-Int($val) { return "{0:N0}" -f $val }
+function Format-Int($val) { return "{0:N0}" -f $val }
 
-function Fmt-Pct($val) { return ("{0:F1}" -f $val) + "%" }
+function Format-Pct($val) { return ("{0:F1}" -f $val) + "%" }
 
-function Fmt-Bytes($val) {
+function Format-Byte($val) {
   if ($val -ge 1000) {
     $kb = [math]::Round($val / 1000, 1)
     return ("{0:N1}" -f $kb) + "KB"
@@ -120,17 +120,17 @@ $report += "|--------|-------|---------|-------|-------|"
 
 # Define metrics as array of hashtables
 $metrics = @(
-  @{Name="AGENTS.md Size"; FmtFunc={ param($v) Fmt-Bytes $v }; Better=$false; V1={$first.AgentsMdBytes}; V2={$last.AgentsMdBytes}}
-  @{Name="AGENTS.md Lines"; FmtFunc={ param($v) Fmt-Int $v }; Better=$false; V1={$first.AgentsMdLines}; V2={$last.AgentsMdLines}}
-  @{Name="Total Skills"; FmtFunc={ param($v) Fmt-Int $v }; Better=$true; V1={$first.TotalSkills}; V2={$last.TotalSkills}}
-  @{Name="Total Skill Size"; FmtFunc={ param($v) Fmt-Bytes $v }; Better=$false; V1={$first.TotalSkillBytes}; V2={$last.TotalSkillBytes}}
-  @{Name="Avg Skill Size"; FmtFunc={ param($v) Fmt-Bytes $v }; Better=$false; V1={$first.AvgSkillBytes}; V2={$last.AvgSkillBytes}}
-  @{Name="Skills >3KB"; FmtFunc={ param($v) Fmt-Int $v }; Better=$true; V1={$first.SkillsOver3kb}; V2={$last.SkillsOver3kb}}
+  @{Name="AGENTS.md Size"; FmtFunc={ param($v) Format-Byte $v }; Better=$false; V1={$first.AgentsMdBytes}; V2={$last.AgentsMdBytes}}
+  @{Name="AGENTS.md Lines"; FmtFunc={ param($v) Format-Int $v }; Better=$false; V1={$first.AgentsMdLines}; V2={$last.AgentsMdLines}}
+  @{Name="Total Skills"; FmtFunc={ param($v) Format-Int $v }; Better=$true; V1={$first.TotalSkills}; V2={$last.TotalSkills}}
+  @{Name="Total Skill Size"; FmtFunc={ param($v) Format-Byte $v }; Better=$false; V1={$first.TotalSkillBytes}; V2={$last.TotalSkillBytes}}
+  @{Name="Avg Skill Size"; FmtFunc={ param($v) Format-Byte $v }; Better=$false; V1={$first.AvgSkillBytes}; V2={$last.AvgSkillBytes}}
+  @{Name="Skills >3KB"; FmtFunc={ param($v) Format-Int $v }; Better=$true; V1={$first.SkillsOver3kb}; V2={$last.SkillsOver3kb}}
   @{Name="Global Junctions"; FmtFunc={ param($v) ("{0}/{1}" -f $v, $last.TotalSkills) }; Better=$true; V1={$first.GlobalJunctionsOk}; V2={$last.GlobalJunctionsOk}}
-  @{Name="Frontmatter"; FmtFunc={ param($v) Fmt-Pct $v }; Better=$true; V1={$first.FrontmatterPct}; V2={$last.FrontmatterPct}}
-  @{Name="When-to-Use"; FmtFunc={ param($v) Fmt-Pct $v }; Better=$true; V1={$first.WhenToUsePct}; V2={$last.WhenToUsePct}}
-  @{Name="Rules Section"; FmtFunc={ param($v) Fmt-Pct $v }; Better=$true; V1={$first.RulesPct}; V2={$last.RulesPct}}
-  @{Name="Scripts Count"; FmtFunc={ param($v) Fmt-Int $v }; Better=$true; V1={$first.ScriptsCount}; V2={$last.ScriptsCount}}
+  @{Name="Frontmatter"; FmtFunc={ param($v) Format-Pct $v }; Better=$true; V1={$first.FrontmatterPct}; V2={$last.FrontmatterPct}}
+  @{Name="When-to-Use"; FmtFunc={ param($v) Format-Pct $v }; Better=$true; V1={$first.WhenToUsePct}; V2={$last.WhenToUsePct}}
+  @{Name="Rules Section"; FmtFunc={ param($v) Format-Pct $v }; Better=$true; V1={$first.RulesPct}; V2={$last.RulesPct}}
+  @{Name="Scripts Count"; FmtFunc={ param($v) Format-Int $v }; Better=$true; V1={$first.ScriptsCount}; V2={$last.ScriptsCount}}
 )
 
 foreach ($m in $metrics) {
@@ -156,15 +156,15 @@ foreach ($s in $snapshots) {
   $report += ("| {0} | {1} | {2} | {3} | {4} | {5} | {6} | {7} | {8} | {9} | {10} |" -f
     $dateStr,
     $s.Commit,
-    (Fmt-Bytes $s.AgentsMdBytes),
+    (Format-Byte $s.AgentsMdBytes),
     $s.TotalSkills,
-    (Fmt-Bytes $s.AvgSkillBytes),
+    (Format-Byte $s.AvgSkillBytes),
     $s.SkillsOver3kb,
     ("{0}/{1}" -f $s.GlobalJunctionsOk, $s.TotalSkills),
     $s.ScriptsCount,
-    (Fmt-Pct $s.FrontmatterPct),
-    (Fmt-Pct $s.WhenToUsePct),
-    (Fmt-Pct $s.RulesPct))
+    (Format-Pct $s.FrontmatterPct),
+    (Format-Pct $s.WhenToUsePct),
+    (Format-Pct $s.RulesPct))
 }
 
 # --- Error Trends (from docs/metricas/errors/) ---

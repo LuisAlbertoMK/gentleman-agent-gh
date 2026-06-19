@@ -40,7 +40,7 @@ try {
         $tAfter = [int]$parts[1]
         $tiktokAvailable = $true
     }
-} catch {}
+} catch { Write-Debug "tiktoken not available, using heuristic fallback" }
 
 # Display
 $border = "=" * 60

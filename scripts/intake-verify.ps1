@@ -23,9 +23,6 @@ param(
     [ValidateSet("auto","fe","be","db","fullstack","mobile","desktop","saas","erp","ecom","api","web","cms","infra")]
     [string]$ProjectType = "auto",
 
-    [ValidateSet("text","json")]
-    [string]$OutputFormat = "text",
-
     [bool]$SaveMetrics = $true
 )
 

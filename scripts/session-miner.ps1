@@ -86,7 +86,7 @@ function Read-Catalog {
     return $patterns
 }
 
-function Read-LearningsPatternKeys {
+function Read-LearningsPatternKey {
     <# Extract Pattern-Key entries from LEARNINGS.md #>
     if (-not (Test-Path -LiteralPath $learningsPath)) {
         return @()
@@ -96,15 +96,15 @@ function Read-LearningsPatternKeys {
     $keys = @()
 
     # Match Pattern-Key values
-    $matches = [regex]::Matches($content, 'Pattern-Key:\s*([^\n\r]+)', [System.Text.RegularExpressions.RegexOptions]::Multiline)
-    foreach ($m in $matches) {
+    $patternMatches = [regex]::Matches($content, 'Pattern-Key:\s*([^\n\r]+)', [System.Text.RegularExpressions.RegexOptions]::Multiline)
+    foreach ($m in $patternMatches) {
         $keys += $m.Groups[1].Value.Trim()
     }
 
     return $keys
 }
 
-function Read-ErrorEntries {
+function Read-ErrorEntry {
     <# Parse structured error entries from ERRORS.md #>
     if (-not (Test-Path -LiteralPath $errorsPath)) {
         return @()
@@ -122,7 +122,7 @@ function Read-ErrorEntries {
     return $errors
 }
 
-function Find-RepeatedPatterns {
+function Find-RepeatedPattern {
     <# Cross-reference learnings with catalog to detect repeats #>
     param(
         [array]$CatalogPatterns,
@@ -167,10 +167,10 @@ function Find-RepeatedPatterns {
 # -- Main --------------------------------------------------------------------
 
 $catalog = Read-Catalog
-$patternKeys = Read-LearningsPatternKeys
-$errors = Read-ErrorEntries
+$patternKeys = Read-LearningsPatternKey
+$errors = Read-ErrorEntry
 
-$repeated = Find-RepeatedPatterns -CatalogPatterns $catalog -PatternKeys $patternKeys -MinCount $Threshold
+$repeated = Find-RepeatedPattern -CatalogPatterns $catalog -PatternKeys $patternKeys -MinCount $Threshold
 
 if ($Mode -eq 'check') {
     $result = [PSCustomObject]@{

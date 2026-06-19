@@ -55,7 +55,7 @@ function Write-Status {
     if (-not $Quiet) { Write-Host "  $Message" }
 }
 
-function Get-PSSAViolations {
+function Get-PSSAViolation {
     param([string]$TargetPath)
     $resolvedTarget = Resolve-Path $TargetPath
     $results = Invoke-ScriptAnalyzer -Path $resolvedTarget -Recurse -Severity Warning, Error 2>$null
@@ -87,7 +87,7 @@ $trackedRules = @(
 )
 
 # -- fix: BOM encoding ------------------------------------------------
-function Fix-BomEncoding {
+function Resolve-BomEncoding {
     param([array]$Violations)
     $fixed = 0
     $seen = @{}
@@ -136,7 +136,7 @@ function Fix-BomEncoding {
 }
 
 # -- fix: switch defaults ---------------------------------------------
-function Fix-SwitchDefaults {
+function Resolve-SwitchDefault {
     param([array]$Violations)
     $fixed = 0
     $seen = @{}
@@ -192,7 +192,7 @@ function Save-Baseline {
     return $baseline
 }
 
-function Load-Baseline {
+function Read-Baseline {
     if (Test-Path $BaselineFile) {
         return Get-Content -LiteralPath $BaselineFile -Raw | ConvertFrom-Json
     }
@@ -214,17 +214,17 @@ if (-not $Quiet) {
 
 # 1. Run analysis
 Write-Status "Running PSScriptAnalyzer..."
-$results = Get-PSSAViolations -TargetPath $targetPath
+$results = Get-PSSAViolation -TargetPath $targetPath
 
 if ($Mode -eq 'Fix') {
     Write-Host "`n-- Auto-fix phase --"
-    $bomFixed = Fix-BomEncoding -Violations ($results | Where-Object { $_.RuleName -eq 'PSUseBOMForUnicodeEncodedFile' })
-    $swFixed = Fix-SwitchDefaults -Violations ($results | Where-Object { $_.RuleName -eq 'PSAvoidDefaultValueSwitchParameter' })
+    $bomFixed = Resolve-BomEncoding -Violations ($results | Where-Object { $_.RuleName -eq 'PSUseBOMForUnicodeEncodedFile' })
+    $swFixed = Resolve-SwitchDefault -Violations ($results | Where-Object { $_.RuleName -eq 'PSAvoidDefaultValueSwitchParameter' })
     Write-Host "  BOM fixes: $bomFixed | Switch fixes: $swFixed"
 
     # Re-run after fixes
     Write-Status "Re-running PSSA after fixes..."
-    $results = Get-PSSAViolations -TargetPath $targetPath
+    $results = Get-PSSAViolation -TargetPath $targetPath
 }
 
 # 2. Categorize
@@ -253,7 +253,7 @@ if (-not $Quiet) {
 switch ($Mode) {
     'Trend' {
         $baseline = Save-Baseline -Results $results
-        $prev = Load-Baseline
+        $prev = Read-Baseline
         if ($prev) {
             $delta = $results.Count - $prev.total
             $sign = if ($delta -gt 0) { '+' } else { '' }

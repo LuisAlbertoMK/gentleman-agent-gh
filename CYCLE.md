@@ -43,10 +43,10 @@ All 10 at 10.0 currently. Focus:
 
 | Repo | What to Check | Last Verified |
 |------|---------------|---------------|
-| karpathy/autoresearch | New program.md patterns, loop improvements | 2026-06-17 |
-| Gentleman-Programming/gentleman-guardian-angel | New caching strategies, AGENTS.md compliance checks | 2026-06-17 (v2.8.1) |
-| gentle-ai ecosystem | New MCP servers, backup systems | 2026-06-17 |
-| engram (MCP) | Cloud sync, new query types, performance | 2026-06-17 |
+| karpathy/autoresearch | New program.md patterns, loop improvements | 2026-06-18 (no changes) |
+| Gentleman-Programming/gentleman-guardian-angel | New caching strategies, AGENTS.md compliance checks | 2026-06-18 (v2.8.1, no changes) |
+| gentle-ai ecosystem | New MCP servers, backup systems | 2026-06-18 (no new public repos) |
+| engram (MCP) | Cloud sync, new query types, performance | 2026-06-18 |
 
 ## Cycle Loop
 

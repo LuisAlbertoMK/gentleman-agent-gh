@@ -184,7 +184,7 @@ function New-Graph {
     return $g
 }
 
-function Resolve-Skills {
+function Resolve-Skill {
     param(
         [hashtable]$Graph,
         [string]$Task,
@@ -219,7 +219,7 @@ function Resolve-Skills {
     $expanded = @{}
     foreach ($name in $matched.Keys) {
         $expanded[$name] = $true
-        Expand-Hops -Graph $Graph -Start $name -Hops $MaxHops -Visited $expanded
+        Expand-Hop -Graph $Graph -Start $name -Hops $MaxHops -Visited $expanded
     }
 
     # Phase 3: build result
@@ -243,7 +243,7 @@ function Resolve-Skills {
     return $result
 }
 
-function Expand-Hops {
+function Expand-Hop {
     param($Graph, $Start, $Hops, $Visited)
     if ($Hops -le 0) { return }
     $current = $Graph.AdjList[$Start]
@@ -251,13 +251,13 @@ function Expand-Hops {
     foreach ($neighbor in $current.to.Keys) {
         if (-not $Visited[$neighbor]) {
             $Visited[$neighbor] = $true
-            Expand-Hops -Graph $Graph -Start $neighbor -Hops ($Hops - 1) -Visited $Visited
+            Expand-Hop -Graph $Graph -Start $neighbor -Hops ($Hops - 1) -Visited $Visited
         }
     }
     foreach ($neighbor in $current.from.Keys) {
         if (-not $Visited[$neighbor]) {
             $Visited[$neighbor] = $true
-            Expand-Hops -Graph $Graph -Start $neighbor -Hops ($Hops - 1) -Visited $Visited
+            Expand-Hop -Graph $Graph -Start $neighbor -Hops ($Hops - 1) -Visited $Visited
         }
     }
 }
@@ -315,7 +315,7 @@ if ([string]::IsNullOrWhiteSpace($Task)) {
     exit 0
 }
 
-$resolved = Resolve-Skills -Graph $graph -Task $Task -MaxHops $Expand
+$resolved = Resolve-Skill -Graph $graph -Task $Task -MaxHops $Expand
 
 if ($null -eq $resolved) {
     Write-Host "Resolution error for task: '$Task'" -ForegroundColor Red

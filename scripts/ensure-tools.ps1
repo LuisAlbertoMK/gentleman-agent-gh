@@ -40,8 +40,9 @@ $tools = @{
 }
 
 $allOk = $true
+$script:quietMode = $Quiet
 
-function Write-VerboseOutput($msg) { if (-not $Quiet) { Write-Host $msg } }
+function Write-VerboseOutput($msg) { if (-not $script:quietMode) { Write-Host $msg } }
 
 foreach ($key in $tools.Keys) {
   $t = $tools[$key]
