@@ -24,3 +24,12 @@ Pre-commit security scan: secrets, injection patterns, dependency vulns, dangero
 ### CRITICAL: {type} in {file:line}- Pattern: `{found}` → Fix: `{suggested fix}
 ````
 ## Rules1. Run `grep` BEFORE manual inspection. Tool first.2. Critical+High → must fix before commit. Medium → suggest.3. Verify false positives — don't auto-flag env vars4. Issues found? Always provide fix, not just warning5. End with: "Remaining risk: NONE/LOW/MED/HIGH (why)"
+## EXAMPLE OUTPUT
+```markdown
+## Security Scan: src/handlers/
+### Summary
+- Secrets: 1 | Injection: 0 | Dangerous APIs: 1 | Vuln deps: 0
+### Issues
+# CRITICAL: Hardcoded API key in config.go:15
+- Pattern: `apiKey := "sk-abc123"` → Fix: use env var
+```

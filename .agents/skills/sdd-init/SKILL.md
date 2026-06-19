@@ -21,3 +21,10 @@ Trigger: "sdd init", "openspec init".
 ## STEPS1. Detect ctx (stack, conventions, test)2. Resolve TDD mode per priority3. Init dirs (openspec)4. Generate config5. Persist testing caps → engram/config.yaml6. Build skill registry7. Persist project ctx → engram/config8. Return summary
 ## RETURN
 ```SDD INIT | Project: {name} | Stack: {detected} | Mode: {engram/openspec/hybrid/none}Strict TDD: {enabled/disabled}Caps: {runner, layers, coverage, quality tools}Saved: {engram IDs / paths}```
+## EXAMPLE OUTPUT
+```SDD INIT | Project: my-api | Stack: Go 1.22 + Chi | Mode: engram
+Strict TDD: enabled | Caps: go test, unit+integration, -cover, golangci-lint```
+## EDGE CASES
+- No project files detected → manual mode, prompt user for stack
+- Missing test runner → default to "no tests detected", strict TDD disabled
+- Existing openspec/ dir → detect and note, don't overwrite

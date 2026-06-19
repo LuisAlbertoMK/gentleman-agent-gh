@@ -27,3 +27,10 @@ Validate: [Rich Results Test](https://search.google.com/test/rich-results)
 **Medium**: heading hierarchy · OG+Twitter cards · mobile-friendly · tap ≥48px · hreflang · CWV · `llms.txt`
 ## Tools: Google Search Console · [Rich Results Test](https://search.google.com/test/rich-results) · Screaming Frog · Ahrefs/SEMrush · PageSpeed Insights
 ## Ref: [Google SEO Guide](https://developers.google.com/search/docs/fundamentals/seo-starter-guide) · [Web Audit](../web-quality-audit/SKILL.md)
+## AUDIT ORDER
+1. Check indexable + title + meta desc + H1 (critical)
+2. Validate structured data (JSON-LD via Rich Results Test)
+3. Verify sitemap + robots.txt
+4. Run Lighthouse for CWV
+5. Check mobile-friendliness
+6. Review internal linking structure

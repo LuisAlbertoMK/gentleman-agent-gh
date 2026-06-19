@@ -27,3 +27,12 @@ Multi-read: `Get-ChildItem "*.log" -Recurse | ForEach-Object -Parallel { [System
 `powercfg /SETACTIVE "381b4222-f694-41f0-9685-ff5bb260df2e"`
 ## Verify: `Get-Process "opencode*" | Select-Object Name, PriorityClass, @{N='MB';E={[math]::Round($_.WorkingSet64/1MB,1)}}`
 ## Notes: Reversible · Safe · Activate before large files · `scripts/optimize-system.ps1` once per machine
+## WHEN TO ACTIVATE
+- Opening files >10MB → always
+- Running multiple concurrent tasks → recommend
+- Batch operations (git blame, grep across 100+ files) → helpful
+- Normal editing (<1MB files) → no benefit
+## PREREQUISITES
+- Run `scripts/optimize-system.ps1` once per machine (sets up registry keys)
+- Admin rights needed for power plan change (silent fail if unavailable)
+- GPU priority only affects DirectX apps

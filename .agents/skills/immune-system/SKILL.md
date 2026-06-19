@@ -26,3 +26,15 @@ Trigger: Repeated errors, failure patterns, "same mistake", user says "ya te dij
 ## Workflow
 ```Error → STOP → Diagnose → Document (catalog) → Immunize (skill/AGENTS.md/mem_save) → Verify → Continue```
 ## Anti-patterns- Silent retry same approach → Document first, change approach- "I'll remember next time" → Write it in catalog- Fix symptom → Trace to root cause- Only fix current case → Generalize prevention rule
+## EXAMPLE IMMUNIZATION
+```
+Symptom: Used && in PS5.1 → parse error
+Cause: No pre-flight check for PS operators
+Fix: ampersand scan in pssa-gate.ps1
+Prevention: AGENTS.md pre-flight: scan every bash call
+```
+## RECOVERY FLOW
+1. User corrects you → STOP (don't argue), diagnose
+2. Same error 2x → mandatory catalog entry
+3. Catalog entry + AGENTS.md rule = fully immunized
+4. Verify next session: pre-check anti-patterns before task

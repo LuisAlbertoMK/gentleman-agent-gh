@@ -27,3 +27,8 @@ Create new AI agent skills following the Agent Skills spec.Trigger: User asks to
 ## RegisterAdd to AGENTS.md:
 ```| `{name}` | {desc} | [SKILL.md](skills/{name}/SKILL.md) |```
 ## ChecklistBefore creating: skill doesn't exist? reusable? name follows convention? frontmatter complete? critical patterns clear? examples minimal? commands exist? AGENTS.md updated?
+## EDGE CASES
+- Skill name collision → append -2 suffix, note in AGENTS.md
+- Empty references/ dir → omit the dir entirely
+- Triggers must match actual user language — test with real queries
+- Skip registration if skill is experimental (add `# experimental` note)

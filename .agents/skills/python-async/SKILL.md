@@ -27,3 +27,9 @@ Trigger: Python async, asyncio, coroutines, event loop.
 ```pythonasync with asyncio.timeout(5.0):    result = await slow_operation()```
 ## Commands
 ```bashpython -m asyncio pstree <pid>         # detect await graph cyclespython -c "import asyncio; asyncio.run(main())"  # single entry```
+## BEST PRACTICES
+- Always use `async with` for resources (aiohttp, aiofiles)
+- `asyncio.gather(return_exceptions=True)` for fault-tolerant fan-out
+- `TaskGroup` in 3.11+ auto-cancels siblings on failure
+- Keep strong refs to background tasks to prevent GC collection
+- Single `asyncio.run()` entry point per app

@@ -24,3 +24,14 @@ metadata:
 ## Decision Tree
 <40% <8 msgs→Normal | <60% ≥8→L1 | 40-60% ≥20→L1+L2 | ≥60%→L2+L3→ultra-lean | >80%→mem_save+break
 ## Cross-Refs: Schedule in AGENTS.md B | Lean: lean-context | Tokens: karpathy-loop | State: code-memory
+## COMPRESSION EXAMPLE
+```
+L1: ~8 msgs → full summary block (−60-70%)
+L2: ~20 msgs → 1-2 line decisions + engram IDs (−40-50%)
+L3: YELLOW>60% → 1-liner + "Ref: engram-obs-{id}" (−80-90%)
+```
+## HALLUCINATION DETECTION
+- Repeats same info twice → suspect compression overdue
+- "As I mentioned" + wrong → FORCE RED, mem_save + break
+- Self-contradiction between early and late context → flag immediately
+- Same file edited 3+ times without commit → stop, summarize, commit, re-read

@@ -24,3 +24,12 @@ Plan refactoring with impact analysis, dependency mapping, and step-by-step migr
 ```
 ### Step types| Type | Risk | Rollback | Evidence needed ||------|------|----------|-----------------|| Extract fn | Low | Single revert | Tests pass || Rename/move | Low-Med | Single revert | Tests pass + no import errors || Change signature | Med | Revert + fix callers | Tests pass + integration || Split module | High | Full revert | All of above + no regression || Merge modules | High | Full revert | All of above + perf check |
 ### Rules1. NEVER refactor without test baseline. If no tests → first task is "add tests"2. Each step must be independently revertible3. After EACH step: `go test ./...` (or equivalent). Never batch steps before testing.4. Track progress: `[x] Step 1` `[ ] Step 2`5. If a step fails → stop, analyze, fix or rollback that step
+## EXAMPLE
+```markdown
+## Refactor Plan: user/profile handler
+### Risk Level: MEDIUM
+### Steps
+1. [SAFE] Extract validation into validateProfile() — tests pass
+2. [MODERATE] Move DB queries to profile/store.go — update imports
+3. [RISKY] Change UpdateProfile signature — affects 3 callers
+```

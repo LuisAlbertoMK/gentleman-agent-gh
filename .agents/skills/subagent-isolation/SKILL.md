@@ -19,3 +19,16 @@ Trigger: Delegating tasks, spawning subagents, multi-agent workflows.
 ### 4. Result isolation- Each delegate returns its OWN output — don't merge unless orchestrating- If results conflict → raise to orchestrator, don't reconcile in subagent- Subagents NEVER modify global state or shared files without explicit instructions
 ### 5. Context cleanupAfter delegation completes:- Don't retain subagent's full output in main context → extract only what's needed- Reference results by delegation ID for later retrieval- If output is large → summarize before carrying forward
 ### 6. Error boundaries| Error | Action ||-------|--------|| Subagent times out | Retry once with cleaner prompt, then escalate || Subagent returns wrong output | Log to Engram, re-delegate with corrected context || Subagent hallucinates | Flag as context contamination → check isolation rules |
+## EXAMPLE DELEGATION
+```markdown
+Task: Explore auth middleware JWT flow
+Context: engram-obs-42 (previous auth decision)
+Files: src/middleware/auth.go
+Output: 4 sections (entry, risks, patterns, recommendation)
+```
+## RULES SUMMARY
+- Fresh context per delegation — no prior knowledge assumed
+- No cross-contamination between parallel subagents
+- Declare dependencies explicitly in prompt
+- Results are independent — don't merge in subagent
+- After completion: extract only what's needed, reference by ID

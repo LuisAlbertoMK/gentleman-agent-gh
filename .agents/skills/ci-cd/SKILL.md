@@ -16,3 +16,18 @@ Trigger: CI setup, failed PR checks, pipeline config.
 ## RULESQuality gate before tests (fail fast) · Tests on every push (catch regressions) · Lint advisory, not blocking · CI must pass before merge · PR checks include spec coverage if SDD
 ## LOCAL PRE-PUSH1. Quality gate (secrets, commit format)2. Tests (auto-detect runner)3. Lint (if available)
 ## INTEGRATIONPR → CI → quality gate → tests → lint → merge if greenSDD mode: CI validates spec coverage (tests vs specs)Auto-gen `.github/workflows/ci.yml` if missing
+## EXAMPLE WORKFLOW
+```yaml
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: go test ./... -race -cover
+```
+## EDGE CASES
+- No test files → skip test step, note in CI output
+- Monorepo → detect subproject test runners per directory
+- SDD mode requires specs dir exists — if missing, skip spec coverage check

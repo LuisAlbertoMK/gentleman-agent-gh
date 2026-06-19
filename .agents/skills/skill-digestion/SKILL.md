@@ -15,3 +15,11 @@ Trigger: Loading skills, after task completion, skill audit.
 ## RESOLUTION FEEDBACK (post-task)Log to Engram after task if skill was loaded:
 ```title: "Skill resolution: {name}"type: learningcontent: Skill | Trigger | Applied(Y/N) | Effective(Y/P/N) | Notes```
 ## AUTO-IMPROVEMENT TRIGGERS| Signal | Action ||--------|--------|| Loaded but NOT applied | Trigger too broad? narrow it || Applied but NOT effective | Update skill patterns || Improvised missing guidance | Create new skill || Same skill loaded 3+ times | Flag heavy — digest more |
+## EXAMPLE
+```markdown
+## Resolution: subagent-isolation
+Applied: Yes | Effective: Yes | Notes: Used for parallel explore
+```
+## EDGE CASES
+- Context <40% → load full skill (no digest needed)
+- New skill first load → always load full (no usage data yet)

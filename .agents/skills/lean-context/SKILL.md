@@ -21,3 +21,10 @@ LEAN/ULTRA: default. CAVEMAN: on-demand extreme.Trigger: "modo normal", /lean-of
 ## BUDGET GATE| Model | Window | Alert || Opus/Sonnet4 | 200k | >120k || Haiku4 | 200k | >100k |>@threshold: [context:growing — /compress or session-end]Same file 3+ edits → suggest /compress
 ## SELF-CHECK1. first word = answer? 2. 30% cut without loss? 3. level correct?
 ## NEVER CUTsafety(1-line) · critical caveats(1x) · func code · security warnings · irreversible confirmations
+## WHEN TO USE EACH LEVEL
+| Situation | Level |
+|-----------|-------|
+| First response to simple Q | LEAN |
+| Mid-session, context >40% | ULTRA |
+| Token budget critical (<10 turns left) | CAVEMAN lite |
+| Emergency compression (RED zone) | CAVEMAN ultra |

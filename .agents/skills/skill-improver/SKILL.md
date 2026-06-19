@@ -21,3 +21,14 @@ Trigger: "improve skills", "audit skills", "refactor skills".
 ### Possibly deprecated (no load in 90d+)- skill-name — created: {date}, never loaded
 ```5. Action: review deprecated → archive or merge into _shared/
 ## STEPS1. Read all `*/SKILL.md` files2. Audit per skill: metadata, trigger clarity, section order, body budget, actionability, decision gates, output contract3. Check usage tracking → flag deprecated skills4. Return audit report grouped by skill with severity5. In apply mode: edit safe issues, create supporting files, preserve content
+## EXAMPLE AUDIT
+```markdown
+## skill-digestion (17 lines)
+- [WARN] Body <30 lines → expand with examples
+- Action: add references/
+```
+## RULES SUMMARY
+- Audit-only default, modify only when asked
+- Never delete meaningful content → move to references/
+- Don't invent triggers or policies
+- Convert tutorial prose to decision tables

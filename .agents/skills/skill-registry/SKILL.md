@@ -20,3 +20,16 @@ Trigger: "update skills", after install/remove skills.
 ## Conventions | File | Path |
 ```
 ## RULES- ALWAYS write .atl/skill-registry.md- ALWAYS mem_save if available- Compact rules: 5-15 lines each- NO skills → write empty registry
+## EXAMPLE REGISTRY
+```
+## Skills
+| Trigger | Skill | Path |
+| archive, revert | sdd-archive | .agents/skills/sdd-archive/SKILL.md |
+| code review, 4R | code-review-agent | .agents/skills/code-review-agent/SKILL.md |
+| commit | commit-crafter | .agents/skills/commit-crafter/SKILL.md |
+```
+## DEDUPLICATION RULES
+- Project-level skills WIN over global (~/.config/opencode/)
+- Same trigger on multiple skills → keep the more specific one
+- Identical rules → merge, keep the shorter version
+- Empty or skeleton skills (only frontmatter) → skip
