@@ -1,9 +1,9 @@
 ﻿# SKILLS INDEX
 
-> Full trigger table for all 65 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 66 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 2.5 | **Changelog**: 2.5 (Added self-improvement — continuous improvement cycle, inter(30), difficulty-based triple-verify)
+> **Version**: 2.6 | **Changelog**: 2.6 (Added baseline-ui skill, session-miner.ps1, Ponytail lazy dev ladder, enriched web-quality skills)
 
 ## Triggers â†’ Skill
 
@@ -67,6 +67,7 @@
 | Core Web Vitals, LCP, INP, CLS, layout shift, page experience | core-web-vitals |
 | Best practices, security audit, modernize code, code quality review | best-practices |
 | Web quality audit, lighthouse audit, review web quality, check page quality | web-quality-audit |
+| UI cleanup, polish interface, fix layout, ui slop, generic ui, design review | baseline-ui |
 | Performance mode, dev mode, modo desarrollo, resource priority, high performance | development-mode |
 | Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
 | Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
@@ -84,6 +85,7 @@
 - **Coordination**: delivery-harness, chained-pr, branch-pr, issue-creation, subagent-isolation, command-wrapper
 - **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner
 - **SDD**: sdd-{init,explore,propose,spec,design,tasks,apply,verify,archive}
+- **UI/Design**: baseline-ui, accessibility, performance, seo, core-web-vitals, web-quality-audit
 
 - **Communication**: comment-writer, cognitive-doc-design
 

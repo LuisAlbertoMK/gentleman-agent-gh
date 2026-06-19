@@ -22,4 +22,13 @@ Security: HTTPS, no vuln deps, CSP, no exposed maps. Standards: No deprecated AP
 ## Severity: Critical(security/failures->fix now) | High(CWV/a11y barriers->pre-launch) | Medium(perf/SEO->this sprint) | Low(minor->convenient)
 ## Output: Issues by severity | Category:File:line - Impact+Fix | Summary: Perf/N A11y/N SEO/N BestPrac/N | Priority: most impactful first
 ## Quick Checks: Pre-deploy(CWV/a11y 0 errors/HTTPS/meta) | Weekly(Search Console/CWV/deps/screen reader) | Monthly(full Lighthouse/real a11y/SEO)
+## Score targets
+Perf >=90 | A11y =100 | BP >=95 | SEO >=95
+## Framework patterns
+Next: next/image, React.lazy, Suspense for INP
+Vue/Nuxt: nuxt/image, async components
+Svelte: {#await}, reactive statements
+Astro: partial hydration, view transitions
+## Site-wide scan
+For full-site audit: `npx unlighthouse --site <url>` -- scans all routes with smart sampling
 ## Refs: Performance | Core Web Vitals | A11y | SEO | Best-Practices skills (../)

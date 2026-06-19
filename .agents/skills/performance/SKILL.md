@@ -50,6 +50,18 @@ Batch DOM reads before writes · debounce scroll/resize ≥100ms · `requestAnim
 ## Key metrics
 LCP <2.5s · FCP <1.8s · Speed Index <3.4s · TBT <200ms · TTI <3.8s
 
+## Framework-specific
+| Stack | Key patterns |
+|-------|-------------|
+| React/Next | `next/image`, `React.lazy()`, Suspense boundaries for INP, `useMemo`/`useCallback` for render thrash |
+| Vue/Nuxt | `nuxt/image`, async components, `v-once`, computed properties |
+| Svelte | `svelte:image`, `{#await}`, reactive `$:` statements |
+| Astro | `<Image>`, partial hydration (`client:load`/`idle`), View Transitions |
+
+## Site-wide scan
+`npx unlighthouse --site <url>` -- full-site Lighthouse scan with smart page sampling.
+Ideal for regressions: run before/after deploy.
+
 ## Testing
 `npx lighthouse https://example.com --output html --output-path report.html`
 
