@@ -24,6 +24,7 @@
 | 13 | 2026-06-14 | Uninitialized $warnings | `$warnings += ...` null error in drift script | Missing `$warnings = @()` before append | Always init all accumulators before first +=. | Lint PS5.1 with PSScriptAnalyzer before commit. |
 | 14 | 2026-06-16 | Case-insensitive -match filter | `One-shot` passes `^[a-z]` regex in PS5.1 | PS5.1 -match is case-insensitive by default | Use `-cmatch` for case-sensitive filters. | Never trust `-match` for casing — use `-cmatch` explicitly. |
 | 15 | 2026-06-19 | Overconfidence in self-score | External-auditor found 4 dims >1.5 gap (Correctness 10→6, ErrPrev 10→5) | No external validator for auto-metrics | Added external-auditor skill with blind subagent audit + immune-system trigger | Post-task auto-evaluation: if avg≥7 AND complex → blind audit before acceptance |
+| 16 | 2026-06-19 | PS5.1 encoding corruption in .ps1 files | Garbled output: `$name` literal, source code leaking, Unicode chars corrupted | Get-Content -Raw (no -Encoding) reads UTF-8-no-BOM as ANSI, corrupting non-ASCII bytes | Use ASCII-only in .ps1 files. Always specify -Encoding UTF8 on Get-Content/Out-File. Add BOM to files with Unicode. | Before saving .ps1: confirm no Unicode outside ASCII range. After writing: verify with hex dump. E3 runtime garbled output → check encoding FIRST. |
 
 ## Prevention cheat sheet
 1. **No code before user confirms understanding** — "¿Entendí bien?" gate
