@@ -41,7 +41,7 @@
                                              },
                               "Project Artifacts":  {
                                                         "evidence":  {
-                                                                         "skills":  66,
+                                                                         "skills":  67,
                                                                          "project_json":  true,
                                                                          "roadmap":  true,
                                                                          "readme":  true,
@@ -49,25 +49,25 @@
                                                                          "cross_ref":  true
                                                                      },
                                                         "score":  10,
-                                                        "rationale":  "Cross-ref True, 66 skills (excl _shared)",
+                                                        "rationale":  "Cross-ref True, 67 skills (excl _shared)",
                                                         "max":  10
                                                     },
                               "Cycle Progress":  {
                                                      "evidence":  {
-                                                                      "inter_count":  30,
+                                                                      "inter_count":  1,
                                                                       "inter_target":  30
                                                                   },
-                                                     "score":  10,
-                                                     "rationale":  "inter: 30/30",
+                                                     "score":  0,
+                                                     "rationale":  "inter: 1/30",
                                                      "max":  10
                                                  },
                               "Orthography":  {
                                                   "evidence":  {
                                                                    "corrupted_files":  0,
-                                                                   "total_scanned":  67
+                                                                   "total_scanned":  68
                                                                },
                                                   "score":  10,
-                                                  "rationale":  "Encoding corruption: 0/67 files",
+                                                  "rationale":  "Encoding corruption: 0/68 files",
                                                   "max":  10
                                               },
                               "Metrics":  {
@@ -85,12 +85,12 @@
                                                           "evidence":  {
                                                                            "over_5kb":  0,
                                                                            "avg_size_kb":  1.8,
-                                                                           "total_skills":  66,
-                                                                           "total_bytes":  119899,
-                                                                           "over_3kb":  0
+                                                                           "total_skills":  67,
+                                                                           "total_bytes":  124169,
+                                                                           "over_3kb":  1
                                                                        },
                                                           "score":  10,
-                                                          "rationale":  "Skills: 66, \u003e3KB: 0, \u003e5KB: 0, avg: 1.8KB",
+                                                          "rationale":  "Skills: 67, \u003e3KB: 1, \u003e5KB: 0, avg: 1.8KB",
                                                           "max":  10
                                                       },
                               "Dead Code":  {
@@ -114,7 +114,7 @@
                                            }
                           },
     "score":  {
-                  "current":  10,
+                  "current":  9.1,
                   "dimensions":  {
                                      "Project Artifacts":  10,
                                      "Security":  10,
@@ -126,9 +126,9 @@
                                      "Metrics":  10,
                                      "Script Performance":  10,
                                      "Skill Effectiveness":  10,
-                                     "Cycle Progress":  10
+                                     "Cycle Progress":  0
                                  },
                   "last_updated":  "2026-06-19",
-                  "trend":  "up"
+                  "trend":  "down"
               }
 }

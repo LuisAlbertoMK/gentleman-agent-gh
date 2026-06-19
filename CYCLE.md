@@ -6,31 +6,32 @@
 
 ## Objective
 
-**Cycle 2**: Mantener score 10.0 y automatizar procesos manuales restantes:
-- ✅ Corregir encoding corruption en SKILLS-INDEX.md (mojibake)
-- ✅ Automatizar trigger de session-miner.ps1 en DREAMING (AGENTS.md)
-- ✅ Reducir PSSA violations en scripts de producción (<49 → 0 manual)
-- ✅ Limpiar experiments/graph-crud/ (referencias de investigación obsoletas)
-- ✅ Decidido: no se mandan PRs a upstream (política del proyecto)
-- 🔲 Próximo ciclo: mantener score, explorar nuevas skills, optimizar scripts
+**Cycle 3**: Integrar external-auditor, validar ciclo de auto-mejora, mantener score 10.0:
+- ✅ Restaurar `.project.json` post-corrupción por auto-metrics (checkpoint safety/cycle2-state-*)
+- ✅ Punto de seguridad creado: tag `checkpoint/cycle2-done-bd39c66`, branch `safety/cycle2-state-*`
+- ✅ external-auditor skill disponible global + local SKILL.md
+- 🔲 Commit cambios pendientes: AGENTS.md (router + auto-audit trigger), ANTI-PATTERN-CATALOG.md (#15), SKILLS-INDEX.md
+- 🔲 Ejecutar external-auditor en primera tarea compleja — validar flujo end-to-end
+- 🔲 Verificar que el ciclo `self-improvement` corre completo (diagnose→fix→verify→learn→propagate)
+- 🔲 Mantener score 10.0 — ninguna dim por debajo de 9.9
 
 ## Metrics
 
 | Metric | Target | Tracked By |
 |--------|--------|------------|
-| inter(30) | ≥30 meaningful interactions per cycle | `scripts/inter-track.ps1` |
+| inter(30) | ≥30 meaningful interactions | `scripts/inter-track.ps1` |
 | Score delta | maintain ≥10.0, no dim below 9.9 | `scripts/score-auto.ps1` |
-| Encoding corruption | 0 files with mojibake | `scripts/score-auto.ps1` (Orthography dim) |
-| PSSA manual violations | <20 in production scripts | `scripts/pssa-gate.ps1 -Mode Check` |
+| External-auditor activations | ≥1 en tarea compleja | bitácora + ANTI-PATTERN-CATALOG |
+| Working tree hygiene | 0 cambios sin commit al cerrar ciclo | `git status --short` |
 | Cross-ref | 0 errors | `scripts/cross-ref-check.ps1` |
 
 ## Dimensions to Improve
 
 All 11 dims at 10.0. Focus:
-- Orthography: ensure 0 encoding corruption across all files
-- Clean Code: maintain 9.9+, aim for 10.0
-- Automate: reduce manual PSSA violations in production scripts
-- Upstream: propagate generic improvements to gentle-ai
+- **Audit**: activar external-auditor post-task — validar que estoy calibrado
+- **Process**: ciclo de mejora completo y reproducible (phase 0→5)
+- **Hygiene**: mantener working tree limpio, commits atómicos
+- **Score**: defender el 10.0 — si external-auditor gap >1.5, immune-system
 
 ## Difficulty → Triple-Verify Mapping
 
@@ -47,10 +48,10 @@ All 11 dims at 10.0. Focus:
 
 | Repo | What to Check | Last Verified |
 |------|---------------|---------------|
-| karpathy/autoresearch | New program.md patterns, loop improvements | 2026-06-18 (no changes) |
-| Gentleman-Programming/gentleman-guardian-angel | New caching strategies, AGENTS.md compliance checks | 2026-06-18 (v2.8.1, no changes) |
-| gentle-ai ecosystem | New MCP servers, backup systems (read-only, no PRs) | 2026-06-18 (no new public repos) |
-| engram (MCP) | Cloud sync, new query types, performance | 2026-06-18 |
+| karpathy/autoresearch | New program.md patterns, loop improvements | 2026-06-19 (no changes) |
+| Gentleman-Programming/gentleman-guardian-angel | New caching strategies, AGENTS.md compliance checks | 2026-06-19 (v2.8.1, no changes) |
+| gentle-ai ecosystem | New MCP servers, backup systems (read-only, no PRs) | 2026-06-19 (no new public repos) |
+| engram (MCP) | Cloud sync, new query types, performance | 2026-06-19 |
 
 ## Cycle Loop
 
@@ -85,4 +86,4 @@ LOOP:
 
 ## Author
 
-gentleman-vMK — Created 2026-06-17 for cycle 1 (infrastructure). Cycle 2 (hygiene+automation) started 2026-06-18.
+gentleman-vMK — Created 2026-06-17 for cycle 1 (infrastructure). Cycle 2 (hygiene+automation) 2026-06-18. Cycle 3 (audit+validation) started 2026-06-19.

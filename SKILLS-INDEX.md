@@ -1,9 +1,9 @@
 ﻿# SKILLS INDEX
 
-> Full trigger table for all 66 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 67 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 2.6 | **Changelog**: 2.6 (Added baseline-ui skill, session-miner.ps1, Ponytail lazy dev ladder, enriched web-quality skills)
+> **Version**: 2.7 | **Changelog**: 2.7 (Added external-auditor skill — blind subagent audit to catch overconfidence in auto-metrics)
 
 ## Triggers → Skill
 
@@ -52,6 +52,7 @@
 | Work-unit commits, commit organization | work-unit-commits |
 | Immune System, anti-pattern, permanent immunity | immune-system |
 | Auto-score, metrics, post-task evaluation | auto-metrics |
+| External audit, blind review, second opinion, verificá mi auto-score, contralor externo | external-auditor |
 | Metricas, before/after, % improvement, tokenization, delta | metricas |
 | Code review, CR, revisar código, criticar | code-review-agent |
 | Refactor, refactoring, reestructurar, migrate | refactoring-planner |
@@ -78,7 +79,7 @@
 
 ## Quick groups
 - **Compression/style**: karpathy-prompt, karpathy-loop, lean-context
-- **Quality**: quality-gate, auto-metrics, immune-system, code-review-agent, performance-tracker, triple-verify, self-improvement
+- **Quality**: quality-gate, auto-metrics, external-auditor, immune-system, code-review-agent, performance-tracker, triple-verify, self-improvement
 - **Memory**: session-resume, code-memory, dreaming
 - **Skills meta**: skill-creator, skill-registry, skill-improver, skill-digestion, skill-graph
 - **Coordination**: delivery-harness, chained-pr, branch-pr, issue-creation, subagent-isolation, command-wrapper

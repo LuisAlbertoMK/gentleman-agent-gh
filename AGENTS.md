@@ -119,7 +119,7 @@ Resume → session-resume · Write code → skill-creator, sdd-*, quality-gate, 
 Fix bug → recovery-protocol, immune-system, sdd-verify · Design → senior-engineer, sdd-propose, sdd-design, cognitive-doc-design
 Learn/Research → research, prompt-engineering, context7, code-memory · Review → judgment-day, skill-testing, pr-evidence, comment-writer, code-review-agent
 UI/Design → baseline-ui, web-quality-audit, performance, accessibility, seo, core-web-vitals
-Measure → metricas, auto-metrics · Optimize → karpathy-*, lean-context, caveman, skill-improver, refactoring-planner
+Measure → metricas, auto-metrics · Audit → external-auditor · Optimize → karpathy-*, lean-context, caveman, skill-improver, refactoring-planner
 Coordinate → delivery-harness, subagent-isolation, command-wrapper, chained-pr
 Commit → commit-crafter | Map → project-mapper | Secure → security-scanner
 Sync docs → doc-sync | Log → bitacora · Track/Decide → decision-capture, dreaming, skill-digestion
@@ -241,6 +241,7 @@ Zero filler ("Sure!"). No code without context. Default-FAIL: tool output = evid
 ### G. Post-task auto-evaluation
 Close task: auto-metrics 6 dims (correctness, tokens, error prevention, skill, speed, breadth).
 <7 → immune-system + protocol adjust. ≥9 → mem_save pattern.
+**If avg ≥7 AND task was complex** (≥3 tool calls, code changes, arch decisions) → load `external-auditor` for blind subagent audit. Discrepancy >1.5 on any dim → immune-system.
 
 ### H. Pull-from-Upstream (gentleman-vMK)
 - **Check**: `.\scripts\pull-upstream.ps1 -Mode Check` — NEW/MODIFIED/OURS ONLY
