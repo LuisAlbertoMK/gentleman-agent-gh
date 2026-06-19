@@ -25,6 +25,7 @@
 | 14 | 2026-06-16 | Case-insensitive -match filter | `One-shot` passes `^[a-z]` regex in PS5.1 | PS5.1 -match is case-insensitive by default | Use `-cmatch` for case-sensitive filters. | Never trust `-match` for casing — use `-cmatch` explicitly. |
 | 15 | 2026-06-19 | Overconfidence in self-score | External-auditor found 4 dims >1.5 gap (Correctness 10→6, ErrPrev 10→5) | No external validator for auto-metrics | Added external-auditor skill with blind subagent audit + immune-system trigger | Post-task auto-evaluation: if avg≥7 AND complex → blind audit before acceptance |
 | 16 | 2026-06-19 | PS5.1 encoding corruption in .ps1 files | Garbled output: `$name` literal, source code leaking, Unicode chars corrupted | Get-Content -Raw (no -Encoding) reads UTF-8-no-BOM as ANSI, corrupting non-ASCII bytes | Use ASCII-only in .ps1 files. Always specify -Encoding UTF8 on Get-Content/Out-File. Add BOM to files with Unicode. | Before saving .ps1: confirm no Unicode outside ASCII range. After writing: verify with hex dump. E3 runtime garbled output → check encoding FIRST. |
+| 17 | 2026-06-19 | Score metadata without guardrail | .project.json fue sobrescrito con formato 6-dim 5/10 incorrecto, sin alerta | Confianza en que "nadie va a sobrescribir esto" sin defensa | Validar .project.json en pre-commit: 11 dims + score.current ≥5 | Agregar guardrail inmediatamente después de restaurar metadata crítica |
 
 ## Prevention cheat sheet
 1. **No code before user confirms understanding** — "¿Entendí bien?" gate
@@ -39,3 +40,4 @@
 10. **Init all accumulators** before first `+=`
 11. **Use `-cmatch`** for case-sensitive filters in PowerShell
 12. **Blind audit your self-score** — overconfidence is invisible to yourself
+13. **Guardrail immediately after restoring critical metadata** — if it can be corrupted once, it will be corrupted again
