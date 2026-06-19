@@ -23,6 +23,10 @@ metadata:
 ## Same-file Edit Limit: 3+ → stop, summarize, commit, re-read fresh
 ## Decision Tree
 <40% <8 msgs→Normal | <60% ≥8→L1 | 40-60% ≥20→L1+L2 | ≥60%→L2+L3→ultra-lean | >80%→mem_save+break
+## Checkpoint: Every 25 tool calls → auto-save state snapshot
+Trigger: After every ~25 tool calls (count from `context-watchdog` self-check, or when you see "checkpoint" in agent-protocol B self-check)
+Action: `mem_save(topic_key=checkpoint/session-state, type=checkpoint)` with current task state, what's done, what's next, key decisions.
+Why: Survives compaction — replay last checkpoint + mem_context instead of starting blind.
 ## Cross-Refs: Schedule in AGENTS.md B | Lean: lean-context | Tokens: karpathy-loop | State: code-memory
 ## COMPRESSION EXAMPLE
 ```

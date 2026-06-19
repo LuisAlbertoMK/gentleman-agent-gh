@@ -15,8 +15,9 @@ Before ANY response, climb the Ponytail Ladder:
 2. **Does the standard library already do this?** Use it.
 3. **Does a native platform feature cover it?** Use it.
 4. **Does an already-installed dependency solve it?** Use it.
-5. **Can this be one line?** Make it one line.
-6. **Only then**: write the minimum code that works.
+5. **Stdlib assertion**: Before writing ANY abstraction, output `stdlib/native does NOT cover this because: <reason>`. If you can't write a real, specific reason, DON'T build it.
+6. **Can this be one line?** Make it one line.
+7. **Only then**: write the minimum code that works.
 
 > No abstractions that weren't explicitly requested. No new dependency if avoidable.
 > No boilerplate nobody asked for. Deletion over addition. Boring over clever. Fewest files possible.
@@ -66,6 +67,7 @@ Comandos rápidos para tareas recurrentes — extienden el sistema de modos:
 | **`!health`** | Full diagnostics: git status, drift, cross-ref, score, inter-track | Fácil |
 | **`!batch`** | `scripts/batch.ps1` — nueva batch auto-incremental + bitácora + inter-track++ | Fácil |
 | **`!cycle`** | `inter-track.ps1 -Show` + score status — resumen del ciclo de auto-mejora actual | Fácil |
+| **`!close`** | `scripts/close-session.ps1` — pipeline unificado de cierre: BITACORA + inter-track + git status + template para mem_session_summary | Fácil |
 
 ## Subagent-First
 Read-heavy (>3 files/scan/map) → delegate `explore`. Saves 2-5K tokens. Main context = synthesis/decisions.
@@ -177,6 +179,8 @@ Delete `$env:TEMP\opencode\` files >24h old at session start.
 
 ### SESSION CLOSE PROTOCOL (mandatory)
 
+Run `!close` (`scripts/close-session.ps1`) to start the pipeline: log to BITACORA, increment inter-track, check git status. Then:
+
 1. **Auto-metrics**: If session had code/task work (≥3 tool calls), run `auto-metrics` score 6 dims. <7 → `immune-system`.
 2. **Auto-dreaming**: If errors/bugfixes, `mem_search(type="error|bugfix")` for patterns. Same 2x→catalog. 3x→AGENTS.md rule.
 3. **mem_session_summary**: Call with ## Goal / ## Instructions / ## Discoveries / ## Accomplished / ## Next Steps / ## Relevant Files
@@ -210,7 +214,7 @@ Updates: `mem_update` on `topic_key=protocol/agente-optimizado`. Review: 2 weeks
 | Long/thorough | sdd-* + `quality-gate` | `caveman` |
 
 ### B. Token budget
-- >500 tokens → summary first. 5 turns no progress → `caveman lite`. 10 turns → `mem_session_summary` + reset. Self-check every 5 tool calls.
+- >500 tokens → summary first. 5 turns no progress → `caveman lite`. 10 turns → `mem_session_summary` + reset. Self-check every 5 tool calls. Every 5th self-check (25 calls) → run checkpoint: `mem_save(topic_key=checkpoint/session-state, type=checkpoint)`.
 - **Recursive Compression** (proactive):
   L1 (~8 msgs/15 calls): full summary from oldest raw block (−60-70%)
   L2 (~20 msgs/>3 L1s): 1-2 line decisions only + Engram ID (−40-50%)

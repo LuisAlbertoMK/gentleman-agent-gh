@@ -1,8 +1,8 @@
 # Project Score: gentleman-agent-gh
 
-**Current**: 9.1/10
+**Current**: 9.3/10
 **Last updated**: 2026-06-19
-**Trend**: down (cycle reset — Cycle Progress 10→0, rest 10)
+**Trend**: up (Cycle Progress 1→2, rest 10)
 
 ## Dimensions
 
@@ -18,7 +18,7 @@
 | Metrics               | 10.0  |
 | Script Performance    | 10.0  |
 | Skill Effectiveness   | 10.0  |
-| Cycle Progress        | 0.0  |
+| Cycle Progress        | 2.0  |
 
 ## Changelog
 
@@ -41,3 +41,5 @@
 | 2026-06-18 | 9.5   | +0.1   | Skill compression: performance-tracker, seo, metricas, branch-pr. inter: 14/30 |
 | 2026-06-19 | 10.0  | +0.5   | Cycle 2 complete — all 11 dims at 10.0. PSSA 0 manual, inter 30/30, encoding fixed. 2 pending objectives: experiments/ cleanup + upstream PR. |
 | 2026-06-19 | 9.1   | −0.9   | Cycle 3 progress: inter 1/30. Cycle Progress 10→0 (cycle reset external-auditor). 10 dims at 10.0. |
+| 2026-06-19 | 9.2   | +0.1   | Score auto-report. Cycle Progress 0→1/10. |
+| 2026-06-19 | 9.3   | +0.1   | 3 improvements implemented: !close (close-session.ps1), stdlib assertion in Pre-Flight Gate, checkpoint cada 25 tools en context-watchdog. Cycle Progress 1→2/10. |
