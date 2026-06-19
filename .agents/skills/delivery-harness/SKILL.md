@@ -21,6 +21,8 @@ Trigger: Multi-step tasks, parallel subagent work, complex deliverables.
    - Clean context per delegation (subagent-isolation rule #1)
    - Exact file paths + Engram IDs for decisions
    - Success criteria per unit
+   - **Request structured output**: each delegation MUST return 4-field block preserved as-is:
+     `## Decision Taken | ## Files Changed | ## Key Findings | ## Nuance (what would be lost in summary)`
 5. **Collect** — gather results, verify each meets criteria
 6. **Reconcile** — merge outputs, resolve conflicts (or escalate)
 7. **Report** — one status: units done, failures, rollback path
@@ -31,7 +33,7 @@ Trigger: Multi-step tasks, parallel subagent work, complex deliverables.
 - Each unit MUST have: success criteria, rollback command, max retries (default: 1)
 - Failure at any unit → either retry with fixed prompt OR rollback ALL
 - NEVER share subagent internal state between units
-- After collection: summarize results, don't retain full subagent output
+- After collection: summarize results, preserve the 4-field contract AS-IS (never summarize: Decision Taken, Files Changed, Key Findings, Nuance)
 
 ## ERROR HANDLING
 | Failure | Action |

@@ -86,7 +86,7 @@
                                                                            "over_5kb":  0,
                                                                            "avg_size_kb":  1.9,
                                                                            "total_skills":  68,
-                                                                           "total_bytes":  129402,
+                                                                           "total_bytes":  130076,
                                                                            "over_3kb":  2
                                                                        },
                                                           "score":  10,
@@ -129,6 +129,6 @@
                                      "Cycle Progress":  2
                                  },
                   "last_updated":  "2026-06-19",
-                  "trend":  "up"
+                  "trend":  "stable"
               }
 }

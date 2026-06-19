@@ -44,3 +44,4 @@
 | 2026-06-19 | 9.2   | +0.1   | Score auto-report. Cycle Progress 0→1/10. |
 | 2026-06-19 | 9.3   | +0.1   | 3 improvements implemented: !close (close-session.ps1), stdlib assertion in Pre-Flight Gate, checkpoint cada 25 tools en context-watchdog. Cycle Progress 1→2/10. |
 | 2026-06-19 | 9.3   | =      | Bias calibration: lowered external-auditor trigger to any code change, added calibration tracking (.learnings/bias-calibration.json), updated auto-metrics to apply offsets. Score stable (Cycle Progress unchanged). |
+| 2026-06-19 | 9.3   | =      | Invoke-Bash mandatory (AGENTS.md Bash-Safe), structured return contract for subagents (delivery-harness + subagent-isolation skills). All 6 weaknesses addressed. Score stable. |
