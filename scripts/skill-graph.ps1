@@ -159,6 +159,8 @@ Add-Skill -Name "python-async" -Category "specialized" -Triggers @("Python async
 # ============================================================
 
 function New-Graph {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
+    param()
     $g = @{ Nodes = @{}; AdjList = @{} }
     foreach ($s in $script:skillRegistry) {
         $name = $s.Name

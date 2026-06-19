@@ -40,7 +40,7 @@ Write-Host "[2/10] SQLite Recursive CTE..." -ForegroundColor Yellow
 . $ExpDir\approach-02-sqlite-cte.ps1
 $dbPath = "$ExpDir\graph-crud-test.db"
 Remove-Item $dbPath -ErrorAction SilentlyContinue
-$dbResult = Initialize-SqliteGraph -DbPath $dbPath
+$null = Initialize-SqliteGraph -DbPath $dbPath
 $sw2 = [System.Diagnostics.Stopwatch]::StartNew()
 $importResult = Import-GraphToSqlite -Graph $graph1 -DbPath $dbPath
 $sw2.Stop()

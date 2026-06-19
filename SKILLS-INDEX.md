@@ -5,7 +5,7 @@
 >
 > **Version**: 2.6 | **Changelog**: 2.6 (Added baseline-ui skill, session-miner.ps1, Ponytail lazy dev ladder, enriched web-quality skills)
 
-## Triggers â†’ Skill
+## Triggers → Skill
 
 | Trigger keywords | Skill |
 |------------------|-------|
@@ -13,7 +13,7 @@
 | Improve prompt, security, ReAct, multi-agent | prompt-engineering |
 | Karpathy loop, optimize prompt, measure tokens | karpathy-loop |
 | Compact, less tokens, caveman, /caveman, ultra-lean | lean-context |
-| ContinuÃ¡, code memory, multi-session | code-memory |
+| Continuá, code memory, multi-session | code-memory |
 | Self-reflection, Hermes, error patterns | self-reflection |
 | Test/verify skill, coverage | skill-testing |
 | Judgment day, dual review, juzgar | judgment-day |
@@ -25,7 +25,7 @@
 | Quality gate, pre-commit | quality-gate |
 | Context >100K tokens, context explosion | context-watchdog |
 | Recovery, "no es eso", frustration | recovery-protocol |
-| Resume, "dÃ³nde lo dejamos", "continuÃ¡", git state gate | session-resume |
+| Resume, "dónde lo dejamos", "continuá", git state gate | session-resume |
 | SDD init, bootstrap | sdd-init |
 | Explore codebase, pre-design | sdd-explore |
 | Proposal, intent, approach | sdd-propose |
@@ -53,12 +53,12 @@
 | Immune System, anti-pattern, permanent immunity | immune-system |
 | Auto-score, metrics, post-task evaluation | auto-metrics |
 | Metricas, before/after, % improvement, tokenization, delta | metricas |
-| Code review, CR, revisar cÃ³digo, criticar | code-review-agent |
+| Code review, CR, revisar código, criticar | code-review-agent |
 | Refactor, refactoring, reestructurar, migrate | refactoring-planner |
 | Commit, mensaje, commit message, conventional commit | commit-crafter |
 | Mapear, project map, estructura, tech stack, arquitectura | project-mapper |
 | Security, seguridad, vulnerabilidad, auditar | security-scanner |
-| Bitacora, historial, histÃ³rico, quÃ© pedÃ­, request log | bitacora |
+| Bitacora, historial, histórico, qué pedí, request log | bitacora |
 | Dreaming, cross-session patterns, memory curation | dreaming |
 | Performance score, mobile perf, desktop perf, rendimiento, app score, lighthouse, benchmark | performance-tracker |
 | Accessibility, a11y, WCAG, screen reader, keyboard nav, make accessible | accessibility |
@@ -69,7 +69,6 @@
 | Web quality audit, lighthouse audit, review web quality, check page quality | web-quality-audit |
 | UI cleanup, polish interface, fix layout, ui slop, generic ui, design review | baseline-ui |
 | Performance mode, dev mode, modo desarrollo, resource priority, high performance | development-mode |
-| Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
 | Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
 | Sparse loading, skill resolution, relevant skills, which skill, resolver skill, minimo skills | skill-graph |
 | Research, technical investigation, investigar, learn tech, compare solutions, evaluate options | research |

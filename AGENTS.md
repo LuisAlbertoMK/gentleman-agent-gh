@@ -169,7 +169,7 @@ Also PROACTIVELY: when starting known-area work · user mentions unfamiliar topi
 
 ### DREAMING (periodic)
 `mem_search(type="error|bugfix")` for patterns. Same error 2x → catalog. 3x → AGENTS.md rule.
-Also: RUN `.\scripts\session-miner.ps1 -Mode scan` every 5th error/bugfix to cross-reference across sessions. Use output to propose new anti-patterns.
+**AUTO: RUN** `.\scripts\session-miner.ps1 -Mode scan -Json` every 5th error/bugfix (triggered by context-watchdog or recovery-protocol) to cross-reference across sessions. Parse JSON output and propose new anti-patterns. The session-miner is invoked automatically — do NOT skip this step.
 
 ### AUTO-CLEAN
 Delete `$env:TEMP\opencode\` files >24h old at session start.

@@ -1,55 +1,35 @@
 ﻿---
 name: execution-mode
-description: "Auto-detect task execution mode — QUICK, THOROUGH, or DRAFT — based on scope, risk, familiarity, and keywords"
-triggers: "Execution mode, quick/thorough/draft, resource adaptive, zone green/yellow/orange/red, runtime mode"
+description: "Auto-detect task execution mode — QUICK, THOROUGH, DRAFT — based on scope, risk, familiarity"
+triggers: "Execution mode, quick/thorough/draft, resource adaptive, zone green/yellow/orange/red"
 license: Apache-2.0
 metadata:
-  tags:
-    - engineering
-    - runtime
+  tags: [engineering, runtime]
   author: gentleman-vMK
-  version: "2.0"
-  changelog: "1.1->2.0: added resource-adaptive zone matrix — GREEN/YELLOW/ORANGE/RED dynamic runtime adaptation"
+  version: "2.1"
+  changelog: "2.1: karpathy compress"
 ---
-
-## TASK MODES
-| Mode | When | Depth | Artifacts | Verification |
-|------|------|-------|-----------|-------------|
-| QUICK | Simple bugfix, known pattern | Minimal | None/1-file | Tests only |
-| THOROUGH | Complex feature, risky change | Full SDD | Spec+Design+Verify | Full gate |
-| DRAFT | Exploration, prototyping | Light | Notes only | Skip |
-
-## DECIDE
-Simple/known? -> QUICK (code+tests+commit) | Complex/risky? -> THOROUGH (full SDD) | Unclear/exploring? -> DRAFT (findings -> ask -> commit)
-
-## AUTO-DETECTION (when unspecified)
-Infer from: scope (1-file vs multi-file), risk (typo vs security/data loss), familiarity (3x+ vs new), keywords ("fix/typo" vs "arch/redesign" vs "explore/what if"), tone.
-
-## RESOURCE-ADAPTIVE ZONE OVERRIDE
-Task mode is per-task. Resource zone adjusts behavioral knobs continuously.
-
-### Metrics
+## Modes
+| Mode | When | Depth | Verification |
+|------|------|-------|-------------|
+| QUICK | Simple bugfix, known | Minimal | Tests only |
+| THOROUGH | Complex, risky | Full SDD | Full gate |
+| DRAFT | Explore, prototype | Notes | Skip |
+## Decide: Simple/known→QUICK · Complex/risky→THOROUGH · Unclear→DRAFT (findings→ask)
+## Auto-detect (when unspecified)
+Scope (1-file vs multi), risk (typo vs data loss), familiarity (3x+ vs new), keywords ("fix" vs "redesign" vs "explore").
+## Resource-Adaptive Zones
 | Metric | Source | GREEN (<40%) | YELLOW (40-60%) | ORANGE (60-80%) | RED (>80%) |
 |--------|--------|-------------|----------------|----------------|-----------|
-| Context Pressure | ctx_stats | <40% | 40-60% | 60-80% | >80% |
-| Session Depth | msgs+tool calls | LOW <10 | MEDIUM 10-25 | HIGH >25 | - |
-| Error Rate | last 5 tools | LOW 0 | MEDIUM 1 | HIGH 2+ | - |
-
-### Zone -> Behavior
-| Zone | Response | Compression | Verification | Skill Loading |
-|------|----------|-------------|-------------|---------------|
-| GREEN | Full answer | L1 normal | Full gate | Normal |
-| YELLOW | Brief+expand | L1+L2 proactive | Essential | Sparse |
-| ORANGE | Headline | L2 forced | Skip non-critical | Minimal |
-| RED | 1-liner | L3 emergency | Skip all | Zero |
-
-### Rules
-Static+dynamic combined: THOROUGH in YELLOW = full SDD + shorter summaries. Re-evaluate every 5 tools. Escalate on any HIGH; de-escalate after 3 checks in lower zone. User override wins.
-
-### Compression Levels
-L1: Oldest raw -> full summary (-60-70%) | L2: L1s -> decisions+Engram IDs (-40-50%) | L3: 1-liner + engram-obs-ref (-80-90%)
-
-## MODE RULES
+| Context | ctx_stats | <40% | 40-60% | 60-80% | >80% |
+| Depth | msgs+tools | LOW <10 | MEDIUM 10-25 | HIGH >25 | — |
+| Errors | last 5 | 0 | 1 | 2+ | — |
+| Response | — | Full | Brief+expand | Headline | 1-liner |
+| Verify | — | Full | Essential | Non-critical skip | Skip all |
+| Skills | — | Normal | Sparse | Minimal | Zero |
+Compression: L1 summary (-60-70%) · L2 decisions+Engram (-40-50%) · L3 1-liner+ref (-80-90%)
+**Rules**: Re-evaluate every 5 tools. Escalate on any HIGH. De-escalate after 3 lower. User override wins.
+## Mode Rules
 QUICK: No SDD. Code+tests. Score+move.
-THOROUGH: Full SDD. Every decision to Engram. Quality gate. PR with evidence.
+THOROUGH: Full SDD. Every decision→Engram. Quality gate. PR with evidence.
 DRAFT: Explore first. No commit without user OK.

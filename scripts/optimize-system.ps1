@@ -4,6 +4,18 @@
 .DESCRIPTION
   REQUIRES: PowerShell as Administrator. Fix page file to 4GB, DISM component
   cleanup, scheduled tasks tuning, services optimization, and registry tweaks.
+
+.PARAMETER DisableHibernation
+  Disable hibernation and delete hiberfil.sys to free disk space.
+
+.PARAMETER SetPageFile
+  Set page file to fixed 4GB to reduce disk usage while preserving crash dumps.
+
+.PARAMETER RunDism
+  Run DISM component cleanup (StartComponentCleanup) to shrink WinSxS.
+
+.PARAMETER DryRun
+  Show what would be done without making changes. Default: $false.
 #>
 #requires -Version 5.1
 #

@@ -116,7 +116,7 @@ foreach ($dir in $dirs) {
     }
 }
 $top = ($rc.GetEnumerator() | Sort-Object Value -Descending | Select-Object -First 1)
-$t_grep4a = $sw.Elapsed
+$null = $sw.Elapsed  # elapsed tracked via $results below
 
 $sw = [System.Diagnostics.Stopwatch]::StartNew()
 $seen3 = @{ $top.Key = $true }; $grep4 = @{}; $cur3 = @($top.Key)
@@ -162,7 +162,7 @@ foreach ($r in $results) {
     $tg += $r[1]; $tgr += $r[2]
 }
 $totalS = [math]::Round($tg/[math]::Max($tgr, 0.001), 1)
-$buildMs = $sw.Elapsed.TotalMilliseconds
+$null = $sw.Elapsed.TotalMilliseconds  # PSSA: timing tracked via $results
 Write-Host ("{0,-45} {1,10:F1} {2,10:F1} {3,8}" -f "TOTAL (4 queries)", $tg, $tgr, "$($totalS)x")
 Write-Host ""
 

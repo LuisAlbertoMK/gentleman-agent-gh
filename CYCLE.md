@@ -6,27 +6,30 @@
 
 ## Objective
 
-Establecer el ciclo de auto-mejora continua como infraestructura del agente:
-- Crear skill `self-improvement` que orqueste el ciclo completo
-- Integrar triple-verify por dificultad (6 niveles)
-- Implementar inter(30) como métrica de progreso
-- Propagar cambios a opencode, opencode-vmk, gentleman-vMK
+**Cycle 2**: Mantener score 10.0 y automatizar procesos manuales restantes:
+- Corregir encoding corruption en SKILLS-INDEX.md (mojibake â†' → →)
+- Automatizar trigger de session-miner.ps1 en DREAMING (AGENTS.md)
+- Reducir PSSA violations en scripts de producción (<49 → <20 manual)
+- Limpiar experiments/graph-crud/ (referencias de investigación obsoletas)
+- Decidir y ejecutar PR a upstream gentle-ai con cambios genéricos
 
 ## Metrics
 
 | Metric | Target | Tracked By |
 |--------|--------|------------|
 | inter(30) | ≥30 meaningful interactions per cycle | `scripts/inter-track.ps1` |
-| Score delta | ≥+0.5 across lowest dimension | `scripts/score-auto.ps1` |
-| Skill size | <3KB per skill | `scripts/run-improvement-cycle.ps1` |
+| Score delta | maintain ≥10.0, no dim below 9.9 | `scripts/score-auto.ps1` |
+| Encoding corruption | 0 files with mojibake | `scripts/score-auto.ps1` (Orthography dim) |
+| PSSA manual violations | <20 in production scripts | `scripts/pssa-gate.ps1 -Mode Check` |
 | Cross-ref | 0 errors | `scripts/cross-ref-check.ps1` |
 
 ## Dimensions to Improve
 
-All 10 at 10.0 currently. Focus:
-- Maintain: keep all 10 dims at 10.0
-- Track: add inter(30) as 11th dimension
-- Automate: reduce manual steps in cycle execution
+All 11 dims at 10.0. Focus:
+- Orthography: ensure 0 encoding corruption across all files
+- Clean Code: maintain 9.9+, aim for 10.0
+- Automate: reduce manual PSSA violations in production scripts
+- Upstream: propagate generic improvements to gentle-ai
 
 ## Difficulty → Triple-Verify Mapping
 
@@ -45,7 +48,7 @@ All 10 at 10.0 currently. Focus:
 |------|---------------|---------------|
 | karpathy/autoresearch | New program.md patterns, loop improvements | 2026-06-18 (no changes) |
 | Gentleman-Programming/gentleman-guardian-angel | New caching strategies, AGENTS.md compliance checks | 2026-06-18 (v2.8.1, no changes) |
-| gentle-ai ecosystem | New MCP servers, backup systems | 2026-06-18 (no new public repos) |
+| gentle-ai ecosystem | New MCP servers, backup systems, upstream PRs | 2026-06-18 (no new public repos) |
 | engram (MCP) | Cloud sync, new query types, performance | 2026-06-18 |
 
 ## Cycle Loop
@@ -81,4 +84,4 @@ LOOP:
 
 ## Author
 
-gentleman-vMK — Created 2026-06-17 for first improvement cycle.
+gentleman-vMK — Created 2026-06-17 for cycle 1 (infrastructure). Cycle 2 (hygiene+automation) started 2026-06-18.

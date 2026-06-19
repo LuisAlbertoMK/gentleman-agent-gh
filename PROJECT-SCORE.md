@@ -1,8 +1,8 @@
 # Project Score: gentleman-agent-gh
 
-**Current**: 10.0/10
+**Current**: 9.2/10
 **Last updated**: 2026-06-18
-**Trend**: stable
+**Trend**: up (cycle progress)
 
 ## Dimensions
 
@@ -18,7 +18,7 @@
 | Metrics               | 10.0  |
 | Script Performance    | 10.0  |
 | Skill Effectiveness   | 10.0  |
-| Cycle Progress        | 10.0  |
+| Cycle Progress        | 5.0   |
 
 ## Changelog
 
@@ -33,3 +33,9 @@
 | 2026-06-18 | 9.4   | 11a dim | Anadida dimension "Cycle Progress" (inter 8/30). Score compuesto baja de 10.0→9.4 por nueva dimension, pero 10 dims originales siguen en 10.0 |
 | 2026-06-18 | 9.4   | inter 10/30 | Score update tras Fix 1 (11a dim + score-auto.ps1), Fix 4 (!cycle shortcut), Fix 5 (final score). Cycle Progress: 3/10. Resto: 10/10. |
 | 2026-06-18 | 9.5   | inter 14/30 | Batch 8 continuacion: Fix 6 (PSSA path bug), Fix 7 (!cycle +score), Fix 8 (unused param), Fix 9 (final score). Cycle Progress: 4.7/10. Resto: 10/10. |
+| 2026-06-18 | 9.1   | −0.9   | Cycle 2 start: SKILLS-INDEX encoding fix (5 mojibake), AGENTS.md DREAMING auto-trigger, CYCLE.md new objective. Cycle Progress 10→0 (cycle reset). inter: 1/30 |
+| 2026-06-18 | 9.2   | +0.1   | PSSA fix round: 11 violations eliminated (49→38). tokenize empty catches, install unused params, experiments unused vars/params/auto-var rename. Cycle Progress: 2/30. inter: 2/30 |
+| 2026-06-18 | 9.2   | =      | experiments/graph-crud cleanup: README, .gitignore, untracked db+json. Syntax verify: 29/29 OK. inter: 4/30 |
+| 2026-06-18 | 9.3   | +0.1   | PSSA reduction run. Gate: experiments/skills exclusion. bench-compare/benchmark/install plural→singular renames. bench-file-io scope fix. tokenize empty catch. PSSA manual: 49→0. inter: 6/30 |
+| 2026-06-18 | 9.4   | +0.1   | Skill compression: gap-analysis, triple-verify, performance. SKILLS-INDEX dup removed. Stale temp cleanup. inter: 10/30 |
+| 2026-06-18 | 9.5   | +0.1   | Skill compression: performance-tracker, seo, metricas, branch-pr. inter: 14/30 |

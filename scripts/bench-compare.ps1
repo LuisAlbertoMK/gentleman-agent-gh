@@ -22,8 +22,8 @@ $ErrorActionPreference = 'Stop'
 $RepoDir = (Resolve-Path $RepoDir).Path
 
 # --- Helper ---
-function Get-Lines { param($Path) if (Test-Path $Path) { (Get-Content $Path | Measure-Object -Line).Lines } else { 0 } }
-function Get-Bytes { param($Path) if (Test-Path $Path) { (Get-Item $Path).Length } else { 0 } }
+function Get-Line { param($Path) if (Test-Path $Path) { (Get-Content $Path | Measure-Object -Line).Lines } else { 0 } }
+function Get-Byte { param($Path) if (Test-Path $Path) { (Get-Item $Path).Length } else { 0 } }
 
 # --- TITLE ---
 Write-Host "`n========================================================" -ForegroundColor Cyan
@@ -40,10 +40,10 @@ $repoAgents = Join-Path $RepoDir "AGENTS.md"
 $globalAgents = "$env:USERPROFILE\.config\opencode\AGENTS.md"
 
 Write-Host ("  gentleman-vMK template (Go): ? lines (no disponible localmente)")
-Write-Host ("  Backup pre-sprint3:      " + (Get-Lines $backupAgents) + " lines, " + (Get-Bytes $backupAgents) + " bytes")
-Write-Host ("  gentleman-agent-gh:      " + (Get-Lines $repoAgents) + " lines, " + (Get-Bytes $repoAgents) + " bytes")
+Write-Host ("  Backup pre-sprint3:      " + (Get-Line $backupAgents) + " lines, " + (Get-Byte $backupAgents) + " bytes")
+Write-Host ("  gentleman-agent-gh:      " + (Get-Line $repoAgents) + " lines, " + (Get-Byte $repoAgents) + " bytes")
 if (Test-Path $globalAgents) {
-    Write-Host ("  Global ~/.config/opencode: " + (Get-Lines $globalAgents) + " lines, " + (Get-Bytes $globalAgents) + " bytes")
+    Write-Host ("  Global ~/.config/opencode: " + (Get-Line $globalAgents) + " lines, " + (Get-Byte $globalAgents) + " bytes")
 }
 Write-Host ""
 
@@ -60,8 +60,8 @@ $onlyRepo = $repoSkills | Where-Object { $backupSkills -notcontains $_ }
 
 $totalBackupLines = 0; $totalRepoLines = 0
 foreach ($s in $common) {
-    $totalBackupLines += (Get-Lines (Join-Path $backupSkillsDir "$s\SKILL.md"))
-    $totalRepoLines += (Get-Lines (Join-Path $repoSkillsDir "$s\SKILL.md"))
+    $totalBackupLines += (Get-Line (Join-Path $backupSkillsDir "$s\SKILL.md"))
+    $totalRepoLines += (Get-Line (Join-Path $repoSkillsDir "$s\SKILL.md"))
 }
 Write-Host ("  Common skills: " + $common.Count + " | Backup: " + $totalBackupLines + "L | Repo: " + $totalRepoLines + "L | Delta: " + ($totalRepoLines - $totalBackupLines) + "L (" + [math]::Round(($totalRepoLines - $totalBackupLines) / $totalBackupLines * 100, 1) + "%)")
 Write-Host ("  Backup-only skills: " + $onlyBackup.Count + " | Repo-only: " + $onlyRepo.Count)
@@ -119,9 +119,9 @@ $crossRef = "scripts\cross-ref-check.ps1"
 $tsPath = Join-Path $RepoDir $testSuite
 $qgPath = Join-Path $RepoDir $qualityGate
 $crPath = Join-Path $RepoDir $crossRef
-$tsStatus = if (Test-Path $tsPath) { "EXISTS (" + (Get-Lines $tsPath) + "L)" } else { "MISSING" }
+$tsStatus = if (Test-Path $tsPath) { "EXISTS (" + (Get-Line $tsPath) + "L)" } else { "MISSING" }
 $qgStatus = if (Test-Path $qgPath) { "EXISTS (4 checks)" } else { "MISSING" }
-$crStatus = if (Test-Path $crPath) { "EXISTS (" + (Get-Lines $crPath) + "L)" } else { "MISSING" }
+$crStatus = if (Test-Path $crPath) { "EXISTS (" + (Get-Line $crPath) + "L)" } else { "MISSING" }
 Write-Host ("  Test suite:         " + $tsStatus)
 Write-Host ("  Quality gate:       " + $qgStatus)
 Write-Host ("  Cross-ref check:    " + $crStatus)

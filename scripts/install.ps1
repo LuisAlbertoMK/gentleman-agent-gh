@@ -37,7 +37,11 @@ Set-StrictMode -Version Latest
 # throw IOException ("handle is invalid") in non-console hosts (ISE, remoting,
 # some CI pipelines) and abort the whole install. Safe to swallow.
 $null = & chcp 65001 2>$null
-try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch { # encoding fallback OK }
+try {
+    [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+} catch {
+    Write-Verbose "install: Console encoding not settable — using system default"
+}
 
 $GITHUB_OWNER = "Gentleman-Programming"
 $GITHUB_REPO = "gentle-ai"
@@ -54,6 +58,7 @@ function Write-Err     { param([string]$Message) Write-Host "[error]   $Message"
 function Write-Step    { param([string]$Message) Write-Host "`n==> $Message" -ForegroundColor Cyan }
 
 function Stop-WithError {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
     param([string]$Message)
     Write-Err $Message
     exit 1
@@ -96,7 +101,7 @@ function Get-Platform {
 # Prerequisites
 # ============================================================================
 
-function Test-Prerequisites {
+function Test-Prerequisite {
     Write-Step "Checking prerequisites"
 
     $missing = @()
@@ -389,7 +394,7 @@ function Test-Installation {
 # Next steps
 # ============================================================================
 
-function Show-NextSteps {
+function Show-NextStep {
     param([string]$Channel = "stable")
 
     Write-Host ""
@@ -427,10 +432,13 @@ function Main {
         [switch]$Insecure
     )
 
+    # Suppress PSSA PSReviewUnusedParameter: reserved for upstream gentle-ai
+    $null = $InstallDir, $Insecure
+
     Show-Banner
 
     $arch = Get-Platform
-    Test-Prerequisites
+    Test-Prerequisite
 
     if ($Channel -eq "nightly") { $Channel = "beta" }
 
@@ -442,7 +450,7 @@ function Main {
     }
 
     Test-Installation
-    Show-NextSteps -Channel $Channel
+    Show-NextStep -Channel $Channel
 }
 
 Main @args

@@ -61,14 +61,14 @@ if ($SkillCount -lt 60) { $ArtifactScore -= 2 }
 if (-not $HasProjectJson) { $ArtifactScore -= 1 }
 $ArtifactScore = [math]::Max(0, $ArtifactScore)
 
-Add-DimensionLog "Project Artifacts" $ArtifactScore 10 @{
+Add-DimensionLog -Name "Project Artifacts" -Score $ArtifactScore -Max 10 -Evidence @{
   skills       = $SkillCount
   cross_ref    = $CrossRefOk
   readme       = $HasReadme
   changelog    = $HasChangelog
   project_json = $HasProjectJson
   roadmap      = $HasRoadmap
-} "Cross-ref $CrossRefOk, $SkillCount skills (excl _shared)"
+} -Rationale "Cross-ref $CrossRefOk, $SkillCount skills (excl _shared)"
 
 # --- 2. Security ---
 $SecurityScore = 10
@@ -96,10 +96,10 @@ if (Test-Path "docs/metricas/errors/LATEST_error.json") {
 
 $SecurityScore = [math]::Max(0, [math]::Min(10, $SecurityScore))
 
-Add-DimensionLog "Security" $SecurityScore 10 @{
+Add-DimensionLog -Name "Security" -Score $SecurityScore -Max 10 -Evidence @{
   weak_crypto = $WeakCryptoFound
   secrets     = $SecretsFound
-} "Weak crypto: $WeakCryptoFound, secrets: $SecretsFound"
+} -Rationale "Weak crypto: $WeakCryptoFound, secrets: $SecretsFound"
 
 # --- 3. Dead Code ---
 $DeadScore = 10
@@ -125,11 +125,11 @@ if ($CommentedCode.Count -gt 10) { $DeadScore -= 1 }
 
 $DeadScore = [math]::Max(0, [math]::Min(10, $DeadScore))
 
-Add-DimensionLog "Dead Code" $DeadScore 10 @{
+Add-DimensionLog -Name "Dead Code" -Score $DeadScore -Max 10 -Evidence @{
   orphans        = $OrphanCount
   dead_junctions = $JunctionIssues
   commented_out  = $CommentedCode.Count
-} "Orphans: $OrphanCount, dead junctions: $JunctionIssues"
+} -Rationale "Orphans: $OrphanCount, dead junctions: $JunctionIssues"
 
 # --- 4. Clean Code ---
 $Scripts = Get-ChildItem ".\scripts\*.ps1"
@@ -149,12 +149,12 @@ foreach ($Script in $Scripts) {
 $CleanRatio = @($WithHelp, $WithParams, $WithStrict | ForEach-Object { [math]::Round($_ / $TotalScripts, 2) })
 $CleanScore = [math]::Round(($CleanRatio[0] + $CleanRatio[1] + $CleanRatio[2]) / 3 * 10, 1)
 
-Add-DimensionLog "Clean Code" $CleanScore 10 @{
+Add-DimensionLog -Name "Clean Code" -Score $CleanScore -Max 10 -Evidence @{
   total_scripts   = $TotalScripts
   with_help       = $WithHelp
   with_params     = $WithParams
   with_strictmode = $WithStrict
-} "Scripts: $TotalScripts, help: $WithHelp, params: $WithParams, strict: $WithStrict"
+} -Rationale "Scripts: $TotalScripts, help: $WithHelp, params: $WithParams, strict: $WithStrict"
 
 # --- 5. Best Practices ---
 $BestScore = [math]::Round(($WithParams / $TotalScripts) * 10, 1)
@@ -168,10 +168,10 @@ $TryCatchRatio = $WithTryCatch / $TotalScripts
 if ($TryCatchRatio -ge 0.8) { $BestScore = [math]::Min(10, $BestScore + 1) }
 elseif ($TryCatchRatio -le 0.3) { $BestScore = [math]::Max(0, $BestScore - 1) }
 
-Add-DimensionLog "Best Practices" $BestScore 10 @{
+Add-DimensionLog -Name "Best Practices" -Score $BestScore -Max 10 -Evidence @{
   param_coverage = $WithParams
   trycatch       = $WithTryCatch
-} "Params: $WithParams/$TotalScripts, try/catch: $WithTryCatch/$TotalScripts"
+} -Rationale "Params: $WithParams/$TotalScripts, try/catch: $WithTryCatch/$TotalScripts"
 
 # --- 6. Orthography (byte-level scan, encoding-agnostic) ---
 $CorruptedCount = 0
@@ -203,10 +203,10 @@ if ($CorruptedCount -gt 10) { $OrthoScore = 4 }
 elseif ($CorruptedCount -gt 5) { $OrthoScore = 7 }
 elseif ($CorruptedCount -gt 0) { $OrthoScore = 9 }
 
-Add-DimensionLog "Orthography" $OrthoScore 10 @{
+Add-DimensionLog -Name "Orthography" -Score $OrthoScore -Max 10 -Evidence @{
   corrupted_files = $CorruptedCount
   total_scanned   = $SkillFiles.Count
-} "Encoding corruption: $CorruptedCount/$($SkillFiles.Count) files"
+} -Rationale "Encoding corruption: $CorruptedCount/$($SkillFiles.Count) files"
 
 # --- 7. Bitácora ---
 $BitaScore = 0
@@ -218,10 +218,10 @@ if (Test-Path "BITACORA.md") {
   else { $BitaScore = 5 }
 }
 
-Add-DimensionLog "Bitácora" $BitaScore 10 @{
+Add-DimensionLog -Name "Bitácora" -Score $BitaScore -Max 10 -Evidence @{
   exists = (Test-Path "BITACORA.md")
   lines  = if (Test-Path "BITACORA.md") { (Get-Content "BITACORA.md").Count } else { 0 }
-} "BITACORA.md exists: $(Test-Path 'BITACORA.md')"
+} -Rationale "BITACORA.md exists: $(Test-Path 'BITACORA.md')"
 
 # --- 8. Metrics ---
 $HasMetricsDir = Test-Path "docs/metricas"
@@ -234,12 +234,12 @@ if ($HasMetricsDir -and $HasErrorJson) { $MetricScore = 9 }
 elseif ($HasMetricsDir) { $MetricScore = 7 }
 if ($HasReports -and $HasErrorsDir) { $MetricScore = [math]::Min(10, $MetricScore + 1) }
 
-Add-DimensionLog "Metrics" $MetricScore 10 @{
+Add-DimensionLog -Name "Metrics" -Score $MetricScore -Max 10 -Evidence @{
   metrics_dir  = $HasMetricsDir
   errors_dir   = $HasErrorsDir
   error_json   = $HasErrorJson
   has_reports  = $HasReports
-} "Metrics dir: $HasMetricsDir, error json: $HasErrorJson"
+} -Rationale "Metrics dir: $HasMetricsDir, error json: $HasErrorJson"
 
 # --- 9. Script Performance ---
 $ScriptSizes = Get-ChildItem ".\scripts\*.ps1" | Select-Object Name, Length
@@ -254,11 +254,11 @@ elseif ($AvgSizeKB -gt 20) { $PerfScore -= 2 }
 if ($Over50KB -gt 0) { $PerfScore -= 2 }
 $PerfScore = [math]::Max(0, [math]::Min(10, $PerfScore))
 
-Add-DimensionLog "Script Performance" $PerfScore 10 @{
+Add-DimensionLog -Name "Script Performance" -Score $PerfScore -Max 10 -Evidence @{
   script_count = $ScriptCount
   avg_size_kb  = $AvgSizeKB
   over_50kb    = $Over50KB
-} "Scripts: $ScriptCount, avg: ${AvgSizeKB}KB, >50KB: $Over50KB"
+} -Rationale "Scripts: $ScriptCount, avg: ${AvgSizeKB}KB, >50KB: $Over50KB"
 
 # --- 10. Skill Effectiveness ---
 $SkillFiles = Get-ChildItem ".\.agents\skills\*\SKILL.md" | Where-Object { $_.Directory.Name -ne '_shared' }
@@ -276,13 +276,13 @@ if ($AvgSkillKB -le 2.5) { $EffectScore = [math]::Min(10, $EffectScore + 0.5) }
 if ($TotalSkills -lt 60) { $EffectScore -= 2 }
 $EffectScore = [math]::Round([math]::Max(0, [math]::Min(10, $EffectScore)), 1)
 
-Add-DimensionLog "Skill Effectiveness" $EffectScore 10 @{
+Add-DimensionLog -Name "Skill Effectiveness" -Score $EffectScore -Max 10 -Evidence @{
   total_skills   = $TotalSkills
   over_3kb       = $Over3KB
   over_5kb       = $Over5KB
   avg_size_kb    = $AvgSkillKB
   total_bytes    = $TotalBytes
-} "Skills: $TotalSkills, >3KB: $Over3KB, >5KB: $Over5KB, avg: ${AvgSkillKB}KB"
+} -Rationale "Skills: $TotalSkills, >3KB: $Over3KB, >5KB: $Over5KB, avg: ${AvgSkillKB}KB"
 
 # --- 11. Cycle Progress (inter(30)) ---
 $InterTrackPath = ".learnings\inter-track.json"
@@ -301,10 +301,10 @@ if (Test-Path $InterTrackPath) {
   }
 }
 
-Add-DimensionLog "Cycle Progress" $CycleScore 10 @{
+Add-DimensionLog -Name "Cycle Progress" -Score $CycleScore -Max 10 -Evidence @{
   inter_count  = $InterCount
   inter_target = $InterTarget
-} "inter: $InterCount/$InterTarget"
+} -Rationale "inter: $InterCount/$InterTarget"
 
 # --- Composite ---
 $AllScores = $ScoreLog.Values | ForEach-Object { $_.score }

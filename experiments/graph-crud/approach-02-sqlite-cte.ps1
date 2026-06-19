@@ -1,4 +1,4 @@
-# APPROACH 2: SQLite + Recursive CTE (Hybrid Graph)
+﻿# APPROACH 2: SQLite + Recursive CTE (Hybrid Graph)
 # ==================================================
 # Graph stored in SQLite with indexes. Recursive CTE for traversal.
 # Best for: Persistent storage, complex queries, >10K nodes.

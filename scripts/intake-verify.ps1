@@ -10,6 +10,12 @@
   Cantidad de ciclos de mejora (default: 3).
 .PARAMETER OutputFormat
   Formato de salida: text (default) o json.
+
+.PARAMETER ProjectType
+  Tipo de proyecto para análisis: auto (default), fe, be, db, fullstack, mobile, etc.
+
+.PARAMETER SaveMetrics
+  Guardar métricas en docs/metricas/ (default: $true).
 #>
 #requires -Version 5.1
 
@@ -23,10 +29,15 @@ param(
     [ValidateSet("auto","fe","be","db","fullstack","mobile","desktop","saas","erp","ecom","api","web","cms","infra")]
     [string]$ProjectType = "auto",
 
-    [bool]$SaveMetrics = $true
+    [bool]$SaveMetrics = $true,
+
+    [ValidateSet("text", "json")]
+    [string]$OutputFormat = "text"
 )
 
 Set-StrictMode -Version Latest
+# Explicit script-scope reference for Write-Result function (PSSA false positive suppression)
+$Script:OutputFormat = $OutputFormat
 
 $script:startTime = Get-Date
 $script:roundResults = @()
@@ -71,14 +82,14 @@ function Get-Score {
 
 function Invoke-IntakeCheck {
     param([int]$Round, [string]$ProjectPath, [string]$ProjectType)
-    
+
     $results = @{}
     $scoreMap = @{}
-    
+
     $checkMark = $script:CHK
     $crossMark = $script:CRS
     $warnMark = $script:WRN
-    
+
     Write-Host ""
     Write-Host ("=" * 55) -ForegroundColor Cyan
     Write-Host "  Iteracion $Round - Intake Verification" -ForegroundColor Cyan
@@ -92,13 +103,13 @@ function Invoke-IntakeCheck {
     elseif (Test-Path "$ProjectPath\docs\roadmap.md") { $rPath = "docs/roadmap.md" }
     elseif (Test-Path "$ProjectPath\roadmap.md") { $rPath = "roadmap.md" }
     elseif (Test-Path "$ProjectPath\roadmap") { $rPath = "roadmap/ (dir)" }
-    
+
     if ($rPath) {
         $size = Get-FileSize "$ProjectPath\$rPath"
-        Write-Result $checkMark "Roadmap" "Found" "$rPath ($size)"
+        Write-Result -Icon $checkMark -Artifact "Roadmap" -Status "Found" -Detail "$rPath ($size)"
         $results["roadmap"] = $checkMark; $scoreMap["roadmap"] = 10
     } else {
-        Write-Result $crossMark "Roadmap" "Missing" "No ROADMAP.md, docs/roadmap.md, or roadmap/ dir"
+        Write-Result -Icon $crossMark -Artifact "Roadmap" -Status "Missing" -Detail "No ROADMAP.md, docs/roadmap.md, or roadmap/ dir"
         $results["roadmap"] = $crossMark; $scoreMap["roadmap"] = 0
     }
 
@@ -125,17 +136,17 @@ function Invoke-IntakeCheck {
         $prScore = [math]::Max($prScore, 5)
     }
     $prIcon = if ($prScore -ge 8) { $checkMark } elseif ($prScore -ge 3) { $warnMark } else { $crossMark }
-    Write-Result $prIcon "PR" "Pull Request + Problem Report" ($prDetail -join " | ")
+    Write-Result -Icon $prIcon -Artifact "PR" -Status "Pull Request + Problem Report" -Detail ($prDetail -join " | ")
     $results["pr"] = $prIcon; $scoreMap["pr"] = $prScore
 
     # --- 3. PRD / Specs ---
     $prdFound = Get-ChildItem -Path "$ProjectPath" -Recurse -Include "*PRD*","*spec*","*requirements*","*srs*" `
         -Exclude "*node_modules*",".git","*vendor*" -File -ErrorAction SilentlyContinue | Select-Object -First 5
     if ($prdFound) {
-        Write-Result $checkMark "PRD" "Found" "$($prdFound.Count) files (e.g., $($prdFound[0].Name))"
+        Write-Result -Icon $checkMark -Artifact "PRD" -Status "Found" -Detail "$($prdFound.Count) files (e.g., $($prdFound[0].Name))"
         $results["prd"] = $checkMark; $scoreMap["prd"] = 10
     } else {
-        Write-Result $crossMark "PRD" "Missing" "No PRD, spec, or requirements files"
+        Write-Result -Icon $crossMark -Artifact "PRD" -Status "Missing" -Detail "No PRD, spec, or requirements files"
         $results["prd"] = $crossMark; $scoreMap["prd"] = 0
     }
 
@@ -152,10 +163,10 @@ function Invoke-IntakeCheck {
         }
         $quality = [math]::Max(1, $quality)
         $qIcon = if ($quality -ge 8) { $checkMark } elseif ($quality -ge 5) { $warnMark } else { $crossMark }
-        Write-Result $qIcon "README" "Found" "$size (quality score: $quality/10)"
+        Write-Result -Icon $qIcon -Artifact "README" -Status "Found" -Detail "$size (quality score: $quality/10)"
         $results["readme"] = $qIcon; $scoreMap["readme"] = $quality
     } else {
-        Write-Result $crossMark "README" "Missing" "No README.md at project root"
+        Write-Result -Icon $crossMark -Artifact "README" -Status "Missing" -Detail "No README.md at project root"
         $results["readme"] = $crossMark; $scoreMap["readme"] = 0
     }
 
@@ -164,16 +175,16 @@ function Invoke-IntakeCheck {
     $testFiles = Get-ChildItem -Path "$ProjectPath" -Recurse -Include "*test*","*spec*","*suite*" -File `
         -Exclude "*node_modules*",".git","*vendor*" -ErrorAction SilentlyContinue | Select-Object -First 10
     if ($testDirs) {
-        Write-Result $checkMark "Tests" "Test dirs found" "$($testDirs.Count) dir(s): $($testDirs.Name -join ', ')"
+        Write-Result -Icon $checkMark -Artifact "Tests" -Status "Test dirs found" -Detail "$($testDirs.Count) dir(s): $($testDirs.Name -join ', ')"
         $results["tests"] = $checkMark; $scoreMap["tests"] = 10
     } elseif ($testFiles.Count -ge 3) {
-        Write-Result $checkMark "Tests" "Test files found" "$($testFiles.Count) files found"
+        Write-Result -Icon $checkMark -Artifact "Tests" -Status "Test files found" -Detail "$($testFiles.Count) files found"
         $results["tests"] = $checkMark; $scoreMap["tests"] = 8
     } elseif ($testFiles.Count -ge 1) {
-        Write-Result $warnMark "Tests" "Minimal test files" "$($testFiles.Count) files found"
+        Write-Result -Icon $warnMark -Artifact "Tests" -Status "Minimal test files" -Detail "$($testFiles.Count) files found"
         $results["tests"] = $warnMark; $scoreMap["tests"] = 5
     } else {
-        Write-Result $crossMark "Tests" "No test artifacts" "No test dirs or files found"
+        Write-Result -Icon $crossMark -Artifact "Tests" -Status "No test artifacts" -Detail "No test dirs or files found"
         $results["tests"] = $crossMark; $scoreMap["tests"] = 0
     }
 
@@ -185,15 +196,15 @@ function Invoke-IntakeCheck {
     if (Test-Path "$ProjectPath\azure-pipelines.yml") { $ciFound += "Azure Pipelines" }
     if (Test-Path "$ProjectPath\.circleci\config.yml") { $ciFound += "CircleCI" }
     if (Test-Path "$ProjectPath\Dockerfile") { $ciFound += "Docker" }
-    
+
     if ($ciFound.Count -ge 2) {
-        Write-Result $checkMark "CI/CD" "Multiple configs" ($ciFound -join ', ')
+        Write-Result -Icon $checkMark -Artifact "CI/CD" -Status "Multiple configs" -Detail ($ciFound -join ', ')
         $results["cicd"] = $checkMark; $scoreMap["cicd"] = 10
     } elseif ($ciFound.Count -eq 1) {
-        Write-Result $warnMark "CI/CD" "Single config" ($ciFound[0])
+        Write-Result -Icon $warnMark -Artifact "CI/CD" -Status "Single config" -Detail ($ciFound[0])
         $results["cicd"] = $warnMark; $scoreMap["cicd"] = 5
     } else {
-        Write-Result $crossMark "CI/CD" "Not found" "No CI/CD config detected"
+        Write-Result -Icon $crossMark -Artifact "CI/CD" -Status "Not found" -Detail "No CI/CD config detected"
         $results["cicd"] = $crossMark; $scoreMap["cicd"] = 0
     }
 
@@ -206,15 +217,15 @@ function Invoke-IntakeCheck {
         if ($m) { $monFound += $m.Name }
     }
     $hasLogging = (Test-Path "$ProjectPath\logs") -or (Get-ChildItem -Path "$ProjectPath" -Directory -Include "metrics","monitoring","alerts" -ErrorAction SilentlyContinue)
-    
+
     if ($monFound.Count -ge 1) {
-        Write-Result $checkMark "Monitoring" "APM/tracing found" "$($monFound[0]) (+$($monFound.Count - 1) more)"
+        Write-Result -Icon $checkMark -Artifact "Monitoring" -Status "APM/tracing found" -Detail "$($monFound[0]) (+$($monFound.Count - 1) more)"
         $results["monitoring"] = $checkMark; $scoreMap["monitoring"] = 10
     } elseif ($hasLogging) {
-        Write-Result $warnMark "Monitoring" "Basic logging only" "logs/ or metrics/ dir exists, no APM"
+        Write-Result -Icon $warnMark -Artifact "Monitoring" -Status "Basic logging only" -Detail "logs/ or metrics/ dir exists, no APM"
         $results["monitoring"] = $warnMark; $scoreMap["monitoring"] = 5
     } else {
-        Write-Result $crossMark "Monitoring" "Not found" "No APM/tracing/logging config"
+        Write-Result -Icon $crossMark -Artifact "Monitoring" -Status "Not found" -Detail "No APM/tracing/logging config"
         $results["monitoring"] = $crossMark; $scoreMap["monitoring"] = 0
     }
 
@@ -222,13 +233,13 @@ function Invoke-IntakeCheck {
     $totalScore = ($scoreMap.Values | Measure-Object -Sum).Sum
     $maxScore = $scoreMap.Count * 10
     $pct = if ($maxScore -gt 0) { [math]::Round(($totalScore / $maxScore) * 100, 1) } else { 0 }
-    
+
     Write-Host ""
     Write-Host ("-" * 50) -ForegroundColor Cyan
     Write-Host ("  Resumen Iteracion " + $Round + ":") -ForegroundColor Cyan
     $scoreColor = if ($pct -ge 80) {"Green"} elseif ($pct -ge 50) {"Yellow"} else {"Red"}
     Write-Host "  Score: $totalScore/$maxScore ($pct%)" -ForegroundColor $scoreColor
-    
+
     $criticalMissing = @()
     if ($results["roadmap"] -eq $crossMark) { $criticalMissing += "Roadmap" }
     if ($results["prd"] -eq $crossMark) { $criticalMissing += "PRD" }
@@ -266,7 +277,7 @@ if ($ProjectType -eq "auto") {
     Write-Host ""
     Write-Host "Detectando tipo de proyecto..." -ForegroundColor Yellow
     $signals = @()
-    
+
     if (Test-Path "$ProjectPath\package.json") {
         $pkg = Get-Content "$ProjectPath\package.json" -Raw -ErrorAction SilentlyContinue
         if ($pkg) {
@@ -281,7 +292,7 @@ if ($ProjectType -eq "auto") {
     if (Test-Path "$ProjectPath\go.mod") { $signals += "backend" }
     if (Test-Path "$ProjectPath\pubspec.yaml") { $signals += "mobile" }
     if (Test-Path "$ProjectPath\Dockerfile") { $signals += "infra" }
-    
+
     if ($signals -contains "frontend" -and $signals -contains "backend") {
         $ProjectType = "fullstack"
     } elseif ($signals -contains "frontend") {
@@ -293,7 +304,7 @@ if ($ProjectType -eq "auto") {
     } else {
         $ProjectType = "be"
     }
-    
+
     Write-Host "  -> Tech Layer: $ProjectType" -ForegroundColor Green
 }
 
@@ -301,12 +312,12 @@ if ($ProjectType -eq "auto") {
 for ($i = 1; $i -le $Iterations; $i++) {
     $round = Invoke-IntakeCheck -Round $i -ProjectPath $ProjectPath -ProjectType $ProjectType
     $script:roundResults += $round
-    
+
     if ($i -lt $Iterations) {
         Write-Host ""
         Write-Host "Esperando antes de iteracion $($i+1)..." -ForegroundColor Yellow
         Start-Sleep -Seconds 1
-        
+
         if ($round.criticalMissing.Count -gt 0) {
             $gapStr = $round.criticalMissing -join ', '
             Write-Host "Sugerencia: Crea $gapStr antes de la proxima iteracion" -ForegroundColor Magenta
@@ -344,7 +355,7 @@ foreach ($a in $allArtifacts) {
     $delta = $lastScore - $baseScore
     $dStr = if ($delta -gt 0) { "+$delta" } elseif ($delta -lt 0) { "$delta" } else { "-" }
     $dColor = if ($delta -gt 0) {"Green"} elseif ($delta -lt 0) {"Red"} else {"Gray"}
-    
+
     $line = "  | $($a.PadRight(19)) | $($baseScore.ToString().PadLeft(8)) | $($lastScore.ToString().PadLeft(8)) | "
     Write-Host $line -NoNewline -ForegroundColor Gray
     Write-Host $dStr.PadLeft(8) -NoNewline -ForegroundColor $dColor
@@ -383,10 +394,10 @@ if ($SaveMetrics) {
     if (-not (Test-Path $metricsDir)) {
         New-Item -ItemType Directory -Path $metricsDir -Force | Out-Null
     }
-    
+
     $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
     $baselineFile = "$metricsDir\intake-baseline.json"
-    
+
     $metrics = @{
         timestamp = (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
         project = $ProjectPath
@@ -399,16 +410,16 @@ if ($SaveMetrics) {
         overall_pct = $overallPct
         critical_gaps = $last.criticalMissing
     }
-    
+
     foreach ($a in $allArtifacts) {
         $metrics.baseline[$a] = if ($first.scores[$a]) { $first.scores[$a] } else { 0 }
         $metrics.current[$a] = if ($last.scores[$a]) { $last.scores[$a] } else { 0 }
         $metrics.delta[$a] = $metrics.current[$a] - $metrics.baseline[$a]
     }
-    
+
     $metricsJson = $metrics | ConvertTo-Json
     $metricsJson | Out-File -FilePath $baselineFile -Encoding utf8
-    
+
     # Human-readable markdown report
     $mdFile = "$metricsDir\intake-report-$timestamp.md"
     $mdContent = @"

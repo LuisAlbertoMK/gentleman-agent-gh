@@ -6,66 +6,37 @@ license: Apache-2.0
 metadata:
   tags: [engineering, quality]
   author: gentleman-vMK
-  version: "1.0"
+  version: "1.1"
+  changelog: "1.1: karpathy compress"
   dependencies: [quality-gate, code-review-agent, commit-crafter]
 ---
-
-## Trigger
-Zona Roja SIEMPRE · Amarilla si diff >10L · Verde NUNCA · Keywords: `!ship`/`!listo`/`!fast`/`!draft`
-- **Roja** (verify): `src/`, `test/`, `*_test.*`, `scripts/`, `migrations/`, `ci/`, `.github/`, `Dockerfile*`, `*.sql`, `*.ps1`
-- **Amarilla** (>10L): `*.css`, `*.scss`, `*.json`, `*.yaml`, `*.toml`, `*.html`, `*.jsx`, `*.tsx`, resto
-- **Verde** (skip): `*.md`, `*.txt`, `*.png`, `*.jpg`, `*.svg`, `*.ico`, `*.lock`, `.gitignore`, `.editorconfig`
-
-## 3 Enfoques (DISTINTOS)
-| E1 — Testing | E2 — Estático | E3 — Build/Runtime |
+## Zones
+- **Roja** (verify REQUIRED): `src/`, `test/`, `*_test.*`, `scripts/`, `migrations/`, `ci/`, `.github/`, `Dockerfile*`, `*.sql`, `*.ps1`
+- **Amarilla** (verify if >10L diff): `*.css`, `*.scss`, `*.json`, `*.yaml`, `*.toml`, `*.html`, `*.jsx`, `*.tsx`, resto
+- **Verde** (SKIP): `*.md`, `*.txt`, `*.png`, `*.jpg`, `*.svg`, `*.ico`, `*.lock`, `.gitignore`, `.editorconfig`
+- Keywords trigger: `!ship`/`!listo`/`!fast`/`!draft`
+## 3 Distinct Approaches
+| E1 — Testing | E2 — Static | E3 — Build/Runtime |
 |---|---|---|
 | Unit/integration/e2e | Lint, 4R, secrets | Build, dry-run, schema |
-
-| Cambio | E1 | E2 | E3 |
-|--------|----|----|----|
-| Nuevo | `go test`/`npm test` | 4R review | Build OK |
-| Refactor | Tests pasan | No regresión | Build + diff |
-| Bug fix | Reproduce→fix→pasa | Edge cases | Build + runtime |
-| Config/JSON | Schema validate | Lint | Dry-run |
-| SQL | Up+down test | Review naming | Dry-run |
-| Dockerfile | — | Layers/secrets | `docker build` |
-| Scripts PS1 | PSSA pasa | 4R review | `-WhatIf` |
-
+| Tests pass, reproduce bug | No regressions, edge cases | Build OK, runtime checks |
+| Schema validate, PSSA pass | Lint, 4R review | Dry-run, `-WhatIf`, `docker build` |
 ## Workflow
 ```
 Propuesto → Verde? → SKIP
-         → Amarilla ≤10? → quality-gate
-         → Rojo/Amarilla>10 → TRIPLE VERIFY
-            1. Seleccionar 3 enfoques
-            2. Ejecutar E1+E2+E3 (paralelo)
-            3. Falla? → STOP + evidencia
-            4. Pasa → continuar
-
-Post-verify:
-  !ship/!listo → quality-gate → commit-crafter → commit+push
-  !fast → build → commit+push (salta verify)
-  !draft → solo aviso
+         → Amarilla ≤10L? → quality-gate
+         → Rojo/Amarilla>10L → TRIPLE VERIFY (E1+E2+E3 parallel)
+Falla? → STOP + evidencia · Pasa → continuar
+!ship/!listo → quality-gate → commit-crafter → commit+push
+!fast → build → commit+push (skip verify)
+!draft → solo aviso
 ```
-
-## Decision Tree
-```
-E1 falla? error nuevo → FIX · pre-existente → user OK
-E2 falla? lint/type → auto-fix · 4R<4 → BLOCK · <6 → preguntar
-E3 falla? compilación → FIX · warning → user decide
-
-¿Override? !ship --no-verify → emergencia (no recomendado)
-```
-
-## Difficulty (self-improvement override)
-From `self-improvement` cycle: Fácil=E2 · Medio=E1+E2 · Medio-Dif=E1+E2+E3 · Difícil=Full+4R · Complejo=Full+judgment-day · Muy Compl=Full+SDD. Full table in CYCLE.md.
-
-## Reglas
-1. **3 enfoques DISTINTOS**: comportamiento + calidad + compilación (no 3 tests iguales)
-2. **Thresholds**: Verde jamás, Roja siempre, Amarilla por tamaño
-3. **Default-FAIL**: sin evidencia de 3 pasos → no verificado
-4. **Build obligatorio** para código compilable
-5. **Level override**: self-improvement cycle puede override el verify depth
-6. **!ship = responsabilidad**: verify + quality-gate + commit + push
-
-## Referencias
+## Rules
+1. **3 DISTINCT approaches**: behavior + quality + compilation — not 3 identical tests
+2. **Default-FAIL**: no evidence of 3 steps → not verified
+3. **Build mandatory** for compilable code
+4. **!ship = responsibility**: verify + quality-gate + commit + push
+5. **Override**: `!ship --no-verify` emergency only (not recommended)
+6. **Self-improvement override**: difficulty levels from CYCLE.md override verify depth
+## References
 quality-gate · code-review-agent · judgment-day · commit-crafter · CYCLE.md

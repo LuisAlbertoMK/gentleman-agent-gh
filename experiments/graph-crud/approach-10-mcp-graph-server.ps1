@@ -1,4 +1,4 @@
-# APPROACH 10: MCP Graph Server (API-Based Knowledge Graph)
+﻿# APPROACH 10: MCP Graph Server (API-Based Knowledge Graph)
 # ===========================================================
 # Expose graph via a local REST/MCP server for agent queries.
 # Best for: AI agent integration, cross-session persistence.
@@ -25,6 +25,7 @@ function Start-GraphServer {
     # Create server in background
     $scriptBlock = {
         param($Port, $Graph)
+        $null = $Graph  # graph reference kept for future use
         $listener = New-Object System.Net.HttpListener
         $listener.Prefixes.Add("http://localhost:$Port/")
         $listener.Start()
@@ -86,7 +87,7 @@ function Start-GraphServer {
     
     # Quick test
     try {
-        $test = Invoke-WebRequest "http://localhost:$Port/status" -UseBasicParsing -TimeoutSec 2
+        $null = Invoke-WebRequest "http://localhost:$Port/status" -UseBasicParsing -TimeoutSec 2
         $script:ServerProcess = $job
         return @{ 
             running = $true

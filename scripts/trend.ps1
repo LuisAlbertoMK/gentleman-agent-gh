@@ -139,7 +139,7 @@ foreach ($m in $metrics) {
   $f1 = & $m.FmtFunc $v1
   $f2 = & $m.FmtFunc $v2
   $delta = Format-Delta $v1 $v2
-  $arrow = Get-TrendArrow $v1 $v2 $m.Better
+  $arrow = Get-TrendArrow -FirstVal $v1 -LastVal $v2 -HigherIsBetter $m.Better
   $report += ("| {0} | {1} | {2} | {3} | {4} |" -f $m.Name, $f1, $f2, $delta, $arrow)
 }
 

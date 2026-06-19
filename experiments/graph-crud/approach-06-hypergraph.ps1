@@ -1,4 +1,4 @@
-# APPROACH 6: Tag-Based Hypergraph
+﻿# APPROACH 6: Tag-Based Hypergraph
 # ==================================
 # Skills/file nodes + hyperedges (category, tag, domain).
 # Best for: Multi-dimensional classification, faceted search.

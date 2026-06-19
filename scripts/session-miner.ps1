@@ -40,6 +40,7 @@ param(
     [int]$Threshold = 2
 )
 
+Set-StrictMode -Version 5.1
 $ErrorActionPreference = 'Stop'
 
 # -- Paths -------------------------------------------------------------------
@@ -174,12 +175,12 @@ $repeated = Find-RepeatedPattern -CatalogPatterns $catalog -PatternKeys $pattern
 
 if ($Mode -eq 'check') {
     $result = [PSCustomObject]@{
-        CatalogEntries   = $catalog.Count
-        PatternKeys      = $patternKeys.Count
-        ErrorEntries     = $errors.Count
-        RepeatedPatterns = $repeated.Count
+        CatalogEntries   = @($catalog).Count
+        PatternKeys      = @($patternKeys).Count
+        ErrorEntries     = @($errors).Count
+        RepeatedPatterns = @($repeated).Count
         Mode             = 'check'
-        Status           = if ($repeated.Count -gt 0) { 'PATTERNS_FOUND' } else { 'CLEAN' }
+        Status           = if (@($repeated).Count -gt 0) { 'PATTERNS_FOUND' } else { 'CLEAN' }
     }
 
     if ($Json) {
@@ -187,21 +188,21 @@ if ($Mode -eq 'check') {
     }
 
     Write-Host '-- session-miner check --' -ForegroundColor Cyan
-    Write-Host "  Catalog:    $($catalog.Count) entries"
-    Write-Host "  Patterns:   $($patternKeys.Count) keys"
-    Write-Host "  Errors:     $($errors.Count) entries"
-    Write-Host "  Repeated:   $($repeated.Count) patterns"
+    Write-Host "  Catalog:    $(@($catalog).Count) entries"
+    Write-Host "  Patterns:   $(@($patternKeys).Count) keys"
+    Write-Host "  Errors:     $(@($errors).Count) entries"
+    Write-Host "  Repeated:   $(@($repeated).Count) patterns"
     Write-Host "  Status:     $($result.Status)"
     return
 }
 
 if ($Mode -eq 'scan') {
-    $uncataloged = $repeated | Where-Object { -not $_.Cataloged }
+    $uncataloged = @($repeated | Where-Object { -not $_.Cataloged })
 
     $result = [PSCustomObject]@{
-        CatalogCount     = $catalog.Count
-        PatternKeyCount  = $patternKeys.Count
-        ErrorCount       = $errors.Count
+        CatalogCount     = @($catalog).Count
+        PatternKeyCount  = @($patternKeys).Count
+        ErrorCount       = @($errors).Count
         RepeatedPatterns = $repeated
         UnCatalogedCount = $uncataloged.Count
         CanApply         = $uncataloged.Count -gt 0
@@ -238,7 +239,7 @@ if ($Mode -eq 'scan') {
 }
 
 if ($Mode -eq 'apply') {
-    $uncataloged = $repeated | Where-Object { -not $_.Cataloged }
+    $uncataloged = @($repeated | Where-Object { -not $_.Cataloged })
 
     if ($uncataloged.Count -eq 0) {
         Write-Host '[OK] Nothing to apply -- all repeated patterns already cataloged' -ForegroundColor Green

@@ -31,3 +31,10 @@
 ```
 2026-06-17 - Automejora 3 enfoques: (1) Karpathy compress 4 skills -49.5% (-10KB, -7.3% total). (2) PSSA empty catch fix. (3) Deltas medidos. Skill Effectiveness 9->10. Commits: 6a24486 + next.
 
+2026-06-18 - Cycle 2 start: SKILLS-INDEX encoding fix (5 mojibake), AGENTS.md DREAMING auto-trigger, CYCLE.md new objective. inter: 1/30
+2026-06-18 - PSSA fix round: 11 violations eliminated (49→38). tokenize empty catches, install unused params, experiments unused vars/params/auto-var. inter: 2/30
+2026-06-18 - experiments/graph-crud/ cleanup: README archive note, .gitignore, untrack generated db+json. inter: 3/30
+2026-06-18 - Syntaxis verification: 29/29 scripts parse OK. experiments graph-crud untracked db+json. inter: 4/30
+2026-06-18 - inter: 6/30. PSSA cleanup: gate exclusion for experiments/skills, bench-compare (Get-Lines→Line, Get-Bytes→Byte), benchmark (Stats→Stat), install (Prerequisites→Prerequisite, NextSteps→NextStep), bench-file-io (capturedOutput→hashtable), tokenize (empty catch fix). PSSA manual: 0. Gate: PASSED.
+2026-06-18 - inter: 7/30. SKILLS-INDEX.md duplicate gap-analysis removed. PSSA gate cleanup continued.
+2026-06-18 - inter: 10/30. Skill compression: gap-analysis 2.9→2.6KB, triple-verify 2.9→2.0KB, performance 2.8→2.1KB. SKILLS-INDEX dup fixed. Temp cleanup.

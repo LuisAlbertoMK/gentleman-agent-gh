@@ -16,6 +16,7 @@ param(
     [string]$OutCsv = ""
 )
 
+$ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 if (-not (Test-Path $Path)) { Write-Host "[tokenize] Skills dir not found: $Path" -ForegroundColor Red; exit 1 }

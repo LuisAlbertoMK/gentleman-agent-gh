@@ -1,4 +1,4 @@
-# APPROACH 3: JSON Property Graph
+﻿# APPROACH 3: JSON Property Graph
 # ================================
 # Portable, human-readable graph stored as JSON.
 # Best for: Portability, debugging, small graphs, hand-editing.
@@ -33,6 +33,7 @@ function Add-PropertyEdge {
         [string]$Label = "references",
         [hashtable]$Properties = @{}
     )
+    $null = $Properties # reserved for future edge metadata
     return Add-GraphEdge -Graph $Graph -From $From -To $To -Type $Label
 }
 

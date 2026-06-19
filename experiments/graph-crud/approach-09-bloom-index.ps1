@@ -1,4 +1,4 @@
-# APPROACH 9: Bloom-Filter Indexed Graph
+﻿# APPROACH 9: Bloom-Filter Indexed Graph
 # ========================================
 # Hybrid: bloom filters for fast "does this exist?" checks + graph for traversal.
 # Best for: Large codebases, pre-filter before expensive operations.
@@ -96,7 +96,7 @@ function Query-BloomKeywordSearch {
         return @{ candidates = @(); bloomMatch = $false; note = "No candidate skills found (bloom negative)" }
     }
     
-    # Bloom says "maybe" — verify with exact match
+    # Bloom says "maybe" â€” verify with exact match
     $candidates = @()
     foreach ($nodeId in $Graph.Nodes.Keys) {
         if (Test-BloomFilter -Filter $Bloom -Item "$nodeId:$Keyword") {

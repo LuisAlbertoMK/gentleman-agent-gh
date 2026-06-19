@@ -1,4 +1,5 @@
 ﻿#requires -Version 5.1
+
 <#
 .SYNOPSIS
   PS5.1 byte-level safety check — zero false positives.
@@ -14,6 +15,7 @@ param(
     [string[]]$FilePath
 )
 
+$ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $hazards = @()
@@ -21,7 +23,7 @@ $hazards = @()
 foreach ($f in $FilePath) {
     $f = $f.Trim()
     if (-not $f) { continue }
-    if ($f -match 'bash-safe') { continue }
+    if ($f -match 'bash-safe|experiments[\\/]') { continue }
     if (-not (Test-Path -LiteralPath $f)) { continue }
 
     try {
@@ -43,7 +45,7 @@ foreach ($f in $FilePath) {
 }
 
 if ($hazards.Count -gt 0) {
-    Write-Host ($hazards -join " ")
+    Write-Output ($hazards -join " ")
     exit 1
 }
 exit 0

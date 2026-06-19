@@ -7,6 +7,8 @@
 .PARAMETER Quiet
   Suprime output detallado, solo muestra resultado final.
 #>
+
+$ErrorActionPreference = 'Stop'
 #requires -Version 5.1
 
 param(

@@ -1,11 +1,11 @@
 ﻿{
-    "trackedCount":  370,
-    "autoFixableCount":  23,
-    "timestamp":  "2026-06-16T13:25:45",
-    "total":  449,
+    "trackedCount":  500,
+    "autoFixableCount":  6,
+    "timestamp":  "2026-06-18T22:04:41",
+    "total":  535,
     "byFile":  [
                    {
-                       "count":  72,
+                       "count":  68,
                        "file":  "tokenize.ps1"
                    },
                    {
@@ -17,15 +17,15 @@
                        "file":  "approach-02-sqlite-cte.ps1"
                    },
                    {
-                       "count":  4,
+                       "count":  3,
                        "file":  "approach-03-json-property.ps1"
                    },
                    {
-                       "count":  3,
+                       "count":  2,
                        "file":  "approach-04-dag-sort.ps1"
                    },
                    {
-                       "count":  4,
+                       "count":  3,
                        "file":  "approach-05-cross-ref.ps1"
                    },
                    {
@@ -33,31 +33,31 @@
                        "file":  "approach-06-hypergraph.ps1"
                    },
                    {
-                       "count":  3,
+                       "count":  2,
                        "file":  "approach-07-bfs-impact.ps1"
                    },
                    {
-                       "count":  3,
+                       "count":  2,
                        "file":  "approach-08-change-propagation.ps1"
                    },
                    {
-                       "count":  6,
+                       "count":  5,
                        "file":  "approach-09-bloom-index.ps1"
                    },
                    {
-                       "count":  6,
+                       "count":  4,
                        "file":  "approach-10-mcp-graph-server.ps1"
                    },
                    {
-                       "count":  13,
+                       "count":  12,
                        "file":  "benchmark-all.ps1"
                    },
                    {
-                       "count":  31,
+                       "count":  29,
                        "file":  "benchmark-final.ps1"
                    },
                    {
-                       "count":  9,
+                       "count":  8,
                        "file":  "graph-engine.ps1"
                    },
                    {
@@ -69,103 +69,111 @@
                        "file":  "bash-safe.ps1"
                    },
                    {
-                       "count":  42,
+                       "count":  3,
+                       "file":  "batch.ps1"
+                   },
+                   {
+                       "count":  39,
                        "file":  "bench-compare.ps1"
                    },
                    {
-                       "count":  16,
+                       "count":  14,
                        "file":  "bench-file-io.ps1"
                    },
                    {
-                       "count":  2,
-                       "file":  "check-skill-drift.ps1"
-                   },
-                   {
-                       "count":  26,
+                       "count":  28,
                        "file":  "cross-ref-check.ps1"
                    },
                    {
-                       "count":  11,
+                       "count":  1,
                        "file":  "ensure-tools.ps1"
                    },
                    {
-                       "count":  55,
+                       "count":  9,
+                       "file":  "extract-skill.ps1"
+                   },
+                   {
+                       "count":  5,
+                       "file":  "install.ps1"
+                   },
+                   {
+                       "count":  54,
                        "file":  "intake-verify.ps1"
                    },
                    {
-                       "count":  31,
+                       "count":  5,
+                       "file":  "inter-track.ps1"
+                   },
+                   {
+                       "count":  38,
                        "file":  "optimize-system.ps1"
                    },
                    {
-                       "count":  3,
+                       "count":  1,
                        "file":  "ps5-detect.ps1"
                    },
                    {
-                       "count":  26,
+                       "count":  23,
                        "file":  "pssa-gate.ps1"
                    },
                    {
                        "count":  28,
+                       "file":  "pull-upstream.ps1"
+                   },
+                   {
+                       "count":  16,
+                       "file":  "run-dreaming.ps1"
+                   },
+                   {
+                       "count":  23,
+                       "file":  "run-improvement-cycle.ps1"
+                   },
+                   {
+                       "count":  10,
+                       "file":  "score-auto.ps1"
+                   },
+                   {
+                       "count":  24,
+                       "file":  "session-miner.ps1"
+                   },
+                   {
+                       "count":  24,
                        "file":  "skill-graph.ps1"
                    },
                    {
-                       "count":  14,
+                       "count":  13,
                        "file":  "skill-test-suite.ps1"
                    },
                    {
-                       "count":  4,
+                       "count":  3,
                        "file":  "token-count.ps1"
                    },
                    {
-                       "count":  4,
+                       "count":  3,
                        "file":  "tokenize-all.ps1"
                    }
                ],
     "byRule":  [
                    {
                        "rule":  "PSUseBOMForUnicodeEncodedFile",
-                       "count":  20
+                       "count":  6
                    },
                    {
                        "rule":  "PSAvoidUsingWriteHost",
-                       "count":  370
-                   },
-                   {
-                       "rule":  "PSAvoidUsingEmptyCatchBlock",
-                       "count":  4
+                       "count":  500
                    },
                    {
                        "rule":  "PSUseSingularNouns",
-                       "count":  13
+                       "count":  7
                    },
                    {
                        "rule":  "PSUseApprovedVerbs",
-                       "count":  19
+                       "count":  16
                    },
                    {
                        "rule":  "PSUseShouldProcessForStateChangingFunctions",
-                       "count":  7
-                   },
-                   {
-                       "rule":  "PSReviewUnusedParameter",
-                       "count":  3
-                   },
-                   {
-                       "rule":  "PSAvoidAssignmentToAutomaticVariable",
-                       "count":  1
-                   },
-                   {
-                       "rule":  "PSUseDeclaredVarsMoreThanAssignments",
-                       "count":  7
-                   },
-                   {
-                       "rule":  "PSAvoidUsingBrokenHashAlgorithms",
-                       "count":  2
-                   },
-                   {
-                       "rule":  "PSAvoidDefaultValueSwitchParameter",
-                       "count":  3
+                       "count":  6
                    }
                ],
-    "manualCount":  56
+    "manualCount":  29
 }

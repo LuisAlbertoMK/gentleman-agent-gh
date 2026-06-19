@@ -1,4 +1,4 @@
-# APPROACH 7: BFS Impact Analyzer
+﻿# APPROACH 7: BFS Impact Analyzer
 # =================================
 # Real-time impact analysis using BFS traversal.
 # Best for: "What breaks if I change X?" queries.
@@ -115,7 +115,7 @@ function Get-ImpactAnalysis {
 function Get-ImpactRanking {
     <#
     .SYNOPSIS
-    Rank all nodes by impact score — find the riskiest to modify
+    Rank all nodes by impact score â€” find the riskiest to modify
     #>
     param([hashtable]$Graph)
     

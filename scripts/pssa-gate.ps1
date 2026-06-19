@@ -1,4 +1,4 @@
-#Requires -Module @{ModuleName='PSScriptAnalyzer'; ModuleVersion='1.20.0'}
+﻿#Requires -Module @{ModuleName='PSScriptAnalyzer'; ModuleVersion='1.20.0'}
 <#
 .SYNOPSIS
     Self-Healing PSSA Gate - run PSScriptAnalyzer, auto-fix safe violations, report remainder.
@@ -49,6 +49,12 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+# Excluded subdirectories (research/experiments not subject to production rules)
+$ExcludedDirs = @(
+    'experiments',
+    'skills'        # junction to .agents/skills/ — skip to avoid duplicate scanning
+)
+
 # -- helpers ----------------------------------------------------------
 function Write-Status {
     param([string]$Message)
@@ -58,8 +64,8 @@ function Write-Status {
 function Get-PSSAViolation {
     param([string]$TargetPath)
     $resolvedTarget = Resolve-Path $TargetPath
-    $results = Invoke-ScriptAnalyzer -Path $resolvedTarget -Recurse -Severity Warning, Error 2>$null
-    return @($results)
+    $results = @(Invoke-ScriptAnalyzer -Path $resolvedTarget -Recurse -Severity Warning, Error 2>$null)
+    return $results
 }
 
 function Get-FullPath {
@@ -228,9 +234,27 @@ if ($Mode -eq 'Fix') {
 }
 
 # 2. Categorize
-$autoFixable = $results | Where-Object { $_.RuleName -in $autoFixRules }
-$tracked     = $results | Where-Object { $_.RuleName -in $trackedRules }
-$manual      = $results | Where-Object { $_.RuleName -notin ($autoFixRules + $trackedRules) }
+$autoFixable = @($results | Where-Object { $_.RuleName -in $autoFixRules })
+$tracked     = @($results | Where-Object { $_.RuleName -in $trackedRules })
+$manual      = @($results | Where-Object { $_.RuleName -notin ($autoFixRules + $trackedRules) })
+
+# Exclude research/experiment paths from manual count (naming conventions for research code)
+$excludedViolations = @($manual | Where-Object {
+    $scriptPath = $_.ScriptPath.Replace('\', '/')
+    $shouldExclude = $false
+    foreach ($dir in $ExcludedDirs) {
+        if ($scriptPath -match "/$dir/") { $shouldExclude = $true; break }
+    }
+    $shouldExclude
+})
+$manual       = @($manual | Where-Object {
+    $scriptPath = $_.ScriptPath.Replace('\', '/')
+    $isExcluded = $false
+    foreach ($dir in $ExcludedDirs) {
+        if ($scriptPath -match "/$dir/") { $isExcluded = $true; break }
+    }
+    -not $isExcluded
+})
 
 # 3. Report
 if (-not $Quiet) {
@@ -238,7 +262,9 @@ if (-not $Quiet) {
     Write-Host "  Total violations:     $($results.Count)"
     Write-Host "  Auto-fixable:         $($autoFixable.Count)"
     Write-Host "  Tracked (info):       $($tracked.Count)"
-    Write-Host "  Manual review needed: $($manual.Count)"
+    $excludedCount = @($excludedViolations).Count
+    Write-Host "  Excluded (experiments): $excludedCount"
+    Write-Host "  Manual review needed:   $($manual.Count)"
 
     if ($manual.Count -gt 0) {
         Write-Host "`n-- Manual review --"

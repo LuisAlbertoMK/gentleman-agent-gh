@@ -1,4 +1,4 @@
-# APPROACH 8: Change Propagation Graph
+﻿# APPROACH 8: Change Propagation Graph
 # ======================================
 # Track what files need updating when a change occurs.
 # Best for: File change impact, ripple effect analysis.
@@ -35,7 +35,7 @@ function Build-PropagationGraph {
     }
     
     # Phase 2: Propagation edges with weights
-    # AGENTS.md configures skills → change in AGENTS.md affects all referenced skills
+    # AGENTS.md configures skills â†’ change in AGENTS.md affects all referenced skills
     $agents = Get-Content "$PSScriptRoot/../../AGENTS.md" -Raw -ErrorAction SilentlyContinue
     if ($agents) {
         $skillRefs = [regex]::Matches($agents, 'skill-[\w-]+') | ForEach-Object { $_.Value } | Sort-Object -Unique
@@ -47,7 +47,7 @@ function Build-PropagationGraph {
         }
     }
     
-    # SKILLS-INDEX references → medium propagation
+    # SKILLS-INDEX references â†’ medium propagation
     $index = Get-Content "$PSScriptRoot/../../SKILLS-INDEX.md" -Raw -ErrorAction SilentlyContinue
     if ($index) {
         $skillRefs = [regex]::Matches($index, 'skill-[\w-]+') | ForEach-Object { $_.Value } | Sort-Object -Unique
@@ -58,7 +58,7 @@ function Build-PropagationGraph {
         }
     }
     
-    # README lists skills → low propagation
+    # README lists skills â†’ low propagation
     $readme = Get-Content "$PSScriptRoot/../../README.md" -Raw -ErrorAction SilentlyContinue
     if ($readme) {
         $skillRefs = [regex]::Matches($readme, 'skill-[\w-]+') | ForEach-Object { $_.Value } | Sort-Object -Unique

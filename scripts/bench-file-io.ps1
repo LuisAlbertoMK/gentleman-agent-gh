@@ -70,24 +70,26 @@ foreach ($method in $methods) {
   Write-Host "--- $($method.name) ---" -ForegroundColor Yellow
   $times = @()
   $sizes = @()
-  
+
   1..$Runs | ForEach-Object {
     # Warm-up: 1 run
     & $method.script $Path > $null
-    
+
+    $content = $null
     $ms = Measure-Command {
-      $content = & $method.script $Path
+      $value = & $method.script $Path
+      Set-Variable -Name content -Value $value -Scope 1
     }
     $elapsed = $ms.TotalMilliseconds
     $times += $elapsed
     $sizes += $content.Length
     Write-Host "  Run $_ : ${elapsed}ms | ${($content.Length/1KB).ToString('F1')} KB"
   }
-  
+
   $avg = ($times | Measure-Object -Average).Average
   $min = ($times | Measure-Object -Minimum).Minimum
   $max = ($times | Measure-Object -Maximum).Maximum
-  
+
   $allResults += [PSCustomObject]@{
     Method = $method.name
     AvgMs = [math]::Round($avg, 1)
@@ -95,7 +97,7 @@ foreach ($method in $methods) {
     MaxMs = [math]::Round($max, 1)
     AvgKB = [math]::Round(($sizes | Measure-Object -Average).Average / 1KB, 1)
   }
-  
+
   Write-Host "  >> AVG: ${avg}ms (min ${min} / max ${max})" -ForegroundColor Green
   Write-Host ""
 }

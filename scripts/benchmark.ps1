@@ -39,7 +39,7 @@ $scriptsDir = Join-Path -Path $repoRoot -ChildPath "scripts"
 $snapDir = Join-Path -Path $repoRoot -ChildPath "docs\metricas\snapshots"
 
 # --- Helpers ---
-function Get-SkillStats($dir) {
+function Get-SkillStat($dir) {
   $skills = Get-ChildItem $dir -Directory | Where-Object { $_.Name -ne '_shared' }
   $results = @()
   foreach ($s in $skills) {
@@ -63,7 +63,7 @@ function Get-SkillStats($dir) {
   return $results
 }
 
-function Get-SystemStats($skills) {
+function Get-SystemStat($skills) {
   $agentsMdContent = if (Test-Path $agentsMd) { Get-Content $agentsMd -Raw } else { "" }
   $scripts = @(Get-ChildItem $scriptsDir -Filter "*.ps1" -ErrorAction SilentlyContinue)
   $globalDir = "$env:USERPROFILE\.config\opencode\skills"
@@ -107,8 +107,8 @@ function Get-SystemStats($skills) {
 # --- Main ---
 if (-not (Test-Path $canonicalDir)) { Write-Error "Canonical skills dir not found: $canonicalDir"; exit 2 }
 
-$skills = Get-SkillStats $canonicalDir
-$system = Get-SystemStats $skills
+$skills = Get-SkillStat $canonicalDir
+$system = Get-SystemStat $skills
 $commit = try { $c = (git rev-parse --short HEAD 2>$null); if ($c) { $c.Trim() } else { "unknown" } } catch { "unknown" }
 
 $timestamp = (Get-Date -Format "o")

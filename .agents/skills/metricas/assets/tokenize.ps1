@@ -1,4 +1,7 @@
-# tokenize.ps1 — Compare tokenization of before/after text
+﻿Set-StrictMode -Version 5.1
+$ErrorActionPreference = 'Stop'
+
+# tokenize.ps1 â€” Compare tokenization of before/after text
 # Usage: .\tokenize.ps1 "verbose text" "concise text"
 #        .\tokenize.ps1 -FileBefore path -FileAfter path
 
@@ -10,8 +13,8 @@ param(
 )
 
 # Load from files if specified
-if ($FileBefore) { $TextBefore = Get-Content $FileBefore -Raw }
-if ($FileAfter) { $TextAfter = Get-Content $FileAfter -Raw }
+if ($FileBefore) { $TextBefore = Get-Content $FileBefore -Raw -Encoding Utf8 }
+if ($FileAfter) { $TextAfter = Get-Content $FileAfter -Raw -Encoding Utf8 }
 
 if (-not $TextBefore -or -not $TextAfter) {
     Write-Host "Usage: .\tokenize.ps1 `"verbose text`" `"concise text`""
@@ -40,7 +43,10 @@ try {
         $tAfter = [int]$parts[1]
         $tiktokAvailable = $true
     }
-} catch {}
+} catch {
+    # tiktoken not available, heuristic fallback used below
+    Write-Verbose "tiktoken unavailable, using character heuristic"
+}
 
 # Display
 $border = "=" * 60

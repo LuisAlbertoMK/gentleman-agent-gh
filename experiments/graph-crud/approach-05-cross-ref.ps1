@@ -1,4 +1,4 @@
-# APPROACH 5: Cross-Reference Analyzer (Grep-Based Graph)
+﻿# APPROACH 5: Cross-Reference Analyzer (Grep-Based Graph)
 # =========================================================
 # Build graph by grepping file contents for references.
 # Best for: Existing codebases, no parser needed, fast initial build.
@@ -36,8 +36,8 @@ function Build-CrossReferenceGraph {
         $content = $lines -join "`n"
         
         foreach ($pattern in $Patterns) {
-            $matches = [regex]::Matches($content, $pattern)
-            foreach ($m in $matches) {
+            $matchResults = [regex]::Matches($content, $pattern)
+            foreach ($m in $matchResults) {
                 $refId = $m.Groups[1].Value -replace "^['""]|['""]$", ""
                 if ($refId -and $refId -ne $fileId) {
                     $graph = Add-GraphNode -Graph $graph -Id $refId -Label $refId -Type "reference"

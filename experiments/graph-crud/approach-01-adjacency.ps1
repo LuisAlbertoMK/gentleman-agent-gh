@@ -1,4 +1,4 @@
-# APPROACH 1: In-Memory Adjacency List
+﻿# APPROACH 1: In-Memory Adjacency List
 # =====================================
 # Fastest for small-medium graphs. O(1) node lookup, O(d) neighbor iteration.
 # Best for: <10K nodes, frequent read/write, low memory overhead.

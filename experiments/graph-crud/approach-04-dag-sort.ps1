@@ -1,4 +1,4 @@
-# APPROACH 4: Directed Acyclic Graph (DAG) — Topological Sort
+﻿# APPROACH 4: Directed Acyclic Graph (DAG) â€” Topological Sort
 # =============================================================
 # Import dependencies as DAG. Topological sort for build order.
 # Best for: Dependency resolution, build ordering, cycle detection.

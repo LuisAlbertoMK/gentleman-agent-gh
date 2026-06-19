@@ -72,7 +72,7 @@ foreach ($dir in $skillDirs) {
 
     # Test 4: Contains ## headers
     $headers = [regex]::Matches($body, '(?m)^##\s+\S')
-    if ($headers.Count -ge 1) { $results += "sects:OK($($headers.Count))" } 
+    if ($headers.Count -ge 1) { $results += "sects:OK($($headers.Count))" }
     elseif ($skillName -eq 'lean-context') { $results += "sects:INTENTIONAL" }  # ultra-lean: plain text headers
     else { $results += "sects:FAIL" }
 
@@ -105,7 +105,7 @@ foreach ($dir in $skillDirs) {
     if ($hasFail) { $fail++ } else { $pass++ }
 
     $icon = if ($hasFail) { 'FAIL' } else { 'PASS' }
-    Write-Host "  $icon $skillName"
+    Write-Output "  $icon $skillName"
     Write-Host "       $($results -join ' ')"
 }
 

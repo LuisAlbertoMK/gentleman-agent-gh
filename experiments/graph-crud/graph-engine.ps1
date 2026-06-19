@@ -1,4 +1,4 @@
-# Graph Engine for File CRUD — gentleman-vMK Agent
+﻿# Graph Engine for File CRUD â€” gentleman-vMK Agent
 # ==================================================
 # Base graph: adjacency list with typed edges.
 # Supports: BFS, DFS, shortest path, topological sort, impact analysis.

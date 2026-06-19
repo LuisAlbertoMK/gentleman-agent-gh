@@ -12,6 +12,9 @@
 .PARAMETER RepoRoot
   Root of the repo. Defaults to script parent dir.
 
+.PARAMETER Json
+  Output structured JSON for agent consumption.
+
 .EXAMPLE
   .\scripts\cross-ref-check.ps1
   .\scripts\cross-ref-check.ps1 -Json
