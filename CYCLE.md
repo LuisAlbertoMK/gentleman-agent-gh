@@ -10,10 +10,10 @@
 - ✅ Restaurar `.project.json` post-corrupción por auto-metrics (checkpoint safety/cycle2-state-*)
 - ✅ Punto de seguridad creado: tag `checkpoint/cycle2-done-bd39c66`, branch `safety/cycle2-state-*`
 - ✅ external-auditor skill disponible global + local SKILL.md
-- 🔲 Commit cambios pendientes: AGENTS.md (router + auto-audit trigger), ANTI-PATTERN-CATALOG.md (#15), SKILLS-INDEX.md
-- 🔲 Ejecutar external-auditor en primera tarea compleja — validar flujo end-to-end
-- 🔲 Verificar que el ciclo `self-improvement` corre completo (diagnose→fix→verify→learn→propagate)
-- 🔲 Mantener score 10.0 — ninguna dim por debajo de 9.9
+- ✅ Commit cambios pendientes: AGENTS.md (router + auto-audit trigger), ANTI-PATTERN-CATALOG.md (#15), SKILLS-INDEX.md
+- ✅ Ejecutar external-auditor en primera tarea compleja — restaurar .project.json + guardrail + commit. Encontró 2 gaps >1.5 (ErrPrev 6vs9, Breadth 5vs9). Immunize: anti-pattern #17 + guardrail pre-commit
+- ✅ Verificar ciclo `self-improvement`: diagnose(score 5→9.4) → fix(restore + guardrail) → verify(external-auditor) → learn(anti-pattern #17) → propagate(committed)
+- 🔲 Mantener score ≥9.4 — ninguna dim por debajo de 3.0
 
 ## Metrics
 

@@ -43,6 +43,7 @@
 2026-06-18 - inter: 10/30. Skill compression: gap-analysis 2.9→2.6KB, triple-verify 2.9→2.0KB, performance 2.8→2.1KB. SKILLS-INDEX dup fixed. Temp cleanup.
 2026-06-19 — Score restored 10.0 (was stale 5/10 at session start). experiments/graph-crud/ deleted (19 files, 10 obsolete research approaches). CYCLE.md ✅ 4/5 objectives complete. Pending: upstream PR scope decision.
 2026-06-19 — Restored .project.json (was overwritten with 6-dim 5/10). Score back to 9.4/10. Cycle Progress 2→3/10. Committed working tree + PROJECT-SCORE.md + BITACORA.md.
+2026-06-19 — Guardrail pre-commit [6/7]: .project.json integrity (11 dims + score.current ≥5). Anti-pattern #17. external-auditor completado (2 gaps >1.5 corregidos). Stash viejo dropped. Commit 68fc4cf.
 
 
 
