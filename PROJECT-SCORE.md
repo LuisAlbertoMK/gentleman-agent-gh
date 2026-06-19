@@ -1,8 +1,8 @@
 # Project Score: gentleman-agent-gh
 
-**Current**: 9.3/10
+**Current**: 9.4/10
 **Last updated**: 2026-06-19
-**Trend**: up (Cycle Progress 1→2, rest 10)
+**Trend**: up (Cycle Progress 2→3, rest 10)
 
 ## Dimensions
 
@@ -18,7 +18,7 @@
 | Metrics               | 10.0  |
 | Script Performance    | 10.0  |
 | Skill Effectiveness   | 10.0  |
-| Cycle Progress        | 2.0  |
+| Cycle Progress        | 3.0  |
 
 ## Changelog
 
@@ -45,3 +45,4 @@
 | 2026-06-19 | 9.3   | +0.1   | 3 improvements implemented: !close (close-session.ps1), stdlib assertion in Pre-Flight Gate, checkpoint cada 25 tools en context-watchdog. Cycle Progress 1→2/10. |
 | 2026-06-19 | 9.3   | =      | Bias calibration: lowered external-auditor trigger to any code change, added calibration tracking (.learnings/bias-calibration.json), updated auto-metrics to apply offsets. Score stable (Cycle Progress unchanged). |
 | 2026-06-19 | 9.3   | =      | Invoke-Bash mandatory (AGENTS.md Bash-Safe), structured return contract for subagents (delivery-harness + subagent-isolation skills). All 6 weaknesses addressed. Score stable. |
+| 2026-06-19 | 9.4   | +0.1   | Restored .project.json (was sobrescrito con 6-dim 5/10 incorrecto). Ran score-auto.ps1 → 11 dims 9.4/10. Cycle Progress 2→3/10. |
