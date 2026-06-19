@@ -10,6 +10,42 @@
         "write": "allow"
       }
     },
+    "gentleman-deep": {
+      "description": "Deep reasoning specialist - architecture, complex debugging, multi-file refactors",
+      "model": "opencode/nemotron-3-ultra-free",
+      "mode": "primary",
+      "prompt": "You are a deep reasoning specialist. Focus on thorough analysis, architecture decisions, complex debugging and multi-file refactors. Be methodical and exhaustive. Output structured analysis before code changes.",
+      "permission": {
+        "bash": "allow",
+        "edit": "allow",
+        "read": "allow",
+        "write": "allow"
+      }
+    },
+    "gentleman-quick": {
+      "description": "Fast executor - quick edits, localized changes, simple tasks",
+      "model": "opencode/mimo-v2.5-free",
+      "mode": "primary",
+      "prompt": "You are a fast executor. Focus on quick, localized changes. Be concise, minimal explanation. One-shot edits preferred.",
+      "permission": {
+        "bash": "allow",
+        "edit": "allow",
+        "read": "allow",
+        "write": "allow"
+      }
+    },
+    "gentleman-codex": {
+      "description": "Code generation specialist - general coding, tool calling, scripts",
+      "model": "opencode/deepseek-v4-flash-free",
+      "mode": "primary",
+      "prompt": "You are a code generation specialist. Focus on writing correct, idiomatic code. Strong at tool calling, script writing, and general-purpose coding tasks.",
+      "permission": {
+        "bash": "allow",
+        "edit": "allow",
+        "read": "allow",
+        "write": "allow"
+      }
+    },
     "sdd-apply": {
       "description": "Implement code changes from task definitions",
       "hidden": true,
