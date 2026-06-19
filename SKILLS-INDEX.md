@@ -1,9 +1,9 @@
 ﻿# SKILLS INDEX
 
-> Full trigger table for all 67 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 68 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 2.7 | **Changelog**: 2.7 (Added external-auditor skill — blind subagent audit to catch overconfidence in auto-metrics)
+> **Version**: 2.8 | **Changelog**: 2.8 (SDD consolidation into sdd/ pipeline — unified sdd skill + 9 phases)
 
 ## Triggers → Skill
 
@@ -26,15 +26,15 @@
 | Context >100K tokens, context explosion | context-watchdog |
 | Recovery, "no es eso", frustration | recovery-protocol |
 | Resume, "dónde lo dejamos", "continuá", git state gate | session-resume |
-| SDD init, bootstrap | sdd-init |
-| Explore codebase, pre-design | sdd-explore |
-| Proposal, intent, approach | sdd-propose |
-| Specs, Given/When/Then | sdd-spec |
-| Technical design, HOW | sdd-design |
-| Task breakdown, implementation plan | sdd-tasks |
-| Apply tasks, implement | sdd-apply |
-| Validate vs specs, verify | sdd-verify |
-| Archive changes, delta to main | sdd-archive |
+| SDD init, bootstrap | sdd (phase 00-init) |
+| Explore codebase, pre-design | sdd (phase 01-explore) |
+| Proposal, intent, approach | sdd (phase 02-propose) |
+| Technical design, HOW | sdd (phase 03-design) |
+| Specs, Given/When/Then | sdd (phase 04-spec) |
+| Task breakdown, implementation plan | sdd (phase 05-tasks) |
+| Apply tasks, implement | sdd (phase 06-apply) |
+| Validate vs specs, verify | sdd (phase 07-verify) |
+| Archive changes, delta to main | sdd (phase 08-archive) |
 | Decision capture, trade-off log | decision-capture |
 | Execution mode, resource-adaptive zones, quick/thorough/draft | execution-mode |
 | Skill digestion, compact on load | skill-digestion |
@@ -84,7 +84,7 @@
 - **Skills meta**: skill-creator, skill-registry, skill-improver, skill-digestion, skill-graph
 - **Coordination**: delivery-harness, chained-pr, branch-pr, issue-creation, subagent-isolation, command-wrapper
 - **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner
-- **SDD**: sdd-{init,explore,propose,spec,design,tasks,apply,verify,archive}
+- **SDD**: sdd (SKILL.md) + phases/ (00-init → 08-archive) — wrappers at sdd-* for backward compat
 - **UI/Design**: baseline-ui, accessibility, performance, seo, core-web-vitals, web-quality-audit
 
 - **Communication**: comment-writer, cognitive-doc-design

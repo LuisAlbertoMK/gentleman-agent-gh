@@ -10,21 +10,10 @@ metadata:
   version: "3.2"
 ---
 
-Trigger: "sdd init", "openspec init".
-## DETECT- **Stack**: package.json/go.mod/pyproject.toml- **Test**: vitest/jest/go test/pytest- **Layers**: Unit/Integration/E2E- **Coverage**: --coverage/-cover/pytest-cov- **Quality**: eslint/ruff/golangci-lint (lint) · tsc/mypy/go vet (types) · prettier/black (fmt)
-## TDD MODEPriority: (1) system `strict-tdd-mode` · (2) openspec/config.yaml · (3) runner exists?→true · (4) no runner→false
-## FILES (openspec)
-```openspec/ → config.yaml · specs/ (source) · changes/archive/ (done)```
-## CONFIG
-```yamlschema: spec-drivencontext: Tech {stack} | Arch {patterns} | Test {framework} | Style {lint}strict_tdd: {true/false}```
-## SKILL REGISTRYScan: ~/.config/opencode/skills/*/, ~/.claude/skills/, project skills/Skip: sdd-*, _shared, skill-registryWrite: `.atl/skill-registry.md` + `mem_save`
-## STEPS1. Detect ctx (stack, conventions, test)2. Resolve TDD mode per priority3. Init dirs (openspec)4. Generate config5. Persist testing caps → engram/config.yaml6. Build skill registry7. Persist project ctx → engram/config8. Return summary
-## RETURN
-```SDD INIT | Project: {name} | Stack: {detected} | Mode: {engram/openspec/hybrid/none}Strict TDD: {enabled/disabled}Caps: {runner, layers, coverage, quality tools}Saved: {engram IDs / paths}```
-## EXAMPLE OUTPUT
-```SDD INIT | Project: my-api | Stack: Go 1.22 + Chi | Mode: engram
-Strict TDD: enabled | Caps: go test, unit+integration, -cover, golangci-lint```
-## EDGE CASES
-- No project files detected → manual mode, prompt user for stack
-- Missing test runner → default to "no tests detected", strict TDD disabled
-- Existing openspec/ dir → detect and note, don't overwrite
+This skill has been consolidated into the unified SDD pipeline.
+
+**Full content**: `{file:sdd/phases/00-init.md}`
+**Common protocol**: `{file:sdd/references/sdd-phase-common.md}`
+**References**: `.agents/skills/sdd-init/references/init-examples.md`
+
+**Pipeline overview**: `{file:sdd/SKILL.md}`

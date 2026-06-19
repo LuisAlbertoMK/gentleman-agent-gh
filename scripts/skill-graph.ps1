@@ -110,15 +110,16 @@ Add-Skill -Name "security-scanner" -Category "code-ops" -Triggers @("security","
 Add-Skill -Name "performance-tracker" -Category "code-ops" -Triggers @("performance score","mobile perf","desktop perf","rendimiento","app score","benchmark") -Description "Score and track app performance across 6 dimensions"
 
 # --- SDD ---
-Add-Skill -Name "sdd-init" -Category "SDD" -Triggers @("SDD init","bootstrap","iniciar SDD") -Description "Initialize SDD project context and config"
-Add-Skill -Name "sdd-explore" -Category "SDD" -Triggers @("explore codebase","pre-design","investigar","codebase exploration") -Description "Explore codebase before designing changes"
-Add-Skill -Name "sdd-propose" -Category "SDD" -Triggers @("proposal","intent","approach","change proposal") -Description "Create formal change proposals" -DependsOn @("sdd-explore")
-Add-Skill -Name "sdd-spec" -Category "SDD" -Triggers @("specs","specification","Given When Then","requisitos","spec") -Description "Write detailed specifications from proposals" -DependsOn @("sdd-propose")
-Add-Skill -Name "sdd-design" -Category "SDD" -Triggers @("technical design","HOW","diseno tecnico") -Description "Create technical design from specs" -DependsOn @("sdd-spec")
-Add-Skill -Name "sdd-tasks" -Category "SDD" -Triggers @("task breakdown","implementation plan","tareas","task list") -Description "Break down designs into implementation tasks" -DependsOn @("sdd-design")
-Add-Skill -Name "sdd-apply" -Category "SDD" -Triggers @("apply tasks","implement","aplicar") -Description "Apply SDD tasks to implement changes" -DependsOn @("sdd-tasks") -Related @("commit-crafter")
-Add-Skill -Name "sdd-verify" -Category "SDD" -Triggers @("validate vs specs","verify","verificar") -Description "Validate implementation against specs" -DependsOn @("sdd-spec")
-Add-Skill -Name "sdd-archive" -Category "SDD" -Triggers @("archive changes","delta to main","archivar") -Description "Archive completed changes with lineage" -DependsOn @("sdd-verify","sdd-apply")
+Add-Skill -Name "sdd" -Category "SDD" -Triggers @("SDD pipeline","SDD phase","spec-driven development") -Description "Unified SDD pipeline — 9 phases (init→archive)" -Related @("sdd-init","sdd-explore","sdd-propose","sdd-spec","sdd-design","sdd-tasks","sdd-apply","sdd-verify","sdd-archive")
+Add-Skill -Name "sdd-init" -Category "SDD" -Triggers @("SDD init","bootstrap","iniciar SDD") -Description "SDD init — bootstrap project context (wrapper, canonical at sdd/phases/00-init.md)"
+Add-Skill -Name "sdd-explore" -Category "SDD" -Triggers @("explore codebase","pre-design","investigar","codebase exploration") -Description "Explore codebase (wrapper, canonical at sdd/phases/01-explore.md)"
+Add-Skill -Name "sdd-propose" -Category "SDD" -Triggers @("proposal","intent","approach","change proposal") -Description "Create change proposals (wrapper, canonical at sdd/phases/02-propose.md)" -DependsOn @("sdd-explore")
+Add-Skill -Name "sdd-spec" -Category "SDD" -Triggers @("specs","specification","Given When Then","requisitos","spec") -Description "Write specifications from proposals (wrapper, canonical at sdd/phases/04-spec.md)" -DependsOn @("sdd-propose")
+Add-Skill -Name "sdd-design" -Category "SDD" -Triggers @("technical design","HOW","diseno tecnico") -Description "Create technical design from specs (wrapper, canonical at sdd/phases/03-design.md)" -DependsOn @("sdd-spec")
+Add-Skill -Name "sdd-tasks" -Category "SDD" -Triggers @("task breakdown","implementation plan","tareas","task list") -Description "Break down designs into tasks (wrapper, canonical at sdd/phases/05-tasks.md)" -DependsOn @("sdd-design")
+Add-Skill -Name "sdd-apply" -Category "SDD" -Triggers @("apply tasks","implement","aplicar") -Description "Apply tasks to implement changes (wrapper, canonical at sdd/phases/06-apply.md)" -DependsOn @("sdd-tasks") -Related @("commit-crafter")
+Add-Skill -Name "sdd-verify" -Category "SDD" -Triggers @("validate vs specs","verify","verificar") -Description "Validate implementation against specs (wrapper, canonical at sdd/phases/07-verify.md)" -DependsOn @("sdd-spec")
+Add-Skill -Name "sdd-archive" -Category "SDD" -Triggers @("archive changes","delta to main","archivar") -Description "Archive completed changes (wrapper, canonical at sdd/phases/08-archive.md)" -DependsOn @("sdd-verify","sdd-apply")
 Add-Skill -Name "sdd-onboard" -Category "SDD" -Triggers @("SDD onboard","onboarding","nuevo proyecto SDD","guia SDD") -Description "Guide users through complete SDD cycle"
 
 # --- Coordination ---

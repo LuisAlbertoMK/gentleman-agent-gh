@@ -88,7 +88,7 @@ if ($missingGlobal.Count -eq 0) { Write-Host " OK (all in global)" } else { $war
 Write-Host "[5/6] _shared refs..." -NoNewline
 $sharedFiles = @{
     'skill-resolver.md' = Test-Path (Join-Path -Path $canonicalDir -ChildPath "_shared\skill-resolver.md")
-    'sdd-phase-common.md' = Test-Path (Join-Path -Path $canonicalDir -ChildPath "_shared\sdd-phase-common.md")
+    'sdd-phase-common.md' = Test-Path (Join-Path -Path $canonicalDir -ChildPath "sdd\references\sdd-phase-common.md")
     'persistence-contract.md' = Test-Path (Join-Path -Path $canonicalDir -ChildPath "_shared\persistence-contract.md")
     'engram-convention.md' = Test-Path (Join-Path -Path $canonicalDir -ChildPath "_shared\engram-convention.md")
 }
