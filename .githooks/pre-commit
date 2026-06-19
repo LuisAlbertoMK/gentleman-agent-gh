@@ -45,7 +45,7 @@ if [ -n "$STAGED_PS1" ]; then
   for f in $STAGED_PS1; do
     FULL="$REPO_ROOT/$f"
     [ ! -f "$FULL" ] && continue
-    case "$f" in *bash-safe*) continue ;; esac
+    case "$f" in *bash-safe*|*pssa-gate*) continue ;; esac
     # Escape single quotes for PowerShell
     ESCAPED=$(echo "$FULL" | sed "s/'/''/g")
     if [ $FIRST -eq 1 ]; then

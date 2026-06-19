@@ -182,7 +182,7 @@ function Resolve-SwitchDefault {
 
 # -- baseline persistence ---------------------------------------------
 function Save-Baseline {
-    param([array]$Results)
+    param([array]$Results, [int]$AmpersandCount)
     $baseline = @{
         timestamp = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ss')
         total     = $Results.Count
@@ -191,6 +191,7 @@ function Save-Baseline {
         autoFixableCount = ($Results | Where-Object { $_.RuleName -in $autoFixRules }).Count
         trackedCount     = ($Results | Where-Object { $_.RuleName -in $trackedRules }).Count
         manualCount      = ($Results | Where-Object { $_.RuleName -notin ($autoFixRules + $trackedRules) }).Count
+        ampersandCount   = $AmpersandCount
     }
     $dir = Split-Path $BaselineFile -Parent
     if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
@@ -256,18 +257,54 @@ $manual       = @($manual | Where-Object {
     -not $isExcluded
 })
 
+# 2b. POSIX-ism scan: detect && in .ps1 scripts (PS5.1 incompatible)
+$ampersandViolations = @()
+$knownExceptions = @('bash-safe.ps1', 'pssa-gate.ps1')
+Get-ChildItem -Path $targetPath -Recurse -Filter '*.ps1' -ErrorAction SilentlyContinue | ForEach-Object {
+    $relPath = $_.FullName.Replace($targetPath, '').TrimStart('\')
+    $shouldSkip = $false
+    foreach ($ex in $knownExceptions) { if ($relPath -match [regex]::Escape($ex)) { $shouldSkip = $true } }
+    foreach ($dir in $ExcludedDirs) { if ($relPath -match "^$dir[\\/]") { $shouldSkip = $true } }
+    if ($shouldSkip) { return }
+
+    $lines = Get-Content -LiteralPath $_.FullName -ErrorAction SilentlyContinue
+    if (-not $lines) { return }
+
+    for ($i = 0; $i -lt $lines.Count; $i++) {
+        $line = $lines[$i]
+        $trimmed = $line.Trim()
+        # Skip comments and empty lines
+        if ($trimmed -eq '' -or $trimmed.StartsWith('#')) { continue }
+        # Check for bare && not inside quotes
+        if ($trimmed -match '(^|[^""])&&([^""]|$)') {
+            $ampersandViolations += [PSCustomObject]@{
+                ScriptName = $relPath
+                Line = $i + 1
+                Text = $trimmed
+            }
+        }
+    }
+}
+$ampersandCount = $ampersandViolations.Count
+
 # 3. Report
 if (-not $Quiet) {
     Write-Host "`n-- Summary --"
-    Write-Host "  Total violations:     $($results.Count)"
-    Write-Host "  Auto-fixable:         $($autoFixable.Count)"
-    Write-Host "  Tracked (info):       $($tracked.Count)"
+    Write-Host "  Total PSSA violations: $($results.Count)"
+    Write-Host "  && chaining violations: $($ampersandCount)"
+    Write-Host "  Auto-fixable:          $($autoFixable.Count)"
+    Write-Host "  Tracked (info):        $($tracked.Count)"
     $excludedCount = @($excludedViolations).Count
-    Write-Host "  Excluded (experiments): $excludedCount"
-    Write-Host "  Manual review needed:   $($manual.Count)"
+    Write-Host "  Excluded (experiments):  $excludedCount"
+    Write-Host "  Manual review needed:    $($manual.Count)"
+
+    if ($ampersandCount -gt 0) {
+        Write-Host "`n-- && violations (PS5.1 incompatible) --"
+        $ampersandViolations | Select-Object ScriptName, Line, Text | Format-Table -AutoSize | Out-String | Write-Host
+    }
 
     if ($manual.Count -gt 0) {
-        Write-Host "`n-- Manual review --"
+        Write-Host "`n-- Manual review (PSSA) --"
         $manual | Group-Object RuleName | ForEach-Object {
             Write-Host "  $($_.Name): $($_.Count)"
         }
@@ -278,15 +315,19 @@ if (-not $Quiet) {
 # 4. Baseline for Trend mode
 switch ($Mode) {
     'Trend' {
-        $baseline = Save-Baseline -Results $results
+        $baseline = Save-Baseline -Results $results -AmpersandCount $ampersandCount
         $prev = Read-Baseline
         if ($prev) {
             $delta = $results.Count - $prev.total
             $sign = if ($delta -gt 0) { '+' } else { '' }
+            $prevAmp = if ($prev.PSObject.Properties['ampersandCount']) { ($prev.ampersandCount -as [int]) } else { 0 }
+            $ampDelta = $ampersandCount - $prevAmp
+            $ampSign = if ($ampDelta -gt 0) { '+' } else { '' }
             Write-Host "`n-- Trend --"
-            Write-Host "  Previous: $($prev.total) | Current: $($results.Count) | Delta: $sign$delta"
-            if ($delta -gt 0) { Write-Warning "  Violations INCREASED by $delta" }
-            elseif ($delta -lt 0) { Write-Host "  Violations DECREASED by $(-$delta) - good!" }
+            Write-Host "  PSSA violations: $($prev.total) → $($results.Count) | Delta: $sign$delta"
+            Write-Host "  && violations:    $($prev.ampersandCount) → $ampersandCount | Delta: $ampSign$ampDelta"
+            if ($delta -gt 0 -or $ampDelta -gt 0) { Write-Warning "  Some violations INCREASED" }
+            elseif ($delta -lt 0 -and $ampDelta -le 0) { Write-Host "  Violations DECREASED - good!" }
             else { Write-Host "  No change - steady." }
         } else {
             Write-Host "  Baseline saved (no previous data)."
@@ -294,17 +335,23 @@ switch ($Mode) {
     }
     'Check' {
         if (-not (Test-Path $BaselineFile)) {
-            Save-Baseline -Results $results | Out-Null
+            Save-Baseline -Results $results -AmpersandCount $ampersandCount | Out-Null
             Write-Status "Initial baseline saved to $BaselineFile"
         }
     }
 }
 
 # 5. Exit code
+$exitCode = 0
 if ($manual.Count -gt 0 -and $Mode -ne 'Trend') {
     Write-Warning "PSSA Gate: $($manual.Count) violations require manual review."
-    exit 1
+    $exitCode = 1
 }
-
-Write-Host "`nPSSA Gate PASSED."
-exit 0
+if ($ampersandCount -gt 0 -and $Mode -ne 'Trend') {
+    Write-Warning "PSSA Gate: $ampersandCount && violations found (PS5.1 incompatible). Run '.\scripts\bash-safe.ps1' for usage instead."
+    $exitCode = 1
+}
+if ($exitCode -eq 0) {
+    Write-Host "`nPSSA Gate PASSED."
+}
+exit $exitCode

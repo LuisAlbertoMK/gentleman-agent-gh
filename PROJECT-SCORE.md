@@ -18,7 +18,7 @@
 | Metrics               | 10.0  |
 | Script Performance    | 10.0  |
 | Skill Effectiveness   | 10.0  |
-| Cycle Progress        | 10.0  |
+| Cycle Progress        | 0.0  |
 
 ## Changelog
 
@@ -40,4 +40,4 @@
 | 2026-06-18 | 9.4   | +0.1   | Skill compression: gap-analysis, triple-verify, performance. SKILLS-INDEX dup removed. Stale temp cleanup. inter: 10/30 |
 | 2026-06-18 | 9.5   | +0.1   | Skill compression: performance-tracker, seo, metricas, branch-pr. inter: 14/30 |
 | 2026-06-19 | 10.0  | +0.5   | Cycle 2 complete — all 11 dims at 10.0. PSSA 0 manual, inter 30/30, encoding fixed. 2 pending objectives: experiments/ cleanup + upstream PR. |
-| 2026-06-19 | 10.0  | —      | Cycle 3 kickoff. Restored .project.json (was overwritten by auto-metrics), added safety checkpoint. Fixed SKILLS-INDEX count 66→67 (external-auditor). Cross-ref OK, score 10.0/10. |
+| 2026-06-19 | 9.1   | −0.9   | Cycle 3 progress: inter 1/30. Cycle Progress 10→0 (cycle reset external-auditor). 10 dims at 10.0. |

@@ -81,6 +81,7 @@ After every completion: auto-score 6 dims. <7 → immune-system.
 ## Bash-Safe (PowerShell 5.1)
 PS 5.1 rejects `&&`, `||`, `@{var}`. WSL `bash` in PATH is broken stub. **Use Git Bash**: `& "C:\Program Files\Git\bin\bash.exe" -c "<cmd>"` — or `Invoke-Bash` from `scripts/bash-safe.ps1`.
 Never use `&&`/`||`/`@{u}` directly in tool calls.
+**Pre-flight check**: BEFORE every bash tool call, scan the command string for `&&` or `||`. If found → use `Invoke-Bash` wrapper or `; if ($?) { }` instead. Violation = auto-immune trigger.
 
 ## Execution & Resource-Adaptive Mode
 Infer: QUICK (simple→min) · THOROUGH (risky→full SDD) · DRAFT (explore→findings). Explicit: "modo rápido" / "modo thorough" / "draft"

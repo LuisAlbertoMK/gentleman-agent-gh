@@ -23,7 +23,7 @@ $hazards = @()
 foreach ($f in $FilePath) {
     $f = $f.Trim()
     if (-not $f) { continue }
-    if ($f -match 'bash-safe|experiments[\\/]') { continue }
+    if ($f -match 'bash-safe|pssa-gate|experiments[\\/]') { continue }
     if (-not (Test-Path -LiteralPath $f)) { continue }
 
     try {
