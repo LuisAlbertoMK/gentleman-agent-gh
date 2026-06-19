@@ -98,15 +98,39 @@ Son **10 subagentes ocultos** del pipeline SDD (`sdd-*`). No se usan directo —
 
 ---
 
+## Routing automático via skill-graph.ps1
+
+El script `scripts/skill-graph.ps1` ahora incluye **routing automático** basado en el `Effort` de cada skill:
+
+- **`low`** → `gentleman-quick`: tareas simples, localizadas, mecánicas
+- **`medium`** → `gentleman-codex`: generación de código, implementación estándar
+- **`high`** → `gentleman-deep`: razonamiento complejo, arquitectura, análisis profundo
+
+Si una tarea matchea skills de distintos niveles, se recomienda el agente del nivel **más alto** entre todas las skills matcheadas.
+
+```powershell
+# Recomendar agente para scripting
+.\scripts\skill-graph.ps1 -Task "security audit" -RecommendAgent
+> gentleman-deep
+
+# Ver routing en output completo
+.\scripts\skill-graph.ps1 -Task "commit changes"
+# Muestra: Agent: gentleman-codex | Effort: medium
+
+# Formato JSON incluye agent_recommendation
+.\scripts\skill-graph.ps1 -Task "refactor" -Format Json
+# { agent_recommendation: { agent: "...", effort: "...", reason: "..." }, skills: [...] }
+```
+
 ## Resumen rápido
 
-| Tarea | Agente |
-|-------|--------|
-| Debug complejo | `deep` |
-| Decisión de arquitectura | `deep` |
-| Escribir código nuevo | `codex` |
-| Feature bien especificada | `codex` |
-| Fix chico / typo | `quick` |
-| Renombrar / refactor mecánico | `quick` o `codex` |
-| No sabés qué hacer | `vMK` (default) |
-| SDD pipeline | `vMK` orquesta subagentes |
+| Tarea | Agente | Routing |
+|-------|--------|---------|
+| Debug complejo | `deep` | Effort high |
+| Decisión de arquitectura | `deep` | Effort high |
+| Escribir código nuevo | `codex` | Effort medium |
+| Feature bien especificada | `codex` | Effort medium |
+| Fix chico / typo | `quick` | Effort low |
+| Renombrar / refactor mecánico | `quick` o `codex` | Effort low/medium |
+| No sabés qué hacer | `vMK` (default) | — |
+| SDD pipeline | `vMK` orquesta subagentes | Effort medium |

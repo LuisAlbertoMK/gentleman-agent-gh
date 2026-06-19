@@ -38,6 +38,7 @@ param(
     [ValidateRange(0,3)]
     [int]$Expand = 1,
     [switch]$ListAll,
+    [switch]$RecommendAgent,
     [ValidateSet("Text","Json","Csv")]
     [string]$Format = "Text"
 )
@@ -59,7 +60,9 @@ function Add-Skill {
         [string]$Category = "general",
         [string[]]$DependsOn = @(),
         [string[]]$Related = @(),
-        [string]$Description = ""
+        [string]$Description = "",
+        [ValidateSet("low","medium","high")]
+        [string]$Effort = "medium"
     )
     $script:skillRegistry += [PSCustomObject]@{
         Name        = $Name
@@ -68,31 +71,32 @@ function Add-Skill {
         DependsOn   = $DependsOn
         Related     = $Related
         Description = $Description
+        Effort      = $Effort
     }
 }
 
 # --- Compression / Style ---
-Add-Skill -Name "karpathy-prompt" -Category "compression" -Triggers @("karpathy","less tokens","context compression","compact prompt") -Description "Apply Karpathy-style compression to prompts"
-Add-Skill -Name "karpathy-loop" -Category "compression" -Triggers @("karpathy loop","optimize prompt","measure tokens","self-improve prompt") -Description "Karpathy-style self-improvement loop for prompts"
-Add-Skill -Name "lean-context" -Category "compression" -Triggers @("compact","less tokens","caveman","caveman","ultra-lean","minimal context") -Description "Ultra-lean context mode"
-Add-Skill -Name "execution-mode" -Category "compression" -Triggers @("execution mode","quick","thorough","draft","modo") -Description "Quick or Thorough or Draft execution modes"
-Add-Skill -Name "skill-digestion" -Category "compression" -Triggers @("skill digestion","compact on load","compress skill") -Description "Digest and compact skills when loaded"
+Add-Skill -Name "karpathy-prompt" -Category "compression" -Effort low -Triggers @("karpathy","less tokens","context compression","compact prompt") -Description "Apply Karpathy-style compression to prompts"
+Add-Skill -Name "karpathy-loop" -Category "compression" -Effort high -Triggers @("karpathy loop","optimize prompt","measure tokens","self-improve prompt") -Description "Karpathy-style self-improvement loop for prompts"
+Add-Skill -Name "lean-context" -Category "compression" -Effort low -Triggers @("compact","less tokens","caveman","caveman","ultra-lean","minimal context") -Description "Ultra-lean context mode"
+Add-Skill -Name "execution-mode" -Category "compression" -Effort low -Triggers @("execution mode","quick","thorough","draft","modo") -Description "Quick or Thorough or Draft execution modes"
+Add-Skill -Name "skill-digestion" -Category "compression" -Effort low -Triggers @("skill digestion","compact on load","compress skill") -Description "Digest and compact skills when loaded"
 
 # --- Quality ---
 Add-Skill -Name "quality-gate" -Category "quality" -Triggers @("quality gate","pre-commit","validate commit") -Description "Pre-commit quality gate with 5 checks" -Related @("auto-metrics","commit-crafter")
 Add-Skill -Name "auto-metrics" -Category "quality" -Triggers @("auto-score","metrics","post-task","evaluate","self-evaluate") -Description "Post-task self-evaluation with 7-dim scoring" -DependsOn @("skill-validate")
-Add-Skill -Name "immune-system" -Category "quality" -Triggers @("immune system","anti-pattern","permanent immunity","nunca mas","bug","fix","error") -Description "Permanent immunity catalog for repeated errors"
+Add-Skill -Name "immune-system" -Category "quality" -Effort high -Triggers @("immune system","anti-pattern","permanent immunity","nunca mas","bug","fix","error") -Description "Permanent immunity catalog for repeated errors"
 Add-Skill -Name "code-review-agent" -Category "quality" -Triggers @("code review","CR","revisar codigo","review code") -Description "Automated code review with standards" -DependsOn @("best-practices")
 Add-Skill -Name "skill-testing" -Category "quality" -Triggers @("test skill","verify skill","coverage","skill test") -Description "Test and verify skill coverage"
 Add-Skill -Name "skill-validate" -Category "quality" -Triggers @("skill validation","benchmark","multi-trial","validate skill","3 trials") -Description "3-trial benchmark validation for skills"
-Add-Skill -Name "judgment-day" -Category "quality" -Triggers @("judgment day","dual review","juzgar","evaluar skill") -Description "Dual review and judgment for skills"
+Add-Skill -Name "judgment-day" -Category "quality" -Effort high -Triggers @("judgment day","dual review","juzgar","evaluar skill") -Description "Dual review and judgment for skills"
 
 # --- Memory ---
 Add-Skill -Name "session-resume" -Category "memory" -Triggers @("resume","donde lo dejamos","continua","session start","git state") -Description "Safe session resume with git state gate" -DependsOn @("dreaming")
 Add-Skill -Name "code-memory" -Category "memory" -Triggers @("code memory","memory","recordar","acordate","multi-session") -Description "Cross-session code memory and recall" -Related @("session-resume","dreaming")
-Add-Skill -Name "dreaming" -Category "memory" -Triggers @("dreaming","cross-session","pattern extraction","memory curation","engram") -Description "Cross-session pattern extraction via Engram" -DependsOn @("auto-metrics")
-Add-Skill -Name "bitacora" -Category "memory" -Triggers @("bitacora","historial","historico","request log") -Description "Session activity log and history tracking"
-Add-Skill -Name "metricas" -Category "memory" -Triggers @("metricas","before or after","percent improvement","delta") -Description "Before or after metrics tracking for improvements"
+Add-Skill -Name "dreaming" -Category "memory" -Effort high -Triggers @("dreaming","cross-session","pattern extraction","memory curation","engram") -Description "Cross-session pattern extraction via Engram" -DependsOn @("auto-metrics")
+Add-Skill -Name "bitacora" -Category "memory" -Effort low -Triggers @("bitacora","historial","historico","request log") -Description "Session activity log and history tracking"
+Add-Skill -Name "metricas" -Category "memory" -Effort low -Triggers @("metricas","before or after","percent improvement","delta") -Description "Before or after metrics tracking for improvements"
 Add-Skill -Name "decision-capture" -Category "memory" -Triggers @("decision","trade-off","decision log") -Description "Capture and log architectural decisions"
 
 # --- Skills Meta ---
@@ -100,10 +104,10 @@ Add-Skill -Name "skill-creator" -Category "meta" -Triggers @("create skill","new
 Add-Skill -Name "skill-registry" -Category "meta" -Triggers @("skill registry","catalog","registro skills") -Description "Skill registry management and catalog"
 Add-Skill -Name "skill-improver" -Category "meta" -Triggers @("skill improvement","audit skills","refactor skills") -Description "Audit and improve existing skills"
 Add-Skill -Name "skill-refresher" -Category "meta" -Triggers @("skill refresher","drift detection","auto-heal") -Description "Detect and fix skill drift"
-Add-Skill -Name "gap-analysis" -Category "meta" -Triggers @("gap analysis","system audit","identificar gaps","project intake") -Description "Complete 8-dim gap analysis for any system" -Related @("project-mapper","security-scanner")
+Add-Skill -Name "gap-analysis" -Category "meta" -Effort high -Triggers @("gap analysis","system audit","identificar gaps","project intake") -Description "Complete 8-dim gap analysis for any system" -Related @("project-mapper","security-scanner")
 
 # --- Code Ops ---
-Add-Skill -Name "commit-crafter" -Category "code-ops" -Triggers @("commit","commit message","conventional commit") -Description "Craft conventional commit messages from diff" -Related @("quality-gate")
+Add-Skill -Name "commit-crafter" -Category "code-ops" -Effort low -Triggers @("commit","commit message","conventional commit") -Description "Craft conventional commit messages from diff" -Related @("quality-gate")
 Add-Skill -Name "refactoring-planner" -Category "code-ops" -Triggers @("refactor","refactoring","reestructurar","migrate") -Description "Plan and execute code refactoring"
 Add-Skill -Name "project-mapper" -Category "code-ops" -Triggers @("mapear","project map","estructura","tech stack") -Description "Map project structure, stack, and architecture" -Related @("gap-analysis")
 Add-Skill -Name "security-scanner" -Category "code-ops" -Triggers @("security","seguridad","vulnerabilidad","auditar") -Description "Security audit and vulnerability scanner" -DependsOn @("best-practices")
@@ -123,12 +127,12 @@ Add-Skill -Name "sdd-archive" -Category "SDD" -Triggers @("archive changes","del
 Add-Skill -Name "sdd-onboard" -Category "SDD" -Triggers @("SDD onboard","onboarding","nuevo proyecto SDD","guia SDD") -Description "Guide users through complete SDD cycle"
 
 # --- Coordination ---
-Add-Skill -Name "delivery-harness" -Category "coordination" -Triggers @("coordinate","orchestrate","multi-agent","delegate work") -Description "Orchestrate multi-agent work delivery" -DependsOn @("subagent-isolation","work-unit-commits") -Related @("chained-pr")
+Add-Skill -Name "delivery-harness" -Category "coordination" -Effort high -Triggers @("coordinate","orchestrate","multi-agent","delegate work") -Description "Orchestrate multi-agent work delivery" -DependsOn @("subagent-isolation","work-unit-commits") -Related @("chained-pr")
 Add-Skill -Name "chained-pr" -Category "coordination" -Triggers @("stacked PR","chained PR","sequential branches","PR chain") -Description "Manage stacked sequential PRs (refs: chaining-details.md)" -DependsOn @("work-unit-commits") -Related @("delivery-harness","branch-pr")
 Add-Skill -Name "branch-pr" -Category "coordination" -Triggers @("branch PR","branch naming","create PR","open pull request") -Description "Branch creation and PR workflow for gentle-ai" -Related @("chained-pr","issue-creation")
 Add-Skill -Name "issue-creation" -Category "coordination" -Triggers @("create issue","GitHub issue","bug report","feature request") -Description "GitHub issue creation with issue-first workflow for gentle-ai" -Related @("branch-pr")
 Add-Skill -Name "subagent-isolation" -Category "coordination" -Triggers @("subagent isolation","context boundaries","delegation") -Description "Isolate subagent contexts and prevent contamination"
-Add-Skill -Name "command-wrapper" -Category "coordination" -Triggers @("command wrapper","safe execution","error handling","output parse") -Description "Safe command execution with error handling"
+Add-Skill -Name "command-wrapper" -Category "coordination" -Effort low -Triggers @("command wrapper","safe execution","error handling","output parse") -Description "Safe command execution with error handling"
 
 # --- Web Quality ---
 Add-Skill -Name "accessibility" -Category "web-quality" -Triggers @("accessibility","a11y","WCAG","screen reader","keyboard nav","make accessible") -Description "Audit and improve web accessibility"
@@ -146,11 +150,12 @@ Add-Skill -Name "research" -Category "research" -Triggers @("research","investig
 Add-Skill -Name "recovery-protocol" -Category "specialized" -Triggers @("recovery","no es eso","frustration","stuck","bloqueado","bug","fix","error") -Description "Recovery protocol for frustration and errors"
 Add-Skill -Name "context-watchdog" -Category "specialized" -Triggers @("context overflow","token limit","context explosion") -Description "Monitor and prevent context window overflow"
 Add-Skill -Name "ci-cd" -Category "specialized" -Triggers @("CI/CD","pipeline","GitHub Actions","continuous integration") -Description "CI/CD pipeline automation"
-Add-Skill -Name "work-unit-commits" -Category "specialized" -Triggers @("work-unit","commit organization") -Description "Organize commits into logical work units"
+Add-Skill -Name "work-unit-commits" -Category "specialized" -Effort low -Triggers @("work-unit","commit organization") -Description "Organize commits into logical work units"
+Add-Skill -Name "self-improvement" -Category "specialized" -Effort high -Triggers @("self-improvement","improvement cycle","auto-improve","inter 30","cycle") -Description "Self-improvement cycle with inter(30) minimum" -Related @("self-reflection","dreaming")
 Add-Skill -Name "self-reflection" -Category "specialized" -Triggers @("self-reflection","Hermes","error patterns","reflexion") -Description "Hermes closed learning loop"
 Add-Skill -Name "cognitive-doc-design" -Category "specialized" -Triggers @("doc design","documentation patterns","cognitive load","progressive disclosure") -Description "Design docs that reduce cognitive load"
-Add-Skill -Name "comment-writer" -Category "specialized" -Triggers @("comment writer","PR feedback","review comment","write feedback") -Description "Write warm, direct collaboration comments"
-Add-Skill -Name "senior-engineer" -Category "specialized" -Triggers @("senior architect","trade-offs","system design","arquitectura") -Description "Senior engineer persona for architecture decisions"
+Add-Skill -Name "comment-writer" -Category "specialized" -Effort low -Triggers @("comment writer","PR feedback","review comment","write feedback") -Description "Write warm, direct collaboration comments"
+Add-Skill -Name "senior-engineer" -Category "specialized" -Effort high -Triggers @("senior architect","trade-offs","system design","arquitectura") -Description "Senior engineer persona for architecture decisions"
 Add-Skill -Name "prompt-engineering" -Category "specialized" -Triggers @("improve prompt","ReAct","multi-agent","prompt engineering") -Description "Advanced prompt engineering techniques"
 Add-Skill -Name "go-testing" -Category "specialized" -Triggers @("Go tests","Bubbletea TUI","golang test") -Description "Go testing patterns and tools"
 Add-Skill -Name "python-async" -Category "specialized" -Triggers @("Python async","asyncio") -Description "Python async/await patterns"
@@ -266,6 +271,35 @@ function Expand-Hop {
 }
 
 # ============================================================
+# AGENT ROUTING
+# ============================================================
+
+$agentRouting = @{
+    low    = "gentleman-quick"
+    medium = "gentleman-codex"
+    high   = "gentleman-deep"
+}
+
+function Get-AgentRecommendation {
+    param([array]$ResolvedSkills)
+    $maxEffort = "low"
+    foreach ($s in $ResolvedSkills) {
+        $node = $script:skillRegistry | Where-Object { $_.Name -eq $s.Name }
+        if (-not $node) { continue }
+        $e = $node.Effort
+        if ($e -eq "high")  { $maxEffort = "high"; break }
+        if ($e -eq "medium") { $maxEffort = "medium" }
+    }
+    $agent = $agentRouting[$maxEffort]
+    $effortLabel = @{ low = "simple — "; medium = "standard — "; high = "complex — " }
+    return [PSCustomObject]@{
+        Agent  = $agent
+        Effort = $maxEffort
+        Reason = $effortLabel[$maxEffort] + "use $agent for this task"
+    }
+}
+
+# ============================================================
 # OUTPUT
 # ============================================================
 
@@ -278,7 +312,7 @@ if ($ListAll) {
         "Json" { try { $groups | ForEach-Object {
                 $g = $_
                 @{ Category = $g.Name; Skills = $g.Group | Sort-Object Name | ForEach-Object {
-                    @{ Name = $_.Name; DependsOn = $_.DependsOn; Related = $_.Related }
+                    @{ Name = $_.Name; Effort = $_.Effort; DependsOn = $_.DependsOn; Related = $_.Related }
                 }}
             } | ConvertTo-Json -Depth 3; } catch { Write-Host "Error generating JSON: $_" -ForegroundColor Red; exit 1 }
         }
@@ -288,6 +322,7 @@ if ($ListAll) {
                     [PSCustomObject]@{
                         Category   = $g.Name
                         Skill      = $s.Name
+                        Effort     = $s.Effort
                         DependsOn  = if ($s.DependsOn.Count -gt 0) { $s.DependsOn -join "; " } else { "" }
                         Related    = if ($s.Related.Count -gt 0) { $s.Related -join "; " } else { "" }
                     }
@@ -300,7 +335,8 @@ if ($ListAll) {
                 Write-Host ("`n[" + $g.Name.ToUpper() + "]  (" + $g.Count + " skills)") -ForegroundColor Green
                 $g.Group | Sort-Object Name | ForEach-Object {
                     $deps = if ($_.DependsOn.Count -gt 0) { "  deps: " + ($_.DependsOn -join ", ") } else { "" }
-                    Write-Host ("  " + $_.Name.PadRight(22) + $deps) -ForegroundColor White
+                    $eff = if ($_.Effort -ne "medium") { "  [" + $_.Effort + "]" } else { "" }
+                    Write-Host ("  " + $_.Name.PadRight(22) + $eff + $deps) -ForegroundColor White
                 }
             }
             Write-Host ("`nTotal: " + $script:skillRegistry.Count + " skills in " + $groups.Count + " categories") -ForegroundColor Cyan
@@ -331,13 +367,40 @@ if ($resolved.Count -eq 0) {
     exit 0
 }
 
-$matchedCount = ($resolved | Where-Object { $_.Matched }).Count
-$expandedCount = ($resolved | Where-Object { -not $_.Matched }).Count
+$matchedCount = @($resolved | Where-Object { $_.Matched }).Count
+$expandedCount = @($resolved | Where-Object { -not $_.Matched }).Count
+
+# Agent recommendation from resolved skills
+$agentRec = Get-AgentRecommendation -ResolvedSkills $resolved
+
+# -RecommendAgent: output just agent name for scripting
+if ($RecommendAgent) {
+    Write-Output $agentRec.Agent
+    exit 0
+}
 
 switch ($Format) {
     "Json" {
         try {
-            $resolved | ConvertTo-Json -Depth 2
+            $jsonResult = @{
+                agent_recommendation = @{
+                    agent  = $agentRec.Agent
+                    effort = $agentRec.Effort
+                    reason = $agentRec.Reason
+                }
+                skills = @($resolved | ForEach-Object {
+                    @{
+                        Name        = $_.Name
+                        Category    = $_.Category
+                        Matched     = $_.Matched
+                        Triggers    = $_.Triggers
+                        DependsOn   = $_.DependsOn
+                        Related     = $_.Related
+                        Description = $_.Description
+                    }
+                })
+            }
+            $jsonResult | ConvertTo-Json -Depth 3
         } catch {
             Write-Host "Error converting results to JSON: $_" -ForegroundColor Red
             exit 1
@@ -347,6 +410,15 @@ switch ($Format) {
         $resolved | ConvertTo-Csv -NoTypeInformation
     }
     "Text" {
+        # Agent recommendation block
+        $effortColor = @{ low = "Green"; medium = "Yellow"; high = "Red" }
+        $agentColor = $effortColor[$agentRec.Effort]
+        Write-Host "=== Agent Recommendation ===" -ForegroundColor Cyan
+        Write-Host ("Agent: " + $agentRec.Agent) -ForegroundColor $agentColor
+        Write-Host ("Effort: " + $agentRec.Effort) -ForegroundColor $agentColor
+        Write-Host ("Reason: " + $agentRec.Reason) -ForegroundColor White
+        Write-Host ""
+
         Write-Host "=== Skill Resolution ===" -ForegroundColor Cyan
         Write-Host ("Task: " + $Task) -ForegroundColor White
         Write-Host ("Matched: " + $matchedCount + " | Expanded (1-hop): " + $expandedCount + " | Total: " + $resolved.Count) -ForegroundColor Green
@@ -357,7 +429,10 @@ switch ($Format) {
 
         if ($matched) {
             Write-Host "--- MATCHED SKILLS (load these) ---" -ForegroundColor Green
-            $matched | Format-Table @{N="Skill";E={$_.Name}}, @{N="Category";E={$_.Category}}, @{N="Match";E={$_.Triggers}} -AutoSize -Wrap
+            $matched | Format-Table @{N="Skill";E={$_.Name}}, @{N="Effort";E={
+                    $sn = $_.Name
+                    ($script:skillRegistry | Where-Object { $_.Name -eq $sn }).Effort
+                }}, @{N="Category";E={$_.Category}}, @{N="Match";E={$_.Triggers}} -AutoSize -Wrap
         }
         if ($expanded) {
             Write-Host "--- DEPENDENCIES (load with matched) ---" -ForegroundColor Yellow
