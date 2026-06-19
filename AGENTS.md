@@ -62,7 +62,7 @@ Comandos rápidos para tareas recurrentes — extienden el sistema de modos:
 |---------|--------|------------|
 | **`!compress`** | Karpathy compression en skills >2.5KB + score auto-update | Fácil |
 | **`!score`** | `score-auto.ps1 -Json` + update PROJECT-SCORE.md + cross-ref | Fácil |
-| **`!sync`** | `pull-upstream.ps1 -Mode Check` → drift check → score update | Medio |
+| **`!sync`** | `pull-upstream.ps1 -Mode Check` → drift check + agent sync (`-SyncAgents`) → score update | Medio |
 | **`!health`** | Full diagnostics: git status, drift, cross-ref, score, inter-track | Fácil |
 | **`!batch`** | `scripts/batch.ps1` — nueva batch auto-incremental + bitácora + inter-track++ | Fácil |
 | **`!cycle`** | `inter-track.ps1 -Show` + score status — resumen del ciclo de auto-mejora actual | Fácil |

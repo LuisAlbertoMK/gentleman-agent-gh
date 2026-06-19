@@ -1,8 +1,9 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 
 <#
 .SYNOPSIS
   Check skill drift between canonical source (.agents/skills/) and global config (~/.config/opencode/skills/).
+  Also optionally sync agent definitions to global config.
   Detects stale junctions or missing global links.
 
 .DESCRIPTION
@@ -16,6 +17,10 @@
 .PARAMETER AutoFix
   Create missing global junctions for any skills not linked.
 
+.PARAMETER SyncAgents
+  Sync gentleman-deep/codex/quick agent definitions from project opencode.json to global config.
+  Makes agents available in every project.
+
 .PARAMETER Json
   Output results as JSON.
 
@@ -23,12 +28,14 @@
   .\scripts\check-skill-drift.ps1
   .\scripts\check-skill-drift.ps1 -Thorough
   .\scripts\check-skill-drift.ps1 -AutoFix
+  .\scripts\check-skill-drift.ps1 -SyncAgents
   .\scripts\check-skill-drift.ps1 -Json
 #>
 
 param(
   [switch]$Thorough,
   [switch]$AutoFix,
+  [switch]$SyncAgents,
   [switch]$Json
 )
 
@@ -140,4 +147,68 @@ if ($Json) {
     }
     exit 1
   }
+}
+
+# ---- Agent definitions sync ----
+function Sync-AgentDefinitions {
+  <#
+    .SYNOPSIS
+      Sync gentleman-* agent definitions from project opencode.json to global config.
+      Ensures gentleman-deep, gentleman-codex, and gentleman-quick are available
+      in every project that this user opens.
+  #>
+  $projectConfigPath = Join-Path -Path $PSScriptRoot -ChildPath "..\opencode.json"
+  $globalConfigPath = "$env:USERPROFILE\.config\opencode\opencode.json"
+  $agentNames = @("gentleman-deep", "gentleman-codex", "gentleman-quick")
+  $syncResult = @{}
+
+  Write-Output "`n--- Syncing agent definitions to global config ---"
+
+  if (-not (Test-Path $projectConfigPath)) {
+    Write-Warning "No project opencode.json at $projectConfigPath"
+    return $syncResult
+  }
+  if (-not (Test-Path $globalConfigPath)) {
+    Write-Warning "No global opencode.json at $globalConfigPath"
+    return $syncResult
+  }
+
+  $projectRaw = Get-Content $projectConfigPath -Raw
+  $globalRaw  = Get-Content $globalConfigPath -Raw
+  $projectJson = $projectRaw | ConvertFrom-Json
+  $globalJson  = $globalRaw  | ConvertFrom-Json
+
+  # Find which agents need to be added
+  $globalAgentNames = $globalJson.agent.PSObject.Properties.Name
+  $toAdd = @()
+  foreach ($name in $agentNames) {
+    if ($globalAgentNames -contains $name) {
+      Write-Output "  [synced] '$name' already in global config"
+    } elseif ($null -eq $projectJson.agent.$name) {
+      Write-Warning "Agent '$name' not found in project opencode.json -- skipping"
+    } else {
+      $toAdd += $name
+    }
+  }
+
+  if ($toAdd.Count -eq 0) {
+    Write-Output "  -> No changes needed"
+    return $syncResult
+  }
+
+  # Add missing agents
+  foreach ($name in $toAdd) {
+    $agentDef = $projectJson.agent.$name
+    $globalJson.agent | Add-Member -Name $name -Value $agentDef -MemberType NoteProperty -Force
+    Write-Output "  + Added '$name' to global config"
+  }
+
+  $globalJson | ConvertTo-Json -Depth 10 | Set-Content -Path $globalConfigPath -Encoding UTF8
+  Write-Output "  -> Global config updated: $globalConfigPath"
+  return $syncResult
+}
+
+# Execute agent sync if requested
+if ($SyncAgents) {
+  Sync-AgentDefinitions
 }
