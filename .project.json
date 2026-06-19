@@ -86,7 +86,7 @@
                                                                            "over_5kb":  0,
                                                                            "avg_size_kb":  1.9,
                                                                            "total_skills":  68,
-                                                                           "total_bytes":  129019,
+                                                                           "total_bytes":  129402,
                                                                            "over_3kb":  2
                                                                        },
                                                           "score":  10,
@@ -105,7 +105,7 @@
                                             },
                               "Bitácora":  {
                                                "evidence":  {
-                                                                "lines":  42,
+                                                                "lines":  41,
                                                                 "exists":  true
                                                             },
                                                "score":  10,

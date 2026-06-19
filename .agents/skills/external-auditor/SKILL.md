@@ -7,14 +7,14 @@ metadata:
   author: gentleman-vMK
   version: "1.1"
   changelog: "1.1: structured parsing, error handling, double-save guard, bitacora integration, auto-metrics fallback"
-triggers: after auto-metrics (avg ≥7 + complex task), "external audit", "blind review", "verificá mi auto-score", "second opinion"
+triggers: after auto-metrics (code changes), "external audit", "blind review", "verificá mi auto-score", "second opinion"
 ---
 
 ## Why
 Auto-metrics is self-scored. **Juez y parte** — sesgo de sobreconfianza. Este skill agrega un **contralor externo** ciego.
 
 ## Flow
-1. **Trigger**: After `auto-metrics` on complex tasks (≥3 tool calls, code changes, arch decisions)
+1. **Trigger**: After `auto-metrics` on tasks with code changes
 2. **Guard**: if auto-metrics was NOT run this session → skip gracefully (warn: "no baseline")
 3. **Gather**: collect `git diff` output (or task summary if no diff) + auto-metrics scores
 4. **Delegate**: launch subagent `general` with BLIND audit prompt (see template)
@@ -25,9 +25,10 @@ Auto-metrics is self-scored. **Juez y parte** — sesgo de sobreconfianza. Este 
 9. **Act**:
    - **Aligned** (all gaps ≤1.5) → `mem_save(type="audit", content="PASSED")` on topic_key, silent pass
    - **I over-scored** (self > audit by >1.5 on any dim) → `immune-system` for each over-scored dim, log `ANTI-PATTERN-CATALOG` entry
-   - **I under-scored** (audit > self by >1.5) → note for calibration, no immune
-   - **Mixed** (some over, some under) → immune ONLY on over-scored dims
+    - **I under-scored** (audit > self by >1.5) → update bias calibration (positive offset), no immune
+    - **Mixed** (some over, some under) → immune ONLY on over-scored dims
 10. **Log**: `bitacora` append audit entry: `external-auditor: {PASSED|OVERSCORE|FAILED}`
+11. **Update bias calibration**: compute `offset = self_score - audit_score` per dim. Update `.learnings/bias-calibration.json` with rolling window (keep last 3). Average offsets → stored. See AGENTS.md §L.
 
 ## Thresholds
 | Signal | Action |

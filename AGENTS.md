@@ -246,7 +246,7 @@ Zero filler ("Sure!"). No code without context. Default-FAIL: tool output = evid
 ### G. Post-task auto-evaluation
 Close task: auto-metrics 6 dims (correctness, tokens, error prevention, skill, speed, breadth).
 <7 → immune-system + protocol adjust. ≥9 → mem_save pattern.
-**If avg ≥7 AND task was complex** (≥3 tool calls, code changes, arch decisions) → load `external-auditor` for blind subagent audit. Discrepancy >1.5 on any dim → immune-system.
+**If task had code changes** → load `external-auditor` for blind subagent audit. Discrepancy >1.5 on any dim → immune-system.
 
 ### H. Pull-from-Upstream (gentleman-vMK)
 - **Check**: `.\scripts\pull-upstream.ps1 -Mode Check` — NEW/MODIFIED/OURS ONLY
@@ -303,6 +303,15 @@ En el **primer mensaje del usuario** de cada sesión (antes de responder su cons
 4. Guardá en Engram: `mem_save` con `topic_key=project/score` y el score actual.
 
 No corras esto en cada mensaje — solo en el PRIMERO de la sesión.
+
+### L. Bias Calibration (systematic overconfidence correction)
+Corrige el sesgo de auto-evaluación usando feedback objetivo del external-auditor.
+
+1. **Storage**: `.learnings/bias-calibration.json` — rolling window of last 3 audits
+2. **Update** (after each external-auditor run): compute `offset = self_score - audit_score` per dimension. Append to history, keep last 3. Average offsets → stored as `offsets.{dim}`.
+3. **Apply** (before auto-metrics threshold check): read `.learnings/bias-calibration.json`. If `samples >= 2`, subtract avg offset from each auto-metrics score BEFORE checking thresholds (<7→immune, ≥9→mem_save).
+4. **Example**: if avg offset is Correctness:+0.7 and I score myself 8, effective score = 7.3 — no false ≥9 pattern save.
+5. **Reset**: offsets reset to 0 when `samples` drops below 2 (e.g., after calibration file deletion).
 <!-- /gentle-ai:agent-protocol -->
 
 <!-- agent-version: 2.2 — Project: gentleman-agent-gh, self-contained -->

@@ -10,6 +10,7 @@ metadata:
 triggers: "task completion, score/metric/auto-score, session end, skill validation, benchmark"
 ---
 Post EVERY done/listo before next task. Avg<7 → immune-system.
+## Bias Calibration: BEFORE scoring, check `.learnings/bias-calibration.json`. If `samples >= 2`, subtract stored avg offsets from each dimension score BEFORE checking thresholds. See AGENTS.md §L.
 ## 7 Dimensions (1-10)
 | Dim | 1-3 | 4-6 | 7-9 | 10 |
 |-----|-----|-----|-----|----|
