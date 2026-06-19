@@ -11,7 +11,8 @@
 - ✅ Automatizar trigger de session-miner.ps1 en DREAMING (AGENTS.md)
 - ✅ Reducir PSSA violations en scripts de producción (<49 → 0 manual)
 - ✅ Limpiar experiments/graph-crud/ (referencias de investigación obsoletas)
-- 🔲 Decidir y ejecutar PR a upstream gentle-ai con cambios genéricos
+- ✅ Decidido: no se mandan PRs a upstream (política del proyecto)
+- 🔲 Próximo ciclo: mantener score, explorar nuevas skills, optimizar scripts
 
 ## Metrics
 
@@ -48,7 +49,7 @@ All 11 dims at 10.0. Focus:
 |------|---------------|---------------|
 | karpathy/autoresearch | New program.md patterns, loop improvements | 2026-06-18 (no changes) |
 | Gentleman-Programming/gentleman-guardian-angel | New caching strategies, AGENTS.md compliance checks | 2026-06-18 (v2.8.1, no changes) |
-| gentle-ai ecosystem | New MCP servers, backup systems, upstream PRs | 2026-06-18 (no new public repos) |
+| gentle-ai ecosystem | New MCP servers, backup systems (read-only, no PRs) | 2026-06-18 (no new public repos) |
 | engram (MCP) | Cloud sync, new query types, performance | 2026-06-18 |
 
 ## Cycle Loop
