@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 
 <#
 .SYNOPSIS
@@ -106,4 +106,16 @@ if ($Quiet) {
     $result | ConvertTo-Json
 } else {
     Write-Host "  Cycle: $($data.cycle.id) | inter: $($data.cycle.count)/$($data.cycle.target)" -ForegroundColor Cyan
+    # Show score when in Show mode (used by !cycle)
+    if (-not $Increment -and -not $Reset) {
+        $scorePath = Join-Path -Path $repoRoot -ChildPath ".project.json"
+        if (Test-Path $scorePath) {
+            try {
+                $scoreData = Get-Content $scorePath -Raw | ConvertFrom-Json
+                Write-Host "  Score: $($scoreData.score.current)/10 (trend: $($scoreData.score.trend))" -ForegroundColor Green
+            } catch {
+                Write-Debug "inter-track: cannot read score ($($_.Exception.Message))"
+            }
+        }
+    }
 }

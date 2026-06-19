@@ -29,6 +29,18 @@ Thresholds detallados en skill `triple-verify`. Modos con keyword:
 > **Excepción válida**: Zona Verde (docs/images) NUNCA requiere verify.
 > **Bypass consciente**: `!fast` y `!draft` confían en criterio del usuario.
 
+### Workflow Shortcuts (según patrones de uso)
+Comandos rápidos para tareas recurrentes — extienden el sistema de modos:
+
+| Keyword | Acción | Dificultad |
+|---------|--------|------------|
+| **`!compress`** | Karpathy compression en skills >2.5KB + score auto-update | Fácil |
+| **`!score`** | `score-auto.ps1 -Json` + update PROJECT-SCORE.md + cross-ref | Fácil |
+| **`!sync`** | `pull-upstream.ps1 -Mode Check` → drift check → score update | Medio |
+| **`!health`** | Full diagnostics: git status, drift, cross-ref, score, inter-track | Fácil |
+| **`!batch`** | `scripts/batch.ps1` — nueva batch auto-incremental + bitácora + inter-track++ | Fácil |
+| **`!cycle`** | `inter-track.ps1 -Show` + score status — resumen del ciclo de auto-mejora actual | Fácil |
+
 ## Subagent-First
 Read-heavy (>3 files/scan/map) → delegate `explore`. Saves 2-5K tokens. Main context = synthesis/decisions.
 
@@ -84,7 +96,7 @@ Measure → metricas, auto-metrics · Optimize → karpathy-*, lean-context, cav
 Coordinate → delivery-harness, subagent-isolation, command-wrapper, chained-pr
 Commit → commit-crafter | Map → project-mapper | Secure → security-scanner
 Sync docs → doc-sync | Log → bitacora · Track/Decide → decision-capture, dreaming, skill-digestion
-Recover → recovery-protocol, immune-system, context-watchdog · Unknown → Pre-Flight: skill-creator, research, retry
+Improve → self-improvement · Recover → recovery-protocol, immune-system, context-watchdog · Unknown → Pre-Flight: skill-creator, research, retry
 ```
 Load order: 1) Anti-Pattern Catalog 2) Behavioral match 3) Trigger match 4) Default-FAIL 5) Mini-dream every 5th call
 

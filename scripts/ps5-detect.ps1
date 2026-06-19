@@ -37,7 +37,6 @@ foreach ($f in $FilePath) {
         }
         if ($bytes[$i] -eq 0x7C -and $bytes[$i+1] -eq 0x7C) {
             $hazards += "$f($([char]0x7C)$([char]0x7C))"
-            $hasOp = $true
             break
         }
     }

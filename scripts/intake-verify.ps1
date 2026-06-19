@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Project Intake Verification — 7 checks + 3-iteration cycle
 .DESCRIPTION

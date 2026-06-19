@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
   Downstream validation of CYCLE-3 skills: delivery-harness, chained-pr, subagent-isolation.
@@ -59,8 +59,6 @@ function Test-Section($path, $section) {
 $dhPath = Test-SkillFile "delivery-harness"
 $cpPath = Test-SkillFile "chained-pr"
 $siPath = Test-SkillFile "subagent-isolation"
-$wucPath = Test-SkillFile "work-unit-commits"
-$cwPath = Test-SkillFile "command-wrapper"
 
 if (-not $dhPath -or -not $cpPath) {
   Add-Result "Structure" "Core skills" "FAIL" "Missing delivery-harness or chained-pr SKILL.md"

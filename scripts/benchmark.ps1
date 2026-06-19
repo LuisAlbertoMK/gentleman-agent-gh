@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 
 <#
 .SYNOPSIS
@@ -146,7 +146,7 @@ if ($Gate) {
       if ($s.SkillsOver3kb -gt $p.SkillsOver3kb) { $regressions += "Skills >3KB increased ($($p.SkillsOver3kb)→$($s.SkillsOver3kb))" }
       if ($s.GlobalJunctionsOk -lt $p.GlobalJunctionsOk) { $regressions += "Global junctions decreased ($($p.GlobalJunctionsOk)→$($s.GlobalJunctionsOk))" }
     } catch {
-      # No previous snapshot — first run
+      Write-Debug "benchmark: no previous snapshot ($($_.Exception.Message))"
     }
   }
   if ($regressions.Count -gt 0) {

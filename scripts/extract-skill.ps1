@@ -50,8 +50,8 @@ if (-not (Test-Path -LiteralPath $learnPath)) {
 
 $content = Get-Content -LiteralPath $learnPath -Raw
 $allKeys = New-Object System.Collections.ArrayList
-$matches = [regex]::Matches($content, '- \*\*Pattern-Key\*\*: (\S+)')
-foreach ($m in $matches) {
+$matchResults = [regex]::Matches($content, '- \*\*Pattern-Key\*\*: (\S+)')
+foreach ($m in $matchResults) {
     $null = $allKeys.Add($m.Groups[1].Value)
 }
 

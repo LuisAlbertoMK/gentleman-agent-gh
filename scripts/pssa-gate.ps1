@@ -39,7 +39,7 @@ param(
     [ValidateSet('Check', 'Fix', 'Trend')]
     [string]$Mode = 'Check',
 
-    [string]$Path = (Resolve-Path "$PSScriptRoot/.."),
+    [string]$Path = (Get-Location).Path,
 
     [switch]$Quiet,
 

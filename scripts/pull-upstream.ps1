@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Pull-from-Upstream Workflow — detect, classify, and selectively apply upstream changes.
 .DESCRIPTION
@@ -86,7 +86,7 @@ if (-not (Test-GitRemote $Remote)) {
 Write-Host "Fetching $Remote/$Branch..."
 $savedEAP = $ErrorActionPreference
 $ErrorActionPreference = 'Continue'
-$fetchOutput = git fetch $Remote $Branch 2>&1
+git fetch $Remote $Branch 2>&1 | Out-Null
 $ErrorActionPreference = $savedEAP
 if ($LASTEXITCODE -ne 0) {
     Write-Warning "Fetch failed. Check remote URL and network."

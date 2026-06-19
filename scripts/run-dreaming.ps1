@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Run cross-session pattern extraction via Engram
 .DESCRIPTION
@@ -132,7 +132,6 @@ if ($Mode -in 'full','report') {
         }
     }
 
-    $patternCount = $learningCounts.Keys.Count
     $workflowCount = $workflowPatterns.Count
     if ($workflowCount -gt 0) {
         Write-Host "  Found $workflowCount recurring workflow pattern(s):"

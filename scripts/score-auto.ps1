@@ -194,7 +194,7 @@ foreach ($File in $SkillFiles) {
     }
     if ($Corrupted) { $CorruptedCount++ }
   } catch {
-    # Silencio intencional: fallo de lectura de bytes no crítico para el score
+    Write-Debug "score-auto: cannot read bytes ($($_.Exception.Message))"
   }
 }
 
@@ -284,6 +284,28 @@ Log-Dimension "Skill Effectiveness" $EffectScore 10 @{
   total_bytes    = $TotalBytes
 } "Skills: $TotalSkills, >3KB: $Over3KB, >5KB: $Over5KB, avg: ${AvgSkillKB}KB"
 
+# --- 11. Cycle Progress (inter(30)) ---
+$InterTrackPath = ".learnings\inter-track.json"
+$CycleScore = 0
+$InterCount = 0
+$InterTarget = 30
+if (Test-Path $InterTrackPath) {
+  try {
+    $InterData = Get-Content $InterTrackPath -Raw | ConvertFrom-Json
+    $InterCount = [int]$InterData.cycle.count
+    $InterTarget = [int]$InterData.cycle.target
+    # Score = (count / target) * 10, capped at 10
+    $CycleScore = [math]::Min(10, [math]::Round(($InterCount / $InterTarget) * 10, 1))
+  } catch {
+    $CycleScore = 0
+  }
+}
+
+Log-Dimension "Cycle Progress" $CycleScore 10 @{
+  inter_count  = $InterCount
+  inter_target = $InterTarget
+} "inter: $InterCount/$InterTarget"
+
 # --- Composite ---
 $AllScores = $ScoreLog.Values | ForEach-Object { $_.score }
 $FinalScore = [math]::Round(($AllScores | Measure-Object -Average).Average, 1)
@@ -292,7 +314,8 @@ $FinalScore = [math]::Round(($AllScores | Measure-Object -Average).Average, 1)
 $DimOrder = @(
   "Project Artifacts", "Security", "Dead Code", "Clean Code",
   "Best Practices", "Orthography", "Bitácora", "Metrics",
-  "Script Performance", "Skill Effectiveness"
+  "Script Performance", "Skill Effectiveness",
+  "Cycle Progress"
 )
 
 $Result = @{

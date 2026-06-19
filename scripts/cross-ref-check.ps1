@@ -19,8 +19,7 @@
 
 param(
     [string]$RepoRoot = (Split-Path $PSScriptRoot -Parent),
-    [switch]$Json,
-    [switch]$AutoFix
+    [switch]$Json
 )
 
 Set-StrictMode -Version Latest
