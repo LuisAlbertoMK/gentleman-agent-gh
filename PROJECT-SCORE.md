@@ -1,8 +1,8 @@
 # Project Score: gentleman-agent-gh
 
 **Current**: 9.4/10
-**Last updated**: 2026-06-19
-**Trend**: stable (Cycle Progress 3, Skills >3KB: 2→0, avg 1.9→1.8KB)
+**Last updated**: 2026-06-20
+**Trend**: up (Cycle Progress 3/10, inter 10/30, all 10 dims at 10)
 
 ## Dimensions
 
@@ -47,3 +47,4 @@
 | 2026-06-19 | 9.3   | =      | Invoke-Bash mandatory (AGENTS.md Bash-Safe), structured return contract for subagents (delivery-harness + subagent-isolation skills). All 6 weaknesses addressed. Score stable. |
 | 2026-06-19 | 9.4   | +0.1   | Restored .project.json (was sobrescrito con 6-dim 5/10 incorrecto). Ran score-auto.ps1 → 11 dims 9.4/10. Cycle Progress 2→3/10. |
 | 2026-06-19 | 9.4   | =      | Skills >3KB: 2→0 (comprimidos external-auditor -44%, sdd -59%). avg_size_kb 1.9→1.8. Cycle Progress inter 8→9/30. Branch structure: master + original. Score estable 9.4. |
+| 2026-06-20 | 9.4   | =      | Sync .project.json con score real 9.4 (11 dims). experiments/ ya limpio (no existe). Skills >3KB: 0. Health checks: OK. Todos los gaps previos resueltos. |

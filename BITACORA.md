@@ -2,6 +2,7 @@
 2026-06-19 - Session close
 2026-06-19 - Session close
 2026-06-19 - Session close
+2026-06-19 - Session close
 2026-06-19 - Session: 4 batches de mejoras - 6 debilidades cubiertas, 3 commits, score 9.3
 2026-06-18 - Batch 7: Workflow shortcuts (5 keywords), batch.ps1 helper, cycle improvements
 # BITÁCORA
@@ -47,3 +48,4 @@
 2026-06-19 — Restored .project.json (was overwritten with 6-dim 5/10). Score back to 9.4/10. Cycle Progress 2→3/10. Committed working tree + PROJECT-SCORE.md + BITACORA.md.
 2026-06-19 — Guardrail pre-commit [6/7]: .project.json integrity (11 dims + score.current ≥5). Anti-pattern #17. external-auditor completado (2 gaps >1.5 corregidos). Stash viejo dropped. Commit 68fc4cf.
 2026-06-19 — Upstream PR branch en fork. external-auditor -44%, sdd -59%. LATEST_error.json → .gitignore + guardrail. 5 commits. inter: 9/30.
+

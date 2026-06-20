@@ -150,7 +150,7 @@ if ($Json) {
 }
 
 # ---- Agent definitions sync ----
-function Sync-AgentDefinitions {
+function Sync-AgentDefinition {
   <#
     .SYNOPSIS
       Sync gentleman-* agent definitions from project opencode.json to global config.
@@ -210,5 +210,5 @@ function Sync-AgentDefinitions {
 
 # Execute agent sync if requested
 if ($SyncAgents) {
-  Sync-AgentDefinitions
+  Sync-AgentDefinition
 }

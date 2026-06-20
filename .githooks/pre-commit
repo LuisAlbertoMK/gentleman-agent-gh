@@ -138,7 +138,7 @@ STAGED_PROJECT_JSON=$(git diff --cached --name-only --diff-filter=ACM | grep '\.
 if [ -n "$STAGED_PROJECT_JSON" ]; then
   POWERSHELL_OUT=$(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
     \$json = Get-Content '$REPO_ROOT/.project.json' -Raw -Encoding UTF8 | ConvertFrom-Json
-    \$dims = \$json.dimensions_detail.PSObject.Properties.Name.Count
+    \$dims = \$json.score.dimensions.PSObject.Properties.Name.Count
     \$current = \$json.score.current
     if (\$dims -ne 11) { Write-Output \"FAIL: Expected 11 dimensions, found \$dims\" }
     if (\$current -eq \$null -or \$current -lt 5) { Write-Output \"FAIL: score.current missing or < 5\" }
