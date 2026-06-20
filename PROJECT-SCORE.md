@@ -2,7 +2,7 @@
 
 **Current**: 9.5/10
 **Last updated**: 2026-06-20
-**Trend**: up (Cycle Progress 4/10, inter 12/30, all 10 dims at 10)
+**Trend**: up (Cycle Progress 5/10, inter 14/30, all 10 dims at 10)
 
 ## Dimensions
 
@@ -18,7 +18,7 @@
 | Metrics               | 10.0  |
 | Script Performance    | 10.0  |
 | Skill Effectiveness   | 10.0  |
-| Cycle Progress        | 3.0  |
+| Cycle Progress        | 5.0  |
 
 ## Changelog
 
@@ -49,3 +49,4 @@
 | 2026-06-19 | 9.4   | =      | Skills >3KB: 2→0 (comprimidos external-auditor -44%, sdd -59%). avg_size_kb 1.9→1.8. Cycle Progress inter 8→9/30. Branch structure: master + original. Score estable 9.4. |
 | 2026-06-20 | 9.4   | =      | Sync .project.json con score real 9.4 (11 dims). experiments/ ya limpio (no existe). Skills >3KB: 0. Health checks: OK. Todos los gaps previos resueltos. |
 | 2026-06-20 | 9.5   | +0.1   | review-rules.jsonc (trigger-rules declarativo, gentle-ai v1.41). PSSA 0 violations. Cycle Progress 3→4/10, inter 12/30. Score 9.4→9.5. |
+| 2026-06-20 | 9.5   | =      | Cross-ref review-rules check [7/7] + .project.json sync. Cycle Progress 4→5/10, inter 14/30, 5 commits pushed. |
