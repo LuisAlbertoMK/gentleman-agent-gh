@@ -6,32 +6,36 @@
 
 ## Objective
 
-**Cycle 3**: Integrar external-auditor, validar ciclo de auto-mejora, mantener score 10.0:
+**Cycle 3**: Integrar external-auditor, validar ciclo de auto-mejora, mantener score ≥9.4 con Cycle Progress → 10:
 - ✅ Restaurar `.project.json` post-corrupción por auto-metrics (checkpoint safety/cycle2-state-*)
 - ✅ Punto de seguridad creado: tag `checkpoint/cycle2-done-bd39c66`, branch `safety/cycle2-state-*`
 - ✅ external-auditor skill disponible global + local SKILL.md
 - ✅ Commit cambios pendientes: AGENTS.md (router + auto-audit trigger), ANTI-PATTERN-CATALOG.md (#15), SKILLS-INDEX.md
 - ✅ Ejecutar external-auditor en primera tarea compleja — restaurar .project.json + guardrail + commit. Encontró 2 gaps >1.5 (ErrPrev 6vs9, Breadth 5vs9). Immunize: anti-pattern #17 + guardrail pre-commit
 - ✅ Verificar ciclo `self-improvement`: diagnose(score 5→9.4) → fix(restore + guardrail) → verify(external-auditor) → learn(anti-pattern #17) → propagate(committed)
-- 🔲 Mantener score ≥9.4 — ninguna dim por debajo de 3.0
+- ✅ Profile-scoped JD agents (review-rules.jsonc + judgment-day v2.1)
+- 🔲 inter(30) — actual: 16/30
+- 🔲 Mantener score ≥9.4 — empujar Cycle Progress 5→10
 
 ## Metrics
 
 | Metric | Target | Tracked By |
 |--------|--------|------------|
 | inter(30) | ≥30 meaningful interactions | `scripts/inter-track.ps1` |
-| Score delta | maintain ≥10.0, no dim below 9.9 | `scripts/score-auto.ps1` |
+| Score delta | maintain ≥9.4, Cycle Progress → 10 | `scripts/score-auto.ps1` |
 | External-auditor activations | ≥1 en tarea compleja | bitácora + ANTI-PATTERN-CATALOG |
+| Profile-scoped JD | activated on next high-risk review | review-rules.jsonc jd_profiles |
 | Working tree hygiene | 0 cambios sin commit al cerrar ciclo | `git status --short` |
 | Cross-ref | 0 errors | `scripts/cross-ref-check.ps1` |
 
 ## Dimensions to Improve
 
-All 11 dims at 10.0. Focus:
-- **Audit**: activar external-auditor post-task — validar que estoy calibrado
-- **Process**: ciclo de mejora completo y reproducible (phase 0→5)
+10 dims at 10.0, Cycle Progress at 5/10. Focus:
+- **Cycle Progress** (5→10): avanzar inter(30) con mejoras reales por iteración
+- **Audit**: activar external-auditor post-task — validar calibración
+- **Process**: ciclo de mejora completo y reproducible
 - **Hygiene**: mantener working tree limpio, commits atómicos
-- **Score**: defender el 10.0 — si external-auditor gap >1.5, immune-system
+- **Score**: mantener ≥9.4, avanzar Cycle Progress
 
 ## Difficulty → Triple-Verify Mapping
 
