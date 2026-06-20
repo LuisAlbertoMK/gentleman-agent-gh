@@ -4,31 +4,23 @@ description: "Audit and improve skills — preserve author intent, fix frontmatt
 triggers: "Skill improvement, audit skills, refactor skills"
 license: Apache-2.0
 metadata:
-  tags:
-    - engineering
+  tags: [engineering]
   author: gentleman-vMK
   version: "1.0"
 ---
-
-Trigger: "improve skills", "audit skills", "refactor skills".
-## HARD RULES- Preserve author intent, critical rules, activation semantics, output contract- Default to audit-only — modify only when explicitly asked- Never delete meaningful content; move long explanations to `references/` or `assets/`- Don't invent triggers, policies, or domain rules — mark ambiguous for human review
-## DECISION GATES| Situation | Action ||---|---|| Missing/invalid frontmatter | Fix name, description, license, metadata || Reads like tutorial | Convert to runtime instructions, move background to `references/` || Body exceeds budget | Preserve rules, move examples to supporting files || Branching logic in prose | Convert to compact decision table || Rules conflict/unclear | Report — don't rewrite automatically |
-## Usage Tracking (skill deprecation)Track which skills are actively used vs stale. Run on audit.1. `mem_search(query="skill load|skill tool|Skill:", limit=50)` — find skill load events2. Cross-reference: skills loaded in last 30 days vs skills NOT loaded3. For untouched skills (90d+): flag as possibly deprecated4. Report format:
-```
-## Skill Usage Report: {date}
-### Active (loaded ≤30d ago)- skill-name — last used: {date}, {context}
-### Rarely used (loaded 30-90d ago)- skill-name — last used: {date}
-### Possibly deprecated (no load in 90d+)- skill-name — created: {date}, never loaded
-```5. Action: review deprecated → archive or merge into _shared/
-## STEPS1. Read all `*/SKILL.md` files2. Audit per skill: metadata, trigger clarity, section order, body budget, actionability, decision gates, output contract3. Check usage tracking → flag deprecated skills4. Return audit report grouped by skill with severity5. In apply mode: edit safe issues, create supporting files, preserve content
-## EXAMPLE AUDIT
-```markdown
-## skill-digestion (17 lines)
-- [WARN] Body <30 lines → expand with examples
-- Action: add references/
-```
-## RULES SUMMARY
-- Audit-only default, modify only when asked
-- Never delete meaningful content → move to references/
-- Don't invent triggers or policies
-- Convert tutorial prose to decision tables
+## HARD RULES
+Preserve author intent · critical rules · activation semantics · output contract | Default: audit-only — modify only when asked | Never delete content → move to `references/` | Don't invent triggers/policies/domain rules — mark ambiguous for human
+## DECISION GATES
+Missing/invalid frontmatter → Fix it | Reads like tutorial → runtime rules, background→`references/` | Body over budget → preserve rules, move examples | Branching prose → decision table | Rules conflict → report, don't rewrite
+## USAGE TRACKING (on audit)
+1. `mem_search(query="skill load|skill tool|Skill:", limit=50)`
+2. Cross-ref: loaded ≤30d vs NOT loaded
+3. 90d+ untouched → flag deprecated
+4. Report: Active (≤30d) · Rare (30-90d) · Possibly deprecated (90d+)
+5. Deprecated → archive or merge into `_shared/`
+## STEPS
+1. Read all `*/SKILL.md` files
+2. Audit per skill: metadata, trigger clarity, section order, body budget, actionability, decision gates, output contract
+3. Check usage tracking → flag deprecated
+4. Return audit report grouped by skill with severity
+5. Apply mode: edit safe issues, create supporting files, preserve content
