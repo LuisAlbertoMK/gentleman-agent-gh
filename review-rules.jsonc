@@ -114,6 +114,37 @@
     "E3": { "label": "Build/Runtime", "description": "Build, dry-run, schema — compiles OK" }
   },
 
+  // --- JD Profiles (profile-scoped judgment-day) ---
+  // Each profile adds a specialized lens to the 4R review.
+  // profile_selector maps change context → [judgeA_profile, judgeB_profile].
+  "jd_profiles": {
+    "architect": {
+      "description": "Structure, coupling, cohesion, patterns, tech debt",
+      "instructions": "Focus on: architectural boundaries, dependency direction, module coupling, pattern consistency, separation of concerns, API design, and tech debt introduction."
+    },
+    "security": {
+      "description": "OWASP, input validation, auth, secrets, injection",
+      "instructions": "Focus on: input validation at trust boundaries, authentication/authorization, secrets handling, injection (SQL/XSS/command), path traversal, dependency vulnerabilities, and secure defaults."
+    },
+    "reliability": {
+      "description": "Error handling, retries, timeouts, data integrity",
+      "instructions": "Focus on: error handling paths, retry logic, timeout configuration, data integrity, idempotency, race conditions, graceful degradation, and recovery mechanisms."
+    },
+    "performance": {
+      "description": "N+1, caching, bundle size, memory leaks",
+      "instructions": "Focus on: N+1 queries, caching strategy, bundle size impact, memory leaks, unnecessary re-renders, blocking operations, and resource cleanup."
+    }
+  },
+  "jd_profile_selector": {
+    "default": ["architect", "security"],
+    "*.ps1": ["security", "reliability"],
+    "*.go": ["architect", "security"],
+    "*.md": ["architect", "reliability"],
+    ".agents/skills/*": ["architect", "reliability"],
+    ".githooks/*": ["reliability", "security"],
+    "review-rules.jsonc": ["architect", "security"]
+  },
+
   // --- Workflow mode overrides ---
   "modes": {
     "!ship":    { "verify": "full",  "quality_gate": true,  "commit": true, "push": true  },
