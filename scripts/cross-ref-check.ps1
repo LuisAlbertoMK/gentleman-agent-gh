@@ -41,13 +41,13 @@ if (-not (Test-Path $canonicalDir)) {
 
 Write-Host "=== Cross-Ref Check: $RepoRoot ===" -ForegroundColor Cyan
 
-# --- [1/7] ANTI-PATTERN-CATALOG ---
-Write-Host "`n[1/7] ANTI-PATTERN-CATALOG..." -NoNewline
+# --- [1/8] ANTI-PATTERN-CATALOG ---
+Write-Host "`n[1/8] ANTI-PATTERN-CATALOG..." -NoNewline
 $apc = Test-Path (Join-Path -Path $RepoRoot -ChildPath "ANTI-PATTERN-CATALOG.md")
 if ($apc) { Write-Host " OK" } else { $errors += "ANTI-PATTERN-CATALOG.md not found at repo root"; Write-Host " FAIL" }
 
-# --- [2/7] All skills have SKILL.md ---
-Write-Host "[2/7] SKILL.md files..." -NoNewline
+# --- [2/8] All skills have SKILL.md ---
+Write-Host "[2/8] SKILL.md files..." -NoNewline
 $missingSkillMd = @()
 try {
     $skillDirs = Get-ChildItem (Join-Path -Path $canonicalDir -ChildPath "*") -Directory
@@ -63,8 +63,8 @@ $skillDirs | ForEach-Object {
 }
 if ($missingSkillMd.Count -eq 0) { Write-Host " OK (all have SKILL.md)" } else { $warnings += "Skills missing SKILL.md: $($missingSkillMd -join ', ')"; Write-Host " WARN" }
 
-# --- [3/7] SKILLS-INDEX count matches canonical ---
-Write-Host "[3/7] SKILLS-INDEX count..." -NoNewline
+# --- [3/8] SKILLS-INDEX count matches canonical ---
+Write-Host "[3/8] SKILLS-INDEX count..." -NoNewline
 $actualCount = ($skillDirs | Where-Object { $_.Name -ne '_shared' }).Count
 $headerLine = Select-String -Path (Join-Path -Path $RepoRoot -ChildPath "SKILLS-INDEX.md") -Pattern "all \d+ skills"
 if ($headerLine -match "all (\d+) skills") {
@@ -72,8 +72,8 @@ if ($headerLine -match "all (\d+) skills") {
     if ($declared -eq $actualCount) { Write-Host " OK ($actualCount)" } else { $errors += "SKILLS-INDEX says $declared but canonical has $actualCount"; Write-Host " FAIL (says $declared, actual $actualCount)" }
 } else { $warnings += "SKILLS-INDEX header format unexpected"; Write-Host " WARN" }
 
-# --- [4/7] Global junctions exist for each skill ---
-Write-Host "[4/7] Global junctions..." -NoNewline
+# --- [4/8] Global junctions exist for each skill ---
+Write-Host "[4/8] Global junctions..." -NoNewline
 $missingGlobal = @()
 if (Test-Path $globalDir) {
     Get-ChildItem $canonicalDir -Directory | Where-Object { $_.Name -ne '_shared' } | ForEach-Object {
@@ -84,8 +84,8 @@ if (Test-Path $globalDir) {
 }
 if ($missingGlobal.Count -eq 0) { Write-Host " OK (all in global)" } else { $warnings += "Missing global junctions: $($missingGlobal -join ', ')"; Write-Host " WARN" }
 
-# --- [5/7] _shared references resolve ---
-Write-Host "[5/7] _shared refs..." -NoNewline
+# --- [5/8] _shared references resolve ---
+Write-Host "[5/8] _shared refs..." -NoNewline
 $sharedFiles = @{
     'skill-resolver.md' = Test-Path (Join-Path -Path $canonicalDir -ChildPath "_shared\skill-resolver.md")
     'sdd-phase-common.md' = Test-Path (Join-Path -Path $canonicalDir -ChildPath "sdd\references\sdd-phase-common.md")
@@ -95,8 +95,8 @@ $sharedFiles = @{
 $missingShared = @($sharedFiles.GetEnumerator() | Where-Object { -not $_.Value } | ForEach-Object { $_.Key })
 if ($missingShared.Count -eq 0) { Write-Host " OK" } else { $errors += "Missing _shared files: $($missingShared -join ', ')"; Write-Host " FAIL" }
 
-# --- [6/7] Cross-Refs in skills point to real skills ---
-Write-Host "[6/7] Cross-refs to real skills..." -NoNewline
+# --- [6/8] Cross-Refs in skills point to real skills ---
+Write-Host "[6/8] Cross-refs to real skills..." -NoNewline
 $brokenRefs = @()
 $allSkillNames = ($skillDirs | Where-Object { $_.Name -ne '_shared' } | ForEach-Object { $_.Name.ToLower() })
 $refPattern = 'Cross-Refs:\s*(.+)'
@@ -130,8 +130,30 @@ Get-ChildItem $canonicalDir -Directory | Where-Object { $_.Name -ne '_shared' } 
 }
 if ($brokenRefs.Count -eq 0) { Write-Host " OK" } else { $errors += $brokenRefs; Write-Host " FAIL ($($brokenRefs.Count) broken)" }
 
-# --- [7/7] review-rules.jsonc integrity ---
-Write-Host "[7/7] review-rules.jsonc..." -NoNewline
+# --- [7/8] config_refs in skill metadata point to real files ---
+Write-Host "[7/8] config_refs to real files..." -NoNewline
+$missingConfig = @()
+$configRefPattern = 'config_refs:\s*(.+)'
+Get-ChildItem $canonicalDir -Directory | Where-Object { $_.Name -ne '_shared' } | ForEach-Object {
+    $skillName = $_.Name
+    $mdPath = Join-Path -Path $_.FullName -ChildPath "SKILL.md"
+    if (-not (Test-Path $mdPath)) { return }
+    $content = Get-Content $mdPath -Raw -Encoding UTF8
+    if (-not $content) { return }
+    if ($content -match $configRefPattern) {
+        $refs = $Matches[1] -split '\s*[\|,]\s*' | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' }
+        foreach ($ref in $refs) {
+            $refPath = Join-Path $RepoRoot $ref
+            if (-not (Test-Path $refPath)) {
+                $missingConfig += "$skillName config_refs '$ref' not found at $refPath"
+            }
+        }
+    }
+}
+if ($missingConfig.Count -eq 0) { Write-Host " OK" } else { $errors += $missingConfig; Write-Host " FAIL ($($missingConfig.Count) missing)" }
+
+# --- [8/8] review-rules.jsonc integrity ---
+Write-Host "[8/8] review-rules.jsonc..." -NoNewline
 $rulesPath = Join-Path $RepoRoot "review-rules.jsonc"
 if (Test-Path $rulesPath) {
     try {
