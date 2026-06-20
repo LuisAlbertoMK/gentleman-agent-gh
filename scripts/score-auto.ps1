@@ -2,7 +2,7 @@
 
 <#
 .SYNOPSIS
-  Compute project score from fresh repo state — zero memory required.
+  Compute project score from fresh repo state -- zero memory required.
 
 .DESCRIPTION
   Measures 10 dimensions objectively using only repo artifacts.
@@ -81,7 +81,7 @@ $WeakCrypto = Select-String -Path ".\scripts\*.ps1" -Pattern "MD5|SHA1\b" -Simpl
 }
 if ($WeakCrypto) { $WeakCryptoFound = $true; $SecurityScore -= 2 }
 
-# Secrets in skills (crude scan — key=value patterns)
+# Secrets in skills (crude scan -- key=value patterns)
 $Secrets = Select-String -Path ".\.agents\skills\*\SKILL.md" -Pattern "(?i)(api[_-]?key|secret|password|token|credential)\s*[=:]\s*['""][^'""]{8,}"
 if ($Secrets) { $SecretsFound = $true; $SecurityScore -= 3 }
 
@@ -141,7 +141,7 @@ $WithStrict = 0
 foreach ($Script in $Scripts) {
   $Content = Get-Content $Script.FullName -Raw
   if ($Content -match '<#') { $WithHelp++ }
-  # param( without line-start anchor — some scripts indent differently
+  # param( without line-start anchor -- some scripts indent differently
   if ($Content -match 'param\(') { $WithParams++ }
   if ($Content -match 'Set-StrictMode') { $WithStrict++ }
 }
@@ -181,11 +181,11 @@ foreach ($File in $SkillFiles) {
     $Bytes = [System.IO.File]::ReadAllBytes($File.FullName)
     $Corrupted = $false
     for ($i = 0; $i -lt $Bytes.Length - 3; $i++) {
-      # Pattern A: Ã (0xC3 0x83) + 0x80-0xBF = corrupted accented chars (áéíóúñ)
+      # Pattern A: ? (0xC3 0x83) + 0x80-0xBF = corrupted accented chars (aeioun)
       if ($Bytes[$i] -eq 0xC3 -and $Bytes[$i+1] -eq 0x83 -and $Bytes[$i+2] -ge 0x80) {
         $Corrupted = $true; break
       }
-      # Pattern B: â (0xC3 0xA2) + E2 80/82 = corrupted symbols (arrows, em dashes, box drawing)
+      # Pattern B: ? (0xC3 0xA2) + E2 80/82 = corrupted symbols (arrows, em dashes, box drawing)
       if ($Bytes[$i] -eq 0xC3 -and $Bytes[$i+1] -eq 0xA2 -and $i + 3 -lt $Bytes.Length) {
         if ($Bytes[$i+2] -eq 0xE2 -and ($Bytes[$i+3] -eq 0x80 -or $Bytes[$i+3] -eq 0x82)) {
           $Corrupted = $true; break
