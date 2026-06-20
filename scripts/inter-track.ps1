@@ -2,7 +2,7 @@
 
 <#
 .SYNOPSIS
-  Track inter(30) — meaningful interactions per improvement cycle.
+  Track inter(30) -- meaningful interactions per improvement cycle.
   Each "inter" = one fix+verify+log cycle (not trivial changes).
 
 .DESCRIPTION
@@ -83,7 +83,7 @@ if ($Increment) {
     if (-not $Quiet) {
         $remaining = [int]$data.cycle.target - [int]$data.cycle.count
         if ($remaining -le 0) {
-            Write-Host "[inter-track] ✅ Target met: $($data.cycle.count)/$($data.cycle.target)" -ForegroundColor Green
+            Write-Host "[inter-track] [OK] Target met: $($data.cycle.count)/$($data.cycle.target)" -ForegroundColor Green
         } else {
             Write-Host "[inter-track] inter: $($data.cycle.count)/$($data.cycle.target) ($remaining remaining)" -ForegroundColor Yellow
         }
