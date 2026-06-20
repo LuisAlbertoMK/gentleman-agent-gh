@@ -1,4 +1,5 @@
-﻿2026-06-20 - Cycle 4 start: restore score 10.0, compress 6 skills (−26.5%), skip-worktree guardrail
+﻿2026-06-20 - Cycle 4 progress 5/10: upstream MODIFIED review (4 KEEP/1 MERGE), PSSA info=0 real, concepts doc, cross-ref 8/8
+2026-06-20 - Cycle 4 start: restore score 10.0, compress 6 skills (−26.5%), skip-worktree guardrail
 2026-06-19 - Session close
 2026-06-19 — Cycle 3 SUCCESS: score 10.0/10, inter 31/30, 11 dims at 10, 14 commits.
 - Profile-scoped JD agents (4 profiles, 21 selectors) + review-rules.jsonc v2

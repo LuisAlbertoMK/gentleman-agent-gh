@@ -15,18 +15,18 @@
 4. **Skill hygiene** -- 0 skills >3KB, avg <2.0KB, Karpathy compression standard.
 
 ### Backlog (sorted by impact/risk)
-| Item | Impact | Risk | I/R | Est. inter |
-|------|--------|------|-----|------------|
-| Activar profile-scoped JD en review real | High | Medium | 2.0 | 3-5 |
-| Evaluar upstream features (backup/planner) | High | Low | 2.0 | 2-3 |
-| Comprimir skills >2.5KB restantes | Medium | Low | 1.5 | 1-2 |
-| PSSA violations: 453 info-level (review/accept) | Low | Low | 1.0 | 1-2 |
-| Skill cross-ref completeness audit | Medium | Low | 1.0 | 1 |
+| Item | Impact | Risk | I/R | Est. inter | Status |
+|------|--------|------|-----|------------|--------|
+| Activar profile-scoped JD en review real | High | Medium | 2.0 | 3-5 | ⏳ Pending (needs real review) |
+| Evaluar upstream features (backup/planner) | High | Low | 2.0 | 2-3 | ✅ Done — Go-only, concepts extracted |
+| Comprimir skills >2.5KB restantes | Medium | Low | 1.5 | 1-2 | ✅ Done — 0 skills >2.5KB |
+| PSSA violations: 453 info-level (review/accept) | Low | Low | 1.0 | 1-2 | ✅ Done — 0 real info violations |
+| Skill cross-ref completeness audit | Medium | Low | 1.0 | 1 | ✅ Done — 8/8 PASS |
 
 ### Progress
 - Score: 10.0/10 (baseline)
-- inter: 33/30
-- Cycle Progress: 3/10
+- inter: 34/30
+- Cycle Progress: 5/10
 
 ## Metrics
 
