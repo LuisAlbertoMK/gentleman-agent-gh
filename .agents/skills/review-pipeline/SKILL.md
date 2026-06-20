@@ -27,7 +27,10 @@ Skill stacking pipeline: **quality-gate → 4R code review → commit craft**. E
 [Phase 0: Load Engram profile] → [Phase 1: quality-gate] ─fail→ STOP
                                        │ pass
                                        ▼
-                                  [Phase 2: 4R review] ─fail→ STOP
+                                  [Phase 2a: Zone check]
+                                  ├── ROJA ──→ [Phase 2b: JD dual review] ─fail→ STOP
+                                  ├── AMARILLA → [Phase 2c: 4R review]
+                                  └── VERDE ──→ skip review
                                        │ pass (all ≥6)
                                        ▼
                                   [Phase 3: commit craft] → ✅ message
@@ -36,7 +39,9 @@ Skill stacking pipeline: **quality-gate → 4R code review → commit craft**. E
 ## Phase Details → `references/phase-details.md`
 - P0: Load `mem_search("review-profile/{project}")` — trend awareness + focus R
 - P1: quality-gate — tests + secrets + PSSA. Gate **authority**: ALWAYS blocks.
-- P2: 4R code-review — ≥6 pass, 4-5 overrideable, <4 BLOCKED. Save profile after.
+- P2a: Zone check — match changed files vs `review-rules.jsonc zones`. ROJA→JD, AMARILLA→4R, VERDE→skip.
+- P2b: JD dual review (ROJA) — load `judgment-day` orchestrator, 2 profile-scoped `code-review-agent` instances.
+- P2c: 4R code-review (AMARILLA) — ≥6 pass, 4-5 overrideable, <4 BLOCKED. Save profile after.
 - P3: commit-crafter — scope injected from 4R findings (`fix`/`refactor` by R).
 
 ## Output → `references/output-format.md`

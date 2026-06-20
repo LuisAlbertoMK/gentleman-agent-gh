@@ -158,13 +158,13 @@ $rulesPath = Join-Path $RepoRoot "review-rules.jsonc"
 if (Test-Path $rulesPath) {
     try {
         $raw = Get-Content $rulesPath -Raw -Encoding UTF8
-        $stripped = $raw -replace '(?m)^\s*//.*$','' -replace '(?m)\s*//[^"\n]*$',''
+        $stripped = $raw -replace '(?m)^\s*//.*$','' -replace '(?m)\s*//[^"\n]*$','' -replace '(?s)/\*.*?\*/',''
         $parsed = $stripped | ConvertFrom-Json
         $zoneCount = $parsed.zones.PSObject.Properties.Name.Count
         $ctxCount = $parsed.context_zones.PSObject.Properties.Name.Count
         $modeCount = $parsed.modes.PSObject.Properties.Name.Count
         $profCount = $parsed.jd_profiles.PSObject.Properties.Name.Count
-        $selCount = $parsed.jd_profile_selector.PSObject.Properties.Name.Count
+        $selCount = $parsed.jd_profile_selector.Count
         $issues = @()
         if ($zoneCount -ne 3) { $issues += "Expected 3 zones, found $zoneCount" }
         if ($ctxCount -ne 4) { $issues += "Expected 4 context zones, found $ctxCount" }

@@ -135,29 +135,32 @@
       "instructions": "Focus on: N+1 queries, caching strategy, bundle size impact, memory leaks, unnecessary re-renders, blocking operations, and resource cleanup."
     }
   },
-  "jd_profile_selector": {
-    "default": ["architect", "security"],
-    "*.ps1": ["security", "reliability"],
-    "*.go": ["architect", "security"],
-    "*.md": ["architect", "reliability"],
-    ".agents/skills/*": ["architect", "reliability"],
-    ".githooks/*": ["reliability", "security"],
-    "review-rules.jsonc": ["architect", "security"],
-    "*.json": ["architect", "performance"],
-    "*.jsonc": ["architect", "performance"],
-    "*.yaml": ["reliability", "security"],
-    "*.yml": ["reliability", "security"],
-    "*.js": ["performance", "security"],
-    "*.ts": ["performance", "security"],
-    "*.jsx": ["performance", "architect"],
-    "*.tsx": ["performance", "architect"],
-    "*.css": ["performance", "reliability"],
-    "*.scss": ["performance", "reliability"],
-    "*.html": ["performance", "security"],
-    "Dockerfile*": ["security", "reliability"],
-    "Makefile": ["reliability", "architect"],
-    "*.sql": ["security", "reliability"]
-  },
+  "jd_profile_selector": [
+    // Full-path rules (most specific — evaluated first)
+    { "pattern": ".agents/skills/*",      "profiles": ["architect", "reliability"], "match": "path" },
+    { "pattern": ".githooks/*",           "profiles": ["reliability", "security"],  "match": "path" },
+    { "pattern": "review-rules.jsonc",    "profiles": ["architect", "security"],   "match": "basename" },
+    // Glob rules (alphabetical for determinism)
+    { "pattern": "*.css",                 "profiles": ["performance", "reliability"], "match": "basename" },
+    { "pattern": "Dockerfile*",           "profiles": ["security", "reliability"],  "match": "basename" },
+    { "pattern": "*.go",                  "profiles": ["architect", "security"],    "match": "basename" },
+    { "pattern": "*.html",                "profiles": ["performance", "security"],  "match": "basename" },
+    { "pattern": "*.js",                  "profiles": ["performance", "security"],  "match": "basename" },
+    { "pattern": "*.json",                "profiles": ["architect", "performance"], "match": "basename" },
+    { "pattern": "*.jsonc",               "profiles": ["architect", "performance"], "match": "basename" },
+    { "pattern": "*.jsx",                 "profiles": ["performance", "architect"], "match": "basename" },
+    { "pattern": "Makefile",              "profiles": ["reliability", "architect"],  "match": "basename" },
+    { "pattern": "*.md",                  "profiles": ["architect", "reliability"],  "match": "basename" },
+    { "pattern": "*.ps1",                 "profiles": ["security", "reliability"],   "match": "basename" },
+    { "pattern": "*.scss",                "profiles": ["performance", "reliability"],"match": "basename" },
+    { "pattern": "*.sql",                 "profiles": ["security", "reliability"],   "match": "basename" },
+    { "pattern": "*.ts",                  "profiles": ["performance", "security"],   "match": "basename" },
+    { "pattern": "*.tsx",                 "profiles": ["performance", "architect"],  "match": "basename" },
+    { "pattern": "*.yaml",                "profiles": ["reliability", "security"],   "match": "basename" },
+    { "pattern": "*.yml",                 "profiles": ["reliability", "security"],   "match": "basename" },
+    // Default (last — catch-all)
+    { "pattern": "default",               "profiles": ["architect", "security"],    "match": "fallback" }
+  ],
 
   // --- Workflow mode overrides ---
   "modes": {

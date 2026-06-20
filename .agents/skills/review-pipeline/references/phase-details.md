@@ -15,8 +15,21 @@ Load `quality-gate` skill. Tests MUST pass. Secrets scan MUST be clean. PSSA gat
 
 **Output to Phase 2**: `GATE_RESULT=pass` + test evidence.
 
-## Phase 2 — 4R Code Review
-Load `code-review-agent` (+ `judgment-day` for high-risk). Score by 4R.
+## Phase 2a — Zone Check
+Before reviewing, determine the zone for changed files via `review-rules.jsonc → zones`:
+- **ROJA** (high-risk: src/, scripts/, *.ps1, *.go, etc.) → Phase 2b — JD dual review
+- **AMARILLA** (medium-risk: *.css, *.json, *.ts, etc.) → Phase 2c — single 4R review
+- **VERDE** (low-risk: *.md, *.txt, images) → skip review, go to Phase 3
+
+Zone is determined by first pattern match against each changed file path.
+
+## Phase 2b — JD Dual Review (ROJA only)
+Load `judgment-day` orchestrator. It resolves 2 profiles via `jd_profile_selector` (ordered array), launches 2 parallel `code-review-agent` instances with different profile lenses, then synthesizes verdicts. See `judgment-day/SKILL.md` for protocol details.
+
+**Output to Phase 3**: `JD_PASSED=true` + confirmed findings + calibration result.
+
+## Phase 2c — 4R Code Review (AMARILLA)
+Load `code-review-agent`. Score by 4R.
 
 **Decision**:
 - All 4R ≥ 6 → PASS → Phase 3

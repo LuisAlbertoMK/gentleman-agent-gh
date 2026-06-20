@@ -1,25 +1,27 @@
 ---
 name: judgment-day
-description: "Dual adversarial 4R review - 2 blind judges (Risk/Readability/Reliability/Resilience), verdict synthesis, fix/re-judge loops"
-triggers: "Judgment day, dual review, juzgar"
+description: "Dual adversarial review orchestrator — 2 profile-scoped code-review-agent instances, verdict synthesis"
+triggers: "Judgment day, JD, dual review, juzgar, adversarial review"
 license: Apache-2.0
 metadata:
-  tags: [engineering, review, gentle-ai]
+  tags: [engineering, review, orchestrator]
   author: gentleman-vMK
-  version: "2.3"
-  changelog: "2.2->2.3: Audit gaps: JSONC parse, profile validation, fallback, distinct check"
+  version: "3.0"
+  changelog: "2.3->3.0: Hybrid orchestrator — delegates 4R to code-review-agent, zone pre-filter, array selector"
   config_refs: review-rules.jsonc
+  dependencies: [code-review-agent]
 ---
 ## Protocol
-### P0: Resolve Skills + Profile
-Load review-rules.jsonc; parse JSONC (strip // /* */ -> JSON.parse). Match file basename vs jd_profile_selector keys (glob, first match). Fallback: ["architect","security"]. Validate profile exists in jd_profiles -> if not, use "architect". If both profiles identical -> [profile,"security"]. Inject: "## Profile Focus\n{profile.instructions}".
-### P1: Parallel Blind 4R Review (Profile-Scoped)
-2 delegates (async, parallel) -- same target, DIFFERENT profiles, NO cross-contamination.
-### P2-P5: Verdict -> Fix -> Re-judge -> Converge
-Both clean -> APPROVED. Both flag same -> Confirmed. One flags -> Triage. Fix -> Re-launch (max2).
-### P6: Calibration: If FIX/BLOCKER, external-auditor on final diff. Gap >1.5 -> immune-system.
-## Sub-Agent Prompts
-### Judge (4R + Profile): 4R + profile lens. LEAD: "## Profile Focus\n{profile.instructions}". Severity: CRITICAL|WARNING(real)|WARNING(theoretical)|SUGGESTION. Clean -> "VERDICT:CLEAN"
-### Fix Agent: [4R-{R}] prefix. Apply ONLY confirmed. Same pattern -> ALL.
-## Output: JD-{target} | R{N} | 4R: Risk:X Readability:X Reliability:X Resilience:X | Confirmed:N | Fixes: [file:line] | A:B: status | JDGMNT: APPROVED/ESCALATED | CALIB: OK/GAP-{dim}:{delta}
-## Blocking: No push until clean(all 4R>=6) OR R2(0 CRIT+0 real WARN) | Judges async+parallel | Unclear -> ask. After 2 -> ASK.
+### P0: Zone Pre-Filter
+Load review-rules.jsonc → strip JSONC comments (3-pass regex: // line, // trailing, /* */ block). Match changed files vs zones. ROJA → proceed dual. AMARILLA → skip (single code-review-agent sufficient). VERDE → skip.
+### P1: Resolve Profiles → Launch 2× code-review-agent
+Parse jd_profile_selector (ordered array, first-match). For match=path: glob against relative file path. For match=basename: glob against filename only. For match=fallback: use as default. First match wins. Validate profiles in jd_profiles → missing → use "architect". If both identical → [profile,"security"]. Launch 2 parallel code-review-agent instances, each injected with "## Profile Focus\n{profile.instructions}". Blind — NO cross-contamination. 120s timeout per delegate, retry once on failure.
+### P2: Synthesize Verdicts
+Both CLEAN → APPROVED. Same root-cause LOCATION (file + line ±5) → Confirmed. Discrepancy → Triage. Fix → re-launch max 2 rounds. On re-judge: pass diff delta only.
+### P3: Calibration
+If FIX/BLOCKER → external-auditor on final diff. Gap >1.5 → immune-system.
+## Pipeline Integration
+- review-pipeline invokes JD for ROJA zone in Phase 2b
+- pre-commit check #9 warns if ROJA staged without JD clearance
+## Output: JD-{target} | Profiles: {A}/{B} | 4R-delegated | Confirmed:N | JDGMNT: APPROVED/ESCALATED | CALIB: OK/GAP
+## Blocking: max 2 re-judge cycles → ASK user | No push without JD on ROJA

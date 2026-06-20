@@ -22,8 +22,8 @@ yellow(){ printf '\033[33m%s\033[0m\n' "$1"; }
 echo ""
 echo "=== Gentleman Quality Gate ==="
 
-# --- [1/8] Trailing whitespace check ---
-echo "[1/8] Trailing whitespace..."
+# --- [1/9] Trailing whitespace check ---
+echo "[1/9] Trailing whitespace..."
 WHITESPACE_FILES=$(git diff --cached --check 2>&1 | grep -E "^[^+]" | head -20)
 if [ -z "$WHITESPACE_FILES" ]; then
   green "  OK"
@@ -34,8 +34,8 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [2/8] PS5.1 safety check on changed .ps1 files ---
-echo "[2/8] PS5.1 safety (staged .ps1)..."
+# --- [2/9] PS5.1 safety check on changed .ps1 files ---
+echo "[2/9] PS5.1 safety (staged .ps1)..."
 STAGED_PS1=$(git diff --cached --name-only --diff-filter=ACM | grep '\.ps1$')
 PS5_BLOCK=""
 if [ -n "$STAGED_PS1" ]; then
@@ -73,8 +73,8 @@ else
 fi
 CHECKS_PASSED=$((CHECKS_PASSED + 1))
 
-# --- [3/8] Cross-ref check on skill changes ---
-echo "[3/8] Cross-ref check..."
+# --- [3/9] Cross-ref check on skill changes ---
+echo "[3/9] Cross-ref check..."
 STAGED_SKILLS=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.agents/skills/' | head -3)
 if [ -n "$STAGED_SKILLS" ]; then
   powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/cross-ref-check.ps1" 2>&1
@@ -90,8 +90,8 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [4/8] Skill drift check on skill changes ---
-echo "[4/8] Skill drift..."
+# --- [4/9] Skill drift check on skill changes ---
+echo "[4/9] Skill drift..."
 if [ -n "$STAGED_SKILLS" ]; then
   powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/check-skill-drift.ps1" 2>&1
   if [ $? -eq 0 ]; then
@@ -106,8 +106,8 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [5/8] Improvement cycle assessment ---
-echo "[5/8] Improvement cycle..."
+# --- [5/9] Improvement cycle assessment ---
+echo "[5/9] Improvement cycle..."
 OVERWEIGHT_SKILLS=$(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
   \$canonical = \"$REPO_ROOT/.agents/skills\"
   if (-not (Test-Path \$canonical)) { exit 0 }
@@ -132,8 +132,8 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [6/8] .project.json integrity check ---
-echo "[6/8] .project.json integrity..."
+# --- [6/9] .project.json integrity check ---
+echo "[6/9] .project.json integrity..."
 STAGED_PROJECT_JSON=$(git diff --cached --name-only --diff-filter=ACM | grep '\.project\.json$')
 if [ -n "$STAGED_PROJECT_JSON" ]; then
   POWERSHELL_OUT=$(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
@@ -156,19 +156,19 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [7/8] review-rules.jsonc integrity (if changed) ---
-echo "[7/8] review-rules.jsonc integrity..."
+# --- [7/9] review-rules.jsonc integrity (if changed) ---
+echo "[7/9] review-rules.jsonc integrity..."
 STAGED_RULES=$(git diff --cached --name-only --diff-filter=ACM | grep 'review-rules\.jsonc$')
 if [ -n "$STAGED_RULES" ]; then
   RULES_VALID=$(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
     try {
       \$json = Get-Content '$REPO_ROOT/review-rules.jsonc' -Raw -Encoding UTF8
-      \$parsed = \$json -replace '(?m)^\s*//.*$','' -replace '(?m)\s*//[^\"\n]*$','' | ConvertFrom-Json
+      \$parsed = \$json -replace '(?m)^\s*//.*$','' -replace '(?m)\s*//[^\"\n]*$','' -replace '(?s)/\*.*?\*/','' | ConvertFrom-Json
       \$zones = \$parsed.zones.PSObject.Properties.Name
       \$ctx = \$parsed.context_zones.PSObject.Properties.Name
       \$modes = \$parsed.modes.PSObject.Properties.Name
       \$profiles = \$parsed.jd_profiles.PSObject.Properties.Name
-      \$selector = \$parsed.jd_profile_selector.PSObject.Properties.Name
+      \$selector = \$parsed.jd_profile_selector
       if (\$zones.Count -ne 3) { Write-Output \"FAIL: Expected 3 zones, found \$(\$zones.Count): \$(\$zones -join ',')\" }
       if (\$ctx.Count -ne 4) { Write-Output \"FAIL: Expected 4 context zones, found \$(\$ctx.Count): \$(\$ctx -join ',')\" }
       if (\$modes.Count -ne 4) { Write-Output \"FAIL: Expected 4 modes, found \$(\$modes.Count): \$(\$modes -join ',')\" }
@@ -193,8 +193,8 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [8/8] Benchmark check (on skill or AGENTS.md changes) ---
-echo "[8/8] Benchmark check..."
+# --- [8/9] Benchmark check (on skill or AGENTS.md changes) ---
+echo "[8/9] Benchmark check..."
 STAGED_AGENTS=$(git diff --cached --name-only --diff-filter=ACM | grep -E 'AGENTS\.md|\.agents/skills/')
 if [ -n "$STAGED_AGENTS" ]; then
   BENCHMARK_OUT=$(powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/benchmark.ps1" -Gate 2>&1)
@@ -209,6 +209,19 @@ if [ -n "$STAGED_AGENTS" ]; then
   fi
 else
   green "  OK (no skill/AGENTS.md changes)"
+  CHECKS_PASSED=$((CHECKS_PASSED + 1))
+fi
+
+# --- [9/9] JD review check (ROJA zone files) ---
+echo "[9/9] JD review check (ROJA zone)..."
+STAGED_ROJA=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^(src/|test/|scripts/|migrations/|ci/|\.github/)' | head -10)
+if [ -n "$STAGED_ROJA" ]; then
+  yellow "  WARN — ROJA zone files staged without JD dual review:"
+  echo "$STAGED_ROJA" | while read -r line; do echo "    $line"; done
+  echo "  Run 'judgment-day' or review-pipeline before !ship"
+  CHECKS_PASSED=$((CHECKS_PASSED + 1))
+else
+  green "  OK (no ROJA files staged)"
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
