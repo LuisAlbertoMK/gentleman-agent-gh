@@ -45,7 +45,7 @@ if (Test-Path -LiteralPath $interTrack) {
 
 # Git status
 $gitStatus = git status --short 2>&1
-$hasChanges = ($gitStatus | Where-Object { $_ -match '\S' }).Count -gt 0
+$hasChanges = (@($gitStatus | Where-Object { $_ -match '\S' }).Count) -gt 0
 try {
     $branch = git rev-parse --abbrev-ref HEAD 2>$null
     if (-not $branch) { $branch = "unknown" }
@@ -56,7 +56,7 @@ $result = [PSCustomObject]@{
     timestamp   = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
     branch      = $branch
     hasChanges  = $hasChanges
-    changeCount = if ($hasChanges) { ($gitStatus | Where-Object { $_ -match '\S' }).Count } else { 0 }
+    changeCount = if ($hasChanges) { @($gitStatus | Where-Object { $_ -match '\S' }).Count } else { 0 }
     goal        = $Goal
 }
 
