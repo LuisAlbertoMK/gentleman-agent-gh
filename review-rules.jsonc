@@ -1,0 +1,124 @@
+{
+  // ═══════════════════════════════════════════════════════
+  //  Review Rules — Declarative Zone Configuration
+  //  Source: gentle-ai v1.41 trigger-rules pattern
+  //  Defines zones, verify depth, and thresholds for
+  //  triple-verify + quality-gate.
+  //
+  //  Edit this file to add new patterns or adjust
+  //  thresholds. Do NOT edit zone logic in AGENTS.md
+  //  or triple-verify/SKILL.md — they reference here.
+  // ═══════════════════════════════════════════════════════
+
+  "version": 1,
+
+  // --- Zones ---
+  // Each zone maps file/pattern rules to a verify depth.
+  // Patterns are evaluated in order: first match wins.
+  "zones": {
+    "roja": {
+      "description": "High-risk — full triple-verify REQUIRED",
+      "patterns": [
+        "src/", "test/", "*_test.*", "scripts/",
+        "migrations/", "ci/", ".github/",
+        "Dockerfile*", "*.sql", "*.ps1",
+        "*.go", "*.rs", "*.c", "*.cpp", "*.h",
+        "Makefile", "*.gradle", "*.csproj"
+      ],
+      "verify": ["E1", "E2", "E3"],
+      "thresholds": {
+        "min_lines_for_verify": 1,
+        "budget_minutes": 10
+      }
+    },
+    "amarilla": {
+      "description": "Medium-risk — verify if diff > threshold",
+      "patterns": [
+        "*.css", "*.scss", "*.json", "*.jsonc",
+        "*.yaml", "*.yml", "*.toml",
+        "*.html", "*.jsx", "*.tsx",
+        "*.js", "*.ts", "*.vue", "*.svelte",
+        "*.xml", "*.env*", "*.conf"
+      ],
+      "verify": ["E1", "E2"],
+      "thresholds": {
+        "min_lines_for_verify": 10,
+        "budget_minutes": 5
+      }
+    },
+    "verde": {
+      "description": "Low-risk — skip verify, quality-gate only",
+      "patterns": [
+        "*.md", "*.txt", "*.png", "*.jpg", "*.jpeg",
+        "*.svg", "*.ico", "*.webp", "*.avif",
+        "*.lock", ".gitignore", ".gitattributes",
+        ".editorconfig", "*.golden",
+        "LICENSE", "*.drawio"
+      ],
+      "verify": [],
+      "thresholds": {
+        "min_lines_for_verify": -1,
+        "budget_minutes": 0
+      }
+    }
+  },
+
+  // --- Context Zones (for resource-adaptive mode) ---
+  "context_zones": {
+    "green": {
+      "description": "All LOW — full response",
+      "max_context_pct": 40,
+      "max_depth": "LOW",
+      "max_error_rate": 0,
+      "response_mode": "Full",
+      "compression": "L1 normal",
+      "verify_override": "Full gate",
+      "skill_load": "Normal"
+    },
+    "yellow": {
+      "description": "ctx>40% or depth MEDIUM — compress",
+      "max_context_pct": 60,
+      "max_depth": "MEDIUM",
+      "max_error_rate": 1,
+      "response_mode": "Brief+expand",
+      "compression": "L1+L2",
+      "verify_override": "Essential only",
+      "skill_load": "Sparse"
+    },
+    "orange": {
+      "description": "ctx>60% or any HIGH — minimize",
+      "max_context_pct": 80,
+      "max_depth": "HIGH",
+      "max_error_rate": 2,
+      "response_mode": "Headline",
+      "compression": "L2 forced",
+      "verify_override": "Skip non-critical",
+      "skill_load": "Minimal"
+    },
+    "red": {
+      "description": "ctx>80% or err rate 2+ — emergency",
+      "max_context_pct": 100,
+      "max_depth": "CRITICAL",
+      "max_error_rate": 100,
+      "response_mode": "1-liner/file",
+      "compression": "L3 emergency",
+      "verify_override": "Skip all",
+      "skill_load": "None"
+    }
+  },
+
+  // --- Verify depth per zone ---
+  "verify_profiles": {
+    "E1": { "label": "Testing", "description": "Unit/integration/e2e — tests pass" },
+    "E2": { "label": "Static", "description": "Lint, 4R, secrets — no regressions" },
+    "E3": { "label": "Build/Runtime", "description": "Build, dry-run, schema — compiles OK" }
+  },
+
+  // --- Workflow mode overrides ---
+  "modes": {
+    "!ship":    { "verify": "full",  "quality_gate": true,  "commit": true, "push": true  },
+    "!listo":   { "verify": "full",  "quality_gate": true,  "commit": true, "push": true  },
+    "!fast":    { "verify": "skip",  "quality_gate": true,  "commit": true, "push": true  },
+    "!draft":   { "verify": "none",  "quality_gate": false, "commit": false,"push": false }
+  }
+}

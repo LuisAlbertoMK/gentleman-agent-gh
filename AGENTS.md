@@ -90,6 +90,9 @@ PS 5.1 rejects `&&`, `||`, `@{var}`. WSL `bash` in PATH is broken stub. **Use Gi
 Infer: QUICK (simple→min) · THOROUGH (risky→full SDD) · DRAFT (explore→findings). Explicit: "modo rápido" / "modo thorough" / "draft"
 Auto-adapts by context pressure, session depth, error rate. Re-evaluated every 5 tool calls.
 
+> **Authoritative config: `review-rules.jsonc` → `zones.*` and `context_zones.*`**
+> Thresholds here are a quick reference only. Edit `review-rules.jsonc` to adjust.
+
 | Zona | Response | Compression | Verify | Skill Load | Condition |
 |------|----------|-------------|--------|------------|-----------|
 | **GREEN** | Full | L1 normal | Full gate | Normal | All LOW |

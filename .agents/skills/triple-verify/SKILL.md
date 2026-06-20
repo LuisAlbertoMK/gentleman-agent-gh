@@ -10,11 +10,14 @@ metadata:
   changelog: "1.1: karpathy compress"
   dependencies: [quality-gate, code-review-agent, commit-crafter]
 ---
-## Zones
-- **Roja** (verify REQUIRED): `src/`, `test/`, `*_test.*`, `scripts/`, `migrations/`, `ci/`, `.github/`, `Dockerfile*`, `*.sql`, `*.ps1`
-- **Amarilla** (verify if >10L diff): `*.css`, `*.scss`, `*.json`, `*.yaml`, `*.toml`, `*.html`, `*.jsx`, `*.tsx`, resto
-- **Verde** (SKIP): `*.md`, `*.txt`, `*.png`, `*.jpg`, `*.svg`, `*.ico`, `*.lock`, `.gitignore`, `.editorconfig`
-- Keywords trigger: `!ship`/`!listo`/`!fast`/`!draft`
+## Zones — Declarative (review-rules.jsonc)
+Zones, patterns, thresholds, and verify depth are defined in `review-rules.jsonc` at repo root.
+- **Roja**: full triple-verify (E1+E2+E3) — see `zones.roja.patterns`
+- **Amarilla**: verify if diff > threshold lines — see `zones.amarilla.thresholds.min_lines_for_verify`
+- **Verde**: skip verify, quality-gate only — see `zones.verde.patterns`
+- Context zones (green/yellow/orange/red) in `context_zones`
+- Workflow modes (`!ship`/`!listo`/`!fast`/`!draft`) in `modes`
+- **Edit `review-rules.jsonc` to adjust — NOT this file**
 ## 3 Distinct Approaches
 | E1 — Testing | E2 — Static | E3 — Build/Runtime |
 |---|---|---|
