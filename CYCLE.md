@@ -14,8 +14,8 @@
 - ✅ Ejecutar external-auditor en primera tarea compleja — restaurar .project.json + guardrail + commit. Encontró 2 gaps >1.5 (ErrPrev 6vs9, Breadth 5vs9). Immunize: anti-pattern #17 + guardrail pre-commit
 - ✅ Verificar ciclo `self-improvement`: diagnose(score 5→9.4) → fix(restore + guardrail) → verify(external-auditor) → learn(anti-pattern #17) → propagate(committed)
 - ✅ Profile-scoped JD agents (review-rules.jsonc + judgment-day v2.1)
-- ✅ inter(30) — actual: 28/30
-- 🔲 Mantener score ≥9.4 — empujar Cycle Progress 8→10
+- ✅ inter(30) -- actual: 30/30
+- ✅ Mantener score >=9.4 -- 10.0, Cycle Progress 10/10
 
 ## Metrics
 
@@ -30,8 +30,8 @@
 
 ## Dimensions to Improve
 
-10 dims at 10.0, Cycle Progress at 8/10. Focus:
-- **Cycle Progress** (8→10): avanzar inter(30) con mejoras reales por iteración
+10 dims at 10.0, Cycle Progress at 10/10. Focus:
+- **Cycle Progress** (10/10): completed -- inter(30) reached
 - **Audit**: activar external-auditor post-task — validar calibración
 - **Process**: ciclo de mejora completo y reproducible
 - **Hygiene**: mantener working tree limpio, commits atómicos

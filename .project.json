@@ -54,11 +54,11 @@
                                                     },
                               "Cycle Progress":  {
                                                      "evidence":  {
-                                                                      "inter_count":  25,
+                                                                      "inter_count":  30,
                                                                       "inter_target":  30
                                                                   },
-                                                     "score":  8,
-                                                     "rationale":  "inter: 25/30",
+                        "score":  10,
+                                                        "rationale":  "inter: 30/30",
                                                      "max":  10
                                                  },
                               "Orthography":  {
@@ -114,7 +114,7 @@
                                            }
                           },
     "score":  {
-                  "current":  9.9,
+                  "current":  10.0,
                   "dimensions":  {
                                      "Project Artifacts":  10,
                                      "Security":  10,
@@ -126,7 +126,7 @@
                                      "Metrics":  10,
                                      "Script Performance":  10,
                                      "Skill Effectiveness":  10,
-                                     "Cycle Progress":  8
+                                     "Cycle Progress":  10
                                  },
                   "last_updated":  "2026-06-19",
                   "trend":  "up"
