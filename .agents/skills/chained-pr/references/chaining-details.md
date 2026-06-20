@@ -44,6 +44,45 @@ main <-- PR 1: foundation
 
 After a parent PR merges, rebase/retarget the next PR so GitHub shows only the current slice.
 
+## Chain Context Section
+
+Append to PR body for chained PRs; do not replace required sections.
+
+```markdown
+## Chain Context
+
+| Field | Value |
+|-------|-------|
+| Chain | <feature or stack name> |
+| Tracker PR | <#NNN or "Not needed"> |
+| Position | <N of total> |
+| Base | `<target branch>` |
+| Depends on | <PR/issue/link or "None"> |
+| Follow-up | <next PR or "None"> |
+| Review budget | <changed lines> / 400 |
+| Starts at | <branch, PR, or state this builds on> |
+| Ends with | <standalone result delivered by this PR> |
+
+### Chain Overview
+
+```text
+main
+ └── #NNN Previous PR
+      └── 📍 #NNN This PR
+           └── #NNN Next PR
+```
+
+### Scope
+- Includes: <focused unit>
+- Excludes: <deferred work>
+
+### Autonomy
+- [ ] CI expected to pass for this PR branch
+- [ ] One deliverable scope per PR
+- [ ] Rollback without unrelated changes
+- [ ] Tests/docs/verification cover this unit
+```
+
 ## Commands
 
 ```bash
