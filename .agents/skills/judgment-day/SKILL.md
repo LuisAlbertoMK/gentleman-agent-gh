@@ -9,8 +9,8 @@ metadata:
     - review
     - gentle-ai
   author: gentleman-vMK
-  version: "2.2"
-  changelog: "2.1->2.2: P6 calibration via external-auditor on FIX/BLOCKER outcomes, CALIB field in output"
+  version: "2.3"
+  changelog: "2.2->2.3: External-auditor gaps fixed: JSONC parse guidance, profile validation, fallback, distinct-profile check"
   config_refs: review-rules.jsonc
 ---
 Dual adversarial 4R review: 2 blind judges (profile-scoped), 4R verdict synthesis, fix/re-judge loops.
@@ -18,10 +18,13 @@ Dual adversarial 4R review: 2 blind judges (profile-scoped), 4R verdict synthesi
 ## Protocol
 ### P0: Resolve Skills + Profile
 Load `code-review-agent` (4R). Load `review-rules.jsonc` and select JD profile matching target file patterns:
-  - Match target files against `jd_profile_selector` keys (first match wins, glob-style).
-  - Default: `["architect", "security"]`.
-  - Judge A gets the first profile, Judge B the second.
-  - Inject profile instructions into each judge prompt alongside Project Standards.
+  - Parse JSONC: strip `//` and `/* */` comments, then JSON.parse. If parse fails → use default profiles silently.
+  - Match target file BASENAME against `jd_profile_selector` keys (glob-style, matches anywhere in repo).
+  - Default: `["architect", "security"]`. If DEFAULT key missing from selector, hardcode fallback.
+  - Judge A gets first profile, Judge B the second.
+  - PROFILE VALIDATION: if selected profile name doesn't exist in `jd_profiles` → fall back to `"architect"` for that judge.
+  - DISTINCT CHECK: if both selected profiles are identical → use `[profile, "default"]`.
+  - Inject profile instructions into each judge prompt: "## Profile Focus\n{profile.instructions}" alongside Project Standards.
 ### P1: Parallel Blind 4R Review (Profile-Scoped)
 2 delegates (async, parallel) — same target, DIFFERENT profiles, NO cross-contamination. Each judge scores 4R independently through its profile lens.
 ### P2: Verdict Synthesis: Both clean->APPROVED. Both flag same R->Confirmed. One flags->Suspect->Triage. Contradictory->Manual.
