@@ -7,34 +7,48 @@ metadata:
   tags:
     - engineering
   author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.0->1.1 (sprint 1: 72->55 lines
+  version: "1.2"
+  changelog: "1.1->1.2 (Karpathy compress: 2755->1700B)"
 ---
 
-Trigger: Repeated errors, failure patterns, "same mistake", user says "ya te dije", frustration signals, post-error recovery.
-## ProtocolEvery failure = asset. Once documented → permanent immunity.
-### 1. DETECT — immunity event| Signal | Means ||--------|-------|| "ya te dije" | Engram miss — prior context lost || Same error 2x | Pattern exists — needs doc || User corrects approach | Knowledge gap — doc correct way || Unexpected tool behavior | Tool/API quirk — doc gotcha || Near-miss | Close call — could have been error. Still document. || Over-scope warning | Taking on too many tasks → split, prioritize |
-### 2. DIAGNOSE — root cause
-```Context miss — didn't read EngramPattern miss — skill exists, not loadedKnowledge gap — agent doesn't knowTool misuse — wrong params/toolHallucination — fabricated API/fileOver-engineering — wrong problemPremature declaration — "done" w/o evidence```
-### 3. DOCUMENT → ANTI-PATTERN-CATALOG.md
+## Protocol — Every failure = asset. Once documented -> permanent immunity.
+
+### 1. DETECT
+| Signal | Means |
+|--------|-------|
+| "ya te dije" | Engram miss |
+| Same error 2x | Pattern exists |
+| User corrects approach | Knowledge gap |
+| Unexpected tool behavior | Tool/API quirk |
+| Near-miss | Close call -- doc anyway |
+
+### 2. DIAGNOSE
+Root cause: Context miss | Pattern miss | Knowledge gap | Tool misuse | Hallucination | Over-engineering | Premature declaration
+
+### 3. DOCUMENT -> ANTI-PATTERN-CATALOG.md
 ```
-## YYYY-MM-DD: title**Symptom**: 1 sentence**Root cause**: why**Fix**: what solved**Prevention**: 1 rule**Files**: paths
+## YYYY-MM-DD: title
+**Symptom**: | **Root cause**: | **Fix**: | **Prevention**: 1 rule | **Files**: paths
 ```
-### 4. IMMUNIZE (REQUIRED — both steps)- **Catalog entry** = loaded at session start (documents the failure)- **Prevention rule** → add to AGENTS.md Rules (changes future behavior)- Fix requires code/skill change → `mem_save` + update SKILL.md- Rule: "Catalog documents. AGENTS.md prevents. Both or it's not immunized."
-### 5. VERIFYPre-task: "Seen this before?" If yes → apply prevention BEFORE starting.
-## Immunity LevelsSession (in-mem) → Skill (auto-load) → Catalog (session-start) → AGENTS.md (always). Each level = stronger enforcement.
-## Workflow
-```Error → STOP → Diagnose → Document (catalog) → Immunize (skill/AGENTS.md/mem_save) → Verify → Continue```
-## Anti-patterns- Silent retry same approach → Document first, change approach- "I'll remember next time" → Write it in catalog- Fix symptom → Trace to root cause- Only fix current case → Generalize prevention rule
-## EXAMPLE IMMUNIZATION
-```
-Symptom: Used && in PS5.1 → parse error
-Cause: No pre-flight check for PS operators
-Fix: ampersand scan in pssa-gate.ps1
-Prevention: AGENTS.md pre-flight: scan every bash call
-```
-## RECOVERY FLOW
-1. User corrects you → STOP (don't argue), diagnose
-2. Same error 2x → mandatory catalog entry
-3. Catalog entry + AGENTS.md rule = fully immunized
+
+### 4. IMMUNIZE (both required)
+- Catalog entry = loaded at session start (documents failure)
+- Prevention rule -> AGENTS.md (changes behavior)
+- Code/skill change -> `mem_save` + update SKILL.md
+- Rule: "Catalog documents. AGENTS.md prevents. Both or not immunized."
+
+### 5. VERIFY
+Pre-task: "Seen this before?" If yes -> apply prevention BEFORE starting.
+
+## Recovery Flow
+1. User corrects you -> STOP (don't argue), diagnose root cause
+2. Same error 2x -> mandatory catalog entry
+3. Catalog + AGENTS.md rule = fully immunized
 4. Verify next session: pre-check anti-patterns before task
+
+## Workflow
+`Error -> STOP -> Diagnose -> Document -> Immunize -> Verify -> Continue`
+
+## Anti-patterns
+- Silent retry -> Document first | "I'll remember" -> Write catalog
+- Fix symptom -> Trace root cause | Fix current case -> Generalize prevention

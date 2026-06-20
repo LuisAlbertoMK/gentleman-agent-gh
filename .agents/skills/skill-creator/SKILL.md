@@ -1,34 +1,64 @@
 ---
 name: skill-creator
-description: "Create new AI agent skills following Agent Skills spec — auto-bootstrap unknown tasks, define structure, register in AGENTS.md"
+description: "Create new AI agent skills following Agent Skills spec -- auto-bootstrap unknown tasks, define structure, register in AGENTS.md"
 triggers: "Create AI skill"
 license: Apache-2.0
 metadata:
   tags:
     - engineering
   author: gentleman-vMK
-  version: "1.1"
+  version: "1.2"
+  changelog: "1.1->1.2 (Karpathy compress: 2551->1700B)"
 ---
 
-Create new AI agent skills following the Agent Skills spec.Trigger: User asks to create skill, add agent instructions, document patterns.
-## WhenPattern repeated + AI needs guidance · Project-specific conventions · Complex workflows · Decision trees needed · **Pre-Flight Gate** (unknown task type — auto-bootstrap)**Don't create:** Docs exist (reference instead) · Trivial pattern · One-off task
-## Auto-Bootstrap Mode (Pre-Flight Gate trigger)When the task type is unknown (no matching skill in Skill Router):1. Research the domain quickly (websearch, context7)2. Create minimal skill with: name, description, key patterns from research3. Register in AGENTS.md trigger table4. THEN proceed with the original task5. After task: refine skill with real experience (gotchas, edge cases)
+## When
+Pattern repeated + AI needs guidance | Project conventions | Complex workflows | Decision trees | Pre-Flight Gate (unknown task)
+**Don't create:** Docs exist | Trivial | One-off
+
+## Auto-Bootstrap (unknown task)
+1. Research domain (websearch, context7)
+2. Create minimal skill: name, description, key patterns
+3. Register in AGENTS.md trigger table
+4. Proceed with original task
+5. Refine with real experience (gotchas, edge cases)
+
 ## Structure
-```skills/{name}/├── SKILL.md          # Required├── assets/           # Templates, schemas, examples└── references/       # Local doc links```
-## SKILL.md Template
-```markdown---name: {name}description: >  skill-creator skilltriggers: "Create AI skill"  {One-line}. Trigger: {when}.license: Apache-2.0metadata: author: gentleman-vMK, version: "1.0"---
-## When{when}
-## Critical Patterns{Must-know rules}
-## Components{Minimal examples}
-## Resources- **Assets**: [assets/](assets/)- **Docs**: [references/](references/)
+`skills/{name}/SKILL.md` (required) | `assets/` (templates) | `references/` (local docs)
+
+## SKILL.md template
+```markdown
+---
+name: {name}
+description: "{1-liner}"
+triggers: "{trigger words}"
+license: Apache-2.0
+metadata: author: gentleman-vMK, version: "1.0"
+---
+## When
+{trigger scenario}
+## Critical Patterns
+{essential rules}
+## Components
+{minimal examples}
+## Resources
 ```
-## Naming| Pattern | Example ||---------|---------|| `{tech}` | `pytest`, `typescript` || `{project}-{component}` | `myapp-api` || `{action}-{target}` | `skill-creator` |
-## Content Rules**DO:** Critical patterns first · Tables for decisions · Minimal examples · Commands section**DON'T:** Keywords · Duplicate docs · Verbose explanations · Web URLs
-## RegisterAdd to AGENTS.md:
-```| `{name}` | {desc} | [SKILL.md](skills/{name}/SKILL.md) |```
-## ChecklistBefore creating: skill doesn't exist? reusable? name follows convention? frontmatter complete? critical patterns clear? examples minimal? commands exist? AGENTS.md updated?
-## EDGE CASES
-- Skill name collision → append -2 suffix, note in AGENTS.md
-- Empty references/ dir → omit the dir entirely
-- Triggers must match actual user language — test with real queries
-- Skip registration if skill is experimental (add `# experimental` note)
+
+## Naming
+| Pattern | Example |
+|---------|---------|
+| `{tech}` | `pytest`, `typescript` |
+| `{project}-{component}` | `myapp-api` |
+| `{action}-{target}` | `skill-creator` |
+
+## Content Rules
+**DO:** Critical patterns first | Tables for decisions | Minimal examples | Commands
+**DON'T:** Keywords | Duplicate docs | Verbose explanations | Web URLs
+
+## Register in AGENTS.md
+`| {name} | {desc} | [SKILL.md](skills/{name}/SKILL.md) |`
+
+## Edge cases
+- Name collision -> `-2` suffix, note in AGENTS.md
+- Empty `references/` -> omit dir entirely
+- Triggers must match real user language -- test with real queries
+- Experimental -> `# experimental` note, skip registration
