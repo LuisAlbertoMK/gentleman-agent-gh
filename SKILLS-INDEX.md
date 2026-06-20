@@ -1,9 +1,9 @@
 ﻿# SKILLS INDEX
 
-> Full trigger table for all 68 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 69 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 2.8 | **Changelog**: 2.8 (SDD consolidation into sdd/ pipeline — unified sdd skill + 9 phases)
+> **Version**: 2.9 | **Changelog**: 2.9 (+ opencode-model-router skill)
 
 ## Triggers → Skill
 
@@ -76,13 +76,14 @@
 | Review pipeline, skill stacking, full review, preparar commit, ready to ship, listo para commit | review-pipeline |
 | Triple verify, triangulate, 3 enfoques, verificación profunda, !ship, !listo, !fast, !draft | triple-verify |
 | Self-improvement, improvement cycle, auto-mejora, ciclo de mejora, comienza ciclo | self-improvement |
+| Model router, routing, qué modelo, delegate or direct, qué hacer con esta tarea, trial risk, security gate | opencode-model-router |
 
 ## Quick groups
 - **Compression/style**: karpathy-prompt, karpathy-loop, lean-context
 - **Quality**: quality-gate, auto-metrics, external-auditor, immune-system, code-review-agent, performance-tracker, triple-verify, self-improvement
 - **Memory**: session-resume, code-memory, dreaming
 - **Skills meta**: skill-creator, skill-registry, skill-improver, skill-digestion, skill-graph
-- **Coordination**: delivery-harness, chained-pr, branch-pr, issue-creation, subagent-isolation, command-wrapper
+- **Coordination**: delivery-harness, chained-pr, branch-pr, issue-creation, subagent-isolation, command-wrapper, opencode-model-router
 - **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner
 - **SDD**: sdd (SKILL.md) + phases/ (00-init → 08-archive) — wrappers at sdd-* for backward compat
 - **UI/Design**: baseline-ui, accessibility, performance, seo, core-web-vitals, web-quality-audit

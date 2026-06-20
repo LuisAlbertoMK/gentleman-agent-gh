@@ -6,27 +6,26 @@
 
 ## Objective
 
-**Cycle 4**: Impact-driven optimization with delegation-first execution. Maintain 10.0 across 12+ cycles through parallel subagent work, risk-based prioritization, and upstream feature evaluation.
+**Cycle 5**: Automation-first with self-healing monitoring and pattern extraction. Maintain 10.0 across all dims while reducing manual overhead — external repo checks become automatic, session learning becomes self-triggering.
 
 ### Pillars
-1. **Impact/Risk prioritization** -- every fix scored by (impact * value) / (complexity * risk). High-impact/low-risk first.
-2. **Subagent delegation** -- default execution strategy. Parallel subagents for independent work. Orchestrate, don't do.
-3. **Profile-scoped JD activation** -- apply on first real high-risk review.
-4. **Skill hygiene** -- 0 skills >3KB, avg <2.0KB, Karpathy compression standard.
+1. **Automated upstream monitoring** — external repo changes detected without manual checks (step 2 in LOOP automated).
+2. **Automatic pattern extraction** — session-miner + dreaming without manual invocation on errors/bugfixes.
+3. **Maintain Cycle 4 gains** — JD ready for real reviews, skills <2.5KB, score 10.0, cross-ref 0.
+4. **Delegation discipline** — ≥3 subagent delegations per session; orchestrate, don't do.
 
 ### Backlog (sorted by impact/risk)
 | Item | Impact | Risk | I/R | Est. inter | Status |
 |------|--------|------|-----|------------|--------|
-| Activar profile-scoped JD en review real | High | Medium | 2.0 | 3-5 | ⏳ Pending (needs real review) |
-| Evaluar upstream features (backup/planner) | High | Low | 2.0 | 2-3 | ✅ Done — Go-only, concepts extracted |
-| Comprimir skills >2.5KB restantes | Medium | Low | 1.5 | 1-2 | ✅ Done — 0 skills >2.5KB |
-| PSSA violations: 453 info-level (review/accept) | Low | Low | 1.0 | 1-2 | ✅ Done — 0 real info violations |
-| Skill cross-ref completeness audit | Medium | Low | 1.0 | 1 | ✅ Done — 8/8 PASS |
+| Automated upstream monitoring | High | Low | 3.0 | 2-3 | 🔄 In progress |
+| Upstream drift auto-report on cycle start | Medium | Low | 2.0 | 1-2 | ⏳ Pending |
+| Auto pattern extraction (dream+immune trigger) | High | Medium | 1.5 | 3-5 | ⏳ Pending |
+| Integration smoke tests for key scripts | Medium | Medium | 1.0 | 2-3 | ⏳ Pending |
 
 ### Progress
 - Score: 10.0/10 (baseline)
-- inter: 34/30
-- Cycle Progress: 5/10
+- inter: 0/30 (cycle 5)
+- Cycle Progress: 0/10
 
 ## Metrics
 
@@ -35,9 +34,9 @@
 | inter(30) | >=30 meaningful interactions | `scripts/inter-track.ps1` |
 | Score delta | maintain >=9.8, target 10.0 | `scripts/score-auto.ps1` |
 | Subagent delegations per session | >=3 delegations | bitacora + engram |
-| Profile-scoped JD | activated >=1 high-risk review | review-rules.jsonc jd_profiles |
+| Upstream check automation | zero manual checks needed | `scripts/check-upstream.ps1` |
+| Dreaming auto-trigger | fires on every 5th error | immune-system + session-miner |
 | Skill sizes | 0 >3KB, avg <2.0KB | `scripts/benchmark.ps1` |
-| Impact/Risk adherence | every item scored before work | CYCLE.md backlog |
 | Working tree hygiene | 0 cambios sin commit al cerrar ciclo | `git status --short` |
 | Cross-ref | 0 errors | `scripts/cross-ref-check.ps1` |
 
@@ -69,7 +68,7 @@ Default execution strategy for non-trivial work:
 
 All 11 dims at 10.0. Focus on keeping them green while advancing Cycle Progress.
 - **Cycle Progress** (0->10): inter(30) with impact-scored improvements
-- **Activation**: profile-scoped JD on first high-risk review
+- **Automation**: upstream checks auto, dreaming auto, monitoring auto
 - **Delegation**: >=3 subagent delegations per session
 - **Hygiene**: working tree clean, atomic commits, cross-ref 0 errors
 
@@ -84,21 +83,21 @@ All 11 dims at 10.0. Focus on keeping them green while advancing Cycle Progress.
 | Complejo | cross-cutting changes | Full + judgment-day | 30 min |
 | Muy Complejo | architectural decisions | Full + SDD cycle | 60 min |
 
-## External Repos (re-check on cycle start)
+## External Repos (auto-checked via `scripts/check-upstream.ps1`)
 
 | Repo | What to Check | Last Verified |
 |------|---------------|---------------|
-| karpathy/autoresearch | New program.md patterns, loop improvements | 2026-06-19 (no changes) |
-| Gentleman-Programming/gentleman-guardian-angel | New caching strategies, AGENTS.md compliance checks | 2026-06-19 (v2.8.1, no changes) |
-| gentle-ai ecosystem | New MCP servers, backup systems (read-only, no PRs) | 2026-06-19 |
-| engram (MCP) | Cloud sync, new query types, performance | 2026-06-19 |
+| karpathy/autoresearch | New program.md patterns, loop improvements | 2026-06-20 (auto, UNCHANGED) |
+| Gentleman-Programming/gentleman-guardian-angel | New caching strategies, AGENTS.md compliance checks | 2026-06-20 (auto, UNCHANGED) |
+| gentle-ai | Skills, scripts, MCP servers, backup systems | 2026-06-20 (auto, UNCHANGED) |
+| engram (MCP) | Cloud sync, new query types, performance | 2026-06-20 (auto, UNCHANGED) |
 
 ## Cycle Loop
 
 ```
 LOOP:
   1. READ CYCLE.md -- understand objective and constraints
-  2. CHECK external repos for new features
+  2. CHECK external repos (automated via scripts/check-upstream.ps1)
   3. DIAGNOSE: score, gaps, skill sizes, cross-ref, PSSA
   4. SCORE backlog items by Impact/Risk (I/R = Impact / Risk)
   5. IDENTIFY fix candidates sorted by I/R descending
@@ -128,3 +127,4 @@ LOOP:
 
 gentleman-vMK -- Cycle 1 (infrastructure) 2026-06-17. Cycle 2 (hygiene+automation) 2026-06-18.
 Cycle 3 (audit+validation) 2026-06-19. Cycle 4 (impact-driven delegation) 2026-06-20.
+Cycle 5 (automation-first) 2026-06-20.
