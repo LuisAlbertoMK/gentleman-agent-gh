@@ -1,8 +1,8 @@
 # Project Score: gentleman-agent-gh
 
-**Current**: 9.5/10
+**Current**: 9.6/10
 **Last updated**: 2026-06-20
-**Trend**: up (Cycle Progress 6/10, inter 19/30, all 10 dims at 10)
+**Trend**: up (Cycle Progress 7/10, inter 21/30, all 10 dims at 10)
 
 ## Dimensions
 
@@ -18,7 +18,7 @@
 | Metrics               | 10.0  |
 | Script Performance    | 10.0  |
 | Skill Effectiveness   | 10.0  |
-| Cycle Progress        | 5.0  |
+| Cycle Progress        | 7.0  |
 
 ## Changelog
 
@@ -51,3 +51,5 @@
 | 2026-06-20 | 9.5   | +0.1   | review-rules.jsonc (trigger-rules declarativo, gentle-ai v1.41). PSSA 0 violations. Cycle Progress 3→4/10, inter 12/30. Score 9.4→9.5. |
 | 2026-06-20 | 9.5   | =      | Cross-ref review-rules check [7/7] + .project.json sync. Cycle Progress 4→5/10, inter 14/30, 5 commits pushed. |
 | 2026-06-20 | 9.5   | =      | Sesión completa: 9 commits. Profile-scoped JD (review-rules jd_profiles + selector, judgment-day v2.1→v2.2), P6 calibration vía external-auditor, pre-commit + cross-ref + review-rules validation. CYCLE.md aligned (≥9.4 real). inter 18/30, Cycle Progress 6/10. |
+| 2026-06-20 | 9.6   | +0.1   | review-rules v2: 21 profile selectors (was 7). Full validation chain. inter 19/30. Score 9.5→9.6. |
+| 2026-06-20 | 9.6   | =      | JD v2.3: external-auditor gap fixes (Correctness 6→9, ErrPrev 5→8). Compressed SKILL.md to 1.8KB. Skills >3KB: 0. inter 21/30, Cycle Progress 7/10. |
