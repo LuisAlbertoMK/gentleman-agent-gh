@@ -41,13 +41,13 @@ if (-not (Test-Path $canonicalDir)) {
 
 Write-Host "=== Cross-Ref Check: $RepoRoot ===" -ForegroundColor Cyan
 
-# --- [1/6] ANTI-PATTERN-CATALOG ---
-Write-Host "`n[1/6] ANTI-PATTERN-CATALOG..." -NoNewline
+# --- [1/7] ANTI-PATTERN-CATALOG ---
+Write-Host "`n[1/7] ANTI-PATTERN-CATALOG..." -NoNewline
 $apc = Test-Path (Join-Path -Path $RepoRoot -ChildPath "ANTI-PATTERN-CATALOG.md")
 if ($apc) { Write-Host " OK" } else { $errors += "ANTI-PATTERN-CATALOG.md not found at repo root"; Write-Host " FAIL" }
 
-# --- [2/6] All skills have SKILL.md ---
-Write-Host "[2/6] SKILL.md files..." -NoNewline
+# --- [2/7] All skills have SKILL.md ---
+Write-Host "[2/7] SKILL.md files..." -NoNewline
 $missingSkillMd = @()
 try {
     $skillDirs = Get-ChildItem (Join-Path -Path $canonicalDir -ChildPath "*") -Directory
@@ -63,8 +63,8 @@ $skillDirs | ForEach-Object {
 }
 if ($missingSkillMd.Count -eq 0) { Write-Host " OK (all have SKILL.md)" } else { $warnings += "Skills missing SKILL.md: $($missingSkillMd -join ', ')"; Write-Host " WARN" }
 
-# --- [3/6] SKILLS-INDEX count matches canonical ---
-Write-Host "[3/6] SKILLS-INDEX count..." -NoNewline
+# --- [3/7] SKILLS-INDEX count matches canonical ---
+Write-Host "[3/7] SKILLS-INDEX count..." -NoNewline
 $actualCount = ($skillDirs | Where-Object { $_.Name -ne '_shared' }).Count
 $headerLine = Select-String -Path (Join-Path -Path $RepoRoot -ChildPath "SKILLS-INDEX.md") -Pattern "all \d+ skills"
 if ($headerLine -match "all (\d+) skills") {
@@ -72,8 +72,8 @@ if ($headerLine -match "all (\d+) skills") {
     if ($declared -eq $actualCount) { Write-Host " OK ($actualCount)" } else { $errors += "SKILLS-INDEX says $declared but canonical has $actualCount"; Write-Host " FAIL (says $declared, actual $actualCount)" }
 } else { $warnings += "SKILLS-INDEX header format unexpected"; Write-Host " WARN" }
 
-# --- [4/6] Global junctions exist for each skill ---
-Write-Host "[4/6] Global junctions..." -NoNewline
+# --- [4/7] Global junctions exist for each skill ---
+Write-Host "[4/7] Global junctions..." -NoNewline
 $missingGlobal = @()
 if (Test-Path $globalDir) {
     Get-ChildItem $canonicalDir -Directory | Where-Object { $_.Name -ne '_shared' } | ForEach-Object {
@@ -84,8 +84,8 @@ if (Test-Path $globalDir) {
 }
 if ($missingGlobal.Count -eq 0) { Write-Host " OK (all in global)" } else { $warnings += "Missing global junctions: $($missingGlobal -join ', ')"; Write-Host " WARN" }
 
-# --- [5/5] _shared references resolve ---
-Write-Host "[5/6] _shared refs..." -NoNewline
+# --- [5/7] _shared references resolve ---
+Write-Host "[5/7] _shared refs..." -NoNewline
 $sharedFiles = @{
     'skill-resolver.md' = Test-Path (Join-Path -Path $canonicalDir -ChildPath "_shared\skill-resolver.md")
     'sdd-phase-common.md' = Test-Path (Join-Path -Path $canonicalDir -ChildPath "sdd\references\sdd-phase-common.md")
@@ -95,8 +95,8 @@ $sharedFiles = @{
 $missingShared = @($sharedFiles.GetEnumerator() | Where-Object { -not $_.Value } | ForEach-Object { $_.Key })
 if ($missingShared.Count -eq 0) { Write-Host " OK" } else { $errors += "Missing _shared files: $($missingShared -join ', ')"; Write-Host " FAIL" }
 
-# --- [6/6] Cross-Refs in skills point to real skills ---
-Write-Host "[6/6] Cross-refs to real skills..." -NoNewline
+# --- [6/7] Cross-Refs in skills point to real skills ---
+Write-Host "[6/7] Cross-refs to real skills..." -NoNewline
 $brokenRefs = @()
 $allSkillNames = ($skillDirs | Where-Object { $_.Name -ne '_shared' } | ForEach-Object { $_.Name.ToLower() })
 $refPattern = 'Cross-Refs:\s*(.+)'
@@ -129,6 +129,25 @@ Get-ChildItem $canonicalDir -Directory | Where-Object { $_.Name -ne '_shared' } 
     }
 }
 if ($brokenRefs.Count -eq 0) { Write-Host " OK" } else { $errors += $brokenRefs; Write-Host " FAIL ($($brokenRefs.Count) broken)" }
+
+# --- [7/7] review-rules.jsonc integrity ---
+Write-Host "[7/7] review-rules.jsonc..." -NoNewline
+$rulesPath = Join-Path $RepoRoot "review-rules.jsonc"
+if (Test-Path $rulesPath) {
+    try {
+        $raw = Get-Content $rulesPath -Raw -Encoding UTF8
+        $stripped = $raw -replace '(?m)^\s*//.*$','' -replace '(?m)\s*//[^"\n]*$',''
+        $parsed = $stripped | ConvertFrom-Json
+        $zoneCount = $parsed.zones.PSObject.Properties.Name.Count
+        $ctxCount = $parsed.context_zones.PSObject.Properties.Name.Count
+        $modeCount = $parsed.modes.PSObject.Properties.Name.Count
+        $issues = @()
+        if ($zoneCount -ne 3) { $issues += "Expected 3 zones, found $zoneCount" }
+        if ($ctxCount -ne 4) { $issues += "Expected 4 context zones, found $ctxCount" }
+        if ($modeCount -ne 4) { $issues += "Expected 4 modes, found $modeCount" }
+        if ($issues.Count -eq 0) { Write-Host " OK (3 zones, 4 context, 4 modes)" } else { $errors += "review-rules.jsonc: $($issues -join '; ')"; Write-Host " FAIL" }
+    } catch { $errors += "review-rules.jsonc parse error: $_"; Write-Host " FAIL" }
+} else { $warnings += "review-rules.jsonc not found at repo root"; Write-Host " WARN (not found)" }
 
 # --- Summary ---
 $result = @{
