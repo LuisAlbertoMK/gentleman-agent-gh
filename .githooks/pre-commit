@@ -156,8 +156,41 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [7/7] Benchmark check (on skill or AGENTS.md changes) ---
-echo "[7/7] Benchmark check..."
+# --- [7/8] review-rules.jsonc integrity (if changed) ---
+echo "[7/8] review-rules.jsonc integrity..."
+STAGED_RULES=$(git diff --cached --name-only --diff-filter=ACM | grep 'review-rules\.jsonc$')
+if [ -n "$STAGED_RULES" ]; then
+  RULES_VALID=$(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
+    try {
+      \$json = Get-Content '$REPO_ROOT/review-rules.jsonc' -Raw -Encoding UTF8
+      \$parsed = \$json -replace '(?m)^\s*//.*$','' -replace '(?m)\s*//[^\"\n]*$','' | ConvertFrom-Json
+      \$zones = \$parsed.zones.PSObject.Properties.Name
+      \$ctx = \$parsed.context_zones.PSObject.Properties.Name
+      \$modes = \$parsed.modes.PSObject.Properties.Name
+      if (\$zones.Count -ne 3) { Write-Output \"FAIL: Expected 3 zones, found \$(\$zones.Count): \$(\$zones -join ',')\" }
+      if (\$ctx.Count -ne 4) { Write-Output \"FAIL: Expected 4 context zones, found \$(\$ctx.Count): \$(\$ctx -join ',')\" }
+      if (\$modes.Count -ne 4) { Write-Output \"FAIL: Expected 4 modes, found \$(\$modes.Count): \$(\$modes -join ',')\" }
+      Write-Output \"OK zones=\$(\$zones -join ',') ctx=\$(\$ctx -join ',') modes=\$(\$modes -join ',')\"
+    } catch {
+      Write-Output \"FAIL: Parse error - \$(\$_.Exception.Message)\"
+    }
+  " 2>&1)
+  if echo "$RULES_VALID" | grep -q "^OK"; then
+    green "  OK"
+    echo "  $RULES_VALID" | head -1
+    CHECKS_PASSED=$((CHECKS_PASSED + 1))
+  else
+    red "  BLOCKING: review-rules.jsonc validation failed"
+    echo "$RULES_VALID" | while read -r line; do echo "    $line"; done
+    CHECKS_FAILED=$((CHECKS_FAILED + 1))
+  fi
+else
+  green "  OK (no review-rules.jsonc changes)"
+  CHECKS_PASSED=$((CHECKS_PASSED + 1))
+fi
+
+# --- [8/8] Benchmark check (on skill or AGENTS.md changes) ---
+echo "[8/8] Benchmark check..."
 STAGED_AGENTS=$(git diff --cached --name-only --diff-filter=ACM | grep -E 'AGENTS\.md|\.agents/skills/')
 if [ -n "$STAGED_AGENTS" ]; then
   BENCHMARK_OUT=$(powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/benchmark.ps1" -Gate 2>&1)
