@@ -7,7 +7,7 @@
                                                                           "script_count":  31
                                                                       },
                                                          "score":  10,
-                                                         "rationale":  "Scripts: 31, avg: 7.4KB, \u003e50KB: 0",
+                                                         "rationale":  "Scripts: 31, avg: 7.4KB, >50KB: 0",
                                                          "max":  10
                                                      },
                               "Best Practices":  {
@@ -54,11 +54,11 @@
                                                     },
                               "Cycle Progress":  {
                                                      "evidence":  {
-                                                                      "inter_count":  19,
+                                                                      "inter_count":  25,
                                                                       "inter_target":  30
                                                                   },
-                                                     "score":  6,
-                                                     "rationale":  "inter: 19/30",
+                                                     "score":  8,
+                                                     "rationale":  "inter: 25/30",
                                                      "max":  10
                                                  },
                               "Orthography":  {
@@ -86,11 +86,11 @@
                                                                            "over_5kb":  0,
                                                                            "avg_size_kb":  1.8,
                                                                            "total_skills":  68,
-                                                                           "total_bytes":  127125,
+                                                                           "total_bytes":  125899,
                                                                            "over_3kb":  0
                                                                        },
                                                           "score":  10,
-                                                          "rationale":  "Skills: 68, \u003e3KB: 0, \u003e5KB: 0, avg: 1.8KB",
+                                                          "rationale":  "Skills: 68, >3KB: 0, >5KB: 0, avg: 1.8KB",
                                                           "max":  10
                                                       },
                               "Dead Code":  {
@@ -103,7 +103,7 @@
                                                 "rationale":  "Orphans: 0, dead junctions: 0",
                                                 "max":  10
                                             },
-                              "Bitácora":  {
+                              "Bitacora":  {
                                                "evidence":  {
                                                                 "lines":  51,
                                                                 "exists":  true
@@ -114,7 +114,7 @@
                                            }
                           },
     "score":  {
-                  "current":  9.6,
+                  "current":  9.8,
                   "dimensions":  {
                                      "Project Artifacts":  10,
                                      "Security":  10,
@@ -122,13 +122,13 @@
                                      "Clean Code":  10,
                                      "Best Practices":  10,
                                      "Orthography":  10,
-                                     "Bitácora":  10,
+                                     "Bitacora":  10,
                                      "Metrics":  10,
                                      "Script Performance":  10,
                                      "Skill Effectiveness":  10,
-                                     "Cycle Progress":  6
+                                     "Cycle Progress":  8
                                  },
-                   "last_updated":  "2026-06-20",
-                   "trend":  "up"
+                  "last_updated":  "2026-06-19",
+                  "trend":  "up"
               }
 }
