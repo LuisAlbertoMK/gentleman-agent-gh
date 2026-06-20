@@ -167,10 +167,14 @@ if [ -n "$STAGED_RULES" ]; then
       \$zones = \$parsed.zones.PSObject.Properties.Name
       \$ctx = \$parsed.context_zones.PSObject.Properties.Name
       \$modes = \$parsed.modes.PSObject.Properties.Name
+      \$profiles = \$parsed.jd_profiles.PSObject.Properties.Name
+      \$selector = \$parsed.jd_profile_selector.PSObject.Properties.Name
       if (\$zones.Count -ne 3) { Write-Output \"FAIL: Expected 3 zones, found \$(\$zones.Count): \$(\$zones -join ',')\" }
       if (\$ctx.Count -ne 4) { Write-Output \"FAIL: Expected 4 context zones, found \$(\$ctx.Count): \$(\$ctx -join ',')\" }
       if (\$modes.Count -ne 4) { Write-Output \"FAIL: Expected 4 modes, found \$(\$modes.Count): \$(\$modes -join ',')\" }
-      Write-Output \"OK zones=\$(\$zones -join ',') ctx=\$(\$ctx -join ',') modes=\$(\$modes -join ',')\"
+      if (\$profiles.Count -lt 1) { Write-Output \"FAIL: Expected >=1 jd_profiles, found \$(\$profiles.Count)\" }
+      if (\$selector.Count -lt 1) { Write-Output \"FAIL: Expected >=1 jd_profile_selector, found \$(\$selector.Count)\" }
+      Write-Output \"OK zones=\$(\$zones -join ',') ctx=\$(\$ctx -join ',') modes=\$(\$modes -join ',') profiles=\$(\$profiles.Count) selectors=\$(\$selector.Count)\"
     } catch {
       Write-Output \"FAIL: Parse error - \$(\$_.Exception.Message)\"
     }

@@ -10,7 +10,7 @@
   //  or triple-verify/SKILL.md — they reference here.
   // ═══════════════════════════════════════════════════════
 
-  "version": 1,
+  "version": 2,
 
   // --- Zones ---
   // Each zone maps file/pattern rules to a verify depth.
@@ -142,7 +142,21 @@
     "*.md": ["architect", "reliability"],
     ".agents/skills/*": ["architect", "reliability"],
     ".githooks/*": ["reliability", "security"],
-    "review-rules.jsonc": ["architect", "security"]
+    "review-rules.jsonc": ["architect", "security"],
+    "*.json": ["architect", "performance"],
+    "*.jsonc": ["architect", "performance"],
+    "*.yaml": ["reliability", "security"],
+    "*.yml": ["reliability", "security"],
+    "*.js": ["performance", "security"],
+    "*.ts": ["performance", "security"],
+    "*.jsx": ["performance", "architect"],
+    "*.tsx": ["performance", "architect"],
+    "*.css": ["performance", "reliability"],
+    "*.scss": ["performance", "reliability"],
+    "*.html": ["performance", "security"],
+    "Dockerfile*": ["security", "reliability"],
+    "Makefile": ["reliability", "architect"],
+    "*.sql": ["security", "reliability"]
   },
 
   // --- Workflow mode overrides ---

@@ -141,11 +141,15 @@ if (Test-Path $rulesPath) {
         $zoneCount = $parsed.zones.PSObject.Properties.Name.Count
         $ctxCount = $parsed.context_zones.PSObject.Properties.Name.Count
         $modeCount = $parsed.modes.PSObject.Properties.Name.Count
+        $profCount = $parsed.jd_profiles.PSObject.Properties.Name.Count
+        $selCount = $parsed.jd_profile_selector.PSObject.Properties.Name.Count
         $issues = @()
         if ($zoneCount -ne 3) { $issues += "Expected 3 zones, found $zoneCount" }
         if ($ctxCount -ne 4) { $issues += "Expected 4 context zones, found $ctxCount" }
         if ($modeCount -ne 4) { $issues += "Expected 4 modes, found $modeCount" }
-        if ($issues.Count -eq 0) { Write-Host " OK (3 zones, 4 context, 4 modes)" } else { $errors += "review-rules.jsonc: $($issues -join '; ')"; Write-Host " FAIL" }
+        if ($profCount -lt 1) { $issues += "Expected >=1 jd_profiles, found $profCount" }
+        if ($selCount -lt 1) { $issues += "Expected >=1 jd_profile_selector, found $selCount" }
+        if ($issues.Count -eq 0) { Write-Host " OK (3 zones, 4 context, 4 modes, $profCount profiles, $selCount selectors)" } else { $errors += "review-rules.jsonc: $($issues -join '; ')"; Write-Host " FAIL" }
     } catch { $errors += "review-rules.jsonc parse error: $_"; Write-Host " FAIL" }
 } else { $warnings += "review-rules.jsonc not found at repo root"; Write-Host " WARN (not found)" }
 
