@@ -208,7 +208,7 @@ Add-DimensionLog -Name "Orthography" -Score $OrthoScore -Max 10 -Evidence @{
   total_scanned   = $SkillFiles.Count
 } -Rationale "Encoding corruption: $CorruptedCount/$($SkillFiles.Count) files"
 
-# --- 7. Bitácora ---
+# --- 7. Bitacora ---
 $BitaScore = 0
 if (Test-Path "BITACORA.md") {
   $BitaContent = Get-Content "BITACORA.md" -Raw
@@ -218,7 +218,7 @@ if (Test-Path "BITACORA.md") {
   else { $BitaScore = 5 }
 }
 
-Add-DimensionLog -Name "Bitácora" -Score $BitaScore -Max 10 -Evidence @{
+Add-DimensionLog -Name "Bitacora" -Score $BitaScore -Max 10 -Evidence @{
   exists = (Test-Path "BITACORA.md")
   lines  = if (Test-Path "BITACORA.md") { (Get-Content "BITACORA.md").Count } else { 0 }
 } -Rationale "BITACORA.md exists: $(Test-Path 'BITACORA.md')"
@@ -313,7 +313,7 @@ $FinalScore = [math]::Round(($AllScores | Measure-Object -Average).Average, 1)
 # --- Output ---
 $DimOrder = @(
   "Project Artifacts", "Security", "Dead Code", "Clean Code",
-  "Best Practices", "Orthography", "Bitácora", "Metrics",
+  "Best Practices", "Orthography", "Bitacora", "Metrics",
   "Script Performance", "Skill Effectiveness",
   "Cycle Progress"
 )
