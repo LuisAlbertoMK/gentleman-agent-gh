@@ -30,6 +30,9 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = Resolve-Path "$PSScriptRoot\.."
 Set-Location -LiteralPath $RepoRoot
 
+# Auto-restore .project.json if vMK's MCP scoring infra overwrote it
+& "$PSScriptRoot\restore-project-score.ps1" -Quiet 2>&1 | Out-Null
+
 # --- Helpers ---
 $ScoreLog = @{}
 
