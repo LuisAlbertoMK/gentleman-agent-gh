@@ -108,6 +108,15 @@ if ($AutoFix) {
     }
     $errors = @($errors) | Where-Object { $_ -and $_.Status -ne "GLOBAL_MISSING" }
   }
+
+  # Also ensure global scripts directory exists as junction
+  $globalScriptsDir = "$env:USERPROFILE\.config\opencode\scripts"
+  $repoScriptsDir = Join-Path -Path $PSScriptRoot -ChildPath "."
+  if (-not (Test-Path $globalScriptsDir)) {
+    Write-Output "Creating global scripts junction..."
+    New-Item -ItemType Junction -Path $globalScriptsDir -Target $repoScriptsDir -Force | Out-Null
+    Write-Output "  Created: $globalScriptsDir -> $repoScriptsDir"
+  }
 }
 
 # --- Output ---

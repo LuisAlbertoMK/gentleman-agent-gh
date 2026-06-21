@@ -62,12 +62,12 @@ Comandos rápidos para tareas recurrentes — extienden el sistema de modos:
 | Keyword | Acción | Dificultad |
 |---------|--------|------------|
 | **`!compress`** | Karpathy compression en skills >2.5KB + score auto-update | Fácil |
-| **`!score`** | `score-auto.ps1 -Json` + update PROJECT-SCORE.md + cross-ref | Fácil |
-| **`!sync`** | `pull-upstream.ps1 -Mode Check` → drift check + agent sync (`-SyncAgents`) → score update | Medio |
+| **`!score`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\score-auto.ps1 -Json` + update PROJECT-SCORE.md + cross-ref | Fácil |
+| **`!sync`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\pull-upstream.ps1 -Mode Check` → drift check + agent sync (`-SyncAgents`) → score update | Medio |
 | **`!health`** | Full diagnostics: git status, drift, cross-ref, score, inter-track | Fácil |
-| **`!batch`** | `scripts/batch.ps1` — nueva batch auto-incremental + bitácora + inter-track++ | Fácil |
-| **`!cycle`** | `inter-track.ps1 -Show` + score status + upstream check — resumen del ciclo de auto-mejora actual | Fácil |
-| **`!close`** | `scripts/close-session.ps1` — pipeline unificado de cierre: BITACORA + inter-track + git status + template para mem_session_summary | Fácil |
+| **`!batch`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\batch.ps1` — nueva batch auto-incremental + bitácora + inter-track++ | Fácil |
+| **`!cycle`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\inter-track.ps1 -Show` + score status + upstream check — resumen del ciclo de auto-mejora actual | Fácil |
+| **`!close`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\close-session.ps1` — pipeline unificado de cierre: BITACORA + inter-track + git status + template para mem_session_summary | Fácil |
 
 ## Subagent-First
 Read-heavy (>3 files/scan/map) → delegate `explore`. Saves 2-5K tokens. Main context = synthesis/decisions.
@@ -75,17 +75,39 @@ Read-heavy (>3 files/scan/map) → delegate `explore`. Saves 2-5K tokens. Main c
 ## Learning Loop (post-task)
 Capture(Engram)→Extract→Evaluate→Apply. Auto-score 6 dims. <7→immune. 10→mem_save. Auto-immunize: error/<7 → anti-pattern + rule.
 Triggers: same fix 2x · gotcha · user corrected 2x · repeat workflow · pattern 3+ files. Self-check every ~5 tools.
-**Every 5th self-check**: run `scripts/session-miner.ps1 -Mode scan -Json` + parse output for new pattern proposals. Always active (no skill dependency).
+**Every 5th self-check**: run `$env:GENTLEMAN_AGENT_ROOT\scripts\session-miner.ps1 -Mode scan -Json` + parse output for new pattern proposals. Always active (no skill dependency).
 
 ## Default-FAIL
 Evidence required for "done". Tool output = evidence. NOT self-assessment. Builder≠Evaluator. Uncertain? → FAIL + evidence. Practice: `go test ./...` before done.
 After every completion: auto-score 6 dims. <7 → immune-system.
 
+## Python Environment
+This agent supports executing Python code through the `bash` tool. Python commands use `python` directly.
+The following Python packages are available globally: `rich`, `requests`, `httpx`, `beautifulsoup4`, `lxml`, `pandas`, `numpy`, `Pillow`, `aiohttp`, `fastapi`, `uvicorn`, `pydantic`, `sqlalchemy`, `alembic`, `pytest`, `pytest-asyncio`, `pytest-cov`, `flake8`, `mypy`, `black`, `isort`, `pre-commit`, `click`, `typer`.
+If a package import fails, install it with `pip install <package>`.
+
+## Global Script Invocation
+Gentleman scripts are invoked from **any** project directory using the global junction at `$env:USERPROFILE\.config\opencode\scripts\`.
+The agent's `bash` tool starts a **fresh** `powershell -NoProfile` process — your PS Profile is NOT loaded.
+
+**Always use this two-step pattern:**
+```powershell
+. "$env:USERPROFILE\.config\opencode\scripts\bash-safe.ps1"
+& "$env:GENTLEMAN_AGENT_ROOT\scripts\script-name.ps1" -args
+```
+Step 1 dot-sources `bash-safe.ps1` from the global junction, which auto-discovers `$env:GENTLEMAN_AGENT_ROOT` from the junction target.
+Step 2 runs the target script from the repo's `scripts/` directory using the discovered root.
+
+**One-liner**: `. "$env:USERPROFILE\.config\opencode\scripts\bash-safe.ps1"; & "$env:GENTLEMAN_AGENT_ROOT\scripts\xxx.ps1" -args`
+
+All script references below assume this preamble.
+
 ## Bash-Safe (PowerShell 5.1)
-PS 5.1 rejects `&&`, `||`, `@{var}`. WSL `bash` in PATH is broken stub. **Use Git Bash** via `Invoke-Bash` from `scripts/bash-safe.ps1`.
+PS 5.1 rejects `&&`, `||`, `@{var}`. WSL `bash` in PATH is broken stub.
+**Use Git Bash** via `Invoke-Bash` (registered in PS Profile AND auto-discovered by dot-sourcing `bash-safe.ps1` from the junction).
 **Invoke-Bash is DEFAULT, raw bash calls are FORBIDDEN**. Every bash command MUST go through `Invoke-Bash "..."` or the equivalent
 `& "C:\Program Files\Git\bin\bash.exe" -c "..."` syntax.
-**Pre-flight check**: BEFORE every bash tool call, scan the command string for `&&` or `||`. If found → use `Invoke-Bash` wrapper or `; if ($?) { }` instead. Violation = auto-immune trigger.
+**Pre-flight check**: BEFORE every bash tool call, scan the command string for `&&` or `||`. If found → use `Invoke-Bash` wrapper or `; if ($?) { }` instead. Violation = auto-immune trigger!
 
 ## Execution & Resource-Adaptive Mode
 Infer: QUICK (simple→min) · THOROUGH (risky→full SDD) · DRAFT (explore→findings). Explicit: "modo rápido" / "modo thorough" / "draft"
@@ -120,7 +142,7 @@ karpathy-prompt · karpathy-loop · caveman · lean-context · quality-gate · a
 `{file:ANTI-PATTERN-CATALOG.md}` — scan BEFORE any task.
 
 ### Skill Router
-**Primary**: `scripts/skill-graph.ps1 -Task "<task>" -Format Json` — resolves 4-8 relevant skills via dep graph (−85-92% vs loading all).
+**Primary**: `$env:GENTLEMAN_AGENT_ROOT\scripts\skill-graph.ps1 -Task "<task>" -Format Json` — resolves 4-8 relevant skills via dep graph (−85-92% vs loading all).
 **Fallback**:
 ```
 Resume → session-resume · Write code → skill-creator, sdd-*, quality-gate, go-testing, work-unit-commits
@@ -147,9 +169,9 @@ Load order: 1) Anti-Pattern Catalog 2) Behavioral match 3) Trigger match 4) Defa
 ## Project Overrides
 | Aspect | Reference |
 |--------|-----------|
-| Skill validation | `scripts/skill-validate.ps1` — 3-trial benchmark |
-| Drift detection | `scripts/check-skill-drift.ps1` |
-| Sparse loading | `scripts/skill-graph.ps1` |
+| Skill validation | `$env:GENTLEMAN_AGENT_ROOT\scripts\skill-validate.ps1` — 3-trial benchmark |
+| Drift detection | `$env:GENTLEMAN_AGENT_ROOT\scripts\check-skill-drift.ps1` |
+| Sparse loading | `$env:GENTLEMAN_AGENT_ROOT\scripts\skill-graph.ps1` |
 | Quality standard | `docs/quality-standard.md` — 13-dim |
 | Metrics | `docs/metricas/` — before/after for tasks ≥3 steps |
 
@@ -177,14 +199,14 @@ Also PROACTIVELY: when starting known-area work · user mentions unfamiliar topi
 
 ### DREAMING (periodic)
 `mem_search(type="error|bugfix")` for patterns. Same error 2x → catalog. 3x → AGENTS.md rule.
-**AUTO: RUN** `.\scripts\session-miner.ps1 -Mode scan -Json` every 5th error/bugfix (triggered by Learning Loop self-check) to cross-reference across sessions. Parse JSON output and propose new anti-patterns. The session-miner is invoked automatically — do NOT skip this step.
+**AUTO: RUN** `$env:GENTLEMAN_AGENT_ROOT\scripts\session-miner.ps1 -Mode scan -Json` every 5th error/bugfix (triggered by Learning Loop self-check) to cross-reference across sessions. Parse JSON output and propose new anti-patterns. The session-miner is invoked automatically — do NOT skip this step.
 
 ### AUTO-CLEAN
 Delete `$env:TEMP\opencode\` files >24h old at session start.
 
 ### SESSION CLOSE PROTOCOL (mandatory)
 
-Run `!close` (`scripts/close-session.ps1`) to start the pipeline: log to BITACORA, increment inter-track, check git status. Then:
+Run `!close` (`$env:GENTLEMAN_AGENT_ROOT\scripts\close-session.ps1`) to start the pipeline: log to BITACORA, increment inter-track, check git status. Then:
 
 1. **Auto-metrics**: If session had code/task work (≥3 tool calls), run `auto-metrics` score 6 dims. <7 → `immune-system`.
 2. **Auto-dreaming**: If errors/bugfixes, `mem_search(type="error|bugfix")` for patterns. Same 2x→catalog. 3x→AGENTS.md rule.
@@ -233,7 +255,7 @@ Updates: `mem_update` on `topic_key=protocol/agente-optimizado`. Review: 2 weeks
 - Same error 2x → immune-system + catalog update
 - Same flow 3+ → consolidate into skill or AGENTS.md rule
 ### D. Security (no opt-in)
-- Pre-commit/PR → quality-gate + security-scanner + `scripts/pssa-gate.ps1 -Mode Check`
+- Pre-commit/PR → quality-gate + security-scanner + `$env:GENTLEMAN_AGENT_ROOT\scripts\pssa-gate.ps1 -Mode Check`
 - PSSA Gate: auto-heals BOM + switch defaults (-Mode Fix); Write-Host intentional; rest manual
 - PS 5.1 → Git Bash (see Bash-Safe above)
 - Commit/push/--force/-i → only on EXPLICIT user request
@@ -254,9 +276,9 @@ Close task: auto-metrics 6 dims (correctness, tokens, error prevention, skill, s
 **If task had code changes** → load `external-auditor` for blind subagent audit. Discrepancy >1.5 on any dim → immune-system.
 
 ### H. Pull-from-Upstream (gentleman-vMK)
-- **Check**: `.\scripts\pull-upstream.ps1 -Mode Check` — NEW/MODIFIED/OURS ONLY
+- **Check**: `$env:GENTLEMAN_AGENT_ROOT\scripts\pull-upstream.ps1 -Mode Check` — NEW/MODIFIED/OURS ONLY
 - **Apply-New**: auto-merge upstream-only files
-- **Apply-File**: `pull-upstream.ps1 -Mode Apply-File -TargetFile "path"`
+- **Apply-File**: `$env:GENTLEMAN_AGENT_ROOT\scripts\pull-upstream.ps1 -Mode Apply-File -TargetFile "path"`
 - **Policy**: review MODIFIED manually; OURS ONLY ignored. Skills → `.agents/skills/`
 
 ### I. Self-Improvement System (active 2026-06-17)
@@ -266,9 +288,9 @@ Close task: auto-metrics 6 dims (correctness, tokens, error prevention, skill, s
 **1. Skill: `self-improvement`** — orquestra ciclo completo: diagnose, fix with triple-verify by difficulty, log (bitácora + inter-track), verify, learn (engram + anti-patterns), propagate. Load: `skill("self-improvement")`.
 
 **2. Scripts**:
-   - `scripts/inter-track.ps1` — tracks inter(30) metric (minimum 30 meaningful interactions per cycle)
-   - `scripts/extract-skill.ps1` — extracts patterns with ≥3 reps from `.learnings/` into reusable skills
-   - `scripts/run-improvement-cycle.ps1` — measure, audit, compress, learn (existing, enhanced)
+   - `$env:GENTLEMAN_AGENT_ROOT\scripts\inter-track.ps1` — tracks inter(30) metric (minimum 30 meaningful interactions per cycle)
+   - `$env:GENTLEMAN_AGENT_ROOT\scripts\extract-skill.ps1` — extracts patterns with ≥3 reps from `.learnings/` into reusable skills
+   - `$env:GENTLEMAN_AGENT_ROOT\scripts\run-improvement-cycle.ps1` — measure, audit, compress, learn (existing, enhanced)
 
 **3. Plugin: `opencode-self-improve`** (Hermes Agent-style) — SkillForge extracts patterns→SQLite skills, Curator re-scores/merges/removes low-quality, SkillInjector injects top-3 pre-turn. 7 tools. Config: `magic-context.jsonc` root. DB: `~/.local/share/opencode-self-improve/skills.db`.
 
@@ -280,10 +302,10 @@ Close task: auto-metrics 6 dims (correctness, tokens, error prevention, skill, s
 
 ### J. Pre-session Health Check (session start) + Project Score
 Al iniciar sesión, MUY rápido (no bloquear):
-0.5. `.\scripts\restore-project-score.ps1 -Quiet` — restaura .project.json si vMK lo sobrescribió (score≠10.0 o ≠11 dims)
+0.5. `$env:GENTLEMAN_AGENT_ROOT\scripts\restore-project-score.ps1 -Quiet` — restaura .project.json si vMK lo sobrescribió (score≠10.0 o ≠11 dims)
 1. `git status --short` — si hay cambios sin commit → alerta leve
-2. Ejecutá `scripts/check-skill-drift.ps1` — verifica que todas las skills tengan sus junctions globales. Si hay drift, reportalo como warning.
-2.5. `.\scripts\check-upstream.ps1 -Json` (timeout 15s) — verifica cambios en repos externos (CYCLE.md External Repos). Si hay `NEW`, guardá en Engram y reportá como warning. No bloquea si falla.
+2. Ejecutá `$env:GENTLEMAN_AGENT_ROOT\scripts\check-skill-drift.ps1` — verifica que todas las skills tengan sus junctions globales. Si hay drift, reportalo como warning.
+2.5. `$env:GENTLEMAN_AGENT_ROOT\scripts\check-upstream.ps1 -Json` (timeout 15s) — verifica cambios en repos externos (CYCLE.md External Repos). Si hay `NEW`, guardá en Engram y reportá como warning. No bloquea si falla.
 3. Si todo OK → seguí sin reportar
 
 ### K. Project Score Auto-Report (first user request)

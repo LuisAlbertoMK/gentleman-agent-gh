@@ -92,6 +92,13 @@ function Test-BashSafe {
     if (($r.Output -join '') -match 'git version') { Write-Host " OK" -ForegroundColor Green } else { Write-Host " FAIL" -ForegroundColor Red }
 }
 
+# Auto-discover GENTLEMAN_AGENT_ROOT on dot-source (via junction)
+$__dir = Split-Path $MyInvocation.MyCommand.Path -Parent
+$__item = Get-Item $__dir
+if ($__item.LinkType -eq "Junction" -and $__item.Target) {
+    $env:GENTLEMAN_AGENT_ROOT = Split-Path $__item.Target -Parent
+}
+
 # Self-test if run directly
 if ($MyInvocation.InvocationName -ne '.' -and $MyInvocation.MyCommand.Path -eq $PSCommandPath) {
     Write-Host "Using: $script:GitBash" -ForegroundColor Cyan
