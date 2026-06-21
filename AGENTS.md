@@ -282,6 +282,7 @@ Al iniciar sesión, MUY rápido (no bloquear):
 0.5. `.\scripts\restore-project-score.ps1 -Quiet` — restaura .project.json si vMK lo sobrescribió (score≠10.0 o ≠11 dims)
 1. `git status --short` — si hay cambios sin commit → alerta leve
 2. Ejecutá `scripts/check-skill-drift.ps1` — verifica que todas las skills tengan sus junctions globales. Si hay drift, reportalo como warning.
+2.5. `.\scripts\check-upstream.ps1 -Json` (timeout 15s) — verifica cambios en repos externos (CYCLE.md External Repos). Si hay `NEW`, guardá en Engram y reportá como warning. No bloquea si falla.
 3. Si todo OK → seguí sin reportar
 
 ### K. Project Score Auto-Report (first user request)

@@ -89,7 +89,7 @@ All 11 dims at 10.0. Focus on keeping them green while advancing Cycle Progress.
 |------|---------------|---------------|
 | karpathy/autoresearch | New program.md patterns, loop improvements | 2026-06-20 (auto, UNCHANGED) |
 | Gentleman-Programming/gentleman-guardian-angel | New caching strategies, AGENTS.md compliance checks | 2026-06-20 (auto, UNCHANGED) |
-| gentle-ai | Skills, scripts, MCP servers, backup systems | 2026-06-20 (auto, UNCHANGED) |
+| gentle-ai | Skills, scripts, MCP servers, backup systems | 2026-06-20 (auto, CHANGED — 9 new commits including JD profiles PR #920) |
 | engram (MCP) | Cloud sync, new query types, performance | 2026-06-20 (auto, UNCHANGED) |
 
 ## Cycle Loop
