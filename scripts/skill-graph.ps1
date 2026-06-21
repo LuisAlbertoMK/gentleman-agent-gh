@@ -1,453 +1,92 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 
 <#
 .SYNOPSIS
-  Skill dependency graph — sparse loading resolver.
-  Given task keywords, returns the minimal skill set needed (matched + 1-hop dependencies).
-
-.DESCRIPTION
-  Builds a dependency graph of all 54 gentleman-agent skills with:
-  - Triggers (keywords that activate each skill)
-  - Categories (compression, quality, memory, meta, code-ops, SDD, web-quality)
-  - Dependencies (skills that must be loaded together)
-  - Cross-references (related skills)
-
-  Resolution: task keywords to BFS match to expand 1-hop to return skill set.
-
+  Skill dependency graph - resolve skills by task keywords.
 .PARAMETER Task
-  Task description or keywords to resolve skills for.
-
+  Keywords to resolve skills for.
 .PARAMETER Expand
-  How many hops of dependencies to include (default: 1, max: 3).
-
+  Dep hops (default:1, max:3).
 .PARAMETER ListAll
-  List all skills with their categories and dependencies (no resolution).
-
+  List all skills.
 .PARAMETER Format
-  Output format: Text (default), Json, or Csv.
-
-.EXAMPLE
-  .\scripts\skill-graph.ps1 -Task "security audit, fix vulnerabilities"
-  .\scripts\skill-graph.ps1 -Task "code review, commit" -Expand 2
-  .\scripts\skill-graph.ps1 -ListAll
-  .\scripts\skill-graph.ps1 -Task "performance" -Format Json
+  Output format: Text|Json|Csv.
 #>
 
-param(
-    [string]$Task = "",
-    [ValidateRange(0,3)]
-    [int]$Expand = 1,
-    [switch]$ListAll,
-    [switch]$RecommendAgent,
-    [ValidateSet("Text","Json","Csv")]
-    [string]$Format = "Text"
-)
+param([string]$Task="",[ValidateRange(0,3)][int]$Expand=1,[switch]$ListAll,[switch]$RecommendAgent,[ValidateSet("Text","Json","Csv")][string]$Format="Text")
+Set-StrictMode -Version Latest;$ErrorActionPreference='Stop'
 
-Set-StrictMode -Version Latest
-
-$ErrorActionPreference = 'Stop'
-
-# ============================================================
-# SKILL REGISTRY — 60 skills with triggers, categories, deps
-# ============================================================
-
-$skillRegistry = @()
-
-function Add-Skill {
-    param(
-        [string]$Name,
-        [string[]]$Triggers,
-        [string]$Category = "general",
-        [string[]]$DependsOn = @(),
-        [string[]]$Related = @(),
-        [string]$Description = "",
-        [ValidateSet("low","medium","high")]
-        [string]$Effort = "medium"
-    )
-    $script:skillRegistry += [PSCustomObject]@{
-        Name        = $Name
-        Triggers    = $Triggers
-        Category    = $Category
-        DependsOn   = $DependsOn
-        Related     = $Related
-        Description = $Description
-        Effort      = $Effort
-    }
-}
-
-# --- Compression / Style ---
-Add-Skill -Name "karpathy-loop" -Category "compression" -Effort medium -Triggers @("karpathy","less tokens","context compression","compact prompt","Karpathy prompt","karpathy loop","optimize prompt","measure tokens","self-improve prompt") -Description "Karpathy-style compression + iterative loop for prompts (merged karpathy-prompt)"
-Add-Skill -Name "lean-context" -Category "compression" -Effort low -Triggers @("compact","less tokens","caveman","caveman","ultra-lean","minimal context") -Description "Ultra-lean context mode"
-Add-Skill -Name "execution-mode" -Category "compression" -Effort low -Triggers @("execution mode","quick","thorough","draft","modo") -Description "Quick or Thorough or Draft execution modes"
-Add-Skill -Name "skill-digestion" -Category "compression" -Effort low -Triggers @("skill digestion","compact on load","compress skill") -Description "Digest and compact skills when loaded"
-
-# --- Quality ---
-Add-Skill -Name "quality-gate" -Category "quality" -Triggers @("quality gate","pre-commit","validate commit") -Description "Pre-commit quality gate with 5 checks" -Related @("auto-metrics","commit-crafter")
-Add-Skill -Name "auto-metrics" -Category "quality" -Triggers @("auto-score","metrics","post-task","evaluate","self-evaluate") -Description "Post-task self-evaluation with 7-dim scoring" -DependsOn @("skill-validate")
-Add-Skill -Name "immune-system" -Category "quality" -Effort high -Triggers @("immune system","anti-pattern","permanent immunity","nunca mas","bug","fix","error") -Description "Permanent immunity catalog for repeated errors"
-Add-Skill -Name "code-review-agent" -Category "quality" -Triggers @("code review","CR","revisar codigo","review code") -Description "Automated code review with standards" -DependsOn @("best-practices")
-Add-Skill -Name "skill-testing" -Category "quality" -Triggers @("test skill","verify skill","coverage","skill test") -Description "Test and verify skill coverage"
-Add-Skill -Name "skill-validate" -Category "quality" -Triggers @("skill validation","benchmark","multi-trial","validate skill","3 trials") -Description "3-trial benchmark validation for skills"
-Add-Skill -Name "judgment-day" -Category "quality" -Effort high -Triggers @("judgment day","dual review","juzgar","evaluar skill") -Description "Dual review and judgment for skills"
-
-# --- Memory ---
-Add-Skill -Name "session-resume" -Category "memory" -Triggers @("resume","donde lo dejamos","continua","session start","git state") -Description "Safe session resume with git state gate" -DependsOn @("dreaming")
-Add-Skill -Name "code-memory" -Category "memory" -Triggers @("code memory","memory","recordar","acordate","multi-session") -Description "Cross-session code memory and recall" -Related @("session-resume","dreaming")
-Add-Skill -Name "dreaming" -Category "memory" -Effort high -Triggers @("dreaming","cross-session","pattern extraction","memory curation","engram") -Description "Cross-session pattern extraction via Engram" -DependsOn @("auto-metrics")
-Add-Skill -Name "bitacora" -Category "memory" -Effort low -Triggers @("bitacora","historial","historico","request log") -Description "Session activity log and history tracking"
-Add-Skill -Name "metricas" -Category "memory" -Effort low -Triggers @("metricas","before or after","percent improvement","delta") -Description "Before or after metrics tracking for improvements"
-Add-Skill -Name "decision-capture" -Category "memory" -Triggers @("decision","trade-off","decision log") -Description "Capture and log architectural decisions"
-
-# --- Skills Meta ---
-Add-Skill -Name "skill-creator" -Category "meta" -Triggers @("create skill","new skill","crear skill") -Description "Create new AI skills from requirements"
-Add-Skill -Name "skill-registry" -Category "meta" -Triggers @("skill registry","catalog","registro skills") -Description "Skill registry management and catalog"
-Add-Skill -Name "skill-improver" -Category "meta" -Triggers @("skill improvement","audit skills","refactor skills") -Description "Audit and improve existing skills"
-# Merged into skill-improver (v2.0)
-Add-Skill -Name "gap-analysis" -Category "meta" -Effort high -Triggers @("gap analysis","system audit","identificar gaps","project intake") -Description "Complete 8-dim gap analysis for any system" -Related @("project-mapper","security-scanner")
-
-# --- Code Ops ---
-Add-Skill -Name "commit-crafter" -Category "code-ops" -Effort low -Triggers @("commit","commit message","conventional commit") -Description "Craft conventional commit messages from diff" -Related @("quality-gate")
-Add-Skill -Name "refactoring-planner" -Category "code-ops" -Triggers @("refactor","refactoring","reestructurar","migrate") -Description "Plan and execute code refactoring"
-Add-Skill -Name "project-mapper" -Category "code-ops" -Triggers @("mapear","project map","estructura","tech stack") -Description "Map project structure, stack, and architecture" -Related @("gap-analysis")
-Add-Skill -Name "security-scanner" -Category "code-ops" -Triggers @("security","seguridad","vulnerabilidad","auditar") -Description "Security audit and vulnerability scanner" -DependsOn @("best-practices")
-Add-Skill -Name "performance-tracker" -Category "code-ops" -Triggers @("performance score","mobile perf","desktop perf","rendimiento","app score","benchmark") -Description "Score and track app performance across 6 dimensions"
-
-# --- SDD ---
-Add-Skill -Name "sdd" -Category "SDD" -Triggers @("SDD pipeline","SDD phase","spec-driven development") -Description "Unified SDD pipeline — 9 phases (init→archive)" -Related @("sdd-init","sdd-explore","sdd-propose","sdd-spec","sdd-design","sdd-tasks","sdd-apply","sdd-verify","sdd-archive")
-Add-Skill -Name "sdd-init" -Category "SDD" -Triggers @("SDD init","bootstrap","iniciar SDD") -Description "SDD init — bootstrap project context (wrapper, canonical at sdd/phases/00-init.md)"
-Add-Skill -Name "sdd-explore" -Category "SDD" -Triggers @("explore codebase","pre-design","investigar","codebase exploration") -Description "Explore codebase (wrapper, canonical at sdd/phases/01-explore.md)"
-Add-Skill -Name "sdd-propose" -Category "SDD" -Triggers @("proposal","intent","approach","change proposal") -Description "Create change proposals (wrapper, canonical at sdd/phases/02-propose.md)" -DependsOn @("sdd-explore")
-Add-Skill -Name "sdd-spec" -Category "SDD" -Triggers @("specs","specification","Given When Then","requisitos","spec") -Description "Write specifications from proposals (wrapper, canonical at sdd/phases/04-spec.md)" -DependsOn @("sdd-propose")
-Add-Skill -Name "sdd-design" -Category "SDD" -Triggers @("technical design","HOW","diseno tecnico") -Description "Create technical design from specs (wrapper, canonical at sdd/phases/03-design.md)" -DependsOn @("sdd-spec")
-Add-Skill -Name "sdd-tasks" -Category "SDD" -Triggers @("task breakdown","implementation plan","tareas","task list") -Description "Break down designs into tasks (wrapper, canonical at sdd/phases/05-tasks.md)" -DependsOn @("sdd-design")
-Add-Skill -Name "sdd-apply" -Category "SDD" -Triggers @("apply tasks","implement","aplicar") -Description "Apply tasks to implement changes (wrapper, canonical at sdd/phases/06-apply.md)" -DependsOn @("sdd-tasks") -Related @("commit-crafter")
-Add-Skill -Name "sdd-verify" -Category "SDD" -Triggers @("validate vs specs","verify","verificar") -Description "Validate implementation against specs (wrapper, canonical at sdd/phases/07-verify.md)" -DependsOn @("sdd-spec")
-Add-Skill -Name "sdd-archive" -Category "SDD" -Triggers @("archive changes","delta to main","archivar") -Description "Archive completed changes (wrapper, canonical at sdd/phases/08-archive.md)" -DependsOn @("sdd-verify","sdd-apply")
-Add-Skill -Name "sdd-onboard" -Category "SDD" -Triggers @("SDD onboard","onboarding","nuevo proyecto SDD","guia SDD") -Description "Guide users through complete SDD cycle"
-
-# --- Coordination ---
-Add-Skill -Name "delivery-harness" -Category "coordination" -Effort high -Triggers @("coordinate","orchestrate","multi-agent","delegate work") -Description "Orchestrate multi-agent work delivery" -DependsOn @("subagent-isolation","work-unit-commits") -Related @("chained-pr")
-Add-Skill -Name "chained-pr" -Category "coordination" -Triggers @("stacked PR","chained PR","sequential branches","PR chain") -Description "Manage stacked sequential PRs (refs: chaining-details.md)" -DependsOn @("work-unit-commits") -Related @("delivery-harness","branch-pr")
-Add-Skill -Name "branch-pr" -Category "coordination" -Triggers @("branch PR","branch naming","create PR","open pull request") -Description "Branch creation and PR workflow for gentle-ai" -Related @("chained-pr","issue-creation")
-Add-Skill -Name "issue-creation" -Category "coordination" -Triggers @("create issue","GitHub issue","bug report","feature request") -Description "GitHub issue creation with issue-first workflow for gentle-ai" -Related @("branch-pr")
-Add-Skill -Name "subagent-isolation" -Category "coordination" -Triggers @("subagent isolation","context boundaries","delegation") -Description "Isolate subagent contexts and prevent contamination"
-Add-Skill -Name "command-wrapper" -Category "coordination" -Effort low -Triggers @("command wrapper","safe execution","error handling","output parse") -Description "Safe command execution with error handling"
-
-# --- Web Quality ---
-Add-Skill -Name "accessibility" -Category "web-quality" -Triggers @("accessibility","a11y","WCAG","screen reader","keyboard nav","make accessible") -Description "Audit and improve web accessibility"
-Add-Skill -Name "performance" -Category "web-quality" -Triggers @("web performance","speed up","reduce load time","page speed","performance audit") -Description "Optimize web performance for faster loading"
-Add-Skill -Name "seo" -Category "web-quality" -Triggers @("SEO","search engine","meta tags","structured data","sitemap") -Description "Optimize for search engine visibility"
-# Merged into performance (v2.0)
-Add-Skill -Name "best-practices" -Category "web-quality" -Triggers @("best practices","security audit","modernize code","code quality review") -Description "Apply modern web development best practices"
-Add-Skill -Name "web-quality-audit" -Category "web-quality" -Triggers @("web quality audit","lighthouse audit","review web quality") -Description "Comprehensive web quality audit" -DependsOn @("accessibility","performance","seo","best-practices")
-Add-Skill -Name "development-mode" -Category "web-quality" -Triggers @("performance mode","dev mode","modo desarrollo","high performance","modo rendimiento") -Description "System resource prioritization mode"
-
-# --- Research ---
-Add-Skill -Name "research" -Category "research" -Triggers @("research","investigar","technical investigation","learn","compare solutions","evaluate") -Description "Structured research workflow for technical investigations"
-
-# --- General / Specialized ---
-Add-Skill -Name "recovery-protocol" -Category "specialized" -Triggers @("recovery","no es eso","frustration","stuck","bloqueado","bug","fix","error") -Description "Recovery protocol for frustration and errors"
-Add-Skill -Name "context-watchdog" -Category "specialized" -Triggers @("context overflow","token limit","context explosion") -Description "Monitor and prevent context window overflow"
-Add-Skill -Name "ci-cd" -Category "specialized" -Triggers @("CI/CD","pipeline","GitHub Actions","continuous integration") -Description "CI/CD pipeline automation"
-Add-Skill -Name "work-unit-commits" -Category "specialized" -Effort low -Triggers @("work-unit","commit organization") -Description "Organize commits into logical work units"
-Add-Skill -Name "self-improvement" -Category "specialized" -Effort high -Triggers @("self-improvement","improvement cycle","auto-improve","inter 30","cycle") -Description "Self-improvement cycle with inter(30) minimum" -Related @("self-reflection","dreaming")
-Add-Skill -Name "self-reflection" -Category "specialized" -Triggers @("self-reflection","Hermes","error patterns","reflexion") -Description "Hermes closed learning loop"
-Add-Skill -Name "cognitive-doc-design" -Category "specialized" -Triggers @("doc design","documentation patterns","cognitive load","progressive disclosure") -Description "Design docs that reduce cognitive load"
-Add-Skill -Name "comment-writer" -Category "specialized" -Effort low -Triggers @("comment writer","PR feedback","review comment","write feedback") -Description "Write warm, direct collaboration comments"
-Add-Skill -Name "senior-engineer" -Category "specialized" -Effort high -Triggers @("senior architect","trade-offs","system design","arquitectura") -Description "Senior engineer persona for architecture decisions"
-Add-Skill -Name "prompt-engineering" -Category "specialized" -Triggers @("improve prompt","ReAct","multi-agent","prompt engineering") -Description "Advanced prompt engineering techniques"
-Add-Skill -Name "go-testing" -Category "specialized" -Triggers @("Go tests","Bubbletea TUI","golang test") -Description "Go testing patterns and tools"
-Add-Skill -Name "python-async" -Category "specialized" -Triggers @("Python async","asyncio") -Description "Python async/await patterns"
-
-# ============================================================
-# GRAPH FUNCTIONS
-# ============================================================
-
-function New-Graph {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
-    param()
-    $g = @{ Nodes = @{}; AdjList = @{} }
-    foreach ($s in $script:skillRegistry) {
-        $name = $s.Name
-        $g.Nodes[$name] = $s
-        $g.AdjList[$name] = @{ to = @{}; from = @{} }
-    }
-    foreach ($s in $script:skillRegistry) {
-        foreach ($dep in $s.DependsOn) {
-            if ($g.AdjList.ContainsKey($dep)) {
-                $g.AdjList[$dep].to[$s.Name] = "depends_on"
-                $g.AdjList[$s.Name].from[$dep] = "depended_by"
-            }
-        }
-    }
-    foreach ($s in $script:skillRegistry) {
-        foreach ($rel in $s.Related) {
-            if ($g.AdjList.ContainsKey($rel)) {
-                $g.AdjList[$rel].to[$s.Name] = "related"
-                $g.AdjList[$s.Name].from[$rel] = "related"
-            }
-        }
-    }
-    return $g
-}
-
-function Resolve-Skill {
-    param(
-        [hashtable]$Graph,
-        [string]$Task,
-        [int]$MaxHops = 1
-    )
-    $taskLower = $Task.ToLower()
-    $matched = @{}
-    $usedTriggers = @{}
-
-    # Phase 1: match by trigger keywords
-    foreach ($s in $script:skillRegistry) {
-        foreach ($trigger in $s.Triggers) {
-            $triggerWords = $trigger.ToLower() -split '\s+|,|/'
-            $matchedAny = $false
-            foreach ($word in $triggerWords) {
-                if ($word.Length -lt 3) { continue }
-                if ($taskLower -match [regex]::Escape($word)) {
-                    $matched[$s.Name] = $true
-                    if (-not $usedTriggers.ContainsKey($s.Name)) {
-                        $usedTriggers[$s.Name] = @()
-                    }
-                    $usedTriggers[$s.Name] += $trigger
-                    $matchedAny = $true
-                    break
-                }
-            }
-            if ($matchedAny) { break }
-        }
-    }
-
-    # Phase 2: BFS expand dependencies
-    $expanded = @{}
-    foreach ($name in $matched.Keys) {
-        $expanded[$name] = $true
-        Expand-Hop -Graph $Graph -Start $name -Hops $MaxHops -Visited $expanded
-    }
-
-    # Phase 3: build result
-    $result = @()
-    foreach ($name in $expanded.Keys) {
-        $s = $Graph.Nodes[$name]
-        if ($s) {
-            $result += [PSCustomObject]@{
-                Name       = $s.Name
-                Category   = $s.Category
-                Matched    = $matched.ContainsKey($name)
-                Triggers   = if ($matched.ContainsKey($name)) { $usedTriggers[$name] -join "; " } else { "" }
-                DependsOn  = $s.DependsOn -join "; "
-                Related    = $s.Related -join "; "
-                Description = $s.Description
-            }
-        }
-    }
-
-    $result = $result | Sort-Object -Property @{E={-$_.Matched}}, Category, Name
-    return $result
-}
-
-function Expand-Hop {
-    param($Graph, $Start, $Hops, $Visited)
-    if ($Hops -le 0) { return }
-    $current = $Graph.AdjList[$Start]
-    if (-not $current) { return }
-    foreach ($neighbor in $current.to.Keys) {
-        if (-not $Visited[$neighbor]) {
-            $Visited[$neighbor] = $true
-            Expand-Hop -Graph $Graph -Start $neighbor -Hops ($Hops - 1) -Visited $Visited
-        }
-    }
-    foreach ($neighbor in $current.from.Keys) {
-        if (-not $Visited[$neighbor]) {
-            $Visited[$neighbor] = $true
-            Expand-Hop -Graph $Graph -Start $neighbor -Hops ($Hops - 1) -Visited $Visited
-        }
-    }
-}
-
-# ============================================================
-# AGENT ROUTING
-# ============================================================
-
-$agentRouting = @{
-    low    = "gentleman-quick"
-    medium = "gentleman-codex"
-    high   = "gentleman-deep"
-}
-
-function Get-AgentRecommendation {
-    param([array]$ResolvedSkills)
-    $maxEffort = "low"
-    foreach ($s in $ResolvedSkills) {
-        $node = $script:skillRegistry | Where-Object { $_.Name -eq $s.Name }
-        if (-not $node) { continue }
-        $e = $node.Effort
-        if ($e -eq "high")  { $maxEffort = "high"; break }
-        if ($e -eq "medium") { $maxEffort = "medium" }
-    }
-    $agent = $agentRouting[$maxEffort]
-    $effortLabel = @{ low = "simple — "; medium = "standard — "; high = "complex — " }
-    return [PSCustomObject]@{
-        Agent  = $agent
-        Effort = $maxEffort
-        Reason = $effortLabel[$maxEffort] + "use $agent for this task"
-    }
-}
-
-# ============================================================
-# OUTPUT
-# ============================================================
-
-$graph = New-Graph
-$resolved = $null
-
-if ($ListAll) {
-    $groups = $script:skillRegistry | Group-Object Category
-    switch ($Format) {
-        "Json" { try { $groups | ForEach-Object {
-                $g = $_
-                @{ Category = $g.Name; Skills = $g.Group | Sort-Object Name | ForEach-Object {
-                    @{ Name = $_.Name; Effort = $_.Effort; DependsOn = $_.DependsOn; Related = $_.Related }
-                }}
-            } | ConvertTo-Json -Depth 3; } catch { Write-Host "Error generating JSON: $_" -ForegroundColor Red; exit 1 }
-        }
-        "Csv" {
-            $flat = foreach ($g in $groups) {
-                foreach ($s in $g.Group | Sort-Object Name) {
-                    [PSCustomObject]@{
-                        Category   = $g.Name
-                        Skill      = $s.Name
-                        Effort     = $s.Effort
-                        DependsOn  = if ($s.DependsOn.Count -gt 0) { $s.DependsOn -join "; " } else { "" }
-                        Related    = if ($s.Related.Count -gt 0) { $s.Related -join "; " } else { "" }
-                    }
-                }
-            }
-            $flat | ConvertTo-Csv -NoTypeInformation
-        }
-        "Text" {
-            foreach ($g in $groups) {
-                Write-Host ("`n[" + $g.Name.ToUpper() + "]  (" + $g.Count + " skills)") -ForegroundColor Green
-                $g.Group | Sort-Object Name | ForEach-Object {
-                    $deps = if ($_.DependsOn.Count -gt 0) { "  deps: " + ($_.DependsOn -join ", ") } else { "" }
-                    $eff = if ($_.Effort -ne "medium") { "  [" + $_.Effort + "]" } else { "" }
-                    Write-Host ("  " + $_.Name.PadRight(22) + $eff + $deps) -ForegroundColor White
-                }
-            }
-            Write-Host ("`nTotal: " + $script:skillRegistry.Count + " skills in " + $groups.Count + " categories") -ForegroundColor Cyan
-        }
-    }
-    exit 0
-}
-
-if ([string]::IsNullOrWhiteSpace($Task)) {
-    Write-Host "Usage:" -ForegroundColor Yellow
-    Write-Host ("  .\scripts\skill-graph.ps1 -Task ""<task description>"" [-Expand N] [-Format Json|Csv]") -ForegroundColor Cyan
-    Write-Host ("  .\scripts\skill-graph.ps1 -ListAll [-Format Json|Csv]") -ForegroundColor Cyan
-    Write-Host ""
-    Write-Host ("Registry: " + $script:skillRegistry.Count + " skills") -ForegroundColor Green
-    exit 0
-}
-
-$resolved = Resolve-Skill -Graph $graph -Task $Task -MaxHops $Expand
-
-if ($null -eq $resolved) {
-    Write-Host "Resolution error for task: '$Task'" -ForegroundColor Red
-    exit 1
-}
-
-if ($resolved.Count -eq 0) {
-    Write-Host "No skills matched task: '$Task'" -ForegroundColor Yellow
-    Write-Host "Try broader keywords or check: .\scripts\skill-graph.ps1 -ListAll" -ForegroundColor Cyan
-    exit 0
-}
-
-$matchedCount = @($resolved | Where-Object { $_.Matched }).Count
-$expandedCount = @($resolved | Where-Object { -not $_.Matched }).Count
-
-# Agent recommendation from resolved skills
-$agentRec = Get-AgentRecommendation -ResolvedSkills $resolved
-
-# -RecommendAgent: output just agent name for scripting
-if ($RecommendAgent) {
-    Write-Output $agentRec.Agent
-    exit 0
-}
-
-switch ($Format) {
-    "Json" {
-        try {
-            $jsonResult = @{
-                agent_recommendation = @{
-                    agent  = $agentRec.Agent
-                    effort = $agentRec.Effort
-                    reason = $agentRec.Reason
-                }
-                skills = @($resolved | ForEach-Object {
-                    @{
-                        Name        = $_.Name
-                        Category    = $_.Category
-                        Matched     = $_.Matched
-                        Triggers    = $_.Triggers
-                        DependsOn   = $_.DependsOn
-                        Related     = $_.Related
-                        Description = $_.Description
-                    }
-                })
-            }
-            $jsonResult | ConvertTo-Json -Depth 3
-        } catch {
-            Write-Host "Error converting results to JSON: $_" -ForegroundColor Red
-            exit 1
-        }
-    }
-    "Csv" {
-        $resolved | ConvertTo-Csv -NoTypeInformation
-    }
-    "Text" {
-        # Agent recommendation block
-        $effortColor = @{ low = "Green"; medium = "Yellow"; high = "Red" }
-        $agentColor = $effortColor[$agentRec.Effort]
-        Write-Host "=== Agent Recommendation ===" -ForegroundColor Cyan
-        Write-Host ("Agent: " + $agentRec.Agent) -ForegroundColor $agentColor
-        Write-Host ("Effort: " + $agentRec.Effort) -ForegroundColor $agentColor
-        Write-Host ("Reason: " + $agentRec.Reason) -ForegroundColor White
-        Write-Host ""
-
-        Write-Host "=== Skill Resolution ===" -ForegroundColor Cyan
-        Write-Host ("Task: " + $Task) -ForegroundColor White
-        Write-Host ("Matched: " + $matchedCount + " | Expanded (1-hop): " + $expandedCount + " | Total: " + $resolved.Count) -ForegroundColor Green
-        Write-Host ""
-
-        $matched = $resolved | Where-Object { $_.Matched }
-        $expanded = $resolved | Where-Object { -not $_.Matched }
-
-        if ($matched) {
-            Write-Host "--- MATCHED SKILLS (load these) ---" -ForegroundColor Green
-            $matched | Format-Table @{N="Skill";E={$_.Name}}, @{N="Effort";E={
-                    $sn = $_.Name
-                    ($script:skillRegistry | Where-Object { $_.Name -eq $sn }).Effort
-                }}, @{N="Category";E={$_.Category}}, @{N="Match";E={$_.Triggers}} -AutoSize -Wrap
-        }
-        if ($expanded) {
-            Write-Host "--- DEPENDENCIES (load with matched) ---" -ForegroundColor Yellow
-            $expanded | Format-Table @{N="Skill";E={$_.Name}}, @{N="Category";E={$_.Category}}, @{N="Reason";E={$_.DependsOn}} -AutoSize -Wrap
-        }
-
-        Write-Host ""
-        Write-Host "Load commands:" -ForegroundColor Cyan
-        $resolved | Where-Object { $_.Matched } | ForEach-Object {
-            Write-Host ("  skill_use @(""" + $_.Name + """)") -ForegroundColor White
-        }
-        if ($expanded) {
-            Write-Host "  # Also load dependencies:" -ForegroundColor DarkYellow
-            $expanded | ForEach-Object {
-                Write-Host ("  skill_use @(""" + $_.Name + """)") -ForegroundColor DarkYellow
-            }
-        }
+$csvData = @'
+n,c,e,t,d,de,r
+karpathy-loop,compression,medium,"karpathy,less tokens,context compression,compact prompt,Karpathy prompt,karpathy loop,optimize prompt,measure tokens,self-improve prompt","Karpathy-style compression + iterative loop for prompts (merged karpathy-prompt)",,
+lean-context,compression,low,"compact,less tokens,caveman,caveman,ultra-lean,minimal context","Ultra-lean context mode",,
+execution-mode,compression,low,"execution mode,quick,thorough,draft,modo","Quick or Thorough or Draft execution modes",,
+skill-digestion,compression,low,"skill digestion,compact on load,compress skill","Digest and compact skills when loaded",,
+quality-gate,quality,medium,"quality gate,pre-commit,validate commit","Pre-commit quality gate with 5 checks",,"auto-metrics,commit-crafter"
+auto-metrics,quality,medium,"auto-score,metrics,post-task,evaluate,self-evaluate","Post-task self-evaluation with 7-dim scoring",skill-validate,
+immune-system,quality,high,"immune system,anti-pattern,permanent immunity,nunca mas,bug,fix,error","Permanent immunity catalog for repeated errors",,
+code-review-agent,quality,medium,"code review,CR,revisar codigo,review code","Automated code review with standards",best-practices,
+skill-testing,quality,medium,"test skill,verify skill,coverage,skill test","Test and verify skill coverage",,
+skill-validate,quality,medium,"skill validation,benchmark,multi-trial,validate skill,3 trials","3-trial benchmark validation for skills",,
+judgment-day,quality,high,"judgment day,dual review,juzgar,evaluar skill","Dual review and judgment for skills",,
+session-resume,memory,medium,"resume,donde lo dejamos,continua,session start,git state","Safe session resume with git state gate",dreaming,
+code-memory,memory,medium,"code memory,memory,recordar,acordate,multi-session","Cross-session code memory and recall",,"session-resume,dreaming"
+dreaming,memory,high,"dreaming,cross-session,pattern extraction,memory curation,engram","Cross-session pattern extraction via Engram",auto-metrics,
+bitacora,memory,low,"bitacora,historial,historico,request log","Session activity log and history tracking",,
+metricas,memory,low,"metricas,before or after,percent improvement,delta","Before or after metrics tracking for improvements",,
+decision-capture,memory,medium,"decision,trade-off,decision log","Capture and log architectural decisions",,
+skill-creator,meta,medium,"create skill,new skill,crear skill","Create new AI skills from requirements",,
+skill-registry,meta,medium,"skill registry,catalog,registro skills","Skill registry management and catalog",,
+skill-improver,meta,medium,"skill improvement,audit skills,refactor skills","Audit and improve existing skills",,
+gap-analysis,meta,high,"gap analysis,system audit,identificar gaps,project intake","Complete 8-dim gap analysis for any system",,"project-mapper,security-scanner"
+commit-crafter,code-ops,low,"commit,commit message,conventional commit","Craft conventional commit messages from diff",,quality-gate
+refactoring-planner,code-ops,medium,"refactor,refactoring,reestructurar,migrate","Plan and execute code refactoring",,
+project-mapper,code-ops,medium,"mapear,project map,estructura,tech stack","Map project structure, stack, and architecture",,gap-analysis
+security-scanner,code-ops,medium,"security,seguridad,vulnerabilidad,auditar","Security audit and vulnerability scanner",best-practices,
+performance-tracker,code-ops,medium,"performance score,mobile perf,desktop perf,rendimiento,app score,benchmark","Score and track app performance across 6 dimensions",,
+sdd,SDD,medium,"SDD pipeline,SDD phase,spec-driven development","Unified SDD pipeline -- 9 phases (init->archive)",,"sdd-init,sdd-explore,sdd-propose,sdd-spec,sdd-design,sdd-tasks,sdd-apply,sdd-verify,sdd-archive"
+sdd-init,SDD,medium,"SDD init,bootstrap,iniciar SDD","SDD init -- bootstrap project context (wrapper, canonical at sdd/phases/00-init.md)",,
+sdd-explore,SDD,medium,"explore codebase,pre-design,investigar,codebase exploration","Explore codebase (wrapper, canonical at sdd/phases/01-explore.md)",,
+sdd-propose,SDD,medium,"proposal,intent,approach,change proposal","Create change proposals (wrapper, canonical at sdd/phases/02-propose.md)",sdd-explore,
+sdd-spec,SDD,medium,"specs,specification,Given When Then,requisitos,spec","Write specifications from proposals (wrapper, canonical at sdd/phases/04-spec.md)",sdd-propose,
+sdd-design,SDD,medium,"technical design,HOW,diseno tecnico","Create technical design from specs (wrapper, canonical at sdd/phases/03-design.md)",sdd-spec,
+sdd-tasks,SDD,medium,"task breakdown,implementation plan,tareas,task list","Break down designs into tasks (wrapper, canonical at sdd/phases/05-tasks.md)",sdd-design,
+sdd-apply,SDD,medium,"apply tasks,implement,aplicar","Apply tasks to implement changes (wrapper, canonical at sdd/phases/06-apply.md)",sdd-tasks,commit-crafter
+sdd-verify,SDD,medium,"validate vs specs,verify,verificar","Validate implementation against specs (wrapper, canonical at sdd/phases/07-verify.md)",sdd-spec,
+sdd-archive,SDD,medium,"archive changes,delta to main,archivar","Archive completed changes (wrapper, canonical at sdd/phases/08-archive.md)","sdd-verify,sdd-apply",
+sdd-onboard,SDD,medium,"SDD onboard,onboarding,nuevo proyecto SDD,guia SDD","Guide users through complete SDD cycle",,
+delivery-harness,coordination,high,"coordinate,orchestrate,multi-agent,delegate work","Orchestrate multi-agent work delivery","subagent-isolation,work-unit-commits",chained-pr
+chained-pr,coordination,medium,"stacked PR,chained PR,sequential branches,PR chain","Manage stacked sequential PRs (refs: chaining-details.md)",work-unit-commits,"delivery-harness,branch-pr"
+branch-pr,coordination,medium,"branch PR,branch naming,create PR,open pull request","Branch creation and PR workflow for gentle-ai",,"chained-pr,issue-creation"
+issue-creation,coordination,medium,"create issue,GitHub issue,bug report,feature request","GitHub issue creation with issue-first workflow for gentle-ai",,branch-pr
+subagent-isolation,coordination,medium,"subagent isolation,context boundaries,delegation","Isolate subagent contexts and prevent contamination",,
+command-wrapper,coordination,low,"command wrapper,safe execution,error handling,output parse","Safe command execution with error handling",,
+accessibility,web-quality,medium,"accessibility,a11y,WCAG,screen reader,keyboard nav,make accessible","Audit and improve web accessibility",,
+performance,web-quality,medium,"web performance,speed up,reduce load time,page speed,performance audit","Optimize web performance for faster loading",,
+seo,web-quality,medium,"SEO,search engine,meta tags,structured data,sitemap","Optimize for search engine visibility",,
+best-practices,web-quality,medium,"best practices,security audit,modernize code,code quality review","Apply modern web development best practices",,
+web-quality-audit,web-quality,medium,"web quality audit,lighthouse audit,review web quality","Comprehensive web quality audit","accessibility,performance,seo,best-practices",
+development-mode,web-quality,medium,"performance mode,dev mode,modo desarrollo,high performance,modo rendimiento","System resource prioritization mode",,
+research,research,medium,"research,investigar,technical investigation,learn,compare solutions,evaluate","Structured research workflow for technical investigations",,
+recovery-protocol,specialized,medium,"recovery,no es eso,frustration,stuck,bloqueado,bug,fix,error","Recovery protocol for frustration and errors",,
+context-watchdog,specialized,medium,"context overflow,token limit,context explosion","Monitor and prevent context window overflow",,
+ci-cd,specialized,medium,"CI/CD,pipeline,GitHub Actions,continuous integration","CI/CD pipeline automation",,
+work-unit-commits,specialized,low,"work-unit,commit organization","Organize commits into logical work units",,
+self-improvement,specialized,high,"self-improvement,improvement cycle,auto-improve,inter 30,cycle","Self-improvement cycle with inter(30) minimum",,"self-reflection,dreaming"
+self-reflection,specialized,medium,"self-reflection,Hermes,error patterns,reflexion","Hermes closed learning loop",,
+cognitive-doc-design,specialized,medium,"doc design,documentation patterns,cognitive load,progressive disclosure","Design docs that reduce cognitive load",,
+comment-writer,specialized,low,"comment writer,PR feedback,review comment,write feedback","Write warm, direct collaboration comments",,
+senior-engineer,specialized,high,"senior architect,trade-offs,system design,arquitectura","Senior engineer persona for architecture decisions",,
+prompt-engineering,specialized,medium,"improve prompt,ReAct,multi-agent,prompt engineering","Advanced prompt engineering techniques",,
+go-testing,specialized,medium,"Go tests,Bubbletea TUI,golang test","Go testing patterns and tools",,
+python-async,specialized,medium,"Python async,asyncio","Python async/await patterns",,
+'@
+$script:skillRegistry = $csvData | ForEach-Object {
+    [PSCustomObject]@{
+        Name=$_.n;Category=$_.c;Effort=$_.e
+        Triggers=if($_.t){@($_.t-split',')}else{@()}
+        DependsOn=if($_.de){@($_.de-split',')}else{@()}
+        Related=if($_.r){@($_.r-split',')}else{@()}
+        Description=$_.d
     }
 }

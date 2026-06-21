@@ -12,479 +12,186 @@
   Cantidad de ciclos de mejora (default: 3).
 .PARAMETER OutputFormat
   Formato de salida: text (default) o json.
-
 .PARAMETER ProjectType
   Tipo de proyecto para análisis: auto (default), fe, be, db, fullstack, mobile, etc.
-
 .PARAMETER SaveMetrics
   Guardar métricas en docs/metricas/ (default: $true).
 #>
 
-param(
-    [Parameter(Mandatory=$true)]
-    [string]$ProjectPath,
+param([Parameter(Mandatory=$true)][string]$ProjectPath,[ValidateRange(1,5)][int]$Iterations=1,[ValidateSet("auto","fe","be","db","fullstack","mobile","desktop","saas","erp","ecom","api","web","cms","infra")][string]$ProjectType="auto",[bool]$SaveMetrics=$true,[ValidateSet("text","json")][string]$OutputFormat="text")
 
-    [ValidateRange(1,5)]
-    [int]$Iterations = 1,
-
-    [ValidateSet("auto","fe","be","db","fullstack","mobile","desktop","saas","erp","ecom","api","web","cms","infra")]
-    [string]$ProjectType = "auto",
-
-    [bool]$SaveMetrics = $true,
-
-    [ValidateSet("text", "json")]
-    [string]$OutputFormat = "text"
-)
-
-$ErrorActionPreference = 'Stop'
+$ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
-# Explicit script-scope reference for Write-Result function (PSSA false positive suppression)
-$Script:OutputFormat = $OutputFormat
-
-$script:startTime = Get-Date
-$script:roundResults = @()
-
-# Unicode icons for PS 5.1 (use [char] NOT backtick-u which requires PS6+)
-$script:CHK = [char]0x2705
-$script:CRS = [char]0x274C
-$script:WRN = [char]0x26A0
+$script:startTime=Get-Date;$script:roundResults=@()
+$script:CHK=[char]0x2705;$script:CRS=[char]0x274C;$script:WRN=[char]0x26A0
 
 function Write-Result {
-    param([string]$Icon, [string]$Artifact, [string]$Status, [string]$Detail, [string]$Score = "")
-    $displayIcon = $Icon
-    if ($Icon -eq "PASS") { $displayIcon = $script:CHK }
-    if ($Icon -eq "FAIL") { $displayIcon = $script:CRS }
-    if ($Icon -eq "WARN") { $displayIcon = $script:WRN }
-    $cMap = @{$script:CHK="Green"; $script:CRS="Red"; $script:WRN="Yellow"}
-    $c = $cMap[$displayIcon]
-    if (-not $c) { $c = "White" }
-    $line = "$displayIcon $Artifact : $Status"
-    if ($Detail) { $line = $line + " - $Detail" }
-    if ($Score) { $line = $line + " [$Score/10]" }
-    if ($OutputFormat -eq "json") { return }
-    Write-Host $line -ForegroundColor $c
+    param([string]$I,[string]$A,[string]$S,[string]$D)
+    $c=@{$script:CHK="Green";$script:CRS="Red";$script:WRN="Yellow"}[$I]
+    if(-not$c){$c="White"}
+    $l="$I $A : $S"
+    if($D){$l+=" - $D"}
+    if($OutputFormat-ne"json"){Write-Host $l -ForegroundColor $c}
 }
 
 function Get-FileSize {
     param([string]$Path)
-    if (Test-Path $Path) {
-        $len = (Get-Item $Path).Length
-        if ($len -gt 1KB) { return "$([math]::Round($len/1KB, 1))KB" }
-        return "$len B"
-    }
-    return ""
+    if(Test-Path $Path){$l=(Get-Item $Path).Length;if($l-gt1KB){return"$([math]::Round($l/1KB,1))KB"};return"$l B"}
+    return""
 }
 
-function Get-Score {
-    param([string]$Icon)
-    if ($Icon -match $script:CHK) { return 10 }
-    if ($Icon -match $script:WRN) { return 5 }
-    return 0
-}
+function Invoke-Check {
+    param([int]$R,[string]$PP,[string]$PT)
+    $r=@{};$sm=@{};$ok=$script:CHK;$no=$script:CRS;$warn=$script:WRN
+    $dash='-'*50
+    Write-Host "`n  Iteracion $R - Intake Verification" -ForegroundColor Cyan
+    Write-Host "  Proyecto: $PP`n  Tipo: $PT" -ForegroundColor Gray
 
-function Invoke-IntakeCheck {
-    param([int]$Round, [string]$ProjectPath, [string]$ProjectType)
+    $rp=$null
+    if(Test-Path "$PP\ROADMAP.md"){$rp="ROADMAP.md"}
+    elseif(Test-Path "$PP\docs\roadmap.md"){$rp="docs/roadmap.md"}
+    elseif(Test-Path "$PP\roadmap.md"){$rp="roadmap.md"}
+    elseif(Test-Path "$PP\roadmap"){$rp="roadmap/ (dir)"}
+    if($rp){$sz=Get-FileSize "$PP\$rp";Write-Result $ok Roadmap Found "$rp ($sz)";$r["roadmap"]=$ok;$sm["roadmap"]=10}
+    else{Write-Result $no Roadmap Missing "No roadmap docs found";$r["roadmap"]=$no;$sm["roadmap"]=0}
 
-    $results = @{}
-    $scoreMap = @{}
+    $prs=0;$prd=@()
+    if(Test-Path "$PP\.git"){
+        $cc=&git -C "$PP" log --oneline -10 2>$null|Measure-Object|ForEach-Object{$_.Count}
+        if($cc-gt0){$prs+=5;$prd+="$cc commits in HEAD";$gp=&gh pr list --limit 5 2>$null;if($LASTEXITCODE-eq0-and$gp){$prd+="$(($gp|Measure-Object|ForEach-Object{$_.Count})) open PR(s)";$prs+=3}}
+    }else{$prd+="no .git dir (score limited)"}
+    $pf=Get-ChildItem -Path "$PP" -Recurse -Include "*PROBLEM*REPORT*","*bug-report*","*incident*" -Exclude "*node_modules*",".git","*vendor*" -ErrorAction SilentlyContinue|Select-Object -First 3
+    if($pf){$prd+="Problem Report: $($pf.Count) file(s) ($($pf[0].Name))";$prs=[math]::Max($prs,5)}
+    $pi=if($prs-ge8){$ok}elseif($prs-ge3){$warn}else{$no}
+    Write-Result $pi PR "Pull Request + Problem Report" ($prd-join" | ")
+    $r["pr"]=$pi;$sm["pr"]=$prs
 
-    $checkMark = $script:CHK
-    $crossMark = $script:CRS
-    $warnMark = $script:WRN
+    $prdF=Get-ChildItem -Path "$PP" -Recurse -Include "*PRD*","*spec*","*requirements*","*srs*" -Exclude "*node_modules*",".git","*vendor*" -File -ErrorAction SilentlyContinue|Select-Object -First 5
+    if($prdF){Write-Result $ok PRD Found "$($prdF.Count) files (e.g., $($prdF[0].Name))";$r["prd"]=$ok;$sm["prd"]=10}
+    else{Write-Result $no PRD Missing "No PRD, spec, or requirements files";$r["prd"]=$no;$sm["prd"]=0}
 
-    Write-Host ""
-    Write-Host ("=" * 55) -ForegroundColor Cyan
-    Write-Host "  Iteracion $Round - Intake Verification" -ForegroundColor Cyan
-    Write-Host "  Proyecto: $ProjectPath" -ForegroundColor Gray
-    Write-Host "  Tipo: $ProjectType" -ForegroundColor Gray
-    Write-Host ("=" * 55) -ForegroundColor Cyan
-
-    # --- 1. Roadmap ---
-    $rPath = $null
-    if (Test-Path "$ProjectPath\ROADMAP.md") { $rPath = "ROADMAP.md" }
-    elseif (Test-Path "$ProjectPath\docs\roadmap.md") { $rPath = "docs/roadmap.md" }
-    elseif (Test-Path "$ProjectPath\roadmap.md") { $rPath = "roadmap.md" }
-    elseif (Test-Path "$ProjectPath\roadmap") { $rPath = "roadmap/ (dir)" }
-
-    if ($rPath) {
-        $size = Get-FileSize "$ProjectPath\$rPath"
-        Write-Result -Icon $checkMark -Artifact "Roadmap" -Status "Found" -Detail "$rPath ($size)"
-        $results["roadmap"] = $checkMark; $scoreMap["roadmap"] = 10
-    } else {
-        Write-Result -Icon $crossMark -Artifact "Roadmap" -Status "Missing" -Detail "No ROADMAP.md, docs/roadmap.md, or roadmap/ dir"
-        $results["roadmap"] = $crossMark; $scoreMap["roadmap"] = 0
-    }
-
-    # --- 2. PR (Pull Request + Problem Report) ---
-    $prScore = 0; $prDetail = @()
-    $gitDir = "$ProjectPath\.git"
-    if (Test-Path $gitDir) {
-        $commitCount = & git -C "$ProjectPath" log --oneline -10 2>$null | Measure-Object | ForEach-Object { $_.Count }
-        if ($commitCount -gt 0) {
-            $prScore += 5; $prDetail += "$commitCount commits in HEAD"
-            $ghPrs = & gh pr list --limit 5 2>$null
-            if ($LASTEXITCODE -eq 0 -and $ghPrs) {
-                $prCount = ($ghPrs | Measure-Object | ForEach-Object { $_.Count })
-                $prDetail += "$prCount open PR(s)"; $prScore += 3
-            }
+    if(Test-Path "$PP\README.md"){
+        $sz=Get-FileSize "$PP\README.md"
+        $c=Get-Content "$PP\README.md" -Raw -ErrorAction SilentlyContinue;$q=10
+        if($c){
+            if($c-notmatch'# '){$q-=2}
+            if($c-notmatch'setup|install|getting started|usage|empezar|instalacion'){$q-=2}
+            if($c.Length-lt200){$q-=2}
+            if($c.Length-lt100){$q-=3}
         }
-    } else {
-        $prDetail += "no .git dir (score limited)"
-    }
-    $prFiles = Get-ChildItem -Path "$ProjectPath" -Recurse -Include "*PROBLEM*REPORT*","*bug-report*","*incident*" `
-        -Exclude "*node_modules*",".git","*vendor*" -ErrorAction SilentlyContinue | Select-Object -First 3
-    if ($prFiles) {
-        $prDetail += "Problem Report: $($prFiles.Count) file(s) ($($prFiles[0].Name))"
-        $prScore = [math]::Max($prScore, 5)
-    }
-    $prIcon = if ($prScore -ge 8) { $checkMark } elseif ($prScore -ge 3) { $warnMark } else { $crossMark }
-    Write-Result -Icon $prIcon -Artifact "PR" -Status "Pull Request + Problem Report" -Detail ($prDetail -join " | ")
-    $results["pr"] = $prIcon; $scoreMap["pr"] = $prScore
+        $q=[math]::Max(1,$q);$qi=if($q-ge8){$ok}elseif($q-ge5){$warn}else{$no}
+        Write-Result $qi README Found "$sz (quality score: $q/10)";$r["readme"]=$qi;$sm["readme"]=$q
+    }else{Write-Result $no README Missing "No README.md at project root";$r["readme"]=$no;$sm["readme"]=0}
 
-    # --- 3. PRD / Specs ---
-    $prdFound = Get-ChildItem -Path "$ProjectPath" -Recurse -Include "*PRD*","*spec*","*requirements*","*srs*" `
-        -Exclude "*node_modules*",".git","*vendor*" -File -ErrorAction SilentlyContinue | Select-Object -First 5
-    if ($prdFound) {
-        Write-Result -Icon $checkMark -Artifact "PRD" -Status "Found" -Detail "$($prdFound.Count) files (e.g., $($prdFound[0].Name))"
-        $results["prd"] = $checkMark; $scoreMap["prd"] = 10
-    } else {
-        Write-Result -Icon $crossMark -Artifact "PRD" -Status "Missing" -Detail "No PRD, spec, or requirements files"
-        $results["prd"] = $crossMark; $scoreMap["prd"] = 0
-    }
+    $td=Get-ChildItem -Path "$PP" -Directory -Include "tests","__tests__","spec","test","cypress" -ErrorAction SilentlyContinue
+    $tf=Get-ChildItem -Path "$PP" -Recurse -Include "*test*","*spec*","*suite*" -File -Exclude "*node_modules*",".git","*vendor*" -ErrorAction SilentlyContinue|Select-Object -First 10
+    if($td){Write-Result $ok Tests "Test dirs found" "$($td.Count) dir(s): $($td.Name -join ', ')";$r["tests"]=$ok;$sm["tests"]=10}
+    elseif($tf.Count-ge3){Write-Result $ok Tests "Test files found" "$($tf.Count) files found";$r["tests"]=$ok;$sm["tests"]=8}
+    elseif($tf.Count-ge1){Write-Result $warn Tests "Minimal test files" "$($tf.Count) files found";$r["tests"]=$warn;$sm["tests"]=5}
+    else{Write-Result $no Tests "No test artifacts" "No test dirs or files found";$r["tests"]=$no;$sm["tests"]=0}
 
-    # --- 4. README ---
-    if (Test-Path "$ProjectPath\README.md") {
-        $size = Get-FileSize "$ProjectPath\README.md"
-        $content = Get-Content "$ProjectPath\README.md" -Raw -ErrorAction SilentlyContinue
-        $quality = 10
-        if ($content) {
-            if ($content -notmatch '# ') { $quality -= 2 }
-            if ($content -notmatch 'setup|install|getting started|usage|empezar|instalacion') { $quality -= 2 }
-            if ($content.Length -lt 200) { $quality -= 2 }
-            if ($content.Length -lt 100) { $quality -= 3 }
-        }
-        $quality = [math]::Max(1, $quality)
-        $qIcon = if ($quality -ge 8) { $checkMark } elseif ($quality -ge 5) { $warnMark } else { $crossMark }
-        Write-Result -Icon $qIcon -Artifact "README" -Status "Found" -Detail "$size (quality score: $quality/10)"
-        $results["readme"] = $qIcon; $scoreMap["readme"] = $quality
-    } else {
-        Write-Result -Icon $crossMark -Artifact "README" -Status "Missing" -Detail "No README.md at project root"
-        $results["readme"] = $crossMark; $scoreMap["readme"] = 0
-    }
+    $cf=@();@(".github\workflows","GitHub Actions","Jenkinsfile","Jenkins",".gitlab-ci.yml","GitLab CI","azure-pipelines.yml","Azure Pipelines",".circleci\config.yml","CircleCI","Dockerfile","Docker")|%{$i=0}{if($i%2-eq0){$k=$_}elseif(Test-Path "$PP\$k"){$cf+=$_};$i++}
+    if($cf.Count-ge2){Write-Result $ok "CI/CD" "Multiple configs" ($cf-join', ');$r["cicd"]=$ok;$sm["cicd"]=10}
+    elseif($cf.Count-eq1){Write-Result $warn "CI/CD" "Single config" $cf[0];$r["cicd"]=$warn;$sm["cicd"]=5}
+    else{Write-Result $no "CI/CD" "Not found" "No CI/CD config detected";$r["cicd"]=$no;$sm["cicd"]=0}
 
-    # --- 5. Tests ---
-    $testDirs = Get-ChildItem -Path "$ProjectPath" -Directory -Include "tests","__tests__","spec","test","cypress" -ErrorAction SilentlyContinue
-    $testFiles = Get-ChildItem -Path "$ProjectPath" -Recurse -Include "*test*","*spec*","*suite*" -File `
-        -Exclude "*node_modules*",".git","*vendor*" -ErrorAction SilentlyContinue | Select-Object -First 10
-    if ($testDirs) {
-        Write-Result -Icon $checkMark -Artifact "Tests" -Status "Test dirs found" -Detail "$($testDirs.Count) dir(s): $($testDirs.Name -join ', ')"
-        $results["tests"] = $checkMark; $scoreMap["tests"] = 10
-    } elseif ($testFiles.Count -ge 3) {
-        Write-Result -Icon $checkMark -Artifact "Tests" -Status "Test files found" -Detail "$($testFiles.Count) files found"
-        $results["tests"] = $checkMark; $scoreMap["tests"] = 8
-    } elseif ($testFiles.Count -ge 1) {
-        Write-Result -Icon $warnMark -Artifact "Tests" -Status "Minimal test files" -Detail "$($testFiles.Count) files found"
-        $results["tests"] = $warnMark; $scoreMap["tests"] = 5
-    } else {
-        Write-Result -Icon $crossMark -Artifact "Tests" -Status "No test artifacts" -Detail "No test dirs or files found"
-        $results["tests"] = $crossMark; $scoreMap["tests"] = 0
-    }
+    $mf=@()
+    foreach($p in @("*sentry*","*datadog*","*newrelic*","*grafana*","*prometheus*","*openTelemetry*","*appinsights*","*bugsnag*","*rollbar*","*logstash*","*honeycomb*","*dynatrace*")){$m=Get-ChildItem -Path "$PP" -Recurse -Include $p -File -Exclude "*node_modules*",".git" -ErrorAction SilentlyContinue|Select-Object -First 1;if($m){$mf+=$m.Name}}
+    $hl=(Test-Path "$PP\logs")-or(Get-ChildItem -Path "$PP" -Directory -Include "metrics","monitoring","alerts" -ErrorAction SilentlyContinue)
+    if($mf.Count-ge1){Write-Result $ok Monitoring "APM/tracing found" "$($mf[0]) (+$($mf.Count-1) more)";$r["monitoring"]=$ok;$sm["monitoring"]=10}
+    elseif($hl){Write-Result $warn Monitoring "Basic logging only" "logs/ or metrics/ dir exists, no APM";$r["monitoring"]=$warn;$sm["monitoring"]=5}
+    else{Write-Result $no Monitoring "Not found" "No APM/tracing/logging config";$r["monitoring"]=$no;$sm["monitoring"]=0}
 
-    # --- 6. CI/CD ---
-    $ciFound = @()
-    if (Test-Path "$ProjectPath\.github\workflows") { $ciFound += "GitHub Actions" }
-    if (Test-Path "$ProjectPath\Jenkinsfile") { $ciFound += "Jenkins" }
-    if (Test-Path "$ProjectPath\.gitlab-ci.yml") { $ciFound += "GitLab CI" }
-    if (Test-Path "$ProjectPath\azure-pipelines.yml") { $ciFound += "Azure Pipelines" }
-    if (Test-Path "$ProjectPath\.circleci\config.yml") { $ciFound += "CircleCI" }
-    if (Test-Path "$ProjectPath\Dockerfile") { $ciFound += "Docker" }
-
-    if ($ciFound.Count -ge 2) {
-        Write-Result -Icon $checkMark -Artifact "CI/CD" -Status "Multiple configs" -Detail ($ciFound -join ', ')
-        $results["cicd"] = $checkMark; $scoreMap["cicd"] = 10
-    } elseif ($ciFound.Count -eq 1) {
-        Write-Result -Icon $warnMark -Artifact "CI/CD" -Status "Single config" -Detail ($ciFound[0])
-        $results["cicd"] = $warnMark; $scoreMap["cicd"] = 5
-    } else {
-        Write-Result -Icon $crossMark -Artifact "CI/CD" -Status "Not found" -Detail "No CI/CD config detected"
-        $results["cicd"] = $crossMark; $scoreMap["cicd"] = 0
-    }
-
-    # --- 7. Monitoring ---
-    $monPatterns = @("*sentry*","*datadog*","*newrelic*","*grafana*","*prometheus*","*openTelemetry*",
-                     "*appinsights*","*bugsnag*","*rollbar*","*logstash*","*honeycomb*","*dynatrace*")
-    $monFound = @()
-    foreach ($pat in $monPatterns) {
-        $m = Get-ChildItem -Path "$ProjectPath" -Recurse -Include $pat -File -Exclude "*node_modules*",".git" -ErrorAction SilentlyContinue | Select-Object -First 1
-        if ($m) { $monFound += $m.Name }
-    }
-    $hasLogging = (Test-Path "$ProjectPath\logs") -or (Get-ChildItem -Path "$ProjectPath" -Directory -Include "metrics","monitoring","alerts" -ErrorAction SilentlyContinue)
-
-    if ($monFound.Count -ge 1) {
-        Write-Result -Icon $checkMark -Artifact "Monitoring" -Status "APM/tracing found" -Detail "$($monFound[0]) (+$($monFound.Count - 1) more)"
-        $results["monitoring"] = $checkMark; $scoreMap["monitoring"] = 10
-    } elseif ($hasLogging) {
-        Write-Result -Icon $warnMark -Artifact "Monitoring" -Status "Basic logging only" -Detail "logs/ or metrics/ dir exists, no APM"
-        $results["monitoring"] = $warnMark; $scoreMap["monitoring"] = 5
-    } else {
-        Write-Result -Icon $crossMark -Artifact "Monitoring" -Status "Not found" -Detail "No APM/tracing/logging config"
-        $results["monitoring"] = $crossMark; $scoreMap["monitoring"] = 0
-    }
-
-    # --- Round Summary ---
-    $totalScore = ($scoreMap.Values | Measure-Object -Sum).Sum
-    $maxScore = $scoreMap.Count * 10
-    $pct = if ($maxScore -gt 0) { [math]::Round(($totalScore / $maxScore) * 100, 1) } else { 0 }
-
-    Write-Host ""
-    Write-Host ("-" * 50) -ForegroundColor Cyan
-    Write-Host ("  Resumen Iteracion " + $Round + ":") -ForegroundColor Cyan
-    $scoreColor = if ($pct -ge 80) {"Green"} elseif ($pct -ge 50) {"Yellow"} else {"Red"}
-    Write-Host "  Score: $totalScore/$maxScore ($pct%)" -ForegroundColor $scoreColor
-
-    $criticalMissing = @()
-    if ($results["roadmap"] -eq $crossMark) { $criticalMissing += "Roadmap" }
-    if ($results["prd"] -eq $crossMark) { $criticalMissing += "PRD" }
-    if ($results["readme"] -eq $crossMark) { $criticalMissing += "README" }
-    if ($criticalMissing.Count -gt 0) {
-        $criticalStr = $criticalMissing -join ', '
-        Write-Host "  CRITICO: Sin $criticalStr el proyecto esta ciego" -ForegroundColor Red
-    }
-
-    return @{
-        round = $Round
-        results = $results
-        scores = $scoreMap
-        totalScore = $totalScore
-        maxScore = $maxScore
-        pct = $pct
-        criticalMissing = $criticalMissing
-    }
+    $ts=($sm.Values|Measure-Object -Sum).Sum;$ms=$sm.Count*10
+    $pct=if($ms-gt0){[math]::Round(($ts/$ms)*100,1)}else{0}
+    Write-Host "  Score: $ts/$ms ($pct%)" -ForegroundColor $(if($pct-ge80){"Green"}elseif($pct-ge50){"Yellow"}else{"Red"})
+    $miss=@()
+    if($r["roadmap"]-eq$no){$miss+="Roadmap"}
+    if($r["prd"]-eq$no){$miss+="PRD"}
+    if($r["readme"]-eq$no){$miss+="README"}
+    if($miss.Count-gt0){Write-Host "  CRIT: Sin $($miss-join', ')" -ForegroundColor Red}
+    return@{round=$R;results=$r;scores=$sm;totalScore=$ts;maxScore=$ms;pct=$pct;criticalMissing=$miss}
 }
 
-# --- MAIN ---
+if(-not(Test-Path $ProjectPath)){Write-Error "Proj path not found: $ProjectPath";exit 2}
+$pp=$ProjectPath
 
-if (-not (Test-Path $ProjectPath)) {
-    Write-Error "ProjectPath does not exist: $ProjectPath"
-    exit 2
+if($ProjectType-eq"auto"){
+    $sigs=@()
+    if(Test-Path "$pp\package.json"){
+        $pkg=Get-Content "$pp\package.json" -Raw -ErrorAction SilentlyContinue
+        if($pkg-match'"react"|"next"|"vue"'){$sigs+="frontend"}
+        if($pkg-match'"express"|"fastify"'){$sigs+="backend"}
+        if($sigs.Count-eq0-and$pkg){$sigs+="node"}
+    }
+    if(Test-Path "$pp\go.mod"){$sigs+="backend"}
+    if(Test-Path "$pp\pubspec.yaml"){$sigs+="mobile"}
+    if(Test-Path "$pp\Dockerfile"){$sigs+="infra"}
+    if($sigs-contains"frontend"-and$sigs-contains"backend"){$ProjectType="fullstack"}
+    elseif($sigs-contains"frontend"){$ProjectType="fe"}
+    elseif($sigs-contains"backend"){$ProjectType="be"}
+    elseif($sigs-contains"mobile"){$ProjectType="mobile"}
+    else{$ProjectType="be"}
 }
 
-Write-Host ""
-Write-Host ("#" * 58) -ForegroundColor Cyan
-Write-Host "#           INTAKE VERIFICATION - $Iterations iteracion(es)          #" -ForegroundColor Cyan
-Write-Host ("#" * 58) -ForegroundColor Cyan
-
-# Auto-detect project type if "auto"
-if ($ProjectType -eq "auto") {
-    Write-Host ""
-    Write-Host "Detectando tipo de proyecto..." -ForegroundColor Yellow
-    $signals = @()
-
-    if (Test-Path "$ProjectPath\package.json") {
-        $pkg = Get-Content "$ProjectPath\package.json" -Raw -ErrorAction SilentlyContinue
-        if ($pkg) {
-            if ($pkg -match '"react"') { $signals += "frontend" }
-            if ($pkg -match '"next"') { $signals += "frontend" }
-            if ($pkg -match '"vue"') { $signals += "frontend" }
-            if ($pkg -match '"express"') { $signals += "backend" }
-            if ($pkg -match '"fastify"') { $signals += "backend" }
-        }
-        if ($signals.Count -eq 0) { $signals += "node" }
-    }
-    if (Test-Path "$ProjectPath\go.mod") { $signals += "backend" }
-    if (Test-Path "$ProjectPath\pubspec.yaml") { $signals += "mobile" }
-    if (Test-Path "$ProjectPath\Dockerfile") { $signals += "infra" }
-
-    if ($signals -contains "frontend" -and $signals -contains "backend") {
-        $ProjectType = "fullstack"
-    } elseif ($signals -contains "frontend") {
-        $ProjectType = "fe"
-    } elseif ($signals -contains "backend") {
-        $ProjectType = "be"
-    } elseif ($signals -contains "mobile") {
-        $ProjectType = "mobile"
-    } else {
-        $ProjectType = "be"
-    }
-
-    Write-Host "  -> Tech Layer: $ProjectType" -ForegroundColor Green
+for($i=1;$i-le$Iterations;$i++){
+    $round=Invoke-Check -R $i -PP $pp -PT $ProjectType;$script:roundResults+=$round
+    if($i-lt$Iterations){Start-Sleep -Seconds 1}
 }
 
-# Run iterations
-for ($i = 1; $i -le $Iterations; $i++) {
-    $round = Invoke-IntakeCheck -Round $i -ProjectPath $ProjectPath -ProjectType $ProjectType
-    $script:roundResults += $round
+$elapsed=[math]::Round(((Get-Date)-$script:startTime).TotalSeconds,1)
+$first=$script:roundResults[0];$last=$script:roundResults[-1]
+Write-Host "`n  Proyecto: $pp`n  Tipo: $ProjectType`n  Iteraciones: $Iterations en ${elapsed}s"
 
-    if ($i -lt $Iterations) {
-        Write-Host ""
-        Write-Host "Esperando antes de iteracion $($i+1)..." -ForegroundColor Yellow
-        Start-Sleep -Seconds 1
-
-        if ($round.criticalMissing.Count -gt 0) {
-            $gapStr = $round.criticalMissing -join ', '
-            Write-Host "Sugerencia: Crea $gapStr antes de la proxima iteracion" -ForegroundColor Magenta
-        }
-    }
+$arts=@("roadmap","pr","prd","readme","tests","cicd","monitoring")
+Write-Host "  | $('Artifact'.PadRight(19)) | $('Baseline'.PadRight(8)) | $('Current'.PadRight(8)) | $('Delta'.PadRight(8)) |" -ForegroundColor Gray
+Write-Host "  $('-'*55)" -ForegroundColor Gray
+foreach($a in $arts){
+    $bs=if($first.scores[$a]){$first.scores[$a]}else{0};$ls=if($last.scores[$a]){$last.scores[$a]}else{0}
+    $d=$ls-$bs;$ds=if($d-gt0){"+$d"}elseif($d-lt0){"$d"}else{"-"};$dc=if($d-gt0){"Green"}elseif($d-lt0){"Red"}else{"Gray"}
+    Write-Host "  | $($a.PadRight(19)) | $($bs.ToString().PadLeft(8)) | $($ls.ToString().PadLeft(8)) | " -NoNewline -ForegroundColor Gray
+    Write-Host $ds.PadLeft(8) -NoNewline -ForegroundColor $dc;Write-Host " |" -ForegroundColor Gray
 }
+$bt=$first.totalScore;$lt=$last.totalScore;$dt=$lt-$bt;$dtc=if($dt-gt0){"Green"}elseif($dt-lt0){"Red"}else{"Gray"}
+Write-Host "  | $('TOTAL'.PadRight(19)) | $($bt.ToString().PadLeft(8)) | $($lt.ToString().PadLeft(8)) | " -NoNewline -ForegroundColor Gray
+Write-Host $dt.ToString().PadLeft(8) -NoNewline -ForegroundColor $dtc;Write-Host " |" -ForegroundColor Gray
 
-# --- FINAL REPORT ---
-$elapsed = [math]::Round(((Get-Date) - $script:startTime).TotalSeconds, 1)
-$first = $script:roundResults[0]
-$last = $script:roundResults[-1]
+$opct=$last.pct
+$g=if($opct-ge90){"A"}elseif($opct-ge80){"B"}elseif($opct-ge60){"C"}elseif($opct-ge40){"D"}else{"F"}
+Write-Host "`n  Grade: $g ($opct%)" -ForegroundColor $(if($opct-ge80){"Green"}elseif($opct-ge60){"Yellow"}else{"Red"})
+if($last.criticalMissing.Count-gt0){Write-Host "  Critical: $($last.criticalMissing-join', ')" -ForegroundColor Red}
 
-Write-Host ""
-Write-Host ("#" * 58) -ForegroundColor Cyan
-Write-Host "#                    FINAL REPORT                          #" -ForegroundColor Cyan
-Write-Host ("#" * 58) -ForegroundColor Cyan
-Write-Host "  Proyecto: $ProjectPath"
-Write-Host "  Tipo: $ProjectType"
-Write-Host "  Iteraciones: $Iterations en ${elapsed}s"
-Write-Host ""
-
-$allArtifacts = @("roadmap","pr","prd","readme","tests","cicd","monitoring")
-
-# Table header
-Write-Host (" " * 2) -NoNewline
-Write-Host ("-" * 55) -ForegroundColor Gray
-$headerLine = "  | $('Artifact'.PadRight(19)) | $('Baseline'.PadRight(8)) | $('Current'.PadRight(8)) | $('Delta'.PadRight(8)) |"
-Write-Host $headerLine -ForegroundColor Gray
-Write-Host (" " * 2) -NoNewline
-Write-Host ("-" * 55) -ForegroundColor Gray
-
-foreach ($a in $allArtifacts) {
-    $baseScore = if ($first.scores[$a]) { $first.scores[$a] } else { 0 }
-    $lastScore = if ($last.scores[$a]) { $last.scores[$a] } else { 0 }
-    $delta = $lastScore - $baseScore
-    $dStr = if ($delta -gt 0) { "+$delta" } elseif ($delta -lt 0) { "$delta" } else { "-" }
-    $dColor = if ($delta -gt 0) {"Green"} elseif ($delta -lt 0) {"Red"} else {"Gray"}
-
-    $line = "  | $($a.PadRight(19)) | $($baseScore.ToString().PadLeft(8)) | $($lastScore.ToString().PadLeft(8)) | "
-    Write-Host $line -NoNewline -ForegroundColor Gray
-    Write-Host $dStr.PadLeft(8) -NoNewline -ForegroundColor $dColor
-    Write-Host " |" -ForegroundColor Gray
-}
-
-Write-Host (" " * 2) -NoNewline
-Write-Host ("-" * 55) -ForegroundColor Gray
-$baseTotal = $first.totalScore; $lastTotal = $last.totalScore; $deltaTotal = $lastTotal - $baseTotal
-$dTotalColor = if ($deltaTotal -gt 0) {"Green"} elseif ($deltaTotal -lt 0) {"Red"} else {"Gray"}
-$totalLine = "  | $('TOTAL'.PadRight(19)) | $($baseTotal.ToString().PadLeft(8)) | $($lastTotal.ToString().PadLeft(8)) | "
-Write-Host $totalLine -NoNewline -ForegroundColor Gray
-Write-Host $deltaTotal.ToString().PadLeft(8) -NoNewline -ForegroundColor $dTotalColor
-Write-Host " |" -ForegroundColor Gray
-Write-Host (" " * 2) -NoNewline
-Write-Host ("-" * 55) -ForegroundColor Gray
-
-$overallPct = $last.pct
-if ($overallPct -ge 90) { $grade = "A (EXCELENTE)" } elseif ($overallPct -ge 80) { $grade = "B (BUENO)" } elseif ($overallPct -ge 60) { $grade = "C (REGULAR)" } elseif ($overallPct -ge 40) { $grade = "D (MALO)" } else { $grade = "F (CRITICO)" }
-$gradeColor = if ($overallPct -ge 80) {"Green"} elseif ($overallPct -ge 60) {"Yellow"} else {"Red"}
-Write-Host ""
-Write-Host "  Grade: $grade ($overallPct%)" -ForegroundColor $gradeColor
-
-if ($last.criticalMissing.Count -gt 0) {
-    Write-Host ""
-    Write-Host "  CRITICAL GAPS still present:" -ForegroundColor Red
-    foreach ($g in $last.criticalMissing) {
-        Write-Host "     - $g" -ForegroundColor Red
-    }
-    Write-Host "  -> Fix these before proceeding with development" -ForegroundColor Yellow
-}
-
-# --- Save metrics ---
-if ($SaveMetrics) {
-    $metricsDir = "$ProjectPath\docs\metricas"
-    if (-not (Test-Path $metricsDir)) {
-        New-Item -ItemType Directory -Path $metricsDir -Force | Out-Null
-    }
-
-    $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-    $baselineFile = "$metricsDir\intake-baseline.json"
-
-    $metrics = @{
-        timestamp = (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
-        project = $ProjectPath
-        type = $ProjectType
-        iterations = $Iterations
-        elapsedSeconds = $elapsed
-        baseline = @{}
-        current = @{}
-        delta = @{}
-        overall_pct = $overallPct
-        critical_gaps = $last.criticalMissing
-    }
-
-    foreach ($a in $allArtifacts) {
-        $metrics.baseline[$a] = if ($first.scores[$a]) { $first.scores[$a] } else { 0 }
-        $metrics.current[$a] = if ($last.scores[$a]) { $last.scores[$a] } else { 0 }
-        $metrics.delta[$a] = $metrics.current[$a] - $metrics.baseline[$a]
-    }
-
-    $metricsJson = $metrics | ConvertTo-Json
-    $metricsJson | Out-File -FilePath $baselineFile -Encoding utf8
-
-    # Human-readable markdown report
-    $mdFile = "$metricsDir\intake-report-$timestamp.md"
-    $mdContent = @"
+if($SaveMetrics){
+    $mdir="$pp\docs\metricas";if(-not(Test-Path $mdir)){New-Item -ItemType Directory -Path $mdir -Force|Out-Null}
+    $ts2=Get-Date -Format "yyyyMMdd-HHmmss";$bf="$mdir\intake-baseline.json"
+    $m=@{timestamp=(Get-Date -Format "yyyy-MM-dd HH:mm:ss");project=$pp;type=$ProjectType;iterations=$Iterations;elapsedSeconds=$elapsed;baseline=@{};current=@{};delta=@{};overall_pct=$opct;critical_gaps=$last.criticalMissing}
+    foreach($a in $arts){$m.baseline[$a]=if($first.scores[$a]){$first.scores[$a]}else{0};$m.current[$a]=if($last.scores[$a]){$last.scores[$a]}else{0};$m.delta[$a]=$m.current[$a]-$m.baseline[$a]}
+    ($m|ConvertTo-Json)|Out-File -FilePath $bf -Encoding utf8
+    $mdf="$mdir\intake-report-$ts2.md"
+    $mdc=@"
 # Intake Verification Report
 
-**Project**: $ProjectPath
+**Project**: $pp
 **Type**: $ProjectType
 **Date**: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
 **Iterations**: $Iterations
 **Elapsed**: ${elapsed}s
-**Grade**: $grade ($overallPct%)
+**Grade**: $g ($opct%)
 
 ## Score Progression
 
 | Artifact | Baseline | Current | Delta |
 |----------|----------|---------|-------|
 "@
-    foreach ($a in $allArtifacts) {
-        $b = if ($first.scores[$a]) { $first.scores[$a] } else { 0 }
-        $c = if ($last.scores[$a]) { $last.scores[$a] } else { 0 }
-        $d = $c - $b
-        $dStr = if ($d -gt 0) { "+$d" } elseif ($d -lt 0) { "$d" } else { "-" }
-        $mdContent += "`n| $a | $b/10 | $c/10 | $dStr |"
-    }
-
-    $mdContent += @"
-
-## Artifact Details (Final Iteration)
-
-| Artifact | Status | Detail |
-|----------|--------|--------|
-"@
-    $statusMap = @{}
-    $statusMap["roadmap"] = "Roadmap"
-    $statusMap["pr"] = "PR"
-    $statusMap["prd"] = "PRD/Specs"
-    $statusMap["readme"] = "README"
-    $statusMap["tests"] = "Tests"
-    $statusMap["cicd"] = "CI/CD"
-    $statusMap["monitoring"] = "Monitoring"
-    foreach ($a in $allArtifacts) {
-        $icon = if ($last.results[$a]) { $last.results[$a] } else { "-" }
-        $score = if ($last.scores[$a]) { $last.scores[$a] } else { 0 }
-        $mdContent += "`n| $($statusMap[$a]) | $icon | Score: $score/10 |"
-    }
-
-    if ($last.criticalMissing.Count -gt 0) {
-        $mdContent += @"
-
-## Critical Gaps
-"@
-        foreach ($g in $last.criticalMissing) {
-            $mdContent += "`n- **$g**: Missing - Blocker"
-        }
-    }
-
-    $mdContent | Out-File -FilePath $mdFile -Encoding utf8
-    Write-Host ""
-    Write-Host "Metrics saved: $baselineFile" -ForegroundColor Cyan
-    Write-Host "Report saved: $mdFile" -ForegroundColor Cyan
+    foreach($a in $arts){$b=if($first.scores[$a]){$first.scores[$a]}else{0};$c=if($last.scores[$a]){$last.scores[$a]}else{0};$d=$c-$b;$ds2=if($d-gt0){"+$d"}elseif($d-lt0){"$d"}else{"-"};$mdc+="`n| $a | $b/10 | $c/10 | $ds2 |"}
+    $mdc+="`n## Artifact Details (Final Iteration)`n`n| Artifact | Status | Detail |`n|----------|--------|--------|"
+    $smap=@{roadmap="Roadmap";pr="PR";prd="PRD/Specs";readme="README";tests="Tests";cicd="CI/CD";monitoring="Monitoring"}
+    foreach($a in $arts){$ic=if($last.results[$a]){$last.results[$a]}else{"-"};$sc=if($last.scores[$a]){$last.scores[$a]}else{0};$mdc+="`n| $($smap[$a]) | $ic | Score: $sc/10 |"}
+    if($last.criticalMissing.Count-gt0){$mdc+="`n## Critical Gaps";foreach($x in $last.criticalMissing){$mdc+="`n- **$x**: Missing - Blocker"}}
+    $mdc|Out-File -FilePath $mdf -Encoding utf8
+    Write-Host "  Metrics: $bf`n  Report: $mdf" -ForegroundColor Cyan
 }
 
-# Return code
-if ($last.criticalMissing.Count -gt 0) { exit 2 }
-if ($overallPct -lt 80) { exit 1 }
+if($last.criticalMissing.Count-gt0){exit 2}
+if($opct-lt80){exit 1}
 exit 0

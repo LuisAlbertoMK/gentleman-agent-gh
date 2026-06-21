@@ -6,29 +6,47 @@
 
 ## Objective
 
-**Cycle 6**: Metric integrity and verification-first. Close gaps between claimed and actual state of automation, backlog tracking, and scoring. Every claim in CYCLE.md and .project.json MUST be verifiable from repo state. Fix score ceiling deadlock with honest sub-scores.
+**Cycle 6** (CLOSED): Metric integrity and verification-first. Closed gaps between claimed and actual state. **Result**: SUCCESS (5/6 backlog items, inter 49/30, 12 dimensions with honest scores).
+
+**Cycle 7**: Score accuracy and script optimization. Fix data integrity in scoring artifacts, compress 3 largest scripts, rewrite README to match reality.
 
 ### Pillars
-1. **Backlog integrity** — every item's status MUST match repo reality. Auto-verify on cycle check.
-2. **Score freshness** — .project.json auto-updates after significant changes; warning when stale >1d.
-3. **Verifiable claims** — every automation claim has a passing smoke test or is marked aspirational.
-4. **Score expansion** — break 10.0 ceiling with sub-dimensions that reward verifiable improvement.
+1. **Score accuracy** — every number in .project.json and PROJECT-SCORE.md MUST be verifiable from repo state. No stale or inflated claims.
+2. **Script optimization** — compress largest scripts to reduce avg size <5KB. Add error handling to all 36 scripts.
+3. **Documentation truth** — README must accurately describe the project: URL, skill count, multi-agent arch, !shortcuts, MCP setup.
+4. **Error handling** — close the try/catch gap on the 12 remaining scripts without exception handling.
 
-### Backlog (sorted by impact/risk)
+### Cycle 6 Backlog (CLOSED)
 | Item | Impact | Risk | I/R | Est. inter | Status | Done criteria |
 |------|--------|------|-----|------------|--------|---------------|
 | Close Cycle 5: mark items 1-3 ✅ Done, carry item 4 forward | High | Low | 3.0 | 1 | ✅ Done | CYCLE.md reflects items 1-3 closed (commit 63f5232) |
 | Add "Backlog Integrity" metric to score-auto.ps1 | High | Low | 3.0 | 2-3 | ✅ Done | `score-auto.ps1` outputs `backlog_integrity` dim; script `check-backlog-integrity.ps1` exists and exits 0 on clean |
 | Score freshness: auto-warning or auto-update .project.json | Medium | Low | 2.0 | 2 | ✅ Done | Cycle loop step 3 auto-checks `.project.json` age; triggers warning if >1d stale |
 | Verify automation claim has end-to-end smoke test | High | Medium | 1.5 | 3-5 | ✅ Done | `scripts/smoke/smoke-all.ps1` tests 5 auto claims (BI, upstream, dreaming, freshness, LOOP) — all pass |
-| Score expansion: sub-dimensions to break 10.0 ceiling | Medium | Low | 2.0 | 3 | ⏳ Pending | `.project.json` has >11 dimensions; score.current >10.0 achievable |
+| Score expansion: sub-dimensions to break 10.0 ceiling | Medium | Low | 2.0 | 3 | ⏳ Deferred | Low impact — taxonomy change, not real improvement. Deferred to Cycle 8+ |
 | Integration smoke tests for key scripts (carry-over from C5) | Medium | Medium | 1.0 | 2-3 | ✅ Done | `scripts/smoke/` exists with 5 tests; `smoke-all.ps1` exits 0 |
 
-### Progress
-- Score: 9.9/10 (honest re-score, Script Performance 9.0 dragging)
-- inter: 48/30 (ongoing cycle 6 execution)
-- Backlog Completion: 5/6 (items #1, #2, #3, #4, #6 done — #5 Score expansion pending)
-- Skills >3KB: 0 ✓ (all 69 skills compressed, including sdd-onboard 6.9→2.3KB)
+### Cycle 6 Progress (CLOSED)
+- Score: 9.7/10 (honest re-score after audit — Best Practices 9.0, Metrics 8 dragging)
+- inter: 49/30 (complete — 163% of target)
+- Backlog Completion: 5/6 (items #1, #2, #3, #4, #6 done — #5 deferred)
+- Skills >3KB (SKILL.md only): 0 ✓ (all 69 SKILL.md files compressed)
+
+### Cycle 7 Backlog
+| Item | Impact | Risk | I/R | Est. inter | Status | Done criteria |
+|------|--------|------|-----|------------|--------|---------------|
+| Score accuracy: sync .project.json ↔ PROJECT-SCORE.md, fix Metrics dimension | High | Low | 3.0 | 1 | ✅ Done | Both files show same 12 dims, accurate inter count, errors/ noted |
+| Clean Code: add StrictMode to scripts missing it | High | Low | 3.0 | 1 | ✅ Done | `run.ps1` + `restore-project-score.ps1` now have StrictMode |
+| Script Performance: compress 3 largest scripts | High | Medium | 1.5 | 3-5 | ✅ Done | skill-graph.ps1 <15KB, intake-verify.ps1 11.8KB ✅, install.ps1 <12KB |
+| README rewrite: accurate URL, counts, multi-agent, MCP, shortcuts | Medium | Low | 2.0 | 2 | ⏳ Pending | README reflects actual repo state, mentions multi-agent arch, !shortcuts, MCP |
+| Error handling: add try/catch to 12 remaining scripts | Medium | Medium | 1.0 | 4-6 | ⏳ Pending | All 36 scripts have try/catch or documented safe-without status |
+
+### Cycle 7 Progress
+- Score: 9.7/10 (post-audit honest score)
+- inter: 0/30 (cycle 7 started 2026-06-21)
+- Score accuracy: ✅ .project.json fixed, PROJECT-SCORE.md synced, errors/ dir created
+- Clean Code: ✅ StrictMode added to last 2 scripts
+- Script Performance: ✅ 3 scripts compressed (avg 7.2→6.3KB)
 
 ## Metrics
 
@@ -138,4 +156,5 @@ LOOP:
 gentleman-vMK -- Cycle 1 (infrastructure) 2026-06-17. Cycle 2 (hygiene+automation) 2026-06-18.
 Cycle 3 (audit+validation) 2026-06-19. Cycle 4 (impact-driven delegation) 2026-06-20.
 Cycle 5 (automation-first) 2026-06-20.
-Cycle 6 (metric integrity) 2026-06-21.
+Cycle 6 (metric integrity) 2026-06-21. ✅ CLOSED (5/6, inter 49/30)
+Cycle 7 (score accuracy + script optimization) 2026-06-21. 🟢 ACTIVE

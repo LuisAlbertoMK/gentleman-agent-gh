@@ -140,7 +140,7 @@ if [ -n "$STAGED_PROJECT_JSON" ]; then
     \$json = Get-Content '$REPO_ROOT/.project.json' -Raw -Encoding UTF8 | ConvertFrom-Json
     \$dims = \$json.score.dimensions.PSObject.Properties.Name.Count
     \$current = \$json.score.current
-    if (\$dims -ne 11) { Write-Output \"FAIL: Expected 11 dimensions, found \$dims\" }
+    if (\$dims -ne 12) { Write-Output \"FAIL: Expected 12 dimensions, found \$dims\" }
     if (\$current -eq \$null -or \$current -lt 5) { Write-Output \"FAIL: score.current missing or < 5\" }
   " 2>&1)
   if [ -z "$POWERSHELL_OUT" ]; then

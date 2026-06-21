@@ -2,46 +2,56 @@
     "dimensions_detail":  {
                               "Script Performance":  {
                                                          "evidence":  {
-                                                                          "avg_size_kb":  7.4,
+                                                                          "avg_size_kb":  6.3,
                                                                           "over_50kb":  0,
-                                                                          "script_count":  31
+                                                                          "script_count":  36,
+                                                                          "largest_kb":  11.8
                                                                       },
-                                                         "score":  10,
-                                                         "rationale":  "Scripts: 31, avg: 7.4KB, >50KB: 0",
+                                                         "score":  9.2,
+                                                         "rationale":  "Scripts: 36, avg: 6.3KB (12.5% reduction), largest: 11.8KB — 3 scripts compressed (25.7→9.5, 19.9→11.8, 17.5→9.2)",
                                                          "max":  10
                                                      },
                               "Best Practices":  {
-                                                     "evidence":  {
-                                                                      "trycatch":  17,
-                                                                      "param_coverage":  31
-                                                                  },
-                                                     "score":  10,
-                                                     "rationale":  "Params: 31/31, try/catch: 17/31",
-                                                     "max":  10
-                                                 },
+                                                    "evidence":  {
+                                                                     "trycatch":  26,
+                                                                     "param_coverage":  35
+                                                                 },
+                                                    "score":  9.0,
+                                                    "rationale":  "Params: 35/36 (97%), try/catch: 26/36 (72%) — 12 scripts still lack error handling",
+                                                    "max":  10
+                                                },
                               "Security":  {
                                                "evidence":  {
                                                                 "secrets":  false,
                                                                 "weak_crypto":  false
                                                             },
                                                "score":  10,
-                                               "rationale":  "Weak crypto: False, secrets: False",
+                                               "rationale":  "Weak crypto: false, secrets: false — no credentials found",
                                                "max":  10
                                            },
                               "Clean Code":  {
                                                  "evidence":  {
-                                                                  "with_params":  31,
-                                                                  "with_help":  31,
-                                                                  "total_scripts":  31,
-                                                                  "with_strictmode":  31
+                                                                  "with_params":  35,
+                                                                  "with_help":  36,
+                                                                  "total_scripts":  36,
+                                                                  "with_strictmode":  36
                                                               },
                                                  "score":  10,
-                                                 "rationale":  "Scripts: 31, help: 31, params: 31, strict: 31",
+                                                 "rationale":  "Scripts: 36, help: 36, params: 35 (run.ps1 intentional), strict: 36",
                                                  "max":  10
                                              },
+                              "Backlog Integrity":  {
+                                                        "evidence":  {
+                                                                         "total":  6,
+                                                                         "passed":  6
+                                                                     },
+                                                        "score":  10,
+                                                        "rationale":  "6/6 backlog items match repo reality (verified by audit)",
+                                                        "max":  10
+                                                    },
                               "Project Artifacts":  {
                                                         "evidence":  {
-                                                                         "skills":  68,
+                                                                         "skills":  69,
                                                                          "project_json":  true,
                                                                          "roadmap":  true,
                                                                          "readme":  true,
@@ -49,48 +59,49 @@
                                                                          "cross_ref":  true
                                                                      },
                                                         "score":  10,
-                                                        "rationale":  "Cross-ref True, 68 skills (excl _shared)",
+                                                        "rationale":  "Cross-ref true, 69 skills (excl _shared), all artifacts present",
                                                         "max":  10
                                                     },
-                              "Cycle Progress":  {
+                              "Cycle Activity":  {
                                                      "evidence":  {
-                                                                      "inter_count":  30,
+                                                                      "inter_count":  49,
                                                                       "inter_target":  30
                                                                   },
-                        "score":  10,
-                                                        "rationale":  "inter: 30/30",
+                                                     "score":  10,
+                                                     "rationale":  "inter: 49/30 (163% of target, Cycle 7 started)",
                                                      "max":  10
                                                  },
                               "Orthography":  {
                                                   "evidence":  {
                                                                    "corrupted_files":  0,
-                                                                   "total_scanned":  69
+                                                                   "total_scanned":  70
                                                                },
                                                   "score":  10,
-                                                  "rationale":  "Encoding corruption: 0/69 files",
+                                                  "rationale":  "Encoding corruption: 0/70 files after BOM strip",
                                                   "max":  10
                                               },
                               "Metrics":  {
                                               "evidence":  {
                                                                "errors_dir":  true,
-                                                               "error_json":  true,
+                                                               "error_json":  false,
                                                                "metrics_dir":  true,
                                                                "has_reports":  true
                                                            },
-                                              "score":  10,
-                                              "rationale":  "Metrics dir: True, error json: True",
+                                              "score":  9,
+                                              "rationale":  "Metrics dir: true, errors dir: created 2026-06-21, error_json: false (no error capture yet)",
                                               "max":  10
                                           },
                               "Skill Effectiveness":  {
                                                           "evidence":  {
                                                                            "over_5kb":  0,
-                                                                           "avg_size_kb":  1.8,
-                                                                           "total_skills":  68,
-                                                                           "total_bytes":  125899,
-                                                                           "over_3kb":  0
+                                                                           "avg_skill_md_kb":  1.7,
+                                                                           "total_skills":  69,
+                                                                           "total_kb_skill_md":  119,
+                                                                           "over_3kb_skill_md":  0,
+                                                                           "note": "SKILL.md only: avg 1.7KB, 0 >3KB. Total dir incl refs: avg 3.5KB, 15 >3KB"
                                                                        },
                                                           "score":  10,
-                                                          "rationale":  "Skills: 68, >3KB: 0, >5KB: 0, avg: 1.8KB",
+                                                          "rationale":  "Skills: 69, SKILL.md avg: 1.7KB, 0 >3KB — compressed for context budget",
                                                           "max":  10
                                                       },
                               "Dead Code":  {
@@ -105,30 +116,31 @@
                                             },
                               "Bitacora":  {
                                                "evidence":  {
-                                                                "lines":  51,
+                                                                "lines":  83,
                                                                 "exists":  true
                                                             },
                                                "score":  10,
-                                               "rationale":  "BITACORA.md exists: True",
+                                               "rationale":  "BITACORA.md exists: true, 83 lines",
                                                "max":  10
                                            }
                           },
     "score":  {
-                  "current":  10.0,
+                  "current":  9.7,
                   "dimensions":  {
-                                     "Project Artifacts":  10,
+                                     "Script Performance":  9.2,
+                                     "Best Practices":  9.0,
                                      "Security":  10,
-                                     "Dead Code":  10,
                                      "Clean Code":  10,
-                                     "Best Practices":  10,
+                                     "Backlog Integrity":  10,
+                                     "Project Artifacts":  10,
+                                     "Cycle Activity":  10,
                                      "Orthography":  10,
-                                     "Bitacora":  10,
-                                     "Metrics":  10,
-                                     "Script Performance":  10,
+                                     "Metrics":  9,
                                      "Skill Effectiveness":  10,
-                                     "Cycle Progress":  10
+                                     "Dead Code":  10,
+                                     "Bitacora":  10
                                  },
-                  "last_updated":  "2026-06-19",
-                  "trend":  "up"
-              }
+                  "last_updated":  "2026-06-21",
+                  "trend":  "stable"
+             }
 }

@@ -1,5 +1,6 @@
 #!/usr/bin/env pwsh
 #requires -Version 5.1
+Set-StrictMode -Version Latest
 <#
 .SYNOPSIS
     Universal runner — discover GENTLEMAN_AGENT_ROOT and invoke a repo script.

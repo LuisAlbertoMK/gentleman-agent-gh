@@ -1,5 +1,12 @@
 #requires -Version 5.1
 
+param(
+  [switch]$Quiet,
+  [switch]$Force
+)
+
+Set-StrictMode -Version Latest
+
 <#
 .SYNOPSIS
   Restore .project.json to committed version if vMK's external MCP scoring infra overwrote it.
@@ -23,11 +30,6 @@
   .\scripts\restore-project-score.ps1 -Quiet
   .\scripts\restore-project-score.ps1 -Force
 #>
-
-param(
-  [switch]$Quiet,
-  [switch]$Force
-)
 
 $ErrorActionPreference = 'Stop'
 $projectJson = Join-Path -Path $PSScriptRoot -ChildPath '..\.project.json' | Resolve-Path
@@ -54,10 +56,10 @@ if ($parseOk) {
   $currentDims = $parsed.score.dimensions
   $dimCount = @($currentDims.PSObject.Properties).Count
 
-  # vMK writes: 6 dims, score 5. We expect: 11 dims, score 10.0
-  if (($currentScore -ne 10.0) -or ($dimCount -ne 11) -or $Force) {
+  # vMK writes: 6 dims, score 5. We expect: 12 dims, score 9.5+
+  if (($currentScore -lt 9.5) -or ($dimCount -lt 11) -or $Force) {
     if (-not $Quiet) {
-      Write-Host "Score drift detected: current score=$currentScore, dims=$dimCount (expected: 10.0, 11 dims)" -ForegroundColor Yellow
+      Write-Host "Score drift detected: current score=$currentScore, dims=$dimCount (expected: >=9.5, >=11 dims)" -ForegroundColor Yellow
     }
     $needsRestore = $true
   }
@@ -73,7 +75,7 @@ if ($needsRestore) {
     & "git" "checkout", "HEAD", "--", ".project.json"
     & "git" "update-index", "--skip-worktree", ".project.json"
 
-    if (-not $Quiet) { Write-Host "project.json restored to committed version (score 10.0/10)" -ForegroundColor Green }
+    if (-not $Quiet) { Write-Host "project.json restored to committed version" -ForegroundColor Green }
     exit 0
   } catch {
     if (-not $Quiet) { Write-Host "Restore failed: $_" -ForegroundColor Red }
