@@ -50,6 +50,7 @@ Antes de sugerir o implementar **cualquier cambio que active thresholds**:
 Thresholds detallados en skill `triple-verify`. Modos con keyword:
 - **Normal** (sin keyword) → triple verify según zona
 - **`!ship` / `!listo`** → triple verify + quality-gate + commit-crafter + commit + push automático
+- **`!check`** → verify profiles + quality-gate, sin commit
 - **`!fast`** → build + commit + push (skip triple verify, hotfix)
 - **`!draft`** → modo exploración, sin verificación
 
@@ -163,7 +164,7 @@ Load order: 1) Anti-Pattern Catalog 2) Behavioral match 3) Trigger match 4) Defa
 
 ## Project Context
 - **Repo**: Gentleman Agent — OpenCode agent skills, scripts & config
-- **Skills**: `.agents/skills/` (65 skills, git-tracked) · workspace `skills/` (junctions, git-ignored)
+- **Skills**: `.agents/skills/` (66 skills, git-tracked) · workspace `skills/` (junctions, git-ignored)
 - **Cycle manifest**: `CYCLE.md` — defines self-improvement objectives, metrics, difficulty mapping
 - **Global config**: junctions `$env:USERPROFILE\.config\opencode\skills/` → `.agents/skills/{name}`
 
@@ -236,6 +237,7 @@ Updates: `mem_update` on `topic_key=protocol/agente-optimizado`. Review: 2 weeks
 | Architecture | `senior-engineer`, `sdd-propose` | — |
 | Code review | `code-review-agent`, `judgment-day` | — |
 | Refactor/opt | `karpathy-loop`, `lean-context`, `metricas` | — |
+| Verify / `!check` | `verify.ps1` → `pssa-gate.ps1` | — |
 | Commit/PR / `!ship` | `triple-verify` → `quality-gate` → `commit-crafter` | — |
 | Hotfix `!fast` | `quality-gate` + `commit-crafter` | `triple-verify` |
 | Security audit | `security-scanner` | — |
@@ -299,7 +301,7 @@ Close task: auto-metrics 6 dims (correctness, tokens, error prevention, skill, s
    - Every cycle: read CYCLE.md → check external repos (Engram #645) → diagnose → execute fixes with triple-verify → verify → learn → propagate
    - inter(30): minimum 30 fix+verify+log iterations per cycle
    - Difficulty levels (6): Fácil→Muy Complejo, each with progressive verification depth
-   - Exit: inter≥30 + no dim below 9.0 → SUCCESS; time budget exhausted → STOP; score drop >0.5 → full revert
+    - Exit: inter≥30 + no dim<9.0 (new dims grace 5 cycles) → SUCCESS; time budget (7d from cycle start) exhausted → STOP; score drop >0.5 from baseline → full revert (git checkout + stash drop); same fix fails 3x → SKIP candidate
 
 ### J. Pre-session Health Check (session start) + Project Score
 Al iniciar sesión, MUY rápido (no bloquear):

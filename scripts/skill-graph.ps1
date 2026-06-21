@@ -76,8 +76,7 @@ function Add-Skill {
 }
 
 # --- Compression / Style ---
-Add-Skill -Name "karpathy-loop" -Category "compression" -Effort low -Triggers @("karpathy","less tokens","context compression","compact prompt","Karpathy prompt") -Description "Apply Karpathy-style compression + iterative loop (merged from karpathy-prompt)"
-Add-Skill -Name "karpathy-loop" -Category "compression" -Effort high -Triggers @("karpathy loop","optimize prompt","measure tokens","self-improve prompt") -Description "Karpathy-style self-improvement loop for prompts"
+Add-Skill -Name "karpathy-loop" -Category "compression" -Effort medium -Triggers @("karpathy","less tokens","context compression","compact prompt","Karpathy prompt","karpathy loop","optimize prompt","measure tokens","self-improve prompt") -Description "Karpathy-style compression + iterative loop for prompts (merged karpathy-prompt)"
 Add-Skill -Name "lean-context" -Category "compression" -Effort low -Triggers @("compact","less tokens","caveman","caveman","ultra-lean","minimal context") -Description "Ultra-lean context mode"
 Add-Skill -Name "execution-mode" -Category "compression" -Effort low -Triggers @("execution mode","quick","thorough","draft","modo") -Description "Quick or Thorough or Draft execution modes"
 Add-Skill -Name "skill-digestion" -Category "compression" -Effort low -Triggers @("skill digestion","compact on load","compress skill") -Description "Digest and compact skills when loaded"

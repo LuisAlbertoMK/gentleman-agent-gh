@@ -226,7 +226,7 @@ if ($Mode -eq 'scan') {
 
     Write-Host '[WARN] Repeated patterns detected:' -ForegroundColor Yellow
     foreach ($r in $repeated) {
-        $status = if ($r.Cataloged) { '[cataloged]' } else { '[UNCATA LOGED]' }
+        $status = if ($r.Cataloged) { '[cataloged]' } else { '[uncataloged]' }
         Write-Host "  [$($r.Count)x] $($r.PatternKey) -- $status"
     }
 

@@ -6,50 +6,36 @@ license: MIT
 metadata:
   tags: [performance]
   author: web-quality-skills
-  version: "2.0"
-  changelog: "2.0: merged core-web-vitals (INP/CLS detail)"
+  version: "2.1"
+  changelog: "2.1: Karpathy compression (2.8→1.5KB), merged CWV inline"
 ---
 ## Budget
 | Resource | Budget | Resource | Budget |
 |---|---|---|---|
-| Total page | <1.5MB | JS (compressed) | <300KB |
-| CSS | <100KB | Images above-fold | <500KB |
+| Total | <1.5MB | JS (gz) | <300KB |
+| CSS | <100KB | Above-fold images | <500KB |
 | Fonts | <100KB | Third-party | <200KB |
 ## Critical Path
-**Server**: TTFB <800ms · Brotli > Gzip · HTTP/2 or 3 · Edge caching · Early Hints
-**Loading**: preconnect origins · preload LCP image+fonts · prerender next nav · defer non-critical CSS/JS
-**JS**: `defer` non-essential, `async` independent · code-split route-based · tree-shake named imports
-## Images
-AVIF (92%+) → WebP (97%+) → PNG transparency → SVG icons.
-`<picture>`, `srcset`/`sizes`, LCP: `fetchpriority="high"`, below-fold: `loading="lazy"`
-## Fonts
-`font-display: swap` · preload `.woff2` + crossorigin · `unicode-range` subset · prefer variable fonts
+**Server**: TTFB <800ms · Brotli > Gzip · HTTP/2+ · Edge cache · Early Hints
+**Loading**: preconnect origins · preload LCP img+fonts · prerender next nav · defer non-critical CSS/JS
+**JS**: `defer` non-essential, `async` independent · code-split routes · tree-shake imports
+## Media
+AVIF→WebP→PNG→SVG. `<picture>`, `srcset`, LCP `fetchpriority="high"`, below-fold `loading="lazy"`.
+Fonts: `font-display: swap` · preload `.woff2`+crossorigin · `unicode-range` subset · variable fonts preferred.
 ## Caching
-`HTML: no-cache` · `Static hashed: public, max-age=31536000, immutable` · `Static unhashed: public, max-age=86400, stale-while-revalidate=604800` · `API: private, max-age=0`
+`HTML: no-cache` · `Static hashed: public, max-age=31536000, immutable` · `Static unhashed: public, max-age=86400, stale-while-revalidate=604800` · `API: private, no-cache`
 ## Runtime
-Batch DOM reads · debounce scroll/resize ≥100ms · `rAF` for animations · virtualize lists >100 · View Transitions API for SPA
-## Third-party
-`async` or IntersectionObserver delay · Facade pattern (YouTube, maps)
+Batch DOM reads · debounce scroll/resize ≥100ms · `rAF` for animations · virtualize lists >100 · View Transitions API
+Third-party: `async`/IObserver delay · Facade pattern (YT, maps)
 ## Metrics
-LCP <2.5s · FCP <1.8s · Speed Index <3.4s · TBT <200ms · TTI <3.8s
-## Core Web Vitals (INP/CLS)
-### INP = Input Delay + Processing + Presentation Delay
-Fixes: Chunk long tasks · debounce handlers · batch DOM writes · React.memo+virtualization · useTransition
+LCP <2.5s · FCP <1.8s · SI <3.4s · TBT <200ms · TTI <3.8s
+### INP (Input Delay+Processing+Presentation): chunk long tasks, debounce handlers, batch DOM writes
 | Phase | Target | How |
-|-------|--------|-----|
+|---|---|---|
 | Input Delay | <50ms | Reduce main thread blocking |
-| Processing | <100ms | Chunk long tasks (`setTimeout`/`scheduler.yield`) |
+| Processing | <100ms | Chunk tasks (`setTimeout`/`scheduler.yield`) |
 | Presentation | <50ms | Minimize layout/paint |
-### CLS = impact fraction × distance fraction
-Causes: Images w/o dimensions · iframes w/o space · dynamic content · web fonts FOIT/FOUT
-Fixes: Explicit `width`+`height`/`aspect-ratio` · reserved embed space · `font-display: swap` · `transform` for animations
+### CLS: explicit w/h or `aspect-ratio` · reserved embed space · `font-display: swap` · `transform` for animations
 ## Frameworks
-| Stack | Key patterns |
-|---|---|
-| React/Next | `next/image`, `React.lazy()`, Suspense, `useMemo`/`useCallback` for render thrash |
-| Vue/Nuxt | `nuxt/image`, async components, `v-once`, computed |
-| Svelte | `svelte:image`, `{#await}`, reactive `$:` |
-| Astro | `<Image>`, partial hydration, View Transitions |
-## Scan
-`npx unlighthouse --site <url>` (full-site) · `npx lighthouse <url> --output html`
-## Ref: [web.dev/vitals](https://web.dev/vitals/) · [Web Audit](../web-quality-audit/SKILL.md)
+React: `next/image`, `lazy()`, Suspense, `useMemo`/`useCallback` · Vue: `nuxt/image`, async components, `v-once` · Svelte: `svelte:image`, `{#await}` · Astro: `<Image>`, partial hydration
+## Scan: `npx unlighthouse --site <url>` · `npx lighthouse <url> --output html`
