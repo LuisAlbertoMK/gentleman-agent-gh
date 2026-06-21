@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 5.1
 
 <#
 .SYNOPSIS
@@ -52,7 +52,17 @@ if (-not (Test-Path -LiteralPath $trackPath)) {
     $init | ConvertTo-Json | Set-Content -LiteralPath $trackPath -Encoding UTF8
 }
 
-$data = Get-Content -LiteralPath $trackPath -Raw | ConvertFrom-Json
+try {
+    $data = Get-Content -LiteralPath $trackPath -Raw | ConvertFrom-Json
+} catch {
+    Write-Warning "Corrupted inter-track.json, backing up and re-initializing"
+    $backup = "$trackPath.bak.$(Get-Date -Format 'yyyyMMddHHmmss')"
+    Copy-Item -LiteralPath $trackPath -Destination $backup -ErrorAction SilentlyContinue
+    $data = @{
+        cycle  = @{ id = ""; start = ""; target = $Target; count = 0 }
+        history = @()
+    }
+}
 
 if ($Reset) {
     $cycleId = "CYC-" + (Get-Date -Format "yyyyMMdd") + "-" + (Get-Random -Minimum 100 -Maximum 999)

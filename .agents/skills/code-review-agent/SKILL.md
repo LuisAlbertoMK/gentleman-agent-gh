@@ -1,4 +1,4 @@
-﻿---
+---
 name: code-review-agent
 description: "4R code review — Risk/Readability/Reliability/Resilience with evidence gates and actionable fixes"
 triggers: "Code review, CR, revisar código, criticar"

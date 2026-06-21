@@ -1,4 +1,4 @@
-﻿---
+---
 name: auto-metrics
 description: "Post-task self-evaluation. Score 7 dims + skill validation with multi-trial benchmark."
 license: Apache-2.0

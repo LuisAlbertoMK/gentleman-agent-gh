@@ -1,4 +1,4 @@
-﻿---
+---
 name: bitacora
 description: "Historical log of user requests per session — auto-append to BITACORA.md, search, date filtering"
 triggers: "Bitacora, historial, histórico, qué pedí, request log"

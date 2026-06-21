@@ -1,4 +1,4 @@
-﻿---
+---
 name: command-wrapper
 description: "Run commands safely — description, error handling, output parsing, and safety wrappers for destructive operations"
 triggers: "Command wrapper, error handling, output parsing"

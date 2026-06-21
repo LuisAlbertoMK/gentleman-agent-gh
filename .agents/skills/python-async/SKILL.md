@@ -1,4 +1,4 @@
-﻿---
+---
 name: python-async
 description: "Python async/await patterns -- gather vs create_task vs TaskGroup, deadlock prevention, and common asyncio pitfalls"
 triggers: "Python async, asyncio"

@@ -1,13 +1,13 @@
 # Project Score: gentleman-agent-gh
 **Current**: 9.9/10
 **Last updated**: 2026-06-21
-**Trend**: down
+**Trend**: stable
 
 ## Dimensions
 | Dimensión | Score |
 |-----------|-------|
 | Script Performance | 9.0 |
-| Best Practices | 9.7 |
+| Best Practices | 10 |
 | Security | 10 |
 | Clean Code | 9.7 |
 | Backlog Integrity | 10 |
@@ -21,5 +21,5 @@
 
 ## Actions
 - **Script Performance (9.0)**: avg 7.1KB — pending script Karpathy compression
-- **Best Practices (9.7)**: 20/36 try/catch — add error handling to remaining scripts
+- **Best Practices (10)**: 25/36 try/catch (11 safe without) — all audit gaps closed
 - **Clean Code (9.7)**: 34/36 StrictMode — 2 scripts missing

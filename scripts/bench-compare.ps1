@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
   Benchmark comparativo: backup pre-sprint3 vs gentleman-agent-gh (actual)
 .DESCRIPTION

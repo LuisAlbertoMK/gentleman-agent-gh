@@ -1,4 +1,4 @@
-﻿---
+---
 name: execution-mode
 description: "Auto-detect task execution mode — QUICK, THOROUGH, DRAFT — based on scope, risk, familiarity"
 triggers: "Execution mode, quick/thorough/draft, resource adaptive, zone green/yellow/orange/red"

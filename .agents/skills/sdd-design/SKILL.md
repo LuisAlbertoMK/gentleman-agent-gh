@@ -1,4 +1,4 @@
-﻿---
+---
 name: sdd-design
 description: "Create technical design documents with architecture decisions, data flow diagrams, file change plans, and testing approach"
 triggers: "Technical design, HOW"

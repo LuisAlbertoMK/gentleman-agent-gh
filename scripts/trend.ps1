@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 5.1
 
 <#
 .SYNOPSIS
@@ -46,8 +46,13 @@ if ($snapFiles.Count -eq 0) {
 # --- Parse snapshots ---
 $snapshots = @()
 foreach ($f in $snapFiles) {
-  $raw = Get-Content -LiteralPath $f.FullName -Raw
-  $data = $raw | ConvertFrom-Json
+  try {
+    $raw = Get-Content -LiteralPath $f.FullName -Raw
+    $data = $raw | ConvertFrom-Json
+  } catch {
+    Write-Debug "trend: skipping corrupt snapshot $($f.Name) ($($_.Exception.Message))"
+    continue
+  }
   $snapshots += [PSCustomObject]@{
     File = $f.Name
     Timestamp = $data.timestamp

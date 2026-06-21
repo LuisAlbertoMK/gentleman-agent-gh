@@ -1,4 +1,4 @@
-﻿---
+---
 name: sdd-verify
 description: "Validate implementation against specs — compliance checking, build verification, scenario mapping, and structured reports"
 triggers: "Validate vs specs, verify"

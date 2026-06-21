@@ -1,4 +1,4 @@
-﻿---
+---
 name: prompt-engineering
 description: "Design effective prompts using SPEARS framework — scope, principles, examples, assertions, refinements, with ReAct and multi-agent patterns"
 triggers: "Improve prompt, security, ReAct, multi-agent"

@@ -167,6 +167,7 @@
     "!ship":    { "verify": "full",  "quality_gate": true,  "commit": true, "push": true  },
     "!listo":   { "verify": "full",  "quality_gate": true,  "commit": true, "push": true  },
     "!fast":    { "verify": "skip",  "quality_gate": true,  "commit": true, "push": true  },
+    "!check":   { "verify": "profile","quality_gate": true,  "commit": false,"push": false },
     "!draft":   { "verify": "none",  "quality_gate": false, "commit": false,"push": false }
   }
 }

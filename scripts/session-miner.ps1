@@ -58,7 +58,12 @@ function Read-Catalog {
         return @()
     }
 
-    $content = Get-Content -LiteralPath $catalogPath -Raw
+    try {
+        $content = Get-Content -LiteralPath $catalogPath -Raw
+    } catch {
+        Write-Debug "session-miner: cannot read catalog ($($_.Exception.Message))"
+        return @()
+    }
     $patterns = @()
 
     # Match each row in the table (pipe-delimited rows)
@@ -93,7 +98,12 @@ function Read-LearningsPatternKey {
         return @()
     }
 
-    $content = Get-Content -LiteralPath $learningsPath -Raw
+    try {
+        $content = Get-Content -LiteralPath $learningsPath -Raw
+    } catch {
+        Write-Debug "session-miner: cannot read learnings ($($_.Exception.Message))"
+        return @()
+    }
     $keys = @()
 
     # Match Pattern-Key values
@@ -111,7 +121,12 @@ function Read-ErrorEntry {
         return @()
     }
 
-    $content = Get-Content -LiteralPath $errorsPath -Raw
+    try {
+        $content = Get-Content -LiteralPath $errorsPath -Raw
+    } catch {
+        Write-Debug "session-miner: cannot read errors ($($_.Exception.Message))"
+        return @()
+    }
     $errors = @()
 
     # Match error entry headers

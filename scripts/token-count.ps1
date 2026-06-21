@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
   Cuenta tokens aproximados en archivos (4 chars = 1 token)
 .DESCRIPTION

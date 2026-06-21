@@ -1,4 +1,4 @@
-﻿---
+---
 name: sdd-tasks
 description: "Break down specs into phased, actionable implementation tasks with workload forecasting and PR splitting guidance"
 triggers: "Task breakdown, implementation plan"

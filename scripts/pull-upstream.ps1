@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 5.1
 
 <#
 .SYNOPSIS
@@ -46,6 +46,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $repoRoot = Resolve-Path "$PSScriptRoot/.."
+trap { try { Pop-Location } catch {}; exit 1 }
 Push-Location $repoRoot
 
 # ---- helpers ----

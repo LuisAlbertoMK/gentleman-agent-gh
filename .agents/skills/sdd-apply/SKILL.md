@@ -1,4 +1,4 @@
-﻿---
+---
 name: sdd-apply
 description: "Implement code changes from task definitions — spec-first execution with strict TDD support, progress persistence, and structured completion reports"
 triggers: "Apply tasks, implement"

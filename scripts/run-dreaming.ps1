@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 5.1
 
 <#
 .SYNOPSIS
@@ -31,7 +31,11 @@ if (-not (Test-Path $learningsDir)) {
 function Write-Log {
     param([string]$Section, [string]$Message)
     $line = "| $timestamp | $cycleId | $Section | $Message |"
-    Add-Content -Path $logFile -Value $line
+    try {
+        Add-Content -Path $logFile -Value $line
+    } catch {
+        Write-Debug "dreaming: Write-Log failed ($($_.Exception.Message))"
+    }
 }
 
 Write-Host "=== Dreaming Session: $cycleId ==="

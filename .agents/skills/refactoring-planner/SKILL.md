@@ -1,4 +1,4 @@
-﻿---
+---
 name: refactoring-planner
 description: "Plan refactoring with impact analysis, dependency mapping, and step-by-step migration with test baseline"
 triggers: "Refactor, refactoring, reestructurar, migrate"

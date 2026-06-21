@@ -1,4 +1,4 @@
-﻿---
+---
 name: sdd-explore
 description: "Investigate codebase to understand requirements, entry points, patterns, and dependencies before design decisions"
 triggers: "Explore codebase, pre-design"

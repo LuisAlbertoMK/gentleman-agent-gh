@@ -1,4 +1,4 @@
-﻿---
+---
 name: sdd-spec
 description: "Write detailed specifications with Given/When/Then scenarios using RFC 2119 requirements language (MUST/SHOULD/MAY)"
 triggers: "Specs, Given/When/Then"

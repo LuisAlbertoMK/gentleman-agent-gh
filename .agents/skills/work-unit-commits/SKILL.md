@@ -1,4 +1,4 @@
-﻿---
+---
 name: work-unit-commits
 description: "Plan commits as reviewable work units — one deliverable per commit, tests/docs included, clean rollback"
 license: Apache-2.0

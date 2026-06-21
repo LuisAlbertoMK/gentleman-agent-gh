@@ -1,4 +1,4 @@
-﻿---
+---
 name: sdd-propose
 description: "Define change proposals with scope, capabilities, approach, risks, rollback plan, and success criteria"
 triggers: "Proposal, intent, approach"

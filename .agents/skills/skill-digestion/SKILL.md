@@ -1,4 +1,4 @@
-﻿---
+---
 name: skill-digestion
 description: "Digest skills on load — load only critical sections based on context budget, log resolution feedback, trigger auto-improvement"
 triggers: "Skill digestion, compact on load"

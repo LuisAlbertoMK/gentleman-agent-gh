@@ -1,4 +1,4 @@
-﻿# SKILLS INDEX
+# SKILLS INDEX
 
 > Full trigger table for all 69 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.

@@ -1,4 +1,4 @@
-﻿---
+---
 name: development-mode
 description: "System resource prioritization — RAM, CPU, GPU, file I/O optimization"
 triggers: "modo desarrollo, dev mode, development mode, performance mode, resource priority"

@@ -1,4 +1,4 @@
-﻿---
+---
 name: security-scanner
 description: "Pre-commit security scan — detect secrets, injection patterns, dependency vulnerabilities, and dangerous API usage"
 triggers: "Security, seguridad, vulnerabilidad, auditar, safe check, harden"

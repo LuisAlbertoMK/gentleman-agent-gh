@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 5.1
 
 <#
 .SYNOPSIS
@@ -105,7 +105,12 @@ Get-ChildItem $canonicalDir -Directory | Where-Object { $_.Name -ne '_shared' } 
     $skillName = $_.Name
     $mdPath = Join-Path -Path $_.FullName -ChildPath "SKILL.md"
     if (-not (Test-Path $mdPath)) { return }
-    $content = Get-Content $mdPath -Raw
+    try {
+        $content = Get-Content $mdPath -Raw
+    } catch {
+        Write-Debug "cross-ref: cannot read $mdPath ($($_.Exception.Message))"
+        return
+    }
     if (-not $content) { return }
     # Check Cross-Refs: line — only match single-word hyphens (skill names)
     if ($content -match $refPattern) {
@@ -138,7 +143,12 @@ Get-ChildItem $canonicalDir -Directory | Where-Object { $_.Name -ne '_shared' } 
     $skillName = $_.Name
     $mdPath = Join-Path -Path $_.FullName -ChildPath "SKILL.md"
     if (-not (Test-Path $mdPath)) { return }
-    $content = Get-Content $mdPath -Raw -Encoding UTF8
+    try {
+        $content = Get-Content $mdPath -Raw -Encoding UTF8
+    } catch {
+        Write-Debug "cross-ref: cannot read $mdPath ($($_.Exception.Message))"
+        return
+    }
     if (-not $content) { return }
     if ($content -match $configRefPattern) {
         $refs = $Matches[1] -split '\s*[\|,]\s*' | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' }

@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 5.1
 
 <#
 .SYNOPSIS
@@ -122,14 +122,18 @@ $snapHash = @{
 
 # --- Snapshot mode ---
 if ($Snapshot) {
-  if (-not (Test-Path $snapDir)) { New-Item -ItemType Directory -Path $snapDir -Force | Out-Null }
-  $filename = "{0:yyyyMMdd-HHmmss}_benchmark.json" -f (Get-Date)
-  $filePath = Join-Path $snapDir $filename
-  $snapHash | ConvertTo-Json -Depth 3 | Set-Content -Path $filePath -Encoding UTF8
-  # Copy as LATEST
-  $latestPath = Join-Path $snapDir "LATEST_benchmark.json"
-  $snapHash | ConvertTo-Json -Depth 3 | Set-Content -Path $latestPath -Encoding UTF8
-  if (-not $Json) { Write-Output "Snapshot saved: $filePath" }
+  try {
+    if (-not (Test-Path $snapDir)) { New-Item -ItemType Directory -Path $snapDir -Force | Out-Null }
+    $filename = "{0:yyyyMMdd-HHmmss}_benchmark.json" -f (Get-Date)
+    $filePath = Join-Path $snapDir $filename
+    $snapHash | ConvertTo-Json -Depth 3 | Set-Content -Path $filePath -Encoding UTF8
+    # Copy as LATEST
+    $latestPath = Join-Path $snapDir "LATEST_benchmark.json"
+    $snapHash | ConvertTo-Json -Depth 3 | Set-Content -Path $latestPath -Encoding UTF8
+    if (-not $Json) { Write-Output "Snapshot saved: $filePath" }
+  } catch {
+    Write-Warning "benchmark: snapshot save failed ($($_.Exception.Message))"
+  }
 }
 
 # --- Gate mode: compare vs LATEST ---

@@ -1,4 +1,4 @@
-﻿---
+---
 name: code-memory
 description: "Multi-session memory — save exact task state, handoff format, auto-save triggers for seamless session resumption"
 triggers: "Continuá, code memory, multi-session"

@@ -1,4 +1,4 @@
-﻿---
+---
 name: sdd-init
 description: "Bootstrap SDD project context — detect stack, init config structure, build skill registry, and persist testing capabilities"
 triggers: "SDD init, bootstrap"

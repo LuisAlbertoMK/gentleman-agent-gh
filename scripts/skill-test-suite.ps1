@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
   Comprehensive skill validation suite
 .DESCRIPTION

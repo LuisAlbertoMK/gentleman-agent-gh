@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 5.1
 
 <#
 .SYNOPSIS
@@ -304,10 +304,28 @@ if (Test-Path $InterTrackPath) {
   }
 }
 
-Add-DimensionLog -Name "Cycle Progress" -Score $CycleScore -Max 10 -Evidence @{
+Add-DimensionLog -Name "Cycle Activity" -Score $CycleScore -Max 10 -Evidence @{
   inter_count  = $InterCount
   inter_target = $InterTarget
 } -Rationale "inter: $InterCount/$InterTarget"
+
+# --- 12. Backlog Integrity ---
+$BacklogScript = Join-Path $PSScriptRoot 'check-backlog-integrity.ps1'
+if (Test-Path $BacklogScript) {
+    $BacklogJson = & $BacklogScript -Json 2>&1 | Out-String | ConvertFrom-Json
+    $BacklogScore = $BacklogJson.score
+    $BacklogPassed = $BacklogJson.passed
+    $BacklogTotal = $BacklogJson.totalItems
+} else {
+    $BacklogScore = 0
+    $BacklogPassed = 0
+    $BacklogTotal = 0
+}
+
+Add-DimensionLog -Name "Backlog Integrity" -Score $BacklogScore -Max 10 -Evidence @{
+    passed = $BacklogPassed
+    total  = $BacklogTotal
+} -Rationale "$BacklogPassed/$BacklogTotal items match reality"
 
 # --- Composite ---
 $AllScores = $ScoreLog.Values | ForEach-Object { $_.score }
@@ -318,7 +336,7 @@ $DimOrder = @(
   "Project Artifacts", "Security", "Dead Code", "Clean Code",
   "Best Practices", "Orthography", "Bitacora", "Metrics",
   "Script Performance", "Skill Effectiveness",
-  "Cycle Progress"
+  "Cycle Activity", "Backlog Integrity"
 )
 
 $Result = @{
@@ -332,7 +350,7 @@ $Result = @{
 }
 foreach ($Dim in $DimOrder) { $Result.score.dimensions[$Dim] = $ScoreLog[$Dim].score }
 
-# Trend vs .project.json
+# Trend vs .project.json + freshness warning
 if (Test-Path ".project.json") {
   try {
     $Prev = Get-Content ".project.json" -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -340,6 +358,15 @@ if (Test-Path ".project.json") {
     if ($FinalScore -gt $PrevScore) { $Result.score.trend = "up" }
     elseif ($FinalScore -lt $PrevScore) { $Result.score.trend = "down" }
     else { $Result.score.trend = "stable" }
+
+    # Score freshness: warn if .project.json last_updated > 1 day stale
+    $lastUpdated = $Prev.score.last_updated
+    if ($lastUpdated) {
+      $age = [int]((Get-Date) - (Get-Date $lastUpdated)).TotalDays
+      if ($age -ge 1) {
+        Write-Host "WARNING: .project.json is $age day(s) stale (last: $lastUpdated)" -ForegroundColor Yellow
+      }
+    }
   } catch { $Result.score.trend = "unknown" }
 }
 

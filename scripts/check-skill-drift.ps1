@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 5.1
 
 <#
 .SYNOPSIS
@@ -103,8 +103,12 @@ if ($AutoFix) {
     foreach ($e in $errorsToFix) {
       $target = Join-Path -Path $canonicalDir -ChildPath $e.Skill
       $link = Join-Path -Path $globalDir -ChildPath $e.Skill
-      New-Item -ItemType Junction -Path $link -Target $target -Force | Out-Null
-      Write-Output "  Created: $link -> $target"
+      try {
+        New-Item -ItemType Junction -Path $link -Target $target -Force | Out-Null
+        Write-Output "  Created: $link -> $target"
+      } catch {
+        Write-Warning "  JUNCTION FAIL: $link -> $target ($($_.Exception.Message))"
+      }
     }
     $errors = @($errors) | Where-Object { $_ -and $_.Status -ne "GLOBAL_MISSING" }
   }
@@ -114,8 +118,12 @@ if ($AutoFix) {
   $repoScriptsDir = Join-Path -Path $PSScriptRoot -ChildPath "."
   if (-not (Test-Path $globalScriptsDir)) {
     Write-Output "Creating global scripts junction..."
-    New-Item -ItemType Junction -Path $globalScriptsDir -Target $repoScriptsDir -Force | Out-Null
-    Write-Output "  Created: $globalScriptsDir -> $repoScriptsDir"
+    try {
+      New-Item -ItemType Junction -Path $globalScriptsDir -Target $repoScriptsDir -Force | Out-Null
+      Write-Output "  Created: $globalScriptsDir -> $repoScriptsDir"
+    } catch {
+      Write-Warning "  JUNCTION FAIL: $globalScriptsDir ($($_.Exception.Message))"
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 5.1
 <#
 .SYNOPSIS
   Unified session close pipeline — log, inter-track, git status, and output structured summary.

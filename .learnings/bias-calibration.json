@@ -1,28 +1,35 @@
 ﻿{
-    "history":  [
-                    {
-                        "date":  "2026-06-20",
-                        "gaps":  "4 4 5 3 1 4",
-                        "task":  "vmk-score-restore",
-                        "audit":  "6 5 5 7 8 6",
-                        "self":  "10 9 10 10 9 10"
-                    },
-                    {
-                        "self":  "9 8 9 8 9 9",
-                        "audit":  "9 9 6 7 9 5",
-                        "gaps":  "0 -1 3 1 0 4",
-                        "date":  "2026-06-19",
-                        "task":  "restore-project-json-score"
-                    }
-                ],
-    "samples":  2,
-    "last_updated":  "2026-06-20",
-    "offsets":  {
-                    "Breadth":  4,
-                    "Correctness":  2,
-                    "Speed":  0.5,
-                    "ErrPrev":  4,
-                    "Tokens":  1.5,
-                    "Skill":  2
-                }
+    "history": [
+        {
+            "date": "2026-06-20",
+            "task": "vmk-score-restore",
+            "self": "10 9 10 10 9 10",
+            "audit": "6 5 5 7 8 6",
+            "gaps": "4 4 5 3 1 4"
+        },
+        {
+            "date": "2026-06-19",
+            "task": "restore-project-json-score",
+            "self": "9 8 9 8 9 9",
+            "audit": "9 9 6 7 9 5",
+            "gaps": "0 -1 3 1 0 4"
+        },
+        {
+            "date": "2026-06-21",
+            "task": "error-handling-audit-4-scripts",
+            "self": "10 9 9 9 10 10",
+            "audit": "6 8 7 6 9 6",
+            "gaps": "4 1 2 3 1 4"
+        }
+    ],
+    "samples": 3,
+    "last_updated": "2026-06-21",
+    "offsets": {
+        "Correctness": 2.67,
+        "Tokens": 1.33,
+        "ErrPrev": 3.33,
+        "Skill": 2.33,
+        "Speed": 0.67,
+        "Breadth": 4.0
+    }
 }

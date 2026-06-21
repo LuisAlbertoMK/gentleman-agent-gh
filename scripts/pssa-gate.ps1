@@ -1,4 +1,4 @@
-﻿#Requires -Module @{ModuleName='PSScriptAnalyzer'; ModuleVersion='1.20.0'}
+#Requires -Module @{ModuleName='PSScriptAnalyzer'; ModuleVersion='1.20.0'}
 <#
 .SYNOPSIS
     Self-Healing PSSA Gate - run PSScriptAnalyzer, auto-fix safe violations, report remainder.

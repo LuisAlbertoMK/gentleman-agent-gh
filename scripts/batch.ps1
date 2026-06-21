@@ -58,13 +58,18 @@ if (-not $Description) {
 $nextBatch = $currentBatch + 1
 $today = Get-Date -Format "yyyy-MM-dd"
 
-$entry = "$today - Batch $($nextBatch): $Description"
-$existingContent = Get-Content -LiteralPath $bitacoraPath -Raw
-$newContent = "$entry`r`n$existingContent"
-Set-Content -LiteralPath $bitacoraPath -Value $newContent -Encoding UTF8
+try {
+    $entry = "$today - Batch $($nextBatch): $Description"
+    $existingContent = Get-Content -LiteralPath $bitacoraPath -Raw
+    $newContent = "$entry`r`n$existingContent"
+    Set-Content -LiteralPath $bitacoraPath -Value $newContent -Encoding UTF8
 
-if (Test-Path -LiteralPath $interTrack) {
-    & $interTrack -Increment -Quiet
+    if (Test-Path -LiteralPath $interTrack) {
+        & $interTrack -Increment -Quiet
+    }
+} catch {
+    Write-Error "Failed to update BITACORA.md: $_"
+    exit 1
 }
 
 if (-not $Quiet) {

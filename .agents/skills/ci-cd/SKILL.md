@@ -1,4 +1,4 @@
-﻿---
+---
 name: ci-cd
 description: "CI/CD pipeline setup — GitHub Actions, local pre-push quality gate, auto-detect test runner, SDD spec coverage"
 triggers: "CI/CD pipeline, GitHub Actions, quality gate"

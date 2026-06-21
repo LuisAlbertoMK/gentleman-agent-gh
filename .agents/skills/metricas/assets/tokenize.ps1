@@ -1,4 +1,4 @@
-﻿Set-StrictMode -Version 5.1
+Set-StrictMode -Version 5.1
 $ErrorActionPreference = 'Stop'
 
 # tokenize.ps1 â€” Compare tokenization of before/after text

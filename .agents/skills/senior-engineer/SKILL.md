@@ -1,4 +1,4 @@
-﻿---
+---
 name: senior-engineer
 description: "Apply senior engineering competencies — system design, trade-off analysis, delegation, mentoring, and tech debt strategy"
 triggers: "Senior architect, trade-offs, system design"

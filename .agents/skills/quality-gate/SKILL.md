@@ -1,4 +1,4 @@
-﻿---
+---
 name: quality-gate
 description: "Pre-commit gate — TDD tests pass, secrets scan, conventional commit, PSSA gate"
 triggers: "Quality gate, pre-commit, PSSA gate"

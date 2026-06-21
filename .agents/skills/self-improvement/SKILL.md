@@ -27,5 +27,5 @@ Engram (`self-improvement/cycle-results`) · anti-patterns if introduced · CYCL
 ### 5: Propagate
 opencode→opencode-vmk→gentleman-vMK · Update junctions via `check-skill-drift.ps1`
 ## Difficulty→Verify table: See CYCLE.md. Summary: Fácil=E2 · Medio=E1+E2 · Medio-Dif=E1+E2+E3 · Difícil=Full+4R · Complejo=Full+judgment-day · Muy Compl=Full+SDD
-## Exit: inter≥30 + no dim<9.0 → SUCCESS · Time budget exhausted → STOP · Same fix fails 3x → SKIP · Score drop >0.5 → revert
+## Exit: inter≥30 + no dim<9.0 (new dims grace 5 cycles) → SUCCESS; time budget (7d from cycle start) exhausted → STOP; score drop >0.5 from baseline → full revert (git checkout + stash drop); same fix fails 3x → SKIP candidate
 ## Refs: CYCLE.md · inter-track.ps1 · extract-skill.ps1 · run-improvement-cycle.ps1 · score-auto.ps1 · Engram #645

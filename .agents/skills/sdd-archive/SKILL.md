@@ -1,4 +1,4 @@
-﻿---
+---
 name: sdd-archive
 description: "Archive completed changes — sync specs to main, move artifacts to archive, create rollback snapshots, and persist reports"
 triggers: "Archive changes, delta to main"

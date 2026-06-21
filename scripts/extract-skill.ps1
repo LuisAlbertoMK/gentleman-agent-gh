@@ -113,10 +113,11 @@ foreach ($key in $allKeys) {
         continue
     }
 
-    $skillDir = Join-Path -Path $skillsDir -ChildPath $safeName
-    New-Item -ItemType Directory -Path $skillDir -Force | Out-Null
+    try {
+        $skillDir = Join-Path -Path $skillsDir -ChildPath $safeName
+        New-Item -ItemType Directory -Path $skillDir -Force | Out-Null
 
-    $desc = "Auto-extracted pattern: $key ($entryCount occurrences in .learnings)"
+        $desc = "Auto-extracted pattern: $key ($entryCount occurrences in .learnings)"
 
     $sb = New-Object System.Text.StringBuilder
     $null = $sb.AppendLine("---")
@@ -138,19 +139,23 @@ foreach ($key in $allKeys) {
     $null = $sb.AppendLine("- See .learnings/LEARNINGS.md entries with Pattern-Key: $key")
     $null = $sb.AppendLine("- Extracted automatically by scripts/extract-skill.ps1")
     $null = $sb.AppendLine("- Review and refine this skill on first use")
-    Set-Content -LiteralPath $skillPath -Value $sb.ToString() -Encoding UTF8
+        Set-Content -LiteralPath $skillPath -Value $sb.ToString() -Encoding UTF8
 
-    if (-not $Quiet) {
-        Write-Host "[extract-skill] Created skill: $safeName ($entryCount entries)" -ForegroundColor Green
+        if (-not $Quiet) {
+            Write-Host "[extract-skill] Created skill: $safeName ($entryCount entries)" -ForegroundColor Green
+        }
+
+        $null = $results.Add([PSCustomObject]@{
+            PatternKey = $key
+            SkillName  = $safeName
+            Entries    = $entryCount
+            Path       = $skillPath
+            Status     = "created"
+        })
+    } catch {
+        $errMsg = $_.Exception.Message
+        Write-Warning ("[extract-skill] Failed to create skill {0}: {1}" -f $safeName, $errMsg)
     }
-
-    $null = $results.Add([PSCustomObject]@{
-        PatternKey = $key
-        SkillName  = $safeName
-        Entries    = $entryCount
-        Path       = $skillPath
-        Status     = "created"
-    })
 }
 
 if ($results.Count -eq 0 -and -not $Quiet) {

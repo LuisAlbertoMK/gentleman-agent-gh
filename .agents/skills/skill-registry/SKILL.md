@@ -1,4 +1,4 @@
-﻿---
+---
 name: skill-registry
 description: "Build and maintain skill registry — scan skill directories, deduplicate across sources, compact rules, and persist to engram"
 triggers: "Skill registry, catalog"

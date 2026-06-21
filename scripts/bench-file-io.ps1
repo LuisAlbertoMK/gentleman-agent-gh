@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
   Benchmark de 3 métodos de file I/O × 3 runs
 .DESCRIPTION
