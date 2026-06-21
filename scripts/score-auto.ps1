@@ -121,9 +121,9 @@ Get-ChildItem ".\skills" -Directory -ErrorAction SilentlyContinue | ForEach-Obje
 if ($JunctionIssues -gt 0) { $DeadScore -= 1 }
 
 # Commented-out code (exclude self-detection)
-$CommentedCode = Select-String -Path ".\scripts\*.ps1" -Pattern "#.*function|#.*if|#.*for\s*\(" -SimpleMatch | Where-Object {
+$CommentedCode = @(Select-String -Path ".\scripts\*.ps1" -Pattern "#.*function|#.*if|#.*for\s*\(" -SimpleMatch | Where-Object {
   $_.Filename -ne "score-auto.ps1"
-}
+})
 if ($CommentedCode.Count -gt 10) { $DeadScore -= 1 }
 
 $DeadScore = [math]::Max(0, [math]::Min(10, $DeadScore))

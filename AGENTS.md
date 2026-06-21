@@ -137,7 +137,7 @@ Match user's language. Spanish: warm Rioplatense (voseo). English: natural, same
 
 ## Skills (Auto-load)
 Top 16 most-used (66 total at `SKILLS-INDEX.md`):
-karpathy-prompt · karpathy-loop · caveman · lean-context · quality-gate · auto-metrics · session-resume · code-memory · skill-creator · immune-system · dreaming · metricas · commit-crafter · code-review-agent · bitacora · triple-verify · self-improvement
+karpathy-loop · caveman · lean-context · quality-gate · auto-metrics · session-resume · code-memory · skill-creator · immune-system · dreaming · metricas · commit-crafter · code-review-agent · bitacora · triple-verify · self-improvement
 ### Anti-Pattern Catalog
 `{file:ANTI-PATTERN-CATALOG.md}` — scan BEFORE any task.
 
@@ -147,13 +147,14 @@ karpathy-prompt · karpathy-loop · caveman · lean-context · quality-gate · a
 ```
 Resume → session-resume · Write code → skill-creator, sdd-*, quality-gate, go-testing, work-unit-commits
 Fix bug → recovery-protocol, immune-system, sdd-verify · Design → senior-engineer, sdd-propose, sdd-design, cognitive-doc-design
-Learn/Research → research, prompt-engineering, context7, code-memory · Review → judgment-day, skill-testing, pr-evidence, comment-writer, code-review-agent
-UI/Design → baseline-ui, web-quality-audit, performance, accessibility, seo, core-web-vitals
-Measure → metricas, auto-metrics · Audit → external-auditor · Optimize → karpathy-*, lean-context, caveman, skill-improver, refactoring-planner
+Learn/Research → research, prompt-engineering, context7, code-memory · Review → review-pipeline, judgment-day, skill-testing, comment-writer, code-review-agent
+UI/Design → baseline-ui, web-quality-audit, performance, accessibility, seo
+System → development-mode, execution-mode, opencode-model-router
+Measure → metricas, auto-metrics, performance-tracker · Audit → external-auditor, gap-analysis · Optimize → karpathy-*, lean-context, caveman, skill-improver, refactoring-planner
 Coordinate → delivery-harness, subagent-isolation, command-wrapper, chained-pr
 Commit → commit-crafter | Map → project-mapper | Secure → security-scanner
 Sync docs → doc-sync | Log → bitacora · Track/Decide → decision-capture, dreaming, skill-digestion
-Improve → self-improvement · Recover → recovery-protocol, immune-system, context-watchdog · Unknown → Pre-Flight: skill-creator, research, retry
+Improve → self-improvement, self-reflection · Setup → sdd-init, ci-cd, project-mapper · Recover → recovery-protocol, immune-system, context-watchdog · Unknown → Pre-Flight: skill-creator, research, retry
 ```
 Load order: 1) Anti-Pattern Catalog 2) Behavioral match 3) Trigger match 4) Default-FAIL 5) Mini-dream every 5th call
 
@@ -229,12 +230,12 @@ Updates: `mem_update` on `topic_key=protocol/agente-optimizado`. Review: 2 weeks
 ### A. Skill combo
 | Tarea | Cargá | No cargues |
 |-------|-------|------------|
-| Q&A/charla | `karpathy-prompt`, `lean-context` | sdd-*, `judgment-day` |
+| Q&A/charla | `karpathy-loop`, `lean-context` | sdd-*, `judgment-day` |
 | Setup project | `sdd-init`, `senior-engineer` | `caveman`, `judgment-day` |
 | Bug fix | `recovery-protocol`, `immune-system`, `sdd-verify` | `sdd-propose` |
 | Architecture | `senior-engineer`, `sdd-propose` | — |
 | Code review | `code-review-agent`, `judgment-day` | — |
-| Refactor/opt | `karpathy-prompt`, `lean-context`, `metricas` | — |
+| Refactor/opt | `karpathy-loop`, `lean-context`, `metricas` | — |
 | Commit/PR / `!ship` | `triple-verify` → `quality-gate` → `commit-crafter` | — |
 | Hotfix `!fast` | `quality-gate` + `commit-crafter` | `triple-verify` |
 | Security audit | `security-scanner` | — |

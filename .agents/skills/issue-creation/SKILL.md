@@ -1,5 +1,5 @@
 ---
-name: gentle-ai-issue-creation
+name: issue-creation
 description: "Create GitHub issues with templates — bug reports, feature requests, triage workflow"
 license: Apache-2.0
 metadata:

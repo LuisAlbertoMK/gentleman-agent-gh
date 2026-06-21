@@ -76,7 +76,7 @@ function Add-Skill {
 }
 
 # --- Compression / Style ---
-Add-Skill -Name "karpathy-prompt" -Category "compression" -Effort low -Triggers @("karpathy","less tokens","context compression","compact prompt") -Description "Apply Karpathy-style compression to prompts"
+Add-Skill -Name "karpathy-loop" -Category "compression" -Effort low -Triggers @("karpathy","less tokens","context compression","compact prompt","Karpathy prompt") -Description "Apply Karpathy-style compression + iterative loop (merged from karpathy-prompt)"
 Add-Skill -Name "karpathy-loop" -Category "compression" -Effort high -Triggers @("karpathy loop","optimize prompt","measure tokens","self-improve prompt") -Description "Karpathy-style self-improvement loop for prompts"
 Add-Skill -Name "lean-context" -Category "compression" -Effort low -Triggers @("compact","less tokens","caveman","caveman","ultra-lean","minimal context") -Description "Ultra-lean context mode"
 Add-Skill -Name "execution-mode" -Category "compression" -Effort low -Triggers @("execution mode","quick","thorough","draft","modo") -Description "Quick or Thorough or Draft execution modes"
@@ -103,7 +103,7 @@ Add-Skill -Name "decision-capture" -Category "memory" -Triggers @("decision","tr
 Add-Skill -Name "skill-creator" -Category "meta" -Triggers @("create skill","new skill","crear skill") -Description "Create new AI skills from requirements"
 Add-Skill -Name "skill-registry" -Category "meta" -Triggers @("skill registry","catalog","registro skills") -Description "Skill registry management and catalog"
 Add-Skill -Name "skill-improver" -Category "meta" -Triggers @("skill improvement","audit skills","refactor skills") -Description "Audit and improve existing skills"
-Add-Skill -Name "skill-refresher" -Category "meta" -Triggers @("skill refresher","drift detection","auto-heal") -Description "Detect and fix skill drift"
+# Merged into skill-improver (v2.0)
 Add-Skill -Name "gap-analysis" -Category "meta" -Effort high -Triggers @("gap analysis","system audit","identificar gaps","project intake") -Description "Complete 8-dim gap analysis for any system" -Related @("project-mapper","security-scanner")
 
 # --- Code Ops ---
@@ -138,9 +138,9 @@ Add-Skill -Name "command-wrapper" -Category "coordination" -Effort low -Triggers
 Add-Skill -Name "accessibility" -Category "web-quality" -Triggers @("accessibility","a11y","WCAG","screen reader","keyboard nav","make accessible") -Description "Audit and improve web accessibility"
 Add-Skill -Name "performance" -Category "web-quality" -Triggers @("web performance","speed up","reduce load time","page speed","performance audit") -Description "Optimize web performance for faster loading"
 Add-Skill -Name "seo" -Category "web-quality" -Triggers @("SEO","search engine","meta tags","structured data","sitemap") -Description "Optimize for search engine visibility"
-Add-Skill -Name "core-web-vitals" -Category "web-quality" -Triggers @("Core Web Vitals","LCP","INP","CLS","layout shift","page experience") -Description "Optimize Core Web Vitals metrics"
+# Merged into performance (v2.0)
 Add-Skill -Name "best-practices" -Category "web-quality" -Triggers @("best practices","security audit","modernize code","code quality review") -Description "Apply modern web development best practices"
-Add-Skill -Name "web-quality-audit" -Category "web-quality" -Triggers @("web quality audit","lighthouse audit","review web quality") -Description "Comprehensive web quality audit" -DependsOn @("accessibility","performance","seo","core-web-vitals","best-practices")
+Add-Skill -Name "web-quality-audit" -Category "web-quality" -Triggers @("web quality audit","lighthouse audit","review web quality") -Description "Comprehensive web quality audit" -DependsOn @("accessibility","performance","seo","best-practices")
 Add-Skill -Name "development-mode" -Category "web-quality" -Triggers @("performance mode","dev mode","modo desarrollo","high performance","modo rendimiento") -Description "System resource prioritization mode"
 
 # --- Research ---

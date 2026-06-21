@@ -6,8 +6,8 @@ license: MIT
 metadata:
   tags: [performance]
   author: web-quality-skills
-  version: "1.3"
-  changelog: "1.3: karpathy compress"
+  version: "2.0"
+  changelog: "2.0: merged core-web-vitals (INP/CLS detail)"
 ---
 ## Budget
 | Resource | Budget | Resource | Budget |
@@ -32,6 +32,17 @@ Batch DOM reads · debounce scroll/resize ≥100ms · `rAF` for animations · vi
 `async` or IntersectionObserver delay · Facade pattern (YouTube, maps)
 ## Metrics
 LCP <2.5s · FCP <1.8s · Speed Index <3.4s · TBT <200ms · TTI <3.8s
+## Core Web Vitals (INP/CLS)
+### INP = Input Delay + Processing + Presentation Delay
+Fixes: Chunk long tasks · debounce handlers · batch DOM writes · React.memo+virtualization · useTransition
+| Phase | Target | How |
+|-------|--------|-----|
+| Input Delay | <50ms | Reduce main thread blocking |
+| Processing | <100ms | Chunk long tasks (`setTimeout`/`scheduler.yield`) |
+| Presentation | <50ms | Minimize layout/paint |
+### CLS = impact fraction × distance fraction
+Causes: Images w/o dimensions · iframes w/o space · dynamic content · web fonts FOIT/FOUT
+Fixes: Explicit `width`+`height`/`aspect-ratio` · reserved embed space · `font-display: swap` · `transform` for animations
 ## Frameworks
 | Stack | Key patterns |
 |---|---|
@@ -41,4 +52,4 @@ LCP <2.5s · FCP <1.8s · Speed Index <3.4s · TBT <200ms · TTI <3.8s
 | Astro | `<Image>`, partial hydration, View Transitions |
 ## Scan
 `npx unlighthouse --site <url>` (full-site) · `npx lighthouse <url> --output html`
-## Ref: [Core Web Vitals](../core-web-vitals/SKILL.md)
+## Ref: [web.dev/vitals](https://web.dev/vitals/) · [Web Audit](../web-quality-audit/SKILL.md)

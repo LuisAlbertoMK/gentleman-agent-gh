@@ -6,36 +6,41 @@
 
 ## Objective
 
-**Cycle 5**: Automation-first with self-healing monitoring and pattern extraction. Maintain 10.0 across all dims while reducing manual overhead — external repo checks become automatic, session learning becomes self-triggering.
+**Cycle 6**: Metric integrity and verification-first. Close gaps between claimed and actual state of automation, backlog tracking, and scoring. Every claim in CYCLE.md and .project.json MUST be verifiable from repo state. Fix score ceiling deadlock with honest sub-scores.
 
 ### Pillars
-1. **Automated upstream monitoring** — external repo changes detected without manual checks (step 2 in LOOP automated).
-2. **Automatic pattern extraction** — session-miner + dreaming without manual invocation on errors/bugfixes.
-3. **Maintain Cycle 4 gains** — JD ready for real reviews, skills <2.5KB, score 10.0, cross-ref 0.
-4. **Delegation discipline** — ≥3 subagent delegations per session; orchestrate, don't do.
+1. **Backlog integrity** — every item's status MUST match repo reality. Auto-verify on cycle check.
+2. **Score freshness** — .project.json auto-updates after significant changes; warning when stale >1d.
+3. **Verifiable claims** — every automation claim has a passing smoke test or is marked aspirational.
+4. **Score expansion** — break 10.0 ceiling with sub-dimensions that reward verifiable improvement.
 
 ### Backlog (sorted by impact/risk)
 | Item | Impact | Risk | I/R | Est. inter | Status |
 |------|--------|------|-----|------------|--------|
-| Automated upstream monitoring | High | Low | 3.0 | 2-3 | 🔄 In progress |
-| Upstream drift auto-report on cycle start | Medium | Low | 2.0 | 1-2 | 🔄 In progress |
-| Auto pattern extraction (dream+immune trigger) | High | Medium | 1.5 | 3-5 | 🔄 In progress |
-| Integration smoke tests for key scripts | Medium | Medium | 1.0 | 2-3 | ⏳ Pending |
+| Close Cycle 5: mark items 1-3 ✅ Done, carry item 4 forward | High | Low | 3.0 | 1 | 🔄 In progress |
+| Add "Backlog Integrity" metric to score-auto.ps1 | High | Low | 3.0 | 2-3 | ⏳ Pending |
+| Score freshness: auto-warning or auto-update .project.json | Medium | Low | 2.0 | 2 | ⏳ Pending |
+| Verify automation claim has end-to-end smoke test | High | Medium | 1.5 | 3-5 | ⏳ Pending |
+| Score expansion: sub-dimensions to break 10.0 ceiling | Medium | Low | 2.0 | 3 | ⏳ Pending |
+| Integration smoke tests for key scripts (carry-over from C5) | Medium | Medium | 1.0 | 2-3 | ⏳ Pending |
 
 ### Progress
-- Score: 10.0/10 (baseline)
-- inter: 39/30 (cycle 5)
-- Cycle Progress: 3/10 (3 backlog items completed)
+- Score: 10.0/10 (baseline carried from C5 — new dims may shift)
+- inter: 41/30 (cycle 5 carry-over)
+- Cycle Progress: 0/10 (cycle 6 — fresh start)
 
 ## Metrics
 
 | Metric | Target | Tracked By |
 |--------|--------|------------|
 | inter(30) | >=30 meaningful interactions | `scripts/inter-track.ps1` |
-| Score delta | maintain >=9.8, target 10.0 | `scripts/score-auto.ps1` |
+| Score delta | maintain >=9.5 (new dims may shift), target >=9.8 | `scripts/score-auto.ps1` |
+| Backlog Integrity | 0 items with status ≠ reality | auto-check on cycle start |
+| Score freshness | ≤1 day since last .project.json update | `git log -1 -- .project.json` |
+| Automation claims verified | 100% of claims pass smoke test | per-claim smoke script |
 | Subagent delegations per session | >=3 delegations | bitacora + engram |
 | Upstream check automation | zero manual checks needed | `scripts/check-upstream.ps1` |
- | Dreaming auto-trigger | fires on every 5th self-check | Learning Loop (unconditional) |
+| Dreaming auto-trigger | fires on every 5th self-check | Learning Loop (unconditional) |
 | Skill sizes | 0 >3KB, avg <2.0KB | `scripts/benchmark.ps1` |
 | Working tree hygiene | 0 cambios sin commit al cerrar ciclo | `git status --short` |
 | Cross-ref | 0 errors | `scripts/cross-ref-check.ps1` |
@@ -66,8 +71,10 @@ Default execution strategy for non-trivial work:
 
 ## Dimensions to Maintain
 
-All 11 dims at 10.0. Focus on keeping them green while advancing Cycle Progress.
-- **Cycle Progress** (0->10): inter(30) with impact-scored improvements
+All 11 dims (plus new) at target. Cycle 6 adds integrity-focused dimensions.
+- **Cycle Progress** (0->10): backlog items completed this cycle
+- **Backlog Integrity** (0->10): % items with status matching repo reality
+- **Score Freshness** (0->10): days since last .project.json update (10 = today)
 - **Automation**: upstream checks auto, dreaming auto, monitoring auto
 - **Delegation**: >=3 subagent delegations per session
 - **Hygiene**: working tree clean, atomic commits, cross-ref 0 errors
@@ -128,3 +135,4 @@ LOOP:
 gentleman-vMK -- Cycle 1 (infrastructure) 2026-06-17. Cycle 2 (hygiene+automation) 2026-06-18.
 Cycle 3 (audit+validation) 2026-06-19. Cycle 4 (impact-driven delegation) 2026-06-20.
 Cycle 5 (automation-first) 2026-06-20.
+Cycle 6 (metric integrity) 2026-06-21.

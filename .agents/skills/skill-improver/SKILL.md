@@ -1,12 +1,13 @@
 ﻿---
 name: skill-improver
 description: "Audit and improve skills — preserve author intent, fix frontmatter, convert tutorial prose to actionable rules, track usage"
-triggers: "Skill improvement, audit skills, refactor skills"
+triggers: "Skill improvement, audit skills, refactor skills, skill refresher, drift detection, auto-heal"
 license: Apache-2.0
 metadata:
   tags: [engineering]
   author: gentleman-vMK
-  version: "1.0"
+  version: "2.0"
+  changelog: "2.0: merged skill-refresher (drift detection, health signals, auto-heal)"
 ---
 ## HARD RULES
 Preserve author intent · critical rules · activation semantics · output contract | Default: audit-only — modify only when asked | Never delete content → move to `references/` | Don't invent triggers/policies/domain rules — mark ambiguous for human
@@ -24,3 +25,23 @@ Missing/invalid frontmatter → Fix it | Reads like tutorial → runtime rules, 
 3. Check usage tracking → flag deprecated
 4. Return audit report grouped by skill with severity
 5. Apply mode: edit safe issues, create supporting files, preserve content
+## DRIFT DETECTION (merged from skill-refresher)
+Trigger: repeated bug, skill unused 5+ sessions, user repeats correction, Karpathy loss >5%.
+### Health Signals
+| Signal | Action |
+|--------|--------|
+| Same bug 2+ times | Skill missed pattern → update |
+| Not loaded 5+ sessions | Unused → flag or merge |
+| User corrects same thing 2+ | Skill vague → clarify |
+| Karpathy loss >5% | Revert, rewrite denser |
+### Healing
+Loaded but didn't help → Engram log (skill, session, why not, suggested fix) → next health check.
+### Self-Test
+Verify loads (`skill name: skill-improver`), YAML valid, triggers fire. Self-test returns `{healthy: true/false, issues: [...]}`.
+### Regeneration Flow
+1. Audit current SKILL.md + Engram usage (last 10 sessions)
+2. Check drift: triggers still match? Too broad/narrow?
+3. Update: fix gaps, tighten triggers, add patterns
+4. Compress: re-Karpathy if >5% new content
+5. Bump version: major=structural, minor=content
+6. Log changelog + commit

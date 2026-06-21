@@ -1,15 +1,15 @@
 ﻿# SKILLS INDEX
 
-> Full trigger table for all 69 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 66 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 2.9 | **Changelog**: 2.9 (+ opencode-model-router skill)
+> **Version**: 3.0 | **Changelog**: 3.0 (-3 skills post-audit: karpathy-prompt→karpathy-loop, core-web-vitals→performance, skill-refresher→skill-improver)
 
 ## Triggers → Skill
 
 | Trigger keywords | Skill |
 |------------------|-------|
-| Karpathy, less tokens, context compilation | karpathy-prompt |
+| Karpathy, less tokens, context compilation | karpathy-loop |
 | Improve prompt, security, ReAct, multi-agent | prompt-engineering |
 | Karpathy loop, optimize prompt, measure tokens | karpathy-loop |
 | Compact, less tokens, caveman, /caveman, ultra-lean | lean-context |
@@ -46,7 +46,7 @@
 | Cognitive doc design, doc design, documentation patterns, reduce cognitive load, progressive disclosure | cognitive-doc-design |
 | Comment writer, PR feedback, review comment, GitHub comment, write feedback | comment-writer |
 | Issue creation, create issue, GitHub issue, bug report, feature request | issue-creation |
-| Skill refresher, drift detection, auto-heal | skill-refresher |
+| Skill refresher, drift detection, auto-heal | skill-improver (merged) |
 | Skill improvement, audit skills, refactor skills | skill-improver |
 | CI/CD pipeline, GitHub Actions, quality gate | ci-cd |
 | Work-unit commits, commit organization | work-unit-commits |
@@ -65,7 +65,7 @@
 | Accessibility, a11y, WCAG, screen reader, keyboard nav, make accessible | accessibility |
 | Web performance, speed up, reduce load time, page speed, performance audit | performance |
 | SEO, search engine, meta tags, structured data, sitemap, search optimization | seo |
-| Core Web Vitals, LCP, INP, CLS, layout shift, page experience | core-web-vitals |
+| Core Web Vitals, LCP, INP, CLS, layout shift, page experience | performance (merged) |
 | Best practices, security audit, modernize code, code quality review | best-practices |
 | Web quality audit, lighthouse audit, review web quality, check page quality | web-quality-audit |
 | UI cleanup, polish interface, fix layout, ui slop, generic ui, design review | baseline-ui |
@@ -79,14 +79,14 @@
 | Model router, routing, qué modelo, delegate or direct, qué hacer con esta tarea, trial risk, security gate | opencode-model-router |
 
 ## Quick groups
-- **Compression/style**: karpathy-prompt, karpathy-loop, lean-context
+- **Compression/style**: karpathy-loop (merged karpathy-prompt), lean-context
 - **Quality**: quality-gate, auto-metrics, external-auditor, immune-system, code-review-agent, performance-tracker, triple-verify, self-improvement
 - **Memory**: session-resume, code-memory, dreaming
 - **Skills meta**: skill-creator, skill-registry, skill-improver, skill-digestion, skill-graph
 - **Coordination**: delivery-harness, chained-pr, branch-pr, issue-creation, subagent-isolation, command-wrapper, opencode-model-router
 - **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner
 - **SDD**: sdd (SKILL.md) + phases/ (00-init → 08-archive) — wrappers at sdd-* for backward compat
-- **UI/Design**: baseline-ui, accessibility, performance, seo, core-web-vitals, web-quality-audit
+- **UI/Design**: baseline-ui, accessibility, performance, seo, web-quality-audit
 
 - **Communication**: comment-writer, cognitive-doc-design
 

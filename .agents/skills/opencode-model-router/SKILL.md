@@ -48,7 +48,7 @@ Si cualquiera de los 3 gates se activa → cargar skill según tipo de tarea y m
 | **UI/UX • CSS • Tailwind** | Delegar a subagente (syntax-preferred) | Manejo directo | `baseline-ui` |
 | **React • Frontend (<100K ctx)** | Delegar a subagente | Manejo directo | `baseline-ui` |
 | **E2E Testing (Playwright/Cypress)** | Delegar a subagente (async-preferred) | Manejo directo | según stack (`go-testing`, `python-async`) |
-| **Performance • Core Web Vitals** | Delegar a subagente | Manejo directo | `performance`, `core-web-vitals` |
+| **Performance • Core Web Vitals** | Delegar a subagente | Manejo directo | `performance` |
 | **Syntax • Linting • Code Quality** | Delegar a subagente | Manejo directo | `code-review-agent` |
 | **SEO • Content • Metadata** | Delegar a subagente (multimodal si posible) | Manejo directo | `seo` |
 | **🏆 Architecture • Best Practices** | MANEJO DIRECTO | — | `senior-engineer` |

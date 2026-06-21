@@ -23,18 +23,7 @@ Skill stacking pipeline: **quality-gate → 4R code review → commit craft**. E
 - "ready to ship" / "listo para commit" / "full review" / before PR or complex push
 
 ## Pipeline
-```
-[Phase 0: Load Engram profile] → [Phase 1: quality-gate] ─fail→ STOP
-                                       │ pass
-                                       ▼
-                                  [Phase 2a: Zone check]
-                                  ├── ROJA ──→ [Phase 2b: JD dual review] ─fail→ STOP
-                                  ├── AMARILLA → [Phase 2c: 4R review]
-                                  └── VERDE ──→ skip review
-                                       │ pass (all ≥6)
-                                       ▼
-                                  [Phase 3: commit craft] → ✅ message
-```
+`P0→P1(quality-gate)—fail→STOP | pass→P2a(zone)—ROJA→JD dual—fail→STOP | AMAR→4R | VER→skip | pass≥6→P3(commit-craft)`
 
 ## Phase Details → `references/phase-details.md`
 - P0: Load `mem_search("review-profile/{project}")` — trend awareness + focus R
@@ -55,9 +44,4 @@ Pipeline summary with per-phase result + commit message.
 5. **Max runtime**: >3 tool calls per phase without progress → ask user.
 
 ## Anti-patterns
-| ❌ | ✅ |
-|---|-----|
-| Parallel phases (race conditions) | Sequential, each feeding next |
-| Ignoring gate failure | Block at Phase 1 until resolved |
-| Generic commit ignoring review | Scope/type from 4R findings |
-| Override 4R <4 w/o confirmation | Hard block — ask user explicitly |
+**Parallel phases**→sequential | **Ignore gate**→block P1 | **Generic commit**→scope from 4R | **Override <4**→hard block

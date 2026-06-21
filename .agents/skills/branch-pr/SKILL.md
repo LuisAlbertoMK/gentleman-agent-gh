@@ -1,5 +1,5 @@
 ---
-name: gentle-ai-branch-pr
+name: branch-pr
 description: "PR workflow — issue-first checks, branch naming, conventional commits, automated PR validation"
 license: Apache-2.0
 metadata:

@@ -6,7 +6,8 @@ license: Apache-2.0
 metadata:
   tags: [engineering]
   author: gentleman-vMK
-  version: "2.1"
+  version: "2.2"
+  changelog: "2.2: aligned zones with review-rules.jsonc (added ORANGE, GREEN<40%)"
 ---
 ## WHEN: Win>60% · Hallucinations/repetition · "context/compress/break" · Same file 3+ edits · ~8 msgs
 ## TOKEN BUDGET: Sonnet4/GPT-4o/Haiku4 200K → YELLOW>120K RED>160K · Gemini 2.5 Pro 1M → >600K >800K
@@ -14,12 +15,13 @@ metadata:
 **L1** (~8msgs/~15calls): Oldest block≥8 → summary. -60-70%.
 **L2** (~20msgs/3+L1s): Key decisions 1-2 lines + engram-obs-id. -40-50%.
 **L3** (YELLOW+): 1-liner + "Ref: engram-obs-{id}". -80-90%. Still YELLOW → mem_save + break.
-## ZONES
-**GREEN (<60%)**: Normal · L1 every ~8 msgs
-**YELLOW (60-80%)**: Force L2 raw + L3 L1s · drop disclaimers · karpathy-prompt · engram IDs. Still? mem_save+break
+## ZONES (aligned with review-rules.jsonc)
+**GREEN (<40%)**: Normal · L1 every ~8 msgs
+**YELLOW (40-60%)**: L1+L2 compression · selective drop
+**ORANGE (60-80%)**: Force L2 raw + L3 L1s · drop disclaimers · karpathy-loop · engram IDs
 **RED (>80%)**: mem_save state · session_summary · new session + 3-line handoff · ultra-lean
 ## SIGNALS: Repeat 2x · "as I mentioned" wrong · Self-contradiction · "ya te dije" → FORCE RED
 ## SAME-FILE LIMIT: 3+ edits → stop, summarize, commit, re-read fresh
-## DECISION TREE: <40% <8→Normal | <60% ≥8→L1 | 40-60% ≥20→L1+L2 | ≥60%→L2+L3→ultra-lean | >80%→mem_save+break
+## DECISION TREE: <40% <8→Normal | ≥8→L1 | 40-60%≥20→L1+L2 | 60-80%→L2+L3 | >80%→mem_save+break
 ## CHECKPOINT: Every 25 tool calls → `mem_save(topic_key=checkpoint/session-state, type=checkpoint)` with state, done, next, decisions
 ## CROSS-REFS: Schedule AGENTS.md B | Lean: lean-context | Tokens: karpathy-loop | State: code-memory

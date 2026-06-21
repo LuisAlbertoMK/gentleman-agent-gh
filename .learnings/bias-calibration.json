@@ -1,13 +1,12 @@
 ﻿{
-    "offsets":  {
-                    "Correctness":  2,
-                    "Skill":  1,
-                    "Speed":  0,
-                    "Breadth":  0,
-                    "Tokens":  0,
-                    "ErrPrev":  3
-                },
     "history":  [
+                    {
+                        "date":  "2026-06-20",
+                        "gaps":  "4 4 5 3 1 4",
+                        "task":  "vmk-score-restore",
+                        "audit":  "6 5 5 7 8 6",
+                        "self":  "10 9 10 10 9 10"
+                    },
                     {
                         "self":  "9 8 9 8 9 9",
                         "audit":  "9 9 6 7 9 5",
@@ -16,6 +15,14 @@
                         "task":  "restore-project-json-score"
                     }
                 ],
-    "samples":  1,
-    "last_updated":  "2026-06-19"
+    "samples":  2,
+    "last_updated":  "2026-06-20",
+    "offsets":  {
+                    "Breadth":  4,
+                    "Correctness":  2,
+                    "Speed":  0.5,
+                    "ErrPrev":  4,
+                    "Tokens":  1.5,
+                    "Skill":  2
+                }
 }
