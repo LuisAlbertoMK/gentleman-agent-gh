@@ -17,7 +17,7 @@
 ### Backlog (sorted by impact/risk)
 | Item | Impact | Risk | I/R | Est. inter | Status |
 |------|--------|------|-----|------------|--------|
-| Close Cycle 5: mark items 1-3 ✅ Done, carry item 4 forward | High | Low | 3.0 | 1 | 🔄 In progress |
+| Close Cycle 5: mark items 1-3 ✅ Done, carry item 4 forward | High | Low | 3.0 | 1 | ✅ Done |
 | Add "Backlog Integrity" metric to score-auto.ps1 | High | Low | 3.0 | 2-3 | ⏳ Pending |
 | Score freshness: auto-warning or auto-update .project.json | Medium | Low | 2.0 | 2 | ⏳ Pending |
 | Verify automation claim has end-to-end smoke test | High | Medium | 1.5 | 3-5 | ⏳ Pending |
