@@ -75,6 +75,7 @@ Read-heavy (>3 files/scan/map) → delegate `explore`. Saves 2-5K tokens. Main c
 ## Learning Loop (post-task)
 Capture(Engram)→Extract→Evaluate→Apply. Auto-score 6 dims. <7→immune. 10→mem_save. Auto-immunize: error/<7 → anti-pattern + rule.
 Triggers: same fix 2x · gotcha · user corrected 2x · repeat workflow · pattern 3+ files. Self-check every ~5 tools.
+**Every 5th self-check**: run `scripts/session-miner.ps1 -Mode scan -Json` + parse output for new pattern proposals. Always active (no skill dependency).
 
 ## Default-FAIL
 Evidence required for "done". Tool output = evidence. NOT self-assessment. Builder≠Evaluator. Uncertain? → FAIL + evidence. Practice: `go test ./...` before done.
@@ -176,7 +177,7 @@ Also PROACTIVELY: when starting known-area work · user mentions unfamiliar topi
 
 ### DREAMING (periodic)
 `mem_search(type="error|bugfix")` for patterns. Same error 2x → catalog. 3x → AGENTS.md rule.
-**AUTO: RUN** `.\scripts\session-miner.ps1 -Mode scan -Json` every 5th error/bugfix (triggered by context-watchdog or recovery-protocol) to cross-reference across sessions. Parse JSON output and propose new anti-patterns. The session-miner is invoked automatically — do NOT skip this step.
+**AUTO: RUN** `.\scripts\session-miner.ps1 -Mode scan -Json` every 5th error/bugfix (triggered by Learning Loop self-check) to cross-reference across sessions. Parse JSON output and propose new anti-patterns. The session-miner is invoked automatically — do NOT skip this step.
 
 ### AUTO-CLEAN
 Delete `$env:TEMP\opencode\` files >24h old at session start.

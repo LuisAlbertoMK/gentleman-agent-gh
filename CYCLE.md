@@ -19,13 +19,13 @@
 |------|--------|------|-----|------------|--------|
 | Automated upstream monitoring | High | Low | 3.0 | 2-3 | 🔄 In progress |
 | Upstream drift auto-report on cycle start | Medium | Low | 2.0 | 1-2 | 🔄 In progress |
-| Auto pattern extraction (dream+immune trigger) | High | Medium | 1.5 | 3-5 | ⏳ Pending |
+| Auto pattern extraction (dream+immune trigger) | High | Medium | 1.5 | 3-5 | 🔄 In progress |
 | Integration smoke tests for key scripts | Medium | Medium | 1.0 | 2-3 | ⏳ Pending |
 
 ### Progress
 - Score: 10.0/10 (baseline)
 - inter: 39/30 (cycle 5)
-- Cycle Progress: 2/10 (2 backlog items completed)
+- Cycle Progress: 3/10 (3 backlog items completed)
 
 ## Metrics
 
@@ -35,7 +35,7 @@
 | Score delta | maintain >=9.8, target 10.0 | `scripts/score-auto.ps1` |
 | Subagent delegations per session | >=3 delegations | bitacora + engram |
 | Upstream check automation | zero manual checks needed | `scripts/check-upstream.ps1` |
-| Dreaming auto-trigger | fires on every 5th error | immune-system + session-miner |
+ | Dreaming auto-trigger | fires on every 5th self-check | Learning Loop (unconditional) |
 | Skill sizes | 0 >3KB, avg <2.0KB | `scripts/benchmark.ps1` |
 | Working tree hygiene | 0 cambios sin commit al cerrar ciclo | `git status --short` |
 | Cross-ref | 0 errors | `scripts/cross-ref-check.ps1` |
