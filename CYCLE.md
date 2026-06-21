@@ -15,19 +15,20 @@
 4. **Score expansion** — break 10.0 ceiling with sub-dimensions that reward verifiable improvement.
 
 ### Backlog (sorted by impact/risk)
-| Item | Impact | Risk | I/R | Est. inter | Status |
-|------|--------|------|-----|------------|--------|
-| Close Cycle 5: mark items 1-3 ✅ Done, carry item 4 forward | High | Low | 3.0 | 1 | ✅ Done |
-| Add "Backlog Integrity" metric to score-auto.ps1 | High | Low | 3.0 | 2-3 | ⏳ Pending |
-| Score freshness: auto-warning or auto-update .project.json | Medium | Low | 2.0 | 2 | ⏳ Pending |
-| Verify automation claim has end-to-end smoke test | High | Medium | 1.5 | 3-5 | ⏳ Pending |
-| Score expansion: sub-dimensions to break 10.0 ceiling | Medium | Low | 2.0 | 3 | ⏳ Pending |
-| Integration smoke tests for key scripts (carry-over from C5) | Medium | Medium | 1.0 | 2-3 | ⏳ Pending |
+| Item | Impact | Risk | I/R | Est. inter | Status | Done criteria |
+|------|--------|------|-----|------------|--------|---------------|
+| Close Cycle 5: mark items 1-3 ✅ Done, carry item 4 forward | High | Low | 3.0 | 1 | ✅ Done | CYCLE.md reflects items 1-3 closed (commit 63f5232) |
+| Add "Backlog Integrity" metric to score-auto.ps1 | High | Low | 3.0 | 2-3 | ✅ Done | `score-auto.ps1` outputs `backlog_integrity` dim; script `check-backlog-integrity.ps1` exists and exits 0 on clean |
+| Score freshness: auto-warning or auto-update .project.json | Medium | Low | 2.0 | 2 | ✅ Done | Cycle loop step 3 auto-checks `.project.json` age; triggers warning if >1d stale |
+| Verify automation claim has end-to-end smoke test | High | Medium | 1.5 | 3-5 | ✅ Done | `scripts/smoke/smoke-all.ps1` tests 5 auto claims (BI, upstream, dreaming, freshness, LOOP) — all pass |
+| Score expansion: sub-dimensions to break 10.0 ceiling | Medium | Low | 2.0 | 3 | ⏳ Pending | `.project.json` has >11 dimensions; score.current >10.0 achievable |
+| Integration smoke tests for key scripts (carry-over from C5) | Medium | Medium | 1.0 | 2-3 | ✅ Done | `scripts/smoke/` exists with 5 tests; `smoke-all.ps1` exits 0 |
 
 ### Progress
-- Score: 10.0/10 (baseline carried from C5 — new dims may shift)
-- inter: 41/30 (cycle 5 carry-over)
-- Cycle Progress: 0/10 (cycle 6 — fresh start)
+- Score: 9.9/10 (honest re-score, Script Performance 9.0 dragging)
+- inter: 47/30 (ongoing cycle 6 execution)
+- Backlog Completion: 5/6 (items #1, #2, #3, #4, #6 done — #5 Score expansion pending)
+- Skills >3KB: 0 ✓ (all 69 skills compressed, including sdd-onboard 6.9→2.3KB)
 
 ## Metrics
 
@@ -41,7 +42,7 @@
 | Subagent delegations per session | >=3 delegations | bitacora + engram |
 | Upstream check automation | zero manual checks needed | `scripts/check-upstream.ps1` |
 | Dreaming auto-trigger | fires on every 5th self-check | Learning Loop (unconditional) |
-| Skill sizes | 0 >3KB, avg <2.0KB | `scripts/benchmark.ps1` |
+| Skill sizes | 0 >3KB, avg <2.0KB | `scripts/benchmark.ps1` (current: avg 1.8KB, 0 >3KB ✓) |
 | Working tree hygiene | 0 cambios sin commit al cerrar ciclo | `git status --short` |
 | Cross-ref | 0 errors | `scripts/cross-ref-check.ps1` |
 
@@ -51,9 +52,9 @@ Every improvement candidate scored on two axes before execution:
 
 | Score | Impact | Risk |
 |-------|--------|------|
-| High (3) | Direct score improvement, unblocks work | Isolated change, easy revert |
+| High (3) | Direct score improvement, unblocks work | Cross-cutting, high breakage potential |
 | Medium (2) | Quality/efficiency gain | Touches multiple files, needs verify |
-| Low (1) | Cosmetic, nice-to-have | Cross-cutting, high breakage potential |
+| Low (1) | Cosmetic, nice-to-have | Isolated change, easy revert |
 
 **Priority = Impact / Risk**. Execute high-priority first. Skip items with Risk > Impact (I/R < 1.0).
 
@@ -72,7 +73,8 @@ Default execution strategy for non-trivial work:
 ## Dimensions to Maintain
 
 All 11 dims (plus new) at target. Cycle 6 adds integrity-focused dimensions.
-- **Cycle Progress** (0->10): backlog items completed this cycle
+- **Backlog Completion** (0->10): backlog items completed this cycle (tracked in Progress section)
+- **Cycle Activity** (0->10): inter count / target (tracked in .project.json)
 - **Backlog Integrity** (0->10): % items with status matching repo reality
 - **Score Freshness** (0->10): days since last .project.json update (10 = today)
 - **Automation**: upstream checks auto, dreaming auto, monitoring auto
@@ -105,23 +107,24 @@ All 11 dims (plus new) at target. Cycle 6 adds integrity-focused dimensions.
 LOOP:
   1. READ CYCLE.md -- understand objective and constraints
    2. CHECK external repos (auto via check-upstream.ps1 — drift found? → auto-report with commit summary + relevance + suggested actions)
-  3. DIAGNOSE: score, gaps, skill sizes, cross-ref, PSSA
+   3. DIAGNOSE: score, gaps, skill sizes, cross-ref, PSSA; check `.project.json` freshness (warning if >1d stale)
   4. SCORE backlog items by Impact/Risk (I/R = Impact / Risk)
   5. IDENTIFY fix candidates sorted by I/R descending
   6. PARTITION independent work -> parallel subagents
-  7. EXECUTE (per item):
-     a. Delegate to subagent with isolated context
-     b. Triple-verify by difficulty level
-     c. Log to bitacora + inter-track++
-     d. Collect results: Decision + Files + Findings + Nuance
-  8. ORCHESTRATE: merge subagent results, verify coherence
-  9. VERIFY: re-score, compare delta, check inter>=30
-  10. If score improved -> Keep changes, advance baseline
-  11. If score equal/worse -> Review and revert
+   7. EXECUTE (per item):
+      a.0. SNAPSHOT: `git stash push -m "auto-${item}"` before any change
+      a. Delegate to subagent with isolated context
+      b. Triple-verify by difficulty level
+      c. Log to bitacora + inter-track++
+      d. Collect results: Decision + Files + Findings + Nuance
+   8. ORCHESTRATE: merge subagent results, verify coherence
+   9. VERIFY: re-score, compare delta
+   10. If score improved -> Keep changes, advance baseline
+   11. If score drop >0.5 from baseline -> full revert (`git checkout -- .` + `git stash drop`); else if score equal/worse -> review and decide
   12. LEARN: engram, anti-patterns, CYCLE.md notes
   13. SCORE AUTO-UPDATE: `score-auto.ps1 -Json | Set-Content .project.json`
   14. PROPAGATE: opencode -> opencode-vmk -> gentleman-vMK
-  15. If inter>=30 OR time budget exhausted -> STOP cycle
+   15. If inter>=30 AND no dim<9.0 (new dims grace 5 cycles) -> SUCCESS; if time budget (7d from cycle start) exhausted -> STOP; if score drop >0.5 from baseline -> full revert (git checkout + stash drop)
 ```
 
 ## Exceptions

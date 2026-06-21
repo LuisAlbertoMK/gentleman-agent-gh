@@ -1,21 +1,23 @@
 # gentleman-vMK Agent Skills — OpenCode AI Agent Skills
 
-Colección de **63 skills profesionales** para OpenCode AI agent. Diseñadas para desarrollo de software con arquitectura limpia, TDD real, y principios SR Engineer.
+Colección de **69 skills profesionales** para OpenCode AI agent. Diseñadas para desarrollo de software con arquitectura limpia, TDD real, y principios SR Engineer.
 
 ## Skills Incluidas
 
 | Categoría | Skills | Versión |
 |-----------|--------|---------|
-| **Prompting** | karpathy-loop (merged karpathy-prompt), prompt-engineering, lean-context | v2.0 |
-| **Self-Improvement** | code-memory, self-reflection, skill-testing, judgment-day | v1.x |
-| **Engineering** | senior-engineer, go-testing, skill-creator, skill-registry | v1.x |
-| **Quality & Safety** | quality-gate, context-watchdog, recovery-protocol | v1.0 |
+| **Prompting** | karpathy-loop (merged karpathy-prompt), prompt-engineering, lean-context, caveman | v2.0 |
+| **Self-Improvement** | code-memory, self-reflection, skill-testing, judgment-day, immune-system, auto-metrics, self-improvement | v1.x |
+| **Engineering** | senior-engineer, go-testing, skill-creator, skill-registry, python-async | v1.x |
+| **Quality & Safety** | quality-gate, context-watchdog, recovery-protocol, security-scanner | v1.0 |
 | **SDD Cycle** | sdd-init, sdd-propose, sdd-spec, sdd-design, sdd-tasks, sdd-apply, sdd-verify, sdd-explore, sdd-archive, sdd-onboard | v1.x |
-| **PR & Workflow** | commit-crafter, code-review-agent, work-unit-commits | v1.x |
+| **PR & Workflow** | commit-crafter, code-review-agent, work-unit-commits, branch-pr, chained-pr | v1.x |
 | **Decisions** | decision-capture | v1.0 |
-| **Performance** | performance-tracker | v1.0 |
+| **Performance** | performance-tracker, performance, baseline-ui | v1.0 |
+| **Routing** | opencode-model-router, skill-graph, execution-mode, development-mode | v1.0 |
+| **Docs & Sync** | doc-sync, bitacora, cognitive-doc-design, comment-writer | v1.0 |
 
-**Total: 63 skills + _shared** — todas con SKILL.md, frontmatter YAML y licencia Apache-2.0.
+**Total: 69 skills + _shared** — todas con SKILL.md, frontmatter YAML y licencia Apache-2.0.
 
 ## Instalación
 
