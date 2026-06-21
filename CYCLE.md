@@ -18,7 +18,7 @@
 | Item | Impact | Risk | I/R | Est. inter | Status |
 |------|--------|------|-----|------------|--------|
 | Automated upstream monitoring | High | Low | 3.0 | 2-3 | 🔄 In progress |
-| Upstream drift auto-report on cycle start | Medium | Low | 2.0 | 1-2 | ⏳ Pending |
+| Upstream drift auto-report on cycle start | Medium | Low | 2.0 | 1-2 | 🔄 In progress |
 | Auto pattern extraction (dream+immune trigger) | High | Medium | 1.5 | 3-5 | ⏳ Pending |
 | Integration smoke tests for key scripts | Medium | Medium | 1.0 | 2-3 | ⏳ Pending |
 
@@ -97,7 +97,7 @@ All 11 dims at 10.0. Focus on keeping them green while advancing Cycle Progress.
 ```
 LOOP:
   1. READ CYCLE.md -- understand objective and constraints
-  2. CHECK external repos (automated via scripts/check-upstream.ps1)
+   2. CHECK external repos (auto via check-upstream.ps1 — drift found? → auto-report with commit summary + relevance + suggested actions)
   3. DIAGNOSE: score, gaps, skill sizes, cross-ref, PSSA
   4. SCORE backlog items by Impact/Risk (I/R = Impact / Risk)
   5. IDENTIFY fix candidates sorted by I/R descending

@@ -66,7 +66,7 @@ Comandos rápidos para tareas recurrentes — extienden el sistema de modos:
 | **`!sync`** | `pull-upstream.ps1 -Mode Check` → drift check + agent sync (`-SyncAgents`) → score update | Medio |
 | **`!health`** | Full diagnostics: git status, drift, cross-ref, score, inter-track | Fácil |
 | **`!batch`** | `scripts/batch.ps1` — nueva batch auto-incremental + bitácora + inter-track++ | Fácil |
-| **`!cycle`** | `inter-track.ps1 -Show` + score status — resumen del ciclo de auto-mejora actual | Fácil |
+| **`!cycle`** | `inter-track.ps1 -Show` + score status + upstream check — resumen del ciclo de auto-mejora actual | Fácil |
 | **`!close`** | `scripts/close-session.ps1` — pipeline unificado de cierre: BITACORA + inter-track + git status + template para mem_session_summary | Fácil |
 
 ## Subagent-First
