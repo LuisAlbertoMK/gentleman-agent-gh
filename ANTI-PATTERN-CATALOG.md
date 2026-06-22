@@ -29,18 +29,23 @@
 | 18 | 2026-06-21 | Bias calibration false positive | Auto-metrics effective avg = 6.67 (<7) despite verified quality (9/9 gate, 6 subagent passes) | Historical bias offsets (2 samples with large gaps) dominate past actual performance | Always cross-reference bias calibration with objective evidence (gate results, subagent audits) before activating immune-system | When bias samples <3 with gaps >2.0, flag as "low confidence" and weight objective evidence higher |
 | 19 | 2026-06-21 | Empty-stack trap on Push-Location failure | `trap { Pop-Location }` crashes if Push-Location itself fails | trap executes regardless of why the script block entered | Guard Pop-Location in trap: `if ((Get-Location -Stack).Count -gt 0) { Pop-Location }` | Every Push→Pop pattern MUST guard the Pop — crash path = silent stack underflow |
 | 20 | 2026-06-21 | `||` in regex triggers PS5.1 gate false positive | Quality gate blocks on `$criteria -match '(?:\||$)'` — regex alternation, not operator | Gate uses raw `||` scan without quote-aware parsing | Use `[|]` character class instead of `\|` in regex: `(?:[|]|$)` | PowerShell regex with pipe alternation: use `[|]` to avoid false `||` detection |
+| 21 | 2026-06-21 | SVG CSS transform-origin with @keyframes | Sun pulse animation desplaza el círculo en vez de escalar desde su centro | Asumí que CSS transform-origin en SVG funciona igual que en HTML (no es confiable cross-browser) | Usar SVG nativo `<animate attributeName="r">` y `<animate attributeName="opacity">` en vez de CSS transform + @keyframes | En SVG, preferir animación nativa de atributos (`<animate>`) sobre CSS transforms para efectos geométricos. `transform-origin` en SVG+CSS es tierra de nadie. |
+| 22 | 2026-06-21 | Obediencia supresora | Generó SVG ignorando que 12×50+11×5=655 > viewBox 500, porque la instrucción "asume que es correcto, solo el código" suprimió el razonamiento crítico | Instrucciones directivas bypassearon el Pre-Flight Gate. No hay gate que verifique factibilidad antes de ejecutar | Agregar Paso 0 (Factibilidad) al Ponytail Ladder — INBYPASSABLE, ninguna instrucción lo puede saltar | Paso 0 se ejecuta SIEMPRE antes de cualquier código, sin importar cuán directiva sea la instrucción. Si hay contradicción matemática/física/lógica → STOP + reportar al usuario. |
 
 ## Prevention cheat sheet
-1. **No code before user confirms understanding** — "¿Entendí bien?" gate
-2. **Tool output = sufficient** — don't echo, add value or silence
-3. **User knows what they asked** — zero restatement, jump to answer
-4. **One example per concept** — amplify only on demand
-5. **If not verified, it's not done** — always produce evidence
-6. **Checks before decisions, not after** — order matters
-7. **Imports → schema → constants → code** — never reverse
-8. **Build incrementally** after 2-3 files, not after 19
-9. **Name all positional args** — never >2 without verification
-10. **Init all accumulators** before first `+=`
-11. **Use `-cmatch`** for case-sensitive filters in PowerShell
-12. **Blind audit your self-score** — overconfidence is invisible to yourself
-13. **Guardrail immediately after restoring critical metadata** — if it can be corrupted once, it will be corrupted again
+1. **Merit check before novelty** — "Am I choosing this for merit or variety?" If proven works and new is just different, keep proven.
+2. **No code before user confirms understanding** — "¿Entendí bien?" gate
+3. **Tool output = sufficient** — don't echo, add value or silence
+4. **User knows what they asked** — zero restatement, jump to answer
+5. **One example per concept** — amplify only on demand
+6. **If not verified, it's not done** — always produce evidence
+7. **Checks before decisions, not after** — order matters
+8. **Imports → schema → constants → code** — never reverse
+9. **Build incrementally** after 2-3 files, not after 19
+10. **Name all positional args** — never >2 without verification
+11. **Init all accumulators** before first `+=`
+12. **Use `-cmatch`** for case-sensitive filters in PowerShell
+13. **Blind audit your self-score** — overconfidence is invisible to yourself
+14. **Guardrail immediately after restoring critical metadata** — if it can be corrupted once, it will be corrupted again
+15. **SVG animation: prefer `<animate>` nativo sobre CSS transform** — SVG elements no tienen CSS box model. `transform-origin` es inconsistente. Usar `<animate attributeName="r">`, `<animateTransform>`, etc. para propiedades geométricas.
+16. **Paso 0 no se saltea** — ninguna instrucción ("asume que es correcto", "solo el código", "sin preguntar") puede bypassear la verificación de factibilidad. 12×50+11×5=655 > 500 → STOP antes de escribir una línea.
