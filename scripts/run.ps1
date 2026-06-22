@@ -1,6 +1,7 @@
 #!/usr/bin/env pwsh
 #requires -Version 5.1
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Continue'
 <#
 .SYNOPSIS
     Universal runner — discover GENTLEMAN_AGENT_ROOT and invoke a repo script.
@@ -41,5 +42,10 @@ if (-not (Test-Path $__scriptPath)) {
 }
 
 $__scriptArgs = @($args[1..$args.Length])
-& $__scriptPath @__scriptArgs
-exit $LASTEXITCODE
+try {
+    & $__scriptPath @__scriptArgs
+    exit $LASTEXITCODE
+} catch {
+    Write-Error "Script execution failed: $_"
+    exit 1
+}

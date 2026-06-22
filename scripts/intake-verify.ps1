@@ -57,8 +57,8 @@ function Invoke-Check {
 
     $prs=0;$prd=@()
     if(Test-Path "$PP\.git"){
-        $cc=&git -C "$PP" log --oneline -10 2>$null|Measure-Object|ForEach-Object{$_.Count}
-        if($cc-gt0){$prs+=5;$prd+="$cc commits in HEAD";$gp=&gh pr list --limit 5 2>$null;if($LASTEXITCODE-eq0-and$gp){$prd+="$(($gp|Measure-Object|ForEach-Object{$_.Count})) open PR(s)";$prs+=3}}
+        try{$cc=&git -C "$PP" log --oneline -10 2>$null|Measure-Object|ForEach-Object{$_.Count}}catch{Write-Warning "git log failed: $_";$cc=0}
+        if($cc-gt0){$prs+=5;$prd+="$cc commits in HEAD";try{$gp=&gh pr list --limit 5 2>$null}catch{Write-Warning "gh pr list failed: $_";$gp=$null};if($LASTEXITCODE-eq0-and$gp){$prd+="$(($gp|Measure-Object|ForEach-Object{$_.Count})) open PR(s)";$prs+=3}}
     }else{$prd+="no .git dir (score limited)"}
     $pf=Get-ChildItem -Path "$PP" -Recurse -Include "*PROBLEM*REPORT*","*bug-report*","*incident*" -Exclude "*node_modules*",".git","*vendor*" -ErrorAction SilentlyContinue|Select-Object -First 3
     if($pf){$prd+="Problem Report: $($pf.Count) file(s) ($($pf[0].Name))";$prs=[math]::Max($prs,5)}
@@ -113,6 +113,7 @@ function Invoke-Check {
     return@{round=$R;results=$r;scores=$sm;totalScore=$ts;maxScore=$ms;pct=$pct;criticalMissing=$miss}
 }
 
+try {
 if(-not(Test-Path $ProjectPath)){Write-Error "Proj path not found: $ProjectPath";exit 2}
 $pp=$ProjectPath
 
@@ -162,11 +163,11 @@ Write-Host "`n  Grade: $g ($opct%)" -ForegroundColor $(if($opct-ge80){"Green"}el
 if($last.criticalMissing.Count-gt0){Write-Host "  Critical: $($last.criticalMissing-join', ')" -ForegroundColor Red}
 
 if($SaveMetrics){
-    $mdir="$pp\docs\metricas";if(-not(Test-Path $mdir)){New-Item -ItemType Directory -Path $mdir -Force|Out-Null}
+    $mdir="$pp\docs\metricas";if(-not(Test-Path $mdir)){try{New-Item -ItemType Directory -Path $mdir -Force|Out-Null}catch{Write-Warning "Failed to create metrics dir: $_"}}
     $ts2=Get-Date -Format "yyyyMMdd-HHmmss";$bf="$mdir\intake-baseline.json"
     $m=@{timestamp=(Get-Date -Format "yyyy-MM-dd HH:mm:ss");project=$pp;type=$ProjectType;iterations=$Iterations;elapsedSeconds=$elapsed;baseline=@{};current=@{};delta=@{};overall_pct=$opct;critical_gaps=$last.criticalMissing}
     foreach($a in $arts){$m.baseline[$a]=if($first.scores[$a]){$first.scores[$a]}else{0};$m.current[$a]=if($last.scores[$a]){$last.scores[$a]}else{0};$m.delta[$a]=$m.current[$a]-$m.baseline[$a]}
-    ($m|ConvertTo-Json)|Out-File -FilePath $bf -Encoding utf8
+    try{($m|ConvertTo-Json)|Out-File -FilePath $bf -Encoding utf8}catch{Write-Warning "Failed to save metrics JSON: $_"}
     $mdf="$mdir\intake-report-$ts2.md"
     $mdc=@"
 # Intake Verification Report
@@ -188,10 +189,14 @@ if($SaveMetrics){
     $smap=@{roadmap="Roadmap";pr="PR";prd="PRD/Specs";readme="README";tests="Tests";cicd="CI/CD";monitoring="Monitoring"}
     foreach($a in $arts){$ic=if($last.results[$a]){$last.results[$a]}else{"-"};$sc=if($last.scores[$a]){$last.scores[$a]}else{0};$mdc+="`n| $($smap[$a]) | $ic | Score: $sc/10 |"}
     if($last.criticalMissing.Count-gt0){$mdc+="`n## Critical Gaps";foreach($x in $last.criticalMissing){$mdc+="`n- **$x**: Missing - Blocker"}}
-    $mdc|Out-File -FilePath $mdf -Encoding utf8
+    try{$mdc|Out-File -FilePath $mdf -Encoding utf8}catch{Write-Warning "Failed to save metrics report: $_"}
     Write-Host "  Metrics: $bf`n  Report: $mdf" -ForegroundColor Cyan
 }
 
 if($last.criticalMissing.Count-gt0){exit 2}
 if($opct-lt80){exit 1}
 exit 0
+} catch {
+    Write-Error "Intake verification failed: $_"
+    exit 1
+}

@@ -12,14 +12,14 @@
                                                          "max":  10
                                                      },
                               "Best Practices":  {
-                                                    "evidence":  {
-                                                                     "trycatch":  26,
-                                                                     "param_coverage":  35
-                                                                 },
-                                                    "score":  9.0,
-                                                    "rationale":  "Params: 35/36 (97%), try/catch: 26/36 (72%) — 12 scripts still lack error handling",
-                                                    "max":  10
-                                                },
+                                                     "evidence":  {
+                                                                      "trycatch":  33,
+                                                                      "param_coverage":  35
+                                                                  },
+                                                     "score":  9.2,
+                                                     "rationale":  "Params: 35/36 (97%), try/catch: 33/36 (92%) — only 3 LOW-risk scripts skip error handling",
+                                                     "max":  10
+                                                 },
                               "Security":  {
                                                "evidence":  {
                                                                 "secrets":  false,
@@ -128,7 +128,7 @@
                   "current":  9.7,
                   "dimensions":  {
                                      "Script Performance":  9.2,
-                                     "Best Practices":  9.0,
+                                     "Best Practices":  9.2,
                                      "Security":  10,
                                      "Clean Code":  10,
                                      "Backlog Integrity":  10,
@@ -140,7 +140,7 @@
                                      "Dead Code":  10,
                                      "Bitacora":  10
                                  },
-                  "last_updated":  "2026-06-21",
+                  "last_updated":  "2026-06-22",
                   "trend":  "stable"
              }
 }

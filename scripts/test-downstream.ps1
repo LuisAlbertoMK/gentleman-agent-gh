@@ -52,11 +52,23 @@ function Test-SkillFile($name) {
 }
 
 function Test-Section($path, $section) {
-  $content = Get-Content -LiteralPath $path -Raw
+  $content = Get-SkillFileContent $path
+  if (-not $content) { return $false }
   if ($content -match $section) { return $true }
   return $false
 }
 
+function Get-SkillFileContent {
+    param([string]$Path)
+    try {
+        return Get-Content -Raw -LiteralPath $Path -ErrorAction Stop
+    } catch {
+        Write-Warning "Could not read $Path': $_"
+        return $null
+    }
+}
+
+try {
 # ====== TESTS ======
 
 # 1. STRUCTURAL: skills exist
@@ -69,7 +81,8 @@ if (-not $dhPath -or -not $cpPath) {
   # Can't continue without core skills
 } else {
   # 2. DELIVERY-HARNESS: workflow steps
-  $dh = Get-Content -LiteralPath $dhPath -Raw
+  $dh = Get-SkillFileContent $dhPath
+  if (-not $dh) { $dh = "" }
   $steps = @(
     'Analyze', 'Break down', 'Map deps', 'Delegate', 'Collect', 'Reconcile', 'Report'
   )
@@ -98,7 +111,8 @@ if (-not $dhPath -or -not $cpPath) {
   Add-Result -Section "Delivery-Harness" -Check "Dep: command-wrapper" -Status $(if ($dh -match 'command-wrapper') { "PASS" } else { "FAIL" }) -Detail ""
 
   # 3. CHAINED-PR: structure
-  $cp = Get-Content -LiteralPath $cpPath -Raw
+  $cp = Get-SkillFileContent $cpPath
+  if (-not $cp) { $cp = "" }
   Add-Result -Section "Chained-PR" -Check "Chain structure diagram" -Status $(if ($cp -match 'main ── PR#1') { "PASS" } else { "FAIL" }) -Detail "Chain format: main--PR#1--PR#2--PR#3"
   Add-Result -Section "Chained-PR" -Check "Branch naming convention" -Status $(if ($cp -match 'feat/{prefix}-{n}-{slug}') { "PASS" } else { "FAIL" }) -Detail "Format: feat/{prefix}-{n}-{slug}"
   Add-Result -Section "Chained-PR" -Check "Rebase cascade" -Status $(if ($cp -match 'REBASE CASCADE') { "PASS" } else { "FAIL" }) -Detail ""
@@ -109,7 +123,8 @@ if (-not $dhPath -or -not $cpPath) {
 
   # 4. SUBAGENT-ISOLATION: rules
   if ($siPath) {
-    $si = Get-Content -LiteralPath $siPath -Raw
+    $si = Get-SkillFileContent $siPath
+    if (-not $si) { $si = "" }
     $isoRules = @(
       'Fresh context per delegation', 'No cross-contamination', 'Dependency declaration',
       'Result isolation', 'Context cleanup', 'Error boundaries'
@@ -137,6 +152,9 @@ if (-not $dhPath -or -not $cpPath) {
   if ($siPath) {
     Add-Result -Section "Size" -Check "subagent-isolation" -Status "PASS" -Detail "$((Get-Item $siPath).Length) bytes"
   }
+}
+} catch {
+  Add-Result -Section "Fatal" -Check "Execution" -Status "FAIL" -Detail "Unhandled exception: $_"
 }
 
 # --- OUTPUT ---

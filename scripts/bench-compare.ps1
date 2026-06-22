@@ -21,9 +21,11 @@ param(
 $ErrorActionPreference = 'Stop'
 $RepoDir = (Resolve-Path $RepoDir).Path
 
+try {
+
 # --- Helper ---
-function Get-Line { param($Path) if (Test-Path $Path) { (Get-Content $Path | Measure-Object -Line).Lines } else { 0 } }
-function Get-Byte { param($Path) if (Test-Path $Path) { (Get-Item $Path).Length } else { 0 } }
+function Get-Line { param($Path) try { if (Test-Path $Path) { (Get-Content $Path -ErrorAction Stop | Measure-Object -Line).Lines } else { 0 } } catch { Write-Warning "Get-Line failed for $Path\`: $_"; 0 } }
+function Get-Byte { param($Path) try { if (Test-Path $Path) { (Get-Item $Path -ErrorAction Stop).Length } else { 0 } } catch { Write-Warning "Get-Byte failed for $Path\`: $_"; 0 } }
 
 # --- TITLE ---
 Write-Host "`n========================================================" -ForegroundColor Cyan
@@ -52,8 +54,8 @@ Write-Host "<<< Skills - line count >>>" -ForegroundColor Yellow
 $backupSkillsDir = Join-Path $BackupDir "skills"
 $repoSkillsDir = Join-Path (Join-Path $RepoDir ".agents") "skills"
 
-$backupSkills = Get-ChildItem -Directory -LiteralPath $backupSkillsDir | ForEach-Object { $_.Name }
-$repoSkills = Get-ChildItem -Directory -LiteralPath $repoSkillsDir | ForEach-Object { $_.Name }
+try { $backupSkills = Get-ChildItem -Directory -LiteralPath $backupSkillsDir -ErrorAction Stop | ForEach-Object { $_.Name } } catch { Write-Warning "Could not read backup skills dir $backupSkillsDir\`: $_"; $backupSkills = @() }
+try { $repoSkills = Get-ChildItem -Directory -LiteralPath $repoSkillsDir -ErrorAction Stop | ForEach-Object { $_.Name } } catch { Write-Warning "Could not read repo skills dir $repoSkillsDir\`: $_"; $repoSkills = @() }
 $common = $backupSkills | Where-Object { $repoSkills -contains $_ }
 $onlyBackup = $backupSkills | Where-Object { $repoSkills -notcontains $_ }
 $onlyRepo = $repoSkills | Where-Object { $backupSkills -notcontains $_ }
@@ -73,13 +75,13 @@ $backupTriggers = 0; $repoTriggers = 0
 $backupTags = 0; $repoTags = 0
 
 foreach ($s in $backupSkills) {
-    $c = Get-Content (Join-Path $backupSkillsDir "$s\SKILL.md") -Raw
+    try { $c = Get-Content (Join-Path $backupSkillsDir "$s\SKILL.md") -Raw -ErrorAction Stop } catch { Write-Warning "Could not read backup SKILL.md for $s\`: $_"; continue }
     if ($c -match 'description:\s*>\s+\{?\w+\}?\s*skill') { $backupPlaceholders++ }
     if ($c -match '(?m)^\s*triggers:') { $backupTriggers++ }
     if ($c -match '(?m)^\s*tags:') { $backupTags++ }
 }
 foreach ($s in $repoSkills) {
-    $c = Get-Content (Join-Path $repoSkillsDir "$s\SKILL.md") -Raw
+    try { $c = Get-Content (Join-Path $repoSkillsDir "$s\SKILL.md") -Raw -ErrorAction Stop } catch { Write-Warning "Could not read repo SKILL.md for $s\`: $_"; continue }
     if ($c -match 'description:\s*>\s+\{?\w+\}?\s*skill') { $repoPlaceholders++ }
     if ($c -match '(?m)^\s*triggers:') { $repoTriggers++ }
     if ($c -match '(?m)^\s*tags:') { $repoTags++ }
@@ -96,13 +98,14 @@ $backupScriptsDir = Join-Path $BackupDir "scripts"
 $repoScriptsDir = Join-Path $RepoDir "scripts"
 
 if (Test-Path $backupScriptsDir) {
-    $bs = (Get-ChildItem -Filter "*.ps1" -LiteralPath $backupScriptsDir).Count
+    try { $bs = (Get-ChildItem -Filter "*.ps1" -LiteralPath $backupScriptsDir -ErrorAction Stop).Count } catch { Write-Warning "Could not list backup scripts dir $backupScriptsDir\`: $_"; $bs = 0 }
 } else { $bs = 0 }
-$rs = (Get-ChildItem -Filter "*.ps1" -LiteralPath $repoScriptsDir).Count
+try { $rs = (Get-ChildItem -Filter "*.ps1" -LiteralPath $repoScriptsDir -ErrorAction Stop).Count } catch { Write-Warning "Could not list repo scripts dir $repoScriptsDir\`: $_"; $rs = 0 }
 
 $strictMode = 0; $catches = 0
-foreach ($f in (Get-ChildItem -Filter "*.ps1" -LiteralPath $repoScriptsDir)) {
-    $c = Get-Content $f.FullName -Raw
+try { $scriptFiles = Get-ChildItem -Filter "*.ps1" -LiteralPath $repoScriptsDir -ErrorAction Stop } catch { Write-Warning "Could not read repo scripts dir $repoScriptsDir\`: $_"; $scriptFiles = @() }
+foreach ($f in $scriptFiles) {
+    try { $c = Get-Content $f.FullName -Raw -ErrorAction Stop } catch { Write-Warning "Could not read $($f.FullName)\`: $_"; continue }
     if ($c -match 'Set-StrictMode') { $strictMode++ }
     $catches += (Select-String -Pattern '\bcatch\b' -LiteralPath $f.FullName).Count
 }
@@ -138,3 +141,7 @@ Write-Host ("  Scripts:           " + $bs + " -> " + $rs + " (StrictMode: " + $s
 Write-Host ("  Test suite:        " + $tsStatus)
 Write-Host ("  Quality gate:      " + $qgStatus)
 Write-Host "========================================================`n" -ForegroundColor Green
+} catch {
+    Write-Error "Benchmark failed: $_"
+    exit 1
+}

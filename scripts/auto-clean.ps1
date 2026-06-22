@@ -43,7 +43,11 @@ $count = 0
 $size = 0
 foreach ($f in $oldFiles) {
     $size += $f.Length
-    Remove-Item $f.FullName -Force -ErrorAction SilentlyContinue
+    try {
+        Remove-Item -LiteralPath $f.FullName -Force -ErrorAction Stop
+    } catch {
+        Write-Warning "  Skipped (locked/error): $($f.Name) — $_"
+    }
     $count++
 }
 
