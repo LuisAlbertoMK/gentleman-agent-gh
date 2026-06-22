@@ -1,0 +1,22 @@
+﻿{
+    "commit":  "6ae90e5",
+    "timestamp":  "2026-06-21T19:18:54.7559330-06:00",
+    "version":  "1.0",
+    "system":  {
+                   "AgentsMdBytes":  24765,
+                   "AgentsMdLines":  365,
+                   "TotalSkills":  69,
+                   "TotalSkillBytes":  121984,
+                   "TotalSkillLines":  2646,
+                   "SkillsOver3kb":  0,
+                   "AvgSkillBytes":  1768,
+                   "MedianSkillBytes":  1894,
+                   "MinSkillBytes":  520,
+                   "MaxSkillBytes":  2725,
+                   "ScriptsCount":  36,
+                   "GlobalJunctionsOk":  69,
+                   "FrontmatterPct":  100,
+                   "WhenToUsePct":  7.2,
+                   "RulesPct":  24.6
+               }
+}

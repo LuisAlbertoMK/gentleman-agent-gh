@@ -2,178 +2,47 @@
 <#
 .SYNOPSIS
   Downstream validation of CYCLE-3 skills: delivery-harness, chained-pr, subagent-isolation.
-  Tests structural integrity, dependency consistency, and workflow traceability.
-
-.DESCRIPTION
-  Tests that:
-  - Skills exist with all required sections
-  - Dependency declarations reference real skills
-  - Delivery-harness workflow is complete (7 steps, error table, dependency refs)
-  - Chained-pr chain structure is valid (branch naming, rebase cascade, rollback)
-  - Subagent-isolation rules cover all 6 categories
-  - Cross-references between skills are consistent
-
-.PARAMETER Json
-  Output structured JSON for agent consumption. Default: human-readable.
-
-.EXAMPLE
-  .\scripts\test-downstream.ps1
-  .\scripts\test-downstream.ps1 -Json
 #>
-
-param(
-  [switch]$Json
-)
-
-$ErrorActionPreference = 'Stop'
-Set-StrictMode -Version Latest
-$exitCode = 0
-$results = @()
-
-# --- Helpers ---
-function Add-Result($section, $check, $status, $detail) {
-  $script:results += [PSCustomObject]@{
-    Section = $section
-    Check   = $check
-    Status  = $status
-    Detail  = $detail
-  }
-  if ($status -ne "PASS") { $script:exitCode = 1 }
-}
-
-function Test-SkillFile($name) {
-  $scriptRoot = Split-Path -Parent $PSCommandPath
-  $path = Join-Path $scriptRoot "..\.agents\skills\$name\SKILL.md"
-  if (-not (Test-Path $path)) {
-    Add-Result -Section "Structure" -Check "Skill: $name" -Status "FAIL" -Detail "SKILL.md not found"
-    return $null
-  }
-  return $path
-}
-
-function Test-Section($path, $section) {
-  $content = Get-SkillFileContent $path
-  if (-not $content) { return $false }
-  if ($content -match $section) { return $true }
-  return $false
-}
-
-function Get-SkillFileContent {
-    param([string]$Path)
-    try {
-        return Get-Content -Raw -LiteralPath $Path -ErrorAction Stop
-    } catch {
-        Write-Warning "Could not read $Path': $_"
-        return $null
-    }
-}
-
-try {
-# ====== TESTS ======
-
-# 1. STRUCTURAL: skills exist
-$dhPath = Test-SkillFile "delivery-harness"
-$cpPath = Test-SkillFile "chained-pr"
-$siPath = Test-SkillFile "subagent-isolation"
-
-if (-not $dhPath -or -not $cpPath) {
-  Add-Result -Section "Structure" -Check "Core skills" -Status "FAIL" -Detail "Missing delivery-harness or chained-pr SKILL.md"
-  # Can't continue without core skills
-} else {
-  # 2. DELIVERY-HARNESS: workflow steps
-  $dh = Get-SkillFileContent $dhPath
-  if (-not $dh) { $dh = "" }
-  $steps = @(
-    'Analyze', 'Break down', 'Map deps', 'Delegate', 'Collect', 'Reconcile', 'Report'
-  )
-  $foundSteps = 0
-  foreach ($step in $steps) {
-    if ($dh -match "\*{1,2}$step") { $foundSteps++ }
-    else { Add-Result -Section "Delivery-Harness" -Check "Step: $step" -Status "WARN" -Detail "Step label not found" }
-  }
-  if ($foundSteps -eq 7) {
-    Add-Result -Section "Delivery-Harness" -Check "7-step workflow" -Status "PASS" -Detail "All $foundSteps steps found"
-  } else {
-    Add-Result -Section "Delivery-Harness" -Check "7-step workflow" -Status "FAIL" -Detail "Found $foundSteps/7 steps"
-  }
-
-  # Delivery-Harness: error handling table
-  $errorTypes = @('Subagent timeout', 'Wrong output', 'Dependency fail', 'Merge conflict')
-  $foundErrors = 0
-  foreach ($et in $errorTypes) {
-    if ($dh -match [regex]::Escape($et)) { $foundErrors++ }
-  }
-  Add-Result -Section "Delivery-Harness" -Check "Error table" -Status $(if ($foundErrors -eq 4) { "PASS" } else { "FAIL" }) -Detail "Found $foundErrors/4 error types"
-
-  # Delivery-Harness: dependencies
-  Add-Result -Section "Delivery-Harness" -Check "Dep: subagent-isolation" -Status $(if ($dh -match 'subagent-isolation') { "PASS" } else { "FAIL" }) -Detail ""
-  Add-Result -Section "Delivery-Harness" -Check "Dep: work-unit-commits" -Status $(if ($dh -match 'work-unit-commits') { "PASS" } else { "FAIL" }) -Detail ""
-  Add-Result -Section "Delivery-Harness" -Check "Dep: command-wrapper" -Status $(if ($dh -match 'command-wrapper') { "PASS" } else { "FAIL" }) -Detail ""
-
-  # 3. CHAINED-PR: structure
-  $cp = Get-SkillFileContent $cpPath
-  if (-not $cp) { $cp = "" }
-  Add-Result -Section "Chained-PR" -Check "Chain structure diagram" -Status $(if ($cp -match 'main ── PR#1') { "PASS" } else { "FAIL" }) -Detail "Chain format: main--PR#1--PR#2--PR#3"
-  Add-Result -Section "Chained-PR" -Check "Branch naming convention" -Status $(if ($cp -match 'feat/{prefix}-{n}-{slug}') { "PASS" } else { "FAIL" }) -Detail "Format: feat/{prefix}-{n}-{slug}"
-  Add-Result -Section "Chained-PR" -Check "Rebase cascade" -Status $(if ($cp -match 'REBASE CASCADE') { "PASS" } else { "FAIL" }) -Detail ""
-  Add-Result -Section "Chained-PR" -Check "Rollback procedure" -Status $(if ($cp -match 'ROLLBACK') { "PASS" } else { "FAIL" }) -Detail ""
-  Add-Result -Section "Chained-PR" -Check "Max chain: 5" -Status $(if ($cp -match 'Max chain length: 5') { "PASS" } else { "FAIL" }) -Detail ""
-  Add-Result -Section "Chained-PR" -Check "Dep: work-unit-commits" -Status $(if ($cp -match 'work-unit-commits') { "PASS" } else { "FAIL" }) -Detail ""
-  Add-Result -Section "Chained-PR" -Check "Dep: command-wrapper" -Status $(if ($cp -match 'command-wrapper') { "PASS" } else { "FAIL" }) -Detail ""
-
-  # 4. SUBAGENT-ISOLATION: rules
-  if ($siPath) {
-    $si = Get-SkillFileContent $siPath
-    if (-not $si) { $si = "" }
-    $isoRules = @(
-      'Fresh context per delegation', 'No cross-contamination', 'Dependency declaration',
-      'Result isolation', 'Context cleanup', 'Error boundaries'
-    )
-    $foundRules = 0
-    foreach ($rule in $isoRules) {
-      if ($si -match [regex]::Escape($rule)) { $foundRules++ }
-      else { Add-Result -Section "Subagent-Isolation" -Check "Rule: $rule" -Status "WARN" -Detail "Not found" }
-    }
-    Add-Result -Section "Subagent-Isolation" -Check "6 isolation rules" -Status $(if ($foundRules -eq 6) { "PASS" } else { "FAIL" }) -Detail "Found $foundRules/6 rules"
-  }
-
-  # 5. CROSS-REF CONSISTENCY
-  # delivery-harness declares subagent-isolation dep
-  # subagent-isolation should be referenced by delivery-harness
-  $dhDeps = @()
-  if ($dh -match 'subagent-isolation') { $dhDeps += 'subagent-isolation' }
-  if ($dh -match 'work-unit-commits') { $dhDeps += 'work-unit-commits' }
-  if ($dh -match 'command-wrapper') { $dhDeps += 'command-wrapper' }
-  Add-Result -Section "Cross-Ref" -Check "DH dependencies resolved" -Status "PASS" -Detail "$($dhDeps.Count) deps: $($dhDeps -join ', ')"
-
-  # 6. FILE SIZE CHECK
-  Add-Result -Section "Size" -Check "delivery-harness" -Status "PASS" -Detail "$((Get-Item $dhPath).Length) bytes"
-  Add-Result -Section "Size" -Check "chained-pr" -Status "PASS" -Detail "$((Get-Item $cpPath).Length) bytes"
-  if ($siPath) {
-    Add-Result -Section "Size" -Check "subagent-isolation" -Status "PASS" -Detail "$((Get-Item $siPath).Length) bytes"
-  }
-}
-} catch {
-  Add-Result -Section "Fatal" -Check "Execution" -Status "FAIL" -Detail "Unhandled exception: $_"
-}
-
-# --- OUTPUT ---
-if ($Json) {
-  Write-Output ($results | ConvertTo-Json -Depth 3)
-} else {
-  Write-Output "`n=== Downstream Test Results ==="
-  Write-Output ""
-
-  $pass = @($results | Where-Object { $_.Status -eq "PASS" }).Count
-  $fail = @($results | Where-Object { $_.Status -eq "FAIL" }).Count
-  $warn = @($results | Where-Object { $_.Status -eq "WARN" }).Count
-
-  $results | Group-Object Section | ForEach-Object {
-    Write-Output "--- $($_.Name) ---"
-    $_.Group | Format-Table Check, Status, Detail -AutoSize
-  }
-
-  Write-Output "`n=== Summary: $pass PASS, $fail FAIL, $warn WARN ==="
-}
-
-exit $exitCode
+param([switch]$Json)
+$ErrorActionPreference='Stop'
+Set-StrictMode -V Latest
+$ec=0;$r=@()
+function AR($s,$c,$st,$d){$script:r+=[PSCustomObject]@{Section=$s;Check=$c;Status=$st;Detail=$d};if($st-ne"PASS"){$script:ec=1}}
+function TSF($n){$sr=Split-Path -Par $PSCommandPath;$p=Join-Path $sr "..\.agents\skills\$n\SKILL.md";if(!(Test-Path $p)){AR Structure "Skill: $n" FAIL "Not found";return $null};return $p}
+function GSC{param([string]$p);try{return Get-Content -Raw -Lit $p -EA Stop}catch{Write-Warning "Can't read ${p}: $_";return $null}}
+try{
+$dhp=TSF delivery-harness;$cpp=TSF chained-pr;$sip=TSF subagent-isolation
+if(!$dhp -or !$cpp){AR Structure "Core skills" FAIL "Missing core SKILL.md"}else{
+$dh=GSC $dhp;if(!$dh){$dh=""}
+$steps=@('Analyze','Break down','Map deps','Delegate','Collect','Reconcile','Report')
+$fs=0;foreach($s in $steps){if($dh-match"\*{1,2}$s"){$fs++}else{AR Delivery-Harness "Step: $s" WARN "Missing"}}
+AR Delivery-Harness "7-step workflow" $(if($fs-eq7){"PASS"}else{"FAIL"}) "Found $fs/7"
+$ets=@('Subagent timeout','Wrong output','Dependency fail','Merge conflict')
+$fe=0;foreach($e in $ets){if($dh-match[regex]::Escape($e)){$fe++}}
+AR Delivery-Harness "Error table" $(if($fe-eq4){"PASS"}else{"FAIL"}) "Found $fe/4"
+AR Delivery-Harness "Dep: subagent-isolation" $(if($dh-match'subagent-isolation'){"PASS"}else{"FAIL"}) ""
+AR Delivery-Harness "Dep: work-unit-commits" $(if($dh-match'work-unit-commits'){"PASS"}else{"FAIL"}) ""
+AR Delivery-Harness "Dep: command-wrapper" $(if($dh-match'command-wrapper'){"PASS"}else{"FAIL"}) ""
+$cp=GSC $cpp;if(!$cp){$cp=""}
+AR Chained-PR "Chain structure diagram" $(if($cp-match'main ── PR#1'){"PASS"}else{"FAIL"}) "main--PR#1--PR#2--PR#3"
+AR Chained-PR "Branch naming convention" $(if($cp-match'feat/{prefix}-{n}-{slug}'){"PASS"}else{"FAIL"}) "feat/{prefix}-{n}-{slug}"
+AR Chained-PR "Rebase cascade" $(if($cp-match'REBASE CASCADE'){"PASS"}else{"FAIL"}) ""
+AR Chained-PR "Rollback procedure" $(if($cp-match'ROLLBACK'){"PASS"}else{"FAIL"}) ""
+AR Chained-PR "Max chain: 5" $(if($cp-match'Max chain length: 5'){"PASS"}else{"FAIL"}) ""
+AR Chained-PR "Dep: work-unit-commits" $(if($cp-match'work-unit-commits'){"PASS"}else{"FAIL"}) ""
+AR Chained-PR "Dep: command-wrapper" $(if($cp-match'command-wrapper'){"PASS"}else{"FAIL"}) ""
+if($sip){$si=GSC $sip;if(!$si){$si=""}
+$ir=@('Fresh context per delegation','No cross-contamination','Dependency declaration','Result isolation','Context cleanup','Error boundaries')
+$fr=0;foreach($rule in $ir){if($si-match[regex]::Escape($rule)){$fr++}else{AR "Subagent-Isolation" "Rule: $rule" WARN "Not found"}}
+AR Subagent-Isolation "6 isolation rules" $(if($fr-eq6){"PASS"}else{"FAIL"}) "Found $fr/6"}
+$dd=@();if($dh-match'subagent-isolation'){$dd+='subagent-isolation'};if($dh-match'work-unit-commits'){$dd+='work-unit-commits'};if($dh-match'command-wrapper'){$dd+='command-wrapper'}
+AR Cross-Ref "DH dependencies resolved" PASS "$($dd.Count) deps: $($dd-join', ')"
+AR Size "delivery-harness" PASS "$((Get-Item $dhp).Length) bytes"
+AR Size "chained-pr" PASS "$((Get-Item $cpp).Length) bytes"
+if($sip){AR Size "subagent-isolation" PASS "$((Get-Item $sip).Length) bytes"}}
+}catch{AR Fatal Execution FAIL "Unhandled exception: $_"}
+if($Json){$r|ConvertTo-Json -D 3}else{
+$pass=@($r|?{$_.Status-eq"PASS"}).Count;$fail=@($r|?{$_.Status-eq"FAIL"}).Count;$warn=@($r|?{$_.Status-eq"WARN"}).Count
+$r|group Section|%{$_.Group|ft Check,Status,Detail -Auto}
+echo "=== Summary: $pass PASS, $fail FAIL, $warn WARN ==="}
+exit $ec
