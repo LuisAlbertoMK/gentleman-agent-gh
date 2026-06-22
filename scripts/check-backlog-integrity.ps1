@@ -51,7 +51,7 @@ if (-not (Test-Path $cyclePath)) { Write-Host 'CYCLE.md not found'; exit 1 }
 $cycleContent = Get-Content $cyclePath -Raw -Encoding UTF8
 
 # Extract table rows between "### Backlog" and the next "### "
-$tableSection = $cycleContent -split '(?=### )' | Where-Object { $_ -match '### Backlog' } | Select-Object -First 1
+$tableSection = $cycleContent -split '(?=### )' | Where-Object { $_ -match '### Cycle \d+ Backlog' } | Select-Object -Last 1
 
 if (-not $tableSection) { Write-Host 'Backlog table not found in CYCLE.md'; exit 1 }
 

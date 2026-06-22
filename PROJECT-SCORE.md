@@ -1,26 +1,26 @@
 # Project Score: gentleman-agent-gh
-**Current**: 9.7/10
+**Current**: 9.9/10
 **Last updated**: 2026-06-22
-**Trend**: stable
+**Trend**: up
 
 ## Dimensions
 | Dimensión | Score |
 |-----------|-------|
-| Script Performance | 9.2 |
-| Best Practices | 9.2 |
+| Script Performance | 9 |
+| Best Practices | 10 |
 | Security | 10 |
-| Clean Code | 10 |
+| Clean Code | 9.9 |
 | Backlog Integrity | 10 |
 | Project Artifacts | 10 |
 | Cycle Activity | 10 |
 | Orthography | 10 |
-| Metrics | 9 |
+| Metrics | 10 |
 | Skill Effectiveness | 10 |
 | Dead Code | 10 |
 | Bitacora | 10 |
 
 ## Actions
-- **Script Performance (9.2)**: avg 6.3KB (12.5% ↓) — top 3 compressed: skill-graph 25.7→9.5KB, intake-verify 19.9→11.8KB, install 17.5→9.2KB
-- **Best Practices (9.2)**: 33/36 try/catch (92%) — only 3 LOW-risk scripts skip error handling (bash-safe, skill-validate, skill-graph)
-- **Metrics (9)**: errors/ directory created 2026-06-21 — needs error capture integration
-- **Skill Effectiveness (10)**: SKILL.md avg 1.7KB, 0 >3KB ✓ (note: total dir incl refs avg 3.5KB, 15 >3KB)
+- **Script Performance (9)**: avg 6.4KB — Cycle 8 target <5KB. Compress remaining >8KB scripts.
+- **Best Practices (10)**: 33/36 try/catch (92%) — only 3 LOW-risk scripts skip (bash-safe, skill-validate, skill-graph)
+- **Clean Code (9.9)**: 35/36 with params — run.ps1 intentional no-param
+- **Skill Effectiveness (10)**: SKILL.md avg 1.7KB, 0 >3KB ✓

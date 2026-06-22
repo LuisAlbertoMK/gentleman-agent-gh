@@ -8,13 +8,14 @@
 
 **Cycle 6** (CLOSED): Metric integrity and verification-first. Closed gaps between claimed and actual state. **Result**: SUCCESS (5/6 backlog items, inter 49/30, 12 dimensions with honest scores).
 
-**Cycle 7**: Score accuracy and script optimization. Fix data integrity in scoring artifacts, compress 3 largest scripts, rewrite README to match reality.
+**Cycle 7** (CLOSED): Score accuracy and script optimization. Fixed data integrity in scoring artifacts, compressed 3 largest scripts, rewrote README to match reality. **Result**: SUCCESS (5/5 backlog items, inter 51/30, score 9.9/10).
+
+**Cycle 8**: Script performance optimization. Compress remaining large scripts to push avg <5KB. Address score expansion taxonomy.
 
 ### Pillars
-1. **Score accuracy** — every number in .project.json and PROJECT-SCORE.md MUST be verifiable from repo state. No stale or inflated claims.
-2. **Script optimization** — compress largest scripts to reduce avg size <5KB. Add error handling to all 36 scripts.
-3. **Documentation truth** — README must accurately describe the project: URL, skill count, multi-agent arch, !shortcuts, MCP setup.
-4. **Error handling** — close the try/catch gap on the 12 remaining scripts without exception handling.
+1. **Script Performance** — reduce avg script size from 6.4KB to <5KB. Compress scripts >8KB.
+2. **Score expansion** — implement sub-dimension taxonomy to break the 10.0 ceiling on key metrics.
+3. **Clean Code refinement** — add `[Parameter(Mandatory)]` to remaining script without params → 36/36.
 
 ### Cycle 6 Backlog (CLOSED)
 | Item | Impact | Risk | I/R | Est. inter | Status | Done criteria |
@@ -38,15 +39,30 @@
 | Score accuracy: sync .project.json ↔ PROJECT-SCORE.md, fix Metrics dimension | High | Low | 3.0 | 1 | ✅ Done | Both files show same 12 dims, accurate inter count, errors/ noted |
 | Clean Code: add StrictMode to scripts missing it | High | Low | 3.0 | 1 | ✅ Done | `run.ps1` + `restore-project-score.ps1` now have StrictMode |
 | Script Performance: compress 3 largest scripts | High | Medium | 1.5 | 3-5 | ✅ Done | skill-graph.ps1 <15KB, intake-verify.ps1 11.8KB ✅, install.ps1 <12KB |
-| README rewrite: accurate URL, counts, multi-agent, MCP, shortcuts | Medium | Low | 2.0 | 2 | ⏳ Pending | README reflects actual repo state, mentions multi-agent arch, !shortcuts, MCP |
-| Error handling: add try/catch to 12 remaining scripts | Medium | Medium | 1.0 | 4-6 | ⏳ Pending | All 36 scripts have try/catch or documented safe-without status |
+| README rewrite: accurate URL, counts, multi-agent, MCP, shortcuts | Medium | Low | 2.0 | 2 | ✅ Done | README reflects actual repo state, mentions multi-agent arch, !shortcuts, MCP |
+| Error handling: add try/catch to 12 remaining scripts | Medium | Medium | 1.0 | 4-6 | ✅ Done | 33/36 have try/catch (92%); 3 LOW-risk intentional (bash-safe, skill-validate, skill-graph) |
 
-### Cycle 7 Progress
-- Score: 9.7/10 (post-audit honest score)
-- inter: 0/30 (cycle 7 started 2026-06-21)
+### Cycle 7 Progress (CLOSED)
+- Score: 9.9/10 (post-closing auto-score — up from 9.7)
+- inter: 51/30 (170% of target)
+- Backlog Completion: 5/5 (all items done)
 - Score accuracy: ✅ .project.json fixed, PROJECT-SCORE.md synced, errors/ dir created
 - Clean Code: ✅ StrictMode added to last 2 scripts
 - Script Performance: ✅ 3 scripts compressed (avg 7.2→6.3KB)
+- README: ✅ Full rewrite with accurate URL, multi-agent table, MCP, !shortcuts
+- Error handling: ✅ try/catch added to 8 scripts (25/36→33/36, 92%)
+- Backlog Integrity: ✅ 5/5 items verified
+
+### Cycle 8 Backlog
+| Item | Impact | Risk | I/R | Est. inter | Status | Done criteria |
+|------|--------|------|-----|------------|--------|---------------|
+| Script Performance: compress scripts >8KB to reduce avg <5KB | High | Low | 3.0 | 4-6 | ⏳ Pending | avg script size <5KB, no scripts >10KB |
+| Score expansion: sub-dimensions to break 10.0 ceiling | Medium | Low | 2.0 | 3 | ⏳ Pending | CYCLE.md defines sub-dims; score-auto.ps1 outputs them |
+| Clean Code: add params to last script without [Parameter()] | Medium | Low | 2.0 | 1 | ⏳ Pending | 36/36 scripts have [Parameter(Mandatory)] or documented no-param |
+
+### Cycle 8 Progress
+- Score: 9.9/10
+- inter: 0/30
 
 ## Metrics
 
@@ -157,4 +173,5 @@ gentleman-vMK -- Cycle 1 (infrastructure) 2026-06-17. Cycle 2 (hygiene+automatio
 Cycle 3 (audit+validation) 2026-06-19. Cycle 4 (impact-driven delegation) 2026-06-20.
 Cycle 5 (automation-first) 2026-06-20.
 Cycle 6 (metric integrity) 2026-06-21. ✅ CLOSED (5/6, inter 49/30)
-Cycle 7 (score accuracy + script optimization) 2026-06-21. 🟢 ACTIVE
+Cycle 7 (score accuracy + script optimization) 2026-06-21. ✅ CLOSED (5/5, inter 51/30)
+Cycle 8 (script performance optimization) 2026-06-22. 🟢 ACTIVE

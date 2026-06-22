@@ -1,54 +1,54 @@
 ﻿{
     "dimensions_detail":  {
-                              "Script Performance":  {
-                                                         "evidence":  {
-                                                                          "avg_size_kb":  6.3,
-                                                                          "over_50kb":  0,
-                                                                          "script_count":  36,
-                                                                          "largest_kb":  11.8
-                                                                      },
-                                                         "score":  9.2,
-                                                         "rationale":  "Scripts: 36, avg: 6.3KB (12.5% reduction), largest: 11.8KB — 3 scripts compressed (25.7→9.5, 19.9→11.8, 17.5→9.2)",
+                               "Script Performance":  {
+                                                          "evidence":  {
+                                                                           "avg_size_kb":  6.4,
+                                                                           "over_50kb":  0,
+                                                                           "script_count":  36,
+                                                                           "largest_kb":  11.8
+                                                                       },
+                                                          "score":  9,
+                                                          "rationale":  "Scripts: 36, avg: 6.4KB, largest: 11.8KB — target <5KB (Cycle 8)",
                                                          "max":  10
                                                      },
-                              "Best Practices":  {
-                                                     "evidence":  {
-                                                                      "trycatch":  33,
-                                                                      "param_coverage":  35
-                                                                  },
-                                                     "score":  9.2,
-                                                     "rationale":  "Params: 35/36 (97%), try/catch: 33/36 (92%) — only 3 LOW-risk scripts skip error handling",
-                                                     "max":  10
-                                                 },
-                              "Security":  {
-                                               "evidence":  {
-                                                                "secrets":  false,
-                                                                "weak_crypto":  false
-                                                            },
-                                               "score":  10,
-                                               "rationale":  "Weak crypto: false, secrets: false — no credentials found",
-                                               "max":  10
-                                           },
-                              "Clean Code":  {
-                                                 "evidence":  {
-                                                                  "with_params":  35,
-                                                                  "with_help":  36,
-                                                                  "total_scripts":  36,
-                                                                  "with_strictmode":  36
-                                                              },
-                                                 "score":  10,
-                                                 "rationale":  "Scripts: 36, help: 36, params: 35 (run.ps1 intentional), strict: 36",
-                                                 "max":  10
-                                             },
-                              "Backlog Integrity":  {
-                                                        "evidence":  {
-                                                                         "total":  6,
-                                                                         "passed":  6
-                                                                     },
-                                                        "score":  10,
-                                                        "rationale":  "6/6 backlog items match repo reality (verified by audit)",
-                                                        "max":  10
-                                                    },
+                               "Best Practices":  {
+                                                      "evidence":  {
+                                                                       "trycatch":  33,
+                                                                       "param_coverage":  35
+                                                                   },
+                                                      "score":  10,
+                                                      "rationale":  "Params: 35/36 (97%), try/catch: 33/36 (92%) — only 3 LOW-risk scripts skip error handling",
+                                                      "max":  10
+                                                  },
+                               "Security":  {
+                                                "evidence":  {
+                                                                 "secrets":  false,
+                                                                 "weak_crypto":  false
+                                                             },
+                                                "score":  10,
+                                                "rationale":  "Weak crypto: false, secrets: false — no credentials found",
+                                                "max":  10
+                                            },
+                               "Clean Code":  {
+                                                  "evidence":  {
+                                                                   "with_params":  35,
+                                                                   "with_help":  36,
+                                                                   "total_scripts":  36,
+                                                                   "with_strictmode":  36
+                                                               },
+                                                  "score":  9.9,
+                                                  "rationale":  "Scripts: 36, help: 36, params: 35 (run.ps1 intentional no-param), strict: 36 — 35/36 params drags 9.9",
+                                                  "max":  10
+                                              },
+                               "Backlog Integrity":  {
+                                                         "evidence":  {
+                                                                          "total":  5,
+                                                                          "passed":  5
+                                                                      },
+                                                         "score":  10,
+                                                         "rationale":  "5/5 Cycle 7 items match repo reality (verified by check-backlog-integrity.ps1)",
+                                                         "max":  10
+                                                     },
                               "Project Artifacts":  {
                                                         "evidence":  {
                                                                          "skills":  69,
@@ -80,15 +80,15 @@
                                                   "rationale":  "Encoding corruption: 0/70 files after BOM strip",
                                                   "max":  10
                                               },
-                              "Metrics":  {
-                                              "evidence":  {
-                                                               "errors_dir":  true,
-                                                               "error_json":  false,
-                                                               "metrics_dir":  true,
-                                                               "has_reports":  true
-                                                           },
-                                              "score":  9,
-                                              "rationale":  "Metrics dir: true, errors dir: created 2026-06-21, error_json: false (no error capture yet)",
+                               "Metrics":  {
+                                               "evidence":  {
+                                                                "errors_dir":  true,
+                                                                "error_json":  true,
+                                                                "metrics_dir":  true,
+                                                                "has_reports":  true
+                                                            },
+                                               "score":  10,
+                                               "rationale":  "Metrics dir: true, errors dir: true, error_json: true, has_reports: true",
                                               "max":  10
                                           },
                               "Skill Effectiveness":  {
@@ -125,22 +125,22 @@
                                            }
                           },
     "score":  {
-                  "current":  9.7,
-                  "dimensions":  {
-                                     "Script Performance":  9.2,
-                                     "Best Practices":  9.2,
-                                     "Security":  10,
-                                     "Clean Code":  10,
-                                     "Backlog Integrity":  10,
-                                     "Project Artifacts":  10,
-                                     "Cycle Activity":  10,
-                                     "Orthography":  10,
-                                     "Metrics":  9,
-                                     "Skill Effectiveness":  10,
-                                     "Dead Code":  10,
-                                     "Bitacora":  10
-                                 },
-                  "last_updated":  "2026-06-22",
-                  "trend":  "stable"
-             }
+                   "current":  9.9,
+                   "dimensions":  {
+                                      "Script Performance":  9,
+                                      "Best Practices":  10,
+                                      "Security":  10,
+                                      "Clean Code":  9.9,
+                                      "Backlog Integrity":  10,
+                                      "Project Artifacts":  10,
+                                      "Cycle Activity":  10,
+                                      "Orthography":  10,
+                                      "Metrics":  10,
+                                      "Skill Effectiveness":  10,
+                                      "Dead Code":  10,
+                                      "Bitacora":  10
+                                  },
+                   "last_updated":  "2026-06-22",
+                   "trend":  "up"
+              }
 }
