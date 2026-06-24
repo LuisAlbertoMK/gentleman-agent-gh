@@ -1,111 +1,70 @@
 #requires -Version 5.1
-<# .SYNOPSIS Compute project score from repo state #>
 param([switch]$Json,[switch]$Quiet)
-$ErrorActionPreference="Stop"
 cd "$PSScriptRoot\.."
 & "$PSScriptRoot\restore-project-score.ps1" -Quiet 2>&1|Out-Null
-$L=@{}
-function ad($Name,$Score,$Max,$Evidence,$Rationale){$L[$Name]=@{score=[math]::Round($Score,1);max=$Max;evidence=$Evidence;rationale=$Rationale}}
-$ErrorActionPreference="SilentlyContinue"
-$Dirs=gci -Directory ".\.agents\skills" -Name
-$SC=($Dirs|?{$_ -ne '_shared'}).Count
-& ".\scripts\cross-ref-check.ps1" *>$null
-$X=($LASTEXITCODE -eq 0);$HR=Test-Path "README.md";$HC=Test-Path "CHANGELOG.md";$HPJ=Test-Path ".project.json";$HRd=Test-Path "docs/decisions/roadmap.md"
-$AS=10
-if(-not $X){$AS-=2}
-if(-not $HR){$AS-=2}
-if(-not $HC){$AS-=1}
-if($SC -lt 60){$AS-=2}
-if(-not $HPJ){$AS-=1}
-$AS=[math]::Max(0,$AS)
-ad "Project Artifacts" $AS 10 @{skills=$SC;cross_ref=$X;readme=$HR;changelog=$HC;project_json=$HPJ;roadmap=$HRd} "Cross-ref $X, $SC skills"
-$Sec=10;$WC=$false;$SF=$false
-$WeakCrypto=sls -Path ".\scripts\*.ps1" -Pattern "MD5|SHA1\b" -SimpleMatch|?{$_.Line -notmatch "SHA1ToSHA256|SHA256|# deprecat|# legacy|SHA1SHA256|Select-String.*MD5"}
-if($WeakCrypto){$WC=$true;$Sec-=2}
-$Secrets=sls -Path ".\.agents\skills\*\SKILL.md" -Pattern "(?i)(api[_-]?key|secret|password|token|credential)\s*[=:]\s*['""][^'""]{8,}"
-if($Secrets){$SF=$true;$Sec-=3}
-if(Test-Path "docs/metricas/errors/LATEST_error.json"){$P=gc "docs/metricas/errors/LATEST_error.json" -Raw|ConvertFrom-Json;if($P.source -ne "quality-gate" -or $P.passed -lt 5){$Sec-=1}}else{$PO=& ".\scripts\pssa-gate.ps1" -Mode Check 2>&1;if($LASTEXITCODE -ne 0 -or $PO -match "FAIL|violation|security"){$Sec-=1}}
-$Sec=[math]::Max(0,[math]::Min(10,$Sec))
-ad "Security" $Sec 10 @{weak_crypto=$WC;secrets=$SF} "Weak crypto: $WC, secrets: $SF"
-$DS=10
-$WF=gci ".\skills" -File -EA SilentlyContinue
-$OC=($WF|?{$_.Name -notin $Dirs}).Count
-if($OC -gt 5){$DS-=2}elseif($OC -gt 0){$DS-=1}
-$JI=0
-gci ".\skills" -Directory -EA SilentlyContinue|%{if(-not (Test-Path $_.Target)){$JI++}}
-if($JI -gt 0){$DS-=1}
-$CC=@(sls -Path ".\scripts\*.ps1" -Pattern "#.*function|#.*if|#.*for\s*\(" -SimpleMatch|?{$_.Filename -ne "score-auto.ps1"})
-if($CC.Count -gt 10){$DS-=1}
-$DS=[math]::Max(0,[math]::Min(10,$DS))
-ad "Dead Code" $DS 10 @{orphans=$OC;dead_junctions=$JI;commented_out=$CC.Count} "Orphans: $OC, dead junctions: $JI"
-$Scripts=gci ".\scripts\*.ps1";$TS=$Scripts.Count;$WH=0;$WP=0;$WS=0
-foreach($S in $Scripts){$C=gc $S.FullName -Raw;if($C -match '<#'){$WH++};if($C -match 'param\('){$WP++};if($C -match 'Set-StrictMode'){$WS++}}
-$CR=@($WH,$WP,$WS|%{[math]::Round($_/$TS,2)})
-$CS=[math]::Round(($CR[0]+$CR[1]+$CR[2])/3*10,1)
-ad "Clean Code" $CS 10 @{total_scripts=$TS;with_help=$WH;with_params=$WP;with_strictmode=$WS} "Scripts: $TS, help: $WH, params: $WP, strict: $WS"
-$Best=[math]::Round(($WP/$TS)*10,1);$WTC=0
-foreach($S in $Scripts){if((gc $S.FullName -Raw) -match 'try\s*\{'){$WTC++}}
-$TCR=$WTC/$TS
-if($TCR -ge 0.8){$Best=[math]::Min(10,$Best+1)}elseif($TCR -le 0.3){$Best=[math]::Max(0,$Best-1)}
-ad "Best Practices" $Best 10 @{param_coverage=$WP;trycatch=$WTC} "Params: $WP/$TS, try/catch: $WTC/$TS"
-$Corr=0
-$SFiles=gci ".\.agents\skills\*\SKILL.md"
-foreach($F in $SFiles){try{$B=[System.IO.File]::ReadAllBytes($F.FullName);$C2=$false;for($i=0;$i -lt $B.Length-3;$i++){if($B[$i]-eq0xC3-and$B[$i+1]-eq0x83-and$B[$i+2]-ge0x80){$C2=$true;break};if($B[$i]-eq0xC3-and$B[$i+1]-eq0xA2-and$i+3-lt$B.Length){if($B[$i+2]-eq0xE2-and($B[$i+3]-eq0x80-or$B[$i+3]-eq0x82)){$C2=$true;break}}};if($C2){$Corr++}}catch{Write-Debug "score-auto: $($_.Exception.Message)"}}
-$Ort=10
-if($Corr -gt 10){$Ort=4}elseif($Corr -gt 5){$Ort=7}elseif($Corr -gt 0){$Ort=9}
-ad "Orthography" $Ort 10 @{corrupted_files=$Corr;total_scanned=$SFiles.Count} "Encoding corruption: $Corr/$($SFiles.Count) files"
-$Bita=0
-if(Test-Path "BITACORA.md"){$Bc=gc "BITACORA.md" -Raw;$BL=$Bc.Split("`n").Count;if($BL -gt 10){$Bita=10}elseif($BL -gt 5){$Bita=7}else{$Bita=5}}
-ad "Bitacora" $Bita 10 @{exists=(Test-Path "BITACORA.md");lines=if(Test-Path "BITACORA.md"){(gc "BITACORA.md").Count}else{0}} "BITACORA.md exists: $(Test-Path 'BITACORA.md')"
-$HMD=Test-Path "docs/metricas";$HED=Test-Path "docs/metricas/errors";$HEJ=Test-Path "docs/metricas/errors/LATEST_error.json";$HRp=(gci "docs/metricas" -File -EA SilentlyContinue).Count -gt 0
-$Met=4
-if($HMD -and $HEJ){$Met=9}elseif($HMD){$Met=7}
-if($HRp -and $HED){$Met=[math]::Min(10,$Met+1)}
-ad "Metrics" $Met 10 @{metrics_dir=$HMD;errors_dir=$HED;error_json=$HEJ;has_reports=$HRp} "Metrics dir: $HMD, error json: $HEJ"
-$SS=gci ".\scripts\*.ps1"|select Name,Length
-$AvgKB=[math]::Round(($SS|measure -Average Length).Average/1KB,1)
-$O50=($SS|?{$_.Length -gt 51200}).Count;$SCt=$SS.Count
-$Perf=10
-if($SCt -lt 15 -or $SCt -gt 35){$Perf-=1}
-if($AvgKB -gt 15){$Perf-=1}elseif($AvgKB -gt 20){$Perf-=2}
-if($O50 -gt 0){$Perf-=2}
-$Perf=[math]::Max(0,[math]::Min(10,$Perf))
-ad "Script Performance" $Perf 10 @{script_count=$SCt;avg_size_kb=$AvgKB;over_50kb=$O50} "Scripts: $SCt, avg: ${AvgKB}KB, >50KB: $O50"
-$SF2=gci ".\.agents\skills\*\SKILL.md"|?{$_.Directory.Name -ne '_shared'};$Tot=$SF2.Count;$O3=($SF2|?{$_.Length -gt 3072}).Count;$O5=($SF2|?{$_.Length -gt 5120}).Count;$TB=($SF2|measure -Sum Length).Sum;$ASKB=[math]::Round($TB/$Tot/1KB,1)
-$Eff=10
-if($O5 -gt 0){$Eff-=2}elseif($O3 -gt 3){$Eff-=2}elseif($O3 -gt 1){$Eff-=1}
-if($ASKB -le 2.5){$Eff=[math]::Min(10,$Eff+0.5)}
-if($Tot -lt 60){$Eff-=2}
-$Eff=[math]::Round([math]::Max(0,[math]::Min(10,$Eff)),1)
-ad "Skill Effectiveness" $Eff 10 @{total_skills=$Tot;over_3kb=$O3;over_5kb=$O5;avg_size_kb=$ASKB;total_bytes=$TB} "Skills: $Tot, >3KB: $O3, >5KB: $O5, avg: ${ASKB}KB"
-$IntPath=".learnings\inter-track.json";$Cyc=0;$IC=0;$IT=30
-if(Test-Path $IntPath){try{$ID=gc $IntPath -Raw|ConvertFrom-Json;$IC=[int]$ID.cycle.count;$IT=[int]$ID.cycle.target;$Cyc=[math]::Min(10,[math]::Round(($IC/$IT)*10,1))}catch{$Cyc=0}}
-ad "Cycle Activity" $Cyc 10 @{inter_count=$IC;inter_target=$IT} "inter: $IC/$IT"
-$BScript=Join-Path $PSScriptRoot 'check-backlog-integrity.ps1'
-if(Test-Path $BScript){$BJ=& $BScript -Json 2>&1|Out-String|ConvertFrom-Json;$BS=$BJ.score;$BP=$BJ.passed;$BT=$BJ.totalItems}else{$BS=0;$BP=0;$BT=0}
-ad "Backlog Integrity" $BS 10 @{passed=$BP;total=$BT} "$BP/$BT items match reality"
-# --- Sub-dimension mapping (evidence → 0-10 scores) ---
-$SDG=@{};function sdg($d,$n,$v){if(-not $SDG[$d]){$SDG[$d]=@{}};$SDG[$d][$n]=$v}
-$e=$L["Project Artifacts"].evidence;sdg "Project Artifacts" "readme" $(if($e.readme){10}else{0});sdg "Project Artifacts" "changelog" $(if($e.changelog){10}else{0});sdg "Project Artifacts" "cross_ref" $(if($e.cross_ref){10}else{0});sdg "Project Artifacts" "skills" $([math]::Min(10,$e.skills/6));sdg "Project Artifacts" "project_json" $(if($e.project_json){10}else{0});sdg "Project Artifacts" "roadmap" $(if($e.roadmap){10}else{0})
-$e=$L["Security"].evidence;sdg "Security" "crypto" $(if($e.weak_crypto){5}else{10});sdg "Security" "secrets" $(if($e.secrets){3}else{10})
-$e=$L["Dead Code"].evidence;sdg "Dead Code" "orphans" $(if($e.orphans -le 0){10}elseif($e.orphans -le 5){7}else{5});sdg "Dead Code" "junctions" $(if($e.dead_junctions -le 0){10}else{7});sdg "Dead Code" "commented" $(if($e.commented_out -le 10){10}else{7})
-$e=$L["Clean Code"].evidence;sdg "Clean Code" "help_rate" $([math]::Round($e.with_help/$e.total_scripts*10,1));sdg "Clean Code" "param_rate" $([math]::Round($e.with_params/$e.total_scripts*10,1));sdg "Clean Code" "strict_rate" $([math]::Round($e.with_strictmode/$e.total_scripts*10,1))
-$e=$L["Best Practices"].evidence;sdg "Best Practices" "param_cov" $([math]::Round($e.param_coverage/$TS*10,1));sdg "Best Practices" "trycatch" $([math]::Round($e.trycatch/$TS*10,1))
-$e=$L["Orthography"].evidence;sdg "Orthography" "corruption" $(if($e.corrupted_files -le 0){10}elseif($e.corrupted_files -le 5){9}elseif($e.corrupted_files -le 10){7}else{4})
-$e=$L["Bitacora"].evidence;sdg "Bitacora" "exists" $(if($e.exists){10}else{0});sdg "Bitacora" "content" $([math]::Min(10,$e.lines/2))
-$e=$L["Metrics"].evidence;sdg "Metrics" "metrics_dir" $(if($e.metrics_dir){10}else{0});sdg "Metrics" "errors_dir" $(if($e.errors_dir){10}else{0});sdg "Metrics" "error_json" $(if($e.error_json){10}else{0});sdg "Metrics" "reports" $(if($e.has_reports){10}else{0})
-$e=$L["Script Performance"].evidence;sdg "Script Performance" "count" $(if($e.script_count -ge 15 -and $e.script_count -le 35){10}else{7});sdg "Script Performance" "avg_size" $(if($e.avg_size_kb -le 10){10}elseif($e.avg_size_kb -le 15){7}else{5});sdg "Script Performance" "huge" $(if($e.over_50kb -le 0){10}else{5})
-$e=$L["Skill Effectiveness"].evidence;sdg "Skill Effectiveness" "skill_count" $(if($e.total_skills -ge 60){10}else{7});sdg "Skill Effectiveness" "over_3kb" $(if($e.over_3kb -le 0){10}elseif($e.over_3kb -le 1){9}else{7});sdg "Skill Effectiveness" "over_5kb" $(if($e.over_5kb -le 0){10}else{7});sdg "Skill Effectiveness" "skill_avg" $(if($e.avg_size_kb -le 2.0){10}elseif($e.avg_size_kb -le 2.5){9.5}else{7})
-$e=$L["Cycle Activity"].evidence;sdg "Cycle Activity" "inter_ratio" $([math]::Min(10,$e.inter_count/$e.inter_target*10))
-$e=$L["Backlog Integrity"].evidence;sdg "Backlog Integrity" "integrity" $($e.passed/$e.total*10)
-# Attach sub_dimensions to each dimension, compute Depth
-$SDAll=@();foreach($dim in $SDG.Keys){$L[$dim].sub_dimensions=$SDG[$dim];$SDAll+=$SDG[$dim].Values}
-$Depth=[math]::Round(($SDAll|measure -Average).Average,1)
-ad "Score Depth" $Depth 10 @{sub_dim_count=$SDAll.Count} "Avg of $($SDAll.Count) sub-dimensions: $Depth/10"
-$All=$L.Values|%{$_.score}
-$Final=[math]::Round(($All|measure -Average).Average,1)
-$dm=@("Project Artifacts","Security","Dead Code","Clean Code","Best Practices","Orthography","Bitacora","Metrics","Script Performance","Skill Effectiveness","Cycle Activity","Backlog Integrity","Score Depth")
-$r=@{score=@{current=$Final;dimensions=[ordered]@{};last_updated=(Get-Date -Format "yyyy-MM-dd");trend="stable"};dimensions_detail=$L}
-foreach($D in $dm){$r.score.dimensions[$D]=$L[$D].score}
-if(Test-Path ".project.json"){try{$Prev=gc ".project.json" -Raw -Encoding UTF8|ConvertFrom-Json;$PSc=$Prev.score.current;if($Final -gt $PSc){$r.score.trend="up"}elseif($Final -lt $PSc){$r.score.trend="down"}else{$r.score.trend="stable"};$LU=$Prev.score.last_updated;if($LU){$age=[int]((Get-Date)-(Get-Date $LU)).TotalDays;if($age -ge 1){Write-Host "WARNING: .project.json is $age day(s) stale (last: $LU)" -ForegroundColor Yellow}}}catch{$r.score.trend="unknown"}}
-if($Json){$r|ConvertTo-Json -Depth 5}elseif($Quiet){Write-Host "Score: $Final/10 (trend: $($r.score.trend))"}else{Write-Host "$($r.score.last_updated) | $Final/10 ($($r.score.trend))" -ForegroundColor Cyan;Write-Host "Dimensions:" -ForegroundColor Yellow;foreach($D in $dm){$d2=$L[$D];$C=if($d2.score -ge 9){"Green"}elseif($d2.score -ge 7){"Yellow"}else{"Red"};Write-Host " $($D.PadRight(16))$($d2.score.ToString('F1').PadLeft(4))/10" -ForegroundColor $C};Write-Host $("-"*32) -ForegroundColor Gray;Write-Host " TOTAL$(''.PadLeft(12))$($Final.ToString('F1').PadLeft(4))/10" -ForegroundColor White}
+$m=[math];$h=@{};function a($n,$s,$e,$r){$h[$n]=@{s=$s;e=$e;r=$r}}
+$d=gci -Directory ".\.agents\skills" -Name;$c=($d|?{$_ -ne '_shared'}).Count
+& ".\scripts\cross-ref-check.ps1" *>$null;$x=($LASTEXITCODE -eq 0)
+$h1=Test-Path "README.md";$h2=Test-Path "CHANGELOG.md";$h3=Test-Path ".project.json";$h4=Test-Path "docs/decisions/roadmap.md"
+$as=10;if(!$x){$as-=2};if(!$h1){$as-=2};if(!$h2){$as-=1};if($c -lt 60){$as-=2};if(!$h3){$as-=1}
+a "PA" ($m::Max(0,$as)) @{skills=$c;cross_ref=$x;readme=$h1;changelog=$h2;project_json=$h3;roadmap=$h4} "X-ref $x, $c skills"
+$s1=10;$wc=$false;$sf=$false
+$wk=sls -Path ".\scripts\*.ps1" -Pattern "MD5|SHA1\b"|?{$_.Line -notmatch "SHA1ToSHA256|SHA256|#deprecat|#legacy|SHA1SHA256|Select-String.*MD5"}
+if($wk){$wc=$true;$s1-=2}
+$sk=sls -Path ".\.agents\skills\*\SKILL.md" -Pattern "(?i)(api[_-]?key|secret|password|token|credential)\s*[=:]\s*['""][^'""]{8,}"
+if($sk){$sf=$true;$s1-=3}
+if(Test-Path "docs/metricas/errors/LATEST_error.json"){$p1=gc "docs/metricas/errors/LATEST_error.json" -Raw|ConvertFrom-Json;if($p1.source -ne "quality-gate" -or $p1.passed -lt 5){$s1-=1}}else{$po=& ".\scripts\pssa-gate.ps1" -Mode Check 2>&1;if($LASTEXITCODE -ne 0 -or $po -match "FAIL|violation|security"){$s1-=1}}
+a "Sec" ($m::Max(0,$m::Min(10,$s1))) @{weak_crypto=$wc;secrets=$sf} "Weak crypto: $wc, secrets: $sf"
+$ds=10;$wf=gci ".\skills" -File -EA SilentlyContinue;$oc=($wf|?{$_.Name -notin $d}).Count
+if($oc -gt 5){$ds-=2}elseif($oc -gt 0){$ds-=1};$ji=0
+gci ".\skills" -Directory -EA SilentlyContinue|%{if(-not (Test-Path $_.Target)){$ji++}}
+if($ji -gt 0){$ds-=1};$co=@(sls -Path ".\scripts\*.ps1" -Pattern "#.*function|#.*if|#.*for\s*\("|?{$_.Filename -ne "score-auto.ps1"});if($co.Count -gt 10){$ds-=1}
+a "DC" ($m::Max(0,$m::Min(10,$ds))) @{orphans=$oc;dead_junctions=$ji;commented_out=$co.Count} "Orphans: $oc, dead junctions: $ji"
+$sc=gci ".\scripts\*.ps1";$ts=$sc.Count;$wh=0;$wp=0;$ws=0
+foreach($s in $sc){$c1=gc $s.FullName -Raw;if($c1 -match '<#'){$wh++};if($c1 -match 'param\('){$wp++};if($c1 -match 'Set-StrictMode'){$ws++}}
+$cr=@($wh,$wp,$ws|%{$m::Round($_/$ts,2)})
+a "CC" ($m::Round(($cr[0]+$cr[1]+$cr[2])/3*10,1)) @{total_scripts=$ts;with_help=$wh;with_params=$wp;with_strictmode=$ws} "S:$ts H:$wh P:$wp S:$ws"
+$bp=$m::Round(($wp/$ts)*10,1);$wt=0
+foreach($s in $sc){if((gc $s.FullName -Raw) -match 'try\s*\{'){$wt++}}
+$tr=$wt/$ts;if($tr -ge 0.8){$bp=$m::Min(10,$bp+1)}elseif($tr -le 0.3){$bp=$m::Max(0,$bp-1)}
+a "BP" $bp @{param_cov=$wp;trycatch=$wt} "P:$wp/$ts T:$wt/$ts"
+$crp=0;$sf2=gci ".\.agents\skills\*\SKILL.md"
+foreach($f in $sf2){try{$b=[System.IO.File]::ReadAllBytes($f.FullName);$c2=$false;for($i=0;$i -lt $b.Length-3;$i++){if($b[$i]-eq0xC3-and$b[$i+1]-eq0x83-and$b[$i+2]-ge0x80){$c2=$true;break};if($b[$i]-eq0xC3-and$b[$i+1]-eq0xA2-and$i+3-lt$b.Length){if($b[$i+2]-eq0xE2-and($b[$i+3]-eq0x80-or$b[$i+3]-eq0x82)){$c2=$true;break}}};if($c2){$crp++}}catch{}}
+$ort=10;if($crp -gt 10){$ort=4}elseif($crp -gt 5){$ort=7}elseif($crp -gt 0){$ort=9}
+a "Or" $ort @{corrupted=$crp;scanned=$sf2.Count} "Corruption: $crp/$($sf2.Count)"
+$bi=0;if(Test-Path "BITACORA.md"){$bc=gc "BITACORA.md" -Raw;$bl=$bc.Split("`n").Count;if($bl -gt 10){$bi=10}elseif($bl -gt 5){$bi=7}else{$bi=5}}
+a "Bi" $bi @{exists=(Test-Path "BITACORA.md");lines=if(Test-Path "BITACORA.md"){(gc "BITACORA.md").Count}else{0}} "BI: $(Test-Path 'BITACORA.md')"
+$hm=Test-Path "docs/metricas";$he=Test-Path "docs/metricas/errors";$hj=Test-Path "docs/metricas/errors/LATEST_error.json";$hr=(gci "docs/metricas" -File -EA SilentlyContinue).Count -gt 0
+$mt=4;if($hm -and $hj){$mt=9}elseif($hm){$mt=7};if($hr -and $he){$mt=$m::Min(10,$mt+1)}
+a "Me" $mt @{md=$hm;ed=$he;ej=$hj;rp=$hr} "MD:$hm EJ:$hj"
+$ak=$m::Round(($sc|measure -Average Length).Average/1KB,1);$o5=($sc|?{$_.Length -gt 51200}).Count
+$pf=10;if($ts -lt 15 -or $ts -gt 35){$pf-=1};if($ak -gt 15){$pf-=1}elseif($ak -gt 20){$pf-=2};if($o5 -gt 0){$pf-=2}
+a "SP" ($m::Max(0,$m::Min(10,$pf))) @{sc=$ts;avg=$ak;huge=$o5} "S:$ts avg:${ak}KB"
+$s4=gci ".\.agents\skills\*\SKILL.md"|?{$_.Directory.Name -ne '_shared'};$tt=$s4.Count;$o3=($s4|?{$_.Length -gt 3072}).Count;$o6=($s4|?{$_.Length -gt 5120}).Count;$tb=($s4|measure -Sum Length).Sum;$ak2=$m::Round($tb/$tt/1KB,1)
+$ef=10;if($o6 -gt 0){$ef-=2}elseif($o3 -gt 3){$ef-=2}elseif($o3 -gt 1){$ef-=1};if($ak2 -le 2.5){$ef=$m::Min(10,$ef+0.5)};if($tt -lt 60){$ef-=2}
+a "SE" ($m::Round($m::Max(0,$m::Min(10,$ef)),1)) @{total=$tt;o3=$o3;o5=$o6;avg=$ak2;bytes=$tb} "T:$tt >3:$o3 >5:$o6 avg:${ak2}KB"
+$ip=".learnings\inter-track.json";$cy=0;$ic=0;$it=30
+if(Test-Path $ip){try{$id=gc $ip -Raw|ConvertFrom-Json;$ic=[int]$id.cycle.count;$it=[int]$id.cycle.target;$cy=$m::Min(10,$m::Round(($ic/$it)*10,1))}catch{$cy=0}}
+a "CA" $cy @{ic=$ic;it=$it} "IC:$ic/$it"
+$bp2=Join-Path $PSScriptRoot 'check-backlog-integrity.ps1'
+if(Test-Path $bp2){$bj=& $bp2 -Json 2>&1|Out-String|ConvertFrom-Json;$bs=$bj.score;$bpp=$bj.passed;$bt=$bj.totalItems}else{$bs=0;$bpp=0;$bt=0}
+a "BI2" $bs @{passed=$bpp;total=$bt} "$bpp/$bt items"
+$sd=@();$e1=$h["PA"].e
+$sd+=$(if($e1.readme){10}else{0});$sd+=$(if($e1.changelog){10}else{0});$sd+=$(if($e1.cross_ref){10}else{0});$sd+=($m::Min(10,$e1.skills/6));$sd+=$(if($e1.project_json){10}else{0});$sd+=$(if($e1.roadmap){10}else{0})
+$e2=$h["Sec"].e;$sd+=$(if($e2.weak_crypto){5}else{10});$sd+=$(if($e2.secrets){3}else{10})
+$e3=$h["DC"].e;$sd+=$(if($e3.orphans -le 0){10}elseif($e3.orphans -le 5){7}else{5});$sd+=$(if($e3.dead_junctions -le 0){10}else{7});$sd+=$(if($e3.commented_out -le 10){10}else{7})
+$e4=$h["CC"].e;$sd+=($m::Round($e4.with_help/$ts*10,1));$sd+=($m::Round($e4.with_params/$ts*10,1));$sd+=($m::Round($e4.with_strictmode/$ts*10,1))
+$e5=$h["BP"].e;$sd+=($m::Round($e5.param_cov/$ts*10,1));$sd+=($m::Round($e5.trycatch/$ts*10,1))
+$sd+=$(if($crp -le 0){10}elseif($crp -le 5){9}elseif($crp -le 10){7}else{4});$sd+=$(if($h["Bi"].e.exists){10}else{0});$sd+=($m::Min(10,$h["Bi"].e.lines/2))
+$sd+=$(if($hm){10}else{0});$sd+=$(if($he){10}else{0});$sd+=$(if($hj){10}else{0});$sd+=$(if($hr){10}else{0})
+$sd+=$(if($ts -ge 15-and$ts -le 35){10}else{7});$sd+=$(if($ak -le 10){10}elseif($ak -le 15){7}else{5});$sd+=$(if($o5 -le 0){10}else{5})
+$sd+=$(if($tt -ge 60){10}else{7});$sd+=$(if($o3 -le 0){10}elseif($o3 -le 1){9}else{7});$sd+=$(if($o6 -le 0){10}else{7});$sd+=$(if($ak2 -le 2.0){10}elseif($ak2 -le 2.5){9.5}else{7})
+$sd+=($m::Min(10,$ic/$it*10));$sd+=$(if($bt -gt 0){$bpp/$bt*10}else{0})
+$dp=$m::Round(($sd|measure -Average).Average,1)
+a "SD" $dp @{subd=$sd.Count} "Depth: $($sd.Count) sub-dims: $dp/10"
+$all=$h.Values|%{$_.s};$fn=$m::Round(($all|measure -Average).Average,1)
+$dn=@{"PA"="Project Artifacts";"Sec"="Security";"DC"="Dead Code";"CC"="Clean Code";"BP"="Best Practices";"Or"="Orthography";"Bi"="Bitacora";"Me"="Metrics";"SP"="Script Performance";"SE"="Skill Effectiveness";"CA"="Cycle Activity";"BI2"="Backlog Integrity";"SD"="Score Depth"}
+$r=@{score=@{current=$fn;dimensions=[ordered]@{};last_updated=(Get-Date -Format "yyyy-MM-dd");trend="stable"};dimensions_detail=$h}
+foreach($k in $dn.Keys){$r.score.dimensions[$dn[$k]]=$h[$k].s}
+if(Test-Path ".project.json"){try{$pr=gc ".project.json" -Raw -Encoding UTF8|ConvertFrom-Json;$ps=$pr.score.current;if($fn -gt $ps){$r.score.trend="up"}elseif($fn -lt $ps){$r.score.trend="down"};$lu=$pr.score.last_updated;if($lu){$age=[int]((Get-Date)-(Get-Date $lu)).TotalDays;if($age -ge 1){Write-Host "WARNING: .project.json is $age day(s) stale (last: $lu)" -ForegroundColor Yellow}}}catch{}}
+if($Json){$r|ConvertTo-Json -Depth 5}elseif($Quiet){Write-Host "Score: $fn/10 (trend: $($r.score.trend))"}else{Write-Host "$($r.score.last_updated) | $fn/10 ($($r.score.trend))" -ForegroundColor Cyan;Write-Host "Dimensions:" -ForegroundColor Yellow;foreach($k in $dn.Keys){$d2=$h[$k];$C=if($d2.s -ge 9){"Green"}elseif($d2.s -ge 7){"Yellow"}else{"Red"};Write-Host " $($dn[$k].PadRight(16))$($d2.s.ToString('F1').PadLeft(4))/10" -ForegroundColor $C};Write-Host $("-"*32);Write-Host " TOTAL$(''.PadLeft(12))$($fn.ToString('F1').PadLeft(4))/10" -ForegroundColor White}

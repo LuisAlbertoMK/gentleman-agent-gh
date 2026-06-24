@@ -56,13 +56,13 @@
 ### Cycle 8 Backlog
 | Item | Impact | Risk | I/R | Est. inter | Status | Done criteria |
 |------|--------|------|-----|------------|--------|---------------|
-| Script Performance: compress scripts >8KB to reduce avg <5KB | High | Low | 3.0 | 4-6 | ⏳ Pending | avg script size <5KB, no scripts >10KB |
+| Script Performance: compress scripts >8KB to reduce avg <5KB | High | Low | 3.0 | 4-6 | ✅ Done | avg 4.3KB, no scripts >8KB (score-auto.ps1: 10.9→8.0KB) |
 | Score expansion: sub-dimensions to break 10.0 ceiling | Medium | Low | 2.0 | 1 | ✅ Done | CYCLE.md defines sub-dims; score-auto.ps1 outputs them (32 sub-dims across 12 dims) |
 | Clean Code: add params to last script without [Parameter()] | Medium | Low | 2.0 | 1 | ✅ Done | run.ps1 documented no-param by design (universal runner uses $args); score-auto.ps1 now recognizes |
 
 ### Cycle 8 Progress
-- Score: 9.9/10 (13 dims, post-expansion)
-- inter: 2/30
+- Score: 9.8/10 (13 dims, score-auto compressed → depth calc shift)
+- inter: 66/30
 
 ## Metrics
 

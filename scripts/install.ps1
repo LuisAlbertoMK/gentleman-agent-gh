@@ -14,9 +14,9 @@
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$srcSkills = Resolve-Path "$PSScriptRoot\..\.agents\skills"
+$srcSkills = Resolve-Path "$PSScriptRoot\..\.agents\skills" -ErrorAction Stop
 $dstSkills = "$env:USERPROFILE\.config\opencode\skills"
-$srcScripts = Resolve-Path "$PSScriptRoot"
+$srcScripts = Resolve-Path "$PSScriptRoot" -ErrorAction Stop
 $dstScripts = "$env:USERPROFILE\.config\opencode\scripts"
 
 Write-Host "==> Gentleman Agent Installer (Windows)" -ForegroundColor Cyan
@@ -24,25 +24,35 @@ Write-Host ""
 
 # Skills
 Write-Host "[info] Installing skills..." -ForegroundColor Blue
-New-Item -ItemType Directory -Path $dstSkills -Force | Out-Null
-$count = 0
-foreach ($skill in Get-ChildItem -Directory -Path $srcSkills) {
-    $link = Join-Path $dstSkills $skill.Name
-    if (-not (Test-Path $link)) {
-        New-Item -ItemType Junction -Path $link -Target $skill.FullName | Out-Null
-        $count++
+try {
+    New-Item -ItemType Directory -Path $dstSkills -Force | Out-Null
+    $count = 0
+    foreach ($skill in Get-ChildItem -Directory -Path $srcSkills) {
+        $link = Join-Path $dstSkills $skill.Name
+        if (-not (Test-Path $link)) {
+            New-Item -ItemType Junction -Path $link -Target $skill.FullName -ErrorAction Stop | Out-Null
+            $count++
+        }
     }
+    $totalSkills = @(Get-ChildItem -Directory $srcSkills).Count
+    Write-Host "[ok] $count new junctions (total available: $totalSkills)" -ForegroundColor Green
+} catch {
+    Write-Host "[err] Skills installation failed: $_" -ForegroundColor Red
+    exit 1
 }
-$totalSkills = @(Get-ChildItem -Directory $srcSkills).Count
-Write-Host "[ok] $count new junctions (total available: $totalSkills)" -ForegroundColor Green
 
 # Scripts
 Write-Host "[info] Installing scripts..." -ForegroundColor Blue
-if (-not (Test-Path $dstScripts)) {
-    New-Item -ItemType Junction -Path $dstScripts -Target $srcScripts | Out-Null
-    Write-Host "[ok] Scripts junction created" -ForegroundColor Green
-} else {
-    Write-Host "[warn] $dstScripts exists, skipping" -ForegroundColor Yellow
+try {
+    if (-not (Test-Path $dstScripts)) {
+        New-Item -ItemType Junction -Path $dstScripts -Target $srcScripts -ErrorAction Stop | Out-Null
+        Write-Host "[ok] Scripts junction created" -ForegroundColor Green
+    } else {
+        Write-Host "[warn] $dstScripts exists, skipping" -ForegroundColor Yellow
+    }
+} catch {
+    Write-Host "[err] Scripts installation failed: $_" -ForegroundColor Red
+    exit 1
 }
 
 Write-Host ""
