@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 <# .SYNOPSIS Verify SDD intake — validates project structure and skill scaffolding against intake.json #>
 param([string]$p,[ValidateRange(1,5)][int]$i=1,[string]$t="auto",[bool]$m=$true,[ValidateSet("text","json")][string]$f="text")
 $ErrorActionPreference='Stop';Set-StrictMode -Version Latest;$t0=Get-Date;$rr=@();$chk=[char]0x2705;$crs=[char]0x274C;$wrn=[char]0x26A0
@@ -6,7 +6,7 @@ function wr{param([string]$I,[string]$M)
 $c=@{$chk="Green";$crs="Red";$wrn="Yellow"}[$I]
 if(-not$c){$c="White"}if($f-ne"json"){Write-Host "$I $M" -ForegroundColor $c}}
 function sz{param([string]$x)
-if(Test-Path $x){$l=(Get-Item $x).Length;if($l-gt1KB){return"$([math]::Round($l/1KB,1))KB"};return"$l B"}return""}
+if(Test-Path $x){$l=(Get-Item $x).Length;if($l-gt1KB){$r=$m::Round($l/1KB,1);return"${r}KB"};return"$l B"}return""}
 function ic{param([int]$R,[string]$pp)
 $r=@{};$sm=@{};Write-Host "`n  #$R Intake" -ForegroundColor Cyan;$rp=$null
 if(Test-Path "$pp\ROADMAP.md"){$rp="ROADMAP.md"}
