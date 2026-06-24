@@ -10,7 +10,7 @@ $ErrorActionPreference="SilentlyContinue"
 $Dirs=gci -Directory ".\.agents\skills" -Name
 $SC=($Dirs|?{$_ -ne '_shared'}).Count
 & ".\scripts\cross-ref-check.ps1" *>$null
-$X=($LASTEXITCODE -eq 0);$HR=Test-Path "README.md";$HC=Test-Path "CHANGELOG.md";$HPJ=Test-Path ".project.json";$HRd=Test-Path "docs/roadmap.md"
+$X=($LASTEXITCODE -eq 0);$HR=Test-Path "README.md";$HC=Test-Path "CHANGELOG.md";$HPJ=Test-Path ".project.json";$HRd=Test-Path "docs/decisions/roadmap.md"
 $AS=10
 if(-not $X){$AS-=2}
 if(-not $HR){$AS-=2}

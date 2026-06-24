@@ -248,7 +248,7 @@ Node 20+: dns.setDefaultResultOrder('ipv4first') — avoid IPv6 timeout penaltie
 
 ### 7.1 Benchmark Data
 
-Based on existing research (`RESEARCH-build-optimization.md`, ram-cpu-gpu-optimization.md):
+Based on existing research (`build-optimization.md`, ram-cpu-gpu-optimization.md):
 
 | Operation | node:fs | bun:fs | @ff-labs/fff-bun | Win |
 |-----------|---------|--------|------------------|-----|
@@ -399,7 +399,7 @@ opencode-vmk:
 15. Paul Calvano — "Choosing Between gzip, Brotli and zStandard Compression" (2024)
 16. SiteGround — "Brotli Compression: ~20% smaller than gzip" (2021)
 17. gentleman-agent-gh — `docs/optimization-consolidado/ram-cpu-gpu-optimization.md` (2026-06-23)
-18. gentleman-agent-gh — `RESEARCH-build-optimization.md` (2026-06-23)
+18. gentleman-agent-gh — `build-optimization.md` (2026-06-23)
 19. gentleman-agent-gh — `docs/optimization-consolidado/ronda3-synthesis.md` (2026-06-23)
 20. HTTP Toolkit — Brotli vs Gzip benchmark
 21. Wikipedia — HTTP/3 protocol comparison

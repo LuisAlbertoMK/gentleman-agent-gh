@@ -73,7 +73,7 @@
 | Plugins + MCP | 3 plugins (dcp, skillful, lazy-loader) + 3 MCP servers |
 | Context Engineering | −63.9% tokens (arXiv:2606.10209) |
 | File I/O optimization | ReadAllBytes 33.3× > Get-Content (verificado 10MB bench) |
-| Bitácora + Metrics | `docs/bitacora.md` + `docs/metricas/phase1-compactacion-20260614.md` |
+| Bitácora + Metrics | `docs/decisions/bitacora.md` + `docs/metricas/phase1-compactacion-20260614.md` |
 | Quality gate | 25/25 tests (5 niveles × 5), cross-ref 5/5 PASS |
 
 ---

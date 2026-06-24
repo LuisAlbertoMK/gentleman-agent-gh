@@ -10,7 +10,7 @@ if(Test-Path $x){$l=(Get-Item $x).Length;if($l-gt1KB){return"$([math]::Round($l/
 function ic{param([int]$R,[string]$pp)
 $r=@{};$sm=@{};Write-Host "`n  #$R Intake" -ForegroundColor Cyan;$rp=$null
 if(Test-Path "$pp\ROADMAP.md"){$rp="ROADMAP.md"}
-elseif(Test-Path "$pp\docs\roadmap.md"){$rp="docs/roadmap.md"}
+elseif(Test-Path "$pp\docs\roadmap.md"){$rp="docs/decisions/roadmap.md"}
 elseif(Test-Path "$pp\roadmap.md"){$rp="roadmap.md"}
 elseif(Test-Path "$pp\roadmap"){$rp="roadmap/ (dir)"}
 if($rp){$s2=sz "$pp\$rp";wr $chk "Roadmap $rp ($s2)";$r.rm=$chk;$sm.rm=10}

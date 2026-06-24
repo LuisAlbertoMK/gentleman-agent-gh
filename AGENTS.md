@@ -77,7 +77,7 @@ Comandos rápidos para tareas recurrentes — extienden el sistema de modos:
 | Keyword | Acción | Dificultad |
 |---------|--------|------------|
 | **`!compress`** | Karpathy compression en skills >2.5KB + score auto-update | Fácil |
-| **`!score`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\score-auto.ps1 -Json` + update docs/project-score.md + cross-ref | Fácil |
+| **`!score`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\score-auto.ps1 -Json` + update docs/operations/project-score.md + cross-ref | Fácil |
 | **`!sync`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\pull-upstream.ps1 -Mode Check` → drift check + agent sync (`-SyncAgents`) → score update | Medio |
 | **`!health`** | Full diagnostics: git status, drift, cross-ref, score, inter-track | Fácil |
 | **`!batch`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\batch.ps1` — nueva batch auto-incremental + bitácora + inter-track++ | Fácil |
@@ -188,7 +188,7 @@ Load order: 1) Anti-Pattern Catalog 2) Behavioral match 3) Trigger match 4) Defa
 | Skill validation | `$env:GENTLEMAN_AGENT_ROOT\scripts\skill-validate.ps1` — 3-trial benchmark |
 | Drift detection | `$env:GENTLEMAN_AGENT_ROOT\scripts\check-skill-drift.ps1` |
 | Sparse loading | `$env:GENTLEMAN_AGENT_ROOT\scripts\skill-graph.ps1` |
-| Quality standard | `docs/quality-standard.md` — 13-dim |
+| Quality standard | `docs/operations/quality-standard.md` — 13-dim |
 | Metrics | `docs/metricas/` — before/after for tasks ≥3 steps |
 
 <!-- /gentle-ai:persona -->
@@ -333,7 +333,7 @@ En el **primer mensaje del usuario** de cada sesión (antes de responder su cons
 2. **Si existe**:
    - Es un proyecto → leé `score.current` y `score.dimensions`
    - Si pasaron >7 días desde `score.last_updated` → tomá metricas frescas y actualizá `.project.json`
-    - Creá/actualizá `docs/project-score.md` con:
+    - Creá/actualizá `docs/operations/project-score.md` con:
      ```markdown
      # Project Score: {name}
      **Current**: {score.current}/10
