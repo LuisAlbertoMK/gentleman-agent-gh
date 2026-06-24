@@ -2,6 +2,13 @@
     "history":  [
                     {
                         "date":  "2026-06-24",
+                        "task":  "triple-verify-close-session",
+                        "self":  "10 8 9 9 8 10",
+                        "audit":  "8 8 9 8 8 7",
+                        "gaps":  "2 0 0 1 0 3"
+                    },
+                    {
+                        "date":  "2026-06-24",
                         "task":  "skill-resolution-engine-cycle9",
                         "self":  "9 8 10 9 8 8",
                         "audit":  "5 7 5 6 8 8",
@@ -13,22 +20,15 @@
                         "self":  "9 8 10 8 9 9",
                         "audit":  "5 7 7 5 8 5",
                         "gaps":  "4 1 3 3 1 4"
-                    },
-                    {
-                        "date":  "2026-06-20",
-                        "task":  "vmk-score-restore",
-                        "self":  "10 9 10 10 9 10",
-                        "audit":  "6 5 5 7 8 6",
-                        "gaps":  "4 4 5 3 1 4"
                     }
                 ],
     "samples":  3,
     "offsets":  {
-                    "Correctness":  4.0,
-                    "Tokens":  2.0,
-                    "ErrPrev":  4.33,
-                    "Skill":  3.0,
-                    "Speed":  0.67,
-                    "Breadth":  2.67
+                    "Correctness":  3.33,
+                    "Tokens":  0.67,
+                    "ErrPrev":  2.67,
+                    "Skill":  2.33,
+                    "Speed":  0.33,
+                    "Breadth":  2.33
                 }
 }

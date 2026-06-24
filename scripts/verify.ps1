@@ -3,13 +3,13 @@
   Unified verify profiles E1/E2/E3 -- runnable checks for triple-verify gates.
 #>
 param(
-    [ValidateSet('E1','E2','E3','All')][string]$Profile='All',
+    [ValidateSet('E1','E2','E3','All')][string]$ProfileName='All',
     [switch]$Json,
     [string]$Root=(Split-Path $PSScriptRoot -Parent)
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
-$r=@{profile=$Profile;checks=@();passed=0;failed=0;errors=@()}
+$r=@{profile=$ProfileName;checks=@();passed=0;failed=0;errors=@()}
 function Add-Check{
     param([string]$N,[bool]$P,[string]$D='')
     $script:r.checks+=@{name=$N;passed=$P;detail=$D}
@@ -107,7 +107,7 @@ function Invoke-E3Checks{
         Add-Check 'CYCLE.md' $true "Sections found: $($dt -join ', ')"
     }else{Add-Check 'CYCLE.md' $false 'Not found'}
 }
-switch($Profile){
+switch($ProfileName){
     'E1'{Invoke-E1Checks}
     'E2'{Invoke-E2Checks}
     'E3'{Invoke-E3Checks}

@@ -27,6 +27,7 @@ param(
     [switch]$Update
 )
 
+Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $Host.UI.RawUI.ForegroundColor = 'White'
 

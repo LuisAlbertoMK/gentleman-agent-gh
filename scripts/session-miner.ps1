@@ -1,6 +1,6 @@
 <# .SYNOPSIS Mine session histories for error patterns and propose corrections #>
 param([ValidateSet('scan','apply','check')][string]$Mode='scan',[switch]$Json,[int]$Threshold=2)
-Set-StrictMode -V 5.1;$ErrorActionPreference='Stop'
+Set-StrictMode -Version Latest;$ErrorActionPreference='Stop'
 $rr=Split-Path -Parent $PSScriptRoot
 $cp=Join-Path $rr 'ANTI-PATTERN-CATALOG.md';$ld=Join-Path $rr '.learnings'
 $ep=Join-Path $ld 'ERRORS.md';$lp=Join-Path $ld 'LEARNINGS.md'

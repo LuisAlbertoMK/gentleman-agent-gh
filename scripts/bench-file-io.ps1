@@ -15,7 +15,7 @@
 
 param(
   [string]$Path = "",
-  [string]$Dir = "D:\gentleman-agent-gh",
+  [string]$Dir = (Resolve-Path "$PSScriptRoot\..").Path,
   [ValidateRange(1,10)]
   [int]$Runs = 3
 )

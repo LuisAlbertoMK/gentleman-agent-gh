@@ -1,6 +1,6 @@
 #requires -Version 5.1
 <#.SYNOPSIS Benchmark system — score skill fitness, system health, track trends.#>param([switch]$Snapshot,[switch]$Gate,[switch]$Json)
-$ErrorActionPreference='Stop';Set-StrictMode -Ver Latest
+$ErrorActionPreference='Stop';Set-StrictMode -Version Latest
 $r=Convert-Path "$PSScriptRoot\.."
 $cd="$r\.agents\skills";$am="$r\AGENTS.md";$sd="$r\scripts";$sn="$r\docs\metricas\snapshots"
 $sk=@();foreach($i in @(gci $cd -Directory|?{$_.Name-ne'_shared'})){$m="$($i.FullName)\SKILL.md";if(!(test-path $m)){continue};$c=gc $m -Raw;$sk+=@{Name=$i.Name;Bytes=$c.Length;Lines=($c-split"`n").Count;F=$c-match"^---";W=$c-match"(?m)^## When to Use";R=$c-match"(?m)^## (Rules|Critical Rules)"}}
@@ -33,7 +33,7 @@ if($Gate){
       if($sys.TotalSkillBytes-gt$pz.TotalSkillBytes*1.05){$reg+="Total skill bytes grew >5% ($($pz.TotalSkillBytes)->$($sys.TotalSkillBytes))"}
       if($sys.SkillsOver3kb-gt$pz.SkillsOver3kb){$reg+="Skills >3KB increased ($($pz.SkillsOver3kb)->$($sys.SkillsOver3kb))"}
       if($sys.GlobalJunctionsOk-lt$pz.GlobalJunctionsOk){$reg+="Global junctions decreased ($($pz.GlobalJunctionsOk)->$($sys.GlobalJunctionsOk))"}
-    }catch{}
+    }catch{Write-Debug "bench: snapshot compare failed ($($_.Exception.Message))"}
   }
   if($reg.Count-gt0){echo "BENCHMARK REGRESSIONS:";$reg|%{echo "  - $_"}}else{dump $sys}
   if(!$Json){echo "   Skills: $($sys.TotalSkills) | Total: $($sys.TotalSkillBytes)B | >3KB: $($sys.SkillsOver3kb) | Junctions: $($sys.GlobalJunctionsOk)/$($sys.TotalSkills)"}

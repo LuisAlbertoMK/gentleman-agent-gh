@@ -6,6 +6,7 @@ param(
   [string]$BDir = "$env:USERPROFILE\.config\opencode\.bak\pre-sprint3-apply-20260607-005330",
   [string]$RDir = "$PSScriptRoot\.."
 )
+Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $RDir = (rvpa $RDir).Path
 try {

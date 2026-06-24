@@ -5,7 +5,7 @@
 #>
 param([switch]$Json)
 $ErrorActionPreference='Stop'
-Set-StrictMode -V Latest
+Set-StrictMode -Version Latest
 $ec=0;$r=@()
 function AR($s,$c,$st,$d){$script:r+=[PSCustomObject]@{Section=$s;Check=$c;Status=$st;Detail=$d};if($st-ne"PASS"){$script:ec=1}}
 function TSF($n){$sr=Split-Path -Par $PSCommandPath;$p=Join-Path $sr "..\.agents\skills\$n\SKILL.md";if(!(Test-Path $p)){AR Structure "Skill: $n" FAIL "Not found";return $null};return $p}

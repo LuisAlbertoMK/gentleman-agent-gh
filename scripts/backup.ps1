@@ -1,4 +1,5 @@
 #requires -Version 5.1
+Set-StrictMode -Version Latest
 param([string]$Message="",[switch]$Force)
 $cfg="$env:USERPROFILE\.config\opencode"
 if(-not(Test-Path $cfg)){Write-Host "[err] $cfg not found" -ForegroundColor Red;exit 1}
