@@ -134,10 +134,10 @@ function Get-AgentRecommendation {
     $result = @()
     foreach ($route in $agentRoutes) { if ($TaskText -match $route.Pattern) { $result += @($route.Skills | Where-Object { $_ -notin $result }) } }
     if ($result.Count -eq 0) {
-        $resolved = Resolve-Skill -TaskText $TaskText -MaxDepth 1
-        $result = $resolved | Where-Object Depth -eq 0 | Sort-Object Score -Descending | ForEach-Object { $_.Name }
+        $resolved = @(Resolve-Skill -TaskText $TaskText -MaxDepth 1)
+        $result = @($resolved | Where-Object Depth -eq 0 | Sort-Object Score -Descending | ForEach-Object { $_.Name })
     }
-    return $result
+    return @($result)
 }
 
 # Build fast lookup
@@ -160,17 +160,17 @@ if ([string]::IsNullOrWhiteSpace($Task)) {
 }
 
 if ($RecommendAgent) {
-    $recs = Get-AgentRecommendation -TaskText $Task
+    $recs = @(Get-AgentRecommendation -TaskText $Task)
     if ($Format -eq "Json") { @{Task=$Task;Recommendations=$recs;RegistrySize=$skillRegistry.Count} | ConvertTo-Json; exit 0 }
     Write-Host ("Recommendations for: $Task")-ForegroundColor Cyan
     $recs | ForEach-Object { Write-Host ("  skill: $_")-ForegroundColor White }
     Write-Host ("`n("+$recs.Count+" skills recommended)")-ForegroundColor Green; exit 0
 }
 
-$resolved = Resolve-Skill -TaskText $Task -MaxDepth $Expand
-if ($resolved.Count -eq 0) { Write-Host "No matching skills for: $Task"-ForegroundColor Yellow; exit 0 }
+$resolved = @(Resolve-Skill -TaskText $Task -MaxDepth $Expand)
 if ($Format -eq "Json") { $resolved | Select-Object Name,Score,Depth,Category,Effort,Description | ConvertTo-Json -Depth 2; exit 0 }
 if ($Format -eq "Csv") { $resolved | Select-Object Name,Score,Depth,Category,Effort | ConvertTo-Csv -NoTypeInformation; exit 0 }
+if ($resolved.Count -eq 0) { Write-Host "No matching skills for: $Task"-ForegroundColor Yellow; exit 0 }
 Write-Host ("Skills for: $Task  (depth=$Expand)")-ForegroundColor Cyan
 $resolved | ForEach-Object { $d=if($_.Depth -gt 0){" hop=$($_.Depth)"}else{""}; Write-Host ("  "+$_.Name+" [score=$($_.Score)]$d")-ForegroundColor White }
 Write-Host ("`n("+$resolved.Count+" skills resolved)")-ForegroundColor Green
