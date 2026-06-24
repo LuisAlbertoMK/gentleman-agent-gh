@@ -178,7 +178,7 @@ Load order: 1) Anti-Pattern Catalog 2) Behavioral match 3) Trigger match 4) Defa
 
 ## Project Context
 - **Repo**: Gentleman Agent — OpenCode agent skills, scripts & config
-- **Skills**: `.agents/skills/` (66 skills, git-tracked) · workspace `skills/` (junctions, git-ignored)
+- **Skills**: `.agents/skills/` (69 skills + `_shared`, git-tracked) · workspace `skills/` (junctions, git-ignored)
 - **Cycle manifest**: `CYCLE.md` — defines self-improvement objectives, metrics, difficulty mapping
 - **Global config**: junctions `$env:USERPROFILE\.config\opencode\skills/` → `.agents/skills/{name}`
 

@@ -1,11 +1,11 @@
 # Gentleman Agent — OpenCode AI Agent Skills & Scripts
 
-Suite de **69 skills profesionales** + **36 scripts PowerShell** para [OpenCode](https://github.com/sst/opencode). Diseñadas para desarrollo de software con arquitectura limpia, TDD, y verificación multi-capa.
+Suite de **69 skills** (+ `_shared`) + **36 scripts PowerShell** para [OpenCode](https://github.com/sst/opencode). Diseñadas para desarrollo de software con arquitectura limpia, TDD, y verificación multi-capa.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
-> **Score**: 9.7/10 (12 dimensiones)
-> **Skills**: 69 (100% <3KB SKILL.md, avg 1.7KB)
-> **Cycle**: 7 activo (score accuracy + script optimization)
+> **Score**: 9.9/10 (13 dimensiones)
+> **Skills**: 69 (+ `_shared` = 70 SKILL.md)
+> **Cycle**: 8 activo (score expansion + doc cleanup)
 
 ---
 
@@ -60,11 +60,9 @@ El proyecto ejecuta ciclos de mejora continua (CYCLE.md):
 
 ### Windows (PowerShell 5.1+)
 ```powershell
-# Clonar
+# Clonar e instalar
 git clone https://github.com/LuisAlbertoMK/gentleman-agent-gh.git
 cd gentleman-agent-gh
-
-# Instalar (crea junctions globales en ~/.config/opencode/skills/)
 .\scripts\install.ps1
 ```
 
@@ -118,7 +116,7 @@ El proyecto usa dos MCPs para memoria cross-session:
 
 | Script | Propósito |
 |--------|-----------|
-| `score-auto.ps1` | Auto-scoring del proyecto en 12 dimensiones |
+| `score-auto.ps1` | Auto-scoring del proyecto en 13 dimensiones + 32 sub-dims |
 | `skill-graph.ps1` | Resolución BFS de skills (carga sparse, −85-92%) |
 | `verify.ps1` | Triple verificación E1/E2/E3 |
 | `pssa-gate.ps1` | PSScriptAnalyzer con auto-fix de BOM |
@@ -139,7 +137,7 @@ El proyecto usa dos MCPs para memoria cross-session:
 | `smoke/smoke-all.ps1` | Tests de humo para claims de automatización |
 | `benchmark.ps1` | Benchmarking de skills y scripts |
 | `trend.ps1` | Análisis de tendencias de scoring |
-| `install.ps1` | Instalación con junctions globales |
+| `install.ps1` | Instalador de gentleman-agent-gh (junctions globales) |
 
 ---
 
@@ -147,7 +145,7 @@ El proyecto usa dos MCPs para memoria cross-session:
 
 ```
 gentleman-agent-gh/
-├── .agents/skills/          # 69 skills (canonical, git-tracked)
+├── .agents/skills/          # 69 skills + _shared (canonical, git-tracked)
 │   ├── quality-gate/
 │   ├── code-review-agent/
 │   └── .../
