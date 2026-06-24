@@ -100,12 +100,9 @@ docs/
 
 | Archivo | Qué contiene |
 |---------|-------------|
-| `optimization-plan.md` | Plan global de optimización (cumplido) |
-| `cycle-improvement-plan.md` | Plan de mejora de ciclo (cumplido) |
 | `benchmark-vs-backup.md` | Comparativa pre-sprint3 (histórica) |
-| `asrd.md` | Binario — imagen o archivo no legible |
-| `identity.md` | Binario — imagen o archivo no legible |
-| `soul.md` | Binario — imagen o archivo no legible |
+| `identity.md` | Declaración de identidad del agente (histórica) |
+| `soul.md` | Filosofía fundacional del agente (histórica) |
 
 ---
 

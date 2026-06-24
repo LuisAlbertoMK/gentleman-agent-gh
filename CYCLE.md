@@ -57,12 +57,12 @@
 | Item | Impact | Risk | I/R | Est. inter | Status | Done criteria |
 |------|--------|------|-----|------------|--------|---------------|
 | Script Performance: compress scripts >8KB to reduce avg <5KB | High | Low | 3.0 | 4-6 | ⏳ Pending | avg script size <5KB, no scripts >10KB |
-| Score expansion: sub-dimensions to break 10.0 ceiling | Medium | Low | 2.0 | 3 | ⏳ Pending | CYCLE.md defines sub-dims; score-auto.ps1 outputs them |
-| Clean Code: add params to last script without [Parameter()] | Medium | Low | 2.0 | 1 | ⏳ Pending | 36/36 scripts have [Parameter(Mandatory)] or documented no-param |
+| Score expansion: sub-dimensions to break 10.0 ceiling | Medium | Low | 2.0 | 1 | ✅ Done | CYCLE.md defines sub-dims; score-auto.ps1 outputs them (32 sub-dims across 12 dims) |
+| Clean Code: add params to last script without [Parameter()] | Medium | Low | 2.0 | 1 | ✅ Done | run.ps1 documented no-param by design (universal runner uses $args); score-auto.ps1 now recognizes |
 
 ### Cycle 8 Progress
-- Score: 9.9/10
-- inter: 0/30
+- Score: 9.9/10 (13 dims, post-expansion)
+- inter: 2/30
 
 ## Metrics
 
@@ -114,6 +114,26 @@ All 11 dims (plus new) at target. Cycle 6 adds integrity-focused dimensions.
 - **Automation**: upstream checks auto, dreaming auto, monitoring auto
 - **Delegation**: >=3 subagent delegations per session
 - **Hygiene**: working tree clean, atomic commits, cross-ref 0 errors
+
+## Sub-Dimension Taxonomy (Score Expansion)
+
+32 sub-dimensions across 12 dimensions, computed by `score-auto.ps1`. Each scores 0-10.
+Averages into **Score Depth** dimension (13th dim) for granularity beyond 10.0 ceiling.
+
+| Dimension | Sub-dims | How they're scored |
+|-----------|----------|-------------------|
+| Project Artifacts | readme, changelog, cross_ref, skills, project_json, roadmap | Each artifact exists → 10, missing → 0. Skills: min(SC/6, 10) |
+| Security | crypto, secrets | crypto: weak crypto present → 5 else 10. secrets: secrets found → 3 else 10 |
+| Dead Code | orphans, junctions, commented | ≤0→10, ≤5→7, else→5. Junctions: 0→10 else 7 |
+| Clean Code | help_rate, param_rate, strict_rate | (count/total) × 10 each |
+| Best Practices | param_cov, trycatch | (count/total) × 10 each |
+| Orthography | corruption | files=0→10, ≤5→9, ≤10→7, else→4 |
+| Bitacora | exists, content | exists→10 else 0. content: min(lines/2, 10) |
+| Metrics | metrics_dir, errors_dir, error_json, reports | each exists→10 else 0 |
+| Script Performance | count, avg_size, huge | count 15-35→10 else 7. avg ≤10KB→10. huge=0→10 |
+| Skill Effectiveness | skill_count, over_3kb, over_5kb, skill_avg | ≥60→10. 0 over→10. avg ≤2.0KB→10 |
+| Cycle Activity | inter_ratio | min((IC/IT)×10, 10) |
+| Backlog Integrity | integrity | passed/total × 10 |
 
 ## Difficulty -> Triple-Verify Mapping
 

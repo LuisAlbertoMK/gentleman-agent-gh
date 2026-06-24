@@ -84,10 +84,28 @@ ad "Cycle Activity" $Cyc 10 @{inter_count=$IC;inter_target=$IT} "inter: $IC/$IT"
 $BScript=Join-Path $PSScriptRoot 'check-backlog-integrity.ps1'
 if(Test-Path $BScript){$BJ=& $BScript -Json 2>&1|Out-String|ConvertFrom-Json;$BS=$BJ.score;$BP=$BJ.passed;$BT=$BJ.totalItems}else{$BS=0;$BP=0;$BT=0}
 ad "Backlog Integrity" $BS 10 @{passed=$BP;total=$BT} "$BP/$BT items match reality"
+# --- Sub-dimension mapping (evidence → 0-10 scores) ---
+$SDG=@{};function sdg($d,$n,$v){if(-not $SDG[$d]){$SDG[$d]=@{}};$SDG[$d][$n]=$v}
+$e=$L["Project Artifacts"].evidence;sdg "Project Artifacts" "readme" $(if($e.readme){10}else{0});sdg "Project Artifacts" "changelog" $(if($e.changelog){10}else{0});sdg "Project Artifacts" "cross_ref" $(if($e.cross_ref){10}else{0});sdg "Project Artifacts" "skills" $([math]::Min(10,$e.skills/6));sdg "Project Artifacts" "project_json" $(if($e.project_json){10}else{0});sdg "Project Artifacts" "roadmap" $(if($e.roadmap){10}else{0})
+$e=$L["Security"].evidence;sdg "Security" "crypto" $(if($e.weak_crypto){5}else{10});sdg "Security" "secrets" $(if($e.secrets){3}else{10})
+$e=$L["Dead Code"].evidence;sdg "Dead Code" "orphans" $(if($e.orphans -le 0){10}elseif($e.orphans -le 5){7}else{5});sdg "Dead Code" "junctions" $(if($e.dead_junctions -le 0){10}else{7});sdg "Dead Code" "commented" $(if($e.commented_out -le 10){10}else{7})
+$e=$L["Clean Code"].evidence;sdg "Clean Code" "help_rate" $([math]::Round($e.with_help/$e.total_scripts*10,1));sdg "Clean Code" "param_rate" $([math]::Round($e.with_params/$e.total_scripts*10,1));sdg "Clean Code" "strict_rate" $([math]::Round($e.with_strictmode/$e.total_scripts*10,1))
+$e=$L["Best Practices"].evidence;sdg "Best Practices" "param_cov" $([math]::Round($e.param_coverage/$TS*10,1));sdg "Best Practices" "trycatch" $([math]::Round($e.trycatch/$TS*10,1))
+$e=$L["Orthography"].evidence;sdg "Orthography" "corruption" $(if($e.corrupted_files -le 0){10}elseif($e.corrupted_files -le 5){9}elseif($e.corrupted_files -le 10){7}else{4})
+$e=$L["Bitacora"].evidence;sdg "Bitacora" "exists" $(if($e.exists){10}else{0});sdg "Bitacora" "content" $([math]::Min(10,$e.lines/2))
+$e=$L["Metrics"].evidence;sdg "Metrics" "metrics_dir" $(if($e.metrics_dir){10}else{0});sdg "Metrics" "errors_dir" $(if($e.errors_dir){10}else{0});sdg "Metrics" "error_json" $(if($e.error_json){10}else{0});sdg "Metrics" "reports" $(if($e.has_reports){10}else{0})
+$e=$L["Script Performance"].evidence;sdg "Script Performance" "count" $(if($e.script_count -ge 15 -and $e.script_count -le 35){10}else{7});sdg "Script Performance" "avg_size" $(if($e.avg_size_kb -le 10){10}elseif($e.avg_size_kb -le 15){7}else{5});sdg "Script Performance" "huge" $(if($e.over_50kb -le 0){10}else{5})
+$e=$L["Skill Effectiveness"].evidence;sdg "Skill Effectiveness" "skill_count" $(if($e.total_skills -ge 60){10}else{7});sdg "Skill Effectiveness" "over_3kb" $(if($e.over_3kb -le 0){10}elseif($e.over_3kb -le 1){9}else{7});sdg "Skill Effectiveness" "over_5kb" $(if($e.over_5kb -le 0){10}else{7});sdg "Skill Effectiveness" "skill_avg" $(if($e.avg_size_kb -le 2.0){10}elseif($e.avg_size_kb -le 2.5){9.5}else{7})
+$e=$L["Cycle Activity"].evidence;sdg "Cycle Activity" "inter_ratio" $([math]::Min(10,$e.inter_count/$e.inter_target*10))
+$e=$L["Backlog Integrity"].evidence;sdg "Backlog Integrity" "integrity" $($e.passed/$e.total*10)
+# Attach sub_dimensions to each dimension, compute Depth
+$SDAll=@();foreach($dim in $SDG.Keys){$L[$dim].sub_dimensions=$SDG[$dim];$SDAll+=$SDG[$dim].Values}
+$Depth=[math]::Round(($SDAll|measure -Average).Average,1)
+ad "Score Depth" $Depth 10 @{sub_dim_count=$SDAll.Count} "Avg of $($SDAll.Count) sub-dimensions: $Depth/10"
 $All=$L.Values|%{$_.score}
 $Final=[math]::Round(($All|measure -Average).Average,1)
-$dm=@("Project Artifacts","Security","Dead Code","Clean Code","Best Practices","Orthography","Bitacora","Metrics","Script Performance","Skill Effectiveness","Cycle Activity","Backlog Integrity")
+$dm=@("Project Artifacts","Security","Dead Code","Clean Code","Best Practices","Orthography","Bitacora","Metrics","Script Performance","Skill Effectiveness","Cycle Activity","Backlog Integrity","Score Depth")
 $r=@{score=@{current=$Final;dimensions=[ordered]@{};last_updated=(Get-Date -Format "yyyy-MM-dd");trend="stable"};dimensions_detail=$L}
 foreach($D in $dm){$r.score.dimensions[$D]=$L[$D].score}
 if(Test-Path ".project.json"){try{$Prev=gc ".project.json" -Raw -Encoding UTF8|ConvertFrom-Json;$PSc=$Prev.score.current;if($Final -gt $PSc){$r.score.trend="up"}elseif($Final -lt $PSc){$r.score.trend="down"}else{$r.score.trend="stable"};$LU=$Prev.score.last_updated;if($LU){$age=[int]((Get-Date)-(Get-Date $LU)).TotalDays;if($age -ge 1){Write-Host "WARNING: .project.json is $age day(s) stale (last: $LU)" -ForegroundColor Yellow}}}catch{$r.score.trend="unknown"}}
-if($Json){$r|ConvertTo-Json -Depth 4}elseif($Quiet){Write-Host "Score: $Final/10 (trend: $($r.score.trend))"}else{Write-Host "$($r.score.last_updated) | $Final/10 ($($r.score.trend))" -ForegroundColor Cyan;Write-Host "Dimensions:" -ForegroundColor Yellow;foreach($D in $dm){$d2=$L[$D];$C=if($d2.score -ge 9){"Green"}elseif($d2.score -ge 7){"Yellow"}else{"Red"};Write-Host " $($D.PadRight(16))$($d2.score.ToString('F1').PadLeft(4))/10" -ForegroundColor $C};Write-Host $("-"*32) -ForegroundColor Gray;Write-Host " TOTAL$(''.PadLeft(12))$($Final.ToString('F1').PadLeft(4))/10" -ForegroundColor White}
+if($Json){$r|ConvertTo-Json -Depth 5}elseif($Quiet){Write-Host "Score: $Final/10 (trend: $($r.score.trend))"}else{Write-Host "$($r.score.last_updated) | $Final/10 ($($r.score.trend))" -ForegroundColor Cyan;Write-Host "Dimensions:" -ForegroundColor Yellow;foreach($D in $dm){$d2=$L[$D];$C=if($d2.score -ge 9){"Green"}elseif($d2.score -ge 7){"Yellow"}else{"Red"};Write-Host " $($D.PadRight(16))$($d2.score.ToString('F1').PadLeft(4))/10" -ForegroundColor $C};Write-Host $("-"*32) -ForegroundColor Gray;Write-Host " TOTAL$(''.PadLeft(12))$($Final.ToString('F1').PadLeft(4))/10" -ForegroundColor White}

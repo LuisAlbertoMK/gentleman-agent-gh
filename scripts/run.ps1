@@ -19,6 +19,8 @@ $ErrorActionPreference = 'Continue'
     & "$env:USERPROFILE\.config\opencode\scripts\run.ps1" close-session.ps1
 #>
 
+# No [Parameter()] block: uses $args (unbound) by design — universal runner delegates to named script.
+# See .SYNOPSIS for usage.
 $__dir = Split-Path $MyInvocation.MyCommand.Path -Parent
 $__item = Get-Item $__dir
 

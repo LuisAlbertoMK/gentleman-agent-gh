@@ -1,11 +1,11 @@
 # Decision Portfolio
 
 > Documento fusionado que consolida 3 decisiones arquitectónicas del proyecto.
-> Los originales se preservan en `docs/archive/` para mantener git history y contenido intacto.
+> Los originales de model-router-verdict y corrections-r2-patch se preservan en `docs/archive/`;
+> gentleman-portable.md fue fusionado al 100% y eliminado.
 >
 > Origen | Tamaño | Tema
 > --- | --- | ---
-> `docs/archive/gentleman-portable.md` | 4.5KB | Corrección de herencia y portabilidad de gentleman-vMK
 > `docs/archive/model-router-verdict.md` | 3.5KB | Ruteo de modelos: Big Pickle, DeepSeek, MiMo
 > `docs/archive/corrections-r2-patch.md` | 16.8KB | 26 correcciones factuales a research docs
 
