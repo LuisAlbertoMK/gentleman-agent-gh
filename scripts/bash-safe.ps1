@@ -27,12 +27,20 @@ Set-StrictMode -Version Latest
     Self-test: 6/6 PASS (run Test-BashSafe after dot-sourcing).
 #>
 
-# Locate real bash interpreter
-$script:GitBash = "C:\Program Files\Git\bin\bash.exe"
-if (-not (Test-Path $script:GitBash)) {
+# Locate real bash interpreter — check 4 common locations + PATH fallback
+$script:GitBash = $null
+$bashCandidates = @(
+    "$env:ProgramFiles\Git\bin\bash.exe"
+    "${env:ProgramFiles(x86)}\Git\bin\bash.exe"
+    "$env:LOCALAPPDATA\Programs\Git\bin\bash.exe"
+    "$env:ChocolateyInstall\lib\git\tools\bin\bash.exe"
+)
+foreach ($c in $bashCandidates) {
+    if (Test-Path $c) { $script:GitBash = $c; break }
+}
+if (-not $script:GitBash) {
     $script:GitBash = (Get-Command bash -ErrorAction SilentlyContinue).Source
 }
-
 if (-not $script:GitBash -or -not (Test-Path $script:GitBash)) {
     throw "No bash interpreter found. Install Git for Windows or WSL."
 }

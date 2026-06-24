@@ -38,7 +38,7 @@ try {
     Write-Host "[ok] $count new junctions (total available: $totalSkills)" -ForegroundColor Green
 } catch {
     Write-Host "[err] Skills installation failed: $_" -ForegroundColor Red
-    exit 1
+    throw
 }
 
 # Scripts
@@ -52,7 +52,7 @@ try {
     }
 } catch {
     Write-Host "[err] Scripts installation failed: $_" -ForegroundColor Red
-    exit 1
+    throw
 }
 
 Write-Host ""

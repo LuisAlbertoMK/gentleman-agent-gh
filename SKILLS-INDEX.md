@@ -26,15 +26,15 @@
 | Context >100K tokens, context explosion | context-watchdog |
 | Recovery, "no es eso", frustration | recovery-protocol |
 | Resume, "dónde lo dejamos", "continuá", git state gate | session-resume |
-| SDD init, bootstrap | sdd (phase 00-init) |
-| Explore codebase, pre-design | sdd (phase 01-explore) |
-| Proposal, intent, approach | sdd (phase 02-propose) |
-| Technical design, HOW | sdd (phase 03-design) |
-| Specs, Given/When/Then | sdd (phase 04-spec) |
-| Task breakdown, implementation plan | sdd (phase 05-tasks) |
-| Apply tasks, implement | sdd (phase 06-apply) |
-| Validate vs specs, verify | sdd (phase 07-verify) |
-| Archive changes, delta to main | sdd (phase 08-archive) |
+| SDD init, bootstrap | sdd-init |
+| Explore codebase, pre-design | sdd-explore |
+| Proposal, intent, approach | sdd-propose |
+| Technical design, HOW | sdd-design |
+| Specs, Given/When/Then | sdd-spec |
+| Task breakdown, implementation plan | sdd-tasks |
+| Apply tasks, implement | sdd-apply |
+| Validate vs specs, verify | sdd-verify |
+| Archive changes, delta to main | sdd-archive |
 | Decision capture, trade-off log | decision-capture |
 | Execution mode, resource-adaptive zones, quick/thorough/draft | execution-mode |
 | Skill digestion, compact on load | skill-digestion |
@@ -88,7 +88,7 @@
 - **Skills meta**: skill-creator, skill-registry, skill-improver, skill-digestion, skill-graph
 - **Coordination**: delivery-harness, chained-pr, branch-pr, issue-creation, subagent-isolation, command-wrapper, opencode-model-router
 - **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner
-- **SDD**: sdd (SKILL.md) + phases/ (00-init → 08-archive) + sdd-onboard — wrappers at sdd-* for backward compat
+- **SDD**: sdd-init, sdd-explore, sdd-propose, sdd-spec, sdd-design, sdd-tasks, sdd-apply, sdd-verify, sdd-archive, sdd-onboard, plus sdd (unified pipeline wrapper)
 - **UI/Design**: baseline-ui, accessibility, performance, seo, web-quality-audit
 
 - **Communication**: comment-writer, cognitive-doc-design

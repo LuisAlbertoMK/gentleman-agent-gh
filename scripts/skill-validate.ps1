@@ -47,6 +47,8 @@ if ($TrialToolCalls.Count -ne 3 -or $TrialTokens.Count -ne 3 -or $TrialScores.Co
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
+try {
+
 $avgToolCalls = [Math]::Round(($TrialToolCalls | Measure-Object -Average).Average, 1)
 $avgTokens    = [Math]::Round(($TrialTokens | Measure-Object -Average).Average, 0)
 $avgScore     = [Math]::Round(($TrialScores | Measure-Object -Average).Average, 1)
@@ -170,4 +172,8 @@ if ($OutputJson) {
 } else {
   Write-Output $report
   Write-Output $scoring
+}
+} catch {
+    Write-Error "skill-validate failed: $_"
+    throw
 }
