@@ -4,7 +4,6 @@ param([string]$Task="",[ValidateRange(0,3)][int]$Expand=1,[switch]$ListAll,[swit
 Set-StrictMode -Version Latest; $ErrorActionPreference='Stop'
 $skillRegistry=@()
 function Add-Skill { param([string]$Name,[string[]]$Triggers,[string]$Category="general",[ValidateSet("low","medium","high")][string]$Effort="medium",[string[]]$DependsOn=@(),[string[]]$Related=@(),[string]$Description=""); $script:skillRegistry+=[PSCustomObject]@{Name=$Name;Triggers=$Triggers;Category=$Category;DependsOn=$DependsOn;Related=$Related;Description=$Description;Effort=$Effort} }
-
 try {
 Add-Skill "karpathy-loop" @("karpathy","less tokens","context compression","compact prompt","karpathy loop","optimize prompt","measure tokens") compression low @() @() "Karpathy-style compression + iterative loop"
 Add-Skill "lean-context" @("compact","less tokens","caveman","ultra-lean","minimal context") compression low @() @() "Ultra-lean context mode"
@@ -89,6 +88,59 @@ function New-Graph {
     return $g
 }
 
+# BFS skill resolution with keyword scoring (tokens>2 chars)
+function Resolve-Skill {
+    param([string]$TaskText,[int]$MaxDepth=1)
+    $tokens = $TaskText.ToLowerInvariant() -split '\s+|[-_/.,!?;:()]' | Where-Object { $_.Length -gt 2 } | Select-Object -Unique
+    $scores = @{}
+    foreach ($s in $script:skillRegistry) {
+        $matchCount = 0
+        foreach ($t in $tokens) { foreach ($tr in $s.Triggers) { if ($tr.ToLowerInvariant() -match $t) { $matchCount++; break } } }
+        if ($matchCount -gt 0) { $scores[$s.Name] = $matchCount }
+    }
+    $matched = $scores.Keys | Sort-Object { $scores[$_] } -Descending
+    $g = New-Graph; $visited = @{}; $queue = [System.Collections.Queue]::new(); $depth = @{}
+    foreach ($m in $matched) { $queue.Enqueue($m); $depth[$m] = 0; $visited[$m] = $true }
+    while ($queue.Count -gt 0) {
+        $current = $queue.Dequeue()
+        if ($depth[$current] -ge $MaxDepth) { continue }
+        foreach ($neighbor in $g.AdjList[$current].to.Keys) {
+            if (-not $visited[$neighbor]) { $visited[$neighbor] = $true; $depth[$neighbor] = $depth[$current] + 1; $queue.Enqueue($neighbor) }
+        }
+    }
+    $result = $visited.Keys | ForEach-Object { $s = $script:RegistryLookup[$_]; [PSCustomObject]@{ Name = $_; Score = if ($scores.ContainsKey($_)) { $scores[$_] } else { 0 }; Depth = $depth[$_]; DependsOn = $s.DependsOn; Related = $s.Related; Category = $s.Category; Effort = $s.Effort; Description = $s.Description } }
+    return ($result | Sort-Object Depth, { -$_.Score })
+}
+
+# Agent routing table (13 regex routes)
+$agentRoutes = @(
+    @{ Pattern = '(?i)(?:review|audit|check|quality|verify|validate)\s.*(?:code|security|skill|pr)'; Skills = @('code-review-agent','security-scanner','quality-gate','triple-verify') }
+    @{ Pattern = '(?i)(?:fix|bug|error|crash|issue|problem|broken|not\s+working)'; Skills = @('recovery-protocol','immune-system','triple-verify') }
+    @{ Pattern = '(?i)(?:design|architecture|plan|propose|proposal)'; Skills = @('senior-engineer','sdd-propose','sdd-design') }
+    @{ Pattern = '(?i)(?:test|testing|coverage|spec|specification)'; Skills = @('skill-testing','sdd-spec','sdd-verify','go-testing') }
+    @{ Pattern = '(?i)(?:doc|documentation|readme|guide|manual|help)'; Skills = @('cognitive-doc-design','doc-sync') }
+    @{ Pattern = '(?i)(?:commit|pr|pull.request|merge|ship|push)'; Skills = @('commit-crafter','quality-gate','branch-pr','chained-pr') }
+    @{ Pattern = '(?i)(?:deploy|ci|cd|pipeline|github.action|release)'; Skills = @('ci-cd','command-wrapper') }
+    @{ Pattern = '(?i)(?:refactor|restructur|clean|migrat|extract)'; Skills = @('refactoring-planner','lean-context') }
+    @{ Pattern = '(?i)(?:performance|speed|slow|lazy|load\s+time|render|optimize|compress)'; Skills = @('karpathy-loop','performance','lean-context','caveman') }
+    @{ Pattern = '(?i)(?:accessib|a11y|wcad|screen\s+reader)'; Skills = @('accessibility') }
+    @{ Pattern = '(?i)(?:seo|search|meta|sitemap|structured.data)'; Skills = @('seo') }
+    @{ Pattern = '(?i)(?:research|investigar|compare|evaluate|learn)'; Skills = @('research','prompt-engineering') }
+    @{ Pattern = '(?i)(?:mapear|map|project\s+structure|tech\s+stack|audit\s+project)'; Skills = @('project-mapper','gap-analysis') }
+)
+function Get-AgentRecommendation {
+    param([string]$TaskText)
+    $result = @()
+    foreach ($route in $agentRoutes) { if ($TaskText -match $route.Pattern) { $result += @($route.Skills | Where-Object { $_ -notin $result }) } }
+    if ($result.Count -eq 0) {
+        $resolved = Resolve-Skill -TaskText $TaskText -MaxDepth 1
+        $result = $resolved | Where-Object Depth -eq 0 | Sort-Object Score -Descending | ForEach-Object { $_.Name }
+    }
+    return $result
+}
+
+# Run
+$script:RegistryLookup = @{}; foreach ($s in $script:skillRegistry) { $script:RegistryLookup[$s.Name] = $s }
 $graph = New-Graph
 if ($ListAll) {
     $groups = $skillRegistry | Group-Object Category
@@ -96,5 +148,23 @@ if ($ListAll) {
     if ($Format -eq "Csv") { $flat=foreach($g in $groups){foreach($s in $g.Group|Sort-Object Name){[PSCustomObject]@{Category=$g.Name;Skill=$s.Name;Effort=$s.Effort;DependsOn=if($s.DependsOn.Count-gt0){$s.DependsOn-join"; "}else{""};Related=if($s.Related.Count-gt0){$s.Related-join"; "}else{""}}}}; $flat|ConvertTo-Csv -NoTypeInformation; exit 0 }
     foreach ($g in $groups) { Write-Host ("`n["+$g.Name.ToUpper()+"]  ("+$g.Count+" skills)")-ForegroundColor Green; $g.Group|Sort-Object Name|ForEach-Object{$deps=if($_.DependsOn.Count-gt0){"  deps: "+($_.DependsOn-join", ")}else{""};$eff=if($_.Effort-ne"medium"){"  ["+$_.Effort+"]"}else{""};Write-Host ("  "+$_.Name+$eff+$deps)-ForegroundColor White} }; Write-Host ("`nTotal: "+$skillRegistry.Count+" skills in "+$groups.Count+" categories")-ForegroundColor Cyan; exit 0
 }
-if ([string]::IsNullOrWhiteSpace($Task)) { Write-Host "Usage:"-ForegroundColor Yellow; Write-Host ("  .\scripts\skill-graph.ps1 -Task `"<task>`" [-Expand N] [-Format Json|Csv]")-ForegroundColor Cyan; Write-Host ("  .\scripts\skill-graph.ps1 -ListAll [-Format Json|Csv]")-ForegroundColor Cyan; Write-Host ""; Write-Host ("Registry: "+$skillRegistry.Count+" skills")-ForegroundColor Green; exit 0 }
-Write-Host "Not yet implemented beyond ListAll" -ForegroundColor Yellow
+if ([string]::IsNullOrWhiteSpace($Task)) {
+    Write-Host "Usage:"-ForegroundColor Yellow
+    Write-Host ("  .\scripts\skill-graph.ps1 -Task `"<task>`" [-Expand N] [-Format Json|Csv]")-ForegroundColor Cyan
+    Write-Host ("  .\scripts\skill-graph.ps1 -Task `"<task>`" -RecommendAgent")-ForegroundColor Cyan
+    Write-Host ("`nRegistry: "+$skillRegistry.Count+" skills")-ForegroundColor Green; exit 0
+}
+if ($RecommendAgent) {
+    $recs = Get-AgentRecommendation -TaskText $Task
+    if ($Format -eq "Json") { @{Task=$Task;Recommendations=$recs;RegistrySize=$skillRegistry.Count} | ConvertTo-Json; exit 0 }
+    Write-Host ("Recommendations for: $Task")-ForegroundColor Cyan
+    $recs | ForEach-Object { Write-Host ("  skill: $_")-ForegroundColor White }
+    Write-Host ("`n("+$recs.Count+" skills recommended)")-ForegroundColor Green; exit 0
+}
+$resolved = Resolve-Skill -TaskText $Task -MaxDepth $Expand
+if ($resolved.Count -eq 0) { Write-Host "No matching skills for: $Task"-ForegroundColor Yellow; exit 0 }
+if ($Format -eq "Json") { $resolved | Select-Object Name,Score,Depth,Category,Effort,Description | ConvertTo-Json -Depth 2; exit 0 }
+if ($Format -eq "Csv") { $resolved | Select-Object Name,Score,Depth,Category,Effort | ConvertTo-Csv -NoTypeInformation; exit 0 }
+Write-Host ("Skills for: $Task  (depth=$Expand)")-ForegroundColor Cyan
+$resolved | ForEach-Object { $d=if($_.Depth -gt 0){" hop=$($_.Depth)"}else{""}; Write-Host ("  "+$_.Name+" [score=$($_.Score)]$d")-ForegroundColor White }
+Write-Host ("`n("+$resolved.Count+" skills resolved)")-ForegroundColor Green
