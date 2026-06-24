@@ -12,12 +12,13 @@
 
 **Cycle 8** (CLOSED): Script performance optimization. Compressed remaining large scripts, pushed avg to <5KB, expanded score taxonomy with sub-dimensions. **Result**: SUCCESS (3/3 backlog items, inter 66/30, score 9.9/10).
 
-**Cycle 9**: [TBD — pending user selection]
+**Cycle 9**: Skill Resolution Engine. Transform `skill-graph.ps1` into a semantic resolver with BFS keyword scoring, regex-based agent routing, and multi-format output.
 
 ### Pillars
 1. **Script Performance** — reduce avg script size from 6.4KB to <5KB. Compress scripts >8KB. (✅ Cycle 8)
 2. **Score expansion** — implement sub-dimension taxonomy to break the 10.0 ceiling on key metrics. (✅ Cycle 8)
 3. **Clean Code refinement** — add `[Parameter(Mandatory)]` to remaining script without params → 36/36. (✅ Cycle 8)
+4. **Skill Resolution** — BFS resolution with keyword scoring + 13-route agent routing table. (🟢 Cycle 9 active)
 
 ### Cycle 6 Backlog (CLOSED)
 | Item | Impact | Risk | I/R | Est. inter | Status | Done criteria |
@@ -70,9 +71,18 @@
 - Score Expansion: ✅ 32 sub-dims across 12 dims
 - Clean Code: ✅ params on remaining scripts, run.ps1 documented exception
 
+### Cycle 9 Progress
+- Score: pending re-score
+- inter: 67/30 (continuing from Cycle 8)
+- Backlog Completion: 2/3 items done
+- Skill Resolution Engine: ✅ BFS keyword scoring + 13-route regex routing + 3 format modes
+- Edge case fixes: ✅ null array safety, format-before-count order, no-match handling
+
 ### Cycle 9 Backlog
 | Item | Impact | Risk | I/R | Est. inter | Status | Done criteria |
 |------|--------|------|-----|------------|--------|---------------|
+| Skill Resolution Engine: BFS + agent routing in skill-graph.ps1 | High | Medium | 1.5 | 2-3 | ✅ Done | `Resolve-Skill` returns scored skills by BFS; `Get-AgentRecommendation` routes by 13 regex patterns + BFS fallback; -Format Json/Csv/Text; tested (ListAll, Task, RecommendAgent) |
+| Fix edge cases: @() guards, null array safety | Medium | Low | 2.0 | 1 | ✅ Done | No-match tasks don't crash; RecommendAgent returns 0 on no match; Json format exits before count check |
 | [TBD] | | | | | ⏳ Pending | |
 
 ## Metrics
