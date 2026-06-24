@@ -1,6 +1,6 @@
 # Roadmap: Items Pendientes (Post-Prioridad)
 
-> **Contexto**: Tras la tanda de prioridad (scripts try/catch, model pins, SKILLS-INDEX, 
+> **Contexto**: Tras la tanda de prioridad (scripts try/catch, model pins, SKILLS-INDEX,
 > skill-graph restore, bash path auto-detect), quedan 3 items de esfuerzo mayor.
 > Fecha: 2026-06-23
 
@@ -38,12 +38,12 @@ Un solo script que detecte OS, clone el repo, corra install.sh/install.ps1, y co
 
 ## 2. Backup/Rollback de Configuración
 
-**Problema**: No hay mecanismo de backup para `~/.config/opencode/`. Cambios en 
+**Problema**: No hay mecanismo de backup para `~/.config/opencode/`. Cambios en
 skills/config pueden romper el entorno sin forma de volver atrás.
 
 **Objetivo**: `gentleman backup` / `gentleman restore` que snapshot y restaure configuración.
 
-| Opción | Esfuerzo | Confiabilidad | 
+| Opción | Esfuerzo | Confiabilidad |
 |--------|----------|---------------|
 | A: Git snapshot del directorio | Bajo | Alta (git) |
 | B: Tarball/zip + timestamp | Bajo | Media |
@@ -67,7 +67,7 @@ B como fallback si git no está disponible.
 
 ## 3. AGENTS.md Portabilidad (bash/zsh)
 
-**Problema**: AGENDS.md tiene ~58 referencias PowerShell (`$env:`, `.ps1`, `Invoke-Bash`, 
+**Problema**: AGENDS.md tiene ~58 referencias PowerShell (`$env:`, `.ps1`, `Invoke-Bash`,
 `; if ($?)`). Solo funciona con PowerShell 5.1 en Windows. Score actual: 3/10.
 
 **Objetivo**: AGENTS.md funcional en bash/zsh + pwsh (Linux/Mac/Windows). Score target: 8/10.
