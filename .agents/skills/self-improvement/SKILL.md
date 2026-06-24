@@ -16,7 +16,7 @@ metadata:
 ### 0: Pre-Flight
 LOAD CYCLE.md · READ Engram #645 (external repos) · CHECK autoresearch/GGA/gentle-ai/engram · RUN `check-skill-drift.ps1` · CAPTURE baseline: `score-auto.ps1`
 ### 1: Diagnose
-Read `.project.json`+`PROJECT-SCORE.md` → lowest dimension → fix candidates by impact/ease.
+Read `.project.json`+`docs/project-score.md` → lowest dimension → fix candidates by impact/ease.
 ### 2: Execute (per fix)
 Backup git snapshot → Apply change → Determine difficulty (CYCLE.md table) → triple-verify per level → Cache result → Log: `inter-track.ps1 -Increment` + bitácora
 ### 3: Verify Cycle

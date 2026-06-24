@@ -44,7 +44,7 @@ El proyecto ejecuta ciclos de mejora continua (CYCLE.md):
 | Keyword | Action |
 |---------|--------|
 | `!compress` | Karpathy compress skills >2.5KB + score update |
-| `!score` | Score auto-update + PROJECT-SCORE.md sync |
+| `!score` | Score auto-update + docs/project-score.md sync |
 | `!sync` | Upstream check + drift + score update |
 | `!health` | Full diagnostics (git, drift, cross-ref, score, inter) |
 | `!batch` | New batch with auto-increment + bitacora + inter-track++ |

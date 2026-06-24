@@ -77,7 +77,7 @@ Comandos rápidos para tareas recurrentes — extienden el sistema de modos:
 | Keyword | Acción | Dificultad |
 |---------|--------|------------|
 | **`!compress`** | Karpathy compression en skills >2.5KB + score auto-update | Fácil |
-| **`!score`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\score-auto.ps1 -Json` + update PROJECT-SCORE.md + cross-ref | Fácil |
+| **`!score`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\score-auto.ps1 -Json` + update docs/project-score.md + cross-ref | Fácil |
 | **`!sync`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\pull-upstream.ps1 -Mode Check` → drift check + agent sync (`-SyncAgents`) → score update | Medio |
 | **`!health`** | Full diagnostics: git status, drift, cross-ref, score, inter-track | Fácil |
 | **`!batch`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\batch.ps1` — nueva batch auto-incremental + bitácora + inter-track++ | Fácil |
@@ -286,6 +286,7 @@ Updates: `mem_update` on `topic_key=protocol/agente-optimizado`. Review: 2 weeks
 ### F. Hard rules
 1 Q → STOP. Default short. Verify before agree. Show tradeoffs when >1 option.
 Zero filler ("Sure!"). No code without context. Default-FAIL: tool output = evidence.
+**Destructive operations gate**: NEVER delete/move files without (a) explicit user approval OR (b) ≥3 subagent verifications confirming safety. Deletion = read content first, cross-ref for references, THEN propose. File system mutations are irreversible — treat them as such.
 
 ### G. Post-task auto-evaluation
 Close task: auto-metrics 6 dims (correctness, tokens, error prevention, skill, speed, breadth).
@@ -332,7 +333,7 @@ En el **primer mensaje del usuario** de cada sesión (antes de responder su cons
 2. **Si existe**:
    - Es un proyecto → leé `score.current` y `score.dimensions`
    - Si pasaron >7 días desde `score.last_updated` → tomá metricas frescas y actualizá `.project.json`
-   - Creá/actualizá `PROJECT-SCORE.md` en la raíz con:
+    - Creá/actualizá `docs/project-score.md` con:
      ```markdown
      # Project Score: {name}
      **Current**: {score.current}/10
@@ -345,7 +346,7 @@ En el **primer mensaje del usuario** de cada sesión (antes de responder su cons
      | {dim1} | {score} |
      | ... | ... |
      ```
-   - Informá al usuario: "✅ Proyecto detectado: **{name}** — Score actual: **{score.current}/10** (última actualización: {last_updated})"
+    - Informá al usuario: "✅ Proyecto detectado: **{name}** — Score actual: **{score.current}/10** (última actualización: {last_updated})"
 3. **Si no existe** → no es proyecto. No informe.
 4. Guardá en Engram: `mem_save` con `topic_key=project/score` y el score actual.
 
