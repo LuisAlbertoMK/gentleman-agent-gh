@@ -4,15 +4,28 @@
     Gentleman Agent -- OpenCode skill installer (Windows).
     Creates junctions from repo skills/scripts to ~/.config/opencode/.
 .DESCRIPTION
-    Usage: .\scripts\install.ps1
-    Requires: git clone of gentleman-agent-gh completed.
-    Creates global junctions so OpenCode can load skills from any directory.
+    Usage: .\scripts\install.ps1  (from local clone)
+       or: irm https://raw.githubusercontent.com/LuisAlbertoMK/gentleman-agent-gh/main/scripts/install.ps1 | iex
+    Creates global junctions so OpenCode can load skills and scripts from any
+    directory.
 .NOTES
-    This installs gentleman-agent-gh, NOT Gentle-AI.
+    This installs gentleman-agent-gh skills (for OpenCode), NOT Gentle-AI.
     For Gentle-AI see https://github.com/Gentleman-Programming/gentle-ai
 #>
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
+
+# Bootstrap: if piped via "irm url | iex" (no local repo), clone and re-invoke
+$needClone = (-not $PSScriptRoot) -or (-not (Test-Path "$PSScriptRoot\..\.git" -ErrorAction SilentlyContinue))
+if ($needClone) {
+    Write-Host "==> Cloning gentleman-agent-gh..." -ForegroundColor Cyan
+    $tmp = Join-Path $env:TEMP "gentleman-agent-gh-$([System.IO.Path]::GetRandomFileName())"
+    git clone --depth 1 https://github.com/LuisAlbertoMK/gentleman-agent-gh.git $tmp 2>&1 | Out-Null
+    if (-not (Test-Path "$tmp\.git")) { throw "Clone failed. Ensure git is installed, or run: git clone https://github.com/LuisAlbertoMK/gentleman-agent-gh.git" }
+    & "$tmp\scripts\install.ps1"
+    Remove-Item -Recurse -Force $tmp -ErrorAction SilentlyContinue
+    return
+}
 
 $srcSkills = Resolve-Path "$PSScriptRoot\..\.agents\skills" -ErrorAction Stop
 $dstSkills = "$env:USERPROFILE\.config\opencode\skills"
