@@ -8,11 +8,22 @@ set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 SKILLS_SRC="$REPO_DIR/.agents/skills"
-SKILLS_DST="$HOME/.config/opencode/skills"
+SKILLS_DST="${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills"
 SCRIPTS_SRC="$REPO_DIR/scripts"
-SCRIPTS_DST="$HOME/.config/opencode/scripts"
+SCRIPTS_DST="${XDG_CONFIG_HOME:-$HOME/.config}/opencode/scripts"
 
 echo "==> Gentleman Agent Installer (Unix)"
+
+# Detect package managers for info
+if command -v brew &>/dev/null; then
+    echo "[info] Homebrew detected at $(brew --prefix)"
+fi
+if command -v scoop &>/dev/null; then
+    echo "[info] Scoop detected at $SCOOP"
+fi
+if command -v choco &>/dev/null; then
+    echo "[info] Chocolatey detected"
+fi
 
 mkdir -p "$SKILLS_DST" "$SCRIPTS_DST"
 

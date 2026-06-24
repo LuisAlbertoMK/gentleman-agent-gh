@@ -35,6 +35,11 @@ $dstScripts = "$env:USERPROFILE\.config\opencode\scripts"
 Write-Host "==> Gentleman Agent Installer (Windows)" -ForegroundColor Cyan
 Write-Host ""
 
+# Detect package managers
+if (Get-Command scoop -ErrorAction SilentlyContinue) { Write-Host "[info] Scoop detected" -ForegroundColor Blue }
+if (Get-Command choco -ErrorAction SilentlyContinue) { Write-Host "[info] Chocolatey detected" -ForegroundColor Blue }
+if (Get-Command winget -ErrorAction SilentlyContinue) { Write-Host "[info] Winget detected" -ForegroundColor Blue }
+
 # Skills
 Write-Host "[info] Installing skills..." -ForegroundColor Blue
 try {

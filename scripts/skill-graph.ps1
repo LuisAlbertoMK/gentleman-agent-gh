@@ -100,6 +100,7 @@ function Resolve-Skill {
     }
     $matched = $scores.Keys | Sort-Object { $scores[$_] } -Descending
     $g = New-Graph; $visited = @{}; $queue = [System.Collections.Queue]::new(); $depth = @{}
+
     foreach ($m in $matched) { $queue.Enqueue($m); $depth[$m] = 0; $visited[$m] = $true }
     while ($queue.Count -gt 0) {
         $current = $queue.Dequeue()
@@ -139,8 +140,10 @@ function Get-AgentRecommendation {
     return $result
 }
 
-# Run
-$script:RegistryLookup = @{}; foreach ($s in $script:skillRegistry) { $script:RegistryLookup[$s.Name] = $s }
+# Build fast lookup
+$script:RegistryLookup = @{}
+foreach ($s in $script:skillRegistry) { $script:RegistryLookup[$s.Name] = $s }
+
 $graph = New-Graph
 if ($ListAll) {
     $groups = $skillRegistry | Group-Object Category
@@ -151,9 +154,11 @@ if ($ListAll) {
 if ([string]::IsNullOrWhiteSpace($Task)) {
     Write-Host "Usage:"-ForegroundColor Yellow
     Write-Host ("  .\scripts\skill-graph.ps1 -Task `"<task>`" [-Expand N] [-Format Json|Csv]")-ForegroundColor Cyan
+    Write-Host ("  .\scripts\skill-graph.ps1 -ListAll [-Format Json|Csv]")-ForegroundColor Cyan
     Write-Host ("  .\scripts\skill-graph.ps1 -Task `"<task>`" -RecommendAgent")-ForegroundColor Cyan
     Write-Host ("`nRegistry: "+$skillRegistry.Count+" skills")-ForegroundColor Green; exit 0
 }
+
 if ($RecommendAgent) {
     $recs = Get-AgentRecommendation -TaskText $Task
     if ($Format -eq "Json") { @{Task=$Task;Recommendations=$recs;RegistrySize=$skillRegistry.Count} | ConvertTo-Json; exit 0 }
@@ -161,6 +166,7 @@ if ($RecommendAgent) {
     $recs | ForEach-Object { Write-Host ("  skill: $_")-ForegroundColor White }
     Write-Host ("`n("+$recs.Count+" skills recommended)")-ForegroundColor Green; exit 0
 }
+
 $resolved = Resolve-Skill -TaskText $Task -MaxDepth $Expand
 if ($resolved.Count -eq 0) { Write-Host "No matching skills for: $Task"-ForegroundColor Yellow; exit 0 }
 if ($Format -eq "Json") { $resolved | Select-Object Name,Score,Depth,Category,Effort,Description | ConvertTo-Json -Depth 2; exit 0 }
