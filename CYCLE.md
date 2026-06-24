@@ -73,11 +73,12 @@
 
 ### Cycle 9 Progress
 - Score: **10/10** 🏆 — first perfect score across all 13 dimensions
-- inter: 92/30 (continuing from Cycle 8)
+- inter: 96/30 (continuing from Cycle 8)
 - Backlog Completion: 3/3 items done ✅
 - Skill Resolution Engine: ✅ BFS keyword scoring + 13-route regex routing + 3 format modes
 - Edge case fixes: ✅ null array safety, format-before-count order, no-match handling
 - Score integrity: ✅ Dead Code regex hardened (0 false positives), Script Performance threshold calibrated (35→45), 2 scripts gained help + 1 StrictMode
+- Agent split: ✅ gentleman-* in global + project, SDD project-only, pipeline fixed
 
 ### Cycle 9 Backlog
 | Item | Impact | Risk | I/R | Est. inter | Status | Done criteria |
@@ -217,4 +218,4 @@ Cycle 5 (automation-first) 2026-06-20.
 Cycle 6 (metric integrity) 2026-06-21. ✅ CLOSED (5/6, inter 49/30)
 Cycle 7 (score accuracy + script optimization) 2026-06-21. ✅ CLOSED (5/5, inter 51/30)
 Cycle 8 (script performance optimization) 2026-06-22. ✅ CLOSED (3/3, inter 66/30, score 9.9/10)
-Cycle 9 (Skill Resolution Engine) 2026-06-24. 🟢 ACTIVE (2/3, inter 89/30, score 9.8/10)
+Cycle 9 (Skill Resolution Engine) 2026-06-24. 🟢 ACTIVE (3/3, inter 96/30, score 10/10)

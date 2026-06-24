@@ -85,7 +85,7 @@ function Sync-AgentDefinition{
   if(Test-Path $sa -PathType Leaf){Copy-Item -LiteralPath $sa -Destination $da -Force;Write-Output "  [synced] AGENTS.md"}
   else{Write-Warning "  AGENTS.md not found at $sa"}
   # Write updated config
-  $gj|ConvertTo-Json -Depth 10|Set-Content $gcp -Encoding UTF8
+  $gj|ConvertTo-Json -Depth 10|Set-Content $gcp -Encoding UTF8 -Force
   Write-Output "  -> Updated $gcp ($($sr.synced.Count) agents, AGENTS.md)"
   return $sr
 }

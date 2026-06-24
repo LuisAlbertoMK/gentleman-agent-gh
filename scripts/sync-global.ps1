@@ -38,6 +38,7 @@ $projectCfg = Resolve-Path "$PSScriptRoot\..\opencode.json" -ErrorAction Stop
 $report = @{timestamp=(Get-Date -Format "o"); steps=@{}; errors=@(); warnings=@()}
 
 function Write-Step([string]$Name, [scriptblock]$Block) {
+    # Captures script-scope $DryRun and $Force — keep synced if adding params
     if ($DryRun) { Write-Host "[dry-run] $Name" -ForegroundColor Yellow; return }
     Write-Host "==> $Name" -ForegroundColor Cyan
     try { &$Block; $report.steps[$Name] = "ok" } catch { Write-Host "[err] $Name : $_" -ForegroundColor Red; $report.errors += "$Name : $_"; $report.steps[$Name] = "fail" }
@@ -120,8 +121,12 @@ Write-Step "Global config (MCPs + permissions + agents)" {
 if (-not $NoAgentSync) {
     Write-Step "Agent sync (project -> global)" {
         if (-not (Test-Path $globalCfg)) { throw "Global config not found at $globalCfg -- run step 3 first" }
-        $proj = Get-Content $projectCfg -Raw | ConvertFrom-Json
-        $glob = Get-Content $globalCfg -Raw | ConvertFrom-Json
+        try {
+            $proj = Get-Content $projectCfg -Raw | ConvertFrom-Json
+            $glob = Get-Content $globalCfg -Raw | ConvertFrom-Json
+        } catch {
+            throw "Failed to parse config JSON: $_"
+        }
         $agentNames = @("gentleman-vMK", "gentleman-deep", "gentleman-codex", "gentleman-quick")
 
         # Ensure agent section exists in global

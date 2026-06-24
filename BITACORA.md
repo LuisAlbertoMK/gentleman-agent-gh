@@ -89,3 +89,4 @@
 
 
 
+2026-06-24 - Agent split + pipeline fix: moved gentleman-* to global config, fixed sync-global.ps1/check-skill-drift.ps1, verified with 3 subagents (22 hallazgos), fixed score drift
