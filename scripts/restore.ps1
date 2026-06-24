@@ -1,4 +1,17 @@
+<#
+.SYNOPSIS
+Restore OpenCode config from git backup.
+.DESCRIPTION
+Lists snapshots or restores to a specific revision. Supports dry-run mode.
+.PARAMETER Revision
+Target revision (commit hash, HEAD~N, 'last' for HEAD~1). Empty = interactive.
+.PARAMETER List
+List snapshots only, no restore.
+.PARAMETER DryRun
+Show what would be restored without applying.
+#>
 #requires -Version 5.1
+Set-StrictMode -Version Latest
 param([string]$Revision="",[switch]$List,[switch]$DryRun)
 $ErrorActionPreference='Stop'
 $cfg="$env:USERPROFILE\.config\opencode"

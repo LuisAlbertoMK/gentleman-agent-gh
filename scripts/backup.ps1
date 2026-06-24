@@ -1,3 +1,13 @@
+<#
+.SYNOPSIS
+Backup OpenCode config to git repository.
+.DESCRIPTION
+Creates or updates a git backup of the OpenCode config directory.
+.PARAMETER Message
+Optional commit message for the backup.
+.PARAMETER Force
+Backup even if no changes detected.
+#>
 #requires -Version 5.1
 Set-StrictMode -Version Latest
 param([string]$Message="",[switch]$Force)

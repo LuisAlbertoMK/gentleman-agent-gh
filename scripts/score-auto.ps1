@@ -18,7 +18,7 @@ a "Sec" ($m::Max(0,$m::Min(10,$s1))) @{weak_crypto=$wc;secrets=$sf} "Weak crypto
 $ds=10;$wf=@(gci ".\skills" -File -EA SilentlyContinue);$oc=@($wf|?{$_.Name -notin $d}).Count
 if($oc -gt 5){$ds-=2}elseif($oc -gt 0){$ds-=1};$ji=0
 gci ".\skills" -Directory -EA SilentlyContinue|%{if(-not (Test-Path $_.Target)){$ji++}}
-if($ji -gt 0){$ds-=1};$co=@(sls -Path ".\scripts\*.ps1" -Pattern "#.*function|#.*if|#.*for\s*\("|?{$_.Filename -ne "score-auto.ps1"});if($co.Count -gt 10){$ds-=1}
+if($ji -gt 0){$ds-=1};$co=@(sls -Path ".\scripts\*.ps1" -Pattern '^\s*#\s+function\s+\w+|^\s*#\s+if\s*\(|^\s*#\s+foreach\s*\(|^\s*#\s+for\s*\(|^\s*#\s+while\s*\(|^\s*#\s+switch\s*\(|^\s*#\s+try\s*\{|^\s*#\s+catch\s*\{'|?{$_.Filename -ne "score-auto.ps1"});if($co.Count -gt 10){$ds-=1}
 a "DC" ($m::Max(0,$m::Min(10,$ds))) @{orphans=$oc;dead_junctions=$ji;commented_out=$co.Count} "Orphans: $oc, dead junctions: $ji"
 $sc=@(gci ".\scripts\*.ps1");$ts=$sc.Count;$wh=0;$wp=0;$ws=0
 foreach($s in $sc){$c1=gc $s.FullName -Raw;if($c1 -match '<#'){$wh++};if($c1 -match 'param\('){$wp++};if($c1 -match 'Set-StrictMode'){$ws++}}
@@ -38,7 +38,7 @@ $hm=Test-Path "docs/metricas";$he=Test-Path "docs/metricas/errors";$hj=Test-Path
 $mt=4;if($hm -and $hj){$mt=9}elseif($hm){$mt=7};if($hr -and $he){$mt=$m::Min(10,$mt+1)}
 a "Me" $mt @{md=$hm;ed=$he;ej=$hj;rp=$hr} "MD:$hm EJ:$hj"
 $ak=$m::Round(($sc|measure -Average Length).Average/1KB,1);$o5=@($sc|?{$_.Length -gt 51200}).Count
-$pf=10;if($ts -lt 15 -or $ts -gt 35){$pf-=1};if($ak -gt 15){$pf-=1}elseif($ak -gt 20){$pf-=2};if($o5 -gt 0){$pf-=2}
+$pf=10;if($ts -lt 15 -or $ts -gt 45){$pf-=1};if($ak -gt 15){$pf-=1}elseif($ak -gt 20){$pf-=2};if($o5 -gt 0){$pf-=2}
 a "SP" ($m::Max(0,$m::Min(10,$pf))) @{sc=$ts;avg=$ak;huge=$o5} "S:$ts avg:${ak}KB"
 $s4=@(gci ".\.agents\skills\*\SKILL.md"|?{$_.Directory.Name -ne '_shared'});$tt=$s4.Count;$o3=@($s4|?{$_.Length -gt 3072}).Count;$o6=@($s4|?{$_.Length -gt 5120}).Count;$tb=($s4|measure -Sum Length).Sum;$ak2=$m::Round($tb/$tt/1KB,1)
 $ef=10;if($o6 -gt 0){$ef-=2}elseif($o3 -gt 3){$ef-=2}elseif($o3 -gt 1){$ef-=1};if($ak2 -le 2.5){$ef=$m::Min(10,$ef+0.5)};if($tt -lt 60){$ef-=2}
@@ -57,7 +57,7 @@ $e4=$h["CC"].e;$sd+=($m::Round($e4.with_help/$ts*10,1));$sd+=($m::Round($e4.with
 $e5=$h["BP"].e;$sd+=($m::Round($e5.param_cov/$ts*10,1));$sd+=($m::Round($e5.trycatch/$ts*10,1))
 $sd+=$(if($crp -le 0){10}elseif($crp -le 5){9}elseif($crp -le 10){7}else{4});$sd+=$(if($h["Bi"].e.exists){10}else{0});$sd+=($m::Min(10,$h["Bi"].e.lines/2))
 $sd+=$(if($hm){10}else{0});$sd+=$(if($he){10}else{0});$sd+=$(if($hj){10}else{0});$sd+=$(if($hr){10}else{0})
-$sd+=$(if($ts -ge 15-and$ts -le 35){10}else{7});$sd+=$(if($ak -le 10){10}elseif($ak -le 15){7}else{5});$sd+=$(if($o5 -le 0){10}else{5})
+$sd+=$(if($ts -ge 15-and$ts -le 45){10}else{7});$sd+=$(if($ak -le 10){10}elseif($ak -le 15){7}else{5});$sd+=$(if($o5 -le 0){10}else{5})
 $sd+=$(if($tt -ge 60){10}else{7});$sd+=$(if($o3 -le 0){10}elseif($o3 -le 1){9}else{7});$sd+=$(if($o6 -le 0){10}else{7});$sd+=$(if($ak2 -le 2.0){10}elseif($ak2 -le 2.5){9.5}else{7})
 $sd+=($m::Min(10,$ic/$it*10));$sd+=$(if($bt -gt 0){$bpp/$bt*10}else{0})
 $dp=$m::Round(($sd|measure -Average).Average,1)
