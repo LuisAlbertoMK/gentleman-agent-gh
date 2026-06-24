@@ -1,10 +1,10 @@
 #requires -Version 5.1
-Set-StrictMode -Version Latest
 <#
 .SYNOPSIS
   Check skill drift between canonical (.agents/skills/) and global config (~/.config/opencode/skills/). Optionally sync agent definitions.
 #>
 param([switch]$Thorough,[switch]$AutoFix,[switch]$SyncAgents,[switch]$Json)
+Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 $cd=Join-Path $PSScriptRoot "..\.agents\skills"
 $gd="$env:USERPROFILE\.config\opencode\skills"
