@@ -6,7 +6,7 @@ function wr{param([string]$I,[string]$M)
 $c=@{$chk="Green";$crs="Red";$wrn="Yellow"}[$I]
 if(-not$c){$c="White"}if($f-ne"json"){Write-Host "$I $M" -ForegroundColor $c}}
 function sz{param([string]$x)
-if(Test-Path $x){$l=(Get-Item $x).Length;if($l-gt1KB){$r=$m::Round($l/1KB,1);return"${r}KB"};return"$l B"}return""}
+if(Test-Path $x){$l=(Get-Item $x).Length;if($l-gt1KB){$r=[math]::Round($l/1KB,1);return"${r}KB"};return"$l B"}return""}
 function ic{param([int]$R,[string]$pp)
 $r=@{};$sm=@{};Write-Host "`n  #$R Intake" -ForegroundColor Cyan;$rp=$null
 if(Test-Path "$pp\ROADMAP.md"){$rp="ROADMAP.md"}
