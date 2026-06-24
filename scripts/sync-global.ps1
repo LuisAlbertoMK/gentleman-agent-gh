@@ -1,13 +1,13 @@
 #requires -Version 5.1
 <#
 .SYNOPSIS
-    Sync gentleman-agent-gh to global OpenCode config — skills, scripts, MCPs, agents, permissions.
+    Sync gentleman-agent-gh to global OpenCode config — skills, scripts, MCPs, agents, AGENTS.md, permissions.
 .DESCRIPTION
     One-shot pipeline to apply gentleman-agent globally:
     1. Install/verify skill junctions → ~/.config/opencode/skills/
     2. Install/verify scripts junction → ~/.config/opencode/scripts/
-    3. Write global opencode.jsonc with MCPs (engram, context7) + permission rules
-    4. Sync gentleman-* agents from project opencode.json to global config
+    3. Write global opencode.jsonc with MCPs (engram, context7) + permission rules (preserves existing agents)
+    4. Sync gentleman-* agents + AGENTS.md from project to global config
     5. Verify MCP availability
     6. Report full status
 .PARAMETER DryRun
@@ -15,7 +15,7 @@
 .PARAMETER Force
     Overwrite existing global opencode.jsonc.
 .PARAMETER NoAgentSync
-    Skip agent definition sync (only install junctions + config).
+    Skip agent + AGENTS.md sync (only install junctions + config).
 .PARAMETER Json
     Output status as JSON.
 .EXAMPLE
@@ -69,10 +69,22 @@ Write-Step "Scripts junction" {
     }
 }
 
-# ── Step 3: Global opencode.jsonc (MCPs + permissions) ───────────────────
-Write-Step "Global config (MCPs + permissions)" {
+# ── Step 3: Global opencode.jsonc (MCPs + permissions + agents) ──────────
+Write-Step "Global config (MCPs + permissions + agents)" {
     $genCfg = $Force -or -not (Test-Path $globalCfg)
     if ($genCfg) {
+        # Preserve existing agent definitions if they exist (global source of truth)
+        $existingAgents = @{}
+        if (Test-Path $globalCfg) {
+            try {
+                $existing = Get-Content $globalCfg -Raw | ConvertFrom-Json
+                if ($existing.PSObject.Properties.Match('agent').Count -gt 0) {
+                    foreach ($prop in $existing.agent.PSObject.Properties) {
+                        $existingAgents[$prop.Name] = $prop.Value
+                    }
+                }
+            } catch { Write-Warning "  Could not read existing global config, starting fresh" }
+        }
         $cfg = @{
             '$schema' = "https://opencode.ai/config.json"
             mcp = @{
@@ -93,45 +105,57 @@ Write-Step "Global config (MCPs + permissions)" {
                     "**/secrets/**" = "deny"; "*.env" = "deny"; "*.env.*" = "deny"
                 }
             }
+            agent = $existingAgents
         }
+        # If no agents preserved, add an empty agent object to keep valid JSON
+        if ($cfg.agent.Keys.Count -eq 0) { $cfg.agent = @{} }
         $cfg | ConvertTo-Json -Depth 10 | Set-Content $globalCfg -Encoding UTF8 -Force
-        Write-Host "  Written $globalCfg" -ForegroundColor Green
+        Write-Host "  Written $globalCfg (preserved $($existingAgents.Keys.Count) agent definitions)" -ForegroundColor Green
     } else {
         Write-Host "  Global config exists, skipping (use -Force to overwrite)" -ForegroundColor Yellow
     }
 }
 
-# ── Step 4: Sync agents (gentleman-*) from project to global ─────────────
+# ── Step 4: Sync gentleman agents from project to global ─────────────────
 if (-not $NoAgentSync) {
-    Write-Step "Agent sync" {
+    Write-Step "Agent sync (project -> global)" {
         if (-not (Test-Path $globalCfg)) { throw "Global config not found at $globalCfg -- run step 3 first" }
         $proj = Get-Content $projectCfg -Raw | ConvertFrom-Json
         $glob = Get-Content $globalCfg -Raw | ConvertFrom-Json
         $agentNames = @("gentleman-vMK", "gentleman-deep", "gentleman-codex", "gentleman-quick")
+
+        # Ensure agent section exists in global
         $globHasAgent = $glob.PSObject.Properties.Match('agent').Count -gt 0
         if (-not $globHasAgent) { $glob | Add-Member -Name agent -Value @{} -MemberType NoteProperty -Force; $globHasAgent = $true }
-        $added = 0
+
+        # Check project has gentleman agents (canonical source)
         $projHasAgent = $proj.PSObject.Properties.Match('agent').Count -gt 0
         if (-not $projHasAgent) {
             Write-Warning "  Project opencode.json has no agent definitions -- nothing to sync"
-            $report.steps["agent_sync"] = @{added=0; note="no project agents"}
+            $report.steps["agent_sync"] = @{added=0; note="no project agents"; source="project -> global"}
         } else {
+            $added = 0; $updated = 0
             foreach ($name in $agentNames) {
-                $globHas = $glob.agent.PSObject.Properties.Match($name).Count -gt 0
-                if ($globHas) { Write-Host "  [exists] $name" -ForegroundColor Gray; continue }
                 $srcProp = $proj.agent.PSObject.Properties[$name]
                 if ($null -eq $srcProp) { Write-Host "  [not in project] $name" -ForegroundColor Gray; continue }
+                $globHas = $glob.agent.PSObject.Properties.Match($name).Count -gt 0
                 $glob.agent | Add-Member -Name $name -Value $srcProp.Value -MemberType NoteProperty -Force
-                $added++
-                Write-Host "  + added $name" -ForegroundColor Green
+                if ($globHas) { $updated++ } else { $added++ }
+                Write-Host "  $(if($globHas){'[updated]'}else{'[added]'}) $name" -ForegroundColor Green
             }
-            if ($added -gt 0) {
-                $glob | ConvertTo-Json -Depth 10 | Set-Content $globalCfg -Encoding UTF8 -Force
-                Write-Host "  Updated $globalCfg (${added} agents added)" -ForegroundColor Green
+            # Sync AGENTS.md for {file:AGENTS.md} reference
+            $srcAgentsMd = Join-Path (Split-Path $projectCfg -Parent) "AGENTS.md"
+            $dstAgentsMd = Join-Path (Split-Path $globalCfg -Parent) "AGENTS.md"
+            if (Test-Path $srcAgentsMd -PathType Leaf) {
+                Copy-Item -LiteralPath $srcAgentsMd -Destination $dstAgentsMd -Force
+                Write-Host "  [synced] AGENTS.md" -ForegroundColor Green
             } else {
-                Write-Host "  All agents already synced" -ForegroundColor Green
+                Write-Warning "  AGENTS.md not found at $srcAgentsMd"
             }
-            $report.steps["agent_sync"] = @{added=$added}
+
+            $glob | ConvertTo-Json -Depth 10 | Set-Content $globalCfg -Encoding UTF8 -Force
+            Write-Host "  Updated $globalCfg (${added} added, ${updated} updated, AGENTS.md synced)" -ForegroundColor Green
+            $report.steps["agent_sync"] = @{added=$added; updated=$updated; agendsMdSynced=$true; source="project -> global"}
         }
     }
 }

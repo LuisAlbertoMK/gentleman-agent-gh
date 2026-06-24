@@ -59,17 +59,34 @@ if($Json){Write-Output ($r|ConvertTo-Json -Depth 3)}else{
 function Sync-AgentDefinition{
 <#
 .SYNOPSIS
-  Sync gentleman-* agent definitions from project opencode.json to global config.
+  Sync gentleman-* agent definitions + AGENTS.md from project to global config.
+  Project opencode.json is canonical source; global config gets a copy for cross-project availability.
 #>
-  $pcp=Join-Path $PSScriptRoot "..\opencode.json";$gcp="$env:USERPROFILE\.config\opencode\opencode.json";$an=@("gentleman-deep","gentleman-codex","gentleman-quick");$sr=@{}
-  Write-Output "--- Syncing agents ---"
+  $pcp=Join-Path $PSScriptRoot "..\opencode.json";$gcp="$env:USERPROFILE\.config\opencode\opencode.json"
+  $an=@("gentleman-vMK","gentleman-deep","gentleman-codex","gentleman-quick")
+  $sr=@{synced=@();skipped=@()}
+  Write-Output "--- Syncing agents (project -> global) ---"
   if(-not (Test-Path $pcp)){Write-Warning "No project opencode.json at $pcp";return $sr}
   if(-not (Test-Path $gcp)){Write-Warning "No global opencode.json at $gcp";return $sr}
   $pj=(gc $pcp -Raw)|ConvertFrom-Json;$gj=(gc $gcp -Raw)|ConvertFrom-Json
-  $gan=$gj.agent.PSObject.Properties.Name;$ta=@()
-  foreach($n in $an){if($gan-contains$n){Write-Output "  [synced] $n"}elseif($null-eq$pj.agent.$n){Write-Warning "Agent $n not in project -- skipping"}else{$ta+=$n}}
-  if($ta.Count-eq0){Write-Output "  -> No changes";return $sr}
-  foreach($n in $ta){$gj.agent|Add-Member -Name $n -Value $pj.agent.$n -MemberType NoteProperty -Force;Write-Output "  + Added $n"}
-  $gj|ConvertTo-Json -Depth 10|Set-Content $gcp -Encoding UTF8;Write-Output "  -> Updated $gcp";return $sr
+  # Ensure agent section exists in global
+  $gha=$gj.PSObject.Properties.Match('agent').Count -gt 0
+  if(-not $gha){$gj|Add-Member -Name agent -Value @{} -MemberType NoteProperty -Force}
+  # Sync each gentleman agent
+  foreach($n in $an){
+    $sp=$pj.agent.PSObject.Properties[$n]
+    if($null-eq$sp){Write-Output "  [skipped] $n (not in project)";$sr.skipped+=$n;continue}
+    $gj.agent|Add-Member -Name $n -Value $sp.Value -MemberType NoteProperty -Force
+    Write-Output "  [synced] $n";$sr.synced+=$n
+  }
+  # Sync AGENTS.md for {file:AGENTS.md} reference
+  $sa=Join-Path (Split-Path $pcp -Parent) "AGENTS.md"
+  $da=Join-Path (Split-Path $gcp -Parent) "AGENTS.md"
+  if(Test-Path $sa -PathType Leaf){Copy-Item -LiteralPath $sa -Destination $da -Force;Write-Output "  [synced] AGENTS.md"}
+  else{Write-Warning "  AGENTS.md not found at $sa"}
+  # Write updated config
+  $gj|ConvertTo-Json -Depth 10|Set-Content $gcp -Encoding UTF8
+  Write-Output "  -> Updated $gcp ($($sr.synced.Count) agents, AGENTS.md)"
+  return $sr
 }
 if($SyncAgents){Sync-AgentDefinition}
