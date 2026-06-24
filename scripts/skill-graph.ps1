@@ -95,7 +95,7 @@ function Resolve-Skill {
     $scores = @{}
     foreach ($s in $script:skillRegistry) {
         $matchCount = 0
-        foreach ($t in $tokens) { foreach ($tr in $s.Triggers) { if ($tr.ToLowerInvariant() -match $t) { $matchCount++; break } } }
+        foreach ($t in $tokens) { $re = [regex]::Escape($t); foreach ($tr in $s.Triggers) { if ($tr.ToLowerInvariant() -match $re) { $matchCount++; break } } }
         if ($matchCount -gt 0) { $scores[$s.Name] = $matchCount }
     }
     $matched = $scores.Keys | Sort-Object { $scores[$_] } -Descending

@@ -15,14 +15,14 @@ $sk=sls -Path ".\.agents\skills\*\SKILL.md" -Pattern "(?i)(api[_-]?key|secret|pa
 if($sk){$sf=$true;$s1-=3}
 if(Test-Path "docs/metricas/errors/LATEST_error.json"){$p1=gc "docs/metricas/errors/LATEST_error.json" -Raw|ConvertFrom-Json;if($p1.source -ne "quality-gate" -or $p1.passed -lt 5){$s1-=1}}else{$po=& ".\scripts\pssa-gate.ps1" -Mode Check 2>&1;if($LASTEXITCODE -ne 0 -or $po -match "FAIL|violation|security"){$s1-=1}}
 a "Sec" ($m::Max(0,$m::Min(10,$s1))) @{weak_crypto=$wc;secrets=$sf} "Weak crypto: $wc, secrets: $sf"
-$ds=10;$wf=gci ".\skills" -File -EA SilentlyContinue;$oc=($wf|?{$_.Name -notin $d}).Count
+$ds=10;$wf=@(gci ".\skills" -File -EA SilentlyContinue);$oc=@($wf|?{$_.Name -notin $d}).Count
 if($oc -gt 5){$ds-=2}elseif($oc -gt 0){$ds-=1};$ji=0
 gci ".\skills" -Directory -EA SilentlyContinue|%{if(-not (Test-Path $_.Target)){$ji++}}
 if($ji -gt 0){$ds-=1};$co=@(sls -Path ".\scripts\*.ps1" -Pattern "#.*function|#.*if|#.*for\s*\("|?{$_.Filename -ne "score-auto.ps1"});if($co.Count -gt 10){$ds-=1}
 a "DC" ($m::Max(0,$m::Min(10,$ds))) @{orphans=$oc;dead_junctions=$ji;commented_out=$co.Count} "Orphans: $oc, dead junctions: $ji"
-$sc=gci ".\scripts\*.ps1";$ts=$sc.Count;$wh=0;$wp=0;$ws=0
+$sc=@(gci ".\scripts\*.ps1");$ts=$sc.Count;$wh=0;$wp=0;$ws=0
 foreach($s in $sc){$c1=gc $s.FullName -Raw;if($c1 -match '<#'){$wh++};if($c1 -match 'param\('){$wp++};if($c1 -match 'Set-StrictMode'){$ws++}}
-$cr=@($wh,$wp,$ws|%{$m::Round($_/$ts,2)})
+$cr=@($wh,$wp,$ws|%{$m::Round(($_/$ts),2)})
 a "CC" ($m::Round(($cr[0]+$cr[1]+$cr[2])/3*10,1)) @{total_scripts=$ts;with_help=$wh;with_params=$wp;with_strictmode=$ws} "S:$ts H:$wh P:$wp S:$ws"
 $bp=$m::Round(($wp/$ts)*10,1);$wt=0
 foreach($s in $sc){if((gc $s.FullName -Raw) -match 'try\s*\{'){$wt++}}
@@ -37,10 +37,10 @@ a "Bi" $bi @{exists=(Test-Path "BITACORA.md");lines=if(Test-Path "BITACORA.md"){
 $hm=Test-Path "docs/metricas";$he=Test-Path "docs/metricas/errors";$hj=Test-Path "docs/metricas/errors/LATEST_error.json";$hr=(gci "docs/metricas" -File -EA SilentlyContinue).Count -gt 0
 $mt=4;if($hm -and $hj){$mt=9}elseif($hm){$mt=7};if($hr -and $he){$mt=$m::Min(10,$mt+1)}
 a "Me" $mt @{md=$hm;ed=$he;ej=$hj;rp=$hr} "MD:$hm EJ:$hj"
-$ak=$m::Round(($sc|measure -Average Length).Average/1KB,1);$o5=($sc|?{$_.Length -gt 51200}).Count
+$ak=$m::Round(($sc|measure -Average Length).Average/1KB,1);$o5=@($sc|?{$_.Length -gt 51200}).Count
 $pf=10;if($ts -lt 15 -or $ts -gt 35){$pf-=1};if($ak -gt 15){$pf-=1}elseif($ak -gt 20){$pf-=2};if($o5 -gt 0){$pf-=2}
 a "SP" ($m::Max(0,$m::Min(10,$pf))) @{sc=$ts;avg=$ak;huge=$o5} "S:$ts avg:${ak}KB"
-$s4=gci ".\.agents\skills\*\SKILL.md"|?{$_.Directory.Name -ne '_shared'};$tt=$s4.Count;$o3=($s4|?{$_.Length -gt 3072}).Count;$o6=($s4|?{$_.Length -gt 5120}).Count;$tb=($s4|measure -Sum Length).Sum;$ak2=$m::Round($tb/$tt/1KB,1)
+$s4=@(gci ".\.agents\skills\*\SKILL.md"|?{$_.Directory.Name -ne '_shared'});$tt=$s4.Count;$o3=@($s4|?{$_.Length -gt 3072}).Count;$o6=@($s4|?{$_.Length -gt 5120}).Count;$tb=($s4|measure -Sum Length).Sum;$ak2=$m::Round($tb/$tt/1KB,1)
 $ef=10;if($o6 -gt 0){$ef-=2}elseif($o3 -gt 3){$ef-=2}elseif($o3 -gt 1){$ef-=1};if($ak2 -le 2.5){$ef=$m::Min(10,$ef+0.5)};if($tt -lt 60){$ef-=2}
 a "SE" ($m::Round($m::Max(0,$m::Min(10,$ef)),1)) @{total=$tt;o3=$o3;o5=$o6;avg=$ak2;bytes=$tb} "T:$tt >3:$o3 >5:$o6 avg:${ak2}KB"
 $ip=".learnings\inter-track.json";$cy=0;$ic=0;$it=30

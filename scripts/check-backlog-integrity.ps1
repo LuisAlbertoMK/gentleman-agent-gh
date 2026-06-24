@@ -63,7 +63,7 @@ $rows = $rows | Where-Object { $_ -notmatch 'Item \| Impact \| Risk' }
 $items = @()
 foreach ($row in $rows) {
     $cols = $row -split '\|' | ForEach-Object { $_.Trim() }
-    if ($cols.Count -ge 6) {
+    if ($cols.Count -ge 7) {
         $items += @{
             raw          = $row
             description  = $cols[1]
