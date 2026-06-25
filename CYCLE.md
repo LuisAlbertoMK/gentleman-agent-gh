@@ -130,7 +130,19 @@
 - Skill compression: branch-pr 8.6→3KB, issue-creation 7.1→3KB, work-unit-commits 3.1→1.8KB ✅
 - PSSA aliases: 257→0 ✅
 - Score recovery: Skill Effectiveness 8→10 (all skills ≤3KB)
-- Remaining: Check-skill-drift alignment + final cycle close
+- Items 16-17 carried forward (install.ps1 guard, PSSA Item 17 duplicates Item 2)
+
+### Cycle 10 Close
+- Score: **10/10** 🏆 — all 13 dims at or above 9.9
+- inter: 105/30 (350% of target)
+- Backlog: 16/18 items complete
+- Key wins:
+  - PSSA zero: 257 alias warnings eliminated, 0 ParseError, 715→462 total
+  - Skills: >3KB count 3→0, total size 135KB→124KB
+  - Score depth: Skill Effectiveness 8→10, Score Depth 9.8→10
+  - Upstream: all 7 MODIFIED files applied (5 skills + 2 scripts)
+  - Smoke tests: modularized from 1→6 scripts
+- Carried forward: Items 16 (install.ps1 $PSScriptRoot guard) and 17 (duplicate of 2)
 
 ## Metrics
 
@@ -264,4 +276,4 @@ Cycle 6 (metric integrity) 2026-06-21. ✅ CLOSED (5/6, inter 49/30)
 Cycle 7 (score accuracy + script optimization) 2026-06-21. ✅ CLOSED (5/5, inter 51/30)
 Cycle 8 (script performance optimization) 2026-06-22. ✅ CLOSED (3/3, inter 66/30, score 9.9/10)
 Cycle 9 (Skill Resolution Engine) 2026-06-24. ✅ CLOSED (3/3, inter 100/30, score 10/10)
-Cycle 10 (Full-Spectrum Quality) 2026-06-25. 🟢 ACTIVE (0/16, inter 100/30, score 10/10)
+Cycle 10 (Full-Spectrum Quality) 2026-06-25. ✅ CLOSED (16/18, inter 105/30, score 10/10)
