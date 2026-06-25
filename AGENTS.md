@@ -51,7 +51,7 @@ Antes de sugerir o implementar **cualquier cambio que active thresholds**:
 
 Thresholds detallados en skill `triple-verify`. Modos con keyword:
 - **Normal** (sin keyword) → triple verify según zona
-- **`!ship` / `!listo`** → triple verify + quality-gate + commit-crafter + commit + push automático
+- **`!ship` / `!listo`** → capture learnings → triple verify → quality-gate → commit-crafter → commit + push
 - **`!check`** → verify profiles + quality-gate, sin commit
 - **`!fast`** → build + commit + push (skip triple verify, hotfix)
 - **`!draft`** → modo exploración, sin verificación
@@ -252,7 +252,7 @@ Updates: `mem_update` on `topic_key=protocol/agente-optimizado`. Review: 2 weeks
 | Code review | `code-review-agent`, `judgment-day` | — |
 | Refactor/opt | `karpathy-loop`, `lean-context`, `metricas` | — |
 | Verify / `!check` | `verify.ps1` → `pssa-gate.ps1` | — |
-| Commit/PR / `!ship` | `triple-verify` → `quality-gate` → `commit-crafter` | — |
+| Commit/PR / `!ship` | `capture-learnings` → `triple-verify` → `quality-gate` → `commit-crafter` | — |
 | Hotfix `!fast` | `quality-gate` + `commit-crafter` | `triple-verify` |
 | Security audit | `security-scanner` | — |
 | Long/thorough | sdd-* + `quality-gate` | `caveman` |

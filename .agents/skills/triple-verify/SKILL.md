@@ -30,7 +30,7 @@ Propuesto → Verde? → SKIP
          → Amarilla ≤10L? → quality-gate
          → Rojo/Amarilla>10L → TRIPLE VERIFY (E1+E2+E3 parallel)
 Falla? → STOP + evidencia · Pasa → continuar
-!ship/!listo → quality-gate → commit-crafter → commit+push
+!ship/!listo → capture-learnings → quality-gate → commit-crafter → commit+push
 !fast → build → commit+push (skip verify)
 !draft → solo aviso
 ```
@@ -38,8 +38,9 @@ Falla? → STOP + evidencia · Pasa → continuar
 1. **3 DISTINCT approaches**: behavior + quality + compilation — not 3 identical tests
 2. **Default-FAIL**: no evidence of 3 steps → not verified
 3. **Build mandatory** for compilable code
-4. **!ship = responsibility**: verify + quality-gate + commit + push
-5. **Override**: `!ship --no-verify` emergency only (not recommended)
-6. **Self-improvement override**: difficulty levels from CYCLE.md override verify depth
+4. **!ship = responsibility**: capture-learnings → verify → quality-gate → commit + push
+5. **capture-learnings**: run `session-miner.ps1 -Mode scan -Json` (if available), stage `.learnings/` changes. No session-miner? Skip gracefully — `.learnings` changes are optionals.
+6. **Override**: `!ship --no-verify` emergency only (not recommended)
+7. **Self-improvement override**: difficulty levels from CYCLE.md override verify depth
 ## References
 quality-gate · code-review-agent · judgment-day · commit-crafter · CYCLE.md
