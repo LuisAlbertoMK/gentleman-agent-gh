@@ -299,11 +299,11 @@ Close task: auto-metrics 7 dims (correctness, tokens, error prevention, skill, s
 - **Apply-File**: `$env:GENTLEMAN_AGENT_ROOT\scripts\pull-upstream.ps1 -Mode Apply-File -TargetFile "path"`
 - **Policy**: review MODIFIED manually; OURS ONLY ignored. Skills → `.agents/skills/`
 
-### I. Self-Improvement System (active 2026-06-17)
+### I. Self-Improvement System (active 2026-06-26)
 
-**Manifest**: `CYCLE.md` — defines current cycle objective, metrics, difficulty mapping, and loop behavior. Inspired by autoresearch `program.md`.
+**Manifest**: `CYCLE.md` — defines current cycle objective, metrics, difficulty mapping, and loop behavior. **Solo proyecto local. NO incluye upstream/gentle-ai.**
 
-**1. Skill: `self-improvement`** — orquestra ciclo completo: diagnose, fix with triple-verify by difficulty, log (bitácora + inter-track), verify, learn (engram + anti-patterns), propagate. Load: `skill("self-improvement")`.
+**1. Skill: `self-improvement`** — orquestra ciclo completo: diagnose, fix with triple-verify by difficulty, log (bitácora + inter-track), verify, learn (engram + anti-patterns), propagate, write report. Load: `skill("self-improvement")`.
 
 **2. Scripts**:
    - `$env:GENTLEMAN_AGENT_ROOT\scripts\inter-track.ps1` — tracks inter(30) metric (minimum 30 meaningful interactions per cycle)
@@ -313,18 +313,18 @@ Close task: auto-metrics 7 dims (correctness, tokens, error prevention, skill, s
 **3. Plugin: `opencode-self-improve`** (Hermes Agent-style) — SkillForge extracts patterns→SQLite skills, Curator re-scores/merges/removes low-quality, SkillInjector injects top-3 pre-turn. 7 tools. Config: `magic-context.jsonc` root. DB: `~/.local/share/opencode-self-improve/skills.db`.
 
 **4. Process**:
-   - Every cycle: read CYCLE.md → check external repos (Engram #645) → diagnose → execute fixes with triple-verify → verify → learn → propagate
+   - Every cycle: read CYCLE.md → diagnose (solo proyecto local, NO upstream/gentle-ai) → execute fixes with 3 subagentes de verificación → verify → learn → propagate → write report a `docs/ciclos/`
    - inter(30): minimum 30 fix+verify+log iterations per cycle
-   - Difficulty levels (6): Fácil→Muy Complejo, each with progressive verification depth
-   - **Subagent triangulation**: adaptativa por complejidad — Fácil→solo Paso 0, Medio→1 subagente, Complejo→3 subagentes, Muy Complejo→3 subagentes + mi verificación (previene overconfidence en autodiagnóstico)
-    - Exit: inter≥30 + no dim<9.0 (new dims grace 5 cycles) → SUCCESS; time budget (7d from cycle start) exhausted → STOP; score drop >0.5 from baseline → full revert (git checkout + stash drop); same fix fails 3x → SKIP candidate
+   - **Subagentes: SIEMPRE 3** — sin excepción. Sin importar la dificultad (Fácil/Medio/Complejo/Muy Complejo), los ciclos de mejora usan exactamente 3 subagentes para verificar gaps de: seguridad, optimización, rendimiento, sintaxis, ortografía, performance, SEO, y cualquier dimensión relevante del proyecto.
+   - **Reporte**: cada ciclo genera `docs/ciclos/cycle<N>-YYYYMMDD.md` con hallazgos estructurados (ver template en `docs/ciclos/README.md`)
+   - Exit: inter≥30 + no dim<9.0 (new dims grace 5 cycles) → SUCCESS; time budget (7d from cycle start) exhausted → STOP; score drop >0.5 from baseline → full revert (git checkout + stash drop); same fix fails 3x → SKIP candidate
 
 ### J. Pre-session Health Check (session start) + Project Score
 Al iniciar sesión, MUY rápido (no bloquear):
 0.5. `$env:GENTLEMAN_AGENT_ROOT\scripts\restore-project-score.ps1 -Quiet` — restaura .project.json si vMK lo sobrescribió (score≠10.0 o ≠11 dims)
 1. `git status --short` — si hay cambios sin commit → alerta leve
 2. Ejecutá `$env:GENTLEMAN_AGENT_ROOT\scripts\check-skill-drift.ps1` — verifica que todas las skills tengan sus junctions globales. Si hay drift, reportalo como warning.
-2.5. `$env:GENTLEMAN_AGENT_ROOT\scripts\check-upstream.ps1 -Json` (timeout 15s) — verifica cambios en repos externos (CYCLE.md External Repos). Si hay `NEW`, guardá en Engram y reportá como warning. No bloquea si falla.
+2.5. (opcional) `$env:GENTLEMAN_AGENT_ROOT\scripts\check-upstream.ps1 -Json` — verifica cambios upstream. Si hay `NEW`, guardá en Engram como info. No bloquea. **NO forma parte del ciclo de mejora.**
 3. Si todo OK → seguí sin reportar
 
 ### K. Project Score Auto-Report (first user request)

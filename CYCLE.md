@@ -153,8 +153,7 @@
 | Backlog Integrity | 0 items with status ≠ reality | auto-check on cycle start |
 | Score freshness | ≤1 day since last .project.json update | `git log -1 -- .project.json` |
 | Automation claims verified | 100% of claims pass smoke test | per-claim smoke script |
-| Subagent delegations per session | >=3 delegations | bitacora + engram |
-| Upstream check automation | zero manual checks needed | `scripts/check-upstream.ps1` |
+| Subagent delegations per session | >=3 delegations (3 verificación siempre) | bitacora + engram |
 | Dreaming auto-trigger | fires on every 5th self-check | Learning Loop (unconditional) |
 | Skill sizes | 0 >3KB, avg <2.0KB | `scripts/benchmark.ps1` (current: avg 1.8KB, 0 >3KB ✓) |
 | Working tree hygiene | 0 cambios sin commit al cerrar ciclo | `git status --short` |
@@ -226,39 +225,29 @@ Averages into **Score Depth** dimension (13th dim) for granularity beyond 10.0 c
 | Complejo | cross-cutting changes | Full + judgment-day | 30 min |
 | Muy Complejo | architectural decisions | Full + SDD cycle | 60 min |
 
-## External Repos (auto-checked via `scripts/check-upstream.ps1`)
-
-| Repo | What to Check | Last Verified |
-|------|---------------|---------------|
-| karpathy/autoresearch | New program.md patterns, loop improvements | 2026-06-20 (auto, UNCHANGED) |
-| Gentleman-Programming/gentleman-guardian-angel | New caching strategies, AGENTS.md compliance checks | 2026-06-20 (auto, UNCHANGED) |
-| gentle-ai | Skills, scripts, MCP servers, backup systems | 2026-06-20 (auto, CHANGED — 9 new commits including JD profiles PR #920) |
-| engram (MCP) | Cloud sync, new query types, performance | 2026-06-20 (auto, UNCHANGED) |
+> **⚠️ Para ciclos de mejora**: esta tabla se reemplaza por **SIEMPRE 3 subagentes** sin excepción, sin importar la dificultad. Los 3 subagentes verifican gaps de: seguridad, optimización, rendimiento, sintaxis, ortografía, performance, SEO, y cualquier dimensión relevante del proyecto.
 
 ## Cycle Loop
 
 ```
 LOOP:
-  1. READ CYCLE.md -- understand objective and constraints
-   2. CHECK external repos (auto via check-upstream.ps1 — drift found? → auto-report with commit summary + relevance + suggested actions)
-   3. DIAGNOSE: score, gaps, skill sizes, cross-ref, PSSA; check `.project.json` freshness (warning if >1d stale)
-  4. SCORE backlog items by Impact/Risk (I/R = Impact / Risk)
-  5. IDENTIFY fix candidates sorted by I/R descending
-  6. PARTITION independent work -> parallel subagents
-   7. EXECUTE (per item):
-      a.0. SNAPSHOT: `git stash push -m "auto-${item}"` before any change
-      a. Delegate to subagent with isolated context
-      b. Triple-verify by difficulty level
-      c. Log to bitacora + inter-track++
-      d. Collect results: Decision + Files + Findings + Nuance
-   8. ORCHESTRATE: merge subagent results, verify coherence
-   9. VERIFY: re-score, compare delta
-   10. If score improved -> Keep changes, advance baseline
-   11. If score drop >0.5 from baseline -> full revert (`git checkout -- .` + `git stash drop`); else if score equal/worse -> review and decide
-  12. LEARN: engram, anti-patterns, CYCLE.md notes
+  1. READ CYCLE.md — understand objective and constraints (solo proyecto local, NO upstream)
+  2. DIAGNOSE: score, gaps, skill sizes, cross-ref, PSSA; check `.project.json` freshness
+  3. SCORE backlog items by Impact/Risk (I/R = Impact / Risk)
+  4. IDENTIFY fix candidates sorted by I/R descending
+  5. PARTITION independent work -> 3 parallel subagentes de verificación
+  6. EXECUTE:
+     a. Delegate a 3 subagentes para verificar gaps (seguridad, optimización, rendimiento, sintaxis, ortografía, performance, SEO, + dims proyecto)
+     b. Cada subagente retorna: Hallazgos + Archivos + Decisiones + Evidencia
+     c. Log a bitacora + inter-track++
+  7. ORCHESTRATE: merge resultados de 3 subagentes, verificar coherencia
+  8. VERIFY: re-score, comparar delta
+  9. If score improved → Keep changes, advance baseline
+  10. If score drop >0.5 from baseline → full revert (`git checkout -- .` + `git stash drop`); else → review and decide
+  11. LEARN: engram, anti-patterns, CYCLE.md notes
+  12. REPORT: escribir `docs/ciclos/cycle<N>-YYYYMMDD.md` con hallazgos estructurados
   13. SCORE AUTO-UPDATE: `score-auto.ps1 -Json | Set-Content .project.json`
-  14. PROPAGATE: opencode -> opencode-vmk -> gentleman-vMK
-   15. If inter>=30 AND no dim<9.0 (new dims grace 5 cycles) -> SUCCESS; if time budget (7d from cycle start) exhausted -> STOP; if score drop >0.5 from baseline -> full revert (git checkout + stash drop)
+  14. If inter>=30 AND no dim<9.0 → SUCCESS; time budget (7d) exhausted → STOP; score drop >0.5 → revert
 ```
 
 ## Exceptions
