@@ -1,5 +1,5 @@
 ﻿#requires -Version 5.1
-<#
+<
 .SYNOPSIS
     Sync gentleman-agent-gh to global OpenCode config — skills, scripts, MCPs, agents, AGENTS.md, permissions.
 .DESCRIPTION
