@@ -5,6 +5,51 @@
 
 ## [Unreleased]
 
+### Cycle 10 (2026-06-25) — Full-Spectrum Quality
+
+- PSSA BOM fix: 23 scripts UTF-8 with BOM, 16 ParseError eliminados
+- README sync: score 9.9→10.0, cycle 8→10, scripts 36→40
+- AGENTS.md: auto-metrics 6→7 dims consistentes
+- Clean Code: install.ps1 param() block agregado
+- BITACORA: encoding corruption fix + dedup (14x "Session close" → 1 por fecha)
+- CHANGELOG actualizado con Cycles 6-9 (gap de 17 días cerrado)
+
+### Cycle 9 (2026-06-24) — Skill Resolution Engine
+
+- **Score**: 10/10 🏆 (primera vez, 13 dimensiones perfectas)
+- **inter**: 100/30 (333% del target)
+- **Skill Resolution Engine**: BFS keyword scoring + 13-route regex routing + 3 format modes en skill-graph.ps1
+- **Edge case hardening**: @() guards, null array safety, format-before-count order
+- **Score integrity**: Dead Code regex hardened (0 falsos positivos), threshold calibrado
+- **Agent split**: gentleman-* en global + project, SDD project-only, pipeline sync-global.ps1
+
+### Cycle 8 (2026-06-22) — Script Performance Optimization
+
+- **Score**: 9.9/10
+- **inter**: 66/30 (220% del target)
+- Script Performance: avg 4.3KB, no scripts >8KB
+- Score expansion: 32 sub-dims across 12 dimensions
+- Clean Code: params en scripts restantes, run.ps1 documented exception
+
+### Cycle 7 (2026-06-21) — Score Accuracy + Script Optimization
+
+- **Score**: 9.9/10 (up from 9.7)
+- **inter**: 51/30 (170% del target)
+- Score accuracy: .project.json ↔ PROJECT-SCORE.md sync, Metrics dimension fix
+- README rewrite: accurate URL, multi-agent table, MCP, !shortcuts
+- Error handling: try/catch added to 8 scripts (25/36→33/36, 92%)
+- StrictMode added to last 2 scripts
+- Script compression: 3 largest scripts compressed (skill-graph.ps1 <15KB, intake-verify.ps1 11.8KB, install.ps1 <12KB)
+
+### Cycle 6 (2026-06-21) — Metric Integrity and Verification-First
+
+- **Score**: 9.7/10 (honest re-score after audit)
+- **inter**: 49/30 (163% del target)
+- Backlog Integrity metric added to score-auto.ps1
+- Score freshness auto-warning on stale .project.json
+- End-to-end smoke test: scripts/smoke/smoke-all.ps1 (5 claims)
+- Cross-ref check: scripts/cross-ref-check.ps1 (8/8 checks)
+
 ### Rebrand — gentleman-ai → gentleman-vMK
 
 - **Rebrand completo**: todas las referencias al proyecto original `gentle-ai` / `gentleman-ai` se unificaron bajo `gentleman-vMK` como la versión customizada definitiva.

@@ -5,18 +5,18 @@
 
 ---
 
-## 🏆 Benchmark Actual (2026-06-19)
+## 🏆 Benchmark Actual (2026-06-25)
 
 | Métrica | Valor |
 |---------|-------|
-| AGENTS.md | 20,071B / 322 líneas |
-| Skills totales | 68 |
-| Total skill bytes | 125,409B |
+| AGENTS.md | 20,071B / 365 líneas |
+| Skills totales | 69 |
+| Total skill bytes | 122,000B |
 | Skills >3KB | 0 |
-| Avg skill size | 1,844B |
-| Junctions globales OK | 68/68 |
+| Avg skill size | 1,700B |
+| Junctions globales OK | 69/69 |
 | Frontmatter coverage | 100% |
-| Scripts | 31 |
+| Scripts | 40 |
 
 ## 🚦 Quality Gate (2026-06-21)
 

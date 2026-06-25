@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Tokenize every SKILL.md in the repo
 .DESCRIPTION

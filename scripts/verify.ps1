@@ -19,7 +19,7 @@ function Add-Check{
 function Invoke-E1Checks{
     $sDir=Join-Path $Root 'scripts'
     $bs=@()
-    gci "$sDir\*.ps1"|%{
+    Get-ChildItem "$sDir\*.ps1" | ForEach-Object {
         $e=$null
         $null=[System.Management.Automation.Language.Parser]::ParseFile($_.FullName,[ref]$null,[ref]$e)
         if($e){$bs+="$($_.Name): $($e.Message)"}
@@ -28,8 +28,8 @@ function Invoke-E1Checks{
     $skd=Join-Path $Root '.agents\skills'
     $bf=@()
     if(Test-Path $skd){
-        gci "$skd\*\SKILL.md"|%{
-            $c=gc $_.FullName -Raw -Encoding UTF8
+        Get-ChildItem "$skd\*\SKILL.md" | ForEach-Object {
+            $c=Get-Content $_.FullName -Raw -Encoding UTF8
             if($c-match'^---'){
                 $end=$c.IndexOf('---',3)
                 if($end-eq-1){$bf+="$($_.Directory.Name): unclosed frontmatter"}
@@ -48,8 +48,8 @@ function Invoke-E2Checks{
     $sDirs=@((Join-Path $Root 'scripts'),(Join-Path $Root '.agents\skills'))
     foreach($dir in $sDirs){
         if(-not(Test-Path $dir)){continue}
-        gci $dir -Recurse -Include '*.ps1','*.md','*.psm1'|%{
-            $c=gc $_.FullName -Raw -Encoding UTF8
+        Get-ChildItem $dir -Recurse -Include '*.ps1','*.md','*.psm1' | ForEach-Object {
+            $c=Get-Content $_.FullName -Raw -Encoding UTF8
             foreach($p in $sPat){if($c-match$p){$sf+="$($_.Name): matched '$p'"}}
         }
     }
@@ -61,9 +61,9 @@ function Invoke-E2Checks{
     $rp=Join-Path $Root 'review-rules.jsonc'
     if(Test-Path $rp){
         try{
-            $raw=gc $rp -Raw -Encoding UTF8
+            $raw=Get-Content $rp -Raw -Encoding UTF8
             $stripped=$raw-replace'(?m)^\s*//.*$',''-replace'(?m)\s*//[^"\n]*$',''-replace'(?s)/\*.*?\*/',''
-            $null=$stripped|ConvertFrom-Json
+            $null=$stripped | ConvertFrom-Json
             Add-Check 'review-rules.jsonc' $true 'Parses OK'
         }catch{Add-Check 'review-rules.jsonc' $false "Parse error: $_"}
     }else{Add-Check 'review-rules.jsonc' $true 'Not found (skipped)'}
@@ -73,7 +73,7 @@ function Invoke-E3Checks{
     $gd="$env:USERPROFILE\.config\opencode\skills"
     $mj=@()
     if((Test-Path $cd)-and(Test-Path $gd)){
-        gci $cd -Directory|?{$_.Name-ne'_shared'}|%{
+        Get-ChildItem $cd -Directory | Where-Object {$_.Name -ne '_shared'} | ForEach-Object {
             if(-not(Test-Path (Join-Path $gd $_.Name))){$mj+=$_.Name}
         }
     }
@@ -81,7 +81,7 @@ function Invoke-E3Checks{
     $pj=Join-Path $Root '.project.json'
     if(Test-Path $pj){
         try{
-            $pjc=gc $pj -Raw -Encoding UTF8|ConvertFrom-Json
+            $pjc=Get-Content $pj -Raw -Encoding UTF8 | ConvertFrom-Json
             $dc=$pjc.score.dimensions.PSObject.Properties.Name.Count
             $sc=$pjc.score.current
             if($dc-ge6-and$sc-ge0-and$sc-le10){Add-Check '.project.json' $true "$dc dims, score $sc/10"}else{Add-Check '.project.json' $false "Invalid structure: $dc dims, score $sc"}
@@ -89,14 +89,14 @@ function Invoke-E3Checks{
     }else{Add-Check '.project.json' $false 'Not found'}
     $sDir=Join-Path $Root 'scripts'
     $mh=@()
-    gci "$sDir\*.ps1"|%{
-        $c=gc $_.FullName -Raw -Encoding UTF8
-        if($c-notmatch'\.SYNOPSIS'){$mh+=$_.Name}
+    Get-ChildItem "$sDir\*.ps1" | ForEach-Object {
+        $c=Get-Content $_.FullName -Raw -Encoding UTF8
+        if($c -notmatch '\.SYNOPSIS'){$mh+=$_.Name}
     }
     if($mh.Count-eq0){Add-Check 'Script Help' $true 'All scripts have .SYNOPSIS'}else{Add-Check 'Script Help' $false "$($mh.Count) missing: $($mh -join ', ')"}
     $cp=Join-Path $Root 'CYCLE.md'
     if(Test-Path $cp){
-        $cc=gc $cp -Raw -Encoding UTF8
+        $cc=Get-Content $cp -Raw -Encoding UTF8
         $hb=$cc-match'\|\s*Item\s*\|'
         $hl=$cc-match'LOOP:'
         $hm=$cc-match'\|\s*Metric\s*\|'
@@ -116,6 +116,6 @@ switch($ProfileName){
 $r.allPassed=($r.failed-eq0)
 if($Json){
     $r.timestamp=(Get-Date -Format 'o')
-    echo ($r|ConvertTo-Json -Depth 3)
+    Write-Output ($r | ConvertTo-Json -Depth 3)
 }
 exit $(if($r.allPassed){0}else{1})

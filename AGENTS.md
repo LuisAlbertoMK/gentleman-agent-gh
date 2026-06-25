@@ -88,13 +88,13 @@ Comandos rápidos para tareas recurrentes — extienden el sistema de modos:
 Read-heavy (>3 files/scan/map) → delegate `explore`. Saves 2-5K tokens. Main context = synthesis/decisions.
 
 ## Learning Loop (post-task)
-Capture(Engram)→Extract→Evaluate→Apply. Auto-score 6 dims. <7→immune. 10→mem_save. Auto-immunize: error/<7 → anti-pattern + rule.
+Capture(Engram)→Extract→Evaluate→Apply. Auto-score 7 dims. <7→immune. 10→mem_save. Auto-immunize: error/<7 → anti-pattern + rule.
 Triggers: same fix 2x · gotcha · user corrected 2x · repeat workflow · pattern 3+ files. Self-check every ~5 tools.
 **Every 5th self-check**: run `$env:GENTLEMAN_AGENT_ROOT\scripts\session-miner.ps1 -Mode scan -Json` + parse output for new pattern proposals. Always active (no skill dependency).
 
 ## Default-FAIL
 Evidence required for "done". Tool output = evidence. NOT self-assessment. Builder≠Evaluator. Uncertain? → FAIL + evidence. Practice: `go test ./...` before done.
-After every completion: auto-score 6 dims. <7 → immune-system.
+After every completion: auto-score 7 dims. <7 → immune-system.
 
 ## Python Environment
 This agent supports executing Python code through the `bash` tool. Python commands use `python` directly.
@@ -224,7 +224,7 @@ Delete `$env:TEMP\opencode\` files >24h old at session start.
 
 Run `!close` (`$env:GENTLEMAN_AGENT_ROOT\scripts\close-session.ps1`) to start the pipeline: log to BITACORA, increment inter-track, check git status. Then:
 
-1. **Auto-metrics**: If session had code/task work (≥3 tool calls), run `auto-metrics` score 6 dims. <7 → `immune-system`.
+1. **Auto-metrics**: If session had code/task work (≥3 tool calls), run `auto-metrics` score 7 dims. <7 → `immune-system`.
 2. **Auto-dreaming**: If errors/bugfixes, `mem_search(type="error|bugfix")` for patterns. Same 2x→catalog. 3x→AGENTS.md rule.
 3. **mem_session_summary**: Call with ## Goal / ## Instructions / ## Discoveries / ## Accomplished / ## Next Steps / ## Relevant Files
 
@@ -289,7 +289,7 @@ Zero filler ("Sure!"). No code without context. Default-FAIL: tool output = evid
 **Destructive operations gate**: NEVER delete/move files without (a) explicit user approval OR (b) ≥3 subagent verifications confirming safety. Deletion = read content first, cross-ref for references, THEN propose. File system mutations are irreversible — treat them as such.
 
 ### G. Post-task auto-evaluation
-Close task: auto-metrics 6 dims (correctness, tokens, error prevention, skill, speed, breadth).
+Close task: auto-metrics 7 dims (correctness, tokens, error prevention, skill, speed, breadth, skill_eval).
 <7 → immune-system + protocol adjust. ≥9 → mem_save pattern.
 **If task had code changes** → load `external-auditor` for blind subagent audit. Discrepancy >1.5 on any dim → immune-system.
 

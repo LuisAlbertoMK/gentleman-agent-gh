@@ -1,41 +1,50 @@
 ---
 name: work-unit-commits
-description: "Plan commits as reviewable work units — one deliverable per commit, tests/docs included, clean rollback"
+description: "Plan commits as reviewable work units. Trigger: implementation, commit splitting, chained PRs, or keeping tests and docs with code."
 license: Apache-2.0
 metadata:
   author: gentleman-programming
-  version: "1.1"
+  version: "1.0"
 ---
 
-## When
+## When to Use
+Split features into reviewable work units — commit splitting, chained PRs, SDD task grouping, cognitive load management.
 
-- Splitting features into reviewable work · preparing commits · chained PRs · keeping reviewer load healthy · SDD tasks with PRs over 400 lines
+## Critical Rules
+- **Commit by work unit**: a commit = deliverable behavior, fix, migration, or docs unit
+- **No commit-by-file-type**: avoid `models`, then `services`, then `tests` if none works alone
+- **Keep tests with code**: tests belong in same commit as the behavior they verify
+- **Keep docs with user-visible change**: docs belong with the feature they explain
+- **Tell a story**: reviewer should understand each commit from its diff + message alone
+- **Future PR-ready**: each commit should be a candidate chained PR slice
+- **SDD workload guard**: if SDD forecasts >400 lines, group commits into chained PRs first
 
-## Rules
+## Work Unit Checklist
+- [ ] One clear purpose per commit
+- [ ] Repo still makes sense after this commit alone
+- [ ] Tests/docs included when relevant
+- [ ] Rollback possible without reverting unrelated work
+- [ ] Message explains the outcome, not the file list
 
-| Rule | Requirement |
-|------|-------------|
-| Commit by work unit | One deliverable behavior, fix, migration, or docs unit per commit |
-| Do NOT commit by file type | Avoid models / services / tests in separate commits if none works alone |
-| Tests with code | Same commit as the behavior they verify |
-| Docs with user-visible change | Same commit as the feature/workflow they explain |
-| Tell a story | Reviewer understands why each commit exists from diff + message |
-| PR-ready | Each commit should be a valid chained PR candidate |
-| SDD guard | >400-line forecast → group into chained PRs before implementation |
+## PR & SDD Relationship
+Work-unit commits → foundation for chained PRs:
+1. Smallest independent unit with verification included
+2. Conventional Commit message per unit
+3. If PR approaches 400 lines → promote groups into chained PRs
 
-## Checklist (pre-commit)
+SDD forecast mapping:
+- **Low risk** → single PR with work-unit commits
+- **Medium** → monitor line count during implementation
+- **High** → follow SDD `delivery_strategy` (ask/auto-chain/exception)
 
-- [ ] One clear purpose · repo works after this commit alone · tests/docs included when relevant · rollback doesn't affect unrelated work · message explains outcome, not file list
+Each SDD work unit maps to commit/PR with: clear start state, clear finished state, verification in same unit, clean rollback.
 
-## Split Examples
+## Commands
+```bash
+# Review before committing
+git diff --stat
+git diff --cached --stat
 
-| Weak | Better work-unit |
-|------|------------------|
-| `add models` | `feat(auth): add token validation domain model and tests` |
-| `add services` | `feat(auth): wire token validation into login flow` |
-
-## PR & SDD
-
-1. Build smallest independent work unit → include verification → conventional commit.
-2. PR approaching 400 lines? → Promote into chained PRs.
-3. SDD forecast: Low=keep in one PR · Medium=monitor lines · High=follow delivery_strategy (ask-on-risk / auto-chain / size:exception).
+# Check recent commit style
+git log --oneline -5
+```

@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
   Downstream validation of CYCLE-3 skills: delivery-harness, chained-pr, subagent-isolation.
@@ -41,8 +41,8 @@ AR Size "delivery-harness" PASS "$((Get-Item $dhp).Length) bytes"
 AR Size "chained-pr" PASS "$((Get-Item $cpp).Length) bytes"
 if($sip){AR Size "subagent-isolation" PASS "$((Get-Item $sip).Length) bytes"}}
 }catch{AR Fatal Execution FAIL "Unhandled exception: $_"}
-if($Json){$r|ConvertTo-Json -D 3}else{
-$pass=@($r|?{$_.Status-eq"PASS"}).Count;$fail=@($r|?{$_.Status-eq"FAIL"}).Count;$warn=@($r|?{$_.Status-eq"WARN"}).Count
-$r|group Section|%{$_.Group|ft Check,Status,Detail -Auto}
-echo "=== Summary: $pass PASS, $fail FAIL, $warn WARN ==="}
+if($Json){$r | ConvertTo-Json -D 3}else{
+$pass=@($r | Where-Object {$_.Status -eq "PASS"}).Count;$fail=@($r | Where-Object {$_.Status -eq "FAIL"}).Count;$warn=@($r | Where-Object {$_.Status -eq "WARN"}).Count
+$r | Group-Object Section | ForEach-Object {$_.Group | Format-Table Check,Status,Detail -Auto}
+Write-Output "=== Summary: $pass PASS, $fail FAIL, $warn WARN ==="}
 exit $ec

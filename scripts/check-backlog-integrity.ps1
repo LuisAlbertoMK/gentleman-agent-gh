@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Verify backlog item status matches repo reality.
 

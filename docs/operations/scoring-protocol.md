@@ -4,7 +4,9 @@
 > **Run**: `powershell ./scripts/score-auto.ps1`
 > **Format**: Returns JSON matching `.project.json` schema.
 
-## Dimensions (10)
+## Dimensions (13)
+
+> **Note**: This protocol covers 9 core dimensions. The current scoring system (`score-auto.ps1`) measures 13: Dead Code, Script Performance, Bitacora, Orthography, Project Artifacts, Cycle Activity, Metrics, Backlog Integrity, Security, Skill Effectiveness, Clean Code, Best Practices, and Score Depth. See `.project.json` for the complete up-to-date taxonomy. For the authoritative score, always run `scripts/score-auto.ps1`.
 
 ---
 
@@ -21,7 +23,7 @@
 
 **Evidence commands**:
 ```powershell
-# Count skills (should be 63)
+# Count skills (should be 69)
 (Get-ChildItem -Directory ".\.agents\skills").Count
 
 # Verify SKILLS-INDEX count matches
@@ -199,7 +201,7 @@ Get-ChildItem "docs/metricas/" -Recurse -File | Select-Object FullName
 
 | Score | Criteria |
 |-------|----------|
-| 10 | 25 scripts, average ≤12KB, no script >50KB, tokenize-all runs clean |
+| 10 | 40 scripts, average ≤12KB, no script >50KB, tokenize-all runs clean |
 | 7 | Scripts exist but some >50KB or tokenization issues |
 | 4 | Bloated scripts or missing token awareness |
 | 0 | No scripts or all oversized |
@@ -239,10 +241,10 @@ Get-ChildItem ".\.agents\skills\*\SKILL.md" | Where-Object { $_.Length -gt 3072 
 
 ## Composite Score
 
-Final = average of all 10 dimensions (each 0-10), rounded to 1 decimal.
+Final = average of all 13 dimensions (each 0-10), rounded to 1 decimal.
 
 ```text
-Σ(dim_scores) / 10 = final_score
+Σ(dim_scores) / 13 = final_score
 ```
 
 ---

@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
   Unified session close pipeline — log, inter-track, git status, and output structured summary.
@@ -28,6 +28,8 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $bitacoraPath = Join-Path -Path $repoRoot -ChildPath "BITACORA.md"
 $interTrack = Join-Path -Path $repoRoot -ChildPath "scripts/inter-track.ps1"
+$scoreAuto = Join-Path -Path $repoRoot -ChildPath "scripts/score-auto.ps1"
+$projectJson = Join-Path -Path $repoRoot -ChildPath ".project.json"
 $dateShort = Get-Date -Format "yyyy-MM-dd"
 
 # Log to BITACORA
@@ -36,6 +38,25 @@ if (Test-Path -LiteralPath $bitacoraPath) {
     $existingContent = Get-Content -LiteralPath $bitacoraPath -Raw
     $newContent = "$entry`r`n$existingContent"
     Set-Content -LiteralPath $bitacoraPath -Value $newContent -Encoding UTF8
+}
+
+# Auto-freshness: update .project.json if >24h stale
+if (Test-Path -LiteralPath $projectJson -PathType Leaf) {
+    try {
+        $proj = Get-Content -LiteralPath $projectJson -Raw -Encoding UTF8 | ConvertFrom-Json
+        $lastUpdate = [datetime]::ParseExact($proj.score.last_updated, "yyyy-MM-dd", $null)
+        $staleDays = [math]::Floor(((Get-Date) - $lastUpdate).TotalDays)
+        if ($staleDays -ge 1 -and (Test-Path -LiteralPath $scoreAuto -PathType Leaf)) {
+            $freshJson = & $scoreAuto -Json 2>$null | ConvertFrom-Json
+            if ($freshJson) {
+                $freshJson | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $projectJson -Encoding UTF8
+                Write-Host "  .project.json auto-updated (was $staleDays day(s) stale)" -ForegroundColor Green
+            }
+        }
+    } catch {
+        # Non-blocking: don't crash session close on score refresh failure
+        Write-Host "  .project.json freshness check skipped ($($_.Exception.Message))" -ForegroundColor DarkYellow
+    }
 }
 
 # Increment inter-track

@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Benchmark comparativo: backup pre-sprint3 vs gentleman-agent-gh (actual)
 #>
@@ -8,10 +8,10 @@ param(
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-$RDir = (rvpa $RDir).Path
+$RDir = (Resolve-Path $RDir).Path
 try {
-function Get-Line { param($P) try { if (test-path $P) { (gc $P -EA Stop | measure -Line).Lines } else { 0 } } catch { Write-Warning "GL $P: $_"; 0 } }
-function Get-Byte { param($P) try { if (test-path $P) { (gi $P -EA Stop).Length } else { 0 } } catch { Write-Warning "GB $P: $_"; 0 } }
+function Get-Line { param($P) try { if (test-path $P) { (Get-Content $P -EA Stop | Measure-Object -Line).Lines } else { 0 } } catch { Write-Warning "GL $P: $_"; 0 } }
+function Get-Byte { param($P) try { if (test-path $P) { (Get-Item $P -EA Stop).Length } else { 0 } } catch { Write-Warning "GB $P: $_"; 0 } }
 Write-Host "<<< AGENTS.md 3-way >>>"
 $bA = Join-Path $BDir "AGENTS.md"
 $rA = Join-Path $RDir "AGENTS.md"
@@ -23,11 +23,11 @@ if (test-path $gA) { Write-Host ("  Global: " + (Get-Line $gA) + "L, " + (Get-By
 Write-Host "<<< Skills - line count >>>"
 $bSD = Join-Path $BDir "skills"
 $rSD = Join-Path (Join-Path $RDir ".agents") "skills"
-try { $bSk = gci -Dir -Lit $bSD -EA Stop | % { $_.Name } } catch { Write-Warning "b skills $bSD: $_"; $bSk = @() }
-try { $rSk = gci -Dir -Lit $rSD -EA Stop | % { $_.Name } } catch { Write-Warning "r skills $rSD: $_"; $rSk = @() }
-$c = $bSk | ? { $rSk -contains $_ }
-$oB = $bSk | ? { $rSk -notcontains $_ }
-$oR = $rSk | ? { $bSk -notcontains $_ }
+try { $bSk = Get-ChildItem -Directory -LiteralPath $bSD -EA Stop | ForEach-Object { $_.Name } } catch { Write-Warning "b skills $bSD: $_"; $bSk = @() }
+try { $rSk = Get-ChildItem -Directory -LiteralPath $rSD -EA Stop | ForEach-Object { $_.Name } } catch { Write-Warning "r skills $rSD: $_"; $rSk = @() }
+$c = $bSk | Where-Object { $rSk -contains $_ }
+$oB = $bSk | Where-Object { $rSk -notcontains $_ }
+$oR = $rSk | Where-Object { $bSk -notcontains $_ }
 $tB = 0; $tR = 0
 foreach ($s in $c) { $tB += (Get-Line (Join-Path $bSD "$s\SKILL.md")); $tR += (Get-Line (Join-Path $rSD "$s\SKILL.md")) }
 $dL = $tR - $tB
@@ -37,13 +37,13 @@ Write-Host ("  B-only: " + $oB.Count + " | R-only: " + $oR.Count)
 Write-Host "<<< Skills - metadata >>>"
 $bP = 0; $rP = 0; $bTr = 0; $rTr = 0; $bTa = 0; $rTa = 0
 foreach ($s in $bSk) {
-  try { $c2 = gc (Join-Path $bSD "$s\SKILL.md") -Raw -EA Stop } catch { Write-Warning "b SKILL.md $s: $_"; continue }
+  try { $c2 = Get-Content (Join-Path $bSD "$s\SKILL.md") -Raw -EA Stop } catch { Write-Warning "b SKILL.md $s: $_"; continue }
   if ($c2 -match 'description:\s*>\s+\{?\w+\}?\s*skill') { $bP++ }
   if ($c2 -match '(?m)^\s*triggers:') { $bTr++ }
   if ($c2 -match '(?m)^\s*tags:') { $bTa++ }
 }
 foreach ($s in $rSk) {
-  try { $c3 = gc (Join-Path $rSD "$s\SKILL.md") -Raw -EA Stop } catch { Write-Warning "r SKILL.md $s: $_"; continue }
+  try { $c3 = Get-Content (Join-Path $rSD "$s\SKILL.md") -Raw -EA Stop } catch { Write-Warning "r SKILL.md $s: $_"; continue }
   if ($c3 -match 'description:\s*>\s+\{?\w+\}?\s*skill') { $rP++ }
   if ($c3 -match '(?m)^\s*triggers:') { $rTr++ }
   if ($c3 -match '(?m)^\s*tags:') { $rTa++ }
@@ -55,14 +55,14 @@ Write-Host ("  Descr real: B NO -> R SI")
 Write-Host "<<< Scripts >>>"
 $bSd = Join-Path $BDir "scripts"
 $rSd = Join-Path $RDir "scripts"
-if (test-path $bSd) { try { $bs = (gci -Filter "*.ps1" -Lit $bSd -EA Stop).Count } catch { $bs = 0 } } else { $bs = 0 }
-try { $rs = (gci -Filter "*.ps1" -Lit $rSd -EA Stop).Count } catch { Write-Warning "r scripts $rSd: $_"; $rs = 0 }
+if (test-path $bSd) { try { $bs = (Get-ChildItem -Filter "*.ps1" -LiteralPath $bSd -EA Stop).Count } catch { $bs = 0 } } else { $bs = 0 }
+try { $rs = (Get-ChildItem -Filter "*.ps1" -LiteralPath $rSd -EA Stop).Count } catch { Write-Warning "r scripts $rSd: $_"; $rs = 0 }
 $sm = 0; $ct = 0
-try { $sf = gci -Filter "*.ps1" -Lit $rSd -EA Stop } catch { Write-Warning "r scripts dir $rSd: $_"; $sf = @() }
+try { $sf = Get-ChildItem -Filter "*.ps1" -LiteralPath $rSd -EA Stop } catch { Write-Warning "r scripts dir $rSd: $_"; $sf = @() }
 foreach ($f in $sf) {
-  try { $cc = gc $f.FullName -Raw -EA Stop } catch { continue }
+  try { $cc = Get-Content $f.FullName -Raw -EA Stop } catch { continue }
   if ($cc -match 'Set-StrictMode') { $sm++ }
-  $ct += (sls '\bcatch\b' -Lit $f.FullName).Count
+  $ct += (Select-String '\bcatch\b' -LiteralPath $f.FullName).Count
 }
 Write-Host ("  Scripts: B " + $bs + " -> R " + $rs)
 Write-Host ("  StrictMd: B 0 -> R " + $sm + "/" + $rs)

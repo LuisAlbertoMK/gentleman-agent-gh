@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Verifica y expone herramientas esenciales en PATH
 .DESCRIPTION

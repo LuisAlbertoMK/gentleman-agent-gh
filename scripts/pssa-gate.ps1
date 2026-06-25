@@ -35,38 +35,38 @@ if($nw-ne$o){$ln[$idx]=$nw;try{Set-Content -LiteralPath $fp -Value $ln -Encoding
 return $n }
 
 function Save-Baseline { param([array]$Results,[int]$AmpersandCount)
-$bl=@{timestamp=(Get-Date -Format 'yyyy-MM-ddTHH:mm:ss');total=$Results.Count;byRule=$Results|group RuleName|%{@{rule=$_.Name;count=$_.Count}};byFile=$Results|group ScriptName|%{@{file=$_.Name;count=$_.Count}};autoFixableCount=($Results|?{$_.RuleName -in $fr}).Count;trackedCount=($Results|?{$_.RuleName -in $tr}).Count;manualCount=($Results|?{$_.RuleName -notin ($fr+$tr)}).Count;ampersandCount=$AmpersandCount}
-$di=Split-Path $BaselineFile -Parent;if(-not(Test-Path $di)){New-Item -ItemType Directory -Path $di -Force|Out-Null}
-$bl|ConvertTo-Json -Depth 10|Set-Content -LiteralPath $BaselineFile -Encoding UTF8;return $bl}
+$bl=@{timestamp=(Get-Date -Format 'yyyy-MM-ddTHH:mm:ss');total=$Results.Count;byRule=$Results | Group-Object RuleName | ForEach-Object {@{rule=$_.Name;count=$_.Count}};byFile=$Results | Group-Object ScriptName | ForEach-Object {@{file=$_.Name;count=$_.Count}};autoFixableCount=($Results | Where-Object {$_.RuleName -in $fr}).Count;trackedCount=($Results | Where-Object {$_.RuleName -in $tr}).Count;manualCount=($Results | Where-Object {$_.RuleName -notin ($fr+$tr)}).Count;ampersandCount=$AmpersandCount}
+$di=Split-Path $BaselineFile -Parent;if(-not(Test-Path $di)){New-Item -ItemType Directory -Path $di -Force | Out-Null}
+$bl | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $BaselineFile -Encoding UTF8;return $bl}
 
 $target=Resolve-Path $Path
 if(-not$Quiet){Write-Host "== PSSA Gate - $Mode ==";Write-Host "  Target: $target"}
 Write-Status "Scanning..."
 $results=Get-PSSAViolation -TargetPath $target
 
-if($Mode-eq'Fix'){Write-Host "`n-- Auto-fix --";$bf=Resolve-BomEncoding -Violations ($results|?{$_.RuleName-eq'PSUseBOMForUnicodeEncodedFile'});$sf=Resolve-SwitchDefault -Violations ($results|?{$_.RuleName-eq'PSAvoidDefaultValueSwitchParameter'});Write-Host "  BOM: $bf | Switch: $sf";Write-Status "Re-scanning...";$results=Get-PSSAViolation -TargetPath $target}
+if($Mode -eq 'Fix'){Write-Host "`n-- Auto-fix --";$bf=Resolve-BomEncoding -Violations ($results | Where-Object {$_.RuleName -eq 'PSUseBOMForUnicodeEncodedFile'});$sf=Resolve-SwitchDefault -Violations ($results | Where-Object {$_.RuleName -eq 'PSAvoidDefaultValueSwitchParameter'});Write-Host "  BOM: $bf | Switch: $sf";Write-Status "Re-scanning...";$results=Get-PSSAViolation -TargetPath $target}
 
-$af=@($results|?{$_.RuleName -in $fr});$td=@($results|?{$_.RuleName -in $tr});$manual=@($results|?{$_.RuleName -notin ($fr+$tr)})
-$ev=@($manual|?{$sp=$_.ScriptPath.Replace('\','/');$sk=$false;foreach($d in $xd){if($sp-match"/$d/"){$sk=$true;break}};$sk})
-$manual=@($manual|?{$sp=$_.ScriptPath.Replace('\','/');$sk=$false;foreach($d in $xd){if($sp-match"/$d/"){$sk=$true;break}};-not$sk})
+$af=@($results | Where-Object {$_.RuleName -in $fr});$td=@($results | Where-Object {$_.RuleName -in $tr});$manual=@($results | Where-Object {$_.RuleName -notin ($fr+$tr)})
+$ev=@($manual | Where-Object {$sp=$_.ScriptPath.Replace('\','/');$sk=$false;foreach($d in $xd){if($sp-match"/$d/"){$sk=$true;break}};$sk})
+$manual=@($manual | Where-Object {$sp=$_.ScriptPath.Replace('\','/');$sk=$false;foreach($d in $xd){if($sp-match"/$d/"){$sk=$true;break}};-not$sk})
 
 $kx=@('bash-safe.ps1','pssa-gate.ps1');$av=@()
-gci -Path $target -Recurse -Filter '*.ps1' -ErrorAction SilentlyContinue|%{$rp=$_.FullName.Replace($target,'').TrimStart('\');$sk=$false;foreach($ex in $kx){if($rp-match[regex]::Escape($ex)){$sk=$true}};foreach($d in $xd){if($rp-match"^$d[\\/]"){$sk=$true}};if($sk){return}
-$ln=gc -LiteralPath $_.FullName -ErrorAction SilentlyContinue;if(-not$ln){return}
+Get-ChildItem -Path $target -Recurse -Filter '*.ps1' -ErrorAction SilentlyContinue | ForEach-Object {$rp=$_.FullName.Replace($target,'').TrimStart('\');$sk=$false;foreach($ex in $kx){if($rp-match[regex]::Escape($ex)){$sk=$true}};foreach($d in $xd){if($rp-match"^$d[\\/]"){$sk=$true}};if($sk){return}
+$ln=Get-Content -LiteralPath $_.FullName -ErrorAction SilentlyContinue;if(-not$ln){return}
 for($i=0;$i-lt$ln.Count;$i++){$t=$ln[$i].Trim();if($t-eq''-or$t.StartsWith('#')){continue};if($t-match'(^|[^""])&&([^""]|$)'){$av+=[PSCustomObject]@{ScriptName=$rp;Line=$i+1;Text=$t}}}}
 $ac=$av.Count
 
 if(-not$Quiet){Write-Host "`n-- Summary --"
 Write-Host "  Total: $($results.Count) | &&: $ac | Auto: $($af.Count) | Tracked: $($td.Count) | Excluded: $(@($ev).Count) | Manual: $($manual.Count)"
-if($ac-gt0){Write-Host "`n-- && violations (PS5.1) --";$av|select ScriptName,Line,Text|ft -AutoSize|Out-String|Write-Host}
-if($manual.Count-gt0){Write-Host "`n-- Manual review (PSSA) --";$manual|group RuleName|%{Write-Host "  $($_.Name): $($_.Count)"};$manual|select RuleName,Line,ScriptName|ft -AutoSize|Out-String|Write-Host}}
+if($ac-gt0){Write-Host "`n-- && violations (PS5.1) --";$av | Select-Object ScriptName,Line,Text | Format-Table -AutoSize | Out-String | Write-Host}
+if($manual.Count-gt0){Write-Host "`n-- Manual review (PSSA) --";$manual | Group-Object RuleName | ForEach-Object {Write-Host "  $($_.Name): $($_.Count)"};$manual | Select-Object RuleName,Line,ScriptName | Format-Table -AutoSize | Out-String | Write-Host}}
 
 switch($Mode){
-'Trend'{$bl=Save-Baseline -Results $results -AmpersandCount $ac;$prior=if(Test-Path $BaselineFile){gc -LiteralPath $BaselineFile -Raw|ConvertFrom-Json}else{$null}
+'Trend'{$bl=Save-Baseline -Results $results -AmpersandCount $ac;$prior=if(Test-Path $BaselineFile){Get-Content -LiteralPath $BaselineFile -Raw | ConvertFrom-Json}else{$null}
 if($prior){$d=$results.Count-$prior.total;$s=if($d-gt0){'+'}else{''};$pa=if($prior.PSObject.Properties['ampersandCount']){($prior.ampersandCount -as[int])}else{0};$ad=$ac-$pa;$as=if($ad-gt0){'+'}else{''}
 Write-Host "`n-- Trend --";Write-Host "  PSSA: $($prior.total)->$($results.Count)|D:$s$d";Write-Host "  &&: $($prior.ampersandCount)->$ac|D:$as$ad"
 if($d-gt0-or$ad-gt0){Write-Warning "  Some INCREASED"}elseif($d-lt0-and$ad-le0){Write-Host "  DECREASED - good!"}else{Write-Host "  Steady."}}else{Write-Host "  No prior data."}}
-'Check'{if(-not(Test-Path $BaselineFile)){Save-Baseline -Results $results -AmpersandCount $ac|Out-Null;Write-Status "Baseline saved to $BaselineFile"}}}
+'Check'{if(-not(Test-Path $BaselineFile)){Save-Baseline -Results $results -AmpersandCount $ac | Out-Null;Write-Status "Baseline saved to $BaselineFile"}}}
 
 $ec=0
 if($manual.Count-gt0-and$Mode-ne'Trend'){Write-Warning "PSSA Gate: $($manual.Count) need manual review.";$ec=1}
