@@ -28,7 +28,7 @@ docs/
 | `quality-standard.md` | 13 dimensiones de calidad del proyecto |
 | `scoring-protocol.md` | Protocolo reproducible de scoring |
 | `subagent-prompts.md` | Prompts de prueba para subagentes |
-| `project-score.md` | Score actual del proyecto (9.9/10) |
+| `project-score.md` | Score actual del proyecto (10.0/10) |
 | `external-audit-findings.md` | Hallazgos de auditoría externa D:\mdShare |
 
 ---

@@ -1,4 +1,4 @@
-# Build System Optimization: Bun/TypeScript Monorepos
+﻿# Build System Optimization: Bun/TypeScript Monorepos
 
 **Project:** opencode-vmk | **Date:** 2026-06-23 | **Status:** Research complete
 
@@ -6,19 +6,19 @@
 
 ## 1. Compiler/Bundler Benchmarks: Bun vs tsc vs SWC vs esbuild
 
-### 1.1 Cold Build — 50K LOC TypeScript (200 modules)
+### 1.1 Cold Build â€” 50K LOC TypeScript (200 modules)
 
 | Tool | Time | Rel vs tsc | Memory | Notes |
 |------|------|-----------|--------|-------|
-| **tsc** | ~56s | 1× | ~520 MB | Full type-check + emit |
-| **esbuild** | ~1.7s | 32× | ~230 MB | Go-based, no type-check |
-| **SWC** | ~1.2s | 47× | ~210 MB | Rust-based, no type-check |
-| **Bun bundler** | ~0.8s* | ~70× | ~190 MB* | Zig-based, no type-check |
+| **tsc** | ~56s | 1Ã— | ~520 MB | Full type-check + emit |
+| **esbuild** | ~1.7s | 32Ã— | ~230 MB | Go-based, no type-check |
+| **SWC** | ~1.2s | 47Ã— | ~210 MB | Rust-based, no type-check |
+| **Bun bundler** | ~0.8s* | ~70Ã— | ~190 MB* | Zig-based, no type-check |
 
-*Sources: Markaicode 2026 benchmarks (tsc 5.7.3, SWC 1.10.11, esbuild 0.24.2); Bun 1.3 internal benchmarks (three.js 10-copy).  
-*Bun numbers estimated from published graphs — bundling 10× three.js in 269ms vs esbuild 572ms.*
+*Sources: Markaicode 2026 benchmarks (tsc 5.7.3, SWC 1.10.11, esbuild 0.24.2); Bun 1.3 internal benchmarks (three.js 10-copy).
+*Bun numbers estimated from published graphs â€” bundling 10Ã— three.js in 269ms vs esbuild 572ms.*
 
-**Key insight:** All transpilers are **40–70× faster than tsc** for code emission. None do type-checking. The correct architecture: `tsc --noEmit` (type-check) + transpiler (emit).
+**Key insight:** All transpilers are **40â€“70Ã— faster than tsc** for code emission. None do type-checking. The correct architecture: `tsc --noEmit` (type-check) + transpiler (emit).
 
 ### 1.2 Incremental Build
 
@@ -29,7 +29,7 @@
 | SWC | 1.2s | ~0.3s |
 | Bun | 0.8s | ~0.2s |
 
-### 1.3 Bundler Benchmark — 10,000 React Components
+### 1.3 Bundler Benchmark â€” 10,000 React Components
 
 From Bun's published Rolldown benchmark (Linux x64):
 
@@ -53,15 +53,15 @@ Split a monorepo into multiple `tsconfig.json` files with `references` and `comp
 
 | Scenario | Before | After | Speedup |
 |----------|--------|-------|---------|
-| DEV community case study | 11 min | 3 min | 3.7× |
-| + TS 7.0 Go compiler (est.) | 3 min | ~18s | 10× |
-| + Incremental (est.) | 18s | ~4s | 4.5× |
+| DEV community case study | 11 min | 3 min | 3.7Ã— |
+| + TS 7.0 Go compiler (est.) | 3 min | ~18s | 10Ã— |
+| + Incremental (est.) | 18s | ~4s | 4.5Ã— |
 
 ### 2.3 Goldilocks Zone
 
 - **Too few projects (<3):** No parallelism benefits
 - **Too many (>20):** Cognitive overhead, IDE restarts, config drift
-- **Sweet spot:** 4–8 large projects aligned with natural package boundaries
+- **Sweet spot:** 4â€“8 large projects aligned with natural package boundaries
 
 ### 2.4 Key Config
 
@@ -75,7 +75,7 @@ Split a monorepo into multiple `tsconfig.json` files with `references` and `comp
     "emitDeclarationOnly": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "isolatedDeclarations": true,  // TS 5.5+ — parallel d.ts emit
+    "isolatedDeclarations": true,  // TS 5.5+ â€” parallel d.ts emit
     "skipLibCheck": true,
     "strict": true,
     "moduleResolution": "bundler",
@@ -105,7 +105,7 @@ Split a monorepo into multiple `tsconfig.json` files with `references` and `comp
 }
 ```
 
-### 2.5 `isolatedDeclarations` — The Accelerator
+### 2.5 `isolatedDeclarations` â€” The Accelerator
 
 - TS 5.5+ feature requiring explicit type annotations on all public APIs
 - Lets downstream packages generate `.d.ts` **without** running the full type-checker on dependencies
@@ -115,7 +115,7 @@ Split a monorepo into multiple `tsconfig.json` files with `references` and `comp
 
 ---
 
-## 3. tsgo — Go-based TypeScript Compiler
+## 3. tsgo â€” Go-based TypeScript Compiler
 
 ### 3.1 Status (June 2026)
 
@@ -131,12 +131,12 @@ Split a monorepo into multiple `tsconfig.json` files with `references` and `comp
 
 | Metric | tsc (JS) | tsgo (Go) | Ratio |
 |--------|----------|-----------|-------|
-| Editor startup (VS Code own codebase) | 9.6s | 1.2s | **8×** |
-| Full type-check (50K LOC) | 56s | ~5.6s* | **10×** |
-| Memory | ~520 MB | ~260 MB | **2×** |
-| Full type-check (Bloomberg 50M LOC) | hours | mins* | **~10×** |
+| Editor startup (VS Code own codebase) | 9.6s | 1.2s | **8Ã—** |
+| Full type-check (50K LOC) | 56s | ~5.6s* | **10Ã—** |
+| Memory | ~520 MB | ~260 MB | **2Ã—** |
+| Full type-check (Bloomberg 50M LOC) | hours | mins* | **~10Ã—** |
 
-*Projected from Microsoft's 10× claim. `tsgo --noEmit` for type-check only.
+*Projected from Microsoft's 10Ã— claim. `tsgo --noEmit` for type-check only.
 
 ### 3.3 Why Go Not Rust
 
@@ -162,10 +162,10 @@ TypeScript's complex symbol table, AST, and type-checker working memory translat
 
 From real-world production optimizations across 3 monorepos:
 
-1. **Remote cache** — **10×** on repeated CI runs (unchanged code = 0s)
-2. **`--affected` / `--filter` on CI** — **3–5×** for feature PRs
-3. **Correct `dependsOn`** — **1.5–2×** by maximizing parallelism
-4. **`outputs` configuration** — Prevents stale cache bugs
+1. **Remote cache** â€” **10Ã—** on repeated CI runs (unchanged code = 0s)
+2. **`--affected` / `--filter` on CI** â€” **3â€“5Ã—** for feature PRs
+3. **Correct `dependsOn`** â€” **1.5â€“2Ã—** by maximizing parallelism
+4. **`outputs` configuration** â€” Prevents stale cache bugs
 
 ### 4.2 Optimized `turbo.json`
 
@@ -225,30 +225,30 @@ From real-world production optimizations across 3 monorepos:
 ### 4.4 Task Dependency Graph
 
 ```
-                  ┌──────────┐
-                  │   lint   │ (no deps, fully parallel)
-                  └──────────┘
-                  ┌──────────┐
-         ┌───────▶│  build   │◀────────┐
-         │        └──────────┘         │
-         │              │              │
-    ┌────────┐   ┌──────────┐   ┌──────────┐
-    │ core   │   │  ui      │   │  app     │
-    │ build  │   │  build   │   │  build   │
-    └────────┘   └──────────┘   └──────────┘
-         │              │              │
-         │        ┌──────────┐         │
-         └───────▶│type-check│◄────────┘
-                  └──────────┘
-                       │
-                  ┌──────────┐
-                  │   test   │
-                  └──────────┘
+                  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+                  â”‚   lint   â”‚ (no deps, fully parallel)
+                  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+         â”Œâ”€â”€â”€â”€â”€â”€â”€â–¶â”‚  build   â”‚â—€â”€â”€â”€â”€â”€â”€â”€â”€â”
+         â”‚        â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜         â”‚
+         â”‚              â”‚              â”‚
+    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+    â”‚ core   â”‚   â”‚  ui      â”‚   â”‚  app     â”‚
+    â”‚ build  â”‚   â”‚  build   â”‚   â”‚  build   â”‚
+    â””â”€â”€â”€â”€â”€â”€â”€â”€â”˜   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+         â”‚              â”‚              â”‚
+         â”‚        â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”         â”‚
+         â””â”€â”€â”€â”€â”€â”€â”€â–¶â”‚type-checkâ”‚â—„â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                       â”‚
+                  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+                  â”‚   test   â”‚
+                  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ---
 
-## 5. Bun Test Runner — Parallelization & Performance
+## 5. Bun Test Runner â€” Parallelization & Performance
 
 ### 5.1 Speed Benchmarks
 
@@ -256,10 +256,10 @@ Suite: 200 test files, 1,500 test cases, TypeScript, some mocks + light DOM.
 
 | Runner | Cold full | Watch (1 change) | 1,000 simple tests |
 |--------|-----------|-------------------|-------------------|
-| **Bun test** | **3–6s** | **sub-1s** | **~0.8s** |
-| Vitest | 10–15s | 1–2s | ~2s |
-| Jest + SWC | 40–50s | 6–10s | ~8s |
-| Jest + ts-jest | 90–120s | 15–25s | ~15s |
+| **Bun test** | **3â€“6s** | **sub-1s** | **~0.8s** |
+| Vitest | 10â€“15s | 1â€“2s | ~2s |
+| Jest + SWC | 40â€“50s | 6â€“10s | ~8s |
+| Jest + ts-jest | 90â€“120s | 15â€“25s | ~15s |
 
 ### 5.2 Key Flags
 
@@ -282,10 +282,10 @@ bun test src/ --filter "User*"    # Filter by test name pattern
 
 | Coverage provider | Cold | Incremental | Notes |
 |------------------|------|-------------|-------|
-| None | 3–6s | sub-1s | Base |
-| Bun built-in (c8) | 6–12s | ~2s | ~2× overhead, native V8 |
-| Vitest V8 | 12–18s | 2–3s | @vitest/coverage-v8 |
-| Jest Istanbul | 50–70s | 10–15s | ~10× overhead |
+| None | 3â€“6s | sub-1s | Base |
+| Bun built-in (c8) | 6â€“12s | ~2s | ~2Ã— overhead, native V8 |
+| Vitest V8 | 12â€“18s | 2â€“3s | @vitest/coverage-v8 |
+| Jest Istanbul | 50â€“70s | 10â€“15s | ~10Ã— overhead |
 
 **Recommendation:** Run coverage only in CI, not in local dev. Use `bun test` for local (fastest), `bun test --coverage` in CI with threshold gate.
 
@@ -293,14 +293,14 @@ bun test src/ --filter "User*"    # Filter by test name pattern
 
 | Criterion | Bun test | Vitest |
 |-----------|----------|--------|
-| Pure TS logic / API tests | ✅ Best | ✅ Great |
-| React components / jsdom | ⚠️ Good | ✅ Best |
-| Snapshot-heavy suites | ⚠️ Limited | ✅ Full compat |
-| Custom serializers | ⚠️ Edge cases | ✅ Full compat |
-| Monorepo Turborepo caching | ⚠️ Less docs | ✅ Documented |
-| CI/reporting integrations | ⚠️ Basic | ✅ Rich |
-| Watch mode speed | ✅ Sub-1s | ✅ 1–2s |
-| Import.meta.vitest features | ❌ | ✅ Vitest API |
+| Pure TS logic / API tests | âœ… Best | âœ… Great |
+| React components / jsdom | âš ï¸ Good | âœ… Best |
+| Snapshot-heavy suites | âš ï¸ Limited | âœ… Full compat |
+| Custom serializers | âš ï¸ Edge cases | âœ… Full compat |
+| Monorepo Turborepo caching | âš ï¸ Less docs | âœ… Documented |
+| CI/reporting integrations | âš ï¸ Basic | âœ… Rich |
+| Watch mode speed | âœ… Sub-1s | âœ… 1â€“2s |
+| Import.meta.vitest features | âŒ | âœ… Vitest API |
 
 **Recommendation for opencode-vmk:** Use **Bun test for logic/internal packages**, Vitest for SolidJS UI packages. Split pipeline using `turbo.json` per-task.
 
@@ -310,7 +310,7 @@ bun test src/ --filter "User*"    # Filter by test name pattern
 
 ### 6.1 What It Does
 
-Bundles TypeScript + dependencies + Bun runtime into a single native executable (~50–90 MB).
+Bundles TypeScript + dependencies + Bun runtime into a single native executable (~50â€“90 MB).
 
 ```bash
 # Basic
@@ -322,7 +322,7 @@ bun build ./cli.ts --compile --target=bun-linux-x64 --outfile mycli-linux
 # Minified + sourcemap
 bun build ./cli.ts --compile --minify --sourcemap --outfile mycli
 
-# Full-stack (server + client HTML in one binary)  — Bun v1.2.17+
+# Full-stack (server + client HTML in one binary)  â€” Bun v1.2.17+
 bun build ./server.ts --compile --outfile app
 ```
 
@@ -330,11 +330,11 @@ bun build ./server.ts --compile --outfile app
 
 | Runtime | Binary size (hello world) | Tree-shaking | Notes |
 |---------|--------------------------|-------------|-------|
-| Bun `--compile` | ~57 MB | ✅ Yes | Includes Bun runtime |
-| Deno `compile` | ~565 MB | ❌ No | Embeds all deps as-is |
-| Node SEA | ~85 MB | ⚠️ Partial | Stability 1.1 |
+| Bun `--compile` | ~57 MB | âœ… Yes | Includes Bun runtime |
+| Deno `compile` | ~565 MB | âŒ No | Embeds all deps as-is |
+| Node SEA | ~85 MB | âš ï¸ Partial | Stability 1.1 |
 
-Bun binaries are **~9× smaller** than Deno equivalents due to tree-shaking + minification.
+Bun binaries are **~9Ã— smaller** than Deno equivalents due to tree-shaking + minification.
 
 ### 6.3 Target Matrix
 
@@ -388,13 +388,13 @@ turbo watch dev
 turbo watch dev --filter=@opencode/ui
 ```
 
-Turborepo 2.0 watch mode uses Turbo's task graph to only re-run affected tasks when files change — more efficient than per-package watchers.
+Turborepo 2.0 watch mode uses Turbo's task graph to only re-run affected tasks when files change â€” more efficient than per-package watchers.
 
 **Recommendation:** Use Bun native `--watch` for single-package dev loops, Turbo `watch` for monorepo-wide. Avoid chokidar entirely on Bun runtime.
 
 ---
 
-## 8. CI/CD Pipeline Optimization — GitHub Actions
+## 8. CI/CD Pipeline Optimization â€” GitHub Actions
 
 ### 8.1 Optimized Workflow
 
@@ -520,26 +520,26 @@ jobs:
 
 ```
 apps/
-├── cli/                    # Entry: bun build --compile
-├── vscode-extension/       # LSP integration
-├── web-dashboard/          # SolidJS SPA
-├── documentation/          # SolidJS docs site
+â”œâ”€â”€ cli/                    # Entry: bun build --compile
+â”œâ”€â”€ vscode-extension/       # LSP integration
+â”œâ”€â”€ web-dashboard/          # SolidJS SPA
+â”œâ”€â”€ documentation/          # SolidJS docs site
 packages/
-├── core/                   # Effect-TS: services, config
-├── shared-types/           # No runtime, .d.ts only
-├── effects/                # Effect-TS layers, managed runtime
-├── store/                  # SolidJS stores, signals
-├── ui/                     # SolidJS atomic components
-├── test-utils/             # Shared test helpers
-├── schema/                 # Zod/Schemas (Effect-TS Schema)
-├── telemetry/              # OpenTelemetry
-├── config/                 # Shared env/config schemas
-├── i18n/                   # Internationalization
-├── auth/                   # Auth middleware
-├── api-client/             # HTTP client (Ky/Effect)
-├── database/               # Drizzle ORM
-├── worker/                 # Background jobs
-└── ...                     # Total ~25 packages
+â”œâ”€â”€ core/                   # Effect-TS: services, config
+â”œâ”€â”€ shared-types/           # No runtime, .d.ts only
+â”œâ”€â”€ effects/                # Effect-TS layers, managed runtime
+â”œâ”€â”€ store/                  # SolidJS stores, signals
+â”œâ”€â”€ ui/                     # SolidJS atomic components
+â”œâ”€â”€ test-utils/             # Shared test helpers
+â”œâ”€â”€ schema/                 # Zod/Schemas (Effect-TS Schema)
+â”œâ”€â”€ telemetry/              # OpenTelemetry
+â”œâ”€â”€ config/                 # Shared env/config schemas
+â”œâ”€â”€ i18n/                   # Internationalization
+â”œâ”€â”€ auth/                   # Auth middleware
+â”œâ”€â”€ api-client/             # HTTP client (Ky/Effect)
+â”œâ”€â”€ database/               # Drizzle ORM
+â”œâ”€â”€ worker/                 # Background jobs
+â””â”€â”€ ...                     # Total ~25 packages
 ```
 
 ### 9.2 Effect Ecosystem Considerations
@@ -548,14 +548,14 @@ Effect-TS has heavy type-level computation that can **dominate** type-check time
 
 | Optimization | Impact | Priority |
 |-------------|--------|----------|
-| `skipLibCheck: true` | ~40% reduction | ✅ Critical |
-| `isolatedDeclarations` on all consuming packages | ~30% for downstream | ✅ Critical |
-| `import type` for Effect types | ~15% cumulative | ⚠️ Recommended |
-| Avoid deep conditional types in public APIs | ~20% for effect boundaries | ⚠️ Recommended |
-| Pre-compile Effect schema to standalone `.d.ts` | ~50% for schema packages | 🔧 Investigate |
-| tsgo (TS 7.0) on Effect-heavy packages | ~10× on type-check | 📅 When stable |
+| `skipLibCheck: true` | ~40% reduction | âœ… Critical |
+| `isolatedDeclarations` on all consuming packages | ~30% for downstream | âœ… Critical |
+| `import type` for Effect types | ~15% cumulative | âš ï¸ Recommended |
+| Avoid deep conditional types in public APIs | ~20% for effect boundaries | âš ï¸ Recommended |
+| Pre-compile Effect schema to standalone `.d.ts` | ~50% for schema packages | ðŸ”§ Investigate |
+| tsgo (TS 7.0) on Effect-heavy packages | ~10Ã— on type-check | ðŸ“… When stable |
 
-### 9.3 SolidJS UI — Build Strategy
+### 9.3 SolidJS UI â€” Build Strategy
 
 SolidJS + Bun/Vite has specific considerations:
 
@@ -686,64 +686,64 @@ sourcemap = "external"
 
 | Dimension | Current (typical Bun monorepo) | Optimized | Gain |
 |-----------|-------------------------------|-----------|------|
-| **Full type-check (25 packages)** | ~4 min (tsc) | ~24s (tsgo) | **10×** |
-| **Incremental type-check** | ~45s | ~5s | **9×** |
-| **Full build (transpile only)** | ~2 min | ~30s | **4×** |
-| **Change-only build (CI)** | Run all packages | `--affected` only | **~8×** |
-| **Test cold (logic packages)** | ~30s (Vitest) | ~3s (Bun test) | **10×** |
-| **Test cold (UI packages)** | ~60s (Vitest) | ~60s (Vitest) | **1×** (same) |
-| **CI full pipeline (no cache)** | ~12 min | ~45s | **16×** |
-| **CI change-only pipeline (cache hit)** | ~6 min | ~5s | **72×** |
-| **Binary startup (CLI)** | ~200ms (bun run) | ~5ms (compiled) | **40×** |
-| **Watch mode latency** | ~150ms (chokidar) | ~5ms (Bun native) | **30×** |
-| **Dependency install** | ~30s (npm) | ~3s (bun install) | **10×** |
+| **Full type-check (25 packages)** | ~4 min (tsc) | ~24s (tsgo) | **10Ã—** |
+| **Incremental type-check** | ~45s | ~5s | **9Ã—** |
+| **Full build (transpile only)** | ~2 min | ~30s | **4Ã—** |
+| **Change-only build (CI)** | Run all packages | `--affected` only | **~8Ã—** |
+| **Test cold (logic packages)** | ~30s (Vitest) | ~3s (Bun test) | **10Ã—** |
+| **Test cold (UI packages)** | ~60s (Vitest) | ~60s (Vitest) | **1Ã—** (same) |
+| **CI full pipeline (no cache)** | ~12 min | ~45s | **16Ã—** |
+| **CI change-only pipeline (cache hit)** | ~6 min | ~5s | **72Ã—** |
+| **Binary startup (CLI)** | ~200ms (bun run) | ~5ms (compiled) | **40Ã—** |
+| **Watch mode latency** | ~150ms (chokidar) | ~5ms (Bun native) | **30Ã—** |
+| **Dependency install** | ~30s (npm) | ~3s (bun install) | **10Ã—** |
 
 ---
 
 ## 11. Recommended Implementation Order
 
 ```
-Phase 1 (Week 1-2) — Low effort, high impact:
-  ☐ Add turbo.json with correct dependsOn + outputs
-  ☐ Enable skipLibCheck + isolatedDeclarations in tsconfig
-  ☐ Set up Vercel Remote Cache (free)
-  ☐ Add --affected flag to CI workflows
-  ☐ Switch to bun test for logic packages
+Phase 1 (Week 1-2) â€” Low effort, high impact:
+  â˜ Add turbo.json with correct dependsOn + outputs
+  â˜ Enable skipLibCheck + isolatedDeclarations in tsconfig
+  â˜ Set up Vercel Remote Cache (free)
+  â˜ Add --affected flag to CI workflows
+  â˜ Switch to bun test for logic packages
 
-Phase 2 (Week 3-4) — Medium effort:
-  ☐ Split into 4-8 TypeScript project references
-  ☐ Configure bunfig.toml with test timeouts + thresholds
-  ☐ Add concurrency groups to CI workflow
-  ☐ Implement coverage thresholds (80% gate)
-  ☐ Switch Vitest to dev-only for UI, Bun test default
+Phase 2 (Week 3-4) â€” Medium effort:
+  â˜ Split into 4-8 TypeScript project references
+  â˜ Configure bunfig.toml with test timeouts + thresholds
+  â˜ Add concurrency groups to CI workflow
+  â˜ Implement coverage thresholds (80% gate)
+  â˜ Switch Vitest to dev-only for UI, Bun test default
 
-Phase 3 (Month 2) — Higher effort:
-  ☐ Migrate type-check to tsgo (when TS 7.0 stable)
-  ☐ bun build --compile for CLI entrypoint
-  ☐ Turbo watch mode for development
-  ☐ Self-host remote cache (if Vercel not desired)
+Phase 3 (Month 2) â€” Higher effort:
+  â˜ Migrate type-check to tsgo (when TS 7.0 stable)
+  â˜ bun build --compile for CLI entrypoint
+  â˜ Turbo watch mode for development
+  â˜ Self-host remote cache (if Vercel not desired)
 
 Phase 4 (Ongoing):
-  ☐ Regular `import type` audits
-  ☐ Effect-TS schema pre-compilation
-  ☐ Periodic benchmark tracking
+  â˜ Regular `import type` audits
+  â˜ Effect-TS schema pre-compilation
+  â˜ Periodic benchmark tracking
 ```
 
 ---
 
 ## Sources
 
-1. Markaicode "TypeScript Compilation Benchmark 2026" — tsc/SWC/esbuild speed/memory
-2. Bun.sh bundler benchmarks — 10,000 React components, bundler speed graph
-3. PkgPulse "Bun Test vs Vitest vs Jest Benchmarks 2026" — test runner comparison
-4. BirJob "TypeScript Build Performance 2026" — TS 7.0 Go compiler, project references, pipeline patterns
-5. Turborepo docs — caching, CI construction, --affected flag, Remote Cache
-6. Microsoft DevBlogs — TypeScript native port announcement, TS 7.0 Beta
-7. Bloomberg "10 Insights Adopting TypeScript at Scale" — 50M LOC infrastructure
-8. Stripe "Migrating Millions of Lines to TypeScript" — 3.7M LOC single PR
-9. DEV Community "TypeScript Project References 11min → 3min"
-10. Bun docs — bundler, test runner, --compile executables, watch mode
-11. GitHub Marketplace — "Caching for Turborepo" action
-12. turborepo-remote-cache (Ducktors) — self-hosted cache server
-13. WarpBuild "GitHub Actions Monorepo Guide" — CI optimization patterns
+1. Markaicode "TypeScript Compilation Benchmark 2026" â€” tsc/SWC/esbuild speed/memory
+2. Bun.sh bundler benchmarks â€” 10,000 React components, bundler speed graph
+3. PkgPulse "Bun Test vs Vitest vs Jest Benchmarks 2026" â€” test runner comparison
+4. BirJob "TypeScript Build Performance 2026" â€” TS 7.0 Go compiler, project references, pipeline patterns
+5. Turborepo docs â€” caching, CI construction, --affected flag, Remote Cache
+6. Microsoft DevBlogs â€” TypeScript native port announcement, TS 7.0 Beta
+7. Bloomberg "10 Insights Adopting TypeScript at Scale" â€” 50M LOC infrastructure
+8. Stripe "Migrating Millions of Lines to TypeScript" â€” 3.7M LOC single PR
+9. DEV Community "TypeScript Project References 11min â†’ 3min"
+10. Bun docs â€” bundler, test runner, --compile executables, watch mode
+11. GitHub Marketplace â€” "Caching for Turborepo" action
+12. turborepo-remote-cache (Ducktors) â€” self-hosted cache server
+13. WarpBuild "GitHub Actions Monorepo Guide" â€” CI optimization patterns
 14. Zenn "Reducing Single Binary Size by 9x: Deno to Bun"

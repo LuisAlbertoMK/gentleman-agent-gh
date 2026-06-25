@@ -9,7 +9,7 @@
 
 | Trigger keywords | Skill |
 |------------------|-------|
-| Karpathy, less tokens, context compilation | karpathy-loop |
+| Karpathy, less tokens, context compression | karpathy-loop |
 | Improve prompt, security, ReAct, multi-agent | prompt-engineering |
 | Karpathy loop, optimize prompt, measure tokens | karpathy-loop |
 | Compact, less tokens, caveman, /caveman, ultra-lean | lean-context |

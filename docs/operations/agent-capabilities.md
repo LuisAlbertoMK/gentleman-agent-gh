@@ -1,112 +1,112 @@
-# Gentleman Agents — Capacidades
+﻿# Gentleman Agents â€” Capacidades
 
-> Qué maneja cada agente, cuándo usar cada uno.
+> QuÃ© maneja cada agente, cuÃ¡ndo usar cada uno.
 
 ## gentleman-vMK (primary)
 
-**Modelo**: big-pickle  
+**Modelo**: big-pickle
 **Rol**: Senior Architect Mentor
 
-Es el agente por defecto, el que estás usando ahora mismo. Orquestador principal que:
-- Decide qué otros agentes invocar según la tarea
+Es el agente por defecto, el que estÃ¡s usando ahora mismo. Orquestador principal que:
+- Decide quÃ© otros agentes invocar segÃºn la tarea
 - Tiene la personalidad completa + skills + engram + protocolos
 - Hace de todo: debug, arquitectura, review, commit, etc.
 
-**Usalo para**: TODO — es el default. Solo derivá a otro cuando necesités un enfoque específico.
+**Usalo para**: TODO â€” es el default. Solo derivÃ¡ a otro cuando necesitÃ©s un enfoque especÃ­fico.
 
 ---
 
 ## gentleman-deep (`deep`)
 
-**Modelo**: opencode/nemotron-3-ultra-free  
+**Modelo**: opencode/nemotron-3-ultra-free
 **Rol**: Deep Reasoning Specialist
 
 **Brilla en**:
-- Análisis profundo de código (dependencias ocultas, side effects)
+- AnÃ¡lisis profundo de cÃ³digo (dependencias ocultas, side effects)
 - Debugging complejo (bugs intermitentes, race conditions, memory leaks)
-- Refactors multi-file con impacto arquitectónico
+- Refactors multi-file con impacto arquitectÃ³nico
 - Trade-off analysis entre 3+ opciones
 - Design docs y decisiones de arquitectura
 
 **No usarlo para**:
-- Edits rápidos de 1 archivo
-- Tareas repetitivas mecánicas
+- Edits rÃ¡pidos de 1 archivo
+- Tareas repetitivas mecÃ¡nicas
 - Commits o PRs simples
 
-**Cuándo delegar**: cuando el problema no es obvio, cuando precisás pensar antes de codear.
+**CuÃ¡ndo delegar**: cuando el problema no es obvio, cuando precisÃ¡s pensar antes de codear.
 
 ---
 
 ## gentleman-codex (`codex`)
 
-**Modelo**: opencode/deepseek-v4-flash-free  
+**Modelo**: opencode/deepseek-v4-flash-free
 **Rol**: Code Generation Specialist
 
 **Brilla en**:
-- Escribir código nuevo (scripts, handlers, endpoints)
+- Escribir cÃ³digo nuevo (scripts, handlers, endpoints)
 - Tool calling y APIs externas
 - Scripts de PowerShell, Bash, Python
-- Refactors mecánicos (renombrar, extraer, mover)
-- Implementación rápida de features bien especificadas
+- Refactors mecÃ¡nicos (renombrar, extraer, mover)
+- ImplementaciÃ³n rÃ¡pida de features bien especificadas
 
 **No usarlo para**:
-- Decisiones arquitectónicas
+- Decisiones arquitectÃ³nicas
 - Debugging que requiere entender el sistema completo
 - Code review profundo
 
-**Cuándo delegar**: cuando ya sabés QUÉ hacer y solo necesitás que alguien lo escriba.
+**CuÃ¡ndo delegar**: cuando ya sabÃ©s QUÃ‰ hacer y solo necesitÃ¡s que alguien lo escriba.
 
 ---
 
 ## gentleman-quick (`quick`)
 
-**Modelo**: opencode/mimo-v2.5-free  
+**Modelo**: opencode/mimo-v2.5-free
 **Rol**: Fast Executor
 
 **Brilla en**:
 - Edits localizados de 1-2 archivos
-- Fixes rápidos (typos, bugs chicos, ajustes de estilo)
+- Fixes rÃ¡pidos (typos, bugs chicos, ajustes de estilo)
 - Tareas repetitivas (cambiar imports, renombrar variables)
-- One-shot commands sin mucha explicación
-- Exploración superficial del codebase
+- One-shot commands sin mucha explicaciÃ³n
+- ExploraciÃ³n superficial del codebase
 
 **No usarlo para**:
 - Refactors que tocan 5+ archivos
-- Decisiones de diseño
-- Investigación profunda
+- Decisiones de diseÃ±o
+- InvestigaciÃ³n profunda
 
-**Cuándo delegar**: cuando es un "hacé este cambio chico y listo".
+**CuÃ¡ndo delegar**: cuando es un "hacÃ© este cambio chico y listo".
 
 ---
 
 ## SDD Subagents
 
-Son **10 subagentes ocultos** del pipeline SDD (`sdd-*`). No se usan directo — los orquesta `gentleman-vMK` o `sdd-orchestrator`. Cada uno ejecuta una fase específica:
+Son **10 subagentes ocultos** del pipeline SDD (`sdd-*`). No se usan directo â€” los orquesta `gentleman-vMK` o `sdd-orchestrator`. Cada uno ejecuta una fase especÃ­fica:
 
 | Subagente | Fase |
 |-----------|------|
 | sdd-init | Bootstrap del proyecto |
-| sdd-explore | Investigación del codebase |
+| sdd-explore | InvestigaciÃ³n del codebase |
 | sdd-propose | Crear propuesta de cambio |
-| sdd-design | Diseño técnico |
+| sdd-design | DiseÃ±o tÃ©cnico |
 | sdd-spec | Especificaciones G/W/T |
 | sdd-tasks | Breakdown en tareas |
-| sdd-apply | Implementación |
-| sdd-verify | Verificación contra specs |
+| sdd-apply | ImplementaciÃ³n |
+| sdd-verify | VerificaciÃ³n contra specs |
 | sdd-archive | Archivo y rollback |
 | sdd-onboard | Onboarding guiado del ciclo SDD |
 
 ---
 
-## Routing automático via skill-graph.ps1
+## Routing automÃ¡tico via skill-graph.ps1
 
-El script `scripts/skill-graph.ps1` ahora incluye **routing automático** basado en el `Effort` de cada skill:
+El script `scripts/skill-graph.ps1` ahora incluye **routing automÃ¡tico** basado en el `Effort` de cada skill:
 
-- **`low`** → `gentleman-quick`: tareas simples, localizadas, mecánicas
-- **`medium`** → `gentleman-codex`: generación de código, implementación estándar
-- **`high`** → `gentleman-deep`: razonamiento complejo, arquitectura, análisis profundo
+- **`low`** â†’ `gentleman-quick`: tareas simples, localizadas, mecÃ¡nicas
+- **`medium`** â†’ `gentleman-codex`: generaciÃ³n de cÃ³digo, implementaciÃ³n estÃ¡ndar
+- **`high`** â†’ `gentleman-deep`: razonamiento complejo, arquitectura, anÃ¡lisis profundo
 
-Si una tarea matchea skills de distintos niveles, se recomienda el agente del nivel **más alto** entre todas las skills matcheadas.
+Si una tarea matchea skills de distintos niveles, se recomienda el agente del nivel **mÃ¡s alto** entre todas las skills matcheadas.
 
 ```powershell
 # Recomendar agente para scripting
@@ -122,15 +122,15 @@ Si una tarea matchea skills de distintos niveles, se recomienda el agente del ni
 # { agent_recommendation: { agent: "...", effort: "...", reason: "..." }, skills: [...] }
 ```
 
-## Resumen rápido
+## Resumen rÃ¡pido
 
 | Tarea | Agente | Routing |
 |-------|--------|---------|
 | Debug complejo | `deep` | Effort high |
-| Decisión de arquitectura | `deep` | Effort high |
-| Escribir código nuevo | `codex` | Effort medium |
+| DecisiÃ³n de arquitectura | `deep` | Effort high |
+| Escribir cÃ³digo nuevo | `codex` | Effort medium |
 | Feature bien especificada | `codex` | Effort medium |
 | Fix chico / typo | `quick` | Effort low |
-| Renombrar / refactor mecánico | `quick` o `codex` | Effort low/medium |
-| No sabés qué hacer | `vMK` (default) | — |
+| Renombrar / refactor mecÃ¡nico | `quick` o `codex` | Effort low/medium |
+| No sabÃ©s quÃ© hacer | `vMK` (default) | â€” |
 | SDD pipeline | `vMK` orquesta subagentes | Effort medium |

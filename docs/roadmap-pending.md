@@ -67,7 +67,7 @@ B como fallback si git no está disponible.
 
 ## 3. AGENTS.md Portabilidad (bash/zsh)
 
-**Problema**: AGENDS.md tiene ~58 referencias PowerShell (`$env:`, `.ps1`, `Invoke-Bash`,
+**Problema**: AGENTS.md tiene ~58 referencias PowerShell (`$env:`, `.ps1`, `Invoke-Bash`,
 `; if ($?)`). Solo funciona con PowerShell 5.1 en Windows. Score actual: 3/10.
 
 **Objetivo**: AGENTS.md funcional en bash/zsh + pwsh (Linux/Mac/Windows). Score target: 8/10.

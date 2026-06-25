@@ -144,7 +144,6 @@ function Get-AgentRecommendation {
 $script:RegistryLookup = @{}
 foreach ($s in $script:skillRegistry) { $script:RegistryLookup[$s.Name] = $s }
 
-$graph = New-Graph
 if ($ListAll) {
     $groups = $skillRegistry | Group-Object Category
     if ($Format -eq "Json") { $groups | ForEach-Object { $g=$_; @{Category=$g.Name;Skills=@($g.Group|Sort-Object Name|ForEach-Object{@{Name=$_.Name;Effort=$_.Effort;DependsOn=@($_.DependsOn);Related=@($_.Related)}})}} | ConvertTo-Json -Depth 3; exit 0 }

@@ -1,6 +1,6 @@
-# Database/Storage Optimization: SQLite + Effect/Drizzle for Agent Workloads
+﻿# Database/Storage Optimization: SQLite + Effect/Drizzle for Agent Workloads
 
-> Research synthesis for **opencode-vmk** (TypeScript/Bun, `@effect/sql-sqlite-bun`, `drizzle-orm`) and **gentleman-vMK** (PowerShell/embedded).  
+> Research synthesis for **opencode-vmk** (TypeScript/Bun, `@effect/sql-sqlite-bun`, `drizzle-orm`) and **gentleman-vMK** (PowerShell/embedded).
 > 35+ sources consulted across 8 domains. June 2026.
 
 ---
@@ -38,20 +38,20 @@ PRAGMA wal_checkpoint(PASSIVE)
 
 | Config | Inserts/sec | Reads/sec | p90 Latency | p99 Latency |
 |--------|------------|-----------|-------------|-------------|
-| DELETE + synchronous=FULL | 279 | 73,800 | 14 µs | ~50 µs |
-| WAL + synchronous=FULL | 442 | 332,225 | 4 µs | ~20 µs |
-| **WAL + synchronous=NORMAL** | **33,135** | **483,558** | **3 µs** | **~8 µs** |
-| WAL + synchronous=OFF | 61,994 | — | — | — |
+| DELETE + synchronous=FULL | 279 | 73,800 | 14 Âµs | ~50 Âµs |
+| WAL + synchronous=FULL | 442 | 332,225 | 4 Âµs | ~20 Âµs |
+| **WAL + synchronous=NORMAL** | **33,135** | **483,558** | **3 Âµs** | **~8 Âµs** |
+| WAL + synchronous=OFF | 61,994 | â€” | â€” | â€” |
 
 *Source: marending.dev, travishorn.com, botmonster.com benchmarks*
 
-**Key finding**: WAL + synchronous=NORMAL is **119× faster for writes** than the default rollback journal config. The p90 drops from 14 µs to 3 µs primarily because NORMAL defers fsync to checkpoint time instead of per-commit.
+**Key finding**: WAL + synchronous=NORMAL is **119Ã— faster for writes** than the default rollback journal config. The p90 drops from 14 Âµs to 3 Âµs primarily because NORMAL defers fsync to checkpoint time instead of per-commit.
 
 ### Synchronicity Tradeoffs in WAL Mode
 
 | synchronous | Durability | Writes/sec | Use Case |
 |-------------|-----------|-----------|----------|
-| FULL (default in WAL) | Full — durable across power loss | ~442 | Banking, payments |
+| FULL (default in WAL) | Full â€” durable across power loss | ~442 | Banking, payments |
 | **NORMAL** | **Atomic across crash; last txn may rollback on power loss** | **~33,135** | **Agent sessions, caches, event logs** |
 | OFF | Corruptible on crash | ~61,994 | Temp/cache data only |
 
@@ -77,17 +77,17 @@ PRAGMA optimize;                              -- run at connection close or dail
 
 | RAM Available | Recommended mmap_size | Notes |
 |--------------|----------------------|-------|
-| ≤512 MB | 64 MB (67108864) | Match to cache_size; avoid OOM |
+| â‰¤512 MB | 64 MB (67108864) | Match to cache_size; avoid OOM |
 | 1-2 GB | 256 MB (268435456) | Good for most agent use |
 | 4+ GB | 1 GB (1073741824) | Server/desktop deployments |
-| 32-bit systems | ≤1 GB | Address space limited |
+| 32-bit systems | â‰¤1 GB | Address space limited |
 
-> **Why mmap**: Eliminates `read()` syscalls for hot pages. The OS manages cache via virtual memory. On NVMe, hybrid cache_size+mmap yields 10-100× faster cache-hit queries vs cache misses.  
-> **Pitfall**: Don't set both cache_size AND mmap_size aggressively — you get duplicate caching. Prefer cache_size for write-heavy, mmap for read-heavy. Agent workloads are read-moderate, so moderate mmap (256 MB) + moderate cache (64 MB) is correct.
+> **Why mmap**: Eliminates `read()` syscalls for hot pages. The OS manages cache via virtual memory. On NVMe, hybrid cache_size+mmap yields 10-100Ã— faster cache-hit queries vs cache misses.
+> **Pitfall**: Don't set both cache_size AND mmap_size aggressively â€” you get duplicate caching. Prefer cache_size for write-heavy, mmap for read-heavy. Agent workloads are read-moderate, so moderate mmap (256 MB) + moderate cache (64 MB) is correct.
 
 ### page_size
 
-- Default since SQLite 3.12 (2016): **4096 bytes** ← already correct
+- Default since SQLite 3.12 (2016): **4096 bytes** â† already correct
 - 4096 is optimal for mixed agent workloads (session data rows are typically 200-2000 bytes each)
 - 8192 may help for very large JSON blobs in `data` columns (>4 KB per row)
 - Cannot change after DB creation without dump+reload + VACUUM
@@ -100,7 +100,7 @@ PRAGMA optimize;                              -- run at connection close or dail
 | 100 MB-1 GB | -64000 (64 MB) | Good for active agent sessions |
 | 1-10 GB | -262144 (256 MB) | Large conversation stores |
 
-> **IMPORTANT**: `cache_size` is PER CONNECTION. With Semaphore(1) in opencode-vmk, only one connection active → 64 MB is fine. If multiple DBs or connections, multiply.
+> **IMPORTANT**: `cache_size` is PER CONNECTION. With Semaphore(1) in opencode-vmk, only one connection active â†’ 64 MB is fine. If multiple DBs or connections, multiply.
 
 ---
 
@@ -125,19 +125,19 @@ const transactionAcquirer = Effect.uninterruptibleMask((restore) => {
 ```
 
 **Key observations**:
-- Single connection, serialized via Semaphore(1) — correct for SQLite
-- Statement cache: LRU Map with 64 entries — adequate for hot queries
-- `executeStream` not implemented — returns `Stream.die("not implemented")`
+- Single connection, serialized via Semaphore(1) â€” correct for SQLite
+- Statement cache: LRU Map with 64 entries â€” adequate for hot queries
+- `executeStream` not implemented â€” returns `Stream.die("not implemented")`
 - WAL enabled by default unless `disableWAL: true`
 - Drizzle ORM layered on top via `drizzle({ client: native })`
 
 ### Connection Pooling: SQLite CANNOT Pool
 
-Unlike PostgreSQL, SQLite has **no connection pooling** — each instance is a file handle. The Effect `@effect/sql` pool config (`min`, `max`, `timeToLive`) applies only to server-based adapters (pg, mysql). For SQLite:
+Unlike PostgreSQL, SQLite has **no connection pooling** â€” each instance is a file handle. The Effect `@effect/sql` pool config (`min`, `max`, `timeToLive`) applies only to server-based adapters (pg, mysql). For SQLite:
 
 - `@effect/sql-sqlite-bun`: no pool, single `bun:sqlite` connection
-- `@effect/sql-sqlite-node`: uses `better-sqlite3` or `node:sqlite` — also single connection
-- Effect `Pool` generic: `Pool.makeWithTTL({acquire, min, max})` — could be used to pool SQLite **files** (e.g., one per agent), but NOT connections to the same file
+- `@effect/sql-sqlite-node`: uses `better-sqlite3` or `node:sqlite` â€” also single connection
+- Effect `Pool` generic: `Pool.makeWithTTL({acquire, min, max})` â€” could be used to pool SQLite **files** (e.g., one per agent), but NOT connections to the same file
 
 **For agent workloads with per-agent databases**, Effect `Pool` over SQLite files makes sense:
 ```typescript
@@ -165,7 +165,7 @@ yield* sql.withTransaction(
 )
 ```
 
-**Performance**: Individual INSERTs outside a transaction → ~1,000/sec. Wrapping 100 INSERTs in one transaction → ~50,000+/sec (50× improvement).
+**Performance**: Individual INSERTs outside a transaction â†’ ~1,000/sec. Wrapping 100 INSERTs in one transaction â†’ ~50,000+/sec (50Ã— improvement).
 
 **Agent-specific batching strategy**: Batch session message writes into transactions of 10-50 messages:
 ```typescript
@@ -183,14 +183,14 @@ const batchMessages = (messages: Message[]) =>
 
 | Pattern | Where | Purpose |
 |---------|-------|---------|
-| `Effect.acquireRelease` + `Effect.scoped` | sqlite.bun.ts:180-184 | Native DB lifecycle (open → close) |
+| `Effect.acquireRelease` + `Effect.scoped` | sqlite.bun.ts:180-184 | Native DB lifecycle (open â†’ close) |
 | `Layer.scoped` | sqlite.bun.ts:195-200 | Wiring DB into Effect Context |
 | `Semaphore(1)` + `Scope.addFinalizer` | sqlite.bun.ts:138-147 | Transaction serialization |
 
 **Recommended additions**:
 - **`Effect.Service` pattern** for the Database service (currently uses raw Layer)
 - **`Pool.makeWithTTL`** if pooling per-agent database files
-- **`sql.onDialect`** for multi-runtime (bun vs node) — already partially done via `#sqlite` import alias
+- **`sql.onDialect`** for multi-runtime (bun vs node) â€” already partially done via `#sqlite` import alias
 
 ### executeStream Gap
 
@@ -205,10 +205,10 @@ const batchMessages = (messages: Message[]) =>
 ### Prepared Statements (Highest Impact)
 
 ```typescript
-// ❌ Without prepared (full SQL planning every call)
+// âŒ Without prepared (full SQL planning every call)
 const user = await db.select().from(users).where(eq(users.id, id))
 
-// ✅ With prepared (30-60% faster for repeated queries)
+// âœ… With prepared (30-60% faster for repeated queries)
 const getUser = db.select()
   .from(users)
   .where(eq(users.id, sql.placeholder('id')))
@@ -255,7 +255,7 @@ GROUP BY sessions.id
 db.query.sessions.findMany({
   with: {
     messages: {
-      limit: 50,        // ← prevents giant arrays
+      limit: 50,        // â† prevents giant arrays
       orderBy: [desc(messages.timeCreated)],
     }
   }
@@ -265,13 +265,13 @@ db.query.sessions.findMany({
 ### N+1 Prevention
 
 ```typescript
-// ❌ N+1: 1 query for sessions + N queries for messages
+// âŒ N+1: 1 query for sessions + N queries for messages
 const sessions = await db.select().from(sessions)
 for (const s of sessions) {
   s.messages = await db.select().from(messages).where(eq(messages.sessionId, s.id))
 }
 
-// ✅ O(1): single query with relation
+// âœ… O(1): single query with relation
 const sessions = await db.query.sessions.findMany({
   with: { messages: true }
 })
@@ -284,14 +284,14 @@ const rows = await db.select()
 ### Partial Column Select
 
 ```typescript
-// ❌ Selects ALL columns including large JSON data fields
+// âŒ Selects ALL columns including large JSON data fields
 db.select().from(users)
 
-// ✅ Selects only needed columns — less memory, less I/O
+// âœ… Selects only needed columns â€” less memory, less I/O
 db.select({ id: users.id, name: users.name }).from(users)
 ```
 
-For agent session queries where you only need metadata (not full message bodies), explicit column selection cuts I/O by 5-50× depending on blob size.
+For agent session queries where you only need metadata (not full message bodies), explicit column selection cuts I/O by 5-50Ã— depending on blob size.
 
 ### Index Strategy from Schema Analysis
 
@@ -318,12 +318,12 @@ Current indexes in `session.sql.ts`:
 | getUserById (single row) | 1,223,260 ops/s | 1,073,001 ops/s | ~1,500,000* | 61,093 ops/s |
 | countPostsByUser (pluck) | 1,151,783 ops/s | 689,478 ops/s | ~1,400,000* | 111,824 ops/s |
 | insertUser | 53,693 ops/s | 41,291 ops/s | ~50,000* | 28,385 ops/s |
-| insertUser (WAL+NORMAL) | ~51080 ops/s | — | **957*** | — |
-| Point query (cached stmt) | 476,190 ops/s | 188,679 ops/s | ~500,000* | — |
+| insertUser (WAL+NORMAL) | ~51080 ops/s | â€” | **957*** | â€” |
+| Point query (cached stmt) | 476,190 ops/s | 188,679 ops/s | ~500,000* | â€” |
 
 *Sources: sqg.dev, takymt/node-builtin-sqlite-bench, oven-sh/bun benchmarks*
 
-**\* bun:sqlite caveat**: bun:sqlite's write performance has been inconsistent. Bun v1.0.29 showed only 957 writes/sec vs better-sqlite3's 51,080 writes/sec on SSD. This was a `PRAGMA synchronous` default issue (bun defaults to FULL). With `PRAGMA synchronous = NORMAL`, bun:sqlite matches or exceeds better-sqlite3. **Current Bun v1.3.x has largely resolved this — but verify in your specific Bun version.**
+**\* bun:sqlite caveat**: bun:sqlite's write performance has been inconsistent. Bun v1.0.29 showed only 957 writes/sec vs better-sqlite3's 51,080 writes/sec on SSD. This was a `PRAGMA synchronous` default issue (bun defaults to FULL). With `PRAGMA synchronous = NORMAL`, bun:sqlite matches or exceeds better-sqlite3. **Current Bun v1.3.x has largely resolved this â€” but verify in your specific Bun version.**
 
 ### Driver Decision Matrix
 
@@ -332,8 +332,8 @@ Current indexes in `session.sql.ts`:
 | **Runtime** | Bun-only | Node 22.5+ | Both (native addon) | Both |
 | **Setup** | Built-in | Built-in (experimental) | npm install w/ prebuild | npm install |
 | **API** | Synchronous | Synchronous | Synchronous | Async |
-| **Speed (reads)** | ★★★★★ | ★★★★ | ★★★★★ | ★★★ |
-| **Speed (writes)** | ★★★★ | ★★★★ | ★★★★★ | ★★★ |
+| **Speed (reads)** | â˜…â˜…â˜…â˜…â˜… | â˜…â˜…â˜…â˜… | â˜…â˜…â˜…â˜…â˜… | â˜…â˜…â˜… |
+| **Speed (writes)** | â˜…â˜…â˜…â˜… | â˜…â˜…â˜…â˜… | â˜…â˜…â˜…â˜…â˜… | â˜…â˜…â˜… |
 | **Cross-runtime** | No | No | Yes (via addon) | Yes |
 | **Memory** | ~15 MB RSS | ~20 MB RSS | ~25 MB RSS (prebuild) | ~30 MB RSS |
 | **FTS5** | Full | Full | Full | Limited |
@@ -344,17 +344,17 @@ Current indexes in `session.sql.ts`:
 
 **Current choice** (dual runtime via `#sqlite` alias): **Correct**.
 
-- Bun → uses `bun:sqlite` (fastest on Bun)
-- Node → uses `node:sqlite` (zero-dependency, built-in)
-- Drizzle layers on top → driver-agnostic queries
+- Bun â†’ uses `bun:sqlite` (fastest on Bun)
+- Node â†’ uses `node:sqlite` (zero-dependency, built-in)
+- Drizzle layers on top â†’ driver-agnostic queries
 
 This is the right architecture. The one gap: add **better-sqlite3 as fallback** for environments where neither built-in is available.
 
 ### Cross-Runtime Compatibility (2026 Status)
 
-- `bun:sqlite` — only in Bun
-- `node:sqlite` — stable since Node 22.13 (no flag needed)
-- `better-sqlite3` — maintenance mode, prebuild download at install
+- `bun:sqlite` â€” only in Bun
+- `node:sqlite` â€” stable since Node 22.13 (no flag needed)
+- `better-sqlite3` â€” maintenance mode, prebuild download at install
 - **Practical approach**: runtime detection with `createRequire` (not top-level `import`), normalizing `query()` vs `prepare()` APIs
 
 ---
@@ -380,7 +380,7 @@ For agent workloads (opencode-vmk, gentleman-vMK), **embedded SQLite with per-ag
 **Turso Sync** (CDC-based, logical changes) is the recommended upgrade path:
 - Local-first: reads are sub-ms file I/O
 - Writes go to local DB immediately, sync to cloud async
-- `push()` / `pull()` protocol — explicit control over sync timing
+- `push()` / `pull()` protocol â€” explicit control over sync timing
 - 5,000 rows written to cloud + pulled fresh: ~2-3 seconds (vs libSQL ER: ~8-10s)
 
 **When to NOT use embedded sync**: If you need strong consistency across machines, or if write volume exceeds ~1,000 writes/sec per agent.
@@ -429,12 +429,12 @@ opencode-vmk has **35+ SQLite migrations** in `packages/core/src/database/migrat
 | **Snapshot JSON size** | ~2 MB | ~7 MB | ~28 MB |
 | **Commutativity check** | ~0.5 s | ~3 s | ~83-115 s |
 
-*\* Known issue: drizzle-kit#5777 — commutativity check does full Zod parse of every snapshot JSON twice + pairwise diffSnapshots at branch points. The check runs unconditionally even when no migrations are pending.*
+*\* Known issue: drizzle-kit#5777 â€” commutativity check does full Zod parse of every snapshot JSON twice + pairwise diffSnapshots at branch points. The check runs unconditionally even when no migrations are pending.*
 
 ### Migration Performance Killers
 
 1. **`drizzle-kit check` commutativity validation**: Each `migration.sql` snapshot (~500 KB) is Zod-parsed twice + diffed pairwise at branch points. For 70 migrations with 5 branch points, this is 83 seconds of single-threaded CPU.
-2. **Snapshot `.strict()` validation**: Deeply nested Zod schemas for tables, columns, indexes, FKs, etc. — the most expensive line item.
+2. **Snapshot `.strict()` validation**: Deeply nested Zod schemas for tables, columns, indexes, FKs, etc. â€” the most expensive line item.
 3. **SQLite ALTER TABLE limitations**: SQLite doesn't support `DROP COLUMN` or `ALTER COLUMN` natively. drizzle-kit handles this via table recreation + data copy, which is slow for large tables.
 
 ### Mitigation Strategies
@@ -444,7 +444,7 @@ opencode-vmk has **35+ SQLite migrations** in `packages/core/src/database/migrat
 drizzle-kit migrate --ignore-conflicts
 ```
 
-**Strategy B**: Split migration snapshots — one per schema domain (session, event, project, etc.).
+**Strategy B**: Split migration snapshots â€” one per schema domain (session, event, project, etc.).
 
 **Strategy C**: Use the programmatic `migrate()` function from `drizzle-orm/bun-sqlite` directly at startup (bypasses CLI overhead):
 
@@ -458,7 +458,7 @@ const db = drizzle(sqlite)
 migrate(db, { migrationsFolder: "./drizzle" })  // ~2s for 35 migrations
 ```
 
-**Strategy D**: Use Effect's `DatabaseMigration` (already in opencode-vmk at `packages/core/src/database/migration/`) — written in Effect.gen, bypasses drizzle-kit entirely. **This is already done and is the right approach for the project.**
+**Strategy D**: Use Effect's `DatabaseMigration` (already in opencode-vmk at `packages/core/src/database/migration/`) â€” written in Effect.gen, bypasses drizzle-kit entirely. **This is already done and is the right approach for the project.**
 
 ### Current Effect-based Migration Pattern (Recommended)
 
@@ -472,7 +472,7 @@ export default Effect.fn("migrate-20260612174303")(function* () {
 })
 ```
 
-**This pattern is correct** — it avoids all drizzle-kit overhead. Recommendation: continue using Effect-based migrations, only use drizzle-kit for initial schema generation.
+**This pattern is correct** â€” it avoids all drizzle-kit overhead. Recommendation: continue using Effect-based migrations, only use drizzle-kit for initial schema generation.
 
 ---
 
@@ -485,7 +485,7 @@ export default Effect.fn("migrate-20260612174303")(function* () {
 | **DELETE journal + FULL sync** | 80-150 | 20-40 | **10-15 months** |
 | WAL + FULL sync | 20-40 | 5-10 | 3-5 years |
 | **WAL + NORMAL sync** | **15-30** | **3-7** | **4-6 years** |
-| WAL + NORMAL + tmpfs | 0.8-1.5 | — | 35+ years |
+| WAL + NORMAL + tmpfs | 0.8-1.5 | â€” | 35+ years |
 
 *Source: smarthometroubleshoot.com research on eMMC wear*
 
@@ -502,11 +502,11 @@ SQLite's atomic commit requires **9 precise steps** in rollback journal mode, wi
 | 5. **fsync DB** | **yes** | deferred to checkpoint | deferred to checkpoint |
 | 6. Delete/truncate journal | yes | checkpoint only | checkpoint only |
 | **Total fsync per commit** | **3-4** | **0** (at commit) | **1** |
-| **Total fsync at checkpoint** | — | **1-2** | **1-2** |
+| **Total fsync at checkpoint** | â€” | **1-2** | **1-2** |
 
 ### Batch-Atomic Write Support
 
-Modern NVMe SSDs and F2FS support `SQLITE_IOCAP_BATCH_ATOMIC` — allowing SQLite to skip the rollback journal entirely for transactions up to the device's atomic write limit (typically 1-2 MB). When available:
+Modern NVMe SSDs and F2FS support `SQLITE_IOCAP_BATCH_ATOMIC` â€” allowing SQLite to skip the rollback journal entirely for transactions up to the device's atomic write limit (typically 1-2 MB). When available:
 - Journal is kept **in-memory only** (no disk I/O for journal)
 - Single `fcntl(BEGIN_ATOMIC_WRITE)` + writes + `fcntl(COMMIT_ATOMIC_WRITE)`
 - Zero write amplification for small transactions
@@ -524,9 +524,9 @@ cat /sys/block/nvme0n1/queue/atomic_write_unit_max
 
 | Technique | WAF Reduction | Effort | Notes |
 |-----------|--------------|--------|-------|
-| WAL + synchronous=NORMAL | 5-10× vs DELETE | Low | Already done |
-| Batch transactions | 10-50× fewer fsyncs | Low | Batch message inserts |
-| Use F2FS instead of ext4 | 2-5× additional | Medium | Requires reformat |
+| WAL + synchronous=NORMAL | 5-10Ã— vs DELETE | Low | Already done |
+| Batch transactions | 10-50Ã— fewer fsyncs | Low | Batch message inserts |
+| Use F2FS instead of ext4 | 2-5Ã— additional | Medium | Requires reformat |
 | `journal_size_limit` | Prevents unbounded WAL | Low | Set 64 MB cap |
 | Periodic checkpoint | Reduces WAL read overhead | Low | Schedule via cron |
 | `temp_store=MEMORY` | Eliminates temp file I/O | Low | Already recommended |
@@ -542,7 +542,7 @@ Typical agent session (~1 hour):
 
 At this rate, with WAL+NORMAL on ext4 (WAF ~20):
 - Per session: ~2,000 pages of flash writes (8 MB)
-- Per year (1,000 sessions): ~8 GB → negligible wear on a 256 GB SSD
+- Per year (1,000 sessions): ~8 GB â†’ negligible wear on a 256 GB SSD
 
 **Conclusion**: Flash wear is not a concern for agent workloads on modern SSDs. Only relevant for constrained eMMC (Raspberry Pi, thin clients) where WAF mitigation matters.
 
@@ -562,26 +562,26 @@ At this rate, with WAL+NORMAL on ext4 (WAF ~20):
 | **LIKE '%term%'** | 50 ms | 500 ms | 5,000 ms |
 | **FTS5 index size** | ~1 MB | ~10 MB | ~100 MB |
 | **DB file size** | 3.2 MB | 32 MB | 320 MB |
-| **FTS5 speedup vs LIKE** | 714× | 4,166× | 25,000× |
+| **FTS5 speedup vs LIKE** | 714Ã— | 4,166Ã— | 25,000Ã— |
 
 *Sources: simple-memory-mcp benchmarks, agent-memory-store docs*
 
-**Key insight**: FTS5 scales **sub-linearly** — doubling memories does NOT double search time. The `porter unicode61` tokenizer handles stemming and Unicode.
+**Key insight**: FTS5 scales **sub-linearly** â€” doubling memories does NOT double search time. The `porter unicode61` tokenizer handles stemming and Unicode.
 
 ### Hybrid Search Architecture (FTS5 + Vector)
 
 ```
-┌─────────────┐     ┌──────────────┐     ┌─────────────┐
-│  User Query  │────▶│  FTS5 (BM25)  │────▶│             │
-└─────────────┘     └──────────────┘     │   RRF Merge  │
-                    ┌──────────────┐     │  (Reciprocal │
-                    │  sqlite-vec   │────▶│  Rank Fusion)│
-                    │  (KNN/cosine) │     └──────┬──────┘
-                    └──────────────┘            │
-                                         ┌──────▼──────┐
-                                         │  Top-K to   │
-                                         │  Agent Ctx  │
-                                         └─────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  User Query  â”‚â”€â”€â”€â”€â–¶â”‚  FTS5 (BM25)  â”‚â”€â”€â”€â”€â–¶â”‚             â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜     â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜     â”‚   RRF Merge  â”‚
+                    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     â”‚  (Reciprocal â”‚
+                    â”‚  sqlite-vec   â”‚â”€â”€â”€â”€â–¶â”‚  Rank Fusion)â”‚
+                    â”‚  (KNN/cosine) â”‚     â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜
+                    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜            â”‚
+                                         â”Œâ”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”
+                                         â”‚  Top-K to   â”‚
+                                         â”‚  Agent Ctx  â”‚
+                                         â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ### sqlite-vec Extension
@@ -662,7 +662,7 @@ rrf AS (
 SELECT * FROM rrf ORDER BY score DESC LIMIT 10;
 ```
 
-**RRF constant `k=60`** — standard value from literature. Weighting: 60% FTS5, 40% vector (ZeroClaw default).
+**RRF constant `k=60`** â€” standard value from literature. Weighting: 60% FTS5, 40% vector (ZeroClaw default).
 
 ### Agent Memory Performance Benchmarks
 
@@ -738,7 +738,7 @@ class DatabaseService extends Effect.Service<DatabaseService>()("DatabaseService
 }) {}
 ```
 
-### PRAGMA Config Diff (Current → Proposed)
+### PRAGMA Config Diff (Current â†’ Proposed)
 
 ```diff
   PRAGMA journal_mode = WAL;
@@ -757,38 +757,38 @@ class DatabaseService extends Effect.Service<DatabaseService>()("DatabaseService
 
 ## Sources
 
-1. SQLite WAL docs — sqlite.org/wal.html
-2. SQLite mmap docs — sqlite.org/mmap.html
-3. SQLite PRAGMA docs — sqlite.org/pragma.html
-4. SQLite Atomic Commit — sqlite.org/atomiccommit.html
-5. SQLite page size change — sqlite.org/pgszchng2016.html
-6. marending.dev SQLite benchmarks — "How fast is SQLite?"
-7. travishorn.com — "Hands-on Exploration of SQLite for Production"
-8. botmonster.com — "SQLite Scales to Production: 10K TPS, WAL Mode"
-9. shivekkhurana.com — "SQLite in Production: A Real-World Benchmark"
-10. cronfeed.work — "SQLite WAL in 2026: checkpoint starvation"
-11. fly.io — "How SQLite Scales Read Concurrency"
-12. sqg.dev — "SQLite Driver Benchmark: better-sqlite3 vs node:sqlite vs libSQL vs Turso"
-13. photostructure/node-sqlite — library comparison
-14. oven-sh/bun — bun:sqlite docs
-15. Effect-TS/effect — @effect/sql-sqlite-bun source
-16. Effect-TS/deepwiki — Data Persistence docs
-17. Drizzle ORM docs — Relational Queries, Performance Optimization
+1. SQLite WAL docs â€” sqlite.org/wal.html
+2. SQLite mmap docs â€” sqlite.org/mmap.html
+3. SQLite PRAGMA docs â€” sqlite.org/pragma.html
+4. SQLite Atomic Commit â€” sqlite.org/atomiccommit.html
+5. SQLite page size change â€” sqlite.org/pgszchng2016.html
+6. marending.dev SQLite benchmarks â€” "How fast is SQLite?"
+7. travishorn.com â€” "Hands-on Exploration of SQLite for Production"
+8. botmonster.com â€” "SQLite Scales to Production: 10K TPS, WAL Mode"
+9. shivekkhurana.com â€” "SQLite in Production: A Real-World Benchmark"
+10. cronfeed.work â€” "SQLite WAL in 2026: checkpoint starvation"
+11. fly.io â€” "How SQLite Scales Read Concurrency"
+12. sqg.dev â€” "SQLite Driver Benchmark: better-sqlite3 vs node:sqlite vs libSQL vs Turso"
+13. photostructure/node-sqlite â€” library comparison
+14. oven-sh/bun â€” bun:sqlite docs
+15. Effect-TS/effect â€” @effect/sql-sqlite-bun source
+16. Effect-TS/deepwiki â€” Data Persistence docs
+17. Drizzle ORM docs â€” Relational Queries, Performance Optimization
 18. drizzle-team/drizzle-orm - performance blog
-19. productionhardening.org — cache_size, mmap tuning
-20. toolbox365.net — "6 PRAGMAs every production SQLite needs"
-21. smarthometroubleshoot.com — SQLite write amplification on eMMC
-22. mdpi.com — "ALEX: Adaptive Log-Embedded Extent Layer for Flash"
-23. autokaam.com — "I Gave My AI Agents a Memory With SQLite FTS5"
-24. agencodex.com — "Production Agent Memory: SQLite Hybrid for Long Context"
-25. zeroclaws.io — "How SQLite + FTS5 + Vectors Beat Dedicated Vector DBs"
-26. dev.to — "Why SQLite+FTS5 beats Vector DBs for AI Agent Memory"
-27. sqlite-memory (sqliteai) — markdown-based agent memory
-28. agent-memory-store (vbfs) — MCP memory with hybrid search
-29. agentmem (oxgeneral) — lightweight persistent memory
-30. simple-memory-mcp (chrisribe) — performance docs
-31. Effect-TS Pattern Library — Pool, Scope, Resource Management
-32. PaulJPhilp/EffectPatterns — resource management patterns
-33. zylos.ai — "SQLite WAL Mode: Patterns and Pitfalls for AI Agent Systems"
-34. adhdecode.com — SQLite page size tuning, Turso/libSQL
-35. turso.tech — Embedded Replicas, Sync Benchmark
+19. productionhardening.org â€” cache_size, mmap tuning
+20. toolbox365.net â€” "6 PRAGMAs every production SQLite needs"
+21. smarthometroubleshoot.com â€” SQLite write amplification on eMMC
+22. mdpi.com â€” "ALEX: Adaptive Log-Embedded Extent Layer for Flash"
+23. autokaam.com â€” "I Gave My AI Agents a Memory With SQLite FTS5"
+24. agencodex.com â€” "Production Agent Memory: SQLite Hybrid for Long Context"
+25. zeroclaws.io â€” "How SQLite + FTS5 + Vectors Beat Dedicated Vector DBs"
+26. dev.to â€” "Why SQLite+FTS5 beats Vector DBs for AI Agent Memory"
+27. sqlite-memory (sqliteai) â€” markdown-based agent memory
+28. agent-memory-store (vbfs) â€” MCP memory with hybrid search
+29. agentmem (oxgeneral) â€” lightweight persistent memory
+30. simple-memory-mcp (chrisribe) â€” performance docs
+31. Effect-TS Pattern Library â€” Pool, Scope, Resource Management
+32. PaulJPhilp/EffectPatterns â€” resource management patterns
+33. zylos.ai â€” "SQLite WAL Mode: Patterns and Pitfalls for AI Agent Systems"
+34. adhdecode.com â€” SQLite page size tuning, Turso/libSQL
+35. turso.tech â€” Embedded Replicas, Sync Benchmark

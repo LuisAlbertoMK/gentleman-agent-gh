@@ -1,7 +1,7 @@
-# GC Tuning for Bun/V8 in Agent Workloads
+﻿# GC Tuning for Bun/V8 in Agent Workloads
 
-**Research date**: 2026-06-23  
-**Scope**: opencode-vmk (Node.js/V8) + gentleman-vMK (Bun/JavaScriptCore)  
+**Research date**: 2026-06-23
+**Scope**: opencode-vmk (Node.js/V8) + gentleman-vMK (Bun/JavaScriptCore)
 **Sources consulted**: 20+ (V8 DeepWiki, Bun DeepWiki, Node.js docs, JSC blog, Platformatic, ADHDecode, NearForm, Red Hat, WebKit blog, several GitHub issues/PRs)
 
 ---
@@ -12,14 +12,14 @@
 
 | Generation | Collector | Strategy | Concurrent? | Incremental? | Typical Pause |
 |---|---|---|---|---|---|
-| Young (NewSpace) | Scavenger | Copying (Cheney) | Parallel (workers) | No | 1–5 ms |
-| Young (NewSpace) | Minor Mark-Sweep | Mark-Sweep | Concurrent | Yes (V8 12+) | 2–8 ms |
-| Old (OldSpace) | Mark-Compact | Mark-Sweep-Compact | Concurrent marking + sweeping | Yes | 15–100 ms+ |
+| Young (NewSpace) | Scavenger | Copying (Cheney) | Parallel (workers) | No | 1â€“5 ms |
+| Young (NewSpace) | Minor Mark-Sweep | Mark-Sweep | Concurrent | Yes (V8 12+) | 2â€“8 ms |
+| Old (OldSpace) | Mark-Compact | Mark-Sweep-Compact | Concurrent marking + sweeping | Yes | 15â€“100 ms+ |
 
-- **V8 heap**: NewSpace (two semi-spaces) → OldSpace → LargeObjectSpace → CodeSpace
+- **V8 heap**: NewSpace (two semi-spaces) â†’ OldSpace â†’ LargeObjectSpace â†’ CodeSpace
 - **Default max-old-space-size**: ~1.5 GB (64-bit), auto-scaled by Node.js to 50% of container RAM (up to 2 GB ceiling)
-- **Default max-semi-space-size**: **DANGEROUSLY small** in Node.js v22+ — as low as **1 MB** per semi-space on 512 MB containers (auto-calculated from perceived available memory). This causes massive premature promotion.
-- **Incremental marking** enabled by default; splits mark phase into 1–5 ms steps triggered every 256 KB old-gen allocation
+- **Default max-semi-space-size**: **DANGEROUSLY small** in Node.js v22+ â€” as low as **1 MB** per semi-space on 512 MB containers (auto-calculated from perceived available memory). This causes massive premature promotion.
+- **Incremental marking** enabled by default; splits mark phase into 1â€“5 ms steps triggered every 256 KB old-gen allocation
 - **Concurrent sweeping** enabled by default; background thread reclaims memory
 
 ### JavaScriptCore (Bun / gentleman-vMK)
@@ -27,10 +27,10 @@
 | Aspect | Behavior |
 |---|---|
 | Heap model | Non-compacting, generational (eden + old space) |
-| Eden GC | Collects only eden (young gen) — fast, ~linear to eden size |
+| Eden GC | Collects only eden (young gen) â€” fast, ~linear to eden size |
 | Full GC | Collects entire heap; concurrent marking + parallel marking threads |
 | Write barrier | Strict generational barrier; Bun uses `JSC::WriteBarrier` + `WriteBarrierList` |
-| Compaction | **None** — JSC does NOT compact (avoids move cost, trades fragmentation) |
+| Compaction | **None** â€” JSC does NOT compact (avoids move cost, trades fragmentation) |
 | Allocation | Bump-pointer in eden; IsoSubspaces for typed allocations |
 
 - **Bun's GarbageCollectionController** (Zig): adaptive timer-based scheduler
@@ -40,8 +40,8 @@
   - Deferred while HTTP requests are in-flight
   - At 70%+ RSS, triggers aggressive collection
   - Configurable: `BUN_GC_TIMER_INTERVAL`, `BUN_GC_TIMER_DISABLE`, `BUN_GC_RUNS_UNTIL_SKIP_RELEASE_ACCESS`
-- **JSC env vars**: prefix with `BUN_JSC_` — unstable, per `OptionsList.h`
-- **Known upstream JSC GC leaks** (4 tracked, critical — `SlotVisitor::drainFromShared` race, `HashTable::removeIterator`, etc.)
+- **JSC env vars**: prefix with `BUN_JSC_` â€” unstable, per `OptionsList.h`
+- **Known upstream JSC GC leaks** (4 tracked, critical â€” `SlotVisitor::drainFromShared` race, `HashTable::removeIterator`, etc.)
 
 ---
 
@@ -61,13 +61,13 @@ Agents like opencode and gentleman have a specific GC profile:
 
 ```
 High allocation rate (tool results, context)
-  → Young gen fills faster → frequent minor GC (1-5ms each, adds up)
-  → Objects promoted prematurely → Old gen grows
-  → Major GC triggered more often → 50-500ms+ pauses
-  → User experiences "stuttering" during streaming
+  â†’ Young gen fills faster â†’ frequent minor GC (1-5ms each, adds up)
+  â†’ Objects promoted prematurely â†’ Old gen grows
+  â†’ Major GC triggered more often â†’ 50-500ms+ pauses
+  â†’ User experiences "stuttering" during streaming
 ```
 
-On Node.js v22+, premature promotion is **aggravated** by the tiny default semi-space (1 MB on 512 MB containers). Objects survive 1–2 scavenges and get promoted, bloating Old Space.
+On Node.js v22+, premature promotion is **aggravated** by the tiny default semi-space (1 MB on 512 MB containers). Objects survive 1â€“2 scavenges and get promoted, bloating Old Space.
 
 ### Problem Chain (Bun/JSC)
 
@@ -80,7 +80,7 @@ JSC's non-compacting design avoids compaction pauses but can fragment. Bun's ada
 ### opencode-vmk (Node.js/V8)
 
 ```bash
-# Agent workload — balanced for interactivity
+# Agent workload â€” balanced for interactivity
 NODE_OPTIONS="
   --max-old-space-size=4096
   --max-semi-space-size=64
@@ -93,12 +93,12 @@ NODE_OPTIONS="
 | Flag | Value | Rationale |
 |---|---|---|
 | `--max-old-space-size` | 4096 (4 GB) | Prevents OOM during long sessions with large context; leaves room for native modules/buffers |
-| `--max-semi-space-size` | 64 MB | **Critical** — prevents premature promotion. Each semi-space 64 MB → NewSpace up to 128 MB. Enough to let short-lived tool results die in Scavenge. Benchmark values: 32/64/128 MB |
+| `--max-semi-space-size` | 64 MB | **Critical** â€” prevents premature promotion. Each semi-space 64 MB â†’ NewSpace up to 128 MB. Enough to let short-lived tool results die in Scavenge. Benchmark values: 32/64/128 MB |
 | `--initial-old-space-size` | 1024 (1 GB) | Pre-allocates old space, reducing early GC churn during session warm-up |
-| `--expose-gc` | — | Enables `global.gc()` for strategic manual collection after large context swaps |
-| `--trace-gc` | — | Logs all GC events for monitoring; can be removed in production after baseline |
+| `--expose-gc` | â€” | Enables `global.gc()` for strategic manual collection after large context swaps |
+| `--trace-gc` | â€” | Logs all GC events for monitoring; can be removed in production after baseline |
 
-**Why NOT `--gc-interval`**: For agent workloads, timer-based GC fights the adaptive controller. Better to let V8's own heuristics (incremental marking + concurrent sweeping) handle it. The exception is if you observe 30–45% pause reduction from periodic scavenge — test empirically.
+**Why NOT `--gc-interval`**: For agent workloads, timer-based GC fights the adaptive controller. Better to let V8's own heuristics (incremental marking + concurrent sweeping) handle it. The exception is if you observe 30â€“45% pause reduction from periodic scavenge â€” test empirically.
 
 ### gentleman-vMK (Bun/JavaScriptCore)
 
@@ -112,9 +112,9 @@ Bun-specific tuning (environment variables):
 ```bash
 # Tune GC timer interval (default: ~1000 ms fast, 30000 ms slow)
 BUN_GC_TIMER_INTERVAL=500          # Faster checks for interactive responsiveness
-# BUN_GC_TIMER_DISABLE=1           # For debugging only — don't use in production
+# BUN_GC_TIMER_DISABLE=1           # For debugging only â€” don't use in production
 
-# JSC internal flags (unstable — check OptionsList.h for your Bun version)
+# JSC internal flags (unstable â€” check OptionsList.h for your Bun version)
 BUN_JSC_gcMaxHeapSize=4096         # Max heap in MB
 BUN_JSC_minHeapSize=512            # Min heap in MB (pre-warm)
 ```
@@ -133,12 +133,12 @@ BUN_JSC_minHeapSize=512            # Min heap in MB (pre-warm)
 
 | Metric | Target | Warning | Critical |
 |---|---|---|---|
-| Minor GC (Scavenge/Eden) | < 5 ms | 5–15 ms | > 15 ms |
-| Major GC (Mark-Compact/Full) | < 50 ms | 50–200 ms | > 200 ms |
-| GC frequency (minor) | < 10/s | 10–30/s | > 30/s |
-| GC frequency (major) | < 1/30s | 1/10s–1/30s | > 1/10s |
-| Heap used / max ratio | 40–60% | 60–80% | > 80% |
-| Total GC time per minute | < 500 ms | 500–2000 ms | > 2000 ms |
+| Minor GC (Scavenge/Eden) | < 5 ms | 5â€“15 ms | > 15 ms |
+| Major GC (Mark-Compact/Full) | < 50 ms | 50â€“200 ms | > 200 ms |
+| GC frequency (minor) | < 10/s | 10â€“30/s | > 30/s |
+| GC frequency (major) | < 1/30s | 1/10sâ€“1/30s | > 1/10s |
+| Heap used / max ratio | 40â€“60% | 60â€“80% | > 80% |
+| Total GC time per minute | < 500 ms | 500â€“2000 ms | > 2000 ms |
 
 ### Allocation Rate Targets
 
@@ -146,7 +146,7 @@ BUN_JSC_minHeapSize=512            # Min heap in MB (pre-warm)
 |---|---|---|
 | Allocation rate (steady) | < 50 MB/s | Normal agent operation |
 | Allocation rate (peak) | < 200 MB/s | During large tool results / streaming |
-| Promotion rate | < 5 MB/s | Above this → increase semi-space |
+| Promotion rate | < 5 MB/s | Above this â†’ increase semi-space |
 
 ---
 
@@ -155,7 +155,7 @@ BUN_JSC_minHeapSize=512            # Min heap in MB (pre-warm)
 ### V8 (Node.js)
 
 ```js
-// Strategic manual GC — NOT on every tick, only after known large allocations
+// Strategic manual GC â€” NOT on every tick, only after known large allocations
 import v8 from 'node:v8';
 
 // After context swap or large tool result
@@ -185,7 +185,7 @@ const profile = profiler.stop();
 ```js
 import { heapStats } from 'bun:jsc';
 
-// Manual GC — supported since Bun v1.1.43
+// Manual GC â€” supported since Bun v1.1.43
 Bun.gc(true);   // synchronous full GC
 Bun.gc(false);  // asynchronous GC
 
@@ -208,16 +208,16 @@ function logHeapStats() {
 
 ## 6. Monitoring Setup
 
-### V8 (Node.js) — `--trace-gc` output
+### V8 (Node.js) â€” `--trace-gc` output
 
 ```
-[13579:0x7f...] Scavenge 10.5 ms, 20.6 MB → 15.2 MB  (26% freed)
-[13579:0x7f...] Mark-sweep 85.2 ms, 312 MB → 180 MB  (42% freed)
+[13579:0x7f...] Scavenge 10.5 ms, 20.6 MB â†’ 15.2 MB  (26% freed)
+[13579:0x7f...] Mark-sweep 85.2 ms, 312 MB â†’ 180 MB  (42% freed)
 ```
 
 Parse this for: pause duration, heap shrinkage %, frequency. Track the ratio of GC time to wall-clock time.
 
-### V8 (Node.js) — `perf_hooks` API
+### V8 (Node.js) â€” `perf_hooks` API
 
 ```js
 const { PerformanceObserver } = require('perf_hooks');
@@ -232,7 +232,7 @@ const obs = new PerformanceObserver((list) => {
 obs.observe({ entryTypes: ['gc'] });
 ```
 
-### V8 (Node.js) — `v8.GCProfiler`
+### V8 (Node.js) â€” `v8.GCProfiler`
 
 ```js
 const { GCProfiler } = require('v8');
@@ -245,7 +245,7 @@ setTimeout(() => {
 }, 10000);
 ```
 
-### V8 (Node.js) — `v8.startHeapProfile` (Node.js 26+, 2026)
+### V8 (Node.js) â€” `v8.startHeapProfile` (Node.js 26+, 2026)
 
 ```js
 const profile = v8.startHeapProfile({
@@ -258,7 +258,7 @@ const profile = v8.startHeapProfile({
 profile.stop();  // writes .heapprofile
 ```
 
-### Bun — JSC heap stats + heap snapshot
+### Bun â€” JSC heap stats + heap snapshot
 
 ```js
 // Runtime heap stats
@@ -371,11 +371,11 @@ Bun's adaptive GC controller is already well-suited for interactive workloads. T
 1. **Use `--expose-gc`** for strategic `Bun.gc(true)` after large context swaps
 2. **Tune `BUN_GC_TIMER_INTERVAL=500`** for more responsive GC scheduling
 3. **Monitor `heapStats()`** from `bun:jsc` for object-type retention analysis
-4. **Watch for JSC upstream GC leaks** (tracking #28343) — periodic full GC may be needed as mitigation until WebKit fixes land
+4. **Watch for JSC upstream GC leaks** (tracking #28343) â€” periodic full GC may be needed as mitigation until WebKit fixes land
 
 ### Universal
 
-1. Profile before tuning — defaults are good until they're not
+1. Profile before tuning â€” defaults are good until they're not
 2. The largest lever is **reducing allocation rate** in agent code (pooling, streaming, pruning context)
-3. Major GC pause > 200 ms is user-noticeable during streaming — tune or refactor
-4. Set heap limit to 50–60% of container RAM, never 100%
+3. Major GC pause > 200 ms is user-noticeable during streaming â€” tune or refactor
+4. Set heap limit to 50â€“60% of container RAM, never 100%
