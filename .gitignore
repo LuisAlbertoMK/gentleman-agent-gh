@@ -105,8 +105,8 @@ magic-context.jsonc
 # Secrets (defensive)
 # ============================================
 .env
-.env.local
-.env.*.local
+.env.*
 *.pem
 *.key
 secrets/
+credentials.json

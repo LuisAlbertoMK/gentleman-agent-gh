@@ -46,19 +46,19 @@ if ($Path -eq "--help" -or $Path -eq "-h") {
 if (-not $Path) { $Path = (Get-Location).Path }
 Write-Host "[!pcycle] Project: $Path" -ForegroundColor Cyan
 
-$profileScript = Join-Path $PSScriptRoot "project-profile.ps1"
-if (-not (Test-Path $profileScript)) {
+$projectProfileScript = Join-Path $PSScriptRoot "project-profile.ps1"
+if (-not (Test-Path $projectProfileScript)) {
     Write-Host "[!pcycle] ERROR: project-profile.ps1 not found" -ForegroundColor Red
     exit 1
 }
 
-$profileJson = & $profileScript -Path $Path -Quiet 2>$null
-if (-not $profileJson) {
+$projectProfileJson = & $projectProfileScript -Path $Path -Quiet 2>$null
+if (-not $projectProfileJson) {
     Write-Host "[!pcycle] ERROR: could not profile project" -ForegroundColor Red
     exit 1
 }
 try {
-    $profile = $profileJson | ConvertFrom-Json
+    $projectProfile = $projectProfileJson | ConvertFrom-Json
 } catch {
     Write-Host "[!pcycle] ERROR: invalid profile output" -ForegroundColor Red
     exit 1
@@ -74,7 +74,7 @@ if (Test-Path $configPath) {
     $configRaw = $configRaw -replace '//.*?(?=\r?\n|$)', '' -replace '/\*.*?\*/', '' -replace '(?m)^\s*$', ''
     try {
         $config = $configRaw | ConvertFrom-Json
-        $stack = $profile.stack.type
+        $stack = $projectProfile.stack.type
         $allDims = $config.dimensions
 
         if ($Migrate -ne "") {
@@ -118,7 +118,7 @@ if (Test-Path $configPath) {
 
         # Calculate N
         if ($N -le 0) {
-            $fileCount = [int]$profile.size.files
+            $fileCount = [int]$projectProfile.size.files
             $scaling = $config.n_subagent_scaling.by_files
             foreach ($s in $scaling) {
                 $max = [int]$s.max
@@ -150,14 +150,14 @@ if ($dimensions.Count -eq 0) {
 
 # ── 3. Summary ──────────────────────────────────────────────────
 $cycleId = "PCYC-" + (Get-Date -Format "yyyyMMdd") + "-" + (Get-Random -Minimum 100 -Maximum 999)
-$stackLabel = $profile.stack.type
-$pkgMgr = $profile.stack.pkgManager
-$fileCount = $profile.size.files
-$loc = $profile.size.loc
+$stackLabel = $projectProfile.stack.type
+$pkgMgr = $projectProfile.stack.pkgManager
+$fileCount = $projectProfile.size.files
+$loc = $projectProfile.size.loc
 
 if (-not $Quiet) {
     Write-Host "=== !pcycle $cycleId ===" -ForegroundColor Green
-    Write-Host "  Project: $($profile.profile.name)" -ForegroundColor White
+    Write-Host "  Project: $($projectProfile.profile.name)" -ForegroundColor White
     Write-Host "  Stack:   $stackLabel / $pkgMgr" -ForegroundColor Yellow
     Write-Host "  Size:    $fileCount files / $loc LOC" -ForegroundColor Gray
     Write-Host "  N:       $N sub-agents" -ForegroundColor Cyan
@@ -170,7 +170,7 @@ $reportDate = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssZ")
 $report = @()
 $report += "---"
 $report += "cycle_id: $cycleId"
-$report += "project: $($profile.profile.name)"
+$report += "project: $($projectProfile.profile.name)"
 $report += "type: external"
 $report += "stack: $stackLabel"
 $report += "pkg_manager: $pkgMgr"
@@ -180,7 +180,7 @@ $report += "status: analysis_only"
 $report += "date: $reportDate"
 $report += "---"
 $report += ""
-$report += "# Project Cycle: $($profile.profile.name)"
+$report += "# Project Cycle: $($projectProfile.profile.name)"
 $report += ""
 $report += "**Date**: $((Get-Date).ToString('yyyy-MM-dd'))"
 $report += "**Stack**: $stackLabel / $pkgMgr"
@@ -194,13 +194,13 @@ $report += "| Property | Value |"
 $report += "|----------|-------|"
 $report += "| Stack | $stackLabel |"
 $report += "| Package Manager | $pkgMgr |"
-$report += "| Frameworks | $($profile.stack.frameworks -join ', ') |"
-$report += "| Test Runner | $($profile.stack.testRunner) |"
-$report += "| CI Provider | $($profile.stack.ciProvider) |"
-$report += "| Docker | $($profile.stack.hasDocker) |"
+$report += "| Frameworks | $($projectProfile.stack.frameworks -join ', ') |"
+$report += "| Test Runner | $($projectProfile.stack.testRunner) |"
+$report += "| CI Provider | $($projectProfile.stack.ciProvider) |"
+$report += "| Docker | $($projectProfile.stack.hasDocker) |"
 $report += "| Files | $fileCount |"
 $report += "| LOC | $loc |"
-$report += "| Maturity | $($profile.size.maturity) |"
+$report += "| Maturity | $($projectProfile.size.maturity) |"
 $report += ""
 $report += "## Analysis Dimensions"
 $report += ""
@@ -250,7 +250,7 @@ if (-not (Test-Path $cyclesDir)) {
 }
 
 $dateStr = (Get-Date).ToString("yyyyMMdd")
-$slug = $profile.profile.name -replace '[^a-zA-Z0-9-]', '-'
+$slug = $projectProfile.profile.name -replace '[^a-zA-Z0-9-]', '-'
 $filename = "cycle-${slug}-${dateStr}.md"
 $reportPath = Join-Path $cyclesDir $filename
 $report | Out-String | Set-Content -LiteralPath $reportPath -Encoding UTF8
@@ -262,7 +262,7 @@ if (-not $AnalysisOnly) {
     if (-not (Test-Path $learningsDir)) {
         New-Item -ItemType Directory -Path $learningsDir -Force | Out-Null
     }
-    $learnFile = "pcyc-${dateStr}-$($profile.profile.name -replace '[^a-zA-Z0-9-]', '-').md"
+    $learnFile = "pcyc-${dateStr}-$($projectProfile.profile.name -replace '[^a-zA-Z0-9-]', '-').md"
     $learnPath = Join-Path $learningsDir $learnFile
 
     $learnEntry = @()
@@ -270,7 +270,7 @@ if (-not $AnalysisOnly) {
     $learnEntry += "type: project"
     $learnEntry += "cycle_id: $cycleId"
     $learnEntry += "date: $reportDate"
-    $learnEntry += "project: $($profile.profile.name)"
+    $learnEntry += "project: $($projectProfile.profile.name)"
     $learnEntry += "stack: $stackLabel"
     $learnEntry += "pkg_manager: $pkgMgr"
     if ($Migrate -ne "") { $learnEntry += "migration: $Migrate" }
@@ -280,7 +280,7 @@ if (-not $AnalysisOnly) {
     $learnEntry += "## Learning Entry"
     $learnEntry += ""
     $learnEntry += "### What"
-    $learnEntry += "!pcycle analysis of $($profile.profile.name) ($stackLabel/$pkgMgr, $fileCount files, $loc LOC)"
+    $learnEntry += "!pcycle analysis of $($projectProfile.profile.name) ($stackLabel/$pkgMgr, $fileCount files, $loc LOC)"
     $learnEntry += ""
     $learnEntry += "### Decisions"
     $learnEntry += "- N sub-agents: $N"
@@ -301,7 +301,7 @@ if (-not $AnalysisOnly) {
 # ── 7. Output ──────────────────────────────────────────────────
 $result = [PSCustomObject]@{
     cycle_id       = $cycleId
-    project        = $profile.profile.name
+    project        = $projectProfile.profile.name
     stack          = $stackLabel
     pkgManager     = $pkgMgr
     n_subagents    = $N

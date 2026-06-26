@@ -178,7 +178,7 @@ if ($gitLog) {
 }
 
 # ── Output ────────────────────────────────────────────────────
-$profile = [PSCustomObject]@{
+$projectProfile = [PSCustomObject]@{
     profile = [PSCustomObject]@{
         path         = "$($resolved)"
         name         = Split-Path "$($resolved)" -Leaf
@@ -200,7 +200,7 @@ $profile = [PSCustomObject]@{
 }
 
 if ($Quiet) {
-    $profile | ConvertTo-Json -Depth 4
+    $projectProfile | ConvertTo-Json -Depth 4
 } else {
     Write-Host "=== Project Profile ===" -ForegroundColor Cyan
     Write-Host "  Path:     $resolved"
@@ -214,6 +214,6 @@ if ($Quiet) {
     Write-Host "  LOC:      $loc"
     Write-Host "  Maturity: $maturity"
     Write-Host "---"
-    $profile | ConvertTo-Json -Depth 4
+    $projectProfile | ConvertTo-Json -Depth 4
 }
 exit 0

@@ -234,5 +234,8 @@
       "*.env": "deny",
       "*.env.*": "deny"
     }
+  },
+  "skills": {
+    "paths": [".agents/skills/*"]
   }
 }

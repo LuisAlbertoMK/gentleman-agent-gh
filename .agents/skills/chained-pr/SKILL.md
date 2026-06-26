@@ -1,6 +1,7 @@
 ---
-name: gentle-ai-chained-pr
+name: chained-pr
 description: "Trigger: PRs over 400 lines, stacked PRs, review slices. Split oversized changes into chained PRs that protect review focus."
+triggers: "chained PR, stacked PR, oversized PR, sequential branches, PR chain"
 license: Apache-2.0
 metadata:
   author: gentleman-programming

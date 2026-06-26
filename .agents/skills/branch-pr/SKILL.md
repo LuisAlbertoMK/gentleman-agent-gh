@@ -1,6 +1,7 @@
 ---
-name: gentle-ai-branch-pr
+name: branch-pr
 description: "Create Gentle AI pull requests with issue-first checks. Trigger: creating, opening, or preparing PRs for review."
+triggers: "branch PR, create PR, pull request, open PR, PR workflow"
 license: Apache-2.0
 metadata:
   author: gentleman-programming

@@ -27,11 +27,11 @@ foreach($c in $cp){if($c.Pattern -cmatch [regex]::Escape($e.Name)){$cat=$true;br
 $r+=[PSCustomObject]@{PatternKey=$e.Name;Count=$e.Value;Cataloged=$cat}}};return $r}
 $catalog=rc;$patternKeys=rl;$errors=re;$repeated=frp -cp $catalog -pk $patternKeys -mn $Threshold
 if($Mode-eq'check'){$data=[PSCustomObject]@{CatalogEntries=@($catalog).Count;PatternKeys=@($patternKeys).Count;ErrorEntries=@($errors).Count;RepeatedPatterns=@($repeated).Count;Mode='check';Status=if(@($repeated).Count-gt0){'PATTERNS_FOUND'}else{'CLEAN'}}
-if($Json){return($data | ConvertTo-Json -Comp)}
+if($Json){return($data | ConvertTo-Json)}
 Write-Host "  Catalog: $(@($catalog).Count) entries`n  Patterns: $(@($patternKeys).Count) keys`n  Errors: $(@($errors).Count) entries`n  Repeated: $(@($repeated).Count) patterns`n  Status: $($data.Status)";return}
 if($Mode-eq'scan'){$uncataloged=@($repeated | Where-Object {-not $_.Cataloged})
 $data=[PSCustomObject]@{CatalogCount=@($catalog).Count;PatternKeyCount=@($patternKeys).Count;ErrorCount=@($errors).Count;RepeatedPatterns=$repeated;UnCatalogedCount=$uncataloged.Count;CanApply=$uncataloged.Count-gt0}
-if($Json){return($data | ConvertTo-Json -Depth 3 -Comp)}
+if($Json){return($data | ConvertTo-Json -Depth 3)}
 Write-Host "Catalog: $($catalog.Count) anti-patterns cataloged`nPattern keys: $($patternKeys.Count) from learnings`nErrors: $($errors.Count) entries"
 if($repeated.Count-eq0){Write-Host "[OK] No repeated patterns found (threshold: $Threshold)";return}
 Write-Host '[WARN] Repeated patterns detected:';foreach($r in $repeated){$s=if($r.Cataloged){'[cataloged]'}else{'[uncataloged]'};Write-Host "  [$($r.Count)x] $($r.PatternKey) -- $s"}

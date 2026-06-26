@@ -9,9 +9,8 @@
 
 | Trigger keywords | Skill |
 |------------------|-------|
-| Karpathy, less tokens, context compression | karpathy-loop |
+| Karpathy, less tokens, context compression, optimize prompt, measure tokens | karpathy-loop |
 | Improve prompt, security, ReAct, multi-agent | prompt-engineering |
-| Karpathy loop, optimize prompt, measure tokens | karpathy-loop |
 | Compact, less tokens, caveman, /caveman, ultra-lean | lean-context |
 | Continuá, code memory, multi-session | code-memory |
 | Self-reflection, Hermes, error patterns | self-reflection |
@@ -35,6 +34,7 @@
 | Apply tasks, implement | sdd-apply |
 | Validate vs specs, verify | sdd-verify |
 | Archive changes, delta to main | sdd-archive |
+| SDD pipeline, unified pipeline, orchestrate SDD phases | sdd |
 | Decision capture, trade-off log | decision-capture |
 | Execution mode, resource-adaptive zones, quick/thorough/draft | execution-mode |
 | Skill digestion, compact on load | skill-digestion |

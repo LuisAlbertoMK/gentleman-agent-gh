@@ -8,7 +8,7 @@ metadata:
     - engineering
   author: gentleman-vMK
   version: "2.0"
-  changelog: "1.1→2.0: merged caveman as CAVEMAN level
+  changelog: "1.1→2.0: merged caveman as CAVEMAN level"
 ---
 
 LEAN/ULTRA: default. CAVEMAN: on-demand extreme.Trigger: "modo normal", /lean-off, "stop caveman". Reactivate: new session.
