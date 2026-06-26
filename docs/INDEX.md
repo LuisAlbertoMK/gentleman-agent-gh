@@ -13,7 +13,8 @@ docs/
 ├── operations/           ← Uso diario — qué agente, estándares, scoring
 ├── decisions/            ← Decisiones arquitectónicas e históricas
 ├── research/             ← Investigaciones técnicas (9 áreas)
-├── metrics/              ← Evidencia de scoring + baselines
+├── metricas/             ← Evidencia de scoring + baselines (es: metricas)
+├── ciclos/               ← Reportes de ciclos de mejora
 ├── reference/            ← Referencias generales
 └── archive/              ← Planes cumplidos + binarios
 ```
@@ -61,26 +62,16 @@ docs/
 
 ---
 
-## 🟣 metrics/ — Evidencia de scoring
+## 🟣 metricas/ — Evidencia de scoring
 
 | Archivo | Qué contiene |
 |---------|-------------|
 | `intake-baseline.json` | Baseline inicial del proyecto (métricas del sistema) |
 | `pssa-baseline.json` | Baseline de PowerShell Script Analyzer |
-| `snapshots/LATEST_benchmark.json` | Benchmark actual: 68 skills, 125KB, 100% frontmatter |
+| `snapshots/LATEST_benchmark.json` | Benchmark actual: 69 skills, ~125KB, 100% frontmatter |
 | `errors/LATEST_error.json` | Último resultado de quality gate (9 pass, 0 fail) |
-| `changelog-20260613-intake-system.md` | Cambios del intake inicial |
-| `compaction-batch2-20260614.md` | Segunda ronda de compactación |
-| `final-optimization-round-20260615.md` | Ronda final de optimización |
-| `fix-docs-scripts-20260614.md` | Fixes de docs y scripts |
-| `intake-report-*.md` (5) | Reportes detallados del intake inicial |
-| `perf-optimization-20260614.md` | Optimización de rendimiento |
-| `perf-report-20260613.md` | Reporte de rendimiento inicial |
-| `phase1-compactacion-20260614.md` | Fase 1 de compactación |
-| `plugin-optimization-20260615.md` | Optimización de plugins |
-| `quality-gate-20260614.md` | Reporte de quality gate |
-| `sparse-loading-20260614.md` | Implementación de sparse loading |
-| `tools-compression-20260614.md` | Compresión de herramientas |
+| `SUMMARY.md` | Resumen ejecutivo de métricas del proyecto |
+| (15 reportes adicionales) | Reportes históricos de intake, compactación, optimización |
 
 > **⚠️ No eliminar** — 6 scripts del proyecto dependen de esta carpeta.
 > Ver `docs/metricas/SUMMARY.md` para resumen ejecutivo.
@@ -112,9 +103,9 @@ docs/
 | Desde | Hacia | Naturaleza |
 |-------|-------|------------|
 | `operations/quality-standard.md` | `decisions/bitacora.md` | Cita cambios registrados |
-| `operations/scoring-protocol.md` | `metrics/` | Baselines para scoring reproducible |
-| `operations/project-score.md` | `metrics/` | Score deriva de métricas |
-| `decisions/roadmap.md` | `decisions/bitacora.md`, `metrics/` | Referencias históricas |
+| `operations/scoring-protocol.md` | `metricas/` | Baselines para scoring reproducible |
+| `operations/project-score.md` | `metricas/` | Score deriva de métricas |
+| `decisions/roadmap.md` | `decisions/bitacora.md`, `metricas/` | Referencias históricas |
 | `decisions/portfolio.md` | `operations/quality-standard.md`, `decisions/bitacora.md` | Citas a estándares y bitácora |
 | `research/network-io.md` | `research/build-optimization.md` | Cross-ref entre investigaciones |
 | `reference/skills-caveman.md` | Skills en `.agents/skills/` | Mapa comprimido de skills |
@@ -123,6 +114,6 @@ docs/
 
 ## 📐 Convenciones de naming
 
-- **Módulos**: `operations/`, `decisions/`, `research/`, `metrics/`, `reference/`, `archive/` — todos en inglés, minúscula, singular
+- **Módulos**: `operations/`, `decisions/`, `research/`, `metricas/`, `ciclos/`, `reference/`, `archive/`
 - **Archivos**: `kebab-case.md` — descriptivo, sin prefijos (`research-`), sin versiones en el nombre
 - **Cross-refs**: rutas relativas desde el archivo que referencia, NO desde la raíz del proyecto
