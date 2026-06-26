@@ -1,3 +1,10 @@
+<#
+.SYNOPSIS
+  Auto-score project metrics across 7 dimensions.
+.DESCRIPTION
+  Scores correctness, tokens, error prevention, skill, speed, breadth, and skill_eval.
+  Outputs JSON with -Json, quiet mode with -Quiet.
+#>
 #requires -Version 5.1
 param([switch]$Json,[switch]$Quiet)
 Set-Location "$PSScriptRoot\.."

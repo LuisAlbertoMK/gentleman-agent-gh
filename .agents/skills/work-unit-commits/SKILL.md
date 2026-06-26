@@ -8,80 +8,42 @@ metadata:
   version: "1.0"
 ---
 
-## When to Use
-
-Load this skill when deciding what belongs in each commit or PR.
-
-Use it for:
-
-- Splitting a feature into reviewable work.
-- Preparing commits before opening a PR.
-- Turning a large change into chained or stacked PRs.
-- Keeping reviewer cognitive load healthy.
-- Applying SDD tasks without accidentally producing a PR above 400 changed lines.
-
 ## Critical Rules
 
 | Rule | Requirement |
 |------|-------------|
-| Commit by work unit | A commit represents a deliverable behavior, fix, migration, or docs unit. |
-| Do not commit by file type | Avoid `models`, then `services`, then `tests` if none works alone. |
-| Keep tests with code | Tests belong in the same commit as the behavior they verify. |
-| Keep docs with the user-visible change | Docs belong with the feature or workflow they explain. |
-| Tell a story | A reviewer should understand why each commit exists from its diff and message. |
-| Future PR-ready | Each commit should be a candidate chained PR when the change grows. |
-| SDD workload guard | If SDD tasks forecast a >400-line change, group commits into chained PR slices before implementation. |
+| Commit by work unit | A commit = deliverable behavior, fix, migration, or docs unit |
+| Keep tests with code | Tests belong in same commit as the behavior they verify |
+| Keep docs with change | Docs belong with the feature/flow they explain |
+| Tell a story | Reviewer understands why each commit exists from diff+message |
+| Future PR-ready | Each commit = candidate chained PR |
+| SDD workload guard | >400 lines forecast → group into chained PR slices before impl |
 
-## Work Unit Checklist
+## Checklist (before committing)
 
-Before committing, confirm:
+- [ ] One clear purpose
+- [ ] Repo makes sense with only this commit applied
+- [ ] Tests/docs included when relevant
+- [ ] Rollback doesn't revert unrelated work
+- [ ] Message explains outcome, not file list
 
-- [ ] The commit has one clear purpose.
-- [ ] The repo still makes sense after applying only this commit.
-- [ ] Tests or docs for this unit are included when relevant.
-- [ ] Rollback is reasonable without reverting unrelated work.
-- [ ] The commit message explains the outcome, not the file list.
+## Split Pattern
 
-## Split Examples
+```
+Weak: "add models" → Strong: "feat(auth): add token validation model and tests"
+Weak: "add services" → Strong: "feat(auth): wire token validation into login flow"
+```
 
-| Weak split | Better work-unit split |
-|------------|------------------------|
-| `add models` | `feat(auth): add token validation domain model and tests` |
-| `add services` | `feat(auth): wire token validation into login flow` |
-| `add tests` | Tests included with each behavior commit |
-| `update docs` | Docs included with the user-facing change they explain |
+## PR & SDD Relationship
 
-## PR Relationship
+Each work unit → one commit or PR with: clear start state · finished state · verification in same unit · rollback isolated.
 
-Use work-unit commits as the foundation for chained PRs:
-
-1. Build the smallest independent work unit.
-2. Include verification for that unit.
-3. Commit it with a Conventional Commit message.
-4. If the PR approaches 400 changed lines, promote commits or groups of commits into chained PRs.
-
-## SDD Relationship
-
-When `sdd-tasks` produces a Review Workload Forecast:
-
-- Low risk: keep work-unit commits inside one PR.
-- Medium risk: commit by work unit and monitor changed lines before PR creation.
-- High risk: follow SDD `delivery_strategy` — ask on `ask-on-risk`, auto-slice on `auto-chain`, require `size:exception` on over-budget `single-pr`, or record accepted `size:exception` on `exception-ok`.
-
-Each SDD work unit should map cleanly to a commit or PR with:
-
-- clear start state,
-- clear finished state,
-- verification in the same unit,
-- rollback that does not remove unrelated work.
+If SDD forecast = medium risk → commit by unit, monitor lines. High risk → follow `delivery_strategy`. Low risk → keep in one PR.
 
 ## Commands
 
 ```bash
-# Review the story before committing
-git diff --stat
+git diff --stat          # review story before committing
 git diff --cached --stat
-
-# Check recent commit style
-git log --oneline -5
+git log --oneline -5     # check recent style
 ```
