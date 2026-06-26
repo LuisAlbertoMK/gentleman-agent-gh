@@ -162,14 +162,14 @@ karpathy-loop · caveman · lean-context · quality-gate · auto-metrics · sess
 ```
 Resume → session-resume · Write code → skill-creator, sdd-*, quality-gate, go-testing, work-unit-commits
 Fix bug → recovery-protocol, immune-system, sdd-verify · Design → senior-engineer, sdd-propose, sdd-design, cognitive-doc-design
-Learn/Research → research, prompt-engineering, context7, code-memory · Review → review-pipeline, judgment-day, skill-testing, comment-writer, code-review-agent
+Learn/Research → research, prompt-engineering, code-memory · Review → review-pipeline, judgment-day, skill-testing, comment-writer, code-review-agent
 UI/Design → baseline-ui, web-quality-audit, performance, accessibility, seo
 System → development-mode, execution-mode, opencode-model-router
 Measure → metricas, auto-metrics, performance-tracker · Audit → external-auditor, gap-analysis · Optimize → karpathy-*, lean-context, caveman, skill-improver, refactoring-planner
 Coordinate → delivery-harness, subagent-isolation, command-wrapper, chained-pr
 Commit → commit-crafter | Map → project-mapper | Secure → security-scanner
 Sync docs → doc-sync | Log → bitacora · Track/Decide → decision-capture, dreaming, skill-digestion
-Improve → self-improvement, self-reflection · Setup → sdd-init, ci-cd, project-mapper · Recover → recovery-protocol, immune-system, context-watchdog · Unknown → Pre-Flight: skill-creator, research, retry
+Improve → self-improvement, self-reflection · Setup → sdd-init, ci-cd, project-mapper · Recover → recovery-protocol, immune-system, context-watchdog · Unknown → Pre-Flight: skill-creator, research, recovery-protocol
 ```
 Load order: 1) Anti-Pattern Catalog 2) Behavioral match 3) Trigger match 4) Default-FAIL 5) Mini-dream every 5th call
 

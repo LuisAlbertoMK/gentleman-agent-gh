@@ -141,5 +141,5 @@ Para la lista completa de las 26 correcciones, ver `docs/archive/corrections-r2-
 |---|---|
 | Estándar de calidad | `docs/operations/quality-standard.md` |
 | Bitácora del proyecto | `docs/decisions/bitacora.md` |
-| Evidencia de scoring | `docs/metrics/` |
+| Evidencia de scoring | `docs/metricas/` |
 | Skill de ruteo de modelos | `.agents/skills/opencode-model-router/SKILL.md` |

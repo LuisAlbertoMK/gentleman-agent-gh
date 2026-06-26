@@ -83,7 +83,7 @@ docs/
 | `tools-compression-20260614.md` | Compresión de herramientas |
 
 > **⚠️ No eliminar** — 6 scripts del proyecto dependen de esta carpeta.
-> Ver `docs/metrics/SUMMARY.md` para resumen ejecutivo.
+> Ver `docs/metricas/SUMMARY.md` para resumen ejecutivo.
 
 ---
 

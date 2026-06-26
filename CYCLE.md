@@ -116,7 +116,7 @@
 | 10 | Auto-update `.project.json` on stale: freshness check en close-session.ps1 | Medium | Low | 2.0 | 1-2 | 🟡 | close-session.ps1 actualiza .project.json si >1d stale |
 | 11 | Cycle 9 metric report en `docs/metricas/` | Medium | Low | 2.0 | 1 | 🟡 | docs/metricas/cycle9-*.md existe con before/after |
 | 12 | Bootstrap PS profile: ~/.config/opencode/init.ps1 con bash-safe.ps1 | Medium | Low | 2.0 | 1 | 🟡 | init.ps1 crea persistencia Invoke-Bash |
-| 13 | Fix docs/metrics/SUMMARY.md stale count (68→69 skills, 31→40 scripts) | Medium | Low | 2.0 | 1 | 🟡 | SUMMARY.md refleja estado actual |
+| 13 | Fix docs/metricas/SUMMARY.md stale count (68→69 skills, 31→42 scripts) | Medium | Low | 2.0 | 1 | 🟡 | SUMMARY.md refleja estado actual |
 | 14 | Aplicar cambios upstream gentle-ai (pull-upstream.ps1 -Mode Apply-New) | High | Medium | 1.5 | 2-3 | 🟡 | Upstream aplicado, `.upstream-state.json` actualizado |
 | 15 | Smoke test modularización: split smoke-all.ps1 en tests individuales | Medium | Low | 2.0 | 1-2 | 🟡 | scripts/smoke/ contiene tests individuales por claim |
 | 16 | `install.ps1` PSScriptRoot guard: prevenir `"\.git"` en edge case | Low | Low | 1.0 | 1 | 🟡 | `-not $PSScriptRoot` eval antes de string interpolation |
