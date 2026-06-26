@@ -88,12 +88,24 @@ docs/
 
 ---
 
+## 🟢 raíz docs/ — Documentos sueltos
+
+| Archivo | Qué contiene | Tamaño |
+|---------|-------------|--------|
+| `hallazgos-completos.md` | Hallazgos completos de auditoría 30+ subagentes | 16KB |
+| `mdshare-consolidated-analysis.md` | Análisis consolidado de documentos mdShare | 5.3KB |
+| `roadmap-pending.md` | Items de roadmap pendientes (post-prioridad) | 4.7KB |
+
+---
+
 ## ⚫ archive/ — Histórico
 
 | Archivo | Qué contiene |
 |---------|-------------|
 | `benchmark-vs-backup.md` | Comparativa pre-sprint3 (histórica) |
+| `corrections-r2-patch.md` | Parche de correcciones Ronda 2 |
 | `identity.md` | Declaración de identidad del agente (histórica) |
+| `model-router-verdict.md` | Veredicto de análisis de ruteo de modelos |
 | `soul.md` | Filosofía fundacional del agente (histórica) |
 
 ---
