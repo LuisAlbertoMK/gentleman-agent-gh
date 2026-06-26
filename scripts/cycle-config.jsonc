@@ -1,0 +1,147 @@
+{
+  // ── cycle-config.jsonc ────────────────────────────────────────
+  // Dimension catalog for !pcycle (external project cycles).
+  // Each dimension defines: applicability by stack, sub-agent count,
+  // analysis prompts, and severity rules.
+  // ──────────────────────────────────────────────────────────────
+
+  "$schema": "v1",
+  "description": "External project cycle dimension catalog",
+
+  "dimensions": [
+    {
+      "id": "security",
+      "label": "Security",
+      "always": true,
+      "severity_weight": 3.0,
+      "subagent_prompt": "Audit project security: scan for hardcoded secrets, vulnerable dependency patterns, missing input validation, outdated TLS/crypto, and OWASP Top 10 risks. Return specific file paths with evidence.",
+      "stacks": {}
+    },
+    {
+      "id": "dependencies",
+      "label": "Dependencies & Package Health",
+      "always": false,
+      "severity_weight": 2.5,
+      "subagent_prompt": "Audit dependency health: outdated packages, deprecated APIs, peer dependency mismatches, unused dependencies, lockfile integrity. Check for major version lag and unmaintained packages.",
+      "stacks": {
+        "node": { "checks": ["npm outdated", "npm audit", "deprecated packages", "unused deps"] },
+        "python": { "checks": ["pip outdated", "safety check", "unused imports"] },
+        "go": { "checks": ["go mod tidy -v", "go vet", "known vulnerabilities"] },
+        "rust": { "checks": ["cargo outdated", "cargo audit", "unused deps"] },
+        "dotnet": { "checks": ["dotnet list package --outdated", "vulnerable packages"] },
+        "ruby": { "checks": ["bundler outdated", "gem audit"] },
+        "php": { "checks": ["composer outdated", "security advisories"] }
+      }
+    },
+    {
+      "id": "migration_readiness",
+      "label": "Migration Readiness",
+      "always": false,
+      "severity_weight": 2.0,
+      "triggers": ["npm_to_pnpm", "cjs_to_esm", "vite_migration", "turbopack", "webpack_to_vite"],
+      "subagent_prompt": "Evaluate migration readiness: identify lockfile, config, script, CI, and Docker changes needed. Check compatibility of current setup with target tool. Report breaking changes and migration complexity.",
+      "stacks": {
+        "node": {
+          "checks": [
+            "lockfile format",
+            "scripts compatibility",
+            "CI pipeline adaptation",
+            "Dockerfile adaptation",
+            "workspace config"
+          ],
+          "migrations": {
+            "npm_to_pnpm": {
+              "triggers": { "pkgManager": "npm" },
+              "checks": [
+                "pnpm import viability",
+                "shamefully-hoist need",
+                "CI actions/setup-node cache",
+                "Dockerfile npm→pnpm",
+                "workspace packages mapping",
+                "node_modules size delta estimate"
+              ]
+            },
+            "cjs_to_esm": {
+              "checks": [
+                "type:module in package.json",
+                "require→import rewrites",
+                "__dirname compat",
+                "dynamic imports",
+                "external ESM compat"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "performance",
+      "label": "Performance",
+      "always": true,
+      "severity_weight": 2.0,
+      "subagent_prompt": "Audit performance: bundle size, build time, runtime performance, asset optimization, memory leaks, slow queries. Prioritize Core Web Vitals impact for web projects.",
+      "stacks": {
+        "node": { "checks": ["bundle size", "build time", "lighthouse", "memory profile"] },
+        "python": { "checks": ["import time", "query N+1", "CPU profile"] },
+        "go": { "checks": ["benchmark stats", "alloc profile", "GC pressure"] },
+        "rust": { "checks": ["release profile", "allocations", "bench suite"] }
+      }
+    },
+    {
+      "id": "architecture",
+      "label": "Architecture & Structure",
+      "always": true,
+      "severity_weight": 2.5,
+      "subagent_prompt": "Analyze project architecture: circular dependencies, layer violations, module coupling, dead code, pattern consistency. Check if structure follows framework conventions and scales well.",
+      "stacks": {
+        "node": { "checks": ["madge cycles", "dependency-cruiser", "folder conventions"] },
+        "go": { "checks": ["go vet cycles", "package layout", "interface segregation"] }
+      }
+    },
+    {
+      "id": "testing",
+      "label": "Testing & Coverage",
+      "always": false,
+      "severity_weight": 2.0,
+      "subagent_prompt": "Audit test health: coverage gaps, missing test types (unit/integration/e2e), flaky tests, slow test suites, test isolation. Recommend test strategy improvements.",
+      "stacks": {
+        "node": { "checks": ["jest --coverage", "vitest run", "test timing"] },
+        "python": { "checks": ["pytest --cov", "test isolation"] },
+        "go": { "checks": ["go test -coverprofile", "test -race"] },
+        "rust": { "checks": ["cargo test", "tarpaulin coverage"] }
+      }
+    },
+    {
+      "id": "code_quality",
+      "label": "Code Quality",
+      "always": true,
+      "severity_weight": 1.5,
+      "subagent_prompt": "Audit code quality: lint errors, type safety, complexity hotspots, formatting, dead code, commented code, naming conventions. Recommend specific files to refactor.",
+      "stacks": {}
+    },
+    {
+      "id": "ci_cd",
+      "label": "CI/CD Pipeline",
+      "always": false,
+      "severity_weight": 1.5,
+      "subagent_prompt": "Review CI/CD pipeline: build times, cache strategy, parallelization, secret management, deployment safety, stage gating. Recommend improvements.",
+      "stacks": {
+        "github-actions": { "checks": ["action versions pinned", "cache usage", "matrix strategy"] },
+        "gitlab-ci": { "checks": ["stage deps", "artifact expiry", "runner tags"] }
+      }
+    }
+  ],
+
+  "n_subagent_scaling": {
+    "description": "Number of sub-agents based on project complexity",
+    "by_files": [
+      { "max": 50,      "N": 3,  "label": "small" },
+      { "max": 200,     "N": 4,  "label": "medium" },
+      { "max": 1000,    "N": 5,  "label": "large" },
+      { "max": -1,      "N": 7,  "label": "xlarge" }
+    ]
+  },
+
+  "default_dimensions": ["security", "architecture", "code_quality", "performance"],
+  "always_include": ["security"]
+}

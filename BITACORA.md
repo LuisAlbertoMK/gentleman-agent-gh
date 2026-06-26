@@ -1,4 +1,6 @@
 ﻿2026-06-25 - Session close
+2026-06-25 — Investigación profunda: optimización recursos hardware (RAM/CPU/GPU/vRAM) para opencode-vmk y gentleman-vmk con 20+ subagentes + verificación triple
+2026-06-25 - Session close
 2026-06-25 - Session close
 2026-06-25 - Session close
 2026-06-25 — Cycle 10: Full-Spectrum Quality. PSSA BOM fix, doc sync, upstream applied, smoke modularized, score 10.0
@@ -60,6 +62,7 @@
 2026-05-30 — SDD cycle completo con subagentes.
 2026-05-28 — Quality gate + pre-commit + seguridad.
 2026-05-26 — Karpathy compresión + anti-patrones.
+
 
 
 
