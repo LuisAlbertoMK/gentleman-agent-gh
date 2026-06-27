@@ -28,7 +28,7 @@ Zones, thresholds, verify depth defined in `review-rules.jsonc`.
 ## Workflow
 
 **Mode routing** (keyword overrides):
-- `!ship/!listo` → capture-learnings → quality-gate → triple-verify (por zona) → commit-crafter → commit+push
+- `!ship/!listo` → quality-gate → triple-verify (por zona, incl. capture-learnings) → commit-crafter → commit+push
 - `!fast` → quality-gate → commit+push (skip verify)
 - `!check` → quality-gate only (no commit)
 - `!draft` → solo aviso (no gates)

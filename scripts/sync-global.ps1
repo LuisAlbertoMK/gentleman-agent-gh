@@ -23,7 +23,7 @@
 .EXAMPLE
     .\scripts\sync-global.ps1 -DryRun
 #>
-param([switch]$DryRun,[switch]$Force,[switch]$NoAgentSync,[switch]$Json)
+param([switch]$DryRun,[switch]$Force,[switch]$NoAgentSync,[switch]$Json,[switch]$NoAgentsMd)
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
@@ -149,13 +149,17 @@ if (-not $NoAgentSync) {
                 Write-Host "  $(if($globHas){'[updated]'}else{'[added]'}) $name" -ForegroundColor Green
             }
             # Sync AGENTS.md for {file:AGENTS.md} reference
-            $srcAgentsMd = Join-Path (Split-Path $projectCfg -Parent) "AGENTS.md"
-            $dstAgentsMd = Join-Path (Split-Path $globalCfg -Parent) "AGENTS.md"
-            if (Test-Path $srcAgentsMd -PathType Leaf) {
-                Copy-Item -LiteralPath $srcAgentsMd -Destination $dstAgentsMd -Force
-                Write-Host "  [synced] AGENTS.md" -ForegroundColor Green
+            if (-not $NoAgentsMd) {
+                $srcAgentsMd = Join-Path (Split-Path $projectCfg -Parent) "AGENTS.md"
+                $dstAgentsMd = Join-Path (Split-Path $globalCfg -Parent) "AGENTS.md"
+                if (Test-Path $srcAgentsMd -PathType Leaf) {
+                    Copy-Item -LiteralPath $srcAgentsMd -Destination $dstAgentsMd -Force
+                    Write-Host "  [synced] AGENTS.md" -ForegroundColor Green
+                } else {
+                    Write-Warning "  AGENTS.md not found at $srcAgentsMd"
+                }
             } else {
-                Write-Warning "  AGENTS.md not found at $srcAgentsMd"
+                Write-Host "  [skipped] AGENTS.md (stub preserved)" -ForegroundColor Yellow
             }
 
             $glob | ConvertTo-Json -Depth 10 | Set-Content $globalCfg -Encoding UTF8 -Force

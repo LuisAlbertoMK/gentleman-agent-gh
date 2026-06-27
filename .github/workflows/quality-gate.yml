@@ -50,6 +50,10 @@ jobs:
             Write-Output "OK: All skills ≤3KB"
           }
 
+      - name: SkillSpector security gate — Docker fallback (non-blocking)
+        continue-on-error: true
+        run: ./scripts/skillspector-gate.ps1
+
       - name: Error snapshot — persist CI quality gate results
         if: always()
         run: ./scripts/capture-errors.ps1 -Snapshot

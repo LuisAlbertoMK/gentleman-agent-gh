@@ -110,3 +110,6 @@ magic-context.jsonc
 *.key
 secrets/
 credentials.json
+
+# SkillSpector clone (upstream NVIDIA)
+.skillspector/

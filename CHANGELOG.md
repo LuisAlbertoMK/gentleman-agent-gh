@@ -326,3 +326,36 @@ See `BITACORA.md` for chronological history. Major prior milestones:
 - 2026-06-06: Skill metricas + tokenización + 6 tools nuevas
 - 2026-06-06: Misión principal registrada + bitacora + autoscore 9.2/10
 - 2026-06-06: session-resume comprimido (97→69 lines, -30%) + auto-clean.ps1
+
+---
+
+## [2026-06-19 to 2026-06-27] Cycles 11-12-13
+
+### Cycle 11: Pipeline Integrity & Skill Compression
+- security-scanner integrated into !ship pipeline
+- session-miner auto-triggers on session close
+- 4 oversized skills compressed: branch-pr (8.5→2.9KB), issue-creation (7.1→2.9KB), triple-verify (3.5→2.4KB), work-unit-commits (3.1→2.4KB)
+- 8 missing skills added to router (70/70 indexed)
+- 2 PS parse errors fixed
+- Score: 9.9→10/10
+
+### Cycle 12: Infrastructure Hardening & Debt Visibility
+- Ponytail intensity levels: lite/full/ultra/off (graduados, no binario)
+- `!ponytail` shortcut + `ponytail-audit.ps1` (debt harvester)
+- PS7.6 migration: 9 scripts with #requires, 0 parse errors
+- SkillOpt gate v1.2 live in self-improvement SKILL.md
+- Adaptive drift cache (30s TTL) in check-skill-drift.ps1
+- Report: docs/ciclos/cycle12-20260627.md
+- Score: 10/10 (mantenido)
+
+### Cycle 13 (in progress): Consolidation & Token Efficiency
+- capture-learnings: pipeline ref removed (skill nunca existió en disco, era placeholder)
+- review-pipeline: inlined into AGENTS.md section router (no more separate skill)
+- self-reflection: merged into self-improvement v2.0 (per-task loop + triggers)
+- AGENTS.md global stub: 6-line redirect (recupera ~13K tokens/request)
+- sync-global.ps1: `-NoAgentsMd` flag preserves stub on sync
+- SkillSpector Docker gate: CLI → Docker fallback, filters RA1 by-design
+- Skills: 71→67 (capture-learnings/review-pipeline inlined, self-reflection merged, caveman deprecated)
+- SkillSpector integrated into quality-gate CI workflow
+- README synced: 67 skills, 45 scripts, Cycle 12 completed
+- Score: 10/10

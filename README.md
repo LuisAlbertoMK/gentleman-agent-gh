@@ -1,11 +1,11 @@
 # Gentleman Agent — OpenCode AI Agent Skills & Scripts
 
-Suite de **70 skills** (+ `_shared`) + **40 scripts PowerShell** para [OpenCode](https://github.com/sst/opencode). Diseñadas para desarrollo de software con arquitectura limpia, TDD, y verificación multi-capa.
+Suite de **67 skills** (+ `_shared`) + **45 scripts PowerShell** para [OpenCode](https://github.com/sst/opencode). Diseñadas para desarrollo de software con arquitectura limpia, TDD, y verificación multi-capa.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
 > **Score**: 10/10 (13 dimensiones)
-> **Skills**: 69 (+ `_shared` = 70 SKILL.md)
-> **Cycle**: 10 activo (full-spectrum quality)
+> **Skills**: 67 (+ `_shared` = 68 SKILL.md)
+> **Cycle**: 12 completado (infrastructure hardening)
 
 ---
 
@@ -91,7 +91,7 @@ El proyecto usa dos MCPs para memoria cross-session:
 |-----------|--------|
 | **Compression** | karpathy-loop, lean-context, caveman |
 | **Quality** | quality-gate, auto-metrics, external-auditor, immune-system, triple-verify |
-| **Code Review** | code-review-agent, judgment-day, review-pipeline |
+| **Code Review** | code-review-agent, judgment-day |
 | **Memory** | session-resume, code-memory, dreaming |
 | **Skills Meta** | skill-creator, skill-registry, skill-improver, skill-digestion, skill-graph |
 | **SDD** | sdd-init, sdd-propose, sdd-spec, sdd-design, sdd-tasks, sdd-apply, sdd-verify, sdd-explore, sdd-archive, sdd-onboard + 9 backward-compat wrappers |
@@ -108,11 +108,11 @@ El proyecto usa dos MCPs para memoria cross-session:
 | **Testing** | skill-testing |
 | **Others** | recovery-protocol, context-watchdog, performance-tracker, metricas, issue-creation, development-mode, execution-mode |
 
-**Total: 70 skills + `_shared`** — todas con SKILL.md, frontmatter YAML, versionado, cambio previo y licencia Apache-2.0.
+**Total: 67 skills + `_shared`** — todas con SKILL.md, frontmatter YAML, versionado, cambio previo y licencia Apache-2.0.
 
 ---
 
-## Scripts (36 en scripts/)
+## Scripts (45 en scripts/)
 
 | Script | Propósito |
 |--------|-----------|
@@ -145,12 +145,12 @@ El proyecto usa dos MCPs para memoria cross-session:
 
 ```
 gentleman-agent-gh/
-├── .agents/skills/          # 70 skills + _shared (canonical, git-tracked)
+├── .agents/skills/          # 67 skills + _shared (canonical, git-tracked)
 │   ├── quality-gate/
 │   ├── code-review-agent/
 │   └── .../
 ├── skills/                  # Junctions workspace (git-ignored)
-├── scripts/                 # 40 PowerShell scripts
+├── scripts/                 # 45 PowerShell scripts
 │   └── smoke/               # Smoke tests
 ├── docs/                    # Documentation
 │   ├── metricas/            # Session metrics
