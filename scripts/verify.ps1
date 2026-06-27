@@ -1,6 +1,7 @@
+#requires -Version 5.1
 <#
 .SYNOPSIS
-  Unified verify profiles E1/E2/E3 -- runnable checks for triple-verify gates.
+    Unified verify profiles E1/E2/E3 -- runnable checks for triple-verify gates.
 #>
 param(
     [ValidateSet('E1','E2','E3','All')][string]$ProfileName='All',

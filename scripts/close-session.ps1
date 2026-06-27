@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+﻿#requires -Version 7.6
 <#
 .SYNOPSIS
   Unified session close pipeline — log, inter-track, git status, and output structured summary.
@@ -66,7 +66,7 @@ if (Test-Path -LiteralPath $interTrack) {
 
 # Git status
 $gitStatus = git status --short 2>&1
-$hasChanges = (@($gitStatus | Where-Object { $_ -match '\S' }).Count) -gt 0
+$hasChanges = $gitStatus.PSWhere({ $_ -match '\S' }).Count -gt 0
 try {
     $branch = git rev-parse --abbrev-ref HEAD 2>$null
     if (-not $branch) { $branch = "unknown" }
@@ -77,7 +77,7 @@ $result = [PSCustomObject]@{
     timestamp   = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
     branch      = $branch
     hasChanges  = $hasChanges
-    changeCount = if ($hasChanges) { @($gitStatus | Where-Object { $_ -match '\S' }).Count } else { 0 }
+    changeCount = if ($hasChanges) { $gitStatus.PSWhere({ $_ -match '\S' }).Count } else { 0 }
     goal        = $Goal
 }
 
@@ -88,11 +88,17 @@ if ($Quiet) {
     Write-Host "Branch : $branch"
     Write-Host "Changes: $(if($hasChanges){ ($result.changeCount).ToString() + ' file(s) modified' }else{ 'clean' })" -ForegroundColor Yellow
     Write-Host "inter  : incremented"
+    if ($hasChanges) {
+        Write-Host "session-miner: scanning for cross-session patterns..." -ForegroundColor Yellow
+        & "$PSScriptRoot\session-miner.ps1" -Mode scan -Json 2>&1 | Out-Null
+        Write-Host "  done" -ForegroundColor Green
+    }
     Write-Host ""
 
     Write-Host "Now complete the Engram close protocol:" -ForegroundColor Green
     Write-Host "--- auto-metrics ---" -ForegroundColor Yellow
     Write-Host "Run auto-metrics if session had code/task work (>=3 tool calls)."
+    Write-Host "  Remember: apply bias correction from .learnings/bias-calibration.json before threshold checks."
     Write-Host ""
     Write-Host "--- error patterns ---" -ForegroundColor Yellow
     Write-Host "Run: mem_search(type='error|bugfix') for cross-session patterns."

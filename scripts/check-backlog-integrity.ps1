@@ -1,6 +1,7 @@
-﻿<#
+﻿#requires -Version 5.1
+<#
 .SYNOPSIS
-  Verify backlog item status matches repo reality.
+    Verify backlog item status matches repo reality.
 
 .DESCRIPTION
   Parses CYCLE.md backlog table and checks each item's status

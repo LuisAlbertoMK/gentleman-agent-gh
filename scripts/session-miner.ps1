@@ -1,3 +1,4 @@
+#requires -Version 5.1
 <# .SYNOPSIS Mine session histories for error patterns and propose corrections #>
 param([ValidateSet('scan','apply','check')][string]$Mode='scan',[switch]$Json,[int]$Threshold=2)
 Set-StrictMode -Version Latest;$ErrorActionPreference='Stop'

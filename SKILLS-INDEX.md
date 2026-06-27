@@ -1,6 +1,6 @@
 # SKILLS INDEX
 
-> Full trigger table for all 69 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 70 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
 > **Version**: 3.1 | **Changelog**: 3.1 (+3 skills: caveman, doc-sync, sdd-onboard); 3.0 (-3 skills post-audit: karpathy-prompt→karpathy-loop, core-web-vitals→performance, skill-refresher→skill-improver)

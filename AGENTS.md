@@ -36,6 +36,21 @@ Before ANY response, climb the Ponytail Ladder:
 
 **Non-trivial logic MUST leave ONE runnable check** — the smallest assert or test that fails if the logic breaks. No frameworks, no fixtures for these. Trivial one-liners need no check.
 
+### Ponytail Mode — Intensity Levels
+
+La escalera tiene 3 intensidades configurables. El modo default es `full`.
+
+| Modo | Rungs activos | Comportamiento | Cuándo usarlo |
+|------|---------------|----------------|---------------|
+| **`lite`** | 0-3 (Factibilidad + YAGNI + stdlib + native) | Solo verifica si debe existir, si stdlib/nativo lo cubre. Omite merit-check y one-liner. | Drafts, exploración, tareas triviales, modo rápido |
+| **`full`** | 0-8 (todos) + excepciones seguridad | La persona completa como está escrita. | Trabajo normal (default) |
+| **`ultra`** | 0-8 + excepciones + **revisión agresiva de código existente** | Además de la escalera, revisa el diff/codebase en busca de over-engineering: abstracciones innecesarias, wrappers sin razón, dependencias infladas. | Codebase con deuda técnica, refactors grandes, PR review |
+| **`off`** | Ninguno | Escalera desactivada por completo. Solo para debugging de la persona misma. | Reproducir bugs del agente, testing |
+
+El modo se configura con `!ponytail <modo>`. Persiste en `~/.config/ponytail/config.json` o variable `$env:PONYTAIL_MODE`.
+
+**Marcar shortcuts con nivel**: los comentarios `ponytail:` pueden incluir nivel: `ponytail:lite`, `ponytail:full`, `ponytail:ultra` para indicar a qué intensidad aplican. Sin prefijo → aplica en `full` y `ultra`.
+
 ---
 
 **SIMPLE** (chat/Q&A/theory) → respond direct, skip gates.
@@ -51,7 +66,7 @@ Antes de sugerir o implementar **cualquier cambio que active thresholds**:
 
 Thresholds detallados en skill `triple-verify`. Modos con keyword:
 - **Normal** (sin keyword) → triple verify según zona
-- **`!ship` / `!listo`** → capture learnings → triple verify → quality-gate → commit-crafter → commit + push
+- **`!ship` / `!listo`** → capture learnings → triple verify → quality-gate → security-scanner → skillspector-gate → commit-crafter → commit + push
 - **`!check`** → verify profiles + quality-gate, sin commit
 - **`!fast`** → build + commit + push (skip triple verify, hotfix)
 - **`!draft`** → modo exploración, sin verificación
@@ -83,6 +98,9 @@ Comandos rápidos para tareas recurrentes — extienden el sistema de modos:
 | **`!batch`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\batch.ps1` — nueva batch auto-incremental + bitácora + inter-track++ | Fácil |
 | **`!cycle`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\inter-track.ps1 -Show` + score status + upstream check — resumen del ciclo de auto-mejora actual | Fácil |
 | **`!close`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\close-session.ps1` — pipeline unificado de cierre: BITACORA + inter-track + git status + template para mem_session_summary | Fácil |
+| **`!pdebt`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\ponytail-audit.ps1` — escanea `ponytail:` shortcuts en skills y scripts, reporta deuda técnica activa | Fácil |
+| **`!paudit`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\ponytail-audit.ps1 -Audit` — detecta over-engineering (skills >5KB, scripts comment-heavy) | Fácil |
+| **`!ponytail`** | Set intensity level: `!ponytail [lite|full|ultra|off]`. Sin argumento reporta el nivel actual. Persiste en `~/.config/ponytail/config.json` o `$env:PONYTAIL_MODE`. | Fácil |
 
 ## Subagent-First
 Read-heavy (>3 files/scan/map) → delegate `explore`. Saves 2-5K tokens. Main context = synthesis/decisions.
@@ -160,16 +178,17 @@ karpathy-loop · caveman · lean-context · quality-gate · auto-metrics · sess
 **Primary**: `$env:GENTLEMAN_AGENT_ROOT\scripts\skill-graph.ps1 -Task "<task>" -Format Json` — resolves 4-8 relevant skills via dep graph (−85-92% vs loading all).
 **Fallback**:
 ```
-Resume → session-resume · Write code → skill-creator, sdd-*, quality-gate, go-testing, work-unit-commits
-Fix bug → recovery-protocol, immune-system, sdd-verify · Design → senior-engineer, sdd-propose, sdd-design, cognitive-doc-design
-Learn/Research → research, prompt-engineering, code-memory · Review → review-pipeline, judgment-day, skill-testing, comment-writer, code-review-agent
-UI/Design → baseline-ui, web-quality-audit, performance, accessibility, seo
-System → development-mode, execution-mode, opencode-model-router
-Measure → metricas, auto-metrics, performance-tracker · Audit → external-auditor, gap-analysis · Optimize → karpathy-*, lean-context, caveman, skill-improver, refactoring-planner
-Coordinate → delivery-harness, subagent-isolation, command-wrapper, chained-pr
+Resume → session-resume · Write code → skill-creator, sdd-*, sdd, quality-gate, go-testing, work-unit-commits
+Fix bug → recovery-protocol, immune-system, sdd-verify · Design → senior-engineer, sdd-propose, sdd-design, cognitive-doc-design, decision-capture
+Learn/Research → research, prompt-engineering, python-async, code-memory · Review → review-pipeline, judgment-day, triple-verify, skill-testing, comment-writer, code-review-agent
+UI/Design → baseline-ui, web-quality-audit, performance, accessibility, best-practices, seo
+System → development-mode, execution-mode, skill-graph, opencode-model-router
+Measure → metricas, auto-metrics, performance-tracker, skill-registry · Audit → external-auditor, gap-analysis · Optimize → karpathy-*, lean-context, caveman, skill-improver, refactoring-planner
+Coordinate → delivery-harness, subagent-isolation, command-wrapper, chained-pr, branch-pr
 Commit → commit-crafter | Map → project-mapper | Secure → security-scanner
-Sync docs → doc-sync | Log → bitacora · Track/Decide → decision-capture, dreaming, skill-digestion
-Improve → self-improvement, self-reflection · Setup → sdd-init, ci-cd, project-mapper · Recover → recovery-protocol, immune-system, context-watchdog · Unknown → Pre-Flight: skill-creator, research, recovery-protocol
+Sync docs → doc-sync | Log → bitacora · Track/Decide → dreaming, skill-digestion
+Issue/Request → issue-creation | Improve → self-improvement, self-reflection
+Setup → sdd-init, ci-cd, project-mapper · Recover → recovery-protocol, immune-system, context-watchdog · Unknown → Pre-Flight: skill-creator, research, recovery-protocol
 ```
 Load order: 1) Anti-Pattern Catalog 2) Behavioral match 3) Trigger match 4) Default-FAIL 5) Mini-dream every 5th call
 
@@ -178,7 +197,7 @@ Load order: 1) Anti-Pattern Catalog 2) Behavioral match 3) Trigger match 4) Defa
 
 ## Project Context
 - **Repo**: Gentleman Agent — OpenCode agent skills, scripts & config
-- **Skills**: `.agents/skills/` (69 skills + `_shared`, git-tracked) · workspace `skills/` (junctions, git-ignored)
+- **Skills**: `.agents/skills/` (70 skills + `_shared`, git-tracked) · workspace `skills/` (junctions, git-ignored)
 - **Cycle manifest**: `CYCLE.md` — defines self-improvement objectives, metrics, difficulty mapping
 - **Global config**: junctions `$env:USERPROFILE\.config\opencode\skills/` → `.agents/skills/{name}`
 
@@ -252,7 +271,7 @@ Updates: `mem_update` on `topic_key=protocol/agente-optimizado`. Review: 2 weeks
 | Code review | `code-review-agent`, `judgment-day` | — |
 | Refactor/opt | `karpathy-loop`, `lean-context`, `metricas` | — |
 | Verify / `!check` | `verify.ps1` → `pssa-gate.ps1` | — |
-| Commit/PR / `!ship` | `capture-learnings` → `triple-verify` → `quality-gate` → `commit-crafter` | — |
+| Commit/PR / `!ship` | `capture-learnings` → `triple-verify` → `quality-gate` → `security-scanner` → `skillspector-gate` → `commit-crafter` | — |
 | Hotfix `!fast` | `quality-gate` + `commit-crafter` | `triple-verify` |
 | Security audit | `security-scanner` | — |
 | Long/thorough | sdd-* + `quality-gate` | `caveman` |
@@ -272,7 +291,7 @@ Updates: `mem_update` on `topic_key=protocol/agente-optimizado`. Review: 2 weeks
 - Same error 2x → immune-system + catalog update
 - Same flow 3+ → consolidate into skill or AGENTS.md rule
 ### D. Security (no opt-in)
-- Pre-commit/PR → quality-gate + security-scanner + `$env:GENTLEMAN_AGENT_ROOT\scripts\pssa-gate.ps1 -Mode Check`
+- Pre-commit/PR → quality-gate + security-scanner + `$env:GENTLEMAN_AGENT_ROOT\scripts\skillspector-gate.ps1` + `$env:GENTLEMAN_AGENT_ROOT\scripts\pssa-gate.ps1 -Mode Check`
 - PSSA Gate: auto-heals BOM + switch defaults (-Mode Fix); Write-Host intentional; rest manual
 - PS 5.1 → Git Bash (see Bash-Safe above)
 - Commit/push/--force/-i → only on EXPLICIT user request

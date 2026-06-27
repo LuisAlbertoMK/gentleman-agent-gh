@@ -1,17 +1,35 @@
-#requires -Version 5.1
+#requires -Version 7.6
 <#
 .SYNOPSIS
   Check skill drift between canonical (.agents/skills/) and global config (~/.config/opencode/skills/). Optionally sync agent definitions.
+  Includes adaptive polling cache: skips full scan if last check was <30s ago.
 #>
 param([switch]$Thorough,[switch]$AutoFix,[switch]$SyncAgents,[switch]$Json)
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
+
+# ── Adaptive polling cache ─────────────────────────────────────────────
+$cachePath=Join-Path $PSScriptRoot "..\.learnings\drift-cache.json"
+$cacheTtl=[int]($env:SKILL_DRIFT_CACHE_TTL ?? 30)  # seconds, configurable via env var
+$skipCache=$Thorough -or $AutoFix -or $SyncAgents
+if(-not $skipCache -and (Test-Path $cachePath)){
+  try{
+    $cache=Get-Content $cachePath -Raw -Encoding UTF8 | ConvertFrom-Json
+    $age=[int]((Get-Date)-[datetime]::ParseExact($cache.timestamp,"yyyy-MM-ddTHH:mm:ssZ",$null)).TotalSeconds
+    if($age -lt $cacheTtl -and (-not $Json -or $cache.lastJson)){
+      # Cached result is fresh enough
+      if($Json -and $cache.lastJson){Write-Output $cache.lastJson;return}
+      else{Write-Output "OK (cached) ALL $($cache.totalSkills) skills in sync! ($($cache.junctionSkills) junctions, $($cache.realFileSkills) real files)";return}
+    }
+  }catch{Write-Debug "drift-cache: ignore ($($_.Exception.Message))"}
+}
+
 $cd=Join-Path $PSScriptRoot "..\.agents\skills"
 $gd="$env:USERPROFILE\.config\opencode\skills"
 $e=@();$w=@();$d=@()
 if(-not (Test-Path $cd)){Write-Error "Canonical dir not found: $cd";exit 2}
 if(-not (Test-Path $gd)){Write-Error "Global dir not found: $gd";exit 2}
-$cs=@(Get-ChildItem $cd -Directory | Where-Object {$_.Name -ne '_shared'})
+$cs=(Get-ChildItem $cd -Directory).PSWhere({$_.Name -ne '_shared'})
 foreach($s in $cs){
   $sn=$s.Name
   $cp=Join-Path $s.FullName "SKILL.md"
@@ -26,28 +44,43 @@ foreach($s in $cs){
   }
 }
 if($AutoFix){
-  $fix=@($e) | Where-Object {$_ -and $_.Status -eq "GLOBAL_MISSING"}
+  $fix=$e.PSWhere({$_ -and $_.Status -eq "GLOBAL_MISSING"})
   if(@($fix).Count -gt 0){
     Write-Output "Creating $($fix.Count) junctions..."
     foreach($x in $fix){
       $t=Join-Path $cd $x.Skill;$l=Join-Path $gd $x.Skill
       try{New-Item -ItemType Junction -Path $l -Target $t -Force | Out-Null;Write-Output "  $l -> $t"}catch{Write-Warning "FAIL $l ($($_.Exception.Message))"}
     }
-    $e=@($e) | Where-Object {$_ -and $_.Status -ne "GLOBAL_MISSING"}
+    $e=$e.PSWhere({$_ -and $_.Status -ne "GLOBAL_MISSING"})
   }
   $gsd="$env:USERPROFILE\.config\opencode\scripts"
   $rsd=Join-Path $PSScriptRoot "."
   if(-not (Test-Path $gsd)){Write-Output "Creating scripts junction...";try{New-Item -ItemType Junction -Path $gsd -Target $rsd -Force | Out-Null;Write-Output "  $gsd -> $rsd"}catch{Write-Warning "FAIL $gsd ($($_.Exception.Message))"}}
 }
+$junctionSkills=$cs.PSWhere({$g=Get-Item (Join-Path $gd $_.Name) -EA SilentlyContinue;$g -and $g.LinkType -eq "Junction"}).Count
+$realFileSkills=$cs.PSWhere({$g=Get-Item (Join-Path $gd $_.Name) -EA SilentlyContinue;$g -and $g.LinkType -ne "Junction"}).Count
 $r=@{
   timestamp=(Get-Date -Format "o")
   totalSkills=$cs.Count
-  junctionSkills=($cs | ForEach-Object {$g=Get-Item (Join-Path $gd $_.Name) -EA SilentlyContinue;if($g -and $g.LinkType -eq "Junction"){$_}else{$null}} | Measure-Object).Count
-  realFileSkills=($cs | ForEach-Object {$g=Get-Item (Join-Path $gd $_.Name) -EA SilentlyContinue;if($g -and $g.LinkType -ne "Junction"){$_}else{$null}} | Measure-Object).Count
+  junctionSkills=$junctionSkills
+  realFileSkills=$realFileSkills
   warnings=$w;drifted=$d;errors=$e
   allSynced=($d.Count -eq 0 -and $e.Count -eq 0 -and $w.Count -eq 0)
 }
-if($Json){Write-Output ($r | ConvertTo-Json -Depth 3)}else{
+# ── Write cache ──────────────────────────────────────────────────────────
+$jsonOut=$null
+if($Json){$jsonOut=($r | ConvertTo-Json -Depth 3)}
+$cacheEntry=@{
+  timestamp=(Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
+  totalSkills=$cs.Count;junctionSkills=$junctionSkills;realFileSkills=$realFileSkills
+  allSynced=$r.allSynced
+  lastJson=$jsonOut
+}
+$cacheDir=Split-Path $cachePath -Parent
+if(-not (Test-Path $cacheDir)){New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null}
+$cacheEntry | ConvertTo-Json -Depth 2 | Set-Content $cachePath -Encoding UTF8 -Force
+
+if($Json){Write-Output $jsonOut}else{
   $wc=@($r.warnings);$dc=@($d);$ec=@($e)
   if($wc.Count -gt 0){Write-Output "WARNINGS: $($wc.Count)";$r.warnings | Format-Table Skill,Status,Detail -AutoSize -EA SilentlyContinue}
   if($r.allSynced){Write-Output "OK ALL $($r.totalSkills) skills in sync! ($($r.junctionSkills) junctions, $($r.realFileSkills) real files)"}else{

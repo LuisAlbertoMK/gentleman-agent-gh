@@ -1,5 +1,5 @@
-﻿#requires -Version 5.1
-<
+﻿#requires -Version 7.6
+<#
 .SYNOPSIS
     Sync gentleman-agent-gh to global OpenCode config — skills, scripts, MCPs, agents, AGENTS.md, permissions.
 .DESCRIPTION
@@ -167,8 +167,8 @@ if (-not $NoAgentSync) {
 
 # ── Step 5: Verify junctions ─────────────────────────────────────────────
 Write-Step "Junction verification" {
-    $skills = Get-ChildItem $dstSkills -Directory -EA SilentlyContinue
-    $bad = @($skills | Where-Object { -not (Test-Path $_.Target) })
+        $skills = Get-ChildItem $dstSkills -Directory -EA SilentlyContinue
+                        $bad = $skills.PSWhere({ -not (Test-Path $_.Target) })
     if ($bad.Count -gt 0) {
         $bad | ForEach-Object { Write-Host "  [broken] $($_.Name) -> $($_.Target)" -ForegroundColor Red }
         throw "$($bad.Count) broken junctions"

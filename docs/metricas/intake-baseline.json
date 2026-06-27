@@ -1,38 +1,38 @@
-﻿{
-    "delta":  {
-                  "roadmap":  0,
-                  "monitoring":  0,
-                  "prd":  0,
-                  "tests":  0,
-                  "readme":  0,
-                  "pr":  0,
-                  "cicd":  0
-              },
-    "iterations":  3,
-    "type":  "be",
-    "critical_gaps":  [
-
-                      ],
-    "project":  ".",
-    "overall_pct":  62.9,
-    "timestamp":  "2026-06-13 15:32:36",
-    "baseline":  {
-                     "roadmap":  10,
-                     "monitoring":  0,
-                     "prd":  10,
-                     "tests":  8,
-                     "readme":  8,
-                     "pr":  8,
-                     "cicd":  0
-                 },
-    "elapsedSeconds":  15.1,
-    "current":  {
-                    "roadmap":  10,
-                    "monitoring":  0,
-                    "prd":  10,
-                    "tests":  8,
-                    "readme":  8,
-                    "pr":  8,
-                    "cicd":  0
-                }
+{
+  "baseline": {
+    "ts": 8,
+    "ci": 5,
+    "pr": 8,
+    "rm": 0,
+    "mo": 0,
+    "pd": 10,
+    "rd": 10
+  },
+  "type": "be",
+  "delta": {
+    "ts": 0,
+    "ci": 0,
+    "pr": 0,
+    "rm": 0,
+    "mo": 0,
+    "pd": 0,
+    "rd": 0
+  },
+  "el": 15.9,
+  "current": {
+    "ts": 8,
+    "ci": 5,
+    "pr": 8,
+    "rm": 0,
+    "mo": 0,
+    "pd": 10,
+    "rd": 10
+  },
+  "gaps": [
+    "Roadmap"
+  ],
+  "timestamp": "2026-06-27 11:54:14",
+  "iterations": 1,
+  "pct": 58.6,
+  "project": "."
 }

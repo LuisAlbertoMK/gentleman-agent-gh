@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 7.6
 <# .SYNOPSIS Verify SDD intake — validates project structure and skill scaffolding against intake.json #>
 param([string]$p,[ValidateRange(1,5)][int]$i=1,[string]$t="auto",[bool]$m=$true,[ValidateSet("text","json")][string]$f="text")
 $ErrorActionPreference='Stop';Set-StrictMode -Version Latest;$t0=Get-Date;$rr=@();$chk=[char]0x2705;$crs=[char]0x274C;$wrn=[char]0x26A0
@@ -6,15 +6,15 @@ function wr{param([string]$I,[string]$M)
 $c=@{$chk="Green";$crs="Red";$wrn="Yellow"}[$I]
 if(-not$c){$c="White"}if($f-ne"json"){Write-Host "$I $M" -ForegroundColor $c}}
 function sz{param([string]$x)
-if(Test-Path $x){$l=(Get-Item $x).Length;if($l-gt1KB){$r=[math]::Round($l/1KB,1);return"${r}KB"};return"$l B"}return""}
+if(Test-Path $x){$l=(Get-Item $x).Length;if($l-gt1KB){$r=[math]::Round($l/1KB,1);return "${r}KB"};return "$l B"}return ""}
 function ic{param([int]$R,[string]$pp)
-$r=@{};$sm=@{};Write-Host "`n  #$R Intake" -ForegroundColor Cyan;$rp=$null
+$res=@{};$sm=@{};Write-Host "`n  #$R Intake" -ForegroundColor Cyan;$rp=$null
 if(Test-Path "$pp\ROADMAP.md"){$rp="ROADMAP.md"}
 elseif(Test-Path "$pp\docs\roadmap.md"){$rp="docs/decisions/roadmap.md"}
 elseif(Test-Path "$pp\roadmap.md"){$rp="roadmap.md"}
 elseif(Test-Path "$pp\roadmap"){$rp="roadmap/ (dir)"}
-if($rp){$s2=sz "$pp\$rp";wr $chk "Roadmap $rp ($s2)";$r.rm=$chk;$sm.rm=10}
-else{wr $crs "Roadmap Missing";$r.rm=$crs;$sm.rm=0}
+if($rp){$s2=sz "$pp\$rp";wr $chk "Roadmap $rp ($s2)";$res.rm=$chk;$sm.rm=10}
+else{wr $crs "Roadmap Missing";$res.rm=$crs;$sm.rm=0}
 $prs=0;$prd=@()
 if(Test-Path "$pp\.git"){
 try{$cc=&git -C "$pp" log --oneline -10 2>$null | Measure-Object | ForEach-Object {$_.Count}}catch{Write-Warning "git: $_";$cc=0}
@@ -23,10 +23,10 @@ if($cc-gt0){$prs+=5;$prd+="$cc commits";try{$gp=&gh pr list --limit 5 2>$null}ca
 $pf=Get-ChildItem "$pp" -Recurse -Include "*PROBLEM*REPORT*","*bug-report*","*incident*" -Exclude "*node_modules*",".git","*vendor*" -ea 0 | Select-Object -First 3
 if($pf){$prd+="Problem Rpt: $($pf.Count) file(s) ($($pf[0].Name))";$prs=[math]::Max($prs,5)}
 $pi=if($prs-ge8){$chk}elseif($prs-ge3){$wrn}else{$crs}
-wr $pi "PR: $($prd-join' | ')";$r.pr=$pi;$sm.pr=$prs
+wr $pi "PR: $($prd-join' | ')";$res.pr=$pi;$sm.pr=$prs
 $prdF=Get-ChildItem "$pp" -Recurse -Include "*PRD*","*spec*","*requirements*","*srs*" -Exclude "*node_modules*",".git","*vendor*" -File -ea 0 | Select-Object -First 5
-if($prdF){wr $chk "PRD $($prdF.Count) files (e.g., $($prdF[0].Name))";$r.pd=$chk;$sm.pd=10}
-else{wr $crs "PRD Missing";$r.pd=$crs;$sm.pd=0}
+if($prdF){wr $chk "PRD $($prdF.Count) files (e.g., $($prdF[0].Name))";$res.pd=$chk;$sm.pd=10}
+else{wr $crs "PRD Missing";$res.pd=$crs;$sm.pd=0}
 if(Test-Path "$pp\README.md"){
 $s2=sz "$pp\README.md";$c=Get-Content "$pp\README.md" -Raw -ea 0;$q=10
 if($c){
@@ -35,33 +35,33 @@ if($c-notmatch'setup|install|getting started|usage|empezar|instalacion'){$q-=2}
 if($c.Length-lt200){$q-=2}
 if($c.Length-lt100){$q-=3}}
 $q=[math]::Max(1,$q);$qi=if($q-ge8){$chk}elseif($q-ge5){$wrn}else{$crs}
-wr $qi "README $s2 (score: $q/10)";$r.rd=$qi;$sm.rd=$q
-}else{wr $crs "README Missing";$r.rd=$crs;$sm.rd=0}
+wr $qi "README $s2 (score: $q/10)";$res.rd=$qi;$sm.rd=$q
+}else{wr $crs "README Missing";$res.rd=$crs;$sm.rd=0}
 $td=Get-ChildItem "$pp" -Directory -Include "tests","__tests__","spec","test","cypress" -ea 0
 $tf=Get-ChildItem "$pp" -Recurse -Include "*test*","*spec*","*suite*" -File -Exclude "*node_modules*",".git","*vendor*" -ea 0 | Select-Object -First 10
-if($td){wr $chk "Tests dirs: $($td.Name -join',')";$r.ts=$chk;$sm.ts=10}
-elseif($tf.Count-ge3){wr $chk "Tests $($tf.Count) files";$r.ts=$chk;$sm.ts=8}
-elseif($tf.Count-ge1){wr $wrn "Tests $($tf.Count) files";$r.ts=$wrn;$sm.ts=5}
-else{wr $crs "No tests";$r.ts=$crs;$sm.ts=0}
+if($td){wr $chk "Tests dirs: $($td.Name -join',')";$res.ts=$chk;$sm.ts=10}
+elseif($tf.Count-ge3){wr $chk "Tests $($tf.Count) files";$res.ts=$chk;$sm.ts=8}
+elseif($tf.Count-ge1){wr $wrn "Tests $($tf.Count) files";$res.ts=$wrn;$sm.ts=5}
+else{wr $crs "No tests";$res.ts=$crs;$sm.ts=0}
 $cf=@();@(".github\workflows","GitHub Actions","Jenkinsfile","Jenkins",".gitlab-ci.yml","GitLab CI","azure-pipelines.yml","Azure Pipelines",".circleci\config.yml","CircleCI","Dockerfile","Docker") | ForEach-Object {$i=0}{if($i%2-eq0){$k=$_}elseif(Test-Path "$pp\$k"){$cf+=$_};$i++}
-if($cf.Count-ge2){wr $chk "CI/CD: $($cf-join',')";$r.ci=$chk;$sm.ci=10}
-elseif($cf.Count-eq1){wr $wrn "CI/CD: $($cf[0])";$r.ci=$wrn;$sm.ci=5}
-else{wr $crs "No CI/CD";$r.ci=$crs;$sm.ci=0}
+if($cf.Count-ge2){wr $chk "CI/CD: $($cf-join',')";$res.ci=$chk;$sm.ci=10}
+elseif($cf.Count-eq1){wr $wrn "CI/CD: $($cf[0])";$res.ci=$wrn;$sm.ci=5}
+else{wr $crs "No CI/CD";$res.ci=$crs;$sm.ci=0}
 $mf=@()
 foreach($q in @("*sentry*","*datadog*","*newrelic*","*grafana*","*prometheus*","*openTelemetry*","*appinsights*","*bugsnag*","*rollbar*","*logstash*","*honeycomb*","*dynatrace*")){$m2=Get-ChildItem "$pp" -Recurse -Include $q -File -Exclude "*node_modules*",".git" -ea 0 | Select-Object -First 1;if($m2){$mf+=$m2.Name}}
 $hl=(Test-Path "$pp\logs")-or(Get-ChildItem "$pp" -Directory -Include "metrics","monitoring","alerts" -ea 0)
-if($mf.Count-ge1){wr $chk "Monitoring $($mf[0]) (+$($mf.Count-1) more)";$r.mo=$chk;$sm.mo=10}
-elseif($hl){wr $wrn "Monitoring logging only";$r.mo=$wrn;$sm.mo=5}
-else{wr $crs "No monitoring";$r.mo=$crs;$sm.mo=0}
+if($mf.Count-ge1){wr $chk "Monitoring $($mf[0]) (+$($mf.Count-1) more)";$res.mo=$chk;$sm.mo=10}
+elseif($hl){wr $wrn "Monitoring logging only";$res.mo=$wrn;$sm.mo=5}
+else{wr $crs "No monitoring";$res.mo=$crs;$sm.mo=0}
 $ts=($sm.Values | Measure-Object -Sum).Sum;$ms=$sm.Count*10
 $pct=if($ms-gt0){[math]::Round(($ts/$ms)*100,1)}else{0}
 Write-Host "  Score: $ts/$ms ($pct%)" -ForegroundColor $(if($pct-ge80){"Green"}elseif($pct-ge50){"Yellow"}else{"Red"})
 $miss=@()
-if($r.rm-eq$crs){$miss+="Roadmap"}
-if($r.pd-eq$crs){$miss+="PRD"}
-if($r.rd-eq$crs){$miss+="README"}
+if($res.rm-eq$crs){$miss+="Roadmap"}
+if($res.pd-eq$crs){$miss+="PRD"}
+if($res.rd-eq$crs){$miss+="README"}
 if($miss.Count-gt0){Write-Host "  MISSING: $($miss-join', ')" -ForegroundColor Red}
-return@{round=$R;results=$r;scores=$sm;totalScore=$ts;maxScore=$ms;pct=$pct;criticalMissing=$miss}}
+return @{round=$R;results=$res;scores=$sm;totalScore=$ts;maxScore=$ms;pct=$pct;criticalMissing=$miss}}
 try {
 if(-not(Test-Path $p)){Write-Error "Path not found: $p";exit 2}
 if($t-eq"auto"){
@@ -97,3 +97,4 @@ try{$md | Out-File "$dv\intake-report.md" -en utf8}catch{Write-Warning "rpt: $_"
 if($rr[-1].criticalMissing.Count-gt0){exit 2}
 if($opct-lt80){exit 1}
 exit 0}catch{Write-Error "Intake failed: $_";exit 1}
+

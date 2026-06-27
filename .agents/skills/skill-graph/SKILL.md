@@ -12,7 +12,7 @@ metadata:
 
 # Skill Graph — Sparse Loading Resolver
 
-Instead of loading all 69 skills, resolve only the relevant ones plus 1-hop dependencies.
+Instead of loading all 70 skills, resolve only the relevant ones plus 1-hop dependencies.
 
 ## Usage
 

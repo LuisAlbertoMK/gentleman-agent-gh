@@ -1,64 +1,62 @@
 ---
-name: issue-creation
+name: gentle-ai-issue-creation
 description: "Create Gentle AI issues with issue-first checks. Trigger: creating GitHub issues, bug reports, or feature requests."
-triggers: "create issue, GitHub issue, bug report, feature request, issue template"
 license: Apache-2.0
 metadata:
   author: gentleman-programming
-  version: "1.1"
-  changelog: "1.1: karpathy compress (7.3→3.0KB)"
+  version: "1.0"
 ---
 
 # Gentle AI — Issue Creation Skill
 
-## When to Use
-Report bugs / request features on [Gentleman-Programming/gentle-ai](https://github.com/Gentleman-Programming/gentle-ai). Load before opening issues.
+Reporting bugs, requesting features on [Gentleman-Programming/gentle-ai](https://github.com/Gentleman-Programming/gentle-ai).
 
-## Critical Rules
-1. **Blank issues DISABLED** — MUST use `.github/ISSUE_TEMPLATE/` (bug_report.yml or feature_request.yml).
-2. **`status:needs-review` auto-applied** — don't add manually.
-3. **`status:approved` REQUIRED before work** — wait for maintainer.
-4. **Questions → [Discussions](https://github.com/Gentleman-Programming/gentle-ai/discussions)**, not issues.
-5. **No `Co-Authored-By`** trailers in commits.
+## Rules
+1. **Blank issues DISABLED** — MUST use template.
+2. **`status:needs-review` auto-applied** — do NOT add manually.
+3. **`status:approved` REQUIRED** before any PR work.
+4. **Questions → Discussions** ([link](https://github.com/Gentleman-Programming/gentle-ai/discussions)), not issues.
+5. **No `Co-Authored-By` trailers**.
 
 ## Workflow
-```
-Search duplicates → choose template (bug/feat) → submit → status:needs-review(auto) → wait for status:approved → open PR referencing issue
-```
+1. Search existing issues → confirm no duplicate
+2. Choose template: `bug_report.yml` (bug) or `feature_request.yml` (feature)
+3. Submit → `status:needs-review` auto-applied
+4. Wait for maintainer → `status:approved` or closed
+5. Only after approval → open PR referencing issue
 
 ## Bug Report
-Template: `.github/ISSUE_TEMPLATE/bug_report.yml`. Auto-labels: `bug`, `status:needs-review`.
-
-Required: Pre-flight checklist · description · steps · expected vs actual · gga version · OS · AI agent/client · affected area (CLI/TUI/Installation/Agent Detection/System Detection/Catalog/Steps/Docs/Other)
+Template: `.github/ISSUE_TEMPLATE/bug_report.yml` · Labels: `bug`, `status:needs-review`
+**Fields**: Pre-flight Checklist, Bug Description, Steps to Reproduce, Expected Behavior, Actual Behavior, `gga version`, OS, AI Agent/Client, Affected Area.
+**Areas**: `CLI`·`TUI`·`Installation`·`Agent Detection`·`System Detection`·`Catalog/Steps`·`Docs`·`Other`
 
 ## Feature Request
-Template: `.github/ISSUE_TEMPLATE/feature_request.yml`. Auto-labels: `enhancement`, `status:needs-review`.
-
-Required: Pre-flight · affected area · problem statement · proposed solution. Optional: alternatives, context.
+Template: `.github/ISSUE_TEMPLATE/feature_request.yml` · Labels: `enhancement`, `status:needs-review`
+**Required**: Pre-flight Checklist, Affected Area, Problem Statement, Proposed Solution.
+**Optional**: Alternatives Considered, Additional Context.
 
 ## Labels
-| Category | Labels |
-|----------|--------|
-| **Status** | `needs-review`(auto) → `approved`(maintainer) → `in-progress` / `blocked` → `wont-fix` |
-| **Type** | `bug`, `enhancement`, `type:{bug,feature,docs,refactor,chore,breaking-change}` |
-| **Priority** | `critical`, `high`, `medium`, `low` |
+**Status**: `needs-review`(auto) · `approved`(maintainer) · `in-progress`(contributor) · `blocked`(maintainer/contributor) · `wont-fix`(maintainer)
+**Type**: `bug`/`enhancement`(issues) · `type:bug`/`:feature`/`:docs`/`:refactor`/`:chore`/`:breaking-change`(PRs)
+**Priority**: `critical`(blocking/security) · `high`(many users) · `medium`(normal) · `low`(nice to have)
 
-## Maintainer Flow
-```
-Issue → needs-review(auto) → maintainer reviews → approved (work begins) / closed (invalid/dup)
-```
-
-## Decision Tree
-```
-Question? → Discussions · Defect? → Bug template · Feature? → Feature template · Duplicate? → Comment on existing · Else → Submit → wait for approved
-```
+## Decision Flow
+Question/idea? → **Discussions** · Bug in `gga`? → **Bug Report** · Otherwise → **Feature Request** · Duplicate? → Comment on existing · New → Submit + wait for `status:approved`
 
 ## Commands
 ```bash
-gh issue list --repo Gentleman-Programming/gentle-ai --state open --search "keywords"  # search
-gh issue create --repo Gentleman-Programming/gentle-ai --template bug_report.yml --title "fix(<scope>): desc"
-gh issue create --repo Gentleman-Programming/gentle-ai --template feature_request.yml --title "feat(<scope>): desc"
-gh issue view <N> --repo Gentleman-Programming/gentle-ai  # check status
+# Search
+gh issue list --repo Gentleman-Programming/gentle-ai --state open --search "keywords"
+# Create bug
+gh issue create --repo Gentleman-Programming/gentle-ai --template bug_report.yml --title "fix(<scope>): <desc>"
+# Create feature
+gh issue create --repo Gentleman-Programming/gentle-ai --template feature_request.yml --title "feat(<scope>): <desc>"
+# Check status
+gh issue view <N> --repo Gentleman-Programming/gentle-ai
 ```
 
-Valid scopes: `tui`, `cli`, `installer`, `catalog`, `system`, `agent`, `e2e`, `ci`, `docs`
+**Valid scopes**: `tui`, `cli`, `installer`, `catalog`, `system`, `agent`, `e2e`, `ci`, `docs`
+
+## References
+- [Bug Report Template](.github/ISSUE_TEMPLATE/bug_report.yml)
+- [Feature Request Template](.github/ISSUE_TEMPLATE/feature_request.yml)

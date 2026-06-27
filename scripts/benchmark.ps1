@@ -1,15 +1,15 @@
-﻿#requires -Version 5.1
+﻿#requires -Version 7.6
 <#.SYNOPSIS Benchmark system — score skill fitness, system health, track trends.#>param([switch]$Snapshot,[switch]$Gate,[switch]$Json)
 $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
 $r=Convert-Path "$PSScriptRoot\.."
 $cd="$r\.agents\skills";$am="$r\AGENTS.md";$sd="$r\scripts";$sn="$r\docs\metricas\snapshots"
-$sk=@();foreach($i in @(Get-ChildItem $cd -Directory | Where-Object {$_.Name -ne '_shared'})){$m="$($i.FullName)\SKILL.md";if(!(test-path $m)){continue};$c=Get-Content $m -Raw;$sk+=@{Name=$i.Name;Bytes=$c.Length;Lines=($c-split"`n").Count;F=$c-match"^---";W=$c-match"(?m)^## When to Use";R=$c-match"(?m)^## (Rules|Critical Rules)"}}
+$sk=@(Get-ChildItem $cd -Directory).PSWhere({$_.Name -ne '_shared'}).PSForEach({$m="$($_.FullName)\SKILL.md";if(!(test-path $m)){return};$c=Get-Content $m -Raw;@{Name=$_.Name;Bytes=$c.Length;Lines=($c-split"`n").Count;F=$c-match"^---";W=$c-match"(?m)^## When to Use";R=$c-match"(?m)^## (Rules|Critical Rules)"}})
 $ac=if(test-path $am){Get-Content $am -Raw}else{""}
 $sc=Get-ChildItem $sd -Filter *.ps1 -EA 0
 $gd="$env:USERPROFILE\.config\opencode\skills";$jo=0
 foreach($i in $sk){$it=Get-Item "$gd\$($i.Name)"-EA 0;if($it -and $it.LinkType -eq "Junction"){$jo++}}
-$ab=($sk | ForEach-Object {$_.Bytes} | Measure-Object -Sum).Sum;$al=($sk | ForEach-Object {$_.Lines} | Measure-Object -Sum).Sum
-$o3=@(@($sk | Where-Object {$_.Bytes -gt 3072})).Count;$sb=@($sk | ForEach-Object {$_.Bytes} | Sort-Object);$ct=$sb.Count
+$ab=($sk.PSForEach({$_.Bytes}) | Measure-Object -Sum).Sum;$al=($sk.PSForEach({$_.Lines}) | Measure-Object -Sum).Sum
+$o3=$sk.PSWhere({$_.Bytes -gt 3072}).Count;$sb=@($sk.PSForEach({$_.Bytes}) | Sort-Object);$ct=$sb.Count
 $md=if($ct-gt0){if($ct%2-eq1){$sb[($ct-1)/2]}else{[math]::Round(($sb[$ct/2-1]+$sb[$ct/2])/2)}}else{0}
 $sys=@{AgentsMdBytes=[int]($ac.Length);AgentsMdLines=($ac-split"`n").Count;TotalSkills=$sk.Count;TotalSkillBytes=[int]$ab;TotalSkillLines=[int]$al;SkillsOver3kb=$o3;AvgSkillBytes=if($ct-gt0){[math]::Round($ab/$ct)}else{0};MedianSkillBytes=$md;MinSkillBytes=if($ct-gt0){$sb[0]}else{0};MaxSkillBytes=if($ct-gt0){$sb[-1]}else{0};ScriptsCount=$sc.Count;GlobalJunctionsOk=$jo;FrontmatterPct=if($ct-gt0){[math]::Round((@($sk | Where-Object {$_.F}).Count)/$ct*100,1)}else{0};WhenToUsePct=if($ct-gt0){[math]::Round((@($sk | Where-Object {$_.W}).Count)/$ct*100,1)}else{0};RulesPct=if($ct-gt0){[math]::Round((@($sk | Where-Object {$_.R}).Count)/$ct*100,1)}else{0}}
 $cmit=try{(git rev-parse --short HEAD 2>$null).Trim()}catch{"unknown"}
