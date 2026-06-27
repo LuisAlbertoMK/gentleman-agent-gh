@@ -103,7 +103,7 @@ El proyecto usa dos MCPs para memoria cross-session:
 | **Decisions** | decision-capture, cognitive-doc-design |
 | **Docs** | doc-sync, bitacora, comment-writer |
 | **Research** | research, prompt-engineering |
-| **Self-Improvement** | self-reflection, self-improvement |
+| **Self-Improvement** | self-improvement (merged self-reflection) |
 | **DevOps** | ci-cd |
 | **Testing** | skill-testing |
 | **Others** | recovery-protocol, context-watchdog, performance-tracker, metricas, issue-creation, development-mode, execution-mode |

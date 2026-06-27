@@ -8,7 +8,7 @@ metadata:
   author: gentleman-vMK
   version: "1.2"
   changelog: "1.2: karpathy compress"
-  dependencies: [quality-gate, code-review-agent, commit-crafter]
+  dependencies: [quality-gate, code-review-agent, commit-crafter, session-miner]
 ---
 ## Zones
 Zones, thresholds, verify depth defined in `review-rules.jsonc`.
@@ -47,7 +47,7 @@ Zones, thresholds, verify depth defined in `review-rules.jsonc`.
 2. **Default-FAIL**: no evidence of 3 steps → not verified
 3. **Build mandatory** for compilable code
 4. **!ship = responsibility**: quality-gate NEVER optional
-5. **capture-learnings**: run `session-miner.ps1 -Mode scan -Json` if available, stage `.learnings/` changes. Skip gracefully if not available.
+5. **capture-learnings** (inline — previously separate skill): run `$env:GENTLEMAN_AGENT_ROOT\scripts\session-miner.ps1 -Mode scan -Json` after task completion or pre-commit. Parses JSON output for new pattern proposals → stores in `.learnings/`. Also `mem_save` significant decisions/bugfixes to Engram. Skip gracefully if session-miner unavailable. Stage `.learnings/` files for commit tracking.
 6. **Override**: `!ship --no-verify` emergency only
 7. **Self-improvement override**: difficulty levels from CYCLE.md override verify depth
 

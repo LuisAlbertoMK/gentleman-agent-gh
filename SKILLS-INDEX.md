@@ -1,6 +1,6 @@
 # SKILLS INDEX
 
-> Full trigger table for all 70 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 67 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
 > **Version**: 3.1 | **Changelog**: 3.1 (+3 skills: caveman, doc-sync, sdd-onboard); 3.0 (-3 skills post-audit: karpathy-prompt→karpathy-loop, core-web-vitals→performance, skill-refresher→skill-improver)
@@ -12,8 +12,7 @@
 | Karpathy, less tokens, context compression, optimize prompt, measure tokens | karpathy-loop |
 | Improve prompt, security, ReAct, multi-agent | prompt-engineering |
 | Compact, less tokens, caveman, /caveman, ultra-lean | lean-context |
-| Continuá, code memory, multi-session | code-memory |
-| Self-reflection, Hermes, error patterns | self-reflection |
+| Code-memory, multi-session | code-memory |
 | Test/verify skill, coverage | skill-testing |
 | Judgment day, dual review, juzgar | judgment-day |
 | Senior architect, trade-offs, system design | senior-engineer |
@@ -73,14 +72,12 @@
 | Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
 | Sparse loading, skill resolution, relevant skills, which skill, resolver skill, minimo skills | skill-graph |
 | Research, technical investigation, investigar, learn tech, compare solutions, evaluate options | research |
-| Review pipeline, skill stacking, full review, preparar commit, ready to ship, listo para commit | review-pipeline |
 | Triple verify, triangulate, 3 enfoques, verificación profunda, !ship, !listo, !fast, !draft | triple-verify |
 | Self-improvement, improvement cycle, auto-mejora, ciclo de mejora, comienza ciclo | self-improvement |
 | Model router, routing, qué modelo, delegate or direct, qué hacer con esta tarea, trial risk, security gate | opencode-model-router |
 | Caveman, ultra-lean, compression, minimal context, emergency mode | caveman |
 | Doc sync, documentation sync, sync docs, propagate docs | doc-sync |
 | SDD onboarding, guided walkthrough, SDD cycle, teach SDD | sdd-onboard |
-| Capture learnings, learning extraction, post-task, session close, pipeline step, !ship | capture-learnings |
 
 ## Quick groups
 - **Compression/style**: karpathy-loop (merged karpathy-prompt), lean-context

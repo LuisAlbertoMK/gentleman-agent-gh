@@ -180,14 +180,14 @@ karpathy-loop · caveman · lean-context · quality-gate · auto-metrics · sess
 ```
 Resume → session-resume · Write code → skill-creator, sdd-*, sdd, quality-gate, go-testing, work-unit-commits
 Fix bug → recovery-protocol, immune-system, sdd-verify · Design → senior-engineer, sdd-propose, sdd-design, cognitive-doc-design, decision-capture
-Learn/Research → research, prompt-engineering, python-async, code-memory · Review → review-pipeline, judgment-day, triple-verify, skill-testing, comment-writer, code-review-agent
+Learn/Research → research, prompt-engineering, python-async, code-memory · Review → quality-gate→zone→JD/4R→commit-crafter (inline), judgment-day, triple-verify, skill-testing, comment-writer, code-review-agent
 UI/Design → baseline-ui, web-quality-audit, performance, accessibility, best-practices, seo
 System → development-mode, execution-mode, skill-graph, opencode-model-router
-Measure → metricas, auto-metrics, performance-tracker, skill-registry · Audit → external-auditor, gap-analysis · Optimize → karpathy-*, lean-context, caveman, skill-improver, refactoring-planner
+Measure → metricas, auto-metrics, performance-tracker, skill-registry · Audit → external-auditor, gap-analysis · Optimize → karpathy-*, lean-context (incl. dep. caveman), skill-improver, refactoring-planner
 Coordinate → delivery-harness, subagent-isolation, command-wrapper, chained-pr, branch-pr
 Commit → commit-crafter | Map → project-mapper | Secure → security-scanner
 Sync docs → doc-sync | Log → bitacora · Track/Decide → dreaming, skill-digestion
-Issue/Request → issue-creation | Improve → self-improvement, self-reflection
+Issue/Request → issue-creation | Improve → self-improvement (incl. per-task reflection, merged)
 Setup → sdd-init, ci-cd, project-mapper · Recover → recovery-protocol, immune-system, context-watchdog · Unknown → Pre-Flight: skill-creator, research, recovery-protocol
 ```
 Load order: 1) Anti-Pattern Catalog 2) Behavioral match 3) Trigger match 4) Default-FAIL 5) Mini-dream every 5th call
@@ -265,19 +265,19 @@ Updates: `mem_update` on `topic_key=protocol/agente-optimizado`. Review: 2 weeks
 | Tarea | Cargá | No cargues |
 |-------|-------|------------|
 | Q&A/charla | `karpathy-loop`, `lean-context` | sdd-*, `judgment-day` |
-| Setup project | `sdd-init`, `senior-engineer` | `caveman`, `judgment-day` |
+| Setup project | `sdd-init`, `senior-engineer` | `judgment-day` |
 | Bug fix | `recovery-protocol`, `immune-system`, `sdd-verify` | `sdd-propose` |
 | Architecture | `senior-engineer`, `sdd-propose` | — |
 | Code review | `code-review-agent`, `judgment-day` | — |
 | Refactor/opt | `karpathy-loop`, `lean-context`, `metricas` | — |
 | Verify / `!check` | `verify.ps1` → `pssa-gate.ps1` | — |
-| Commit/PR / `!ship` | `capture-learnings` → `triple-verify` → `quality-gate` → `security-scanner` → `skillspector-gate` → `commit-crafter` | — |
+| Commit/PR / `!ship` | `capture-learnings` → (inline in triple-verify) → `quality-gate` → `security-scanner` → `skillspector-gate` → `commit-crafter` | — |
 | Hotfix `!fast` | `quality-gate` + `commit-crafter` | `triple-verify` |
 | Security audit | `security-scanner` | — |
-| Long/thorough | sdd-* + `quality-gate` | `caveman` |
+| Long/thorough | sdd-* + `quality-gate` | |
 
 ### B. Token budget
-- >500 tokens → summary first. 5 turns no progress → `caveman lite`. 10 turns → `mem_session_summary` + reset. Self-check every 5 tool calls. Every 5th self-check (25 calls) → run checkpoint: `mem_save(topic_key=checkpoint/session-state, type=checkpoint)`.
+- >500 tokens → summary first. 5 turns no progress → `lean-context CAVEMAN lite`. 10 turns → `mem_session_summary` + reset. Self-check every 5 tool calls. Every 5th self-check (25 calls) → run checkpoint: `mem_save(topic_key=checkpoint/session-state, type=checkpoint)`.
 - **Recursive Compression** (proactive):
   L1 (~8 msgs/15 calls): full summary from oldest raw block (−60-70%)
   L2 (~20 msgs/>3 L1s): 1-2 line decisions only + Engram ID (−40-50%)

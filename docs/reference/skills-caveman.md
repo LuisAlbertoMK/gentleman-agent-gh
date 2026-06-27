@@ -113,8 +113,7 @@
 | **skill-graph** | Sparse loading. Skills relevantes por task via dependency graph. | |
 | **skill-digestion** | Digiere skills on load. Context budget. Auto-improvement trigger. | |
 | **skill-registry** | Catálogo de skills. Scan + dedup + compact + persist. | |
-| **self-improvement** | Ciclo macro. Diagnose→fix→verify→learn. inter(30). | |
-| **self-reflection** | Loop por-task. Reflect→learn→improve. Inner loop de self-improvement. | |
+| **self-improvement** | Ciclo macro + per-task reflection (merged self-reflection). Diagnose→fix→verify→learn + per-task loop. inter(30). | |
 | **immune-system** | Inmunidad contra errores repetidos. Anti-pattern catalog + reglas. | |
 
 ---
