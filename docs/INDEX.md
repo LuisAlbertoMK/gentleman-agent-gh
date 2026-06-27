@@ -68,7 +68,7 @@ docs/
 |---------|-------------|
 | `intake-baseline.json` | Baseline inicial del proyecto (métricas del sistema) |
 | `pssa-baseline.json` | Baseline de PowerShell Script Analyzer |
-| `snapshots/LATEST_benchmark.json` | Benchmark actual: 70 skills, ~126KB, 100% frontmatter |
+| `snapshots/LATEST_benchmark.json` | Benchmark actual: 67 skills, ~126KB, 100% frontmatter |
 | `errors/LATEST_error.json` | Último resultado de quality gate (9 pass, 0 fail) |
 | `SUMMARY.md` | Resumen ejecutivo de métricas del proyecto |
 | (15 reportes adicionales) | Reportes históricos de intake, compactación, optimización |

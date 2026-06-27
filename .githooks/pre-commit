@@ -218,7 +218,7 @@ STAGED_ROJA=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^(src/|
 if [ -n "$STAGED_ROJA" ]; then
   yellow "  WARN — ROJA zone files staged without JD dual review:"
   echo "$STAGED_ROJA" | while read -r line; do echo "    $line"; done
-  echo "  Run 'judgment-day' or review-pipeline before !ship"
+  echo "  Use '!ship' for full pipeline or 'judgment-day' for dual review"
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 else
   green "  OK (no ROJA files staged)"

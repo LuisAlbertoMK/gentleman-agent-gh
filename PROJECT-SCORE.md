@@ -25,7 +25,7 @@
 ## Summary
 
 - **Score**: 9.8/10 (13 dimensions, 32 sub-dimensions)
-- **Skills**: 70 skills, 0 >3KB, avg 1.8KB
-- **Scripts**: 39 total, avg 4.5KB
+- **Skills**: 67 skills, 0 >3KB, avg 1.8KB
+- **Scripts**: 45 total, avg 5.3KB
 - **Upstream sync**: 69/69 junctions in sync
 - **Cycle 9**: active — Skill Resolution Engine (2/3 backlog items done)
