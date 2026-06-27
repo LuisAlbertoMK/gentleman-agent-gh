@@ -80,6 +80,7 @@
 | Caveman, ultra-lean, compression, minimal context, emergency mode | caveman |
 | Doc sync, documentation sync, sync docs, propagate docs | doc-sync |
 | SDD onboarding, guided walkthrough, SDD cycle, teach SDD | sdd-onboard |
+| Capture learnings, learning extraction, post-task, session close, pipeline step, !ship | capture-learnings |
 
 ## Quick groups
 - **Compression/style**: karpathy-loop (merged karpathy-prompt), lean-context

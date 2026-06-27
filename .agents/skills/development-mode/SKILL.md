@@ -1,6 +1,6 @@
 ---
 name: development-mode
-description: "System resource prioritization — RAM, CPU, GPU, file I/O optimization"
+description: "System resource prioritization — RAM/CPU/GPU/file I/O optimization. NOT task execution mode (see execution-mode)."
 triggers: "modo desarrollo, dev mode, development mode, performance mode, resource priority"
 license: Apache-2.0
 metadata:

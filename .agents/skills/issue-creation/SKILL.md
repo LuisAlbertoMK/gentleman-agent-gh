@@ -1,6 +1,6 @@
 ---
-name: gentle-ai-issue-creation
-description: "Create Gentle AI issues with issue-first checks. Trigger: creating GitHub issues, bug reports, or feature requests."
+name: issue-creation
+description: "Create GitHub issues with issue-first checks. Trigger: creating GitHub issues, bug reports, or feature requests."
 license: Apache-2.0
 metadata:
   author: gentleman-programming

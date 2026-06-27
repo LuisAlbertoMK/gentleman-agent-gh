@@ -1,6 +1,6 @@
 ---
 name: execution-mode
-description: "Auto-detect task execution mode — QUICK, THOROUGH, DRAFT — based on scope, risk, familiarity"
+description: "Auto-detect task execution mode — QUICK/THOROUGH/DRAFT — based on scope/risk/familiarity. NOT system resource optimization (see development-mode)."
 triggers: "Execution mode, quick/thorough/draft, resource adaptive, zone green/yellow/orange/red"
 license: Apache-2.0
 metadata:
