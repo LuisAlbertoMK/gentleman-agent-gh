@@ -484,4 +484,5 @@ Cycle 10 (Full-Spectrum Quality) 2026-06-25. ✅ CLOSED (16/18, inter 105/30, sc
 Cycle 11 (Deep Pipeline & Learning Integrity) 2026-06-27. ✅ CLOSED (11/11, inter 140/30, score 9.9/10)
 Cycle 12 (Infrastructure Hardening & Debt Visibility) 2026-06-27. 🟢 COMPLETED (6/8, inter 8/30, score 10/10)
 Cycle 13 (Score Recovery & Pipeline Integrity) 2026-06-30. ✅ CLOSED (7/7, inter 7/30, score 9.9/10)
-Cycle 14 (Score Perfection & Debt Cleanup) 2026-06-30. 🟡 IN PROGRESS
+Cycle 14 (Score Perfection & Debt Cleanup) 2026-06-30. ✅ CLOSED (5/5, inter 0/30, score 10/10)
+Cycle 15 (Bias Calibration Loop) 2026-06-30. ✅ CLOSED (4/4, inter 1/30, score 10/10)
