@@ -4,60 +4,83 @@ description: "Plan commits as reviewable work units. Trigger: implementation, co
 license: Apache-2.0
 metadata:
   author: gentleman-programming
-  version: "1.1"
-  changelog: "1.1: karpathy compress"
+  version: "1.0"
 ---
 
 ## When to Use
-- Splitting a feature into reviewable work units
-- Preparing commits before opening a PR
-- Turning large changes into chained/stacked PRs
-- Keeping reviewer cognitive load healthy
-- Applying SDD tasks without exceeding 400 changed lines
+
+Load this skill when deciding what belongs in each commit or PR.
+
+Use it for:
+
+- Splitting a feature into reviewable work.
+- Preparing commits before opening a PR.
+- Turning a large change into chained or stacked PRs.
+- Keeping reviewer cognitive load healthy.
+- Applying SDD tasks without accidentally producing a PR above 400 changed lines.
 
 ## Critical Rules
+
 | Rule | Requirement |
 |------|-------------|
-| Commit by work unit | A commit = deliverable behavior, fix, migration, or docs unit |
-| Do not commit by file type | Avoid `models`→`services`→`tests` if none works alone |
-| Keep tests with code | Tests in same commit as behavior they verify |
-| Keep docs with change | Docs with feature/workflow they explain |
-| Tell a story | Reviewer understands why each commit exists from diff + message |
-| Future PR-ready | Each commit = candidate chained PR when change grows |
-| SDD workload guard | >400 lines → group commits into chained PRs before impl |
+| Commit by work unit | A commit represents a deliverable behavior, fix, migration, or docs unit. |
+| Do not commit by file type | Avoid `models`, then `services`, then `tests` if none works alone. |
+| Keep tests with code | Tests belong in the same commit as the behavior they verify. |
+| Keep docs with the user-visible change | Docs belong with the feature or workflow they explain. |
+| Tell a story | A reviewer should understand why each commit exists from its diff and message. |
+| Future PR-ready | Each commit should be a candidate chained PR when the change grows. |
+| SDD workload guard | If SDD tasks forecast a >400-line change, group commits into chained PR slices before implementation. |
 
 ## Work Unit Checklist
-- [ ] One clear purpose
-- [ ] Repo makes sense after this commit alone
-- [ ] Tests/docs included when relevant
-- [ ] Rollback reasonable without reverting unrelated work
-- [ ] Message explains outcome, not file list
+
+Before committing, confirm:
+
+- [ ] The commit has one clear purpose.
+- [ ] The repo still makes sense after applying only this commit.
+- [ ] Tests or docs for this unit are included when relevant.
+- [ ] Rollback is reasonable without reverting unrelated work.
+- [ ] The commit message explains the outcome, not the file list.
 
 ## Split Examples
-| Weak | Better |
-|------|--------|
+
+| Weak split | Better work-unit split |
+|------------|------------------------|
 | `add models` | `feat(auth): add token validation domain model and tests` |
 | `add services` | `feat(auth): wire token validation into login flow` |
-| `add tests` | Included with each behavior commit |
-| `update docs` | Included with the user-facing change |
+| `add tests` | Tests included with each behavior commit |
+| `update docs` | Docs included with the user-facing change they explain |
 
 ## PR Relationship
-1. Build smallest independent work unit
-2. Include verification for that unit
-3. Commit with Conventional Commit message
-4. If PR approaches 400 lines → promote commits into chained PRs
+
+Use work-unit commits as the foundation for chained PRs:
+
+1. Build the smallest independent work unit.
+2. Include verification for that unit.
+3. Commit it with a Conventional Commit message.
+4. If the PR approaches 400 changed lines, promote commits or groups of commits into chained PRs.
 
 ## SDD Relationship
-When `sdd-tasks` produces a Review Workload Forecast:
-- **Low risk**: keep work-unit commits inside one PR
-- **Medium risk**: commit by work unit, monitor lines before PR
-- **High risk**: follow SDD `delivery_strategy` — ask/auto-slice/require `size:exception`
 
-Each SDD work unit maps to a commit or PR with: clear start state, clear finished state, verification in same unit, rollback safe.
+When `sdd-tasks` produces a Review Workload Forecast:
+
+- Low risk: keep work-unit commits inside one PR.
+- Medium risk: commit by work unit and monitor changed lines before PR creation.
+- High risk: follow SDD `delivery_strategy` — ask on `ask-on-risk`, auto-slice on `auto-chain`, require `size:exception` on over-budget `single-pr`, or record accepted `size:exception` on `exception-ok`.
+
+Each SDD work unit should map cleanly to a commit or PR with:
+
+- clear start state,
+- clear finished state,
+- verification in the same unit,
+- rollback that does not remove unrelated work.
 
 ## Commands
+
 ```bash
+# Review the story before committing
 git diff --stat
 git diff --cached --stat
+
+# Check recent commit style
 git log --oneline -5
 ```
