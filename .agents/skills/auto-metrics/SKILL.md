@@ -10,7 +10,12 @@ metadata:
 triggers: "task completion, score/metric/auto-score, session end, skill validation, benchmark"
 ---
 Post EVERY done/listo before next task. Avg<7 → immune-system.
-## Bias Calibration: BEFORE scoring, check `.learnings/bias-calibration.json`. If `samples >= 2`, subtract stored avg offsets from each dimension score BEFORE checking thresholds. See AGENTS.md §L.
+## BIAS CALIBRATION — MANDATORY pre-scoring step
+Read `.learnings/bias-calibration.json`. If `samples >= 2`:
+1. Subtract each dim's avg offset from self-score BEFORE threshold checks
+2. Log: "Bias corrected: {dim}={offset}"
+3. Only THEN check thresholds (<7→immune, ≥9→mem_save)
+Offsets persist; repeat every auto-metrics run. See AGENTS.md §L.
 ## 7 Dimensions (1-10)
 | Dim | 1-3 | 4-6 | 7-9 | 10 |
 |-----|-----|-----|-----|----|

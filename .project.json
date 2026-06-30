@@ -1,139 +1,139 @@
 {
   "score": {
-    "current": 9.9,
+    "trend": "stable",
     "dimensions": {
-      "Cycle Activity": 10,
       "Metrics": 10,
       "Clean Code": 10.0,
-      "Best Practices": 10,
-      "Orthography": 10,
-      "Security": 10,
-      "Bitacora": 10,
-      "Script Performance": 9,
-      "Dead Code": 10,
-      "Backlog Integrity": 10.0,
+      "Cycle Activity": 10,
       "Score Depth": 9.9,
+      "Script Performance": 9,
+      "Security": 10,
+      "Skill Effectiveness": 10.0,
+      "Backlog Integrity": 10.0,
+      "Bitacora": 10,
       "Project Artifacts": 10,
-      "Skill Effectiveness": 10.0
+      "Orthography": 10,
+      "Best Practices": 10,
+      "Dead Code": 10
     },
-    "last_updated": "2026-06-30",
-    "trend": "down"
+    "current": 9.9,
+    "last_updated": "2026-06-30"
   },
   "dimensions_detail": {
-    "CC": {
-      "s": 10.0,
-      "r": "S:46 H:46 P:46 S:46",
-      "e": {
-        "with_params": 46,
-        "total_scripts": 46,
-        "with_help": 46,
-        "with_strictmode": 46
-      }
-    },
     "DC": {
-      "s": 10,
       "r": "Orphans: 0, dead junctions: 0",
+      "s": 10,
       "e": {
         "commented_out": 0,
-        "orphans": 0,
-        "dead_junctions": 0
+        "dead_junctions": 0,
+        "orphans": 0
+      }
+    },
+    "Bi": {
+      "r": "BI: True",
+      "s": 10,
+      "e": {
+        "lines": 82,
+        "exists": true
       }
     },
     "BI2": {
-      "s": 10.0,
       "r": "3/3 items",
+      "s": 10.0,
       "e": {
         "total": 3,
         "passed": 3
       }
     },
-    "SE": {
-      "s": 10.0,
-      "r": "T:67 >3:0 >5:0 avg:1.8KB",
+    "CA": {
+      "r": "IC:151/30",
+      "s": 10,
       "e": {
+        "ic": 151,
+        "it": 30
+      }
+    },
+    "SE": {
+      "r": "T:67 >3:0 >5:0 avg:1.8KB",
+      "s": 10.0,
+      "e": {
+        "avg": 1.8,
         "o3": 0,
         "bytes": 120663.0,
         "o5": 0,
-        "avg": 1.8,
         "total": 67
       }
     },
-    "BP": {
-      "s": 10,
-      "r": "P:46/46 T:41/46",
+    "CC": {
+      "r": "S:46 H:46 P:46 S:46",
+      "s": 10.0,
       "e": {
-        "trycatch": 41,
-        "param_cov": 46
-      }
-    },
-    "PA": {
-      "s": 10,
-      "r": "X-ref True, 67 skills",
-      "e": {
-        "cross_ref": true,
-        "project_json": true,
-        "roadmap": true,
-        "changelog": true,
-        "skills": 67,
-        "readme": true
-      }
-    },
-    "Bi": {
-      "s": 10,
-      "r": "BI: True",
-      "e": {
-        "exists": true,
-        "lines": 81
-      }
-    },
-    "Me": {
-      "s": 10,
-      "r": "MD:True EJ:True",
-      "e": {
-        "rp": true,
-        "ed": true,
-        "ej": true,
-        "md": true
+        "total_scripts": 46,
+        "with_params": 46,
+        "with_help": 46,
+        "with_strictmode": 46
       }
     },
     "SD": {
-      "s": 9.9,
       "r": "Depth: 32 sub-dims: 9.9/10",
+      "s": 9.9,
       "e": {
         "subd": 32
       }
     },
-    "SP": {
-      "s": 9,
-      "r": "S:46 avg:5.5KB",
+    "Or": {
+      "r": "Corruption: 0/68",
+      "s": 10,
       "e": {
-        "avg": 5.5,
-        "sc": 46,
-        "huge": 0
+        "scanned": 68,
+        "corrupted": 0
       }
     },
     "Sec": {
-      "s": 10,
       "r": "Weak crypto: False, secrets: False",
+      "s": 10,
       "e": {
         "weak_crypto": false,
         "secrets": false
       }
     },
-    "CA": {
+    "BP": {
+      "r": "P:46/46 T:41/46",
       "s": 10,
-      "r": "IC:151/30",
       "e": {
-        "it": 30,
-        "ic": 151
+        "param_cov": 46,
+        "trycatch": 41
       }
     },
-    "Or": {
+    "Me": {
+      "r": "MD:True EJ:True",
       "s": 10,
-      "r": "Corruption: 0/68",
       "e": {
-        "scanned": 68,
-        "corrupted": 0
+        "ej": true,
+        "rp": true,
+        "ed": true,
+        "md": true
+      }
+    },
+    "PA": {
+      "r": "X-ref True, 67 skills",
+      "s": 10,
+      "e": {
+        "readme": true,
+        "changelog": true,
+        "roadmap": true,
+        "skills": 67,
+        "project_json": true,
+        "cross_ref": true
+      }
+    },
+    "SP": {
+      "r": "S:46 avg:5.5KB",
+      "s": 9,
+      "e": {
+        "huge": 0,
+        "avg": 5.5,
+        "sc": 46
       }
     }
   }

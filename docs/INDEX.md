@@ -31,6 +31,7 @@ docs/
 | `subagent-prompts.md` | Prompts de prueba para subagentes |
 | `project-score.md` | Score actual del proyecto (10.0/10) |
 | `external-audit-findings.md` | Hallazgos de auditoría externa D:\mdShare |
+| `mcp-security-checkpoint.md` | Security gate MCP — riesgo, controles, verificado 3 subagentes |
 
 ---
 

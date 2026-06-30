@@ -1,4 +1,5 @@
 #requires -Version 5.1
+Set-StrictMode -Version Latest
 <#
 .SYNOPSIS
     SkillSpector security gate for agent skills. Scans .agents/skills/

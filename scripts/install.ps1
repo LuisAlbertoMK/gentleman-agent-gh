@@ -1,4 +1,5 @@
 #Requires -Version 5.1
+Set-StrictMode -Version Latest
 <#
 .SYNOPSIS
     Gentle-AI - Install Script for Windows

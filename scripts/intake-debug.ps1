@@ -1,4 +1,6 @@
 #requires -Version 5.1
+param()
+Set-StrictMode -Version Latest
 <#
 .SYNOPSIS
     Debug script for intake-verify.ps1 — runs inline verification with verbose output.

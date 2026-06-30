@@ -71,6 +71,8 @@ $sd+=$(if($tt -ge 60){10}else{7});$sd+=$(if($o3 -le 0){10}elseif($o3 -le 1){9}el
 $sd+=($m::Min(10,$ic/$it*10));$sd+=$(if($bt -gt 0){$bpp/$bt*10}else{0})
 $dp=($sd | Measure-Object -Average).Average;if($dp -is [double]){$dp=$m::Round($dp,1)}
 a "SD" $dp @{subd=$sd.Count} "Depth: $($sd.Count) sub-dims: $dp/10"
+# Bias calibration warning (auto-metrics correction, not project score)
+$bp3=".learnings/bias-calibration.json";if(Test-Path $bp3){try{$bc2=Get-Content $bp3 -Raw|ConvertFrom-Json;if($bc2.samples -ge 2){Write-Host "⚠️ Active bias offsets (auto-metrics):" -ForegroundColor DarkYellow;$bc2.offsets.PSObject.Properties|Sort-Object Name|ForEach-Object{Write-Host "  $($_.Name): $($_.Value)" -ForegroundColor DarkYellow}}}catch{}}
 $all=$h.Values.PSForEach({$_.s});$fn=$m::Round(($all | Measure-Object -Average).Average,1)
 $dn=@{"PA"="Project Artifacts";"Sec"="Security";"DC"="Dead Code";"CC"="Clean Code";"BP"="Best Practices";"Or"="Orthography";"Bi"="Bitacora";"Me"="Metrics";"SP"="Script Performance";"SE"="Skill Effectiveness";"CA"="Cycle Activity";"BI2"="Backlog Integrity";"SD"="Score Depth"}
 $r=@{score=@{current=$fn;dimensions=[ordered]@{};last_updated=(Get-Date -Format "yyyy-MM-dd");trend="stable"};dimensions_detail=$h}

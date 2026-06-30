@@ -1,4 +1,5 @@
 #requires -Version 7.6
+Set-StrictMode -Version Latest
 
 <#
 .SYNOPSIS

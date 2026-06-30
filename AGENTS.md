@@ -101,6 +101,7 @@ Comandos rápidos para tareas recurrentes — extienden el sistema de modos:
 | **`!pdebt`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\ponytail-audit.ps1` — escanea `ponytail:` shortcuts en skills y scripts, reporta deuda técnica activa | Fácil |
 | **`!paudit`** | `$env:GENTLEMAN_AGENT_ROOT\scripts\ponytail-audit.ps1 -Audit` — detecta over-engineering (skills >5KB, scripts comment-heavy) | Fácil |
 | **`!ponytail`** | Set intensity level: `!ponytail [lite|full|ultra|off]`. Sin argumento reporta el nivel actual. Persiste en `~/.config/ponytail/config.json` o `$env:PONYTAIL_MODE`. | Fácil |
+| **`!manifest`** | Lee `CYCLE.md`, reporta ciclo actual + score, verifica global shortcuts (opencode-vmk, gentleman-vmk) y los crea si faltan. | Fácil |
 
 ## Subagent-First
 Read-heavy (>3 files/scan/map) → delegate `explore`. Saves 2-5K tokens. Main context = synthesis/decisions.
