@@ -1,3 +1,6 @@
+2026-06-30 — Shortcuts globales (opencode-vmk, gentleman-vmk) + !manifest workflow shortcut + Cycle 13 review. Clean close. Score: 9.0/10
+2026-06-30 - Session close
+2026-06-29 - Session close
 2026-06-27 - Session close
 2026-06-27 — Cycle 13 kickoff: 3-subagente audit corrigió I/R de mi propuesta inicial. Bugs: capture-learnings dangling ref (skill nunca existió), AGENTS.md global stub perdido. Fix: pipeline limpiado, stub re-creado (~13K tokens/request), sync-global -NoAgentsMd flag. README sync, CHANGELOG Cycles 11-12-13. SkillSpector Docker gate live (NVIDIA v2.3.7), CI workflow integrado. opencode-vmk fork: agents + engram MCP configurados. Score 10/10.
 2026-06-27 — Session close
@@ -65,6 +68,8 @@
 2026-06-06 — session-resume comprimido (97→69 lines, −30%) + auto-clean.ps1 + judgment-day audit.
 2026-06-06 — Misión principal registrada + bitacora + autoscore 9.2/10 + session close.
 2026-06-06 — Skill metricas + tokenización + 6 tools nuevas.
+
+
 
 
 

@@ -1,209 +1,140 @@
-﻿{
-    "dimensions_detail":  {
-                              "Bitacora":  {
-                                               "evidence":  {
-                                                                "lines":  106,
-                                                                "exists":  true
-                                                            },
-                                               "score":  10,
-                                               "rationale":  "BITACORA.md exists: True",
-                                               "sub_dimensions":  {
-                                                                      "content":  10,
-                                                                      "exists":  10
-                                                                  },
-                                               "max":  10
-                                           },
-                              "Cycle Activity":  {
-                                                     "evidence":  {
-                                                                      "inter_count":  63,
-                                                                      "inter_target":  30
-                                                                  },
-                                                     "score":  10,
-                                                     "rationale":  "inter: 63/30",
-                                                     "sub_dimensions":  {
-                                                                            "inter_ratio":  10
-                                                                        },
-                                                     "max":  10
-                                                 },
-                              "Backlog Integrity":  {
-                                                        "evidence":  {
-                                                                         "total":  3,
-                                                                         "passed":  3
-                                                                     },
-                                                        "score":  10,
-                                                        "rationale":  "3/3 items match reality",
-                                                        "sub_dimensions":  {
-                                                                               "integrity":  10
-                                                                           },
-                                                        "max":  10
-                                                    },
-                              "Score Depth":  {
-                                                  "evidence":  {
-                                                                   "sub_dim_count":  32
-                                                               },
-                                                  "score":  9.9,
-                                                  "rationale":  "Avg of 32 sub-dimensions: 9.9/10",
-                                                  "max":  10
-                                              },
-                              "Orthography":  {
-                                                  "evidence":  {
-                                                                   "corrupted_files":  0,
-                                                                   "total_scanned":  70
-                                                               },
-                                                  "score":  10,
-                                                  "rationale":  "Encoding corruption: 0/70 files",
-                                                  "sub_dimensions":  {
-                                                                         "corruption":  10
-                                                                     },
-                                                  "max":  10
-                                              },
-                              "Best Practices":  {
-                                                     "evidence":  {
-                                                                      "trycatch":  33,
-                                                                      "param_coverage":  35
-                                                                  },
-                                                     "score":  10,
-                                                     "rationale":  "Params: 35/36, try/catch: 33/36",
-                                                     "sub_dimensions":  {
-                                                                            "trycatch":  9.2,
-                                                                            "param_cov":  9.7
-                                                                        },
-                                                     "max":  10
-                                                 },
-                              "Security":  {
-                                               "evidence":  {
-                                                                "secrets":  false,
-                                                                "weak_crypto":  false
-                                                            },
-                                               "score":  10,
-                                               "rationale":  "Weak crypto: False, secrets: False",
-                                               "sub_dimensions":  {
-                                                                      "crypto":  10,
-                                                                      "secrets":  10
-                                                                  },
-                                               "max":  10
-                                           },
-                              "Script Performance":  {
-                                                         "evidence":  {
-                                                                          "avg_size_kb":  4.4,
-                                                                          "over_50kb":  0,
-                                                                          "script_count":  36
-                                                                      },
-                                                         "score":  9,
-                                                         "rationale":  "Scripts: 36, avg: 4.4KB, \u003e50KB: 0",
-                                                         "sub_dimensions":  {
-                                                                                "huge":  10,
-                                                                                "avg_size":  10,
-                                                                                "count":  7
-                                                                            },
-                                                         "max":  10
-                                                     },
-                              "Project Artifacts":  {
-                                                        "evidence":  {
-                                                                         "skills":  69,
-                                                                         "project_json":  true,
-                                                                         "roadmap":  true,
-                                                                         "readme":  true,
-                                                                         "changelog":  true,
-                                                                         "cross_ref":  true
-                                                                     },
-                                                        "score":  10,
-                                                        "rationale":  "Cross-ref True, 69 skills",
-                                                        "sub_dimensions":  {
-                                                                               "project_json":  10,
-                                                                               "changelog":  10,
-                                                                               "skills":  10,
-                                                                               "roadmap":  10,
-                                                                               "readme":  10,
-                                                                               "cross_ref":  10
-                                                                           },
-                                                        "max":  10
-                                                    },
-                              "Metrics":  {
-                                              "evidence":  {
-                                                               "errors_dir":  true,
-                                                               "error_json":  true,
-                                                               "metrics_dir":  true,
-                                                               "has_reports":  true
-                                                           },
-                                              "score":  10,
-                                              "rationale":  "Metrics dir: True, error json: True",
-                                              "sub_dimensions":  {
-                                                                     "errors_dir":  10,
-                                                                     "error_json":  10,
-                                                                     "metrics_dir":  10,
-                                                                     "reports":  10
-                                                                 },
-                                              "max":  10
-                                          },
-                              "Clean Code":  {
-                                                 "evidence":  {
-                                                                  "with_params":  35,
-                                                                  "with_help":  36,
-                                                                  "total_scripts":  36,
-                                                                  "with_strictmode":  36
-                                                              },
-                                                 "score":  9.9,
-                                                 "rationale":  "Scripts: 36, help: 36, params: 35, strict: 36",
-                                                 "sub_dimensions":  {
-                                                                        "strict_rate":  10,
-                                                                        "help_rate":  10,
-                                                                        "param_rate":  9.7
-                                                                    },
-                                                 "max":  10
-                                             },
-                              "Skill Effectiveness":  {
-                                                          "evidence":  {
-                                                                           "over_5kb":  0,
-                                                                           "avg_size_kb":  1.7,
-                                                                           "total_skills":  69,
-                                                                           "total_bytes":  122000,
-                                                                           "over_3kb":  0
-                                                                       },
-                                                          "score":  10,
-                                                          "rationale":  "Skills: 69, \u003e3KB: 0, \u003e5KB: 0, avg: 1.7KB",
-                                                          "sub_dimensions":  {
-                                                                                 "skill_count":  10,
-                                                                                 "skill_avg":  10,
-                                                                                 "over_5kb":  10,
-                                                                                 "over_3kb":  10
-                                                                             },
-                                                          "max":  10
-                                                      },
-                              "Dead Code":  {
-                                                "evidence":  {
-                                                                 "commented_out":  0,
-                                                                 "orphans":  0,
-                                                                 "dead_junctions":  0
-                                                             },
-                                                "score":  10,
-                                                "rationale":  "Orphans: 0, dead junctions: 0",
-                                                "sub_dimensions":  {
-                                                                       "junctions":  10,
-                                                                       "orphans":  10,
-                                                                       "commented":  10
-                                                                   },
-                                                "max":  10
-                                            }
-                          },
-    "score":  {
-                  "current":  9.9,
-                  "dimensions":  {
-                                     "Project Artifacts":  10,
-                                     "Security":  10,
-                                     "Dead Code":  10,
-                                     "Clean Code":  9.9,
-                                     "Best Practices":  10,
-                                     "Orthography":  10,
-                                     "Bitacora":  10,
-                                     "Metrics":  10,
-                                     "Script Performance":  9,
-                                     "Skill Effectiveness":  10,
-                                     "Cycle Activity":  10,
-                                     "Backlog Integrity":  10,
-                                     "Score Depth":  9.9
-                                 },
-                  "last_updated":  "2026-06-23",
-                  "trend":  "stable"
-              }
+{
+  "score": {
+    "current": 9.9,
+    "dimensions": {
+      "Cycle Activity": 10,
+      "Metrics": 10,
+      "Clean Code": 10.0,
+      "Best Practices": 10,
+      "Orthography": 10,
+      "Security": 10,
+      "Bitacora": 10,
+      "Script Performance": 9,
+      "Dead Code": 10,
+      "Backlog Integrity": 10.0,
+      "Score Depth": 9.9,
+      "Project Artifacts": 10,
+      "Skill Effectiveness": 10.0
+    },
+    "last_updated": "2026-06-30",
+    "trend": "down"
+  },
+  "dimensions_detail": {
+    "CC": {
+      "s": 10.0,
+      "r": "S:46 H:46 P:46 S:46",
+      "e": {
+        "with_params": 46,
+        "total_scripts": 46,
+        "with_help": 46,
+        "with_strictmode": 46
+      }
+    },
+    "DC": {
+      "s": 10,
+      "r": "Orphans: 0, dead junctions: 0",
+      "e": {
+        "commented_out": 0,
+        "orphans": 0,
+        "dead_junctions": 0
+      }
+    },
+    "BI2": {
+      "s": 10.0,
+      "r": "3/3 items",
+      "e": {
+        "total": 3,
+        "passed": 3
+      }
+    },
+    "SE": {
+      "s": 10.0,
+      "r": "T:67 >3:0 >5:0 avg:1.8KB",
+      "e": {
+        "o3": 0,
+        "bytes": 120663.0,
+        "o5": 0,
+        "avg": 1.8,
+        "total": 67
+      }
+    },
+    "BP": {
+      "s": 10,
+      "r": "P:46/46 T:41/46",
+      "e": {
+        "trycatch": 41,
+        "param_cov": 46
+      }
+    },
+    "PA": {
+      "s": 10,
+      "r": "X-ref True, 67 skills",
+      "e": {
+        "cross_ref": true,
+        "project_json": true,
+        "roadmap": true,
+        "changelog": true,
+        "skills": 67,
+        "readme": true
+      }
+    },
+    "Bi": {
+      "s": 10,
+      "r": "BI: True",
+      "e": {
+        "exists": true,
+        "lines": 81
+      }
+    },
+    "Me": {
+      "s": 10,
+      "r": "MD:True EJ:True",
+      "e": {
+        "rp": true,
+        "ed": true,
+        "ej": true,
+        "md": true
+      }
+    },
+    "SD": {
+      "s": 9.9,
+      "r": "Depth: 32 sub-dims: 9.9/10",
+      "e": {
+        "subd": 32
+      }
+    },
+    "SP": {
+      "s": 9,
+      "r": "S:46 avg:5.5KB",
+      "e": {
+        "avg": 5.5,
+        "sc": 46,
+        "huge": 0
+      }
+    },
+    "Sec": {
+      "s": 10,
+      "r": "Weak crypto: False, secrets: False",
+      "e": {
+        "weak_crypto": false,
+        "secrets": false
+      }
+    },
+    "CA": {
+      "s": 10,
+      "r": "IC:151/30",
+      "e": {
+        "it": 30,
+        "ic": 151
+      }
+    },
+    "Or": {
+      "s": 10,
+      "r": "Corruption: 0/68",
+      "e": {
+        "scanned": 68,
+        "corrupted": 0
+      }
+    }
+  }
 }
