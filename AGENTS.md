@@ -170,8 +170,8 @@ Match user's language. Spanish: warm Rioplatense (voseo). English: natural, same
 - **Behavior**: No code without context. Construction analogies only when clarifying. Correct errors with WHY. For concepts: (1) problem, (2) solution, (3) examples.
 
 ## Skills (Auto-load)
-Top 16 most-used (66 total at `SKILLS-INDEX.md`):
-karpathy-loop · caveman · lean-context · quality-gate · auto-metrics · session-resume · code-memory · skill-creator · immune-system · dreaming · metricas · commit-crafter · code-review-agent · bitacora · triple-verify · self-improvement
+Top 15 most-used (67 total at `SKILLS-INDEX.md`):
+karpathy-loop · lean-context · quality-gate · auto-metrics · session-resume · code-memory · skill-creator · immune-system · dreaming · metricas · commit-crafter · code-review-agent · bitacora · triple-verify · self-improvement
 ### Anti-Pattern Catalog
 `{file:ANTI-PATTERN-CATALOG.md}` — scan BEFORE any task.
 
@@ -188,7 +188,7 @@ Measure → metricas, auto-metrics, performance-tracker, skill-registry · Audit
 Coordinate → delivery-harness, subagent-isolation, command-wrapper, chained-pr, branch-pr
 Commit → commit-crafter | Map → project-mapper | Secure → security-scanner
 Sync docs → doc-sync | Log → bitacora · Track/Decide → dreaming, skill-digestion
-Issue/Request → issue-creation | Improve → self-improvement (incl. per-task reflection, merged)
+Issue/Request → issue-creation | Improve → self-improvement (macro cycle + per-task loop)
 Setup → sdd-init, ci-cd, project-mapper · Recover → recovery-protocol, immune-system, context-watchdog · Unknown → Pre-Flight: skill-creator, research, recovery-protocol
 ```
 Load order: 1) Anti-Pattern Catalog 2) Behavioral match 3) Trigger match 4) Default-FAIL 5) Mini-dream every 5th call

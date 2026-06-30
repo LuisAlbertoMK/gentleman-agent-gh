@@ -1,3 +1,4 @@
+2026-06-30 — Cycle 14 CLOSE: Score Perfection & Debt Cleanup. Score 10/10 🏆 (SP 9→10, SD 9.9→10.0). Caveman deprecation finalized, self-reflection merge verified. Trend up.
 2026-06-30 — Cycle 13 CLOSE: Score Recovery & Pipeline Integrity. 6/7 items done (compression, clean code, bias wiring, errors/ dir). Score 9.9/10 (stable). Script Performance 9/10 único dim bajo. Items 1-6 sellados.
 2026-06-30 — Shortcuts globales (opencode-vmk, gentleman-vmk) + !manifest workflow shortcut + Cycle 13 review. Clean close. Score: 9.0/10
 2026-06-30 - Session close
