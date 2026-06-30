@@ -325,7 +325,39 @@
   - **Score Depth 9.9→10.0**: sub-dim threshold corregido
   - **Counts corregidos**: AGENTS.md 16→15 skills, 66→67 total
   - **Score trend**: stable→up 📈
-- Carried forward: inter 0/30 (ciclo exprés), bias offsets siguen altos
+- Carried forward: bias offsets altos (Correctness +3.33)
+
+### Cycle 15: Bias Calibration Loop
+
+**Objetivo**: Cerrar el loop de bias calibration. Hoy los offsets existen pero no se aplican automáticamente — dependen de que el agente se acuerde. Pasar de "recordatorio" a "gating automático".
+
+### Pilares
+1. **Auto-gate en close-session** — Si hay code changes, close-session.ps1 debe emitir un requerimiento explícito de external-auditor (no un "remember", un "REQUIRED").
+2. **Hard gate en auto-metrics** — La corrección por bias pasa de sugerida a obligatoria: si hay offsets ≥2 muestras y no hay audit entry del día, auto-metrics debe fallar.
+
+### Backlog
+| # | Item | Impact | Risk | I/R | Est. inter | Status | Done criteria |
+|---|------|--------|------|-----|------------|--------|---------------|
+| 1 | Hard gate en close-session.ps1: emitir REQUERIMIENTO explícito de external-auditor cuando hay code changes | High | Low | 3.0 | 1 | 🔴 | close-session.ps1 muestra "⚠️ REQUIRED: Run external-auditor" con formato rojo/negrita, no un "remember" gris |
+| 2 | Hard gate en auto-metrics SKILL.md: bias correction pasa de "MANDATORY pre-scoring step" a gating con verificación de audit reciente | High | Low | 3.0 | 1 | 🔴 | SKILL.md dice "FAIL if no audit entry for today AND offsets exist" |
+| 3 | 3 subagentes de verificación | High | Low | 3.0 | 1 | 🔴 | 3 subagentes ejecutados, todos OK |
+| 4 | Re-score + reporte + commit | Medium | Low | 2.0 | 1 | 🔴 | .project.json actualizado, docs/ciclos/cycle15-*.md, commit |
+
+### Cycle 15 Progress
+- Score: **10/10** (mantenido)
+- inter: 1/30 (cycle tracking)
+- Items: 4/4 done ✅ — ALL completed
+
+### Cycle 15 Close
+- Score: **10/10** 🏆 — mantenido durante todo el ciclo
+- inter: 1/30 (ciclo exprés — bias calibration loop)
+- Backlog: 4/4 items complete ✅ (100%)
+- Key wins:
+  - **close-session.ps1**: "Remember" → "REQUIRED" rojo con steps enumerados cuando hay code changes
+  - **auto-metrics SKILL.md**: Bias calibration upgrade a hard gate con pre-check (audit reciente obligatorio)
+  - **3 subagentes**: verificaron parse, lógica, rutas, consistencia cross-ref — todos OK
+  - **Sin regresiones**: score 10/10 intacto, trend up mantenido
+- Carried forward: (ninguno — deuda técnica arrastrada liquidada)
 
 ## Metrics
 

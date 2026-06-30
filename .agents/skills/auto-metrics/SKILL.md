@@ -10,11 +10,26 @@ metadata:
 triggers: "task completion, score/metric/auto-score, session end, skill validation, benchmark"
 ---
 Post EVERY done/listo before next task. Avg<7 → immune-system.
-## BIAS CALIBRATION — MANDATORY pre-scoring step
-Read `.learnings/bias-calibration.json`. If `samples >= 2`:
+## BIAS CALIBRATION — HARD GATE (pre-scoring)
+### Pre-check
+If `.learnings/bias-calibration.json` exists with `samples >= 2`:
+1. **CHECK bitácora for today's audit entry**: search for `[audit] {today}` pattern
+2. **If no audit found**: STOP. Load `external-auditor` skill and run blind audit first.
+   - Rationale: offsets exist from past sessions, may not reflect current bias.
+   - Fresh audit ensures latest diff is evaluated.
+3. **If audit found**: proceed to correction.
+
+### Correction
 1. Subtract each dim's avg offset from self-score BEFORE threshold checks
 2. Log: "Bias corrected: {dim}={offset}"
 3. Only THEN check thresholds (<7→immune, ≥9→mem_save)
+4. Update calibration: append today's self/audit pair to `.learnings/bias-calibration.json`
+
+### Fail behavior
+- No bias-calibration.json → OK (no data yet)
+- Exists, samples≥2, no today audit → **MUST NOT score without fresh audit**
+- Audit exists, offsets applied → proceed normally
+
 Offsets persist; repeat every auto-metrics run. See AGENTS.md §L.
 ## 7 Dimensions (1-10)
 | Dim | 1-3 | 4-6 | 7-9 | 10 |
