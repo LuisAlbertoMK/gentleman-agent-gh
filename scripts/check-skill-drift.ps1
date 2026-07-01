@@ -1,4 +1,4 @@
-#requires -Version 7.6
+﻿#requires -Version 7.6
 <#
 .SYNOPSIS
   Check skill drift between canonical (.agents/skills/) and global config (~/.config/opencode/skills/). Optionally sync agent definitions.

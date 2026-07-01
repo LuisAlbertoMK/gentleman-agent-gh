@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Auto-score project metrics across 7 dimensions.
 .DESCRIPTION

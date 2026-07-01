@@ -23,4 +23,4 @@ Template: `reflection/{date}` with Outcome/Root cause/Score/What changed.
 Frustration signals → `recovery-protocol`.
 ## Buffer Formats
 Schemas: `.learnings/rejected-edits.json` (id/timestamp/target/edit/reason/delta) and `accepted-edits.json` (id/timestamp/target/edit/delta/pattern).
-## Refs: CYCLE.md · inter-track · extract-skill · run-improvement-cycle · score-auto · SkillOpt arXiv:2605.23904 · SkillSpector · recovery-protocol
+## Refs: CYCLE.md · inter-track · extract-skill · run-improvement-cycle · score-auto · SkillOpt arXiv:2605.23904 · SkillSpector · recovery-protocol · external-improvement (5-phase cycle for external projects)

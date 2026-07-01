@@ -1,9 +1,9 @@
 # SKILLS INDEX
 
-> Full trigger table for all 67 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 68 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 3.1 | **Changelog**: 3.1 (+3 skills: caveman, doc-sync, sdd-onboard); 3.0 (-3 skills post-audit: karpathy-prompt→karpathy-loop, core-web-vitals→performance, skill-refresher→skill-improver)
+> **Version**: 3.2 | **Changelog**: 3.2 (+1 skill: external-improvement); 3.1 (+3 skills: caveman, doc-sync, sdd-onboard); 3.0 (-3 skills post-audit: karpathy-prompt→karpathy-loop, core-web-vitals→performance, skill-refresher→skill-improver)
 
 ## Triggers → Skill
 
@@ -74,6 +74,7 @@
 | Research, technical investigation, investigar, learn tech, compare solutions, evaluate options | research |
 | Triple verify, triangulate, 3 enfoques, verificación profunda, !ship, !listo, !fast, !draft | triple-verify |
 | Self-improvement, improvement cycle, auto-mejora, ciclo de mejora, comienza ciclo | self-improvement |
+| External improvement, 5-phase cycle, external project, analyze project, improve external, cliente, proyecto externo | external-improvement |
 | Model router, routing, qué modelo, delegate or direct, qué hacer con esta tarea, trial risk, security gate | opencode-model-router |
 | Caveman, ultra-lean, compression, minimal context, emergency mode | caveman |
 | Doc sync, documentation sync, sync docs, propagate docs | doc-sync |
@@ -81,7 +82,7 @@
 
 ## Quick groups
 - **Compression/style**: karpathy-loop (merged karpathy-prompt), lean-context
-- **Quality**: quality-gate, auto-metrics, external-auditor, immune-system, code-review-agent, performance-tracker, triple-verify, self-improvement
+- **Quality**: quality-gate, auto-metrics, external-auditor, immune-system, code-review-agent, performance-tracker, triple-verify, self-improvement, external-improvement
 - **Memory**: session-resume, code-memory, dreaming
 - **Skills meta**: skill-creator, skill-registry, skill-improver, skill-digestion, skill-graph
 - **Coordination**: delivery-harness, chained-pr, branch-pr, issue-creation, subagent-isolation, command-wrapper, opencode-model-router

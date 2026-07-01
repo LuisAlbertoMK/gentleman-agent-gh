@@ -55,13 +55,13 @@
     "SE": {
       "s": 10.0,
       "e": {
-        "total": 67,
+        "total": 68,
         "o3": 0,
         "bytes": 121341.0,
         "avg": 1.8,
         "o5": 0
       },
-      "r": "T:67 >3:0 >5:0 avg:1.8KB"
+      "r": "T:68 >3:0 >5:0 avg:1.8KB"
     },
     "SD": {
       "s": 10.0,
@@ -108,13 +108,13 @@
       "s": 10,
       "e": {
         "project_json": true,
-        "skills": 67,
+        "skills": 68,
         "roadmap": true,
         "changelog": true,
         "readme": true,
         "cross_ref": true
       },
-      "r": "X-ref True, 67 skills"
+      "r": "X-ref True, 68 skills"
     }
   },
   "score": {

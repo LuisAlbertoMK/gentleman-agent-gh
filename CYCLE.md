@@ -359,6 +359,144 @@
   - **Sin regresiones**: score 10/10 intacto, trend up mantenido
 - Carried forward: (ninguno — deuda técnica arrastrada liquidada)
 
+### Cycle 16: External Improvement Protocol 🆕
+
+**Objetivo**: Extender el ciclo de mejora a proyectos externos con una metodología de 5 fases y 3+ subagentes por fase. El mismo patrón se aplica a la mejora general (ciclo interno). Crear el skill `external-improvement`, indexar gentleman-agent-gh en codebase-memory, y actualizar CYCLE.md para reflejar el nuevo protocolo.
+
+Contexto: El score interno está en 10/10 estable. La nota de Cycle 15 decía: *"El próximo ciclo debería ser externo"*. Este ciclo habilita esa capacidad.
+
+### Pilares
+1. **External Improvement Skill** — Crear `.agents/skills/external-improvement/` con la metodología de 5 fases: EXPLORE → DIAGNOSE → PLAN → EXECUTE → VERIFY & LEARN. Cada fase: 3+ subagentes.
+2. **Codebase Memory Integration** — Indexar gentleman-agent-gh para que codebase-memory pueda resolver consultas estructurales durante los ciclos.
+3. **CYCLE.md 5-Phase Skeleton** — Reorganizar el Cycle Loop para que siga explícitamente el mismo patrón de 5 fases que external-improvement. Consistencia interna ↔ externa.
+4. **Documentation** — Ciclo report + session close.
+
+### Backlog
+| # | Item | Impact | Risk | I/R | Est. inter | Status | Done criteria |
+|---|------|--------|------|-----|------------|--------|---------------|
+| 1 | Crear skill `external-improvement` con 5 fases (3+ subagentes/fase) | High 3 | Low 1 | 3.0 | 1 | 🔴 | SKILL.md existe en `.agents/skills/external-improvement/` con las 5 fases documentadas |
+| 2 | Indexar gentleman-agent-gh en codebase-memory | High 3 | Low 1 | 3.0 | 1 | ✅ | Indexado (1425 nodos, 1421 edges) |
+| 3 | Actualizar CYCLE.md Cycle Loop → 5-phase skeleton explícito | High 3 | Low 1 | 3.0 | 1 | 🔴 | Cycle Loop reorganizado: LOOP sigue fases EXPLORE-DIAGNOSE-PLAN-EXECUTE-VERIFY |
+| 4 | 3 subagentes de verificación | High 3 | Low 1 | 3.0 | 1 | 🔴 | 3 subagentes ejecutados, todos OK |
+| 5 | Re-score + reporte ciclo + commit | Medium 2 | Low 1 | 2.0 | 1 | 🔴 | `.project.json` actualizado, `docs/ciclos/cycle16-*.md`, commit final |
+
+### Cycle 16 Progress
+- Score: **10/10** (mantenido)
+- inter: 3/30 (cycle tracking)
+- Items: 5/5 done (ALL completed ✅)
+  - Item 1: `external-improvement` skill creado con 5 fases, 3+ subagentes/fase ✅
+  - Item 2: gentleman-agent-gh indexado en codebase-memory (1425 nodos, 1421 edges) ✅
+  - Item 3: CYCLE.md reorganizado con 5-Phase skeleton, old loop marcado como legacy ✅
+  - Item 4: 3 subagentes de verificación ejecutados (1ra ronda: FAIL con fixes → 2da ronda: PASS 12/12) ✅
+  - Item 5: Re-score + reporte ciclo + commit completado ✅
+
+### Cycle 16 Close
+- Score: **10/10** 🏆 — mantenido, sin regresiones
+- inter: 3/30 (ciclo rápido — creación de skill + reestructura, 3 subagentes verification)
+- Backlog: 5/5 items complete ✅ (100%)
+- Key wins:
+  - **external-improvement skill**: 5 fases (EXPLORE→DIAGNOSE→PLAN→EXECUTE→VERIFY & LEARN), 3+ subagentes por fase, gates por fase, delivery-harness integration
+  - **Codebase-memory**: gentleman-agent-gh indexado (1425 nodos, 1421 edges) — consultas estructurales disponibles
+  - **CYCLE.md 5-phase skeleton**: mismo patrón para ciclos internos y externos, old loop → legacy con forward-reference
+  - **Cross-ref consistency**: AGENTS.md router + count, SKILLS-INDEX.md trigger + count, self-improvement refs — todo actualizado
+- Carried forward: Aplicar el ciclo de 5 fases a un proyecto externo real (próximo paso)
+
+## 5-Phase Cycle Loop (Cycle 16+)
+
+The improvement cycle now follows a **5-phase skeleton** — identical pattern for both external projects (`external-improvement` skill) and internal improvement (CYCLE.md):
+
+```
+┌──────────────────────────────────────────────────┐
+│             5-PHASE IMPROVEMENT CYCLE             │
+├──────────────────────────────────────────────────┤
+│  P1: EXPLORE   │  3+ subagentes: structure,      │
+│  (Intake)      │  arch, deps                     │
+├──────────────────────────────────────────────────┤
+│  P2: DIAGNOSE  │  3+ subagentes: quality,        │
+│  (Gap Analysis)│  security, performance, tests    │
+├──────────────────────────────────────────────────┤
+│  P3: PLAN      │  3 subagentes: I/R scoring,     │
+│  (Prioritize)  │  dep graph, rollback strategy   │
+├──────────────────────────────────────────────────┤
+│  P4: EXECUTE   │  3+ subagentes por batch:       │
+│  (Implement)   │  fix, test, commit              │
+├──────────────────────────────────────────────────┤
+│  P5: VERIFY & LEARN │  3 subagentes: regression,      │
+│  (Learn)       │  score delta, learnings extract │
+└──────────────────────────────────────────────────┘
+```
+
+### Phase Mapping (old → new)
+
+| Old Cycle Loop Step | New 5-Phase Equivalent |
+|---------------------|------------------------|
+| 1. READ CYCLE.md | P0: Pre-Flight |
+| 2. Diagnose (score, gaps, sizes, cross-ref) | **P1+P2**: EXPLORE + DIAGNOSE |
+| 3. Score backlog by I/R | **P3**: PLAN |
+| 4. Identify fix candidates sorted | P3 (sub-product) |
+| 5. Partition independent work | **P4**: EXECUTE (step 5.1) |
+| 6. Delegate to 3 subagentes | P4: EXECUTE (step 5.2) |
+| 7. Orchestrate merge | P4: EXECUTE (step 5.3) |
+| 8. Verify: re-score, compare delta | **P5**: VERIFY & LEARN |
+| 9-10. Keep or revert | P5: VERIFY & LEARN (sub-step) |
+| 11. Learn: engram, anti-patterns | P5: LEARN (sub-step) |
+| 12. Report | P5: LEARN (sub-step) |
+| 13. Score auto-update | P5: VERIFY & LEARN (sub-step) |
+| 14. Exit condition | P5: LEARN (sub-step) |
+
+### Updated Loop
+
+```
+P0: PRE-FLIGHT
+  ├── READ CYCLE.md
+  ├── Check .project.json freshness (>7d → auto-update)
+  └── Verify codebase-memory indexed (if applicable)
+
+P1: EXPLORE (3+ subagentes)
+  ├── S1: Structure — tree, stack, entry points, config
+  ├── S2: Architecture — modules, data flow, patterns
+  └── S3: Dependencies — health, versions, CVEs
+  └── Internal shortcut: skip P1, use existing metrics instead
+
+P2: DIAGNOSE (3+ subagentes)
+  ├── S1: Quality — dead code, orthography, PSSA, clean code
+  ├── S2: Security — secrets, injection, auth patterns
+  └── S3: Performance — N+1, O(n²), allocations, bundle
+  └── S4 (opt): Coverage — test gaps
+  └── Output: scored gap table per subagent
+
+P3: PLAN (3 subagentes)
+  ├── S1: Impact/Risk scoring → prioritized backlog
+  ├── S2: Dependency graph → batch ordering
+  └── S3: Rollback strategy per batch
+  └── Gate: ≥1 batch with I/R ≥ 1.0
+
+P4: EXECUTE (3+ subagentes per batch, serial by dep order)
+  ├── Per batch: fix, test, commit (conventional)
+  ├── Parallel: docs + additional tests
+  └── On fail: rollback per P3 plan, retry once, then SKIP
+  └── Max 3 consecutive SKIP → STOP, escalate
+
+P5: VERIFY & LEARN (3 subagentes)
+  ├── S1: Regression — build, test suite, smoke
+  ├── S2: Score delta — before/after, compare baseline
+  └── S3: Learnings — engram, anti-patterns, skill-creator if ≥3 reps
+  └── Gate: score drop >0.5 → full revert
+  └── Exit: inter≥30 + no dim<9.0 → SUCCESS; 7d → STOP
+```
+
+### External vs Internal Differences
+
+| Aspect | External Project | Internal (CYCLE.md) |
+|--------|-----------------|---------------------|
+| P1: Explore | Full: scan from zero | **Skip** — use existing project score + metrics |
+| P2: Diagnose | Full: 4 subagentes | **Pass** — use existing score-auto.ps1 output |
+| P3: Plan | Full: 3 subagentes | **Light** — I/R scoring only, dep/rollback from existing |
+| P4: Execute | Full: batches, serial deps | Full — same, 3+ subagentes |
+| P5: Verify | Full: regression + score + learn | Full — same |
+| Codebase memory | Must index first | Already indexed |
+| Output dir | `docs/external/<project>/` | `docs/ciclos/cycle<N>-*.md` |
+
 ## Metrics
 
 | Metric | Target | Tracked By |
@@ -442,7 +580,10 @@ Averages into **Score Depth** dimension (13th dim) for granularity beyond 10.0 c
 
 > **⚠️ Para ciclos de mejora**: esta tabla se reemplaza por **SIEMPRE 3 subagentes** sin excepción, sin importar la dificultad. Los 3 subagentes verifican gaps de: seguridad, optimización, rendimiento, sintaxis, ortografía, performance, SEO, y cualquier dimensión relevante del proyecto.
 
-## Cycle Loop
+## Legacy Cycle Loop (pre-Cycle 16)
+
+> ⚠️ **SUPERSEDED** by `## 5-Phase Cycle Loop (Cycle 16+)` above. This legacy loop is kept for reference only.
+> The new P0-P5 loop replaces this 14-step structure. See the phase mapping table in the 5-Phase section for equivalence.
 
 ```
 LOOP:

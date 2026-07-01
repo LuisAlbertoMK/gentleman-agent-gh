@@ -1,4 +1,4 @@
-#requires -Version 7.6
+﻿#requires -Version 7.6
 <# .SYNOPSIS Verify SDD intake — validates project structure and skill scaffolding against intake.json #>
 param([string]$p,[ValidateRange(1,5)][int]$i=1,[string]$t="auto",[bool]$m=$true,[ValidateSet("text","json")][string]$f="text")
 $ErrorActionPreference='Stop';Set-StrictMode -Version Latest;$t0=Get-Date;$rr=@();$chk=[char]0x2705;$crs=[char]0x274C;$wrn=[char]0x26A0
