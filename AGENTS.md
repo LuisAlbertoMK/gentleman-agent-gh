@@ -58,6 +58,11 @@ Thresholds en skill `triple-verify`. Modos: Normal (zona) · `!ship`=triple+qual
 | `!ponytail` | Set intensity level: `!ponytail [lite\|full\|ultra\|off]` |
 | `!manifest` | Lee CYCLE.md, reporta ciclo actual + score, verifica shortcuts |
 | `!5fases`/`!extimprove` | Carga `external-improvement` — 5-phase cycle, 3+ sub/fase |
+| `!setup` | `scripts/setup-machine.ps1` — bootstrap portability on new machine |
+| `!dev` | `scripts/dev-server.ps1` — manage background dev servers (start/status/logs/kill) |
+
+> **Portability**: On a new machine, run `!setup` or `.\scripts\setup-machine.ps1` after cloning.  
+> **Dev servers**: Use `!dev start frontend -- npm run dev` to start, `!dev logs frontend` to see output.
 
 ## Subagent-First
 Read-heavy (>3 files) → delegate `explore`. Main context = synthesis/decisions. Saves 2-5K tokens.
@@ -74,6 +79,7 @@ Global packages: rich, requests, httpx, beautifulsoup4, lxml, pandas, numpy, Pil
 ## Global Script Invocation
 Two-step: `. "$env:USERPROFILE\.config\opencode\scripts\bash-safe.ps1"` then `& "$env:GENTLEMAN_AGENT_ROOT\scripts\xxx.ps1" -args`.
 One-liner: `. "$env:USERPROFILE\.config\opencode\scripts\bash-safe.ps1"; & "$env:GENTLEMAN_AGENT_ROOT\scripts\xxx.ps1" -args`
+> **Portability**: `$env:GENTLEMAN_AGENT_ROOT` is auto-set by `scripts/setup-machine.ps1`. On a new machine, clone the repo and run setup-machine.ps1 first.
 
 ## Bash-Safe (PowerShell 5.1)
 PS 5.1 rejects `&&`, `||`. WSL bash stub broken. **Use `Invoke-Bash`** wrapper (auto-discovered by bash-safe.ps1). **Forbidden**: raw bash calls. Pre-flight check: scan for `&&`/`||` → use `Invoke-Bash` or `; if ($?) { }`.
@@ -105,6 +111,21 @@ Top 15: karpathy-loop · lean-context · quality-gate · auto-metrics · session
 **Primary**: `skill-graph.ps1 -Task "<task>" -Format Json` — resolves 4-8 relevant skills (−85-92%).
 **Fallback**: Resume→session-resume · Write code→skill-creator, sdd-*, quality-gate, go-testing · Fix bug→recovery-protocol, immune-system, sdd-verify · Design→senior-engineer, sdd-propose/design, cognitive-doc-design · Learn→research, prompt-engineering, python-async · Review→quality-gate→JD/4R, judgment-day, triple-verify, code-review-agent · UI→baseline-ui, web-quality-audit, performance, a11y, best-practices, seo · System→development-mode, execution-mode, skill-graph, model-router · Measure→metricas, auto-metrics, performance-tracker · Audit→external-auditor, gap-analysis · Optimize→karpathy-loop, lean-context, skill-improver, refactoring-planner · Coordinate→delivery-harness, subagent-isolation, command-wrapper, gentle-ai-chained-pr, gentle-ai-branch-pr · Commit→commit-crafter · Map→project-mapper · Secure→security-scanner · Sync→doc-sync · Log→bitacora · Track→dreaming, skill-digestion · Issue→gentle-ai-issue-creation · Improve internal→self-improvement · Improve external→external-improvement · Setup→sdd-init, ci-cd, project-mapper · Recover→recovery-protocol, immune-system, context-watchdog · Unknown→skill-creator, research, recovery-protocol
 Load order: 1) ANTI-PATTERN-CATALOG 2) Behavioral match 3) Trigger match 4) Default-FAIL 5) Mini-dream every 5th
+
+### Dev Server Pattern (instead of blocking on long-lived processes)
+When running a dev server / watcher / long-lived process, DO NOT wait for it to complete:
+1. Use `scripts/dev-server.ps1 -Action Start -Name <name> -Command <cmd> -Arguments <args>`
+2. Confirm with `scripts/dev-server.ps1 -Action Status -Name <name>`
+3. Read output with `scripts/dev-server.ps1 -Action Logs -Name <name> -Tail <N>`
+4. Kill with `scripts/dev-server.ps1 -Action Kill -Name <name>`
+Or use the `!dev` shortcut: `!dev start frontend -- npm run dev`
+
+### Portability (new machine setup)
+When setting up on a new machine: `scripts/setup-machine.ps1` (or `!setup` shortcut). This sets:
+- `$env:GENTLEMAN_AGENT_ROOT` → repo root
+- Global shortcuts (opencode-vmk, gentleman-vmk)
+- OpenCode env vars (cache, config, db paths)
+- Skill junctions in global config
 
 ## Contextual Skill Loading (MANDATORY)
 `<available_skills>` is authoritative. Self-check BEFORE every response: match by file context + task context.

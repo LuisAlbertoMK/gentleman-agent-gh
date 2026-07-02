@@ -216,6 +216,14 @@
       "enabled": true,
       "type": "local",
       "command": ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "headroom": {
+      "enabled": true,
+      "type": "local",
+      "command": ["headroom", "mcp", "serve"],
+      "environment": {
+        "HEADROOM_PROXY_URL": "http://127.0.0.1:8787"
+      }
     }
   },
   "permission": {
