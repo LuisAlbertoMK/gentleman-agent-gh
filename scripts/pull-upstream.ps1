@@ -19,9 +19,9 @@ if([string]::IsNullOrEmpty($up)){$uf=@(git ls-tree -r --name-only $rem | Where-O
 else{$uf=@(git ls-tree -r --name-only $rem -- "$up" | ForEach-Object {if(-not[string]::IsNullOrEmpty($lo)-and$lo-ne$up){$_.Replace($up,$lo)}else{$_}});$lf=@(git ls-tree -r --name-only $loc -- "$lo" | ForEach-Object {$_})}
 $us=@($uf | Sort-Object -Unique);$ls=@($lf | Sort-Object -Unique)
 $n=@($us | Where-Object {$_ -notin $ls});$c=@($us | Where-Object {$_ -in $ls});$o=@($ls | Where-Object {$_ -notin $us})
-if($l-eq'Root files'){$n=$n | Where-Object {$_ -notmatch '\.md$|LICENSE'}}
+if($l-eq'Root files'){$n=$n | Where-Object {$_ -notmatch '\.md$|LICENSE'}}elseif($l-eq'Scripts'){$n=$n | Where-Object {$_ -notmatch 'install\.(ps1|sh)$'}}
 $mod=@()
-if($l-ne'Root files'){$uh=@{};if([string]::IsNullOrEmpty($up)){git ls-tree $rem | ForEach-Object {$p=$_-split'\s+';$uh[$p[3]]=$p[2]}}else{git ls-tree -r $rem -- "$up" | ForEach-Object {$p=$_-split'\s+';$fp=$p[3];if(-not[string]::IsNullOrEmpty($lo)-and$lo-ne$up){$fp=$fp.Replace($up,$lo)};$uh[$fp]=$p[2]}};$lh=@{};if([string]::IsNullOrEmpty($lo)){git ls-tree $loc | ForEach-Object {$p=$_-split'\s+';$lh[$p[3]]=$p[2]}}else{git ls-tree -r $loc -- "$lo" | ForEach-Object {$p=$_-split'\s+';$lh[$p[3]]=$p[2]}};$c | ForEach-Object {if($uh[$_]-and$lh[$_]-and$uh[$_]-ne$lh[$_]){$mod+=$_}}}
+if($l-ne'Root files'){$uh=@{};if([string]::IsNullOrEmpty($up)){git ls-tree $rem | ForEach-Object {$p=$_-split'\s+';$uh[$p[3]]=$p[2]}}else{git ls-tree -r $rem -- "$up" | ForEach-Object {$p=$_-split'\s+';$fp=$p[3];if(-not[string]::IsNullOrEmpty($lo)-and$lo-ne$up){$fp=$fp.Replace($up,$lo)};$uh[$fp]=$p[2]}};$lh=@{};if([string]::IsNullOrEmpty($lo)){git ls-tree $loc | ForEach-Object {$p=$_-split'\s+';$lh[$p[3]]=$p[2]}}else{git ls-tree -r $loc -- "$lo" | ForEach-Object {$p=$_-split'\s+';$lh[$p[3]]=$p[2]}};$c | ForEach-Object {if($uh[$_]-and$lh[$_]-and$uh[$_]-ne$lh[$_]){$mod+=$_}};if($l-eq'Scripts'){$mod=$mod | Where-Object {$_ -notmatch 'install\.(ps1|sh)$'}}}
 Write-Host "--- $l ---"
 if($n.Count){Write-Host "NEW $($n.Count)";$n | ForEach-Object {Write-Host "  + $_"}}
 if($mod.Count){Write-Host "MOD $($mod.Count)";$mod | ForEach-Object {Write-Host "  ~ $_"}}

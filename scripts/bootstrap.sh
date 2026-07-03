@@ -155,7 +155,11 @@ cd "$INSTALL_DIR"
 case "$OS" in
     linux|macos)
         chmod +x scripts/install.sh
-        ./scripts/install.sh
+        if [ ! -t 0 ]; then
+            ./scripts/install.sh --yes
+        else
+            ./scripts/install.sh
+        fi
         ;;
     windows)
         if command -v powershell &>/dev/null; then
