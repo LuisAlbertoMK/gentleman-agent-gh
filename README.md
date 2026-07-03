@@ -1,11 +1,11 @@
 # Gentleman Agent — OpenCode AI Agent Skills & Scripts
 
-Suite de **67 skills** (+ `_shared`) + **45 scripts PowerShell** para [OpenCode](https://github.com/sst/opencode). Diseñadas para desarrollo de software con arquitectura limpia, TDD, y verificación multi-capa.
+Suite de **68 skills** (+ `_shared`) + **48 scripts PowerShell** para [OpenCode](https://github.com/sst/opencode). Diseñadas para desarrollo de software con arquitectura limpia, TDD, y verificación multi-capa.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
 > **Score**: 10/10 (13 dimensiones)
-> **Skills**: 67 (+ `_shared` = 68 SKILL.md)
-> **Cycle**: 12 completado (infrastructure hardening)
+> **Skills**: 68 (+ `_shared` = 69 SKILL.md)
+> **Cycle**: 17 completado (portability, dev-server, Headroom MCP)
 
 ---
 
@@ -16,10 +16,10 @@ Suite de **67 skills** (+ `_shared`) + **45 scripts PowerShell** para [OpenCode]
 
 | Agent | Model | Specialty |
 |-------|-------|-----------|
-| `gentleman-deep` | Claude Sonnet | Architecture, design, complex code |
-| `gentleman-codex` | GPT-4o | Code generation, boilerplate |
-| `gentleman-quick` | Haiku | Fast tasks, review, simple edits |
-| `sdd-orchestrator` | Claude Sonnet | SDD pipeline orchestration |
+| `gentleman-deep` | nemotron-3-ultra-free | Architecture, design, complex code |
+| `gentleman-codex` | deepseek-v4-flash-free | Code generation, boilerplate |
+| `gentleman-quick` | mimo-v2.5-free | Fast tasks, review, simple edits |
+| `sdd-orchestrator` | claude-sonnet-4-6 | SDD pipeline orchestration |
 
 ### Self-Improvement Cycle
 El proyecto ejecuta ciclos de mejora continua (CYCLE.md):
@@ -108,11 +108,11 @@ El proyecto usa dos MCPs para memoria cross-session:
 | **Testing** | skill-testing |
 | **Others** | recovery-protocol, context-watchdog, performance-tracker, metricas, issue-creation, development-mode, execution-mode |
 
-**Total: 67 skills + `_shared`** — todas con SKILL.md, frontmatter YAML, versionado, cambio previo y licencia Apache-2.0.
+**Total: 68 skills + `_shared`** — todas con SKILL.md, frontmatter YAML, versionado, cambio previo y licencia Apache-2.0.
 
 ---
 
-## Scripts (45 en scripts/)
+## Scripts (48 en scripts/)
 
 | Script | Propósito |
 |--------|-----------|
@@ -145,12 +145,12 @@ El proyecto usa dos MCPs para memoria cross-session:
 
 ```
 gentleman-agent-gh/
-├── .agents/skills/          # 67 skills + _shared (canonical, git-tracked)
+├── .agents/skills/          # 68 skills + _shared (canonical, git-tracked)
 │   ├── quality-gate/
 │   ├── code-review-agent/
 │   └── .../
 ├── skills/                  # Junctions workspace (git-ignored)
-├── scripts/                 # 45 PowerShell scripts
+├── scripts/                 # 48 PowerShell scripts
 │   └── smoke/               # Smoke tests
 ├── docs/                    # Documentation
 │   ├── metricas/            # Session metrics

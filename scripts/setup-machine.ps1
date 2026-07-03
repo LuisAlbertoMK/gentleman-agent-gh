@@ -77,7 +77,7 @@ foreach ($kv in $ocVars.GetEnumerator()) {
     $current = [Environment]::GetEnvironmentVariable($kv.Key, "User")
     if ($current -ne $kv.Value) {
         [Environment]::SetEnvironmentVariable($kv.Key, $kv.Value, "User")
-        $env:$($kv.Key) = $kv.Value
+        Set-Item -Path "env:$($kv.Key)" -Value $kv.Value
         ok "$($kv.Key) set"
     } else {
         skip "$($kv.Key) already set"

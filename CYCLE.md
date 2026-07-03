@@ -628,10 +628,11 @@ Cycle 13 (Score Recovery & Pipeline Integrity) 2026-06-30. ✅ CLOSED (7/7, inte
 Cycle 14 (Score Perfection & Debt Cleanup) 2026-06-30. ✅ CLOSED (5/5, inter 0/30, score 10/10)
 Cycle 15 (Bias Calibration Loop) 2026-06-30. ✅ CLOSED (4/4, inter 1/30, score 10/10)
 Cycle 16 (External Improvement Protocol) 2026-06-30. ✅ CLOSED (5/5, inter 3/30, score 10/10)
+Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅ CLOSED (8/8, inter 2/30, score 10/10)
 
 ---
 
-### Cycle 17: Portability, Background Processes & External Research 🔄
+### Cycle 17: Portability, Background Processes & External Research ✅ CLOSED
 
 **Objetivo**: Cerrar 5 brechas identificadas: portabilidad multi-máquina, manejo de procesos background, integración de herramientas de style clone, exploración de MCPs útiles, y optimización de tokens.
 
@@ -645,14 +646,14 @@ Cycle 16 (External Improvement Protocol) 2026-06-30. ✅ CLOSED (5/5, inter 3/30
 ### Backlog
 | # | Item | Impact | Risk | I/R | Est. inter | Status | Done criteria |
 |---|------|--------|------|-----|------------|--------|---------------|
-| 1 | Crear `scripts/setup-machine.ps1` — bootstrap portabilidad (env vars, shortcuts, skills) | High | Low | 3.0 | 1 | 🟢 | Script existe, configura GENTLEMAN_AGENT_ROOT + shortcuts + env vars |
-| 2 | Crear `scripts/dev-server.ps1` — background process manager | High | Low | 3.0 | 1 | 🟢 | Start/Status/Logs/Kill/List/Cleanup funcionan con .NET Process async IO |
-| 3 | Investigar web style clone + documentar en `docs/research/web-style-clone.md` | Medium | Low | 2.0 | 1 | 🟢 | Doc con herramientas priorizadas (designmaxxing, designlang) |
-| 4 | Investigar MCPs útiles + documentar en `docs/research/mcp-servers-analysis.md` | Medium | Low | 2.0 | 1 | 🟢 | Doc con ranking P1-P6, budget math, security notes |
-| 5 | Investigar token efficiency + documentar en `docs/research/token-efficiency.md` | Medium | Low | 2.0 | 1 | 🟢 | Doc con priority stack (RTK, Headroom, caching, etc.) |
-| 6 | Actualizar AGENTS.md con dev-server + portabilidad instructions | Medium | Low | 2.0 | 1 | 🟢 | AGENTS.md refs a dev-server.ps1 y setup-machine.ps1 |
-| 7 | 3 subagentes de verificación por cada workstream (15 total) | High | Low | 3.0 | 3-5 | 🔴 | 3 subagentes ejecutados y aprobados por workstream |
-| 8 | Re-score + reporte ciclo + commit | Medium | Low | 2.0 | 1 | 🔴 | `.project.json` actualizado, `docs/ciclos/cycle17-*.md`, commit |
+| 1 | Crear `scripts/setup-machine.ps1` — bootstrap portabilidad (env vars, shortcuts, skills) | High | Low | 3.0 | 1 | ✅ | Script existe, configura GENTLEMAN_AGENT_ROOT + shortcuts + env vars |
+| 2 | Crear `scripts/dev-server.ps1` — background process manager | High | Low | 3.0 | 1 | ✅ | Start/Status/Logs/Kill/List/Cleanup funcionan con .NET Process async IO |
+| 3 | Investigar web style clone + documentar en `docs/research/web-style-clone.md` | Medium | Low | 2.0 | 1 | ✅ | Doc con herramientas priorizadas (designmaxxing, designlang) |
+| 4 | Investigar MCPs útiles + documentar en `docs/research/mcp-servers-analysis.md` | Medium | Low | 2.0 | 1 | ✅ | Doc con ranking P1-P6, budget math, security notes |
+| 5 | Investigar token efficiency + documentar en `docs/research/token-efficiency.md` | Medium | Low | 2.0 | 1 | ✅ | Doc con priority stack (RTK, Headroom, caching, etc.) |
+| 6 | Actualizar AGENTS.md con dev-server + portabilidad instructions | Medium | Low | 2.0 | 1 | ✅ | AGENTS.md refs a dev-server.ps1 y setup-machine.ps1 |
+| 7 | 3 subagentes de verificación por cada workstream (15 total) | High | Low | 3.0 | 3-5 | ✅ | 3 subagentes ejecutados y aprobados por workstream |
+| 8 | Re-score + reporte ciclo + commit | Medium | Low | 2.0 | 1 | ✅ | `.project.json` actualizado, `docs/ciclos/cycle17-*.md`, commit 77afc64 |
 
 ### Cycle 17 Progress
 - Score: **10/10** (mantenido)
@@ -665,7 +666,19 @@ Cycle 16 (External Improvement Protocol) 2026-06-30. ✅ CLOSED (5/5, inter 3/30
   - Web clone: ❌ FAIL (pkg name) → 🔧 FIXED → ✅ RE-PASS
   - MCP analysis: ❌ FAIL (tool counts) → 🔧 FIXED → ✅ RE-PASS
   - Token efficiency: ❌ FAIL (Windows install) → 🔧 FIXED → ✅ RE-PASS
-- Item 8: ⏳ Pending (re-score + commit)
+- Item 8: ✅ Closed (commit 77afc64)
+
+### Cycle 17 Close
+- Score: **10/10** 🏆 — mantenido durante todo el ciclo
+- inter: 2/30 (ciclo exprés — 5 workstreams)
+- Backlog: 8/8 items complete ✅ (100%)
+- Key wins:
+  - **Portability**: `setup-machine.ps1` — bootstrap de env vars, global shortcuts, skill junctions
+  - **Background processes**: `dev-server.ps1` — Start/Status/Logs/Kill con .NET Process async IO
+  - **Research**: 3 docs (web-style-clone, mcp-servers-analysis, token-efficiency)
+  - **Headroom MCP**: v0.28.0 instalado y configurado (compress/retrieve/stats)
+  - **15 subagentes**: 5 workstreams × 3 — todos PASS después de fixes
+- Carried forward: Aplicar Headroom proxy transparente (opcional), iniciar Cycle 18
 
 ---
 

@@ -6,6 +6,8 @@
 $ErrorActionPreference='Stop';Set-StrictMode -Version Latest;$rr=Resolve-Path "$PSScriptRoot/.."
 trap{try{Pop-Location}catch{};exit 1};Push-Location $rr
 function Test-GitRemote([string]$N){(git remote) -contains $N}
+# ponytail: files we customize locally — upstream must NOT overwrite
+$excludeList = @('install.ps1','install.sh','README.md','PROJECT-SCORE.md','docs/operations/project-score.md','.env.example')
 $pm=@{u='skills/';p='.agents/skills/';n='Skills'},@{u='scripts/';p='scripts/';n='Scripts'},@{u='';p='';n='Root files'}
 if(-not(Test-GitRemote $Remote)){Write-Warning "Remote '$Remote' not found";Pop-Location;exit 1}
 Write-Host "Fetch $Remote/$Branch...";$e=$ErrorActionPreference;$ErrorActionPreference='Continue';git fetch $Remote $Branch 2>&1 | Out-Null;$ErrorActionPreference=$e
@@ -19,9 +21,9 @@ if([string]::IsNullOrEmpty($up)){$uf=@(git ls-tree -r --name-only $rem | Where-O
 else{$uf=@(git ls-tree -r --name-only $rem -- "$up" | ForEach-Object {if(-not[string]::IsNullOrEmpty($lo)-and$lo-ne$up){$_.Replace($up,$lo)}else{$_}});$lf=@(git ls-tree -r --name-only $loc -- "$lo" | ForEach-Object {$_})}
 $us=@($uf | Sort-Object -Unique);$ls=@($lf | Sort-Object -Unique)
 $n=@($us | Where-Object {$_ -notin $ls});$c=@($us | Where-Object {$_ -in $ls});$o=@($ls | Where-Object {$_ -notin $us})
-if($l-eq'Root files'){$n=$n | Where-Object {$_ -notmatch '\.md$|LICENSE'}}elseif($l-eq'Scripts'){$n=$n | Where-Object {$_ -notmatch 'install\.(ps1|sh)$'}}
+$n=$n | Where-Object {$_ -notin $excludeList};if($l-eq'Root files'){$n=$n | Where-Object {$_ -notmatch '\.md$|LICENSE'}}
 $mod=@()
-if($l-ne'Root files'){$uh=@{};if([string]::IsNullOrEmpty($up)){git ls-tree $rem | ForEach-Object {$p=$_-split'\s+';$uh[$p[3]]=$p[2]}}else{git ls-tree -r $rem -- "$up" | ForEach-Object {$p=$_-split'\s+';$fp=$p[3];if(-not[string]::IsNullOrEmpty($lo)-and$lo-ne$up){$fp=$fp.Replace($up,$lo)};$uh[$fp]=$p[2]}};$lh=@{};if([string]::IsNullOrEmpty($lo)){git ls-tree $loc | ForEach-Object {$p=$_-split'\s+';$lh[$p[3]]=$p[2]}}else{git ls-tree -r $loc -- "$lo" | ForEach-Object {$p=$_-split'\s+';$lh[$p[3]]=$p[2]}};$c | ForEach-Object {if($uh[$_]-and$lh[$_]-and$uh[$_]-ne$lh[$_]){$mod+=$_}};if($l-eq'Scripts'){$mod=$mod | Where-Object {$_ -notmatch 'install\.(ps1|sh)$'}}}
+if($l-ne'Root files'){$uh=@{};if([string]::IsNullOrEmpty($up)){git ls-tree $rem | ForEach-Object {$p=$_-split'\s+';$uh[$p[3]]=$p[2]}}else{git ls-tree -r $rem -- "$up" | ForEach-Object {$p=$_-split'\s+';$fp=$p[3];if(-not[string]::IsNullOrEmpty($lo)-and$lo-ne$up){$fp=$fp.Replace($up,$lo)};$uh[$fp]=$p[2]}};$lh=@{};if([string]::IsNullOrEmpty($lo)){git ls-tree $loc | ForEach-Object {$p=$_-split'\s+';$lh[$p[3]]=$p[2]}}else{git ls-tree -r $loc -- "$lo" | ForEach-Object {$p=$_-split'\s+';$lh[$p[3]]=$p[2]}};$c | ForEach-Object {if($uh[$_]-and$lh[$_]-and$uh[$_]-ne$lh[$_]){$mod+=$_}};$mod=$mod | Where-Object {$_ -notin $excludeList}}
 Write-Host "--- $l ---"
 if($n.Count){Write-Host "NEW $($n.Count)";$n | ForEach-Object {Write-Host "  + $_"}}
 if($mod.Count){Write-Host "MOD $($mod.Count)";$mod | ForEach-Object {Write-Host "  ~ $_"}}
@@ -43,10 +45,11 @@ if($LASTEXITCODE -eq 0){if($up-ne$f){if(Test-Path $up){Move-Item -Path $up -Dest
 Write-Host "$app applied, $fail failed"
 if($app){Write-Host "Staged. git status then commit"}}
 if($Mode-eq'Apply-File'){
-if([string]::IsNullOrEmpty($TargetFile)){Write-Warning "Usage: -TargetFile path";Pop-Location;exit 1}
-$up=$TargetFile
-foreach($m in $pm){if(-not[string]::IsNullOrEmpty($m.p)-and$TargetFile.StartsWith($m.p)){$up=$TargetFile.Replace($m.p,$m.u);break}}
-Write-Host "Checkout '$up' from $Remote/$Branch..."
-git checkout "$Remote/$Branch" -- "$up" 2>&1
-if($LASTEXITCODE -eq 0){if($up-ne$TargetFile){$pd=Split-Path $TargetFile -Parent;if(-not[string]::IsNullOrEmpty($pd)-and-not(Test-Path $pd)){New-Item -ItemType Directory -Path $pd -Force | Out-Null};Move-Item -Path $up -Destination $TargetFile -Force};Write-Host "Done. git diff --cached $TargetFile"}else{Write-Warning "Failed $up"}}
-Pop-Location;exit 0
+	if([string]::IsNullOrEmpty($TargetFile)){Write-Warning "Usage: -TargetFile path";Pop-Location;exit 1}
+	$fn=(Split-Path $TargetFile -Leaf);if($fn -in $excludeList -or $TargetFile -in $excludeList){Write-Warning "SKIP '$TargetFile' — excluded (local customization)";Pop-Location;exit 0}
+	$up=$TargetFile
+	foreach($m in $pm){if(-not[string]::IsNullOrEmpty($m.p)-and$TargetFile.StartsWith($m.p)){$up=$TargetFile.Replace($m.p,$m.u);break}}
+	Write-Host "Checkout '$up' from $Remote/$Branch..."
+	git checkout "$Remote/$Branch" -- "$up" 2>&1
+	if($LASTEXITCODE -eq 0){if($up-ne$TargetFile){$pd=Split-Path $TargetFile -Parent;if(-not[string]::IsNullOrEmpty($pd)-and-not(Test-Path $pd)){New-Item -ItemType Directory -Path $pd -Force | Out-Null};Move-Item -Path $up -Destination $TargetFile -Force};Write-Host "Done. git diff --cached $TargetFile"}else{Write-Warning "Failed $up"}}
+	Pop-Location;exit 0
