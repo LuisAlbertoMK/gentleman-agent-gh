@@ -7,8 +7,9 @@ metadata:
   tags:
     - engineering
   author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.0->1.1 (Karpathy compress: 2618->1700B)"
+  version: "1.2"
+  changelog: "1.2: declared dependency on metricas"
+  dependencies: [metricas]
 ---
 
 ## Pre-flight assessment

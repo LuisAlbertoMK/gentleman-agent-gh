@@ -7,7 +7,9 @@ metadata:
   tags:
     - engineering
   author: gentleman-vMK
-  version: "1.1"
+  version: "1.2"
+  changelog: "1.2: declared dependency on quality-gate"
+  dependencies: [quality-gate]
 ---
 
 Trigger: CI setup, failed PR checks, pipeline config.

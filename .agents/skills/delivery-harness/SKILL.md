@@ -8,7 +8,9 @@ metadata:
     - engineering
     - coordination
   author: gentleman-vMK
-  version: "1.0"
+  version: "1.1"
+  changelog: "1.1: declared dependency on subagent-isolation"
+  dependencies: [subagent-isolation]
 ---
 
 Trigger: Multi-step tasks, parallel subagent work, complex deliverables.

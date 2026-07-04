@@ -23,6 +23,37 @@ jobs:
         if: runner.os == 'Linux'
         run: ./scripts/install.sh --yes --skip-env-var --skip-shortcuts
 
+      - name: Cross-platform — shellcheck bash scripts (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          if command -v shellcheck &>/dev/null; then
+            shellcheck scripts/*.sh
+          else
+            # fallback: bash -n syntax check
+            for f in scripts/*.sh; do
+              bash -n "$f" && echo "OK: $f" || exit 1
+            done
+          fi
+
+      - name: Cross-platform — PS7 syntax check .ps1 on Linux
+        if: runner.os == 'Linux'
+        run: |
+          $fail = 0
+          Get-ChildItem -Recurse -Filter *.ps1 | Where-Object {
+            $_.FullName -notmatch 'experiments|node_modules|metricas\\assets'
+          } | ForEach-Object {
+            try {
+              $null = [System.Management.Automation.Language.Parser]::ParseFile(
+                $_.FullName, [ref]$null, [ref]$null
+              )
+              Write-Output "OK: $($_.Name)"
+            } catch {
+              Write-Warning "Syntax error: $($_.Name) — $($_.Exception.Message)"
+              $fail++
+            }
+          }
+          if ($fail) { exit 1 }
+
       - name: Cross-ref validation — skills, index, references
         run: ./scripts/cross-ref-check.ps1
 

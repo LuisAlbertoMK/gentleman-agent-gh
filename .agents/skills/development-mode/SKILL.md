@@ -6,8 +6,11 @@ license: Apache-2.0
 metadata:
   tags: [tools]
   author: gentleman-vMK
-  version: "1.2"
-  changelog: "1.2: karpathy compress"
+  version: "1.3"
+  changelog: "1.3: parametrized script paths via GENTLEMAN_AGENT_ROOT"
+  dependencies: []
+  env:
+    GENTLEMAN_AGENT_ROOT: "Repo root — all script paths are relative to this"
 ---
 ## Complementary: opencode-skillful (-30-50%) · opencode-dcp (-50-70%) · context-mode (-98%) · opencode-lazy-loader
 ## Activate (on user approval)
@@ -26,13 +29,13 @@ Multi-read: `Get-ChildItem "*.log" -Recurse | ForEach-Object -Parallel { [System
 `Get-Process "opencode*" | ForEach-Object { $_.PriorityClass = [System.Diagnostics.ProcessPriorityClass]::Normal }`
 `powercfg /SETACTIVE "381b4222-f694-41f0-9685-ff5bb260df2e"`
 ## Verify: `Get-Process "opencode*" | Select-Object Name, PriorityClass, @{N='MB';E={[math]::Round($_.WorkingSet64/1MB,1)}}`
-## Notes: Reversible · Safe · Activate before large files · `scripts/optimize-system.ps1` once per machine
+## Notes: Reversible · Safe · Activate before large files · `"$env:GENTLEMAN_AGENT_ROOT/scripts/optimize-system.ps1"` once per machine
 ## WHEN TO ACTIVATE
 - Opening files >10MB → always
 - Running multiple concurrent tasks → recommend
 - Batch operations (git blame, grep across 100+ files) → helpful
 - Normal editing (<1MB files) → no benefit
 ## PREREQUISITES
-- Run `scripts/optimize-system.ps1` once per machine (sets up registry keys)
+- Run `"$env:GENTLEMAN_AGENT_ROOT/scripts/optimize-system.ps1"` once per machine (sets up registry keys)
 - Admin rights needed for power plan change (silent fail if unavailable)
 - GPU priority only affects DirectX apps
