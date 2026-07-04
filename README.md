@@ -1,11 +1,11 @@
 # Gentleman Agent — OpenCode AI Agent Skills & Scripts
 
-Suite de **68 skills** (+ `_shared`) + **48 scripts PowerShell** para [OpenCode](https://github.com/sst/opencode). Diseñadas para desarrollo de software con arquitectura limpia, TDD, y verificación multi-capa.
+Suite de **68 skills** (+ `_shared`) + **56 scripts PowerShell** para [OpenCode](https://github.com/sst/opencode). Diseñadas para desarrollo de software con arquitectura limpia, TDD, y verificación multi-capa.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
-> **Score**: 10/10 (13 dimensiones)
+> **Score**: 9.3/10 (13 dimensiones)
 > **Skills**: 68 (+ `_shared` = 69 SKILL.md)
-> **Cycle**: 17 completado (portability, dev-server, Headroom MCP)
+> **Cycle**: 18 completado (Stabilization & Regression Lock)
 
 ---
 
@@ -112,7 +112,7 @@ El proyecto usa dos MCPs para memoria cross-session:
 
 ---
 
-## Scripts (48 en scripts/)
+## Scripts (56 en scripts/)
 
 | Script | Propósito |
 |--------|-----------|
@@ -150,7 +150,7 @@ gentleman-agent-gh/
 │   ├── code-review-agent/
 │   └── .../
 ├── skills/                  # Junctions workspace (git-ignored)
-├── scripts/                 # 48 PowerShell scripts
+├── scripts/                 # 56 PowerShell scripts
 │   └── smoke/               # Smoke tests
 ├── docs/                    # Documentation
 │   ├── metricas/            # Session metrics
