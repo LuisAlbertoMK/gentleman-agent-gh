@@ -199,7 +199,7 @@
     "context7": {
       "enabled": true,
       "type": "local",
-      "command": ["npx", "-y", "@upstash/context7-mcp"],
+      "command": ["npx", "-y", "@upstash/context7-mcp@3.2.2"],
       "environment": {
         "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
       }
@@ -215,7 +215,7 @@
     "sequential-thinking": {
       "enabled": true,
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking"]
+      "command": ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking@2025.12.18"]
     },
     "headroom": {
       "enabled": true,

@@ -13,7 +13,6 @@
 .PARAMETER Runs
   Cantidad de runs (1-10, default: 3).
 #>
-#requires -Version 7.6
 
 param(
   [string]$Path = "",

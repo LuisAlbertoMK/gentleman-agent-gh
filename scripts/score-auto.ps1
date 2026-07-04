@@ -6,7 +6,6 @@
   Scores correctness, tokens, error prevention, skill, speed, breadth, and skill_eval.
   Outputs JSON with -Json, quiet mode with -Quiet.
 #>
-#requires -Version 7.6
 param([switch]$Json,[switch]$Quiet)
 Set-Location "$PSScriptRoot\.."
 & "$PSScriptRoot\restore-project-score.ps1" -Quiet 2>&1 | Out-Null
@@ -20,7 +19,7 @@ a "PA" ($m::Max(0,$as)) @{skills=$c;cross_ref=$x;readme=$h1;changelog=$h2;projec
 $s1=10;$wc=$false;$sf=$false
 $wk=@(Select-String -Path ".\scripts\*.ps1" -Pattern "MD5|SHA1\b").PSWhere({$_.Line -notmatch "SHA1ToSHA256|SHA256|#deprecat|#legacy|SHA1SHA256|Select-String.*MD5"})
 if($wk){$wc=$true;$s1-=2}
-$sk=Select-String -Path ".\.agents\skills\*\SKILL.md" -Pattern "(?i)(api[_-]?key|secret|password|token|credential)\s*[=:]\s*['""][^'""]{8,}"
+$sk=@(Select-String -Path ".\.agents\skills\*\SKILL.md", ".\scripts\*.ps1", ".\.github\workflows\*.yml", ".\opencode.json" -Pattern "(?i)(api[_-]?key|secret|password|token|credential)\s*[=:]\s*['""][^'""]{8,}")
 if($sk){$sf=$true;$s1-=3}
 if(Test-Path "docs/metricas/errors/LATEST_error.json"){$p1=Get-Content "docs/metricas/errors/LATEST_error.json" -Raw | ConvertFrom-Json;if($p1.source -ne "quality-gate" -or $p1.passed -lt 5){$s1-=1}}else{$po=& ".\scripts\pssa-gate.ps1" -Mode Check 2>&1;if($LASTEXITCODE -ne 0 -or $po -match "FAIL|violation|security"){$s1-=1}}
 a "Sec" ($m::Max(0,$m::Min(10,$s1))) @{weak_crypto=$wc;secrets=$sf} "Weak crypto: $wc, secrets: $sf"
@@ -50,8 +49,13 @@ $ak=$m::Round(($sc | Measure-Object -Average Length).Average/1KB,1);$o5=$sc.PSWh
 $pf=10;if($ts -lt 15 -or $ts -gt 50){$pf-=1};if($ak -gt 15){$pf-=1}elseif($ak -gt 20){$pf-=2};if($o5 -gt 0){$pf-=2}
 a "SP" ($m::Max(0,$m::Min(10,$pf))) @{sc=$ts;avg=$ak;huge=$o5} "S:$ts avg:${ak}KB"
 $s4=(Get-ChildItem ".\.agents\skills\*\SKILL.md").PSWhere({$_.Directory.Name -ne '_shared'});$tt=$s4.Count;$o3=$s4.PSWhere({$_.Length -gt 3072}).Count;$o6=$s4.PSWhere({$_.Length -gt 5120}).Count;$tb=($s4 | Measure-Object -Sum Length).Sum;$ak2=$m::Round($tb/$tt/1KB,1)
-$ef=10;if($o6 -gt 0){$ef-=2}elseif($o3 -gt 3){$ef-=2}elseif($o3 -gt 1){$ef-=1};if($ak2 -le 2.5){$ef=$m::Min(10,$ef+0.5)};if($tt -lt 60){$ef-=2}
-a "SE" ($m::Round($m::Max(0,$m::Min(10,$ef)),1)) @{total=$tt;o3=$o3;o5=$o6;avg=$ak2;bytes=$tb} "T:$tt >3:$o3 >5:$o6 avg:${ak2}KB"
+# Extend overweight check to commands/ + prompts/ (H-019)
+$cmdFiles=Get-ChildItem "commands\*.md" -EA SilentlyContinue;$promptFiles=Get-ChildItem "prompts" -Recurse -File -EA SilentlyContinue
+$cmdOver3=$cmdFiles.PSWhere({$_.Length -gt 3072}).Count;$cmdOver5=$cmdFiles.PSWhere({$_.Length -gt 5120}).Count
+$prOver3=$promptFiles.PSWhere({$_.Length -gt 3072}).Count;$prOver5=$promptFiles.PSWhere({$_.Length -gt 5120}).Count
+$owPenalty=0;if($cmdOver5 -gt 0-or$prOver5 -gt 0){$owPenalty=2}elseif($cmdOver3 -gt 2-or$prOver3 -gt 1){$owPenalty=1}
+$ef=10;if($o6 -gt 0){$ef-=2}elseif($o3 -gt 3){$ef-=2}elseif($o3 -gt 1){$ef-=1};$ef-=$owPenalty;if($ak2 -le 2.5){$ef=$m::Min(10,$ef+0.5)};if($tt -lt 60){$ef-=2}
+a "SE" ($m::Round($m::Max(0,$m::Min(10,$ef)),1)) @{total=$tt;o3=$o3;o5=$o6;avg=$ak2;bytes=$tb;cmdO3=$cmdOver3;cmdO5=$cmdOver5;prO3=$prOver3;prO5=$prOver5} "T:$tt >3:$o3 >5:$o6 avg:${ak2}KB cmdO3:$cmdOver3 cmdO5:$cmdOver5 prO3:$prOver3 prO5:$prOver5"
 $ip=".learnings\inter-track.json";$cy=0;$ic=0;$it=30
 if(Test-Path $ip){try{$id=Get-Content $ip -Raw | ConvertFrom-Json;$ic=[int]$id.cycle.count;$it=[int]$id.cycle.target;$cy=$m::Min(10,$m::Round(($ic/$it)*10,1))}catch{$cy=0}}
 a "CA" $cy @{ic=$ic;it=$it} "IC:$ic/$it"

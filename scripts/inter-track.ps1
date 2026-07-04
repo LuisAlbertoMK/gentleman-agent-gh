@@ -52,17 +52,48 @@ if (-not (Test-Path -LiteralPath $trackPath)) {
     $init | ConvertTo-Json | Set-Content -LiteralPath $trackPath -Encoding UTF8
 }
 
-try {
-    $data = Get-Content -LiteralPath $trackPath -Raw | ConvertFrom-Json
-} catch {
-    Write-Warning "Corrupted inter-track.json, backing up and re-initializing"
-    $backup = "$trackPath.bak.$(Get-Date -Format 'yyyyMMddHHmmss')"
-    Copy-Item -LiteralPath $trackPath -Destination $backup -ErrorAction SilentlyContinue
+# Exclusive file lock to prevent race conditions on read-modify-write
+function Invoke-TrackLocked {
+    param([scriptblock]$Action)
+    $stream = $null
+    try {
+        $stream = [System.IO.FileStream]::new($trackPath, [System.IO.FileMode]::OpenOrCreate, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
+        $reader = [System.IO.StreamReader]::new($stream)
+        $content = $reader.ReadToEnd()
+        $reader.Close()
+        if ([string]::IsNullOrWhiteSpace($content)) {
+            $data = $null
+        } else {
+            $data = $content | ConvertFrom-Json
+        }
+        & $action ([ref]$data)
+        $stream.SetLength(0)
+        $stream.Seek(0, [System.IO.SeekOrigin]::Begin) | Out-Null
+        $writer = [System.IO.StreamWriter]::new($stream)
+        $writer.Write(($data | ConvertTo-Json -Depth 4))
+        $writer.Flush()
+    } finally {
+        if ($stream) { $stream.Close() }
+    }
+}
+
+if (-not (Test-Path -LiteralPath $trackPath) -or (Get-Item $trackPath).Length -eq 0) {
     $data = @{
         cycle  = @{ id = ""; start = ""; target = $Target; count = 0 }
         history = @()
     }
+    $data | ConvertTo-Json | Set-Content -LiteralPath $trackPath -Encoding UTF8
 }
+
+Invoke-TrackLocked -Action {
+    param([ref]$dataRef)
+    $data = $dataRef.Value
+    if (-not $data) {
+        $data = @{
+            cycle  = @{ id = ""; start = ""; target = $Target; count = 0 }
+            history = @()
+        }
+    }
 
 if ($Reset) {
     $cycleId = "CYC-" + (Get-Date -Format "yyyyMMdd") + "-" + (Get-Random -Minimum 100 -Maximum 999)
@@ -98,10 +129,8 @@ if ($Increment) {
             Write-Host "[inter-track] inter: $($data.cycle.count)/$($data.cycle.target) ($remaining remaining)" -ForegroundColor Yellow
         }
     }
+    $dataRef.Value = $data
 }
-
-# Save
-$data | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $trackPath -Encoding UTF8
 
 # Output
 $result = [PSCustomObject]@{

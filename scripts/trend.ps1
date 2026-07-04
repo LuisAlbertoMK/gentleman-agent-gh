@@ -2,6 +2,7 @@
 <# .SYNOPSIS Trend analysis: scoring snapshots over time #>
 $d=$args[0]
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 $sd = Split-Path $PSCommandPath
 $r = Split-Path $sd
 if (-not $d) { $d = "$r\docs\metricas\snapshots" }

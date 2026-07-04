@@ -17,8 +17,6 @@ CONTEXT:
 TASK:
 Create a change proposal for "$ARGUMENTS". Use the exploration results as input. Define intent, scope, capabilities, approach, affected areas, risks, rollback, and success criteria.
 
-ENGRAM PERSISTENCE (artifact store mode: engram):
-Required: mem_search(query: "sdd/$ARGUMENTS/explore", project: "{project}") → mem_get_observation(id) for exploration input
-Save: mem_save(title: "sdd/$ARGUMENTS/proposal", topic_key: "sdd/$ARGUMENTS/proposal", type: "architecture", project: "{project}", content: "{proposal}")
+ENGRAM PERSISTENCE: See [\_shared/engram-convention.md](../.agents/skills/_shared/engram-convention.md) for full protocol.
 
 Return: status, executive_summary, artifacts, next_recommended.

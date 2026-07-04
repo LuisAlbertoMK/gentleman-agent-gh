@@ -19,6 +19,6 @@ CONTEXT:
 - Change name: $ARGUMENTS
 - Artifact store mode: engram
 
-ENGRAM NOTE: To check which artifacts exist, search mem_search(query: "sdd/$ARGUMENTS/", project: "{project}"). Sub-agents handle persistence with topic_key "sdd/$ARGUMENTS/{type}".
+ENGRAM PERSISTENCE: See [\_shared/engram-convention.md](../.agents/skills/_shared/engram-convention.md) for full protocol.
 
 Read orchestrator instructions. Do NOT execute phase work inline — delegate to sub-agents.

@@ -31,7 +31,8 @@ param(
     [switch]$DisableHibernation,
     [switch]$SetPageFile,
     [switch]$RunDism,
-    [switch]$DryRun = $false
+    [switch]$DryRun = $false,
+    [switch]$Restore
 )
 
 $ErrorActionPreference = 'Stop'
@@ -42,6 +43,69 @@ $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIden
 if (-not $isAdmin) {
     Write-Host "[ERROR] Must run as Administrator. Right-click → 'Run as Administrator'" -ForegroundColor Red
     exit 1
+}
+
+# ---- CHECKPOINT / RESTORE ----
+$checkpointFile = "$env:TEMP\gentleman-optimize-checkpoint.json"
+if ($Restore) {
+    if (-not (Test-Path $checkpointFile)) {
+        Write-Host "[err] No checkpoint found at $checkpointFile" -ForegroundColor Red
+        exit 1
+    }
+    $cp = Get-Content $checkpointFile -Raw | ConvertFrom-Json
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host "  RESTORING PREVIOUS STATE" -ForegroundColor Cyan
+    Write-Host "  Saved: $($cp.timestamp)" -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Cyan
+
+    # Restore page file to automatic
+    if ($cp.hadAutoPageFile -eq $false) {
+        try {
+            $cs = Get-CimInstance Win32_ComputerSystem
+            $cs.AutomaticManagedPagefile = $true
+            Set-CimInstance -InputObject $cs | Out-Null
+            Write-Host "  ✓ Page file restored to automatic" -ForegroundColor Green
+        } catch { Write-Host "  ✗ Failed to restore page file: $_" -ForegroundColor Red }
+    }
+    # Restore hibernation
+    if ($cp.hadHibernation -eq $true) {
+        try { powercfg /h on 2>&1 | Out-Null; Write-Host "  ✓ Hibernation re-enabled" -ForegroundColor Green }
+        catch { Write-Host "  ✗ Failed to enable hibernation: $_" -ForegroundColor Red }
+    }
+    # Restore registry values
+    foreach ($key in $cp.registry.PSObject.Properties) {
+        try {
+            Set-ItemProperty -Path $key.Name -Name $key.Value.name -Value $key.Value.value -Type DWord -ErrorAction Stop
+            Write-Host "  ✓ Restored $($key.Value.name) = $($key.Value.value)" -ForegroundColor Green
+        } catch { Write-Host "  - Could not restore $($key.Name): $_" -ForegroundColor Gray }
+    }
+    Write-Host "`n[ok] Restore complete. Reboot recommended." -ForegroundColor Green
+    Remove-Item $checkpointFile -Force -ErrorAction SilentlyContinue
+    exit 0
+}
+
+# Save checkpoint before any changes
+if (-not $DryRun) {
+    $cp = @{
+        timestamp       = (Get-Date -Format 'o')
+        hadAutoPageFile = $null
+        hadHibernation  = (Get-CimInstance -ClassName Win32_ComputerSystem -ErrorAction SilentlyContinue).AutomaticManagedPagefile
+        registry        = @{}
+    }
+    # Snapshot current registry values
+    $regKeys = @(
+        @{Path = "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem"; Name = "NtfsDisableLastAccessUpdate"}
+        @{Path = "HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl"; Name = "Win32PrioritySeparation"}
+    )
+    foreach ($rk in $regKeys) {
+        try {
+            $val = Get-ItemProperty -Path $rk.Path -Name $rk.Name -ErrorAction Stop
+            $cp.registry[$rk.Path] = @{name = $rk.Name; value = $val.$($rk.Name)}
+        } catch { $cp.registry[$rk.Path] = @{name = $rk.Name; value = $null} }
+    }
+    $cp | ConvertTo-Json | Set-Content $checkpointFile -Encoding UTF8
+    Write-Host "[checkpoint] Saved to $checkpointFile" -ForegroundColor DarkGray
+    Write-Host "       To restore: $PSCommandPath -Restore" -ForegroundColor DarkGray
 }
 
 $before = (Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='C:'").FreeSpace
@@ -152,4 +216,5 @@ Write-Host "  C: free AFTER:  $([math]::Round($after/1GB,2)) GB" -ForegroundColo
 Write-Host "  RECOVERED:      $([math]::Round($gained,2)) GB" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "`n⚠  A REBOOT is recommended to apply all changes." -ForegroundColor Magenta
+Write-Host "   To undo: $PSCommandPath -Restore" -ForegroundColor DarkGray
 Write-Host "   After reboot, run: Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase" -ForegroundColor Gray

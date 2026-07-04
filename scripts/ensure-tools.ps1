@@ -10,7 +10,6 @@
 #>
 
 $ErrorActionPreference = 'Stop'
-#requires -Version 7.6
 
 param(
   [switch]$Quiet

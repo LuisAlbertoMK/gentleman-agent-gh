@@ -1,4 +1,4 @@
-﻿#requires -Version 7.0
+#requires -Version 7.6
 <#
 .SYNOPSIS
     Manage long-lived dev servers in the background
@@ -56,6 +56,8 @@ param(
     [int]$Tail = 5
 )
 
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 # ── Registry: persisted in script scope ─────────────────────────────
 # Servers are stored in a module-level hashtable. Since this script is
 # invoked fresh each time (not dot-sourced), we use a JSON file as

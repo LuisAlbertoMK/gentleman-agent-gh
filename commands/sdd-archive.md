@@ -16,10 +16,7 @@ CONTEXT:
 TASK:
 Archive the active SDD change. Read the verification report first to confirm the change is ready. Then:
 
-ENGRAM PERSISTENCE (see [\_shared/engram-convention.md](../.agents/skills/_shared/engram-convention.md) for full protocol):
-- Batch search: proposal + spec + design + tasks + verify-report
-- Retrieve all (preview rule: mem_get_observation mandatory)
-- Save: mem_save(title: "sdd/{change-name}/archive-report", ...)
+ENGRAM PERSISTENCE: See [\_shared/engram-convention.md](../.agents/skills/_shared/engram-convention.md) for full protocol.
 
 Then:
 1. Sync delta specs into main specs (source of truth)

@@ -17,9 +17,7 @@ CONTEXT:
 TASK:
 Explore the topic "$ARGUMENTS" in this codebase. Investigate current state, identify affected areas, compare approaches, recommend.
 
-ENGRAM PERSISTENCE (artifact store mode: engram):
-Optional context: mem_search(query: "sdd-init/{project}", project: "{project}") → if found, mem_get_observation(id) for full content
-Save: mem_save(title: "sdd/$ARGUMENTS/explore", topic_key: "sdd/$ARGUMENTS/explore", type: "architecture", project: "{project}", content: "{exploration}")
+ENGRAM PERSISTENCE: See [\_shared/engram-convention.md](../.agents/skills/_shared/engram-convention.md) for full protocol.
 
 Exploration only — do NOT create files or modify code. Just research and return analysis.
 

@@ -12,7 +12,6 @@
 .PARAMETER Recurse
   Buscar recursivamente en subdirectorios.
 #>
-#requires -Version 7.6
 
 param(
   [string[]]$Path = @(),

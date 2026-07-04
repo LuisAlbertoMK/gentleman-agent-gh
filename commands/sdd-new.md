@@ -19,6 +19,6 @@ CONTEXT:
 - Change name: $ARGUMENTS
 - Artifact store mode: engram
 
-ENGRAM NOTE: Sub-agents handle persistence automatically. Each phase saves to engram with topic_key "sdd/$ARGUMENTS/{type}".
+ENGRAM PERSISTENCE: See [\_shared/engram-convention.md](../.agents/skills/_shared/engram-convention.md) for full protocol.
 
 Read orchestrator instructions to coordinate. Do NOT execute phase work inline — delegate to sub-agents.

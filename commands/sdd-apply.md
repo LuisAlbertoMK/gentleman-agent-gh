@@ -18,11 +18,7 @@ CONTEXT:
 TASK:
 Implement the remaining incomplete tasks for the active SDD change.
 
-ENGRAM PERSISTENCE (see [\_shared/engram-convention.md](../.agents/skills/_shared/engram-convention.md) for full protocol):
-- Batch search: spec + design + tasks + apply-progress (optional)
-- Retrieve all (preview rule: mem_get_observation mandatory)
-- Update tasks: mem_update(id: tasks_id, content: "{[x] marks}")
-- Save progress: mem_save(title: "sdd/{change-name}/apply-progress", ...)
+ENGRAM PERSISTENCE: See [\_shared/engram-convention.md](../.agents/skills/_shared/engram-convention.md) for full protocol.
 
 For each task:
 1. Read spec scenarios (acceptance criteria)

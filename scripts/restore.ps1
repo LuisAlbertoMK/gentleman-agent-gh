@@ -12,7 +12,6 @@ List snapshots only, no restore.
 .PARAMETER DryRun
 Show what would be restored without applying.
 #>
-#requires -Version 7.6
 Set-StrictMode -Version Latest
 param([string]$Revision="",[switch]$List,[switch]$DryRun)
 $ErrorActionPreference='Stop'
@@ -27,13 +26,16 @@ Push-Location $cfg;try{
     }
     if([string]::IsNullOrWhiteSpace($Revision)){$Revision=Read-Host "Enter revision (or 'q')";if($Revision-eq'q'){return}}
     if($Revision-eq'last'){$Revision='HEAD~1'}
+    # ponytail: git ref safety — reject shell metacharacters, only allow git-safe refs
+    if($Revision -notmatch '^[\w/\.\-\^~@]+$'){Write-Host "[err] Invalid revision: contains unsafe characters" -ForegroundColor Red;exit 1}
     $resolved=git rev-parse --verify "${Revision}^{commit}" 2>$null
     if(-not$resolved){Write-Host "[err] Unknown: $Revision" -ForegroundColor Red;exit 1}
-    $changed=git diff --name-only "$Revision" HEAD 2>$null
+    # Use resolved hash for all subsequent commands to prevent injection via ref name
+    $changed=git diff --name-only "$resolved" HEAD 2>$null
     if($changed){Write-Host "Files:" -ForegroundColor Blue;$changed|ForEach-Object{Write-Host "  $_"}}else{Write-Host "[warn] No file changes" -ForegroundColor Yellow}
     if($DryRun){Write-Host "[dry-run] Would restore to $Revision" -ForegroundColor Yellow;return}
     $confirm=Read-Host "Restore to $Revision? [y/N]"
     if($confirm-notmatch'^[yY]'){Write-Host "Cancelled.";return}
-    git checkout "$Revision" -- . 2>$null
+    git checkout "$resolved" -- . 2>$null
     if($?){Write-Host "[ok] Restored" -ForegroundColor Green}else{Write-Host "[err] Failed" -ForegroundColor Red}
 }finally{Pop-Location}

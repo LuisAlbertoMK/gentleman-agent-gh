@@ -17,8 +17,6 @@ CONTEXT:
 TASK:
 Write the delta specification for "$ARGUMENTS" based on the proposal. Use ADDED / MODIFIED / REMOVED sections. Each requirement MUST have GIVEN → WHEN → THEN scenarios.
 
-ENGRAM PERSISTENCE (artifact store mode: engram):
-Required: mem_search(query: "sdd/$ARGUMENTS/proposal", project: "{project}") → mem_get_observation(id) for proposal input
-Save: mem_save(title: "sdd/$ARGUMENTS/spec", topic_key: "sdd/$ARGUMENTS/spec", type: "architecture", project: "{project}", content: "{specification}")
+ENGRAM PERSISTENCE: See [\_shared/engram-convention.md](../.agents/skills/_shared/engram-convention.md) for full protocol.
 
 Return: status, executive_summary, artifacts, next_recommended.

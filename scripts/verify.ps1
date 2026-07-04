@@ -45,8 +45,10 @@ function Invoke-E2Checks{
     $ps=Join-Path $Root 'scripts\pssa-gate.ps1'
     if(Test-Path $ps){& $ps -Mode Check;Add-Check 'PSSA Gate' ($LASTEXITCODE-eq0) "exit $LASTEXITCODE"}else{Add-Check 'PSSA Gate' $true 'not found (skipped)'}
     $sf=@()
-    $sPat=@('password\s*=','secret\s*=','api[_-]?key\s*=','token\s*=','connection\s*string\s*=')
-    $sDirs=@((Join-Path $Root 'scripts'),(Join-Path $Root '.agents\skills'))
+    $sPat=@('password\s*=','secret\s*=','api[_-]?key\s*=','token\s*=','connection\s*string\s*=',
+             'GH_TOKEN\s*=','GITHUB_TOKEN\s*=','ghp_','gho_','ghs_','github_pat_','ctx7sk_','AKIA',
+             'xox[abprs]-\d+','sk-[a-zA-Z0-9]{20,}','-----BEGIN\s+(RSA|EC|DSA|PRIVATE|OPENSSH)\s+KEY')
+    $sDirs=@((Join-Path $Root 'scripts'),(Join-Path $Root '.agents\skills'),(Join-Path $Root '.github\workflows'),(Join-Path $Root 'docs'))
     foreach($dir in $sDirs){
         if(-not(Test-Path $dir)){continue}
         Get-ChildItem $dir -Recurse -Include '*.ps1','*.md','*.psm1' | ForEach-Object {

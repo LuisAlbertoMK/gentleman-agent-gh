@@ -16,10 +16,7 @@ CONTEXT:
 TASK:
 Verify the active SDD change. Read the proposal, specs, design, and tasks artifacts. Then:
 
-ENGRAM PERSISTENCE (see [\_shared/engram-convention.md](../.agents/skills/_shared/engram-convention.md) for full protocol):
-- Batch search: spec + design + tasks
-- Retrieve all (preview rule: mem_get_observation mandatory)
-- Save report: mem_save(title: "sdd/{change-name}/verify-report", ...)
+ENGRAM PERSISTENCE: See [\_shared/engram-convention.md](../.agents/skills/_shared/engram-convention.md) for full protocol.
 
 Then:
 1. Completeness — all tasks done?

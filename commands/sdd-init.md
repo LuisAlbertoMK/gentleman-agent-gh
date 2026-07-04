@@ -16,8 +16,6 @@ CONTEXT:
 TASK:
 Initialize Spec-Driven Development in this project. Detect tech stack, existing conventions, architecture patterns. Bootstrap the active persistence backend.
 
-ENGRAM PERSISTENCE (artifact store mode: engram):
-After detecting project context, save: mem_save(title: "sdd-init/{project}", topic_key: "sdd-init/{project}", type: "architecture", project: "{project}", content: "{detected context}")
-topic_key enables upserts — re-running init updates, not duplicates.
+ENGRAM PERSISTENCE: See [\_shared/engram-convention.md](../.agents/skills/_shared/engram-convention.md) for full protocol.
 
 Return: status, executive_summary, artifacts, next_recommended.

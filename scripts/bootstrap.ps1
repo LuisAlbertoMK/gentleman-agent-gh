@@ -14,7 +14,8 @@
 .PARAMETER Update
     Update existing installation instead of fresh clone
 .EXAMPLE
-    iex "& { $(irm https://gentleman.sh/install.ps1) }"
+    # Safe: download to temp, inspect, then execute
+    # irm https://gentleman.sh/install.ps1 -OutFile tmp.ps1; ./tmp.ps1
 .EXAMPLE
     .\scripts\bootstrap.ps1 -Update
 .NOTES

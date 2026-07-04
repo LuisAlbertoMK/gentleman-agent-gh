@@ -17,8 +17,6 @@ CONTEXT:
 TASK:
 Create the technical design for "$ARGUMENTS" based on the specification. Define technical approach, architecture decisions (with alternatives + rationale), data flow (ASCII), file changes, interfaces, testing approach, and migration plan.
 
-ENGRAM PERSISTENCE (artifact store mode: engram):
-Required: mem_search(query: "sdd/$ARGUMENTS/spec", project: "{project}") → mem_get_observation(id) for spec input
-Save: mem_save(title: "sdd/$ARGUMENTS/design", topic_key: "sdd/$ARGUMENTS/design", type: "architecture", project: "{project}", content: "{design}")
+ENGRAM PERSISTENCE: See [\_shared/engram-convention.md](../.agents/skills/_shared/engram-convention.md) for full protocol.
 
 Return: status, executive_summary, artifacts, next_recommended.

@@ -26,7 +26,7 @@ param(
     [string]$Path = "",
     [string]$Focus = "",
     [string]$Migrate = "",
-    [int]$N = 0,
+    [int]$Number = 0,
     [switch]$AnalysisOnly,
     [switch]$Quiet
 )
@@ -117,25 +117,25 @@ if (Test-Path $configPath) {
         }
 
         # Calculate N
-        if ($N -le 0) {
+        if ($Number -le 0) {
             $fileCount = [int]$projectProfile.size.files
             $scaling = $config.n_subagent_scaling.by_files
             foreach ($s in $scaling) {
                 $max = [int]$s.max
                 if ($max -eq -1 -or $fileCount -le $max) {
-                    $N = [int]$s.N
+                    $Number = [int]$s.N
                     break
                 }
             }
-            if ($N -le 0) { $N = 3 }
+            if ($Number -le 0) { $Number = 3 }
         }
     } catch {
         Write-Host "[!pcycle] WARNING: config parse error, using defaults" -ForegroundColor Yellow
         $dimensions = @()
-        if ($N -le 0) { $N = 3 }
+        if ($Number -le 0) { $Number = 3 }
     }
 } else {
-    if ($N -le 0) { $N = 3 }
+    if ($Number -le 0) { $Number = 3 }
 }
 
 # Ensure at least one dimension
@@ -160,7 +160,7 @@ if (-not $Quiet) {
     Write-Host "  Project: $($projectProfile.profile.name)" -ForegroundColor White
     Write-Host "  Stack:   $stackLabel / $pkgMgr" -ForegroundColor Yellow
     Write-Host "  Size:    $fileCount files / $loc LOC" -ForegroundColor Gray
-    Write-Host "  N:       $N sub-agents" -ForegroundColor Cyan
+    Write-Host "  N:       $Number sub-agents" -ForegroundColor Cyan
     Write-Host "  Dims:    $($dimensions.Count) dimensions" -ForegroundColor Magenta
     foreach ($d in $dimensions) { Write-Host "    - $($d.label)" -ForegroundColor DarkCyan }
 }
@@ -175,7 +175,7 @@ $report += "type: external"
 $report += "stack: $stackLabel"
 $report += "pkg_manager: $pkgMgr"
 if ($Migrate -ne "") { $report += "migration: $Migrate" }
-$report += "n_subagents: $N"
+$report += "n_subagents: $Number"
 $report += "status: analysis_only"
 $report += "date: $reportDate"
 $report += "---"
@@ -185,7 +185,7 @@ $report += ""
 $report += "**Date**: $((Get-Date).ToString('yyyy-MM-dd'))"
 $report += "**Stack**: $stackLabel / $pkgMgr"
 $report += "**Size**: $fileCount files / $loc LOC"
-$report += "**N sub-agents**: $N"
+$report += "**N sub-agents**: $Number"
 $report += "**Status**: Analysis complete - ready for execution"
 $report += ""
 $report += "## Profile"
@@ -283,7 +283,7 @@ if (-not $AnalysisOnly) {
     $learnEntry += "!pcycle analysis of $($projectProfile.profile.name) ($stackLabel/$pkgMgr, $fileCount files, $loc LOC)"
     $learnEntry += ""
     $learnEntry += "### Decisions"
-    $learnEntry += "- N sub-agents: $N"
+    $learnEntry += "- N sub-agents: $Number"
     $learnEntry += "- Dimensions: $($dimensions.Count) ($($dimensions.label -join ', '))"
     if ($Migrate -ne "") { $learnEntry += "- Migration focus: $Migrate" }
     $learnEntry += ""
@@ -304,7 +304,7 @@ $result = [PSCustomObject]@{
     project        = $projectProfile.profile.name
     stack          = $stackLabel
     pkgManager     = $pkgMgr
-    n_subagents    = $N
+    n_subagents    = $Number
     dimensions     = @($dimensions | ForEach-Object { $_.id })
     report         = $reportPath
     learnings      = if (-not $AnalysisOnly) { $learnPath } else { $null }
@@ -315,7 +315,7 @@ if ($Quiet) {
     $result | ConvertTo-Json -Depth 3
 } else {
     Write-Host ""
-    Write-Host "[!pcycle] Done. Run with N=$N sub-agents to analyze $($dimensions.Count) dimensions." -ForegroundColor Green
+    Write-Host "[!pcycle] Done. Run with N=$Number sub-agents to analyze $($dimensions.Count) dimensions." -ForegroundColor Green
     Write-Host "[!pcycle] To execute: review report, then re-run with sub-agent orchestration." -ForegroundColor Yellow
 }
 

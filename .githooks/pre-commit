@@ -7,6 +7,8 @@
 
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
 [ -z "$REPO_ROOT" ] && REPO_ROOT="."
+# Escape single quotes for PowerShell -Command blocks
+REPO_ROOT_ESC=$(echo "$REPO_ROOT" | sed "s/'/''/g")
 
 CHECKS_PASSED=0
 CHECKS_FAILED=0
@@ -92,7 +94,7 @@ fi
 # --- [5/9] Improvement cycle assessment ---
 echo "[5/9] Improvement cycle..."
 OVERWEIGHT_SKILLS=$(pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command "
-  \$canonical = \"$REPO_ROOT/.agents/skills\"
+  \$canonical = '$REPO_ROOT_ESC/.agents/skills'
   if (-not (Test-Path \$canonical)) { exit 0 }
   Get-ChildItem \$canonical -Directory | Where-Object { \$_.Name -ne '_shared' } | ForEach-Object {
     \$md = Join-Path \$_.FullName 'SKILL.md'
@@ -208,6 +210,25 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
+# --- [10/9] Secrets scan on staged diff ---
+echo "[10/9] Secrets scan..."
+STAGED_SECRETS=$(git diff --cached --diff-filter=ACM 2>/dev/null | pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command "
+  \$input | Select-String -Pattern '(ghp_|gho_|github_pat_|AKIA|ctx7sk_|-----BEGIN\s+(RSA|EC|DSA|PRIVATE)\s+KEY|GH_TOKEN\s*=|GITHUB_TOKEN\s*=|password\s*=|api[_-]?key\s*=|secret\s*=|token\s*=)' -CaseSensitive 2>\$null | ForEach-Object {
+    \$line = \$_.Line.Trim()
+    if (\$line.Length -gt 80) { \$line = \$line.Substring(0, 77) + '...' }
+    Write-Output \"\$(\$_.Filename):\$(\$_.LineNumber) \$line\"
+  }
+" 2>&1)
+if [ -n "$STAGED_SECRETS" ]; then
+  red "  BLOCKING: potential secrets found in staged diff:"
+  echo "$STAGED_SECRETS" | while read -r line; do echo "    $line"; done
+  echo "  Use 'git diff --cached' to review. Remove before committing."
+  CHECKS_FAILED=$((CHECKS_FAILED + 1))
+else
+  green "  OK"
+  CHECKS_PASSED=$((CHECKS_PASSED + 1))
+fi
+
 # --- Summary ---
 echo ""
 TOTAL=$((CHECKS_PASSED + CHECKS_FAILED))
@@ -221,9 +242,7 @@ else
 fi
 
 # --- Capture gate result to error tracking (non-blocking, silent) ---
-pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command "
-  & '$REPO_ROOT/scripts/capture-errors.ps1' -Source quality-gate -Passed $CHECKS_PASSED -Failed $CHECKS_FAILED -Blocked '$BLOCKED'
-" > /dev/null 2>&1
+pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/capture-errors.ps1" -Source quality-gate -Passed $CHECKS_PASSED -Failed $CHECKS_FAILED -Blocked $BLOCKED > /dev/null 2>&1
 
 if [ "$BLOCKED" = "yes" ]; then
   exit 1

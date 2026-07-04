@@ -68,9 +68,18 @@ foreach ($repo in $repos) {
 }
 
 # --- Get bash for git ls-remote ---
-$bashPath = "C:\Program Files\Git\bin\bash.exe"
-if (-not (Test-Path -LiteralPath $bashPath)) {
-    Write-Error "Git Bash not found at $bashPath"
+# Prefer Git Bash over WSL bash stub (WSL relay fails on git ls-remote)
+$bashPath = @(
+    "$env:ProgramFiles\Git\bin\bash.exe",
+    "${env:ProgramFiles(x86)}\Git\bin\bash.exe",
+    "$env:LOCALAPPDATA\Programs\Git\bin\bash.exe",
+    "$env:SystemDrive\Program Files\Git\bin\bash.exe"
+) | Where-Object { Test-Path $_ } | Select-Object -First 1
+if (-not $bashPath) {
+    $bashPath = (Get-Command 'bash' -ErrorAction SilentlyContinue).Source
+}
+if (-not $bashPath) {
+    Write-Error "Git Bash not found. Install Git for Windows or ensure 'bash' is in PATH."
     exit 1
 }
 

@@ -16,8 +16,6 @@ CONTEXT:
 TASK:
 Guide the user through a complete SDD cycle using their actual codebase. This is a real change with real artifacts, not a toy. Teach by doing — walk through explore, propose, spec, design, tasks, apply, verify, archive.
 
-ENGRAM PERSISTENCE (artifact store mode: engram):
-Save progress: mem_save(title: "sdd-onboard/{project}", topic_key: "sdd-onboard/{project}", type: "architecture", project: "{project}", content: "{onboarding state}")
-topic_key enables upserts — re-running updates, not duplicates.
+ENGRAM PERSISTENCE: See [\_shared/engram-convention.md](../.agents/skills/_shared/engram-convention.md) for full protocol.
 
 Return: status, executive_summary, artifacts, next_recommended.

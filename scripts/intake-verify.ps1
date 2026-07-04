@@ -1,10 +1,10 @@
 ﻿#requires -Version 7.6
 <# .SYNOPSIS Verify SDD intake — validates project structure and skill scaffolding against intake.json #>
-param([string]$p,[ValidateRange(1,5)][int]$i=1,[string]$t="auto",[bool]$m=$true,[ValidateSet("text","json")][string]$f="text")
+param([string]$Path,[ValidateRange(1,5)][int]$Level=1,[string]$Type="auto",[bool]$Minimal=$true,[ValidateSet("text","json")][string]$Format="text")
 $ErrorActionPreference='Stop';Set-StrictMode -Version Latest;$t0=Get-Date;$rr=@();$chk=[char]0x2705;$crs=[char]0x274C;$wrn=[char]0x26A0
 function wr{param([string]$I,[string]$M)
 $c=@{$chk="Green";$crs="Red";$wrn="Yellow"}[$I]
-if(-not$c){$c="White"}if($f-ne"json"){Write-Host "$I $M" -ForegroundColor $c}}
+if(-not$c){$c="White"}if($Format-ne"json"){Write-Host "$I $M" -ForegroundColor $c}}
 function sz{param([string]$x)
 if(Test-Path $x){$l=(Get-Item $x).Length;if($l-gt1KB){$r=[math]::Round($l/1KB,1);return "${r}KB"};return "$l B"}return ""}
 function ic{param([int]$R,[string]$pp)
@@ -63,22 +63,22 @@ if($res.rd-eq$crs){$miss+="README"}
 if($miss.Count-gt0){Write-Host "  MISSING: $($miss-join', ')" -ForegroundColor Red}
 return @{round=$R;results=$res;scores=$sm;totalScore=$ts;maxScore=$ms;pct=$pct;criticalMissing=$miss}}
 try {
-if(-not(Test-Path $p)){Write-Error "Path not found: $p";exit 2}
-if($t-eq"auto"){
-$sigs=@()
-if(Test-Path "$p\package.json"){$pkg=Get-Content "$p\package.json" -Raw -ea 0
-if($pkg-match'"react"|"next"|"vue"'){$sigs+="frontend"}
-if($pkg-match'"express"|"fastify"'){$sigs+="backend"}
-if($sigs.Count-eq0-and$pkg){$sigs+="node"}}
-if(Test-Path "$p\go.mod"){$sigs+="backend"}
-if(Test-Path "$p\pubspec.yaml"){$sigs+="mobile"}
-if(Test-Path "$p\Dockerfile"){$sigs+="infra"}
-if($sigs-contains"frontend"-and$sigs-contains"backend"){$t="fullstack"}
-elseif($sigs-contains"frontend"){$t="fe"}
-elseif($sigs-contains"backend"){$t="be"}
-elseif($sigs-contains"mobile"){$t="mobile"}
-else{$t="be"}}
-for($j=1;$j-le$i;$j++){$round=ic -R $j -pp $p;$rr+=$round;if($j-lt$i){Start-Sleep 1}}
+if(-not(Test-Path $Path)){Write-Error "Path not found: $Path";exit 2}
+    if($Type-eq"auto"){
+    $sigs=@()
+    if(Test-Path "$Path\package.json"){$pkg=Get-Content "$Path\package.json" -Raw -ea 0
+    if($pkg-match'"react"|"next"|"vue"'){$sigs+="frontend"}
+    if($pkg-match'"express"|"fastify"'){$sigs+="backend"}
+    if($sigs.Count-eq0-and$pkg){$sigs+="node"}}
+    if(Test-Path "$Path\go.mod"){$sigs+="backend"}
+    if(Test-Path "$Path\pubspec.yaml"){$sigs+="mobile"}
+    if(Test-Path "$Path\Dockerfile"){$sigs+="infra"}
+    if($sigs-contains"frontend"-and$sigs-contains"backend"){$Type="fullstack"}
+    elseif($sigs-contains"frontend"){$Type="fe"}
+    elseif($sigs-contains"backend"){$Type="be"}
+    elseif($sigs-contains"mobile"){$Type="mobile"}
+    else{$Type="be"}}
+for($j=1;$j-le$Level;$j++){$round=ic -R $j -pp $Path;$rr+=$round;if($j-lt$Level){Start-Sleep 1}}
 $el=[math]::Round(((Get-Date)-$t0).TotalSeconds,1)
 $ar=@("rm","pr","pd","rd","ts","ci","mo")
 foreach($a in $ar){$b=$rr[0].scores.$a;$c=$rr[-1].scores.$a;$d=$c-$b;$ds=if($d-gt0){"+$d"}elseif($d-lt0){"$d"}else{"-"};Write-Host "  $a $b->$c ($ds)"}
@@ -86,14 +86,14 @@ $bt=$rr[0].totalScore;$lt=$rr[-1].totalScore;$dt=$lt-$bt;$ds=if($dt-gt0){"+$dt"}
 $opct=$rr[-1].pct;$g=if($opct-ge90){"A"}elseif($opct-ge80){"B"}elseif($opct-ge60){"C"}elseif($opct-ge40){"D"}else{"F"}
 Write-Host "`n  Grade: $g ($opct%)" -ForegroundColor $(if($opct-ge80){"Green"}elseif($opct-ge60){"Yellow"}else{"Red"})
 if($rr[-1].criticalMissing.Count-gt0){Write-Host "  Critical: $($rr[-1].criticalMissing-join', ')" -ForegroundColor Red}
-if($m){
-$dv="$p\docs\metricas";if(-not(Test-Path $dv)){try{New-Item $dv -ItemType Directory | Out-Null}catch{Write-Warning "dv: $_"}}
-$x=@{timestamp=(Get-Date -Format "yyyy-MM-dd HH:mm:ss");project=$p;type=$t;iterations=$i;el=$el;baseline=@{};current=@{};delta=@{};pct=$opct;gaps=$rr[-1].criticalMissing}
-$md="# Intake $p $t $g $opct%"
-foreach($a in $ar){$b=$rr[0].scores.$a;$c=$rr[-1].scores.$a;$d=$c-$b;$ds2=if($d-gt0){"+$d"}elseif($d-lt0){"$d"}else{"-"};$x.baseline[$a]=$b;$x.current[$a]=$c;$x.delta[$a]=$d;$md+="`n$a $b->$c ($ds2)"}
-if($rr[-1].criticalMissing.Count-gt0){$md+="`nCritical: $($rr[-1].criticalMissing-join',')"}
-try{($x | ConvertTo-Json) | Out-File "$dv\intake-baseline.json" -en utf8}catch{Write-Warning "json: $_"}
-try{$md | Out-File "$dv\intake-report.md" -en utf8}catch{Write-Warning "rpt: $_"};Write-Host "  $dv\intake-..." -ForegroundColor Cyan}
+    if($Minimal){
+    $dv="$Path\docs\metricas";if(-not(Test-Path $dv)){try{New-Item $dv -ItemType Directory | Out-Null}catch{Write-Warning "dv: $_"}}
+    $x=@{timestamp=(Get-Date -Format "yyyy-MM-dd HH:mm:ss");project=$Path;type=$Type;iterations=$Level;el=$el;baseline=@{};current=@{};delta=@{};pct=$opct;gaps=$rr[-1].criticalMissing}
+    $md="# Intake $Path $Type $g $opct%"
+    foreach($a in $ar){$b=$rr[0].scores.$a;$c=$rr[-1].scores.$a;$d=$c-$b;$ds2=if($d-gt0){"+$d"}elseif($d-lt0){"$d"}else{"-"};$x.baseline[$a]=$b;$x.current[$a]=$c;$x.delta[$a]=$d;$md+="`n$a $b->$c ($ds2)"}
+    if($rr[-1].criticalMissing.Count-gt0){$md+="`nCritical: $($rr[-1].criticalMissing-join',')"}
+    try{($x | ConvertTo-Json) | Out-File "$dv\intake-baseline.json" -en utf8}catch{Write-Warning "json: $_"}
+    try{$md | Out-File "$dv\intake-report.md" -en utf8}catch{Write-Warning "rpt: $_"};Write-Host "  $dv\intake-..." -ForegroundColor Cyan}
 if($rr[-1].criticalMissing.Count-gt0){exit 2}
 if($opct-lt80){exit 1}
 exit 0}catch{Write-Error "Intake failed: $_";exit 1}

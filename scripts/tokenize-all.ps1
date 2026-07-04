@@ -13,7 +13,6 @@
 .PARAMETER ThrottleLimit
   Max concurrent python processes (default: 5, CPU-based).
 #>
-#requires -Version 7.6
 
 param(
     [string]$Path = (Join-Path (Split-Path $PSScriptRoot -Parent) ".agents\skills"),
