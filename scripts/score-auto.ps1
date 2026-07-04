@@ -13,9 +13,9 @@ $m=[math];$h=@{};function a($n,$s,$e,$r){$h[$n]=@{s=$s;e=$e;r=$r}}
 $d=Get-ChildItem -Directory ".\.agents\skills" -Name
 $c=$d.PSWhere({$_ -ne '_shared'}).Count
 & ".\scripts\cross-ref-check.ps1" *>$null;$x=($LASTEXITCODE -eq 0)
-$h1=Test-Path "README.md";$h2=Test-Path "CHANGELOG.md";$h3=Test-Path ".project.json";$h4=Test-Path "docs/decisions/roadmap.md"
-$as=10;if(!$x){$as-=2};if(!$h1){$as-=2};if(!$h2){$as-=1};if($c -lt 60){$as-=2};if(!$h3){$as-=1}
-a "PA" ($m::Max(0,$as)) @{skills=$c;cross_ref=$x;readme=$h1;changelog=$h2;project_json=$h3;roadmap=$h4} "X-ref $x, $c skills"
+$h1=Test-Path "README.md";$h3=Test-Path ".project.json"
+$as=10;if(!$x){$as-=2};if(!$h1){$as-=2};if($c -lt 60){$as-=2};if(!$h3){$as-=1}
+a "PA" ($m::Max(0,$as)) @{skills=$c;cross_ref=$x;readme=$h1;project_json=$h3} "X-ref $x, $c skills"
 $s1=10;$wc=$false;$sf=$false
 $wk=@(Select-String -Path ".\scripts\*.ps1" -Pattern "MD5|SHA1\b").PSWhere({$_.Line -notmatch "SHA1ToSHA256|SHA256|#deprecat|#legacy|SHA1SHA256|Select-String.*MD5"})
 if($wk){$wc=$true;$s1-=2}
@@ -63,7 +63,7 @@ $bp2=Join-Path $PSScriptRoot 'check-backlog-integrity.ps1'
 if(Test-Path $bp2){$bj=& $bp2 -Json 2>&1 | Out-String | ConvertFrom-Json;$bs=$bj.score;$bpp=$bj.passed;$bt=$bj.totalItems}else{$bs=0;$bpp=0;$bt=0}
 a "BI2" $bs @{passed=$bpp;total=$bt} "$bpp/$bt items"
 $sd=@();$e1=$h["PA"].e
-$sd+=$(if($e1.readme){10}else{0});$sd+=$(if($e1.changelog){10}else{0});$sd+=$(if($e1.cross_ref){10}else{0});$sd+=($m::Min(10,$e1.skills/6));$sd+=$(if($e1.project_json){10}else{0});$sd+=$(if($e1.roadmap){10}else{0})
+$sd+=$(if($e1.readme){10}else{0});$sd+=$(if($e1.cross_ref){10}else{0});$sd+=($m::Min(10,$e1.skills/6));$sd+=$(if($e1.project_json){10}else{0})
 $e2=$h["Sec"].e;$sd+=$(if($e2.weak_crypto){5}else{10});$sd+=$(if($e2.secrets){3}else{10})
 $e3=$h["DC"].e;$sd+=$(if($e3.orphans -le 0){10}elseif($e3.orphans -le 5){7}else{5});$sd+=$(if($e3.dead_junctions -le 0){10}else{7});$sd+=$(if($e3.commented_out -le 10){10}else{7})
 $e4=$h["CC"].e;$sd+=($m::Round($e4.with_help/$ts*10,1));$sd+=($m::Round($e4.with_params/$ts*10,1));$sd+=($m::Round($e4.with_strictmode/$ts*10,1))

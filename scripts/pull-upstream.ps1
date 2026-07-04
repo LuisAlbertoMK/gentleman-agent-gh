@@ -7,7 +7,7 @@ $ErrorActionPreference='Stop';Set-StrictMode -Version Latest;$rr=Resolve-Path "$
 trap{try{Pop-Location}catch{};exit 1};Push-Location $rr
 function Test-GitRemote([string]$N){(git remote) -contains $N}
 # ponytail: files we customize locally — upstream must NOT overwrite
-$excludeList = @('install.ps1','install.sh','README.md','PROJECT-SCORE.md','docs/operations/project-score.md','.env.example')
+$excludeList = @('install.ps1','install.sh','README.md','.env.example')
 $pm=@{u='skills/';p='.agents/skills/';n='Skills'},@{u='scripts/';p='scripts/';n='Scripts'},@{u='';p='';n='Root files'}
 if(-not(Test-GitRemote $Remote)){Write-Warning "Remote '$Remote' not found";Pop-Location;exit 1}
 Write-Host "Fetch $Remote/$Branch...";$e=$ErrorActionPreference;$ErrorActionPreference='Continue';git fetch $Remote $Branch 2>&1 | Out-Null;$ErrorActionPreference=$e
