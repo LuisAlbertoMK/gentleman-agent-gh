@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Gentle AI Upstream
+    url: https://github.com/Gentleman-Programming/gentle-ai
+    about: For issues with the gentle-ai CLI tool, please use the upstream repo
