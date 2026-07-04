@@ -58,9 +58,9 @@ function Invoke-TrackLocked {
     $stream = $null
     try {
         $stream = [System.IO.FileStream]::new($trackPath, [System.IO.FileMode]::OpenOrCreate, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
-        $reader = [System.IO.StreamReader]::new($stream)
+        $reader = [System.IO.StreamReader]::new($stream, [System.Text.Encoding]::UTF8, $true, 1024, $true)
         $content = $reader.ReadToEnd()
-        $reader.Close()
+        # leaveOpen=$true → Dispose doesn't close $stream
         if ([string]::IsNullOrWhiteSpace($content)) {
             $data = $null
         } else {
@@ -158,3 +158,4 @@ if ($Quiet) {
         }
     }
 }
+} # /Invoke-TrackLocked -Action
