@@ -64,6 +64,18 @@ Thresholds en skill `triple-verify`. Modos: Normal (zona) · `!ship`=triple+qual
 > **Portability**: On a new machine, run `!setup` or `.\scripts\setup-machine.ps1` after cloning.  
 > **Dev servers**: Use `!dev start frontend -- npm run dev` to start, `!dev logs frontend` to see output.
 
+### Analysis Mode (trigger: `!analisi` | `analisi` | `análisis`)
+Overrides DEFAULT/SIMPLE/COMPLEX execution mode. Trigger explicitly as first word (case-insensitive, first 2 tokens) or `!analisi`. Examples: `"analisi cómo funciona X"`, `"!analisi revisa esta ruta"`, `"haceme un análisis de esto"`.
+
+**When triggered:**
+- **MODE**: Read-only exploration + reasoning + findings. Wraps existing DRAFT mode (see §Execution) with stricter gates.
+- **PRESERVED**: Ponytail rung 0 (Factibilidad — contradiction/language detection still runs). Engram save of relevant findings. Session close protocol on request.
+- **SKIPPED** entirely: TRIANGULATE (REGLAMENTARIO exento), Security §D gate, quality gate, commit pipeline, auto-metrics (post-task), Ponytail rungs 1-8 (YAGNI→Min code).
+- **EXEMPT** from §A Skill combo table (uses Q&A load: karpathy-loop + lean-context).
+- **PROCESS**: 1) Load karpathy-loop + lean-context only. 2) Delegate ≥2 subagents for independent analysis. 3) Compare results: report consensus + divergences.
+- **OUTPUT**: Strict findings, no fluff. NO code, NO commit, NO implementation ask. If user requests code after analysis, confirm exit from analysis mode first.
+- **STRICT**: Do NOT ask "should I implement this". Do NOT suggest writing code. Analyze only.
+
 ## Subagent-First
 Read-heavy (>3 files) → delegate `explore`. Main context = synthesis/decisions. Saves 2-5K tokens.
 
