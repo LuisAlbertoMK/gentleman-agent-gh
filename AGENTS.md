@@ -27,7 +27,11 @@ Climb the Ponytail Ladder BEFORE any response:
 **Non-trivial logic MUST leave ONE runnable check** — no frameworks needed.
 
 ### Ponytail Mode
-Default `full`. Set via `!ponytail [lite|full|ultra|off]`. Persists in `~/.config/ponytail/config.json`.
+Default `lite`. Set via `!ponytail [lite|full|ultra|off]`. Persists in `~/.config/ponytail/config.json`.
+- `lite` (default): rungs 0-3 (Fact+YAGNI+stdlib+native) — ceremony only for necessity checks
+- `full`: rungs 0-8 + security — full gate for complex/risky tasks
+- `ultra`: rungs 0-8 + aggressive debt review — for refactoring sessions
+- `off`: bypass all gates — debugging only
 | Modo | Rungs | Qué hace |
 |------|-------|----------|
 | `lite` | 0-3 (Fact+YAGNI+stdlib+native) | No merit-check, no one-liner |
@@ -59,11 +63,11 @@ Thresholds en skill `triple-verify`. Modos: Normal (zona) · `!ship`=triple+qual
 | `!manifest` | Lee CYCLE.md, reporta ciclo actual + score, verifica shortcuts |
 | `!5fases`/`!extimprove` | Carga `external-improvement` — 5-phase cycle, 3+ sub/fase |
 | `!analisis` | Análisis multi-agente: gentleman-vMK + 3 subagentes + research web → plan consolidado |
-| `!setup` | `scripts/setup-machine.ps1` — bootstrap portability on new machine |
+| `!setup` | `scripts/setup-machine.ps1` (Windows) / `scripts/setup-machine.sh` (Linux/macOS) — bootstrap portability on new machine |
 | `!dev` | `scripts/dev-server.ps1` — manage background dev servers (start/status/logs/kill) |
 | `!gentleman` | `scripts/use-gentleman.ps1` — gentleman-ize any project (one command to inherit MCPs, agents, skills) |
 
-> **Portability**: On a new machine, run `!setup` or `.\scripts\setup-machine.ps1` after cloning.  
+> **Portability**: On a new machine, run `!setup` or `scripts/setup-machine.ps1` (Windows) / `scripts/setup-machine.sh` (Linux/macOS) after cloning.  
 > **Dev servers**: Use `!dev start frontend -- npm run dev` to start, `!dev logs frontend` to see output.
 > **Project init**: Run `!gentleman` in any project directory to inherit gentleman-vMK as default agent, with all MCPs, skills, and skills auto-available.
 
@@ -83,11 +87,11 @@ Overrides DEFAULT/SIMPLE/COMPLEX execution mode. Trigger explicitly with `!anali
 Read-heavy (>3 files) → delegate `explore`. Main context = synthesis/decisions. Saves 2-5K tokens.
 
 ## Learning Loop
-Capture→Extract→Evaluate→Apply. Auto-score 7 dims. <7→immune. 10→mem_save. Triggers: same fix 2x · gotcha · user corrected 2x · repeat workflow · pattern 3+ files. Self-check every ~5 tools. Every 5th: `session-miner.ps1 -Mode scan -Json`.
+Capture→Extract→Evaluate→Apply. Triggers: same fix 2x · gotcha · user corrected 2x · repeat workflow · pattern 3+ files. Self-check: concise enough? Risk detected? Score/metrics via `!score`.
 
 ## Default-FAIL
-Evidence = tool output. NOT self-assessment. Builder≠Evaluator. Uncertain? → FAIL. After every completion: auto-score 7 dims. <7 → immune-system.
-Post-task: si auto-metrics ≥9 y hay mejora obvia detectada → sugerir 1 línea al usuario. Si hay drift o score drop >0.5 → proponer 1 candidato de mejora. Siempre sugerir, nunca actuar sin confirmación.
+Evidence = tool output. NOT self-assessment. Builder≠Evaluator. Uncertain? → FAIL.
+Post-task: si hay mejora obvia detectada → sugerir 1 línea al usuario. Si hay drift o score drop >0.5 → proponer 1 candidato de mejora. Siempre sugerir, nunca actuar sin confirmación. Scoring via `!score`.
 
 ## Python Environment
 Global packages: rich, requests, httpx, beautifulsoup4, lxml, pandas, numpy, Pillow, aiohttp, fastapi, uvicorn, pydantic, sqlalchemy, alembic, pytest, pytest-asyncio, pytest-cov, flake8, mypy, black, isort, pre-commit, click, typer. If missing → `pip install`.
@@ -95,7 +99,7 @@ Global packages: rich, requests, httpx, beautifulsoup4, lxml, pandas, numpy, Pil
 ## Global Script Invocation
 Two-step: `. "$env:USERPROFILE\.config\opencode\scripts\bash-safe.ps1"` then `& "$env:GENTLEMAN_AGENT_ROOT\scripts\xxx.ps1" -args`.
 One-liner: `. "$env:USERPROFILE\.config\opencode\scripts\bash-safe.ps1"; & "$env:GENTLEMAN_AGENT_ROOT\scripts\xxx.ps1" -args`
-> **Portability**: `$env:GENTLEMAN_AGENT_ROOT` is auto-set by `scripts/setup-machine.ps1`. On a new machine, clone the repo and run setup-machine.ps1 first.
+> **Portability**: `$env:GENTLEMAN_AGENT_ROOT` is auto-set by `scripts/setup-machine.ps1` (Windows) or `scripts/setup-machine.sh` (Linux/macOS). On a new machine, clone the repo and run the appropriate setup script first.
 
 ## Bash-Safe (PowerShell 5.1)
 PS 5.1 rejects `&&`, `||`. WSL bash stub broken. **Use `Invoke-Bash`** wrapper (auto-discovered by bash-safe.ps1). **Forbidden**: raw bash calls. Pre-flight check: scan for `&&`/`||` → use `Invoke-Bash` or `; if ($?) { }`.
@@ -108,6 +112,16 @@ Infer: QUICK (simple→min) · THOROUGH (risky→full SDD) · DRAFT (explore→f
 | YELLOW | Brief+expand | L1+L2 | Essential | Pedir nod humano | ctx>40% or depth MEDIUM |
 | ORANGE | Headline | L2 forced | Non-critical skip | Escalar a usuario | ctx>60% or any HIGH |
 | RED | 1-liner/file | L3 emergency | Skip all | Solo informar, no actuar | ctx>80% or err rate 2+ |
+
+## Risk-Adaptive Ceremony Zones (diff-based)
+Ceremony adapts to change RISK (not just context window). Auto-detect from diff:
+| Risk Level | Diff Signal | Ceremony |
+|---|---|---|
+| 🟢 TRIVIAL | 1 file, ≤3 lines, no `fn`/`class`, only comments/whitespace/strings | `git add` + commit + secrets scan only |
+| 🟡 LOW | ≤3 files, test-only, local refactor | quality-gate + commit-crafter + security |
+| 🟠 MEDIUM | 3-8 files, touches existing logic | quality-gate + triple-verify (auto-zona) + security + commit-crafter |
+| 🔴 HIGH | >8 files, or touches auth/storage/API/schema | Full pipeline + suggest `!audit` + `!score` |
+Default: **LOW**. Only escalate when diff signal indicates risk. No auto-metrics, no auto-auditor for trivial/low changes.
 
 ## Persona Scope (CRITICAL)
 Persona governs reply TEXT only — NOT artifacts (code, identifiers, commits, docs, UI, PRs). Artifacts default to English. No Rioplatense in code.
@@ -137,18 +151,18 @@ When running a dev server / watcher / long-lived process, DO NOT wait for it to 
 Or use the `!dev` shortcut: `!dev start frontend -- npm run dev`
 
 ### Portability (new machine setup)
-When setting up on a new machine: `scripts/setup-machine.ps1` (or `!setup` shortcut). This sets:
-- `$env:GENTLEMAN_AGENT_ROOT` → repo root
+When setting up on a new machine: `scripts/setup-machine.ps1` (Windows) or `scripts/setup-machine.sh` (Linux/macOS), or the `!setup` shortcut. This sets:
+- `$env:GENTLEMAN_AGENT_ROOT` (or `GENTLEMAN_AGENT_ROOT` on Linux/macOS) → repo root
 - Global shortcuts (opencode-vmk, gentleman-vmk)
 - OpenCode env vars (cache, config, db paths)
-- Skill junctions in global config
+- Skill junctions/symlinks in global config
 
 ### Project init (any project)
 Run `scripts/use-gentleman.ps1` (or `!gentleman` shortcut) in any project directory to:
 - Inherit gentleman-vMK as default agent (without copying agent definitions)
 - Auto-import global MCPs (context7, engram, sequential-thinking, headroom)
 - Access all 68 skills via global junction
-- Auto-fix missing global setup by calling setup-machine.ps1
+- Auto-fix missing global setup by calling the appropriate setup script
 
 ## Contextual Skill Loading (MANDATORY)
 `<available_skills>` is authoritative. Self-check BEFORE every response: match by file context + task context.
@@ -189,7 +203,7 @@ Auto: `session-miner.ps1 -Mode scan -Json` every 5th error/bugfix via self-check
 Delete `$env:TEMP\opencode\` >24h at session start.
 
 ### Session Close Protocol (mandatory)
-Run `!close` (`close-session.ps1`) → auto-metrics (if ≥3 tool calls, 7 dims, <7→immune) → dreaming (if errors/bugfixes) → `mem_session_summary` (Goal/Instructions/Discoveries/Accomplished/Next/Files). All mandatory unless pure chat.
+Run `!close` (`close-session.ps1`) → `mem_session_summary` (Goal/Instructions/Discoveries/Accomplished/Next/Files). Scoring y dreaming via `!score` / `!dream`. Mandatory unless pure chat.
 
 ### After Compaction
 On compaction/"FIRST ACTION REQUIRED": 1) `mem_session_summary` 2) `mem_context` 3) Continue.
@@ -230,7 +244,7 @@ PSSA Gate: auto-heals BOM + switch defaults. Write-Host intentional. No `git com
 ### E-H. Workflow rules
 - **Subagent-first**: Read-heavy delegate explore. Batch independent calls.
 - **Hard rules**: 1Q→STOP (con excepciones §Rules). Zero filler. Default-FAIL. Destructive ops gate: NEVER delete/move without (a) explicit approval OR (b) ≥3 subagent verification + content read + cross-ref.
-- **Post-task**: auto-metrics 7 dims. Code changes → external-auditor AUTOMÁTICO (delegar subagente blind audit antes de auto-metrics, no solo recordatorio). Bias correction via §L.
+- **Post-task**: suggest `!score` / `!audit` only for HIGH-risk changes (8+ files, auth/storage/API). No auto-metrics, no auto external-auditor.
 - **Upstream**: `pull-upstream.ps1 -Mode Check` → NEW auto-merge, MODIFIED manual, OURS ONLY ignored.
 
 ### I. Self-Improvement System
@@ -244,7 +258,7 @@ Plugin: `opencode-self-improve` (Hermes-style) — SkillForge→SQLite, Curator�
 Buscar `.project.json`. Si existe: reportar score actual. Si >7d stale → fresh metrics + update. Si no existe → no informe. `mem_save(topic_key=project/score)`.
 
 ### L. Bias Calibration
-`.learnings/bias-calibration.json` — rolling window of last 3 audits. `offset = self - audit` per dim. Before auto-metrics threshold check: if samples≥2, subtract avg offset. <7→immune, ≥9→mem_save.
+`.learnings/bias-calibration.json` — rolling window of last 3 audits. Only checked during `!score`/`!audit`, not automatically.
 <!-- /gentle-ai:agent-protocol -->
 
 <!-- agent-version: 2.2 — Project: gentleman-agent-gh, self-contained -->

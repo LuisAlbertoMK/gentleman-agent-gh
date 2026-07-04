@@ -58,7 +58,7 @@ El proyecto ejecuta ciclos de mejora continua (CYCLE.md):
 
 ## Instalación
 
-### Windows (PowerShell 5.1+)
+### Windows (PowerShell 7+)
 ```powershell
 # Clonar e instalar
 git clone https://github.com/LuisAlbertoMK/gentleman-agent-gh.git
@@ -68,13 +68,10 @@ cd gentleman-agent-gh
 
 ### Linux/macOS
 ```bash
-# Clonar
+# Clonar e instalar
 git clone https://github.com/LuisAlbertoMK/gentleman-agent-gh.git
 cd gentleman-agent-gh
-
-# Copiar skills a OpenCode
-mkdir -p ~/.config/opencode/skills/
-cp -r .agents/skills/* ~/.config/opencode/skills/
+./scripts/install.sh
 ```
 
 ### MCP Setup (recomendado)
@@ -137,7 +134,7 @@ El proyecto usa dos MCPs para memoria cross-session:
 | `smoke/smoke-all.ps1` | Tests de humo para claims de automatización |
 | `benchmark.ps1` | Benchmarking de skills y scripts |
 | `trend.ps1` | Análisis de tendencias de scoring |
-| `install.ps1` | Instalador de gentleman-agent-gh (junctions globales) |
+| `install.ps1` / `install.sh` | Instalador multi-plataforma (Windows/Linux/macOS) |
 
 ---
 
