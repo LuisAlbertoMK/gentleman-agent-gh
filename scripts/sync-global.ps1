@@ -171,14 +171,15 @@ if (-not $NoAgentSync) {
 
 # ── Step 5: Verify junctions ─────────────────────────────────────────────
 Write-Step "Junction verification" {
-        $skills = Get-ChildItem $dstSkills -Directory -EA SilentlyContinue
-                        $bad = $skills.PSWhere({ -not (Test-Path $_.Target) })
+    $skills = Get-ChildItem $dstSkills -Directory -EA SilentlyContinue
+    $bad = $skills.PSWhere({ $_.Target -and -not (Test-Path $_.Target) })
     if ($bad.Count -gt 0) {
         $bad | ForEach-Object { Write-Host "  [broken] $($_.Name) -> $($_.Target)" -ForegroundColor Red }
         throw "$($bad.Count) broken junctions"
     }
-    Write-Host "  Skills: $($skills.Count) junctions, all valid" -ForegroundColor Green
-    Write-Host "  Scripts: $(Test-Path $dstScripts)" -ForegroundColor Green
+    Write-Host "  Skills: $($skills.Count) entries accessible via junction" -ForegroundColor Green
+    $scriptsOk = Test-Path $dstScripts
+    Write-Host "  Scripts junction: $scriptsOk" -ForegroundColor Green
 }
 
 # ── Step 6: Verify MCPs ──────────────────────────────────────────────────

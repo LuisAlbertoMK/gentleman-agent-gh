@@ -715,17 +715,20 @@ Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅
   - Item 5 (H4): `skills/` confirmado limpio — `.gitignore` correcto, 0 archivos trackeados ✅
   - Item 6 (M1/M4): Verificado — README sin tabla de modelos stale; `docs/research/` ya eliminada ✅
   - Item 7: 3 subagentes de verificación ejecutados — stability PASS, cross-ref PASS, regression PASS ✅
-  - Item 8: Re-score + reporte ciclo + commit pendiente
+  - Item 8: Re-score + reporte ciclo + commit final + mejoras post-close (SE recovery, sync-global fix) ✅
 
 ### Cycle 18 Close
-- Score: **9.1/10** (post-regen honesto; Skill Effectiveness 8.0, Cycle Activity 1 — se recuperarán con actividad del ciclo)
-- inter: 5/30
+- Score: **9.3/10** (post-all-fixes; Skill Effectiveness 10.0 recuperado tras compresión de prompt)
+- inter: 8/30
 - Backlog: 8/8 items complete ✅ (100%)
 - Key wins:
   - **Regression Lock (F3)**: `install.ps1` + `install.sh` — eliminada toda auto-descarga de upstream ajeno
   - **Single Source of Truth (F2)**: `.project.json` consolidado vía `score-auto.ps1`; 3 archivos score duplicados ya no existen
   - **CI Gate Fix (H3)**: Bug corregido en `quality-gate.yml` — `Get-Content -Head 3` reemplaza `-TotalCount 3 -Raw`
   - **Consistencia (F1)**: 68 skills verificados en todos los artefactos
+  - **SE Recovery**: `prompts/sdd/sdd-orchestrator.md` comprimido (5.2KB→2.9KB), eliminado penalizador prO5 → Skill Effectiveness 8.0→10.0
+  - **sync-global fix**: Junction verification corregido (`$_.Target -and` guard contra null), ahora pasa con status OK
+  - **Global sync completa**: Skills junction, scripts junction, 4 agentes, MCPs, AGENTS.md — todo verificado y OK
   - **Pipeline terminado sin regresiones**: 3 subagentes confirmaron estabilidad, cross-ref, y 0 regresiones
 
 ---
