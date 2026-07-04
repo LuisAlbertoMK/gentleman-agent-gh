@@ -1,6 +1,78 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "default_agent": "gentleman-vMK",
+  "skills": {
+    "paths": [
+      ".agents/skills/*"
+    ]
+  },
+  "permission": {
+    "bash": {
+      "*": "allow",
+      "git commit *": "ask",
+      "git push": "ask",
+      "git push *": "ask",
+      "git push --force *": "ask",
+      "git push --delete *": "ask",
+      "git rebase *": "ask",
+      "git reset *": "ask",
+      "git merge *": "ask",
+      "git branch -D *": "ask",
+      "git stash drop *": "ask",
+      "gh pr merge *": "ask"
+    },
+    "read": {
+      "*": "allow",
+      "**/.env": "deny",
+      "**/.env.*": "deny",
+      "**/credentials.json": "deny",
+      "**/secrets/**": "deny",
+      "*.env": "deny",
+      "*.env.*": "deny"
+    }
+  },
+  "mcp": {
+    "context7": {
+      "enabled": true,
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@upstash/context7-mcp@3.2.2"
+      ],
+      "environment": {
+        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+      }
+    },
+    "engram": {
+      "command": [
+        "engram",
+        "mcp",
+        "--tools=agent"
+      ],
+      "type": "local"
+    },
+    "sequential-thinking": {
+      "enabled": true,
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking@2025.12.18"
+      ]
+    },
+    "headroom": {
+      "enabled": true,
+      "type": "local",
+      "command": [
+        "headroom",
+        "mcp",
+        "serve"
+      ],
+      "environment": {
+        "HEADROOM_PROXY_URL": "http://127.0.0.1:8787"
+      }
+    }
+  },
   "agent": {
     "gentleman-vMK": {
       "description": "Senior Architect mentor - helpful first, challenging when it matters",
@@ -196,63 +268,5 @@
       }
     }
   },
-  "mcp": {
-    "context7": {
-      "enabled": true,
-      "type": "local",
-      "command": ["npx", "-y", "@upstash/context7-mcp@3.2.2"],
-      "environment": {
-        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
-      }
-    },
-    "engram": {
-      "command": [
-        "engram",
-        "mcp",
-        "--tools=agent"
-      ],
-      "type": "local"
-    },
-    "sequential-thinking": {
-      "enabled": true,
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking@2025.12.18"]
-    },
-    "headroom": {
-      "enabled": true,
-      "type": "local",
-      "command": ["headroom", "mcp", "serve"],
-      "environment": {
-        "HEADROOM_PROXY_URL": "http://127.0.0.1:8787"
-      }
-    }
-  },
-  "permission": {
-    "bash": {
-      "*": "allow",
-      "git commit *": "ask",
-      "git push": "ask",
-      "git push *": "ask",
-      "git push --force *": "ask",
-      "git push --delete *": "ask",
-      "git rebase *": "ask",
-      "git reset *": "ask",
-      "git merge *": "ask",
-      "git branch -D *": "ask",
-      "git stash drop *": "ask",
-      "gh pr merge *": "ask"
-    },
-    "read": {
-      "*": "allow",
-      "**/.env": "deny",
-      "**/.env.*": "deny",
-      "**/credentials.json": "deny",
-      "**/secrets/**": "deny",
-      "*.env": "deny",
-      "*.env.*": "deny"
-    }
-  },
-  "skills": {
-    "paths": [".agents/skills/*"]
-  }
+  "default_agent": "gentleman-vMK"
 }

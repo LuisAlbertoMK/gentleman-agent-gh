@@ -128,17 +128,20 @@ if (Test-Path $projectCfgFile -PathType Leaf) {
 }
 
 # Ensure minimal setup: default_agent + $schema
-$projectCfg['$schema'] = $projectCfg['$schema'] -or "https://opencode.ai/config.json"
+$currentSchema = $projectCfg['$schema']
+if (-not $projectCfg.ContainsKey('$schema') -or $currentSchema -isnot [string] -or [string]::IsNullOrEmpty($currentSchema)) {
+    $projectCfg['$schema'] = "https://opencode.ai/config.json"
+}
 $projectCfg['default_agent'] = $DefaultAgent
 
 # Inherit MCPs from global if project has none
-$hasMcp = $projectCfg.ContainsKey('mcp') -and $projectCfg['mcp'].PSObject.Properties.Count -gt 0
+$hasMcp = $projectCfg.ContainsKey('mcp') -and @($projectCfg['mcp'].PSObject.Properties).Count -gt 0
 if (-not $hasMcp -and $cfg.mcp) {
     $projectCfg['mcp'] = $cfg.mcp
 }
 
 # Inherit permissions from global if project has none
-$hasPermissions = $projectCfg.ContainsKey('permission') -and $projectCfg['permission'].PSObject.Properties.Count -gt 0
+$hasPermissions = $projectCfg.ContainsKey('permission') -and @($projectCfg['permission'].PSObject.Properties).Count -gt 0
 if (-not $hasPermissions -and $cfg.permission) {
     $projectCfg['permission'] = $cfg.permission
 }
