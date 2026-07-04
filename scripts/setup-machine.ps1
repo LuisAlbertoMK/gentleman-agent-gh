@@ -117,7 +117,39 @@ if (-not $SkipShortcuts) {
     skip "Global shortcuts (via -SkipShortcuts)"
 }
 
-# ── Step 4: Global skill config ────────────────────────────────────
+# ── Step 4: Global opencode config ─────────────────────────────────
+info "Syncing global opencode config from repo"
+$globalConfigPath = "$env:USERPROFILE\.config\opencode\opencode.json"
+$repoConfigPath = Join-Path $RepoDir "opencode.json"
+if (Test-Path $globalConfigPath -and (Test-Path $repoConfigPath)) {
+    $globalConfig = Get-Content $globalConfigPath -Raw | ConvertFrom-Json
+    $repoConfig = Get-Content $repoConfigPath -Raw | ConvertFrom-Json
+
+    $synced = $false
+    # Sync default_agent
+    if (-not $globalConfig.default_agent -or $globalConfig.default_agent -ne "gentleman-vMK") {
+        $globalConfig | Add-Member -NotePropertyName "default_agent" -NotePropertyValue "gentleman-vMK" -Force
+        $synced = $true
+    }
+    # Sync sections: mcp, permission, skills
+    foreach ($section in @("mcp", "permission", "skills")) {
+        $repoValue = $repoConfig.$section
+        if ($repoValue) {
+            $globalConfig | Add-Member -NotePropertyName $section -NotePropertyValue $repoValue -Force
+            $synced = $true
+        }
+    }
+    if ($synced) {
+        $globalConfig | ConvertTo-Json -Depth 10 | Set-Content $globalConfigPath
+        ok "Global config synced from repo (default_agent + mcp + permission + skills)"
+    } else {
+        skip "Global config already up to date"
+    }
+} else {
+    warn "Global or repo config not found — sync manually"
+}
+
+# ── Step 5: Global skill config ────────────────────────────────────
 info "Setting up global skill config"
 $globalSkillsDir = "$env:USERPROFILE\.config\opencode\skills"
 $repoSkillsDir = Join-Path $RepoDir ".agents\skills"
@@ -134,7 +166,7 @@ if (-not (Test-Path "$globalSkillsDir\_shared")) {
     skip "Skills junction already exists"
 }
 
-# ── Step 5: Verify ────────────────────────────────────────────────
+# ── Step 6: Verify ────────────────────────────────────────────────
 info "Verifying setup"
 $checks = @(
     @{ Label = "GENTLEMAN_AGENT_ROOT"; Test = { $env:GENTLEMAN_AGENT_ROOT -eq $RepoDir } },
