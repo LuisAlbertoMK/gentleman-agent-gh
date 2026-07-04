@@ -39,7 +39,7 @@ foreach($s in $cs){
   if($gi.LinkType -ne "Junction"){$w+=[PSCustomObject]@{Skill=$sn;Status="GLOBAL_NOT_JUNCTION";Detail="Real file, not junction"}}
   if($gi.LinkType -ne "Junction"){
     if($Thorough){$m=(Get-FileHash $cp).Hash -eq (Get-FileHash (Join-Path $gd "$sn\SKILL.md")).Hash}
-    else{$cl=(Get-Content $cp | Measure-Object -Line).Lines;$gl=(Get-Content (Join-Path $gd "$sn\SKILL.md") | Measure-Object -Line).Lines;$m=$cl -eq $gl}
+    else{$cl=([IO.File]::ReadAllText($cp) -split "`n").Count;$gl=([IO.File]::ReadAllText((Join-Path $gd "$sn\SKILL.md")) -split "`n").Count;$m=$cl -eq $gl}
     if(-not $m){$d+=[PSCustomObject]@{Skill=$sn;Status="DRIFT";Detail=if($Thorough){"Hash mismatch"}else{"Lines: canon=$cl glob=$gl"}}}
   }
 }

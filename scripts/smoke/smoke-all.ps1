@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7.6
 
 <#
 .SYNOPSIS
@@ -34,6 +34,7 @@ $smokeScripts = @(
     @{ name = 'Dreaming auto-trigger (session-miner)'; file = 'smoke-dreaming.ps1' }
     @{ name = 'Score freshness warning';       file = 'smoke-score-freshness.ps1' }
     @{ name = 'Cycle LOOP step 3 freshness check'; file = 'smoke-cycle-loop.ps1' }
+    @{ name = 'JsonFast serialization module'; file = 'smoke-jsonfast.ps1' }
 )
 
 foreach ($s in $smokeScripts) {

@@ -1,3 +1,5 @@
+#requires -Version 7.6
+
 <#
 .SYNOPSIS
 Backup OpenCode config to git repository.
@@ -8,7 +10,7 @@ Optional commit message for the backup.
 .PARAMETER Force
 Backup even if no changes detected.
 #>
-#requires -Version 5.1
+#requires -Version 7.6
 Set-StrictMode -Version Latest
 param([string]$Message="",[switch]$Force)
 $cfg="$env:USERPROFILE\.config\opencode"

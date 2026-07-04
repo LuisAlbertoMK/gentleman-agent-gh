@@ -16,18 +16,10 @@ CONTEXT:
 TASK:
 Archive the active SDD change. Read the verification report first to confirm the change is ready. Then:
 
-ENGRAM PERSISTENCE (artifact store mode: engram):
-CRITICAL: mem_search returns 300-char PREVIEWS, not full content. You MUST call mem_get_observation(id) for EVERY artifact.
-STEP A — SEARCH (get IDs only):
-  mem_search(query: "sdd/{change-name}/proposal", project: "{project}") → proposal_id
-  mem_search(query: "sdd/{change-name}/spec", project: "{project}") → spec_id
-  mem_search(query: "sdd/{change-name}/design", project: "{project}") → design_id
-  mem_search(query: "sdd/{change-name}/tasks", project: "{project}") → tasks_id
-  mem_search(query: "sdd/{change-name}/verify-report", project: "{project}") → verify_id
-STEP B — RETRIEVE FULL CONTENT (mandatory):
-  mem_get_observation(proposal_id) | mem_get_observation(spec_id) | mem_get_observation(design_id) | mem_get_observation(tasks_id) | mem_get_observation(verify_id)
-Record all observation IDs in the archive report for traceability.
-Save: mem_save(title: "sdd/{change-name}/archive-report", topic_key: "sdd/{change-name}/archive-report", type: "architecture", project: "{project}", content: "{archive report with observation IDs}")
+ENGRAM PERSISTENCE (see [\_shared/engram-convention.md](../.agents/skills/_shared/engram-convention.md) for full protocol):
+- Batch search: proposal + spec + design + tasks + verify-report
+- Retrieve all (preview rule: mem_get_observation mandatory)
+- Save: mem_save(title: "sdd/{change-name}/archive-report", ...)
 
 Then:
 1. Sync delta specs into main specs (source of truth)

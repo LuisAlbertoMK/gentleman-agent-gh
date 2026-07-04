@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+﻿#requires -Version 7.6
 <#
 .SYNOPSIS
   Continuous Improvement Cycle — measure, compress, validate, log, repeat.

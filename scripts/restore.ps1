@@ -1,3 +1,5 @@
+#requires -Version 7.6
+
 <#
 .SYNOPSIS
 Restore OpenCode config from git backup.
@@ -10,7 +12,7 @@ List snapshots only, no restore.
 .PARAMETER DryRun
 Show what would be restored without applying.
 #>
-#requires -Version 5.1
+#requires -Version 7.6
 Set-StrictMode -Version Latest
 param([string]$Revision="",[switch]$List,[switch]$DryRun)
 $ErrorActionPreference='Stop'

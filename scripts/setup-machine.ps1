@@ -1,4 +1,4 @@
-#requires -Version 7.0
+﻿#requires -Version 7.0
 <#
 .SYNOPSIS
     Gentleman Agent — One-shot machine setup for portability

@@ -100,7 +100,7 @@ Launching `sdd-apply` or `sdd-verify` → search `mem_search("sdd-init/{project}
 **Apply-Progress Continuity (MANDATORY)**:
 Launching `sdd-apply` for continuation → search `mem_search("sdd/{change-name}/apply-progress")`. If found, add: `"PREVIOUS APPLY-PROGRESS at topic_key 'sdd/{change-name}/apply-progress'. Read first, MERGE your new progress, save combined. Do NOT overwrite."`
 
-**Engram Topic Keys**:
+**Engram Topic Keys** (canonical reference: [\_shared/engram-convention.md](../../.agents/skills/_shared/engram-convention.md)):
 
 | Artifact | Topic Key |
 |----------|-----------|

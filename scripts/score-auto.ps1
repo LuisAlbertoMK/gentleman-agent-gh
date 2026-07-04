@@ -1,4 +1,5 @@
-﻿<#
+﻿#requires -Version 7.6
+<#
 .SYNOPSIS
   Auto-score project metrics across 7 dimensions.
 .DESCRIPTION
@@ -29,16 +30,15 @@ $ji=(Get-ChildItem ".\skills" -Directory -EA SilentlyContinue).PSWhere({ $_.Targ
 if($ji -gt 0){$ds-=1};$co=@(Select-String -Path ".\scripts\*.ps1" -Pattern '^\s*#\s+function\s+\w+|^\s*#\s+if\s*\(|^\s*#\s+foreach\s*\(|^\s*#\s+for\s*\(|^\s*#\s+while\s*\(|^\s*#\s+switch\s*\(|^\s*#\s+try\s*\{|^\s*#\s+catch\s*\{').PSWhere({$_.Filename -ne "score-auto.ps1"})
 if($co.Count -gt 10){$ds-=1}
 a "DC" ($m::Max(0,$m::Min(10,$ds))) @{orphans=$oc;dead_junctions=$ji;commented_out=$co.Count} "Orphans: $oc, dead junctions: $ji"
-$sc=@(Get-ChildItem ".\scripts\*.ps1");$ts=$sc.Count;$wh=0;$wp=0;$ws=0
-foreach($s in $sc){$c1=Get-Content $s.FullName -Raw;if($c1 -match '<#'){$wh++};if($c1 -match 'param\('){$wp++};if($c1 -match 'Set-StrictMode'){$ws++}}
+$sc=@(Get-ChildItem ".\scripts\*.ps1");$ts=$sc.Count
+$scStats=$sc|ForEach-Object -Parallel{$c1=[IO.File]::ReadAllText($_.FullName);[PSCustomObject]@{h=[bool]($c1-match'<#');p=[bool]($c1-match'param\(');s=[bool]($c1-match'Set-StrictMode');t=[bool]($c1-match'try\s*\{')}} -ThrottleLimit 7
+$wh=@($scStats|?{$_.h}).Count;$wp=@($scStats|?{$_.p}).Count;$ws=@($scStats|?{$_.s}).Count;$wt=@($scStats|?{$_.t}).Count
 $cr=($wh,$wp,$ws).PSForEach({$m::Round(($_/$ts),2)})
 a "CC" ($m::Round(($cr[0]+$cr[1]+$cr[2])/3*10,1)) @{total_scripts=$ts;with_help=$wh;with_params=$wp;with_strictmode=$ws} "S:$ts H:$wh P:$wp S:$ws"
-$bp=$m::Round(($wp/$ts)*10,1);$wt=0
-foreach($s in $sc){if((Get-Content $s.FullName -Raw) -match 'try\s*\{'){$wt++}}
+$bp=$m::Round(($wp/$ts)*10,1)
 $tr=$wt/$ts;if($tr -ge 0.8){$bp=$m::Min(10,$bp+1)}elseif($tr -le 0.3){$bp=$m::Max(0,$bp-1)}
 a "BP" $bp @{param_cov=$wp;trycatch=$wt} "P:$wp/$ts T:$wt/$ts"
-$crp=0;$sf2=Get-ChildItem ".\.agents\skills\*\SKILL.md"
-foreach($f in $sf2){try{$b=[System.IO.File]::ReadAllBytes($f.FullName);$c2=$false;for($i=0;$i -lt $b.Length-3;$i++){if($b[$i]-eq0xC3-and$b[$i+1]-eq0x83-and$b[$i+2]-ge0x80){$c2=$true;break};if($b[$i]-eq0xC3-and$b[$i+1]-eq0xA2-and$i+3-lt$b.Length){if($b[$i+2]-eq0xE2-and($b[$i+3]-eq0x80-or$b[$i+3]-eq0x82)){$c2=$true;break}}};if($c2){$crp++}}catch{Write-Debug "score-auto: utf8 scan failed ($($_.Exception.Message))"}}
+$sf2=Get-ChildItem ".\.agents\skills\*\SKILL.md";$crp=@($sf2|ForEach-Object -Parallel{$f=$_;try{$b=[System.IO.File]::ReadAllBytes($f.FullName);for($i=0;$i -lt $b.Length-3;$i++){if($b[$i]-eq0xC3-and$b[$i+1]-eq0x83-and$b[$i+2]-ge0x80){$true;return};if($b[$i]-eq0xC3-and$b[$i+1]-eq0xA2-and$i+3-lt$b.Length-and$b[$i+2]-eq0xE2-and($b[$i+3]-eq0x80-or$b[$i+3]-eq0x82)){$true;return}};return $false}catch{$false}} -ThrottleLimit 4|?{$_}).Count
 $ort=10;if($crp -gt 10){$ort=4}elseif($crp -gt 5){$ort=7}elseif($crp -gt 0){$ort=9}
 a "Or" $ort @{corrupted=$crp;scanned=$sf2.Count} "Corruption: $crp/$($sf2.Count)"
 $bi=0;if(Test-Path "BITACORA.md"){$bc=Get-Content "BITACORA.md" -Raw;$bl=$bc.Split("`n").Count;if($bl -gt 10){$bi=10}elseif($bl -gt 5){$bi=7}else{$bi=5}}

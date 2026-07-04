@@ -16,15 +16,10 @@ CONTEXT:
 TASK:
 Verify the active SDD change. Read the proposal, specs, design, and tasks artifacts. Then:
 
-ENGRAM PERSISTENCE (artifact store mode: engram):
-CRITICAL: mem_search returns 300-char PREVIEWS, not full content. You MUST call mem_get_observation(id) for EVERY artifact.
-STEP A — SEARCH (get IDs only):
-  mem_search(query: "sdd/{change-name}/spec", project: "{project}") → spec_id
-  mem_search(query: "sdd/{change-name}/design", project: "{project}") → design_id
-  mem_search(query: "sdd/{change-name}/tasks", project: "{project}") → tasks_id
-STEP B — RETRIEVE FULL CONTENT (mandatory):
-  mem_get_observation(spec_id) | mem_get_observation(design_id) | mem_get_observation(tasks_id)
-Save report: mem_save(title: "sdd/{change-name}/verify-report", topic_key: "sdd/{change-name}/verify-report", type: "architecture", project: "{project}", content: "{verification report}")
+ENGRAM PERSISTENCE (see [\_shared/engram-convention.md](../.agents/skills/_shared/engram-convention.md) for full protocol):
+- Batch search: spec + design + tasks
+- Retrieve all (preview rule: mem_get_observation mandatory)
+- Save report: mem_save(title: "sdd/{change-name}/verify-report", ...)
 
 Then:
 1. Completeness — all tasks done?

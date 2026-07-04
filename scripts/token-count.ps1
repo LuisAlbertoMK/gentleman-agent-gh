@@ -1,4 +1,5 @@
-﻿<#
+﻿#requires -Version 7.6
+<#
 .SYNOPSIS
   Cuenta tokens aproximados en archivos (4 chars = 1 token)
 .DESCRIPTION
@@ -11,7 +12,7 @@
 .PARAMETER Recurse
   Buscar recursivamente en subdirectorios.
 #>
-#requires -Version 5.1
+#requires -Version 7.6
 
 param(
   [string[]]$Path = @(),

@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7.6
 <#
 .SYNOPSIS
   Create a new auto-incremented batch entry - log to BITACORA.md, increment inter-track.

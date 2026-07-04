@@ -1,4 +1,6 @@
-﻿<#
+﻿#requires -Version 7.6
+
+<#
 .SYNOPSIS
   Benchmark de 3 métodos de file I/O × 3 runs
 .DESCRIPTION
@@ -11,7 +13,7 @@
 .PARAMETER Runs
   Cantidad de runs (1-10, default: 3).
 #>
-#requires -Version 5.1
+#requires -Version 7.6
 
 param(
   [string]$Path = "",

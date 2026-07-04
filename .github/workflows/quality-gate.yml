@@ -8,25 +8,31 @@ on:
 
 jobs:
   quality-gate:
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
-        shell: powershell
+        shell: pwsh
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cross-ref validation — skills, index, junctions, references
+      - name: Cross-ref validation — skills, index, references
         run: ./scripts/cross-ref-check.ps1
 
-      - name: Skill drift check — canonical vs global junctions
+      - name: Skill drift check — canonical vs global config
+        if: runner.os == 'Windows'
         run: ./scripts/check-skill-drift.ps1
 
-      - name: PS5.1 safety scan — detect &&/|| hazards in all .ps1
+      - name: PS7 version gate — verify all scripts require 7.6
         run: |
-          $files = Get-ChildItem -Recurse -Filter *.ps1 | Where-Object { $_.FullName -notmatch 'bash-safe|experiments|node_modules' } | Select-Object -ExpandProperty FullName
-          if ($files.Count -gt 0) { & ./scripts/ps5-detect.ps1 -FilePath $files }
-          else { Write-Output "No .ps1 files to scan" }
+          $bad = Get-ChildItem -Recurse -Filter *.ps1 | Where-Object { $_.FullName -notmatch 'experiments|node_modules' } | Where-Object {
+            $c = Get-Content $_ -TotalCount 3 -Raw; $c -notmatch '#requires -Version 7'
+          }
+          if ($bad) { $bad | ForEach-Object { Write-Output "::warning title=Missing PS7::$($_.Name)" }; exit 1 }
+          else { Write-Output "OK: All .ps1 scripts require PS7+" }
 
       - name: Downstream tests — delivery-harness, chained-pr, subagent-isolation
         run: ./scripts/test-downstream.ps1

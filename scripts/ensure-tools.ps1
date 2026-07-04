@@ -1,4 +1,5 @@
-﻿<#
+﻿#requires -Version 7.6
+<#
 .SYNOPSIS
   Verifica y expone herramientas esenciales en PATH
 .DESCRIPTION
@@ -9,7 +10,7 @@
 #>
 
 $ErrorActionPreference = 'Stop'
-#requires -Version 5.1
+#requires -Version 7.6
 
 param(
   [switch]$Quiet

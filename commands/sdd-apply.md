@@ -18,18 +18,11 @@ CONTEXT:
 TASK:
 Implement the remaining incomplete tasks for the active SDD change.
 
-ENGRAM PERSISTENCE (artifact store mode: engram):
-CRITICAL: mem_search returns 300-char PREVIEWS, not full content. You MUST call mem_get_observation(id) for EVERY artifact.
-STEP A — SEARCH (get IDs only):
-  mem_search(query: "sdd/{change-name}/spec", project: "{project}") → spec_id
-  mem_search(query: "sdd/{change-name}/design", project: "{project}") → design_id
-  mem_search(query: "sdd/{change-name}/tasks", project: "{project}") → tasks_id
-  mem_search(query: "sdd/{change-name}/apply-progress", project: "{project}") → if found, progress_id (merge)
-STEP B — RETRIEVE FULL CONTENT (mandatory):
-  mem_get_observation(spec_id) | mem_get_observation(design_id) | mem_get_observation(tasks_id)
-  IF progress_id: mem_get_observation(progress_id) → skip completed tasks, merge on save
-Update tasks as you complete: mem_update(id: tasks_id, content: "{[x] marks}")
-Save progress: mem_save(title: "sdd/{change-name}/apply-progress", topic_key: "sdd/{change-name}/apply-progress", type: "architecture", project: "{project}", content: "{progress report}")
+ENGRAM PERSISTENCE (see [\_shared/engram-convention.md](../.agents/skills/_shared/engram-convention.md) for full protocol):
+- Batch search: spec + design + tasks + apply-progress (optional)
+- Retrieve all (preview rule: mem_get_observation mandatory)
+- Update tasks: mem_update(id: tasks_id, content: "{[x] marks}")
+- Save progress: mem_save(title: "sdd/{change-name}/apply-progress", ...)
 
 For each task:
 1. Read spec scenarios (acceptance criteria)

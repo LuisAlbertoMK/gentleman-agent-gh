@@ -1,4 +1,5 @@
-﻿<#
+﻿#requires -Version 7.6
+<#
 .SYNOPSIS
   Comprehensive skill validation suite
 .DESCRIPTION
@@ -7,7 +8,7 @@
 .PARAMETER RepoRoot
   Ruta raíz del repositorio (default: parent of scripts/).
 #>
-#requires -Version 5.1
+#requires -Version 7.6
 
 param(
     [string]$RepoRoot = (Split-Path $PSScriptRoot -Parent)

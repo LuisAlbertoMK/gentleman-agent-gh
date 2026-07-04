@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7.6
 <#
 .SYNOPSIS
     Unified verify profiles E1/E2/E3 -- runnable checks for triple-verify gates.
@@ -30,7 +30,7 @@ function Invoke-E1Checks{
     $bf=@()
     if(Test-Path $skd){
         Get-ChildItem "$skd\*\SKILL.md" | ForEach-Object {
-            $c=Get-Content $_.FullName -Raw -Encoding UTF8
+            $c=[IO.File]::ReadAllText($_.FullName)
             if($c-match'^---'){
                 $end=$c.IndexOf('---',3)
                 if($end-eq-1){$bf+="$($_.Directory.Name): unclosed frontmatter"}
@@ -50,7 +50,7 @@ function Invoke-E2Checks{
     foreach($dir in $sDirs){
         if(-not(Test-Path $dir)){continue}
         Get-ChildItem $dir -Recurse -Include '*.ps1','*.md','*.psm1' | ForEach-Object {
-            $c=Get-Content $_.FullName -Raw -Encoding UTF8
+            $c=[IO.File]::ReadAllText($_.FullName)
             foreach($p in $sPat){if($c-match$p){$sf+="$($_.Name): matched '$p'"}}
         }
     }
@@ -90,8 +90,8 @@ function Invoke-E3Checks{
     }else{Add-Check '.project.json' $false 'Not found'}
     $sDir=Join-Path $Root 'scripts'
     $mh=@()
-    Get-ChildItem "$sDir\*.ps1" | ForEach-Object {
-        $c=Get-Content $_.FullName -Raw -Encoding UTF8
+    [IO.Directory]::EnumerateFiles($sDir, '*.ps1') | ForEach-Object {
+        $c=[IO.File]::ReadAllText($_)
         if($c -notmatch '\.SYNOPSIS'){$mh+=$_.Name}
     }
     if($mh.Count-eq0){Add-Check 'Script Help' $true 'All scripts have .SYNOPSIS'}else{Add-Check 'Script Help' $false "$($mh.Count) missing: $($mh -join ', ')"}

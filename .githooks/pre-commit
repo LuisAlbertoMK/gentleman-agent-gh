@@ -34,39 +34,22 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [2/9] PS5.1 safety check on changed .ps1 files ---
-echo "[2/9] PS5.1 safety (staged .ps1)..."
-STAGED_PS1=$(git diff --cached --name-only --diff-filter=ACM | grep '\.ps1$')
-PS5_BLOCK=""
+# --- [2/9] PS7 requirement check on changed .ps1 files ---
+echo "[2/9] PS7 #requires (staged .ps1)..."
+STAGED_PS1=$(git diff --cached --name-only --diff-filter=ACM | grep '\.ps1$' | grep -v 'ps5-detect\.ps1')
+PS7_BLOCK=""
 if [ -n "$STAGED_PS1" ]; then
-  # Build file list for PowerShell byte-level detector (zero false positives)
-  PS_ARGS=""
-  FIRST=1
-  for f in $STAGED_PS1; do
+  MISSING=$(for f in $STAGED_PS1; do
     FULL="$REPO_ROOT/$f"
     [ ! -f "$FULL" ] && continue
-    case "$f" in *bash-safe*|*pssa-gate*) continue ;; esac
-    # Escape single quotes for PowerShell
-    ESCAPED=$(echo "$FULL" | sed "s/'/''/g")
-    if [ $FIRST -eq 1 ]; then
-      PS_ARGS="'$ESCAPED'"
-      FIRST=0
-    else
-      PS_ARGS="$PS_ARGS, '$ESCAPED'"
-    fi
-  done
-  HAZARD_FILES=""
-  if [ -n "$PS_ARGS" ]; then
-    HAZARD_FILES=$(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
-      & '$REPO_ROOT/scripts/ps5-detect.ps1' -FilePath @($PS_ARGS)
-    " 2>&1)
-  fi
-  if [ -z "$HAZARD_FILES" ]; then
+    head -3 "$FULL" | grep -q '#requires -Version 7' || echo "$f"
+  done)
+  if [ -z "$MISSING" ]; then
     green "  OK"
   else
-    red "  BLOCKING: PS5.1 hazard in: $HAZARD_FILES"
-    echo "  PS5.1 does not support &&/||. Use: cmd1; if (\$?) { cmd2 }"
-    PS5_BLOCK="yes"
+    red "  BLOCKING: scripts missing #requires -Version 7.6:"
+    echo "$MISSING" | while read -r line; do echo "    $line"; done
+    PS7_BLOCK="yes"
   fi
 else
   green "  OK (no .ps1 staged)"
@@ -77,7 +60,7 @@ CHECKS_PASSED=$((CHECKS_PASSED + 1))
 echo "[3/9] Cross-ref check..."
 STAGED_SKILLS=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.agents/skills/' | head -3)
 if [ -n "$STAGED_SKILLS" ]; then
-  powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/cross-ref-check.ps1" 2>&1
+  pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/cross-ref-check.ps1" 2>&1
   if [ $? -eq 0 ]; then
     green "  OK"
     CHECKS_PASSED=$((CHECKS_PASSED + 1))
@@ -93,7 +76,7 @@ fi
 # --- [4/9] Skill drift check on skill changes ---
 echo "[4/9] Skill drift..."
 if [ -n "$STAGED_SKILLS" ]; then
-  powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/check-skill-drift.ps1" 2>&1
+  pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/check-skill-drift.ps1" 2>&1
   if [ $? -eq 0 ]; then
     green "  OK"
     CHECKS_PASSED=$((CHECKS_PASSED + 1))
@@ -108,7 +91,7 @@ fi
 
 # --- [5/9] Improvement cycle assessment ---
 echo "[5/9] Improvement cycle..."
-OVERWEIGHT_SKILLS=$(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
+OVERWEIGHT_SKILLS=$(pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command "
   \$canonical = \"$REPO_ROOT/.agents/skills\"
   if (-not (Test-Path \$canonical)) { exit 0 }
   Get-ChildItem \$canonical -Directory | Where-Object { \$_.Name -ne '_shared' } | ForEach-Object {
@@ -136,7 +119,7 @@ fi
 echo "[6/9] .project.json integrity..."
 STAGED_PROJECT_JSON=$(git diff --cached --name-only --diff-filter=ACM | grep '\.project\.json$')
 if [ -n "$STAGED_PROJECT_JSON" ]; then
-  POWERSHELL_OUT=$(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
+  POWERSHELL_OUT=$(pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command "
     \$json = Get-Content '$REPO_ROOT/.project.json' -Raw -Encoding UTF8 | ConvertFrom-Json
     \$dims = \$json.score.dimensions.PSObject.Properties.Name.Count
     \$current = \$json.score.current
@@ -160,7 +143,7 @@ fi
 echo "[7/9] review-rules.jsonc integrity..."
 STAGED_RULES=$(git diff --cached --name-only --diff-filter=ACM | grep 'review-rules\.jsonc$')
 if [ -n "$STAGED_RULES" ]; then
-  RULES_VALID=$(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
+  RULES_VALID=$(pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command "
     try {
       \$json = Get-Content '$REPO_ROOT/review-rules.jsonc' -Raw -Encoding UTF8
       \$parsed = \$json -replace '(?m)^\s*//.*$','' -replace '(?m)\s*//[^\"\n]*$','' -replace '(?s)/\*.*?\*/','' | ConvertFrom-Json
@@ -197,7 +180,7 @@ fi
 echo "[8/9] Benchmark check..."
 STAGED_AGENTS=$(git diff --cached --name-only --diff-filter=ACM | grep -E 'AGENTS\.md|\.agents/skills/')
 if [ -n "$STAGED_AGENTS" ]; then
-  BENCHMARK_OUT=$(powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/benchmark.ps1" -Gate 2>&1)
+  BENCHMARK_OUT=$(pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/benchmark.ps1" -Gate 2>&1)
   if echo "$BENCHMARK_OUT" | grep -q "REGRESSIONS"; then
     yellow "  WARN — benchmark regressions detected:"
     echo "$BENCHMARK_OUT" | while read -r line; do echo "    $line"; done
@@ -230,7 +213,7 @@ echo ""
 TOTAL=$((CHECKS_PASSED + CHECKS_FAILED))
 echo "=== Gate: $CHECKS_PASSED/$TOTAL passed ==="
 BLOCKED="no"
-if [ $CHECKS_FAILED -gt 0 ] || [ -n "$PS5_BLOCK" ]; then
+if [ $CHECKS_FAILED -gt 0 ] || [ -n "$PS7_BLOCK" ]; then
   BLOCKED="yes"
   red "  BLOCKED: fix errors above and stage again"
 else
@@ -238,7 +221,7 @@ else
 fi
 
 # --- Capture gate result to error tracking (non-blocking, silent) ---
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
+pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command "
   & '$REPO_ROOT/scripts/capture-errors.ps1' -Source quality-gate -Passed $CHECKS_PASSED -Failed $CHECKS_FAILED -Blocked '$BLOCKED'
 " > /dev/null 2>&1
 
