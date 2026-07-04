@@ -58,6 +58,7 @@ Thresholds en skill `triple-verify`. Modos: Normal (zona) · `!ship`=triple+qual
 | `!ponytail` | Set intensity level: `!ponytail [lite\|full\|ultra\|off]` |
 | `!manifest` | Lee CYCLE.md, reporta ciclo actual + score, verifica shortcuts |
 | `!5fases`/`!extimprove` | Carga `external-improvement` — 5-phase cycle, 3+ sub/fase |
+| `!analisis` | Análisis multi-agente: gentleman-vMK + 3 subagentes + research web → plan consolidado |
 | `!setup` | `scripts/setup-machine.ps1` — bootstrap portability on new machine |
 | `!dev` | `scripts/dev-server.ps1` — manage background dev servers (start/status/logs/kill) |
 
@@ -68,13 +69,13 @@ Thresholds en skill `triple-verify`. Modos: Normal (zona) · `!ship`=triple+qual
 Overrides DEFAULT/SIMPLE/COMPLEX execution mode. Trigger explicitly with `!analisis` as first token. Must be exact — `!analisis` only, case-insensitive.
 
 **When triggered:**
-- **MODE**: Read-only exploration + reasoning + findings. Wraps existing DRAFT mode (see §Execution) with stricter gates.
+- **MODE**: Multi-agent analysis → solid plan. Wraps existing DRAFT mode (see §Execution) with stricter gates.
 - **PRESERVED**: Ponytail rung 0 (Factibilidad — contradiction/language detection still runs). Engram save of relevant findings. Session close protocol on request.
 - **SKIPPED** entirely: TRIANGULATE (REGLAMENTARIO exento), Security §D gate, quality gate, commit pipeline, auto-metrics (post-task), Ponytail rungs 1-8 (YAGNI→Min code).
 - **EXEMPT** from §A Skill combo table (uses Q&A load: karpathy-loop + lean-context).
-- **PROCESS**: 1) Load karpathy-loop + lean-context only. 2) Delegate ≥2 subagents for independent analysis. 3) Compare results: report consensus + divergences.
-- **OUTPUT**: Strict findings, no fluff. NO code, NO commit, NO implementation ask. If user requests code after analysis, confirm exit from analysis mode first.
-- **STRICT**: Do NOT ask "should I implement this". Do NOT suggest writing code. Analyze only.
+- **PROCESS**: 1) Load karpathy-loop + lean-context. 2) gentleman-vMK (yo) + 3 subagentes — análisis independiente en paralelo. 3) 1 subagente extra de research web sobre el tema. 4) Sintetizar las 4 opiniones + research en un plan consolidado. 5) Proponer plan final con consensos, divergencias y fundamentos.
+- **OUTPUT**: Plan sólido basado en múltiples perspectivas + investigación externa. NO código, NO commit inmediato. Si pide implementar, confirmar salida de analysis mode primero.
+- **STRICT**: No sugerir implementación durante el análisis. Primero el plan, después si el usuario pide, se sale del modo.
 
 ## Subagent-First
 Read-heavy (>3 files) → delegate `explore`. Main context = synthesis/decisions. Saves 2-5K tokens.
