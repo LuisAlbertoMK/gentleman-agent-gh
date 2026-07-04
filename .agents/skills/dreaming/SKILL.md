@@ -18,7 +18,7 @@ triggers: session start/end, ~5 tool calls, "dream/patrones/memory review"
 | **Project fingerprint** | First interaction | Save project fingerprint: `mem_save(type="architecture", title="project:{name}", topic_key="project/{name}", content="**Tech**:{lang/framework/db}**Structure**:{dirs}**Patterns**:{arch}**Tests**:{count}**Gaps**:{known issues}")` |
 | **Harvest** | Session end | `mem_session_summary` + extract patterns (error→catalog, workflow→skill, arch→mem_save). Same error 2+ sessions→AGENTS.md. |
 | **Mini-dream** | ~5 tools | Self-check quality/efficiency/reusability. Skill gap→create/update. Error repeated→catalog. |
-| **Full dream** | Milestone | `mem_search(type="error|bugfix")` across ALL sessions. ≥2→anti-pattern. ≥3→AGENTS.md rule. Check decision contradictions. Curate stale obs. |
+| **Full dream** | Milestone | `mem_search(type="error|bugfix|pattern|discovery|decision")` across ALL sessions. ≥2→anti-pattern/cluster. ≥3→AGENTS.md rule or skill. Check decision contradictions. Curate stale obs. |
 
 ## Proactive Recall (NEW — mandatory)
 BEFORE any task execution:

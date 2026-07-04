@@ -98,13 +98,13 @@ if ($Quiet) {
     Write-Host "Now complete the Engram close protocol:" -ForegroundColor Green
     Write-Host "--- auto-metrics ---" -ForegroundColor Yellow
     if ($hasChanges) {
-        Write-Host "  ⚠️  REQUIRED: Run external-auditor before auto-metrics" -ForegroundColor Red
-        Write-Host "  Code changes detected -- bias calibration requires a blind audit entry for today."  -ForegroundColor Red
+        Write-Host "  AUTO: external-auditor → subagent blind audit → auto-metrics with bias correction" -ForegroundColor Green
+        Write-Host "  Code changes detected. Pipeline: audit → bias → auto-metrics."  -ForegroundColor Yellow
         Write-Host "  Steps:" -ForegroundColor Yellow
         Write-Host "    1. Load skill external-auditor" -ForegroundColor Gray
-        Write-Host "    2. Delegate subagent for blind audit of git diff" -ForegroundColor Gray
+        Write-Host "    2. Delegate subagent for blind audit of git diff (AUTOMATIC, no preguntar)" -ForegroundColor Gray
         Write-Host "    3. Verify audit entry logged to bitácora (pattern: '[audit] YYYY-MM-DD')" -ForegroundColor Gray
-        Write-Host "    4. THEN run auto-metrics with bias correction" -ForegroundColor Gray
+        Write-Host "    4. Run auto-metrics with bias correction" -ForegroundColor Gray
         Write-Host ""
     } else {
         Write-Host "  Run auto-metrics if session had code/task work (>=3 tool calls)." -ForegroundColor Gray
