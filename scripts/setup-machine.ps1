@@ -121,7 +121,7 @@ if (-not $SkipShortcuts) {
 info "Syncing global opencode config from repo"
 $globalConfigPath = "$env:USERPROFILE\.config\opencode\opencode.json"
 $repoConfigPath = Join-Path $RepoDir "opencode.json"
-if (Test-Path $globalConfigPath -and (Test-Path $repoConfigPath)) {
+if ((Test-Path $globalConfigPath) -and (Test-Path $repoConfigPath)) {
     $globalConfig = Get-Content $globalConfigPath -Raw | ConvertFrom-Json
     $repoConfig = Get-Content $repoConfigPath -Raw | ConvertFrom-Json
 

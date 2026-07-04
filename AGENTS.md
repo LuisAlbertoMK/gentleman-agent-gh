@@ -61,9 +61,11 @@ Thresholds en skill `triple-verify`. Modos: Normal (zona) · `!ship`=triple+qual
 | `!analisis` | Análisis multi-agente: gentleman-vMK + 3 subagentes + research web → plan consolidado |
 | `!setup` | `scripts/setup-machine.ps1` — bootstrap portability on new machine |
 | `!dev` | `scripts/dev-server.ps1` — manage background dev servers (start/status/logs/kill) |
+| `!gentleman` | `scripts/use-gentleman.ps1` — gentleman-ize any project (one command to inherit MCPs, agents, skills) |
 
 > **Portability**: On a new machine, run `!setup` or `.\scripts\setup-machine.ps1` after cloning.  
 > **Dev servers**: Use `!dev start frontend -- npm run dev` to start, `!dev logs frontend` to see output.
+> **Project init**: Run `!gentleman` in any project directory to inherit gentleman-vMK as default agent, with all MCPs, skills, and skills auto-available.
 
 ### Analysis Mode (trigger: `!analisis`)
 Overrides DEFAULT/SIMPLE/COMPLEX execution mode. Trigger explicitly with `!analisis` as first token. Must be exact — `!analisis` only, case-insensitive.
@@ -140,6 +142,13 @@ When setting up on a new machine: `scripts/setup-machine.ps1` (or `!setup` short
 - Global shortcuts (opencode-vmk, gentleman-vmk)
 - OpenCode env vars (cache, config, db paths)
 - Skill junctions in global config
+
+### Project init (any project)
+Run `scripts/use-gentleman.ps1` (or `!gentleman` shortcut) in any project directory to:
+- Inherit gentleman-vMK as default agent (without copying agent definitions)
+- Auto-import global MCPs (context7, engram, sequential-thinking, headroom)
+- Access all 68 skills via global junction
+- Auto-fix missing global setup by calling setup-machine.ps1
 
 ## Contextual Skill Loading (MANDATORY)
 `<available_skills>` is authoritative. Self-check BEFORE every response: match by file context + task context.

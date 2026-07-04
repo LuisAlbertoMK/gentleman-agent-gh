@@ -88,9 +88,12 @@ Write-Step "Global config (MCPs + permissions + agents)" {
         }
         $cfg = @{
             '$schema' = "https://opencode.ai/config.json"
+            default_agent = "gentleman-vMK"
             mcp = @{
                 context7 = @{ enabled = $true; type = "remote"; url = "https://mcp.context7.com/mcp" }
                 engram = @{ command = @("engram", "mcp", "--tools=agent"); type = "local" }
+                "sequential-thinking" = @{ enabled = $true; type = "local"; command = @("npx", "-y", "@modelcontextprotocol/server-sequential-thinking@2025.12.18") }
+                headroom = @{ enabled = $true; type = "local"; command = @("headroom", "mcp", "serve") }
             }
             permission = @{
                 bash = @{
