@@ -131,8 +131,8 @@ if ((Test-Path $globalConfigPath) -and (Test-Path $repoConfigPath)) {
         $globalConfig | Add-Member -NotePropertyName "default_agent" -NotePropertyValue "gentleman-vMK" -Force
         $synced = $true
     }
-    # Sync sections: mcp, permission, skills
-    foreach ($section in @("mcp", "permission", "skills")) {
+    # Sync sections: mcp, permission, skills, agent
+    foreach ($section in @("mcp", "permission", "skills", "agent")) {
         $repoValue = $repoConfig.$section
         if ($repoValue) {
             $globalConfig | Add-Member -NotePropertyName $section -NotePropertyValue $repoValue -Force
@@ -141,7 +141,7 @@ if ((Test-Path $globalConfigPath) -and (Test-Path $repoConfigPath)) {
     }
     if ($synced) {
         $globalConfig | ConvertTo-Json -Depth 10 | Set-Content $globalConfigPath
-        ok "Global config synced from repo (default_agent + mcp + permission + skills)"
+        ok "Global config synced from repo (default_agent + mcp + permission + skills + agent)"
     } else {
         skip "Global config already up to date"
     }
