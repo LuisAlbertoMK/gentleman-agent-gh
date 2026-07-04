@@ -34,46 +34,19 @@ try {
 }
 
 # ── Step 2: Optional gentle-ai CLI ──────────────────────────────────
+# NOTE: This repo (gentleman-agent-gh) does NOT install gentle-ai by default.
+# The -InstallGentleAI switch is deprecated and now throws an error to prevent
+# accidentally shadowing the local environment with a different upstream tool.
+if ($InstallGentleAI) {
+    throw "-InstallGentleAI is no longer supported. If you need the gentle-ai CLI, install it separately from https://github.com/Gentleman-Programming/gentle-ai"
+}
+
 $hasGentleAI = [bool](Get-Command "gentle-ai" -ErrorAction SilentlyContinue)
 if (-not $hasGentleAI) {
-    $installDep = $InstallGentleAI
-    if (-not $installDep -and -not $Yes) {
-        $resp = Read-Host "gentle-ai CLI not found. Install it? (required to use these skills) [Y/n]"
-        $installDep = ($resp -ne 'n' -and $resp -ne 'N')
-    }
-    if ($installDep) {
-        Write-Host "==> Installing gentle-ai CLI..." -ForegroundColor Cyan
-        $url = "https://raw.githubusercontent.com/Gentleman-Programming/gentle-ai/main/scripts/install.ps1"
-        $tmpFile = [System.IO.Path]::GetTempFileName() + ".ps1"
-        try {
-            Invoke-WebRequest -Uri $url -UseBasicParsing -OutFile $tmpFile
-            $hash = (Get-FileHash -LiteralPath $tmpFile -Algorithm SHA256).Hash
-            Write-Host "       Downloaded to: $tmpFile" -ForegroundColor DarkGray
-            Write-Host "       SHA256: $hash" -ForegroundColor DarkGray
-            Write-Host "       Source: $url" -ForegroundColor DarkGray
-            $expected = $env:GENTLE_AI_INSTALL_HASH
-            if ($expected) {
-                if ($hash -ne $expected) {
-                    throw "Checksum mismatch! Expected $expected, got $hash. Aborting for safety."
-                }
-                Write-Host "       [ok] checksum verified" -ForegroundColor Green
-            } else {
-                Write-Host "       [warn] Set GENTLE_AI_INSTALL_HASH to verify checksum automatically" -ForegroundColor Yellow
-            }
-            if (-not $Yes) {
-                $confirm = Read-Host "Execute remote install script? [Y/n]"
-                if ($confirm -eq 'n' -or $confirm -eq 'N') { throw "Aborted by user" }
-            }
-            & $tmpFile
-        } finally {
-            if (Test-Path $tmpFile) { Remove-Item $tmpFile -Force -ErrorAction SilentlyContinue }
-        }
-    } else {
-        Write-Host "[warn] gentle-ai CLI not installed. Skills won't be usable." -ForegroundColor Yellow
-        Write-Host "       Install later: .\scripts\install.ps1 -InstallGentleAI" -ForegroundColor DarkGray
-    }
+    Write-Host "[info] gentle-ai CLI not found. This is optional — gentleman-agent-gh works without it." -ForegroundColor Yellow
+    Write-Host "       To install gentle-ai separately, visit: https://github.com/Gentleman-Programming/gentle-ai" -ForegroundColor DarkGray
 } else {
-    Write-Host "[ok] gentle-ai CLI already installed" -ForegroundColor Green
+    Write-Host "[ok] gentle-ai CLI detected (optional dependency)" -ForegroundColor Green
 }
 
 # ── Done ─────────────────────────────────────────────────────────────

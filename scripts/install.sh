@@ -68,26 +68,18 @@ fi
 unset _append_ga_root
 
 # ── Step 3: Optional gentle-ai CLI ──────────────────────────────────
+# NOTE: This repo (gentleman-agent-gh) does NOT install gentle-ai by default.
+# The --install-gentle-ai flag is deprecated — it warns but does not auto-install.
+if [ "$INSTALL_GENTLE_AI" = true ]; then
+    warn "--install-gentle-ai is no longer supported. Install gentle-ai CLI manually:"
+    warn "  https://github.com/Gentleman-Programming/gentle-ai"
+fi
+
 if ! command -v gentle-ai &>/dev/null; then
-    if [ "$INSTALL_GENTLE_AI" = true ] || [ "$YES" = true ]; then
-        info "Installing gentle-ai CLI..."
-        curl -fsSL https://raw.githubusercontent.com/Gentleman-Programming/gentle-ai/main/scripts/install.sh | bash
-    else
-        warn "gentle-ai CLI not found. Install it? [Y/n]"
-        if [ "$YES" = false ] && [ -t 0 ]; then
-            read -r resp </dev/tty
-            case "$resp" in n|N) ;; *)
-                info "Installing gentle-ai CLI..."
-                curl -fsSL https://raw.githubusercontent.com/Gentleman-Programming/gentle-ai/main/scripts/install.sh | bash
-            ;; esac
-        elif [ "$YES" = false ]; then
-            warn "Non-interactive shell — use --yes or --install-gentle-ai to auto-install"
-            warn "Skipping gentle-ai CLI install. Install manually:"
-            warn "  curl -fsSL https://raw.githubusercontent.com/Gentleman-Programming/gentle-ai/main/scripts/install.sh | bash"
-        fi
-    fi
+    warn "gentle-ai CLI not found. This is optional — gentleman-agent-gh works without it."
+    warn "To install gentle-ai separately, visit: https://github.com/Gentleman-Programming/gentle-ai"
 else
-    ok "gentle-ai CLI already installed"
+    ok "gentle-ai CLI detected (optional dependency)"
 fi
 
 # ── Done ─────────────────────────────────────────────────────────────

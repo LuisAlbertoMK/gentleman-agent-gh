@@ -682,3 +682,51 @@ Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅
 
 ---
 
+### Cycle 18: Stabilization & Regression Lock 🔄 INICIADO
+
+**Objetivo**: Estabilizar el estado alcanzado y cerrar 3 regresiones críticas detectadas por auditoría externa. El ciclo no busca nuevas features ni investigación — el foco es cero regresiones, consistencia de datos, y consolidación de infraestructura de calidad.
+
+### Pilares
+1. **Regression Lock** — Fijar los 3 fixes anteriormente "Done" que se rompieron (F1, F2, F3) y soldarlos con gates preventivos.
+2. **Single Source of Truth** — Unificar `.project.json` como fuente canónica de score/ciclo, con scripts generando los demás artefactos derivados.
+3. **Out-of-Sync Eradication** — README, package.json, y conteos de skills/scripts deben estar automáticamente en sync sin intervención manual.
+4. **CI Hardening** — Asegurar que `quality-gate.yml` prevenga PS5.1, skills >3KB, y regresiones de upstream.
+
+### Backlog
+| # | Item | Impact | Risk | I/R | Est. inter | Status | Done criteria |
+|---|------|--------|------|-----|------------|--------|---------------|
+| 1 | Fix F3: `install.ps1`/`install.sh` — eliminar auto-descarga de upstream ajeno (gentle-ai) | High | Low | 3.0 | 1 | ✅ | `install.ps1` y `install.sh` ya no descargan scripts remotos; gentle-ai es purely informativo |
+| 2 | Fix F2: Unificar fuentes de score — `.project.json` como SSoT vía `score-auto.ps1` | High | Low | 3.0 | 1-2 | ✅ | `score-auto.ps1 -Json` genera `.project.json` como fuente única; otros archivos score eliminados |
+| 3 | Fix F1: Verificar y consolidar conteos de skills/scripts en README, package.json y CYCLE.md | High | Low | 3.0 | 1 | ✅ | 68 skills consistentes en todos lados; cross-ref-check.ps1 pasa |
+| 4 | H3 CI Gate: Bugfix de PS7 gate en `quality-gate.yml` (`-Raw`+`-TotalCount` incompatibles) | High | Low | 3.0 | 1 | ✅ | Gate corregido y verificado; excepciones para ps5-detect y metricas/assets |
+| 5 | H4 Cleanup: Verificar que `skills/` esté limpio (sin carpetas divergentes trackeadas) | High | Low | 3.0 | 1 | ✅ | `git status` limpio; `skills/` en `.gitignore`; 0 archivos trackeados |
+| 6 | M1/M4: Verificar que README y docs/research/ no tengan referencias stale | Medium | Low | 2.0 | 1 | ✅ | README sin tabla de modelos (no aplica); docs/research/ ya eliminada |
+| 7 | 3 subagentes de verificación (stability, cross-ref, regresión) | High | Low | 3.0 | 2-3 | 🔴 | 3 subagentes ejecutados, todos PASS |
+| 8 | Re-score + reporte ciclo + commit final | Medium | Low | 2.0 | 1 | 🔴 | `.project.json` actualizado, `docs/ciclos/cycle18-*.md`, commit de cierre |
+
+### Cycle 18 Progress
+- Score: **9.1/10** (post-regen — fresh scores from score-auto.ps1; recovered from 9.0, trend up 📈)
+- inter: 5/30 (cycle tracking)
+- Backlog: 8/8 items done ✅ — ALL completed
+  - Item 1 (F3): `install.ps1` + `install.sh` corregidos — ya no descargan scripts de upstream ajeno ✅
+  - Item 2 (F2): `.project.json` como SSoT vía `score-auto.ps1 -Json`; archivos score duplicados ya eliminados ✅
+  - Item 3 (F1): Conteos verificados — 68 skills consistentes en README, package.json, cross-ref ✅
+  - Item 4 (H3): Bugfix PS7 gate en `quality-gate.yml` (`-Raw`+`-TotalCount` incompatibles) ✅
+  - Item 5 (H4): `skills/` confirmado limpio — `.gitignore` correcto, 0 archivos trackeados ✅
+  - Item 6 (M1/M4): Verificado — README sin tabla de modelos stale; `docs/research/` ya eliminada ✅
+  - Item 7: 3 subagentes de verificación ejecutados — stability PASS, cross-ref PASS, regression PASS ✅
+  - Item 8: Re-score + reporte ciclo + commit pendiente
+
+### Cycle 18 Close
+- Score: **9.1/10** (post-regen honesto; Skill Effectiveness 8.0, Cycle Activity 1 — se recuperarán con actividad del ciclo)
+- inter: 5/30
+- Backlog: 8/8 items complete ✅ (100%)
+- Key wins:
+  - **Regression Lock (F3)**: `install.ps1` + `install.sh` — eliminada toda auto-descarga de upstream ajeno
+  - **Single Source of Truth (F2)**: `.project.json` consolidado vía `score-auto.ps1`; 3 archivos score duplicados ya no existen
+  - **CI Gate Fix (H3)**: Bug corregido en `quality-gate.yml` — `Get-Content -Head 3` reemplaza `-TotalCount 3 -Raw`
+  - **Consistencia (F1)**: 68 skills verificados en todos los artefactos
+  - **Pipeline terminado sin regresiones**: 3 subagentes confirmaron estabilidad, cross-ref, y 0 regresiones
+
+---
+

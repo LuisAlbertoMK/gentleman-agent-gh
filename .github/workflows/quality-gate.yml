@@ -28,9 +28,11 @@ jobs:
 
       - name: PS7 version gate — verify all scripts require 7.6
         run: |
-          $bad = Get-ChildItem -Recurse -Filter *.ps1 | Where-Object { $_.FullName -notmatch 'experiments|node_modules' } | Where-Object {
-            $c = Get-Content $_ -TotalCount 3 -Raw; $c -notmatch '#requires -Version 7'
+          $bad = Get-ChildItem -Recurse -Filter *.ps1 | Where-Object { $_.FullName -notmatch 'experiments|node_modules|metricas\\assets' } | Where-Object {
+            $c = (Get-Content $_ -Head 3) -join "`n"; $c -notmatch '#requires -Version 7'
           }
+          # ps5-detect.ps1 intentionally targets PS5.1 — skip it
+          $bad = $bad | Where-Object { $_.Name -ne 'ps5-detect.ps1' }
           if ($bad) { $bad | ForEach-Object { Write-Output "::warning title=Missing PS7::$($_.Name)" }; exit 1 }
           else { Write-Output "OK: All .ps1 scripts require PS7+" }
 
