@@ -64,8 +64,8 @@ Thresholds en skill `triple-verify`. Modos: Normal (zona) · `!ship`=triple+qual
 > **Portability**: On a new machine, run `!setup` or `.\scripts\setup-machine.ps1` after cloning.  
 > **Dev servers**: Use `!dev start frontend -- npm run dev` to start, `!dev logs frontend` to see output.
 
-### Analysis Mode (trigger: `!analisi` | `analisi` | `análisis`)
-Overrides DEFAULT/SIMPLE/COMPLEX execution mode. Trigger explicitly as first word (case-insensitive, first 2 tokens) or `!analisi`. Examples: `"analisi cómo funciona X"`, `"!analisi revisa esta ruta"`, `"haceme un análisis de esto"`.
+### Analysis Mode (trigger: `!analisis`)
+Overrides DEFAULT/SIMPLE/COMPLEX execution mode. Trigger explicitly with `!analisis` as first token. Must be exact — `!analisis` only, case-insensitive.
 
 **When triggered:**
 - **MODE**: Read-only exploration + reasoning + findings. Wraps existing DRAFT mode (see §Execution) with stricter gates.
