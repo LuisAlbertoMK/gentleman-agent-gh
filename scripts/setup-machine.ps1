@@ -166,6 +166,44 @@ if (-not (Test-Path "$globalSkillsDir\_shared")) {
     skip "Skills junction already exists"
 }
 
+# ── Step 5b: Global prompts junction ────────────────────────────────
+# The global config may contain {file:prompts/sdd/*.md} references from agent
+# definitions synced in Step 4. Those resolve relative to the global config dir,
+# so we need the prompts directory there too.
+info "Setting up global prompts junction"
+$globalPromptsDir = "$env:USERPROFILE\.config\opencode\prompts"
+$repoSddDir = Join-Path $RepoDir "prompts\sdd"
+if (Test-Path $repoSddDir) {
+    $sddJunction = "$globalPromptsDir\sdd"
+    if (-not (Test-Path $sddJunction)) {
+        if (-not (Test-Path $globalPromptsDir)) {
+            New-Item -ItemType Directory -Path $globalPromptsDir -Force | Out-Null
+        }
+        New-Item -ItemType Junction -Path $sddJunction -Target $repoSddDir -Force 2>$null
+        if ($?) { ok "Prompts junction created at $sddJunction" }
+        else { warn "Could not create prompts junction. Copy prompts manually: Copy-Item '$repoSddDir' '$sddJunction' -Recurse" }
+    } else {
+        skip "Prompts junction already exists"
+    }
+} else {
+    warn "Repo prompts/sdd not found at $repoSddDir"
+}
+
+# ── Step 5c: Global AGENTS.md ──────────────────────────────────────
+# {file:AGENTS.md} in gentleman-vMK agent prompt resolves relative to global config
+$globalAgentsMd = "$env:USERPROFILE\.config\opencode\AGENTS.md"
+$repoAgentsMd = Join-Path $RepoDir "AGENTS.md"
+if (Test-Path $repoAgentsMd) {
+    if (-not (Test-Path $globalAgentsMd)) {
+        Copy-Item -Path $repoAgentsMd -Destination $globalAgentsMd -Force
+        ok "AGENTS.md copied to global config"
+    } else {
+        skip "AGENTS.md already exists in global config"
+    }
+} else {
+    warn "Repo AGENTS.md not found at $repoAgentsMd"
+}
+
 # ── Step 6: Verify ────────────────────────────────────────────────
 info "Verifying setup"
 $checks = @(
