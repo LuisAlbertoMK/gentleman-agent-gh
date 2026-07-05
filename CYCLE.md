@@ -785,6 +785,18 @@ Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅
 
 ---
 
+### Cycle 21: Universal Optimization & Research 🆕 EXPLORE (saved epic)
+
+**Objetivo**: Investigación profunda en 16 áreas de mejora — nuevos MCPs/skills, reducción RAM/CPU/tokens, calidad de código, SEO, UI/UX, seguridad, contexto lineal. Epic: `docs/epics/cycle21-universal-optimization.md`
+- inter: 3/30 | Score: 9.3/10
+- P1 (EXPLORE): 3 subagentes en paralelo — top-3 áreas de impacto ✅
+  - R1: OpenCode ecosystem — MCPs, skills, plugins nuevos ✅ → `docs/research/cycle21-phase1-findings.md`
+  - R2: Resource optimization — RAM/CPU/Token reduction ✅ → `docs/research/cycle21-phase1-findings.md`
+  - R3: Code quality — static analysis, linting, formatting ✅ → `docs/research/cycle21-phase1-findings.md`
+- **Top finding**: codebase-memory-mcp (26K★) — single binary, -120× tokens for code queries
+- **Quick wins**: StringBuilder, .Where(), Explicit GC, Dependabot, actionlint
+- **Next**: P3 PLAN (install codebase-memory-mcp, pre-commit, apply optimizations)
+
 ### Cycle 20: Agent Optimization 🔄 INICIADO
 
 **Objetivo**: Ejecutar las 26 recomendaciones del análisis multi-agente (`docs/optimizaciones/agent-optimization-analysis.md`) para mejorar velocidad, calidad y eficiencia de tokens. P1 (EXPLORE) y P2 (DIAGNOSE) ya completados por el análisis existente — arrancamos en P3 (PLAN).
