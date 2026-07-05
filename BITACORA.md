@@ -86,4 +86,6 @@
 [audit] 2026-06-30 ÔÇö PASSED (minor): self=8.0 audit=6.0 gaps=+1.71
 2026-07-05 - Cycle 19 Deep Clean: track 4 untracked + fix skill counts 68→69 + purge 6 dead scripts + consolidate docs (CHEATSHEET/QUICKSTART/CHANGELOG/CONTRIBUTING/MANIFEST to docs/) + BITACORA cleanup
 2026-07-05 - Purge opencode-vmk references: 22 edits across 11 files (setup-machine, install, AGENTS.md, README, doc-sync, bridge-mcp-server, research docs). All opencode-vmk fork references removed, only opencode-ai upstream retained.
+2026-07-05 - Batch cleanup: dead scripts, fork shortcuts, stale config, doc sync (14 files, 1111 lines deleted)
+2026-07-05 - Agent optimization analysis saved to docs/optimizaciones/agent-optimization-analysis.md (pending Cycle 20)
 
