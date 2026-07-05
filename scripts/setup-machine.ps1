@@ -67,7 +67,27 @@ if (-not $SkipEnvVar) {
     skip "GENTLEMAN_AGENT_ROOT (via -SkipEnvVar)"
 }
 
-# ── Step 2: OpenCode env vars ──────────────────────────────────────
+# ── Step 2: pre-commit hooks ───────────────────────────────────────
+info "Setting up pre-commit framework"
+$pc = py -m pre_commit --version 2>$null
+if ($pc) {
+    ok "pre-commit $pc already installed"
+} else {
+    info "Installing pre-commit via pip..."
+    py -m pip install pre-commit -q 2>$null
+    if ($?) { ok "pre-commit installed" } else { warn "pre-commit install failed — CI can run it standalone" }
+}
+if (-not [string]::IsNullOrEmpty((py -m pre_commit --version 2>$null))) {
+    $hooksPath = git config core.hooksPath 2>$null
+    if ([string]::IsNullOrEmpty($hooksPath)) {
+        py -m pre_commit install 2>$null
+        if ($?) { ok "pre-commit hooks installed" } else { warn "pre-commit hooks install failed" }
+    } else {
+        skip "pre-commit hooks (hooksPath=$hooksPath — managed by OpenCode)"
+    }
+}
+
+# ── Step 3: OpenCode env vars ──────────────────────────────────────
 # NOTE: Do NOT set OPENCODE_CONFIG_DIR/CACHE_DIR/DB here — those would
 # override ~\.config\opencode\ and break the global install. OpenCode
 # uses its defaults (global config dir) automatically.
@@ -88,7 +108,7 @@ foreach ($kv in $ocVars.GetEnumerator()) {
     }
 }
 
-# ── Step 3: Global shortcuts ───────────────────────────────────────
+# ── Step 4: Global shortcuts ───────────────────────────────────────
 if (-not $SkipShortcuts) {
     info "Creating global shell shortcuts"
     $npmDir = "$env:APPDATA\npm"
@@ -119,7 +139,7 @@ if (-not $SkipShortcuts) {
     skip "Global shortcuts (via -SkipShortcuts)"
 }
 
-# ── Step 4: Global opencode config ─────────────────────────────────
+# ── Step 5: Global opencode config ─────────────────────────────────
 info "Syncing global opencode config from repo"
 $globalConfigPath = "$env:USERPROFILE\.config\opencode\opencode.json"
 $repoConfigPath = Join-Path $RepoDir "opencode.json"
@@ -151,7 +171,7 @@ if ((Test-Path $globalConfigPath) -and (Test-Path $repoConfigPath)) {
     warn "Global or repo config not found — sync manually"
 }
 
-# ── Step 5: Global skill config ────────────────────────────────────
+# ── Step 6: Global skill config ────────────────────────────────────
 info "Setting up global skill config"
 $globalSkillsDir = "$env:USERPROFILE\.config\opencode\skills"
 $repoSkillsDir = Join-Path $RepoDir ".agents\skills"
@@ -168,7 +188,7 @@ if (-not (Test-Path "$globalSkillsDir\_shared")) {
     skip "Skills junction already exists"
 }
 
-# ── Step 5b: Global prompts junction ────────────────────────────────
+# ── Step 6b: Global prompts junction ────────────────────────────────
 # The global config may contain {file:prompts/sdd/*.md} references from agent
 # definitions synced in Step 4. Those resolve relative to the global config dir,
 # so we need the prompts directory there too.
@@ -191,7 +211,7 @@ if (Test-Path $repoSddDir) {
     warn "Repo prompts/sdd not found at $repoSddDir"
 }
 
-# ── Step 5c: Global AGENTS.md ──────────────────────────────────────
+# ── Step 6c: Global AGENTS.md ──────────────────────────────────────
 # {file:AGENTS.md} in gentleman-vMK agent prompt resolves relative to global config
 $globalAgentsMd = "$env:USERPROFILE\.config\opencode\AGENTS.md"
 $repoAgentsMd = Join-Path $RepoDir "AGENTS.md"
@@ -206,7 +226,7 @@ if (Test-Path $repoAgentsMd) {
     warn "Repo AGENTS.md not found at $repoAgentsMd"
 }
 
-# ── Step 6: Verify ────────────────────────────────────────────────
+# ── Step 7: Verify ────────────────────────────────────────────────
 info "Verifying setup"
 $checks = @(
     @{ Label = "GENTLEMAN_AGENT_ROOT"; Test = { $env:GENTLEMAN_AGENT_ROOT -eq $__rootDir } },

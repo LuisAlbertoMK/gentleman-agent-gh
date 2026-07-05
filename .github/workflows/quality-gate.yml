@@ -90,6 +90,18 @@ jobs:
             Write-Output "OK: All skills ≤3KB"
           }
 
+      - name: pre-commit — all hooks (local + remote)
+        run: |
+          py -m pre_commit run --all-files --show-diff-on-failure
+
+      - name: trufflehog — deep secrets scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --only-verified --fail
+
       - name: SkillSpector security gate — Docker fallback (non-blocking)
         continue-on-error: true
         run: ./scripts/skillspector-gate.ps1

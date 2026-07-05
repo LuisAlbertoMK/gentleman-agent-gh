@@ -382,7 +382,7 @@ Contexto: El score interno está en 10/10 estable. La nota de Cycle 15 decía: *
 
 ### Cycle 16 Progress
 - Score: **10/10** (mantenido)
-- inter: 3/30 (cycle tracking)
+- inter: 6/30 (cycle tracking)
 - Items: 5/5 done (ALL completed ✅)
   - Item 1: `external-improvement` skill creado con 5 fases, 3+ subagentes/fase ✅
   - Item 2: gentleman-agent-gh indexado en codebase-memory (1425 nodos, 1421 edges) ✅
@@ -392,7 +392,7 @@ Contexto: El score interno está en 10/10 estable. La nota de Cycle 15 decía: *
 
 ### Cycle 16 Close
 - Score: **10/10** 🏆 — mantenido, sin regresiones
-- inter: 3/30 (ciclo rápido — creación de skill + reestructura, 3 subagentes verification)
+- inter: 6/30 (ciclo rápido — creación de skill + reestructura, 3 subagentes verification)
 - Backlog: 5/5 items complete ✅ (100%)
 - Key wins:
   - **external-improvement skill**: 5 fases (EXPLORE→DIAGNOSE→PLAN→EXECUTE→VERIFY & LEARN), 3+ subagentes por fase, gates por fase, delivery-harness integration
@@ -760,7 +760,7 @@ Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅
 
 ### Cycle 19 Progress
 - Score: **9.3/10** (maintained — stable)
-- inter: 3/30 (cycle tracking)
+- inter: 6/30 (cycle tracking)
 - Items: **10/10 done** ✅ — ALL completed
   - Items 1-4: Track + sync counts (untracked files, 68→69, CYCLE.md, SUMMARY.md) ✅
   - Item 5: Purged 6 dead scripts (check-bridge, bench-compare, bench-file-io, list-skills, skill-test-suite, sync-global) ✅
@@ -772,7 +772,7 @@ Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅
 
 ### Cycle 19 Close
 - Score: **9.3/10** (mantenido — estable)
-- inter: 3/30
+- inter: 6/30
 - Backlog: 10/10 items complete ✅ (100%)
 - Key wins:
   - **Root cleanup**: 19→14 root files (−26%), 56→50 scripts (−6 zombies)
@@ -785,17 +785,26 @@ Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅
 
 ---
 
-### Cycle 21: Universal Optimization & Research 🆕 EXPLORE (saved epic)
+### Cycle 21: Universal Optimization & Research 🆕 P3 PLAN
 
 **Objetivo**: Investigación profunda en 16 áreas de mejora — nuevos MCPs/skills, reducción RAM/CPU/tokens, calidad de código, SEO, UI/UX, seguridad, contexto lineal. Epic: `docs/epics/cycle21-universal-optimization.md`
-- inter: 3/30 | Score: 9.3/10
+- inter: 10/30 | Score: 9.3/10
 - P1 (EXPLORE): 3 subagentes en paralelo — top-3 áreas de impacto ✅
   - R1: OpenCode ecosystem — MCPs, skills, plugins nuevos ✅ → `docs/research/cycle21-phase1-findings.md`
   - R2: Resource optimization — RAM/CPU/Token reduction ✅ → `docs/research/cycle21-phase1-findings.md`
   - R3: Code quality — static analysis, linting, formatting ✅ → `docs/research/cycle21-phase1-findings.md`
 - **Top finding**: codebase-memory-mcp (26K★) — single binary, -120× tokens for code queries
 - **Quick wins**: StringBuilder, .Where(), Explicit GC, Dependabot, actionlint
-- **Next**: P3 PLAN (install codebase-memory-mcp, pre-commit, apply optimizations)
+- P3 (PLAN): Aplicación de quick wins + pre-commit + trufflehog + actionlint ✅
+  - codebase-memory-mcp: configurado en opencode.json (project + global) ✅
+  - Dependabot: `.github/dependabot.yml` creado (NuGet + GitHub Actions) ✅
+  - StringBuilder: verify.ps1 (5 instances) + cross-ref-check.ps1 (5 instances) ✅
+  - .Where(): cross-ref-check.ps1 (9 pipeline→method) ✅
+  - pre-commit: `.pre-commit-config.yaml` + CI step + `setup-machine.ps1` install ✅
+  - trufflehog: CI step agregado (deep secrets scan) ✅
+  - actionlint: pre-commit hook + CI via yamllint+markdownlint configs ✅
+  - `setup-machine.ps1`: Step 2 pre-commit install + Step numbers re-sequenced ✅
+- **Next**: P4 EXECUTE — remaining quick wins (Explicit GC, File.ReadLines, caching, JSON -AsHashtable)
 
 ### Cycle 20: Agent Optimization 🔄 INICIADO
 
@@ -823,7 +832,7 @@ Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅
 ### Cycle 20 Progress
 - Score: **9.3/10** (post-C19 close, .project.json SSoT)
 - inter: 5/30 (cycle tracking)
-- Backlog: 8/9 items done (Items 1,2,3,4,5,6,7 ✅ — Items 8 pending)
+- Backlog: 9/9 items done ✅ — ALL completed
 - P1 (EXPLORE) + P2 (DIAGNOSE): ✅ Completados — `docs/optimizaciones/agent-optimization-analysis.md` con 26 hallazgos y recomendaciones priorizadas
 - P4 Batch 1: Items 2 (context-watchdog drift detection), 5 (compact_prompt), 7 (PSSA baseline cleanup) ✅
 - P4 Batch 2: Items 3 (tool output -Quiet flags), 6 (script audit -Quiet) ✅
@@ -840,4 +849,5 @@ Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅
 ---
 
 ## 5-Phase Cycle Loop (Cycle 16+)
+
 
