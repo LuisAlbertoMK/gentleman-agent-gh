@@ -71,9 +71,6 @@ jobs:
           if ($bad) { $bad | ForEach-Object { Write-Output "::warning title=Missing PS7::$($_.Name)" }; exit 1 }
           else { Write-Output "OK: All .ps1 scripts require PS7+" }
 
-      - name: Downstream tests — delivery-harness, chained-pr, subagent-isolation
-        run: ./scripts/test-downstream.ps1
-
       - name: Benchmark report — system health snapshot
         run: ./scripts/benchmark.ps1
 

@@ -821,6 +821,9 @@ Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅
 - H5: Hardcoded paths fixed in 3 scripts (check-config-drift, health-check, sync-vmk) ✅
 - H10: Trailing comma in opencode.json fixed ✅
 - Fix: skillspector-gate.ps1 Set-StrictMode before param() → parse error fixed ✅
+- H2: CI step test-downstream.ps1 removed (script was deliberately purged) ✅
+- H6: Global skills restored as copies (junctiones imposible cross-volume C:→D:) ✅
+- M1: Set-StrictMode added to setup-machine.ps1 ✅
 
 ---
 

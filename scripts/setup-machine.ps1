@@ -27,6 +27,7 @@ param(
     [switch]$SkipEnvVar,
     [switch]$SkipShortcuts
 )
+Set-StrictMode -Version Latest
 
 $ErrorActionPreference = "Stop"
 
