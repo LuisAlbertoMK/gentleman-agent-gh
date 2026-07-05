@@ -1,3 +1,4 @@
+2026-07-05 - Session close
 2026-07-04 - Session close
 2026-07-04 - Close: setup-machine.ps1 fix (sync agent definitions) + !setup run + global config verified with 15 agents
 2026-07-04 - Close session: all 6 commits pushed, 0 pendientes, score 9.3
@@ -85,3 +86,4 @@
 [audit] 2026-06-30 ÔÇö PASSED (minor): self=8.0 audit=6.0 gaps=+1.71
 2026-07-05 - Cycle 19 Deep Clean: track 4 untracked + fix skill counts 68→69 + purge 6 dead scripts + consolidate docs (CHEATSHEET/QUICKSTART/CHANGELOG/CONTRIBUTING/MANIFEST to docs/) + BITACORA cleanup
 2026-07-05 - Purge opencode-vmk references: 22 edits across 11 files (setup-machine, install, AGENTS.md, README, doc-sync, bridge-mcp-server, research docs). All opencode-vmk fork references removed, only opencode-ai upstream retained.
+
