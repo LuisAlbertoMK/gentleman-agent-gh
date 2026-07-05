@@ -265,7 +265,7 @@ Manifest: `CYCLE.md` (solo proyecto local, NO upstream). Skill: `self-improvemen
 Plugin: `opencode-self-improve` (Hermes-style) — SkillForge→SQLite, Curator→re-score/merge, SkillInjector→top-3 pre-turn.
 
 ### J. Pre-session Health Check
-0.5. `restore-project-score.ps1 -Quiet` 1. `git status --short` (alerta si cambios) 2. `check-skill-drift.ps1` (warning si drift) 2.5. (opt) `check-upstream.ps1 -Json` (NEW→engram info, no bloquea) 3. Todo OK → seguí.
+0.5. `restore-project-score.ps1 -Quiet` 1. `git status --short` (alerta si cambios) 2. `check-skill-drift.ps1` (warning si drift) 2.5. (opt) `check-upstream.ps1 -Json` (NEW→engram info, no bloquea) 3. **Bridge**: `bridge.ps1 -Command checkpoint` → entries nuevos? mostrar. 4. **Health**: `health-check.ps1 -Json` rápido (exit 0/1/2). 5. Todo OK → seguí.
 
 ### K. Project Score Auto-Report (first request)
 Buscar `.project.json`. Si existe: reportar score actual. Si >7d stale → fresh metrics + update. Si no existe → no informe. `mem_save(topic_key=project/score)`.
