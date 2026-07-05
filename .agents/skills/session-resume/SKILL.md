@@ -15,6 +15,7 @@ triggers: "session resume, dónde lo dejamos, continuá, session start"
 3. Ahead (unpushed)? WARN+ask: push/keep/continue.
 4. Both clean → silent, `mem_context` only.
 5. One question, max 4 options. Terse (numbers+paths).
+6. Bridge checkpoint: `bridge.ps1 -Command checkpoint` → changed? show entries.
 ## Proactive Recall (post-gate)
 1. `mem_search(query="<last session>", limit=5)` — past work context
 2. If user msg has keywords → search matching observations

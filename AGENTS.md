@@ -52,8 +52,8 @@ Thresholds en skill `triple-verify`. Modos: Normal (zona) · `!ship`=triple+qual
 |----------|--------|
 | `!compress` | Karpathy compression skills >2.5KB + score update |
 | `!score` | `score-auto.ps1 -Json` + docs update + cross-ref |
-| `!sync` | `pull-upstream.ps1 -Mode Check` → drift → agent sync → score |
-| `!health` | git status, drift, cross-ref, score, inter-track |
+| `!sync` | `pull-upstream.ps1 -Mode Check` → sync-vmk.ps1 + check-config-drift.ps1 → score |
+| `!health` | health-check.ps1 + check-config-drift.ps1 + bridge status + git status |
 | `!batch` | `batch.ps1` — batch auto-incremental + bitácora |
 | `!cycle` | `inter-track.ps1 -Show` + score + upstream |
 | `!close` | `close-session.ps1` — pipeline de cierre unificado |
@@ -112,6 +112,13 @@ Infer: QUICK (simple→min) · THOROUGH (risky→full SDD) · DRAFT (explore→f
 | YELLOW | Brief+expand | L1+L2 | Essential | Pedir nod humano | ctx>40% or depth MEDIUM |
 | ORANGE | Headline | L2 forced | Non-critical skip | Escalar a usuario | ctx>60% or any HIGH |
 | RED | 1-liner/file | L3 emergency | Skip all | Solo informar, no actuar | ctx>80% or err rate 2+ |
+
+## Ecosystem Autonomy (bridge integration)
+| Zona | Acción | Ejemplos |
+|------|--------|----------|
+| GREEN | Auto-fix sin preguntar | junction repair, bridge write/read, config drift check |
+| YELLOW | Proponer + esperar ok | config sync, DB fix, script creation |
+| RED | Solo detectar, escalar | core engine, binary changes, destructive ops |
 
 ## Risk-Adaptive Ceremony Zones (diff-based)
 Ceremony adapts to change RISK (not just context window). Auto-detect from diff:
@@ -178,9 +185,15 @@ Run `scripts/use-gentleman.ps1` (or `!gentleman` shortcut) in any project direct
 |--------|--------|
 | Skill validation | `skill-validate.ps1` — 3-trial benchmark |
 | Drift detection | `check-skill-drift.ps1` |
+| Config drift (3-way) | `check-config-drift.ps1` |
 | Sparse loading | `skill-graph.ps1` |
+| Health check | `health-check.ps1` — 6 checks, Json/AutoRepair |
+| Bridge (inter-agent) | `bridge.ps1` — D:\TEMP\opencode-bridge.jsonl |
+| Sync canonical→vmk | `sync-vmk.ps1` — agent/permission/skills |
 | Quality standard | `docs/operations/quality-standard.md` (13-dim) |
 | Metrics | `docs/metricas/` — before/after for ≥3 step tasks |
+| Bridge file (machine) | `D:\TEMP\opencode-bridge.jsonl` |
+| Bridge checkpoint | `D:\TEMP\.bridge-checkpoint` (SHA256) |
 
 <!-- /gentle-ai:persona -->
 
