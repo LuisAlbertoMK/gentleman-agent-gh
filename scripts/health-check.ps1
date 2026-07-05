@@ -2,7 +2,7 @@
 <#
 .SYNOPSIS
   Unified pre-session health check for gentleman-vMK and opencode-ai ecosystem.
-  Checks: junctions, config drift, bridge state, binary, DB schema, MCP status.
+  Checks: skills junctions (vmk + global), prompts junction.
   Part of P1 — Autonomous Integration Plan.
 #>
 param(
@@ -107,42 +107,7 @@ if (Test-Path $globalSkills) {
   if ($exitCode -lt 1) { $exitCode = 1 }
 }
 
-# ── Check 4: Bridge new entries (per-agent checkpoint) ──────────────────
-$checkpointFile = "D:\TEMP\.bridge-checkpoint.gentleman-gh"
-$bridgeJsonl = "D:\TEMP\opencode-bridge.jsonl"
-if (Test-Path $bridgeJsonl) {
-  $lastOffset = if (Test-Path $checkpointFile) { [long](Get-Content $checkpointFile -Raw -ErrorAction SilentlyContinue | ForEach-Object { $_.Trim() } | Where-Object { $_ -match '^\d+' }) } else { 0L }
-  $currentSize = (Get-Item $bridgeJsonl).Length
-  if ($currentSize -gt $lastOffset) {
-    $checks.Add(@{check = "bridge-new-entries"; status = "INFO"; detail = "New bridge messages since last checkpoint (offset $lastOffset → $currentSize bytes). Run 'bridge.ps1 -Command checkpoint -Source gentleman-gh' to read." })
-  } else {
-    $checks.Add(@{check = "bridge-new-entries"; status = "OK"; detail = "No new messages ✅" })
-  }
-}
 
-# ── Check 6b: Bridge file state ─────────────────────────────────────────
-$bridgeMd = "D:\TEMP\opencode-error-analysis-report.md"
-$bridgeJsonl = "D:\TEMP\opencode-bridge.jsonl"
-$openItems = 0
-if (Test-Path $bridgeMd) {
-  $openCount = @(Select-String -Path $bridgeMd -Pattern "\*\*Abierto\*\*" -SimpleMatch).Count
-  $openItems += $openCount
-}
-if (Test-Path $bridgeJsonl) {
-  $jsonlLines = Get-Content $bridgeJsonl -ErrorAction SilentlyContinue
-  if ($jsonlLines) {
-    $jsonlOpen = $jsonlLines | ForEach-Object { try { $_ | ConvertFrom-Json -ErrorAction Stop } catch {} } |
-      Where-Object { $null -ne $_ -and $_.PSObject.Properties.Name -contains 'status' -and $_.status -eq "open" } |
-      Measure-Object | Select-Object -ExpandProperty Count
-    $openItems += $jsonlOpen
-  }
-}
-if ($openItems -gt 0) {
-  $checks.Add(@{check = "bridge-items"; status = "WARN"; detail = "$openItems open item(s)" })
-  if ($exitCode -lt 1) { $exitCode = 1 }
-} else {
-  $checks.Add(@{check = "bridge-items"; status = "OK"; detail = "No open items ✅" })
-}
 
 # ── Output ──────────────────────────────────────────────────────────────
 if ($Json) {

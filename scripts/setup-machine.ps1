@@ -67,11 +67,11 @@ if (-not $SkipEnvVar) {
 }
 
 # ── Step 2: OpenCode env vars ──────────────────────────────────────
+# NOTE: Do NOT set OPENCODE_CONFIG_DIR/CACHE_DIR/DB here — those would
+# override ~\.config\opencode\ and break the global install. OpenCode
+# uses its defaults (global config dir) automatically.
 info "Setting OpenCode environment variables"
 $ocVars = @{
-    "OPENCODE_CACHE_DIR"              = "$RepoDir\.vmk-cache"
-    "OPENCODE_CONFIG_DIR"             = "$RepoDir\.vmk-config"
-    "OPENCODE_DB"                     = "$RepoDir\.vmk-data\opencode.db"
     "OPENCODE_DISABLE_EMBEDDED_WEB_UI" = "true"
     "OPENCODE_DISABLE_MODELS_FETCH"    = "true"
     "OPENCODE_EXPERIMENTAL_DISABLE_FILEWATCHER" = "true"

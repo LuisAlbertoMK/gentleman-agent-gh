@@ -53,7 +53,7 @@ Thresholds en skill `triple-verify`. Modos: Normal (zona) · `!ship`=triple+qual
 | `!compress` | Karpathy compression skills >2.5KB + score update |
 | `!score` | `score-auto.ps1 -Json` + docs update + cross-ref |
 | `!sync` | `pull-upstream.ps1 -Mode Check` → sync-vmk.ps1 + check-config-drift.ps1 → score |
-| `!health` | health-check.ps1 + check-config-drift.ps1 + bridge status + git status |
+| `!health` | health-check.ps1 + check-config-drift.ps1 + git status |
 | `!batch` | `batch.ps1` — batch auto-incremental + bitácora |
 | `!cycle` | `inter-track.ps1 -Show` + score + upstream |
 | `!close` | `close-session.ps1` — pipeline de cierre unificado |
@@ -113,10 +113,10 @@ Infer: QUICK (simple→min) · THOROUGH (risky→full SDD) · DRAFT (explore→f
 | ORANGE | Headline | L2 forced | Non-critical skip | Escalar a usuario | ctx>60% or any HIGH |
 | RED | 1-liner/file | L3 emergency | Skip all | Solo informar, no actuar | ctx>80% or err rate 2+ |
 
-## Ecosystem Autonomy (bridge integration)
+## Ecosystem Autonomy
 | Zona | Acción | Ejemplos |
 |------|--------|----------|
-| GREEN | Auto-fix sin preguntar | junction repair, bridge write/read, config drift check |
+| GREEN | Auto-fix sin preguntar | junction repair, config drift check |
 | YELLOW | Proponer + esperar ok | config sync, DB fix, script creation |
 | RED | Solo detectar, escalar | core engine, binary changes, destructive ops |
 
@@ -187,13 +187,10 @@ Run `scripts/use-gentleman.ps1` (or `!gentleman` shortcut) in any project direct
 | Drift detection | `check-skill-drift.ps1` |
 | Config drift (3-way) | `check-config-drift.ps1` |
 | Sparse loading | `skill-graph.ps1` |
-| Health check | `health-check.ps1` — 6 checks, Json/AutoRepair |
-| Bridge (inter-agent) | `bridge.ps1` — D:\TEMP\opencode-bridge.jsonl |
+| Health check | `health-check.ps1` — 3 checks, Json/AutoRepair |
 | Sync canonical→vmk | `sync-vmk.ps1` — agent/permission/skills |
 | Quality standard | `docs/operations/quality-standard.md` (13-dim) |
 | Metrics | `docs/metricas/` — before/after for ≥3 step tasks |
-| Bridge file (machine) | `D:\TEMP\opencode-bridge.jsonl` |
-| Bridge checkpoint (v2) | `D:\TEMP\.bridge-checkpoint.<agent>` (per-agent byte offset) |
 
 <!-- /gentle-ai:persona -->
 
@@ -263,34 +260,16 @@ PSSA Gate: auto-heals BOM + switch defaults. Write-Host intentional. No `git com
 ### I. Self-Improvement System
 Manifest: `CYCLE.md` (solo proyecto local, NO upstream). Skill: `self-improvement`. Proceso: READ CYCLE.md → diagnose → 3 subagentes → verify → learn → `docs/ciclos/cycle<N>-*.md`. inter(30) minimum. Score drop >0.5 → full revert. Same fix fails 3x → SKIP.
 Plugin: `opencode-self-improve` (Hermes-style) — SkillForge→SQLite, Curator→re-score/merge, SkillInjector→top-3 pre-turn.
-### J. Pre-session Health Check — INBYPASSABLE
+### J. Pre-session Health Check
 
-**Bridge check es INBYPASSABLE — mismo nivel que factibilidad (rung 0). Se ejecuta SIEMPRE antes del primer mensaje al usuario.**
+0. `restore-project-score.ps1 -Quiet`
+1. `git status --short` (alerta si cambios)
+2. `check-skill-drift.ps1` (warning si drift)
+3. (opt) `check-upstream.ps1 -Json` (NEW→engram info, no bloquea)
+4. **Health**: `health-check.ps1 -Json` rápido (exit 0/1/2)
+5. Todo OK → seguí
 
-0. **Bridge detect (INBYPASSABLE)**: `vmk-bridge-detect.ps1` — corre al inicio de CADA sesión. Costo ~0 tokens si no hay cambios. Si hay mensajes del otro agente → procesarlos y responder ANTES de continuar con cualquier otra cosa.
-0.5. `restore-project-score.ps1 -Quiet` 1. `git status --short` (alerta si cambios) 2. `check-skill-drift.ps1` (warning si drift) 2.5. (opt) `check-upstream.ps1 -Json` (NEW→engram info, no bloquea) 3. ~~Bridge: `bridge.ps1 -Command checkpoint`~~ → **DEPRECADO** — usar step 0 (`vmk-bridge-detect.ps1`) 4. **Health**: `health-check.ps1 -Json` rápido (exit 0/1/2). 5. Todo OK → seguí.
-
-### K. Bridge Bilateral Protocol (v2 — per-project identity)
-
-**Acuerdo entre proyectos** — bridge v2 protocol:
-
-1. **Cada proyecto tiene su propio checkpoint**: per-project byte offset en `.bridge-checkpoint.<slug>`.
-   - IDENTIDAD = proyecto, NO agente. NUNCA uses "gentleman-vmk" como slug.
-   - gentleman-agent-gh → slug `gentleman-gh`, checkpoint `.bridge-checkpoint.gentleman-gh`
-   - opencode → slug `opencode`, checkpoint `.bridge-checkpoint.opencode`
-   - Nuevo proyecto → slug derivado del nombre del repo, checkpoint autogenerado.
-2. **Write NUNCA actualiza checkpoint** — solo el lector al procesar mensajes.
-3. **Detección**: stat() del JSONL → comparar Length vs lastOffset → delta read (~0 tokens).
-4. **Pre-session**: bridge check es INBYPASSABLE (ver §J) — corre antes del primer mensaje.
-5. **MCP server**: `bridge-mcp-server.ps1` expone tools `bridge_send`, `bridge_read`, `bridge_status`.
-   - Registrado en cada proyecto como MCP server "project-bridge" con `-ProjectId <slug>`.
-6. **vmk-bridge-detect.ps1** es el mecanismo legacy de pre-session (~0 tokens).
-7. **SHA256 checkpoint legacy** (`.bridge-checkpoint` sin sufijo) — zombie, no se usa más.
-   - `.bridge-checkpoint.gentleman-vmk` — zombie, eliminar.
-8. **Flujo**: arranca sesión → detecta (MCP bridge_read o vmk-bridge-detect) → procesa → responde por bridge → checkpoint.
-9. **Nuevo proyecto**: crear entrada MCP en su opencode.json con slug único, checkpoint nace en offset actual.
-
-### L. Project Score Auto-Report (first request)
+### K. Project Score Auto-Report (first request)
 Buscar `.project.json`. Si existe: reportar score actual. Si >7d stale → fresh metrics + update. Si no existe → no informe. `mem_save(topic_key=project/score)`.
 
 ### L. Bias Calibration
