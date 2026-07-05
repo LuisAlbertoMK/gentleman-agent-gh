@@ -20,24 +20,26 @@ function Add-Check{
 }
 function Invoke-E1Checks{
     $sDir=Join-Path $Root 'scripts'
-    $bs=@()
+    $sb_bs = [System.Text.StringBuilder]::new(65536)
     Get-ChildItem "$sDir\*.ps1" | ForEach-Object {
         $e=$null
         $null=[System.Management.Automation.Language.Parser]::ParseFile($_.FullName,[ref]$null,[ref]$e)
-        if($e){$bs+="$($_.Name): $($e.Message)"}
+        if($e){$null = $sb_bs.AppendLine("$($_.Name): $($e.Message)")}
     }
+    $bs = @($sb_bs.ToString().Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries))
     if($bs.Count-eq0){Add-Check 'PS Syntax' $true 'All scripts parse OK'}else{Add-Check 'PS Syntax' $false "$($bs.Count) files with errors: $($bs -join '; ')"}
     $skd=Join-Path $Root '.agents\skills'
-    $bf=@()
+    $sb_bf = [System.Text.StringBuilder]::new(65536)
     if(Test-Path $skd){
         Get-ChildItem "$skd\*\SKILL.md" | ForEach-Object {
             $c=[IO.File]::ReadAllText($_.FullName)
             if($c-match'^---'){
                 $end=$c.IndexOf('---',3)
-                if($end-eq-1){$bf+="$($_.Directory.Name): unclosed frontmatter"}
+                if($end-eq-1){$null = $sb_bf.AppendLine("$($_.Directory.Name): unclosed frontmatter")}
             }
         }
     }
+    $bf = @($sb_bf.ToString().Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries))
     if($bf.Count-eq0){Add-Check 'Skill Frontmatter' $true 'All frontmatter valid'}else{Add-Check 'Skill Frontmatter' $false "$($bf.Count) issues: $($bf -join '; ')"}
     $xs=Join-Path $sDir 'cross-ref-check.ps1'
     if(Test-Path $xs){& $xs;Add-Check 'Cross-Ref Check' ($LASTEXITCODE-eq0) "exit $LASTEXITCODE"}else{Add-Check 'Cross-Ref Check' $true 'not found (skipped)'}
@@ -45,7 +47,7 @@ function Invoke-E1Checks{
 function Invoke-E2Checks{
     $ps=Join-Path $Root 'scripts\pssa-gate.ps1'
     if(Test-Path $ps){& $ps -Mode Check;Add-Check 'PSSA Gate' ($LASTEXITCODE-eq0) "exit $LASTEXITCODE"}else{Add-Check 'PSSA Gate' $true 'not found (skipped)'}
-    $sf=@()
+    $sb_sf = [System.Text.StringBuilder]::new(65536)
     $sPat=@('password\s*=','secret\s*=','api[_-]?key\s*=','token\s*=','connection\s*string\s*=',
              'GH_TOKEN\s*=','GITHUB_TOKEN\s*=','ghp_','gho_','ghs_','github_pat_','ctx7sk_','AKIA',
              'xox[abprs]-\d+','sk-[a-zA-Z0-9]{20,}','-----BEGIN\s+(RSA|EC|DSA|PRIVATE|OPENSSH)\s+KEY')
@@ -54,9 +56,10 @@ function Invoke-E2Checks{
         if(-not(Test-Path $dir)){continue}
         Get-ChildItem $dir -Recurse -Include '*.ps1','*.md','*.psm1' | ForEach-Object {
             $c=[IO.File]::ReadAllText($_.FullName)
-            foreach($p in $sPat){if($c-match$p){$sf+="$($_.Name): matched '$p'"}}
+            foreach($p in $sPat){if($c-match$p){$null = $sb_sf.AppendLine("$($_.Name): matched '$p'")}}
         }
     }
+    $sf = @($sb_sf.ToString().Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries))
     if($sf.Count-eq0){Add-Check 'Secrets Scan' $true 'No patterns detected'}else{Add-Check 'Secrets Scan' $false "$($sf.Count) potential secrets: $($sf -join '; ')"}
     Push-Location $Root
     $gs=$(git status --short)
@@ -75,12 +78,13 @@ function Invoke-E2Checks{
 function Invoke-E3Checks{
     $cd=Join-Path $Root '.agents\skills'
     $gd="$env:USERPROFILE\.config\opencode\skills"
-    $mj=@()
+    $sb_mj = [System.Text.StringBuilder]::new(65536)
     if((Test-Path $cd)-and(Test-Path $gd)){
         Get-ChildItem $cd -Directory | Where-Object {$_.Name -ne '_shared'} | ForEach-Object {
-            if(-not(Test-Path (Join-Path $gd $_.Name))){$mj+=$_.Name}
+            if(-not(Test-Path (Join-Path $gd $_.Name))){$null = $sb_mj.AppendLine($_.Name)}
         }
     }
+    $mj = @($sb_mj.ToString().Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries))
     if($mj.Count-eq0){Add-Check 'Global Junctions' $true 'All junctions present'}else{Add-Check 'Global Junctions' $false "Missing: $($mj -join ', ')"}
     $pj=Join-Path $Root '.project.json'
     if(Test-Path $pj){
@@ -92,11 +96,12 @@ function Invoke-E3Checks{
         }catch{Add-Check '.project.json' $false "Parse error: $_"}
     }else{Add-Check '.project.json' $false 'Not found'}
     $sDir=Join-Path $Root 'scripts'
-    $mh=@()
+    $sb_mh = [System.Text.StringBuilder]::new(65536)
     [IO.Directory]::EnumerateFiles($sDir, '*.ps1') | ForEach-Object {
         $c=[IO.File]::ReadAllText($_)
-        if($c -notmatch '\.SYNOPSIS'){$mh+=$_.Name}
+        if($c -notmatch '\.SYNOPSIS'){$null = $sb_mh.AppendLine($_.Name)}
     }
+    $mh = @($sb_mh.ToString().Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries))
     if($mh.Count-eq0){Add-Check 'Script Help' $true 'All scripts have .SYNOPSIS'}else{Add-Check 'Script Help' $false "$($mh.Count) missing: $($mh -join ', ')"}
     $cp=Join-Path $Root 'CYCLE.md'
     if(Test-Path $cp){
