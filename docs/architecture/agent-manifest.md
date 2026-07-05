@@ -12,11 +12,11 @@
 | **Skills** | Crear, mantener, mejorar los 69 skills | `.agents/skills/` |
 | **SDD Prompts** | Mantener los 11 prompts del SDD workflow | `prompts/sdd/` |
 | **Config de agente** | Definir gentleman-vMK, gentleman-deep, gentleman-quick, gentleman-codex | `opencode.json` (sección `agent`) |
-| **Scripts de integración** | health-check, sync, bridge, audit, batch | `scripts/` |
+| **Scripts de integración** | health-check, sync, audit, batch | `scripts/` |
 | **AGENTS.md** | Mi propia personalidad y reglas de comportamiento | `AGENTS.md` |
-| **Junctions** | Crear y mantener junctions hacia skills/prompts | `~/.config/opencode/skills/`, `.vmk-config/skills/` |
+| **Junctions** | Crear y mantener junctions hacia skills/prompts | `~/.config/opencode/skills/` |
 | **Pre-sesion health** | Verificar que mi entorno está sano antes de trabajar | `scripts/health-check.ps1` |
-| **Bridge** | Reportar hallazgos que afecten al ecosistema opencode | `D:\TEMP\opencode-bridge.jsonl` |
+
 
 ---
 

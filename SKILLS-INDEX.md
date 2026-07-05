@@ -77,6 +77,7 @@
 | External improvement, 5-phase cycle, external project, analyze project, improve external, cliente, proyecto externo | external-improvement |
 | Model router, routing, qué modelo, delegate or direct, qué hacer con esta tarea, trial risk, security gate | opencode-model-router |
 | Caveman, ultra-lean, compression, minimal context, emergency mode | caveman |
+| Bias calibration, calibrate scoring, audit bias, self-score correction, external audit correction | bias-calibration |
 | Doc sync, documentation sync, sync docs, propagate docs | doc-sync |
 | SDD onboarding, guided walkthrough, SDD cycle, teach SDD | sdd-onboard |
 

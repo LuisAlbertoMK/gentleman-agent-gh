@@ -15,7 +15,7 @@
 | Avg skill size | 2,000B |
 | Junctions globales OK | 69/69 |
 | Frontmatter coverage | 100% |
-| Scripts | 56 |
+| Scripts | 50 |
 
 ## 🚦 Quality Gate (2026-06-26)
 

@@ -109,7 +109,7 @@ El proyecto usa dos MCPs para memoria cross-session:
 
 ---
 
-## Scripts (56 en scripts/)
+## Scripts (50 en scripts/)
 
 | Script | Propósito |
 |--------|-----------|
