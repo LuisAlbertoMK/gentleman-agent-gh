@@ -809,10 +809,18 @@ Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅
 | 9 | Re-score + reporte ciclo + commit final | Medium | Low | 2.0 | 1 | 🔴 | `.project.json` actualizado, `docs/ciclos/cycle20-*.md`, commit sellado |
 
 ### Cycle 20 Progress
-- Score: **10/10** (mantenido de C19)
-- inter: 0/30 (cycle tracking)
-- Backlog: 0/9 items done
+- Score: **9.3/10** (post-C19 close, .project.json SSoT)
+- inter: 5/30 (cycle tracking)
+- Backlog: 8/9 items done (Items 1,2,3,4,5,6,7 ✅ — Items 8 pending)
 - P1 (EXPLORE) + P2 (DIAGNOSE): ✅ Completados — `docs/optimizaciones/agent-optimization-analysis.md` con 26 hallazgos y recomendaciones priorizadas
+- P4 Batch 1: Items 2 (context-watchdog drift detection), 5 (compact_prompt), 7 (PSSA baseline cleanup) ✅
+- P4 Batch 2: Items 3 (tool output -Quiet flags), 6 (script audit -Quiet) ✅
+- P4 Batch 3: Items 1 (AGENTS.md compression 20KB→14.8KB), 4 (delegation rules added) ✅
+- T1: MCP inheritance fix (use-gentleman.ps1 always-merge) + env var load ✅
+- T2: Gap analysis — 25 gaps found — registered in `docs/gaps/cycle20-gaps-20260705.md` ✅
+- H5: Hardcoded paths fixed in 3 scripts (check-config-drift, health-check, sync-vmk) ✅
+- H10: Trailing comma in opencode.json fixed ✅
+- Fix: skillspector-gate.ps1 Set-StrictMode before param() → parse error fixed ✅
 
 ---
 

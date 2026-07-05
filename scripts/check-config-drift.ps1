@@ -13,8 +13,10 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+$gentlemanRoot = if ($env:GENTLEMAN_AGENT_ROOT) { $env:GENTLEMAN_AGENT_ROOT } else { (Get-Item $PSScriptRoot).Parent.FullName }
+
 # ── Config paths ─────────────────────────────────────────────────────────
-$canonicalPath = "D:\gentleman-agent-gh\opencode.json"
+$canonicalPath = "$gentlemanRoot/opencode.json"
 $globalPath    = "$env:USERPROFILE\.config\opencode\opencode.json"
 
 $results = [System.Collections.Generic.List[object]]::new()

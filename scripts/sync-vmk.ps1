@@ -24,7 +24,9 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$canonicalPath = "D:\gentleman-agent-gh\opencode.json"
+$gentlemanRoot = if ($env:GENTLEMAN_AGENT_ROOT) { $env:GENTLEMAN_AGENT_ROOT } else { (Get-Item $PSScriptRoot).Parent.FullName }
+
+$canonicalPath = (Join-Path $gentlemanRoot "opencode.json")
 $globalPath    = "$env:USERPROFILE\.config\opencode\opencode.json"
 
 # ── Validate canonical exists ────────────────────────────────────────────
@@ -88,7 +90,7 @@ function Sync-Config {
 # ── Execute ──────────────────────────────────────────────────────────────
 if ($Target -eq "global") {
   Sync-Config -TargetPath $globalPath -Label "global" -PreserveMCP $false
-  Copy-Item -LiteralPath "D:\gentleman-agent-gh\AGENTS.md" "$env:USERPROFILE\.config\opencode\AGENTS.md" -Force -ErrorAction SilentlyContinue
+  Copy-Item -LiteralPath (Join-Path $gentlemanRoot "AGENTS.md") "$env:USERPROFILE\.config\opencode\AGENTS.md" -Force -ErrorAction SilentlyContinue
   $results.Add(@{target="global-agents-md"; status="SYNCED"; detail="AGENTS.md copied"})
 }
 

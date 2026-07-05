@@ -13,6 +13,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+$gentlemanRoot = if ($env:GENTLEMAN_AGENT_ROOT) { $env:GENTLEMAN_AGENT_ROOT } else { (Get-Item $PSScriptRoot).Parent.FullName }
+
 $exitCode = 0
 $checks = [System.Collections.Generic.List[object]]::new()
 
@@ -58,14 +60,14 @@ function Repair-Junction {
 
 # ── Check 1: vmk skills junction ────────────────────────────────────────
 $check1 = Test-Junction -Path "D:\opencode\.vmk-config\skills" `
-  -ExpectedTarget "D:\gentleman-agent-gh\.agents\skills" `
+  -ExpectedTarget "$gentlemanRoot/.agents/skills" `
   -Label "vmk-skills-junction"
 if ($check1.status -eq "FAIL" -and $AutoRepair) {
   Repair-Junction -Path "D:\opencode\.vmk-config\skills" `
-    -Target "D:\gentleman-agent-gh\.agents\skills" `
+    -Target "$gentlemanRoot/.agents/skills" `
     -Label "vmk-skills"
   $check1 = Test-Junction -Path "D:\opencode\.vmk-config\skills" `
-    -ExpectedTarget "D:\gentleman-agent-gh\.agents\skills" `
+    -ExpectedTarget "$gentlemanRoot/.agents/skills" `
     -Label "vmk-skills-junction"
 }
 $checks.Add($check1)
@@ -73,14 +75,14 @@ if ($check1.status -eq "FAIL") { $exitCode = 2 }
 
 # ── Check 2: vmk prompts junction ───────────────────────────────────────
 $check2 = Test-Junction -Path "D:\opencode\prompts\sdd" `
-  -ExpectedTarget "D:\gentleman-agent-gh\prompts\sdd" `
+  -ExpectedTarget "$gentlemanRoot/prompts/sdd" `
   -Label "vmk-prompts-junction"
 if ($check2.status -eq "FAIL" -and $AutoRepair) {
   Repair-Junction -Path "D:\opencode\prompts\sdd" `
-    -Target "D:\gentleman-agent-gh\prompts\sdd" `
+    -Target "$gentlemanRoot/prompts/sdd" `
     -Label "vmk-prompts"
   $check2 = Test-Junction -Path "D:\opencode\prompts\sdd" `
-    -ExpectedTarget "D:\gentleman-agent-gh\prompts\sdd" `
+    -ExpectedTarget "$gentlemanRoot/prompts/sdd" `
     -Label "vmk-prompts-junction"
 }
 $checks.Add($check2)
