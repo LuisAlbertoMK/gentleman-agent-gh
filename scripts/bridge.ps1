@@ -49,11 +49,36 @@ function Get-Prefix {
   }
 }
 
+function Safe-Prop {
+  param($Obj, [string]$Name, $Default)
+  if ($null -ne $Obj -and $Obj.PSObject.Properties.Name -contains $Name) { return $Obj.$Name }
+  return $Default
+}
+
+function Normalize-Entry {
+  param($Entry)
+  if ($null -eq $Entry) { return $Entry }
+  $Entry | Add-Member -NotePropertyName "id" -NotePropertyValue (Safe-Prop $Entry "id" "?") -Force -ErrorAction SilentlyContinue | Out-Null
+  $Entry | Add-Member -NotePropertyName "source" -NotePropertyValue (Safe-Prop $Entry "source" (Safe-Prop $Entry "agent" "?")) -Force -ErrorAction SilentlyContinue | Out-Null
+  $Entry | Add-Member -NotePropertyName "status" -NotePropertyValue (Safe-Prop $Entry "status" "open") -Force -ErrorAction SilentlyContinue | Out-Null
+  return $Entry
+}
+
+function Get-BridgeEntries {
+  if (-not (Test-Path $bridgeJsonl)) { return @() }
+  $items = Get-Content $bridgeJsonl | ForEach-Object { Normalize-Entry ($_ | ConvertFrom-Json) }
+  # Use -NoEnumerate to preserve array structure through pipeline
+  Write-Output -NoEnumerate $items
+}
+
+
+
 # ── Command dispatch ─────────────────────────────────────────────────────
 switch ($Command) {
   "write" {
-    $existing = if (Test-Path $bridgeJsonl) { Get-Content $bridgeJsonl | ConvertFrom-Json } else { @() }
-    $lastId = ($existing | Where-Object { $_.source -eq $Source } | Select-Object -Last 1).id
+    $existing = Get-BridgeEntries
+    $last = $existing | Where-Object { $_.source -eq $Source } | Select-Object -Last 1
+    $lastId = if ($last) { $last.id } else { $null }
     $nextNum = if ($lastId) { [int]($lastId -replace '^[A-Z]+-','') + 1 } else { 1 }
     $newId = "$(Get-Prefix $Source)-$($nextNum.ToString('D3'))"
 
@@ -71,27 +96,30 @@ switch ($Command) {
   }
 
   "read" {
-    if (-not (Test-Path $bridgeJsonl)) { if (-not $Quiet) { Write-Output "Bridge empty" }; return }
-    $entries = Get-Content $bridgeJsonl | ConvertFrom-Json
+    $entries = Get-BridgeEntries
+    $total = ($entries | Measure-Object).Count
+    if ($total -eq 0) { if (-not $Quiet) { Write-Output "Bridge empty" }; return }
     if ($Source) { $entries = $entries | Where-Object { $_.source -eq $Source } }
-    if ($Type)   { $entries = $entries | Where-Object { $_.type -eq $Type } }
+    if ($Type)   { $entries = $entries | Where-Object { (Safe-Prop $_ "type" "") -eq $Type } }
     if ($Status) { $entries = $entries | Where-Object { $_.status -eq $Status } }
-    if ($Since)  { $entries = $entries | Where-Object { $_.ts -ge $Since } }
+    if ($Since)  { $entries = $entries | Where-Object { (Safe-Prop $_ "ts" "") -ge $Since } }
     if ($Id)     { $entries = $entries | Where-Object { $_.id -eq $Id } }
-    if ($Json) { ConvertTo-Json @{entries = $entries; count = $entries.Count} -Depth 3 }
+    if ($Json) { ConvertTo-Json @{entries = $entries; count = ($entries | Measure-Object).Count} -Depth 3 }
     elseif (-not $Quiet) {
-      if ($entries.Count -eq 0) { Write-Output "No matches" }
+      $remaining = ($entries | Measure-Object).Count
+      if ($remaining -eq 0) { Write-Output "No matches" }
       else { $entries | ForEach-Object { Write-Output "$($_.id) [$($_.source)] $($_.message) — $($_.status)" } }
     }
   }
 
   "status" {
-    if (-not (Test-Path $bridgeJsonl)) { if (-not $Quiet) { Write-Output "Bridge: empty" }; return }
-    $entries = Get-Content $bridgeJsonl | ConvertFrom-Json
-    $open = ($entries | Where-Object { $_.status -eq "open" }).Count
-    $resolved = ($entries | Where-Object { $_.status -eq "resolved" }).Count
-    if ($Json) { ConvertTo-Json @{total = $entries.Count; open = $open; resolved = $resolved} }
-    elseif (-not $Quiet) { Write-Output "Bridge: $($entries.Count) total | $open open | $resolved resolved" }
+    $entries = Get-BridgeEntries
+    $total = ($entries | Measure-Object).Count
+    if ($total -eq 0) { if (-not $Quiet) { Write-Output "Bridge: empty" }; return }
+    $open = ($entries | Where-Object { $_.status -eq "open" } | Measure-Object).Count
+    $resolved = ($entries | Where-Object { $_.status -eq "resolved" } | Measure-Object).Count
+    if ($Json) { ConvertTo-Json @{total = $total; open = $open; resolved = $resolved} }
+    elseif (-not $Quiet) { Write-Output "Bridge: $total total | $open open | $resolved resolved" }
   }
 
   "close" {
@@ -100,7 +128,7 @@ switch ($Command) {
     $lines = Get-Content $bridgeJsonl
     $found = $false
     $newLines = foreach ($line in $lines) {
-      $entry = $line | ConvertFrom-Json
+      $entry = Normalize-Entry ($line | ConvertFrom-Json)
       if ($entry.id -eq $Id) {
         $entry.status = "resolved"
         if ($Resolution) { $entry | Add-Member -NotePropertyName "resolution" -NotePropertyValue $Resolution -Force }
@@ -123,10 +151,8 @@ switch ($Command) {
       Set-Content -LiteralPath $checkpoint -Value $currHash -NoNewline
       if (-not $Quiet) {
         Write-Output "Bridge changed! Latest:"
-        Get-Content $bridgeJsonl | Select-Object -Last 3 | ConvertFrom-Json | ForEach-Object {
-          $src = if ($_.PSObject.Properties.Name -contains 'source') { $_.source } else { $_.agent }
-          $id = if ($_.PSObject.Properties.Name -contains 'id') { $_.id } else { "?" }
-          Write-Output "  [$src] $id: $($_.message)"
+        Get-BridgeEntries | Select-Object -Last 3 | ForEach-Object {
+          Write-Output "  [$($_.source)] $($_.id): $($_.message)"
         }
       }
     }

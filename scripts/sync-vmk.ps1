@@ -89,9 +89,14 @@ function Sync-Config {
 # ── Execute ──────────────────────────────────────────────────────────────
 if ($Target -eq "all" -or $Target -eq "vmk") {
   Sync-Config -TargetPath $vmkPath -Label "vmk" -PreserveMCP $true
+  # Copy AGENTS.md for {file:AGENTS.md} references
+  Copy-Item -LiteralPath "D:\gentleman-agent-gh\AGENTS.md" "D:\opencode\.vmk-config\AGENTS.md" -Force -ErrorAction SilentlyContinue
+  $results.Add(@{target="vmk-agents-md"; status="SYNCED"; detail="AGENTS.md copied"})
 }
 if ($Target -eq "all" -or $Target -eq "global") {
   Sync-Config -TargetPath $globalPath -Label "global" -PreserveMCP $false
+  Copy-Item -LiteralPath "D:\gentleman-agent-gh\AGENTS.md" "$env:USERPROFILE\.config\opencode\AGENTS.md" -Force -ErrorAction SilentlyContinue
+  $results.Add(@{target="global-agents-md"; status="SYNCED"; detail="AGENTS.md copied"})
 }
 
 # ── Output ──────────────────────────────────────────────────────────────
