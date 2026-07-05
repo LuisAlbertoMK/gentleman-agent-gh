@@ -5,17 +5,18 @@
 #>
 param(
     [ValidateSet('E1','E2','E3','All')][string]$ProfileName='All',
-    [switch]$Json,
+    [switch]$Json,[switch]$Quiet,
     [string]$Root=(Split-Path $PSScriptRoot -Parent)
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 $r=@{profile=$ProfileName;checks=@();passed=0;failed=0;errors=@()}
+if($Quiet){$Json=$true}
 function Add-Check{
     param([string]$N,[bool]$P,[string]$D='')
     $script:r.checks+=@{name=$N;passed=$P;detail=$D}
     if($P){$script:r.passed++}else{$script:r.failed++}
-    Write-Host ("[{0}] {1} -- {2}" -f $(if($P){'PASS'}else{'FAIL'}),$N,$D) -ForegroundColor $(if($P){'Green'}else{'Red'})
+    if(-not $Quiet){Write-Host ("[{0}] {1} -- {2}" -f $(if($P){'PASS'}else{'FAIL'}),$N,$D) -ForegroundColor $(if($P){'Green'}else{'Red'})}
 }
 function Invoke-E1Checks{
     $sDir=Join-Path $Root 'scripts'

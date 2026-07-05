@@ -1,6 +1,7 @@
 #requires -Version 7.6
 <# .SYNOPSIS Mine session histories for error patterns and propose corrections #>
-param([ValidateSet('scan','apply','check')][string]$Mode='scan',[switch]$Json,[int]$Threshold=2)
+param([ValidateSet('scan','apply','check')][string]$Mode='scan',[switch]$Json,[switch]$Quiet,[int]$Threshold=2)
+if($Quiet){$Json=$true}
 Set-StrictMode -Version Latest;$ErrorActionPreference='Stop'
 $rr=Split-Path -Parent $PSScriptRoot
 $cp=Join-Path $rr 'ANTI-PATTERN-CATALOG.md';$ld=Join-Path $rr '.learnings'
@@ -29,15 +30,15 @@ $r+=[PSCustomObject]@{PatternKey=$e.Name;Count=$e.Value;Cataloged=$cat}}};return
 $catalog=rc;$patternKeys=rl;$errors=re;$repeated=frp -cp $catalog -pk $patternKeys -mn $Threshold
 if($Mode-eq'check'){$data=[PSCustomObject]@{CatalogEntries=@($catalog).Count;PatternKeys=@($patternKeys).Count;ErrorEntries=@($errors).Count;RepeatedPatterns=@($repeated).Count;Mode='check';Status=if(@($repeated).Count-gt0){'PATTERNS_FOUND'}else{'CLEAN'}}
 if($Json){return($data | ConvertTo-Json)}
-Write-Host "  Catalog: $(@($catalog).Count) entries`n  Patterns: $(@($patternKeys).Count) keys`n  Errors: $(@($errors).Count) entries`n  Repeated: $(@($repeated).Count) patterns`n  Status: $($data.Status)";return}
+if(-not $Quiet){Write-Host "  Catalog: $(@($catalog).Count) entries`n  Patterns: $(@($patternKeys).Count) keys`n  Errors: $(@($errors).Count) entries`n  Repeated: $(@($repeated).Count) patterns`n  Status: $($data.Status)"};return}
 if($Mode-eq'scan'){$uncataloged=@($repeated | Where-Object {-not $_.Cataloged})
 $data=[PSCustomObject]@{CatalogCount=@($catalog).Count;PatternKeyCount=@($patternKeys).Count;ErrorCount=@($errors).Count;RepeatedPatterns=$repeated;UnCatalogedCount=$uncataloged.Count;CanApply=$uncataloged.Count-gt0}
 if($Json){return($data | ConvertTo-Json -Depth 3)}
-Write-Host "Catalog: $($catalog.Count) anti-patterns cataloged`nPattern keys: $($patternKeys.Count) from learnings`nErrors: $($errors.Count) entries"
-if($repeated.Count-eq0){Write-Host "[OK] No repeated patterns found (threshold: $Threshold)";return}
-Write-Host '[WARN] Repeated patterns detected:';foreach($r in $repeated){$s=if($r.Cataloged){'[cataloged]'}else{'[uncataloged]'};Write-Host "  [$($r.Count)x] $($r.PatternKey) -- $s"}
-if($uncataloged.Count-gt0){Write-Host "Proposal: run with -Mode apply to add $($uncataloged.Count) new anti-pattern(s)"};return}
+if(-not $Quiet){Write-Host "Catalog: $($catalog.Count) anti-patterns cataloged`nPattern keys: $($patternKeys.Count) from learnings`nErrors: $($errors.Count) entries"}
+if($repeated.Count-eq0){if(-not $Quiet){Write-Host "[OK] No repeated patterns found (threshold: $Threshold)"};return}
+if(-not $Quiet){Write-Host '[WARN] Repeated patterns detected:'};foreach($r in $repeated){$s=if($r.Cataloged){'[cataloged]'}else{'[uncataloged]'};if(-not $Quiet){Write-Host "  [$($r.Count)x] $($r.PatternKey) -- $s"}}
+if($uncataloged.Count-gt0){if(-not $Quiet){Write-Host "Proposal: run with -Mode apply to add $($uncataloged.Count) new anti-pattern(s)"}};return}
 if($Mode-eq'apply'){$uncataloged=@($repeated | Where-Object {-not $_.Cataloged})
-if($uncataloged.Count-eq0){Write-Host '[OK] Nothing to apply';return}
-Write-Host "Would add $($uncataloged.Count) new anti-pattern(s):";foreach($u in $uncataloged){$sk=$u.PatternKey -replace '[^\w-]','_';Write-Host "  - [$($u.Count)x] $($u.PatternKey) -> ANTI-PATTERN-CATALOG.md + docs/anti-patterns/$sk.md"}
-Write-Host 'Run manually: edit ANTI-PATTERN-CATALOG.md with pattern details'}
+if($uncataloged.Count-eq0){if(-not $Quiet){Write-Host '[OK] Nothing to apply'};return}
+if(-not $Quiet){Write-Host "Would add $($uncataloged.Count) new anti-pattern(s):"};foreach($u in $uncataloged){$sk=$u.PatternKey -replace '[^\w-]','_';if(-not $Quiet){Write-Host "  - [$($u.Count)x] $($u.PatternKey) -> ANTI-PATTERN-CATALOG.md + docs/anti-patterns/$sk.md"}}
+if(-not $Quiet){Write-Host 'Run manually: edit ANTI-PATTERN-CATALOG.md with pattern details'}}

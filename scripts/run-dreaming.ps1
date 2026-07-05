@@ -1,4 +1,4 @@
-﻿#requires -Version 7.6
+#requires -Version 7.6
 
 <#
 .SYNOPSIS
@@ -11,7 +11,8 @@
 #>
 param(
     [ValidateSet('full','quick','report')]
-    [string]$Mode = 'report'
+    [string]$Mode = 'report',
+    [switch]$Quiet
 )
 
 $ErrorActionPreference = 'Stop'
@@ -38,12 +39,12 @@ function Write-Log {
     }
 }
 
-Write-Host "=== Dreaming Session: $cycleId ==="
-Write-Host "Mode: $Mode"
+if(-not $Quiet){Write-Host "=== Dreaming Session: $cycleId ==="}
+if(-not $Quiet){Write-Host "Mode: $Mode"}
 
 # ---- Quick scan (error pattern check) ----
 if ($Mode -in 'quick','full','report') {
-    Write-Host '[1/3] Scanning error patterns...'
+    if(-not $Quiet){Write-Host '[1/3] Scanning error patterns...'}
 
     $errorCounts = @{}
     if (Test-Path $errorFile) {
@@ -87,21 +88,21 @@ if ($Mode -in 'quick','full','report') {
 
     if ($repeated.Count -gt 0) {
         $msg = "$($repeated.Count) repeated error pattern(s) found"
-        Write-Host "  WARNING: $($msg):"
+        if(-not $Quiet){Write-Host "  WARNING: $($msg):"}
         foreach ($r in $repeated) {
             $severity = 'INFO'
             if ($r.Count -ge 3) { $severity = 'CRITICAL' }
             elseif ($r.Count -ge 2) { $severity = 'WARNING' }
-            Write-Host "    [$severity] $($r.Text) appears $($r.Count) times"
+            if(-not $Quiet){Write-Host "    [$severity] $($r.Text) appears $($r.Count) times"}
         }
     } else {
-        Write-Host '  No repeated error patterns. Clean.'
+        if(-not $Quiet){Write-Host '  No repeated error patterns. Clean.'}
     }
 }
 
 # ---- Learning patterns scan ----
 if ($Mode -in 'full','report') {
-    Write-Host '[2/3] Scanning learning patterns...'
+    if(-not $Quiet){Write-Host '[2/3] Scanning learning patterns...'}
 
     $learningCounts = @{}
     if (Test-Path $logFile) {
@@ -140,23 +141,23 @@ if ($Mode -in 'full','report') {
 
     $workflowCount = $workflowPatterns.Count
     if ($workflowCount -gt 0) {
-        Write-Host "  Found $workflowCount recurring workflow pattern(s):"
+        if(-not $Quiet){Write-Host "  Found $workflowCount recurring workflow pattern(s):"}
         foreach ($wp in $workflowPatterns) {
-            Write-Host "    [$($wp.Section)] $($wp.Message) - $($wp.Count)x"
+            if(-not $Quiet){Write-Host "    [$($wp.Section)] $($wp.Message) - $($wp.Count)x"}
         }
     } else {
-        Write-Host '  No recurring workflow patterns (need 3+ for promotion).'
+        if(-not $Quiet){Write-Host '  No recurring workflow patterns (need 3+ for promotion).'}
     }
 }
 
 # ---- Anti-pattern catalog drift check ----
 if ($Mode -in 'full','report') {
-    Write-Host '[3/3] Checking catalog drift...'
+    if(-not $Quiet){Write-Host '[3/3] Checking catalog drift...'}
     if (Test-Path $catalogFile) {
         $catalogItem = Get-Item $catalogFile
         $catalogContent = Get-Content $catalogFile -Raw
         $age = (Get-Date) - $catalogItem.LastWriteTime
-        Write-Host "  ANTI-PATTERN-CATALOG.md last updated: $($age.Days)d $($age.Hours)h ago"
+        if(-not $Quiet){Write-Host "  ANTI-PATTERN-CATALOG.md last updated: $($age.Days)d $($age.Hours)h ago"}
 
         $entryCount = 0
         $lines = $catalogContent -split "`n"
@@ -165,15 +166,15 @@ if ($Mode -in 'full','report') {
                 $entryCount = $entryCount + 1
             }
         }
-        Write-Host "  Catalog entries: $entryCount"
+        if(-not $Quiet){Write-Host "  Catalog entries: $entryCount"}
     } else {
-        Write-Host '  ANTI-PATTERN-CATALOG.md not found.'
+        if(-not $Quiet){Write-Host '  ANTI-PATTERN-CATALOG.md not found.'}
     }
 }
 
-Write-Host ''
+if(-not $Quiet){Write-Host ''}
 
-Write-Host "=== Dreaming Complete: $cycleId ==="
+if(-not $Quiet){Write-Host "=== Dreaming Complete: $cycleId ==="}
 $finalRepeated = 0
 $finalPatterns = 0
 if ($repeated.Count -gt 0) { $finalRepeated = $repeated.Count }

@@ -785,5 +785,36 @@ Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅
 
 ---
 
+### Cycle 20: Agent Optimization 🔄 INICIADO
+
+**Objetivo**: Ejecutar las 26 recomendaciones del análisis multi-agente (`docs/optimizaciones/agent-optimization-analysis.md`) para mejorar velocidad, calidad y eficiencia de tokens. P1 (EXPLORE) y P2 (DIAGNOSE) ya completados por el análisis existente — arrancamos en P3 (PLAN).
+
+### Pilares
+1. **AGENTS.md Compression** — Reducir de 20KB → 12-15KB. Sacar secciones redundantes (ETH Zurich AGENTbench: context files *decrease* success rate). Fusionar reglas duplicadas global↔local.
+2. **Context-Watchdog Upgrade** — Agregar detección de drift (re-lecturas, re-statements) además de agotamiento de ventana. Zylos/Chroma: 65% de fallas por drift, no exhaustion.
+3. **Tool Output Filtering** — Implementar flags `-Quiet` en scripts, filtrar tool output en subagent return (Anthropic: tool output es el primary token killer).
+4. **Delegación Inteligente** — Thresholds explícitos: max 6 concurrentes, depth 1, no delegar tareas <3 pasos (Morphllm: short tasks cuestan más delegadas).
+
+### Backlog
+| # | Item | Impact | Risk | I/R | Est. inter | Status | Done criteria |
+|---|------|--------|------|-----|------------|--------|---------------|
+| 1 | Comprimir AGENTS.md 20KB→12-15KB: sacar Project Context/Overrides, fusionar reglas global/local, mover engram protocol a skill | High | Medium | 1.5 | 2-3 | 🔴 | AGENTS.md <15KB, sin pérdida de reglas críticas, 3 subagentes verifican |
+| 2 | Upgradear context-watchdog SKILL.md con detección de drift (re-lecturas, re-statements) + trigger compaction at 70% | High | Low | 3.0 | 1 | 🔴 | context-watchdog/SKILL.md incluye drift detection + compaction trigger |
+| 3 | Tool output filtering: agregar -Quiet flag a scripts principales (score-auto, skill-graph, health-check, close-session) | High | Low | 3.0 | 1 | 🔴 | Scripts tienen -Quiet/-Json flag, output por defecto es mínimo |
+| 4 | Codificar reglas de delegación en AGENTS.md: max 6 concurrentes, depth 1, threshold 3+ pasos | High | Low | 3.0 | 1 | 🔴 | AGENTS.md tiene §Delegation Rules con thresholds explícitos |
+| 5 | Agregar compact_prompt pipeline en close-session.ps1 (preserve decisions, drop raw output) | Medium | Low | 2.0 | 1 | 🔴 | close-session.ps1 preserva decisions, elimina raw output |
+| 6 | Auditar scripts para output verboso: agregar -Quiet flag donde falte | Medium | Low | 2.0 | 1 | 🔴 | Todos los scripts >50 líneas tienen modo quiet |
+| 7 | PSSA baseline regenerate (carry-over de C19) | Medium | Low | 2.0 | 1 | 🔴 | PSSA baseline actualizado, refiere a scripts existentes |
+| 8 | 3 subagentes de verificación por batch (12 total) | High | Low | 3.0 | 3-4 | 🔴 | 4 batches × 3 subagentes = 12 verificaciones, todos PASS |
+| 9 | Re-score + reporte ciclo + commit final | Medium | Low | 2.0 | 1 | 🔴 | `.project.json` actualizado, `docs/ciclos/cycle20-*.md`, commit sellado |
+
+### Cycle 20 Progress
+- Score: **10/10** (mantenido de C19)
+- inter: 0/30 (cycle tracking)
+- Backlog: 0/9 items done
+- P1 (EXPLORE) + P2 (DIAGNOSE): ✅ Completados — `docs/optimizaciones/agent-optimization-analysis.md` con 26 hallazgos y recomendaciones priorizadas
+
+---
+
 ## 5-Phase Cycle Loop (Cycle 16+)
 

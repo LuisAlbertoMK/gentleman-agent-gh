@@ -48,6 +48,12 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+# ── Load GENTLEMAN_AGENT_ROOT from User env if not in session ────────
+if (-not $env:GENTLEMAN_AGENT_ROOT) {
+    $userRoot = [Environment]::GetEnvironmentVariable("GENTLEMAN_AGENT_ROOT", "User")
+    if ($userRoot) { $env:GENTLEMAN_AGENT_ROOT = $userRoot }
+}
+
 # ── Paths ────────────────────────────────────────────────────────────
 $globalCfgDir   = "$env:USERPROFILE\.config\opencode"
 $globalCfgFile  = "$globalCfgDir\opencode.json"
@@ -134,16 +140,24 @@ if (-not $projectCfg.ContainsKey('$schema') -or $currentSchema -isnot [string] -
 }
 $projectCfg['default_agent'] = $DefaultAgent
 
-# Inherit MCPs from global if project has none
-$hasMcp = $projectCfg.ContainsKey('mcp') -and @($projectCfg['mcp'].PSObject.Properties).Count -gt 0
-if (-not $hasMcp -and $cfg.mcp) {
-    $projectCfg['mcp'] = $cfg.mcp
+# Always merge global MCPs into project config (project overrides win)
+if ($cfg.mcp) {
+    $mergedMcp = @{}
+    $cfg.mcp.PSObject.Properties | ForEach-Object { $mergedMcp[$_.Name] = $_.Value }
+    if ($projectCfg.ContainsKey('mcp')) {
+        $projectCfg['mcp'].PSObject.Properties | ForEach-Object { $mergedMcp[$_.Name] = $_.Value }
+    }
+    $projectCfg['mcp'] = $mergedMcp
 }
 
-# Inherit permissions from global if project has none
-$hasPermissions = $projectCfg.ContainsKey('permission') -and @($projectCfg['permission'].PSObject.Properties).Count -gt 0
-if (-not $hasPermissions -and $cfg.permission) {
-    $projectCfg['permission'] = $cfg.permission
+# Always merge global permissions into project config (project overrides win)
+if ($cfg.permission) {
+    $mergedPerms = @{}
+    $cfg.permission.PSObject.Properties | ForEach-Object { $mergedPerms[$_.Name] = $_.Value }
+    if ($projectCfg.ContainsKey('permission')) {
+        $projectCfg['permission'].PSObject.Properties | ForEach-Object { $mergedPerms[$_.Name] = $_.Value }
+    }
+    $projectCfg['permission'] = $mergedPerms
 }
 
 $projectCfg | ConvertTo-Json -Depth 10 | Set-Content $projectCfgFile -Encoding UTF8 -Force
@@ -160,6 +174,25 @@ try {
 } catch {
     Out-Message "  [err] Config verification failed: $_" -color Red
     $verifyOk = $false
+}
+
+# Verify MCP tools are available
+$mcpTools = @(
+    @{ Name = "context7"; Cmd = { Get-Command "npx" -ErrorAction SilentlyContinue } },
+    @{ Name = "engram"; Cmd = { Get-Command "engram" -ErrorAction SilentlyContinue } },
+    @{ Name = "headroom"; Cmd = { Get-Command "headroom" -ErrorAction SilentlyContinue } }
+)
+$allMcpOk = $true
+foreach ($mcp in $mcpTools) {
+    if (& $mcp.Cmd) {
+        Out-Message "  [ok] MCP '$($mcp.Name)' tool available" -color Green
+    } else {
+        Out-Message "  [warn] MCP '$($mcp.Name)' tool not in PATH — install globally" -color Yellow
+        $allMcpOk = $false
+    }
+}
+if (-not $allMcpOk) {
+    Out-Message "  → Install missing MCPs: npm i -g @upstash/context7-mcp engram headroom" -color DarkGray
 }
 
 # ── Report ───────────────────────────────────────────────────────────
