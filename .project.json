@@ -1,142 +1,134 @@
 {
   "score": {
-    "trend": "stable",
+    "current": 9.2,
+    "trend": "up",
     "last_updated": "2026-07-05",
-    "current": 9.3,
     "dimensions": {
-      "Best Practices": 10,
-      "Orthography": 10,
-      "Cycle Activity": 1,
-      "Skill Effectiveness": 10.0,
-      "Clean Code": 9.9,
-      "Security": 10,
       "Script Performance": 10,
-      "Metrics": 10,
-      "Dead Code": 10,
-      "Score Depth": 9.6,
-      "Project Artifacts": 10,
+      "Orthography": 10,
       "Backlog Integrity": 10.0,
-      "Bitacora": 10
+      "Project Artifacts": 10,
+      "Best Practices": 10,
+      "Cycle Activity": 1,
+      "Clean Code": 10.0,
+      "Dead Code": 10,
+      "Security": 10,
+      "Metrics": 10,
+      "Score Depth": 9.0,
+      "Skill Effectiveness": 10.0,
+      "Bitacora": null
     }
   },
   "dimensions_detail": {
-    "Bi": {
-      "e": {
-        "exists": true,
-        "lines": 93
-      },
-      "r": "BI: True",
-      "s": 10
-    },
-    "SE": {
-      "e": {
-        "prO5": 0,
-        "cmdO3": 0,
-        "prO3": 0,
-        "o5": 0,
-        "total": 69,
-        "bytes": 124705.0,
-        "o3": 0,
-        "cmdO5": 0,
-        "avg": 1.8
-      },
-      "r": "T:69 >3:0 >5:0 avg:1.8KB cmdO3:0 cmdO5:0 prO3:0 prO5:0",
-      "s": 10.0
-    },
-    "DC": {
-      "e": {
-        "orphans": 0,
-        "commented_out": 0,
-        "dead_junctions": 0
-      },
-      "r": "Orphans: 0, dead junctions: 0",
-      "s": 10
-    },
     "CC": {
+      "s": 10.0,
       "e": {
-        "with_strictmode": 42,
+        "total_scripts": 43,
         "with_params": 43,
-        "with_help": 43,
-        "total_scripts": 43
+        "with_strictmode": 43,
+        "with_help": 43
       },
-      "r": "S:43 H:43 P:43 S:42",
-      "s": 9.9
-    },
-    "Sec": {
-      "e": {
-        "secrets": false,
-        "weak_crypto": false
-      },
-      "r": "Weak crypto: False, secrets: False",
-      "s": 10
+      "r": "S:43 H:43 P:43 S:43"
     },
     "SP": {
+      "s": 10,
       "e": {
-        "huge": 0,
-        "avg": 5.4,
-        "sc": 43
+        "sc": 43,
+        "avg": 5.5,
+        "huge": 0
       },
-      "r": "S:43 avg:5.4KB",
-      "s": 10
+      "r": "S:43 avg:5.5KB"
+    },
+    "SE": {
+      "s": 10.0,
+      "e": {
+        "cmdO3": 0,
+        "cmdO5": 0,
+        "avg": 1.8,
+        "prO3": 0,
+        "bytes": 124702.0,
+        "o5": 0,
+        "o3": 0,
+        "total": 69,
+        "prO5": 0
+      },
+      "r": "T:69 >3:0 >5:0 avg:1.8KB cmdO3:0 cmdO5:0 prO3:0 prO5:0"
+    },
+    "Sec": {
+      "s": 10,
+      "e": {
+        "weak_crypto": false,
+        "secrets": false
+      },
+      "r": "Weak crypto: False, secrets: False"
+    },
+    "Or": {
+      "s": 10,
+      "e": {
+        "scanned": 70,
+        "corrupted": 0
+      },
+      "r": "Corruption: 0/70"
+    },
+    "DC": {
+      "s": 10,
+      "e": {
+        "dead_junctions": 0,
+        "commented_out": 0,
+        "orphans": 0
+      },
+      "r": "Orphans: 0, dead junctions: 0"
+    },
+    "PA": {
+      "s": 10,
+      "e": {
+        "project_json": true,
+        "cross_ref": true,
+        "skills": 69,
+        "readme": true
+      },
+      "r": "X-ref True, 69 skills"
     },
     "Me": {
+      "s": 10,
       "e": {
-        "rp": true,
-        "md": true,
         "ed": true,
+        "md": true,
+        "rp": true,
         "ej": true
       },
-      "r": "MD:True EJ:True",
-      "s": 10
+      "r": "MD:True EJ:True"
     },
     "SD": {
+      "s": 9.0,
       "e": {
         "subd": 30
       },
-      "r": "Depth: 30 sub-dims: 9.6/10",
-      "s": 9.6
+      "r": "Depth: 30 sub-dims: 9/10"
     },
-    "CA": {
+    "BP": {
+      "s": 10,
       "e": {
-        "it": 30,
-        "ic": 3
+        "param_cov": 43,
+        "trycatch": 36
       },
-      "r": "IC:3/30",
-      "s": 1
+      "r": "P:43/43 T:36/43"
     },
     "BI2": {
+      "s": 10.0,
       "e": {
         "passed": 3,
         "total": 3
       },
-      "r": "3/3 items",
-      "s": 10.0
+      "r": "3/3 items"
     },
-    "PA": {
+    "CA": {
+      "s": 1,
       "e": {
-        "readme": true,
-        "skills": 69,
-        "cross_ref": true,
-        "project_json": true
+        "it": 30,
+        "ic": 3
       },
-      "r": "X-ref True, 69 skills",
-      "s": 10
-    },
-    "Or": {
-      "e": {
-        "corrupted": 0,
-        "scanned": 70
-      },
-      "r": "Corruption: 0/70",
-      "s": 10
-    },
-    "BP": {
-      "e": {
-        "trycatch": 36,
-        "param_cov": 43
-      },
-      "r": "P:43/43 T:36/43",
-      "s": 10
+      "r": "IC:3/30"
     }
   }
 }

@@ -785,10 +785,10 @@ Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅
 
 ---
 
-### Cycle 21: Universal Optimization & Research 🆕 P3 PLAN
+### Cycle 21: Universal Optimization & Research 🔵 CLOSED
 
 **Objetivo**: Investigación profunda en 16 áreas de mejora — nuevos MCPs/skills, reducción RAM/CPU/tokens, calidad de código, SEO, UI/UX, seguridad, contexto lineal. Epic: `docs/epics/cycle21-universal-optimization.md`
-- inter: 10/30 | Score: 9.3/10
+- inter: 14/30 | Score: 9.2/10
 - P1 (EXPLORE): 3 subagentes en paralelo — top-3 áreas de impacto ✅
   - R1: OpenCode ecosystem — MCPs, skills, plugins nuevos ✅ → `docs/research/cycle21-phase1-findings.md`
   - R2: Resource optimization — RAM/CPU/Token reduction ✅ → `docs/research/cycle21-phase1-findings.md`
@@ -804,7 +804,36 @@ Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅
   - trufflehog: CI step agregado (deep secrets scan) ✅
   - actionlint: pre-commit hook + CI via yamllint+markdownlint configs ✅
   - `setup-machine.ps1`: Step 2 pre-commit install + Step numbers re-sequenced ✅
-- **Next**: P4 EXECUTE — remaining quick wins (Explicit GC, File.ReadLines, caching, JSON -AsHashtable)
+- P4 (EXECUTE): Resource optimization quick wins ✅
+  - P4-1: Explicit GC — session-miner.ps1 (try/finally), run-dreaming.ps1 (trap+GC) ✅
+  - P4-2: File.ReadLines — run-dreaming.ps1 (2x Get-Content→streaming) ✅
+  - P4-3: -Raw var reuse — score-auto.ps1 (eliminated redundant Get-Content) ✅
+  - Parse verification: ALL 3 scripts PASS (PS7) ✅
+  - Functional test: ALL 3 scripts run clean ✅
+  - Commits: `perf: Explicit GC + File.ReadLines + score-auto reuse` ✅
+- P5 (VERIFY & LEARN): 3 subagentes de verificación ✅
+  - S1: Regression — Parse clean (3/3), cross-ref 0 errors, skill sizes ok ✅
+  - S2: Score delta — 9.3→9.2 (−0.1, gate PASS) ✅
+  - S3: Learnings — 5 achievements, 3 patterns, 3 anti-patterns, 3 skill gaps, carry-forward ✅
+  - Score persisted: `.project.json` — 9.2/10 ✅
+  - Report: `docs/ciclos/cycle21-20260705.md` ✅
+
+### Cycle 21 Close
+- Score: **9.2/10** (−0.1, marginal — Score Depth 9.6→9.0 main driver)
+- inter: 14/30
+- Phases: 5/5 complete ✅ (EXPLORE → DIAGNOSE → PLAN → EXECUTE → VERIFY & LEARN)
+- Key wins:
+  - **codebase-memory-mcp**: Configurado (−120× tokens for code queries)
+  - **Pre-commit + trufflehog**: Local + CI secrets scanning
+  - **Resource optimization**: GC, File.ReadLines, -Raw reuse — 3 scripts optimized
+  - **StringBuilder + .Where()**: 19 instances converted across 2 scripts
+  - **Dependabot**: NuGet + GitHub Actions auto-updates
+- Patterns detected: 3-subagente research, parse+func gate, pre-commit sealing
+- Anti-patterns avoided: compound commits, ACON deferral (documented)
+- Skill gaps registered: ps7-hotpaths, resource-optimization-checklist, pre-commit-config
+- Carried forward: SkillPointer, L1/L2/L3 compression, ACON, prettier-powershell, Score Depth investigation
+
+---
 
 ### Cycle 20: Agent Optimization 🔄 INICIADO
 
