@@ -6,7 +6,7 @@ Set-StrictMode -Version Latest;$ErrorActionPreference='Stop'
 $rr=Split-Path -Parent $PSScriptRoot
 $cp=Join-Path $rr 'ANTI-PATTERN-CATALOG.md';$ld=Join-Path $rr '.learnings'
 $ep=Join-Path $ld 'ERRORS.md';$lp=Join-Path $ld 'LEARNINGS.md'
-$ro='Multiline'
+$ro='Multiline';try{
 function rc{if(-not(Test-Path $cp)){return @()}
 try{$c=Get-Content $cp -Raw}catch{Write-Debug "sm: cannot read catalog ($($_.Exception.Message))";return @()}
 $p=@();$rows=[regex]::Matches($c,'^\|\s*\d+\s*\|.*?\|.*?\|.*?\|.*?\|.*?\|.*?\|',$ro)
@@ -42,3 +42,4 @@ if($Mode-eq'apply'){$uncataloged=@($repeated | Where-Object {-not $_.Cataloged})
 if($uncataloged.Count-eq0){if(-not $Quiet){Write-Host '[OK] Nothing to apply'};return}
 if(-not $Quiet){Write-Host "Would add $($uncataloged.Count) new anti-pattern(s):"};foreach($u in $uncataloged){$sk=$u.PatternKey -replace '[^\w-]','_';if(-not $Quiet){Write-Host "  - [$($u.Count)x] $($u.PatternKey) -> ANTI-PATTERN-CATALOG.md + docs/anti-patterns/$sk.md"}}
 if(-not $Quiet){Write-Host 'Run manually: edit ANTI-PATTERN-CATALOG.md with pattern details'}}
+}finally{$catalog=$patternKeys=$errors=$repeated=$data=$uncataloged=$null;[GC]::Collect()}

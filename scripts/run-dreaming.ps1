@@ -17,7 +17,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
-$repoRoot = Split-Path -Parent $PSScriptRoot
+$repoRoot = Split-Path -Parent $PSScriptRoot;trap{[GC]::Collect();break}
 $learningsDir = Join-Path $repoRoot '.learnings'
 $logFile = Join-Path $learningsDir 'LEARNINGS.md'
 $errorFile = Join-Path $learningsDir 'ERRORS.md'
@@ -48,8 +48,7 @@ if ($Mode -in 'quick','full','report') {
 
     $errorCounts = @{}
     if (Test-Path $errorFile) {
-        $content = Get-Content $errorFile
-        foreach ($line in $content) {
+        foreach ($line in [System.IO.File]::ReadLines($errorFile)) {
             $startsWithPipe = $line.StartsWith('|')
             $startsWithPipeTS = $line.StartsWith('| Timestamp')
             if ($startsWithPipe -and (-not $startsWithPipeTS)) {
@@ -106,8 +105,7 @@ if ($Mode -in 'full','report') {
 
     $learningCounts = @{}
     if (Test-Path $logFile) {
-        $logContent = Get-Content $logFile
-        foreach ($line in $logContent) {
+        foreach ($line in [System.IO.File]::ReadLines($logFile)) {
             $startsWithPipe = $line.StartsWith('|')
             $startsWithPipeTS = $line.StartsWith('| Timestamp')
             if ($startsWithPipe -and (-not $startsWithPipeTS)) {
@@ -175,9 +173,10 @@ if ($Mode -in 'full','report') {
 if(-not $Quiet){Write-Host ''}
 
 if(-not $Quiet){Write-Host "=== Dreaming Complete: $cycleId ==="}
-$finalRepeated = 0
-$finalPatterns = 0
+$finalRepeated = 0; $finalPatterns = 0
 if ($repeated.Count -gt 0) { $finalRepeated = $repeated.Count }
 if ($learningCounts.Count -gt 0) { $finalPatterns = $learningCounts.Keys.Count }
+# ponytail: explicit GC at session boundary — regex+pattern processing may hold large strings
+$errorCounts=$learningCounts=$repeated=$workflowPatterns=$null;[GC]::Collect()
 $msg = "Mode=$Mode | Repeated=$finalRepeated | Patterns=$finalPatterns"
 Write-Log -Section 'Dreaming' -Message $msg
