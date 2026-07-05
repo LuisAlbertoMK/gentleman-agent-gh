@@ -1,7 +1,7 @@
 #requires -Version 7.6
 <#
 .SYNOPSIS
-  Bridge CLI for inter-agent communication between opencode-vMK and gentleman-vMK.
+  Bridge CLI for inter-agent communication between gentleman-vMK and opencode-ai.
   Part of P2 — Autonomous Integration Plan.
 .DESCRIPTION
   Reads/writes structured events to D:\TEMP\opencode-bridge.jsonl (machine) and
@@ -13,7 +13,7 @@ param(
   [ValidateSet("write","read","status","close","checkpoint")]
   [string]$Command,
   # For write
-  [ValidateSet("opencode-vmk","gentleman-vmk","opencode-global")]
+  [ValidateSet("gentleman-gh","opencode","opencode-global")]
   [string]$Source,
   [ValidateSet("error","fix","finding","proposal","agreement")]
   [string]$Type,
@@ -38,7 +38,7 @@ if (-not (Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Forc
 # Write NEVER updates checkpoint — only the reader does, after processing.
 function Get-AgentCheckpoint {
   param([string]$Agent)
-  if (-not $Agent) { $Agent = "gentleman-vmk" }
+  if (-not $Agent) { $Agent = "gentleman-gh" }
   $cp = "D:\TEMP\.bridge-checkpoint.$Agent"
   if (Test-Path $cp) {
     $val = Get-Content $cp -Raw -ErrorAction SilentlyContinue
@@ -52,7 +52,7 @@ function Get-AgentCheckpoint {
 
 function Set-AgentCheckpoint {
   param([string]$Agent, [long]$Offset)
-  if (-not $Agent) { $Agent = "gentleman-vmk" }
+  if (-not $Agent) { $Agent = "gentleman-gh" }
   $cp = "D:\TEMP\.bridge-checkpoint.$Agent"
   Set-Content $cp -Value $Offset -NoNewline
 }
@@ -62,8 +62,8 @@ function Set-AgentCheckpoint {
 function Get-Prefix {
   param([string]$Source)
   switch ($Source) {
-    "opencode-vmk"   { "ERR" }
-    "gentleman-vmk"  { "FND" }
+    "opencode"  { "OC" }
+    "gentleman-gh" { "GA" }
     "opencode-global" { "REF" }
   }
 }
@@ -166,7 +166,7 @@ switch ($Command) {
   }
 
   "checkpoint" {
-    $agent = if ($Source) { $Source } else { "gentleman-vmk" }
+    $agent = if ($Source) { $Source } else { "gentleman-gh" }
     if (-not (Test-Path $bridgeJsonl)) { if (-not $Quiet) { Write-Output "No bridge files" }; return }
 
     $lastOffset = Get-AgentCheckpoint $agent

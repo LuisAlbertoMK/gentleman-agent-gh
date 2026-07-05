@@ -4,7 +4,7 @@
     Gentleman Agent — One-shot machine setup for portability
 .DESCRIPTION
     Sets up a new machine after cloning gentleman-agent-gh:
-    - Creates global shell shortcuts (opencode-vmk, gentleman-vmk)
+    - Creates global shell shortcuts (gentleman-vmk)
     - Sets GENTLEMAN_AGENT_ROOT environment variable
     - Configures OpenCode env vars
     - Creates skill junction in global config
@@ -47,14 +47,17 @@ foreach ($f in $requiredFiles) {
 ok "Repo structure validated"
 
 # ── Step 1: GENTLEMAN_AGENT_ROOT ────────────────────────────────────
+# Normalize to forward slashes so JSONC `{env:...}` substitution doesn't
+# produce invalid JSON escapes (e.g. `\g` in `D:\gentleman-agent-gh/...`)
+$__rootDir = $RepoDir.Replace('\', '/')
 if (-not $SkipEnvVar) {
-    info "Setting GENTLEMAN_AGENT_ROOT → $RepoDir"
+    info "Setting GENTLEMAN_AGENT_ROOT → $__rootDir"
     # Current session
-    $env:GENTLEMAN_AGENT_ROOT = $RepoDir
+    $env:GENTLEMAN_AGENT_ROOT = $__rootDir
     # Persistent (user-level)
     $current = [Environment]::GetEnvironmentVariable("GENTLEMAN_AGENT_ROOT", "User")
-    if ($current -ne $RepoDir) {
-        [Environment]::SetEnvironmentVariable("GENTLEMAN_AGENT_ROOT", $RepoDir, "User")
+    if ($current -ne $__rootDir) {
+        [Environment]::SetEnvironmentVariable("GENTLEMAN_AGENT_ROOT", $__rootDir, "User")
         ok "GENTLEMAN_AGENT_ROOT set (takes effect in new shells)"
     } else {
         skip "GENTLEMAN_AGENT_ROOT already set correctly"
@@ -91,23 +94,21 @@ if (-not $SkipShortcuts) {
     if (-not (Test-Path $npmDir)) { New-Item -ItemType Directory -Path $npmDir -Force | Out-Null }
 
     $shortcuts = @(
-        @{ Name = "opencode-vmk"; Cmd = "opencode --agent gentleman-vMK `$*" },
-        @{ Name = "gentleman-vmk"; Cmd = "opencode --agent gentleman-vMK `$*" }
+        @{ Name = "gentleman-vmk"; Ps1Cmd = "opencode --agent gentleman-vMK @args"; CmdCmd = "opencode --agent gentleman-vMK %*" }
     )
     foreach ($sc in $shortcuts) {
         $ps1Path = Join-Path $npmDir "$($sc.Name).ps1"
         $cmdPath = Join-Path $npmDir "$($sc.Name).cmd"
-        $needCreate = $false
 
         if (-not (Test-Path $ps1Path)) {
-            Set-Content -Path $ps1Path -Value "# $($sc.Name).ps1`n$($sc.Cmd)`nif (`$LASTEXITCODE -and `$LASTEXITCODE -ne 0) { exit `$LASTEXITCODE }"
+            Set-Content -Path $ps1Path -Value "# $($sc.Name).ps1`n$($sc.Ps1Cmd)`nif (`$LASTEXITCODE -and `$LASTEXITCODE -ne 0) { exit `$LASTEXITCODE }"
             ok "Created $ps1Path"
         } else {
             skip "$ps1Path already exists"
         }
 
         if (-not (Test-Path $cmdPath)) {
-            Set-Content -Path $cmdPath -Value "@echo off`n$($sc.Cmd -replace '\$', '%')"
+            Set-Content -Path $cmdPath -Value "@echo off`n$($sc.CmdCmd)"
             ok "Created $cmdPath"
         } else {
             skip "$cmdPath already exists"
@@ -207,9 +208,8 @@ if (Test-Path $repoAgentsMd) {
 # ── Step 6: Verify ────────────────────────────────────────────────
 info "Verifying setup"
 $checks = @(
-    @{ Label = "GENTLEMAN_AGENT_ROOT"; Test = { $env:GENTLEMAN_AGENT_ROOT -eq $RepoDir } },
+    @{ Label = "GENTLEMAN_AGENT_ROOT"; Test = { $env:GENTLEMAN_AGENT_ROOT -eq $__rootDir } },
     @{ Label = "opencode.json exists"; Test = { Test-Path (Join-Path $RepoDir "opencode.json") } },
-    @{ Label = "Global shortcut: opencode-vmk"; Test = { Get-Command "opencode-vmk" -ErrorAction SilentlyContinue } },
     @{ Label = "Global shortcut: gentleman-vmk"; Test = { Get-Command "gentleman-vmk" -ErrorAction SilentlyContinue } }
 )
 $allOk = $true
@@ -221,8 +221,7 @@ foreach ($c in $checks) {
 if ($allOk) {
     Write-Host ""
     Write-Host "✅ Machine setup COMPLETE" -ForegroundColor Green
-    Write-Host "   → Run 'opencode-vmk' to launch" -ForegroundColor Cyan
-    Write-Host "   → Run 'gentleman-vmk' (alias)" -ForegroundColor Cyan
+    Write-Host "   → Run 'gentleman-vmk' to launch" -ForegroundColor Cyan
 } else {
     Write-Host ""
     Write-Host "⚠️  Setup PARTIAL — review warnings above" -ForegroundColor Yellow

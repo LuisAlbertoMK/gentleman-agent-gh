@@ -71,6 +71,17 @@
       "environment": {
         "HEADROOM_PROXY_URL": "http://127.0.0.1:8787"
       }
+    },
+    "project-bridge": {
+      "enabled": true,
+      "type": "local",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-Command",
+        "& \"$env:GENTLEMAN_AGENT_ROOT/scripts/bridge-mcp-server.ps1\" -ProjectId gentleman-gh"
+      ],
+      "timeout": 30000
     }
   },
   "$schema": "https://opencode.ai/config.json",

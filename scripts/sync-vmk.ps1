@@ -1,7 +1,7 @@
 #requires -Version 7.6
 <#
 .SYNOPSIS
-  Sync canonical config from gentleman-agent-gh to opencode-vMK and opencode-global.
+  Sync canonical config from gentleman-agent-gh to opencode-global.
   Part of P3 — Autonomous Integration Plan.
 .DESCRIPTION
   Sync: agent section, skills paths, permission rules.
@@ -14,8 +14,8 @@
   Skip confirmation prompts
 #>
 param(
-  [ValidateSet("vmk","global","all")]
-  [string]$Target = "all",
+  [ValidateSet("global")]
+  [string]$Target = "global",
   [switch]$DryRun,
   [switch]$Force,
   [switch]$Json,
@@ -25,7 +25,6 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $canonicalPath = "D:\gentleman-agent-gh\opencode.json"
-$vmkPath       = "D:\opencode\.vmk-config\opencode.json"
 $globalPath    = "$env:USERPROFILE\.config\opencode\opencode.json"
 
 # ── Validate canonical exists ────────────────────────────────────────────
@@ -87,13 +86,7 @@ function Sync-Config {
 }
 
 # ── Execute ──────────────────────────────────────────────────────────────
-if ($Target -eq "all" -or $Target -eq "vmk") {
-  Sync-Config -TargetPath $vmkPath -Label "vmk" -PreserveMCP $true
-  # Copy AGENTS.md for {file:AGENTS.md} references
-  Copy-Item -LiteralPath "D:\gentleman-agent-gh\AGENTS.md" "D:\opencode\.vmk-config\AGENTS.md" -Force -ErrorAction SilentlyContinue
-  $results.Add(@{target="vmk-agents-md"; status="SYNCED"; detail="AGENTS.md copied"})
-}
-if ($Target -eq "all" -or $Target -eq "global") {
+if ($Target -eq "global") {
   Sync-Config -TargetPath $globalPath -Label "global" -PreserveMCP $false
   Copy-Item -LiteralPath "D:\gentleman-agent-gh\AGENTS.md" "$env:USERPROFILE\.config\opencode\AGENTS.md" -Force -ErrorAction SilentlyContinue
   $results.Add(@{target="global-agents-md"; status="SYNCED"; detail="AGENTS.md copied"})

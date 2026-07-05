@@ -67,5 +67,4 @@ fi
 echo ""
 printf "${GREEN}✅ gentleman-agent-gh setup complete${NC}\n"
 echo ""
-echo "  Run 'opencode-vmk' to launch"
-echo "  Run 'gentleman-vmk' (alias)"
+echo "  Run 'gentleman-vmk' to launch"

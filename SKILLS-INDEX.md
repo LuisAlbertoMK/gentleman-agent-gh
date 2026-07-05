@@ -105,7 +105,6 @@
 **Utility scripts**:
 - `scripts/ensure-tools.ps1` — verify rg/sg/gh are in PATH
 - `scripts/token-count.ps1` — count ~tokens in files (4 chars/token)
-- `scripts/bench-file-io.ps1` — benchmark 3 file I/O methods × N runs
 - `scripts/skill-graph.ps1` — sparse loading resolver: find relevant skills + deps for any task
 - `scripts/pull-upstream.ps1` — sync new/modified skills & scripts from upstream (gentleman-vMK) via git merge. 3 modes: `Check` (drift report), `Apply-New` (safe auto-merge), `Apply-File` (checkout individual file)
 

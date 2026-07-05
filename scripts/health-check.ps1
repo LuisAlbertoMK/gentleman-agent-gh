@@ -1,7 +1,7 @@
 #requires -Version 7.6
 <#
 .SYNOPSIS
-  Unified pre-session health check for 3-layer ecosystem (gentleman-vMK, opencode-vMK, opencode-global).
+  Unified pre-session health check for gentleman-vMK and opencode-ai ecosystem.
   Checks: junctions, config drift, bridge state, binary, DB schema, MCP status.
   Part of P1 — Autonomous Integration Plan.
 #>
@@ -107,44 +107,14 @@ if (Test-Path $globalSkills) {
   if ($exitCode -lt 1) { $exitCode = 1 }
 }
 
-# ── Check 4: vMK binary ─────────────────────────────────────────────────
-$vmkBinary = "D:\opencode\packages\opencode\dist\opencode-windows-x64\bin\opencode-vMK.exe"
-if (Test-Path $vmkBinary) {
-  $ver = & $vmkBinary --version 2>&1 | Out-String
-  $checks.Add(@{check = "vmk-binary"; status = "OK"; detail = "$vmkBinary → $($ver.Trim())"})
-} else {
-  $checks.Add(@{check = "vmk-binary"; status = "FAIL"; detail = "Binary not found at $vmkBinary"})
-  $exitCode = 2
-}
-
-# ── Check 5: DB schema (replacement_seq + revision) ─────────────────────
-$dbPath = "D:\opencode\.vmk-data\opencode.db"
-$dbIssues = @()
-if (Test-Path $dbPath) {
-  $schema = sqlite3 $dbPath ".schema session_context_epoch" 2>&1
-  if ($schema -match "replacement_seq") { $dbIssues += "replacement_seq ✅" }
-  else { $dbIssues += "replacement_seq ❌" }
-  if ($schema -match "revision") { $dbIssues += "revision ✅" }
-  else { $dbIssues += "revision ❌" }
-  if ($dbIssues -match "❌") {
-    $checks.Add(@{check = "db-schema"; status = "FAIL"; detail = "Missing columns: $($dbIssues -join ', ')" })
-    $exitCode = 2
-  } else {
-    $checks.Add(@{check = "db-schema"; status = "OK"; detail = "All columns present ✅" })
-  }
-} else {
-  $checks.Add(@{check = "db-schema"; status = "WARN"; detail = "DB not found at $dbPath (first run?)" })
-  if ($exitCode -lt 1) { $exitCode = 1 }
-}
-
-# ── Check 6a: Bridge new entries (per-agent checkpoint) ────────────────
-$checkpointFile = "D:\TEMP\.bridge-checkpoint.gentleman-vmk"
+# ── Check 4: Bridge new entries (per-agent checkpoint) ──────────────────
+$checkpointFile = "D:\TEMP\.bridge-checkpoint.gentleman-gh"
 $bridgeJsonl = "D:\TEMP\opencode-bridge.jsonl"
 if (Test-Path $bridgeJsonl) {
   $lastOffset = if (Test-Path $checkpointFile) { [long](Get-Content $checkpointFile -Raw -ErrorAction SilentlyContinue | ForEach-Object { $_.Trim() } | Where-Object { $_ -match '^\d+' }) } else { 0L }
   $currentSize = (Get-Item $bridgeJsonl).Length
   if ($currentSize -gt $lastOffset) {
-    $checks.Add(@{check = "bridge-new-entries"; status = "INFO"; detail = "New bridge messages since last checkpoint (offset $lastOffset → $currentSize bytes). Run 'bridge.ps1 -Command checkpoint -Source gentleman-vmk' to read." })
+    $checks.Add(@{check = "bridge-new-entries"; status = "INFO"; detail = "New bridge messages since last checkpoint (offset $lastOffset → $currentSize bytes). Run 'bridge.ps1 -Command checkpoint -Source gentleman-gh' to read." })
   } else {
     $checks.Add(@{check = "bridge-new-entries"; status = "OK"; detail = "No new messages ✅" })
   }

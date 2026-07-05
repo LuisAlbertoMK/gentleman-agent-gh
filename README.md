@@ -1,10 +1,10 @@
 # Gentleman Agent — OpenCode AI Agent Skills & Scripts
 
-Suite de **68 skills** (+ `_shared`) + **56 scripts PowerShell** para [OpenCode](https://github.com/sst/opencode). Diseñadas para desarrollo de software con arquitectura limpia, TDD, y verificación multi-capa.
+Suite de **69 skills** (+ `_shared`) + **50 scripts PowerShell** para [OpenCode](https://github.com/sst/opencode). Diseñadas para desarrollo de software con arquitectura limpia, TDD, y verificación multi-capa.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
 > **Score**: 9.3/10 (13 dimensiones)
-> **Skills**: 68 (+ `_shared` = 69 SKILL.md)
+> **Skills**: 69 (+ `_shared` = 70 SKILL.md)
 > **Cycle**: 18 completado (Stabilization & Regression Lock)
 
 ---
@@ -105,7 +105,7 @@ El proyecto usa dos MCPs para memoria cross-session:
 | **Testing** | skill-testing |
 | **Others** | recovery-protocol, context-watchdog, performance-tracker, metricas, issue-creation, development-mode, execution-mode |
 
-**Total: 68 skills + `_shared`** — todas con SKILL.md, frontmatter YAML, versionado, cambio previo y licencia Apache-2.0.
+**Total: 69 skills + `_shared`** — todas con SKILL.md, frontmatter YAML, versionado, cambio previo y licencia Apache-2.0.
 
 ---
 
@@ -142,16 +142,22 @@ El proyecto usa dos MCPs para memoria cross-session:
 
 ```
 gentleman-agent-gh/
-├── .agents/skills/          # 68 skills + _shared (canonical, git-tracked)
+├── .agents/skills/          # 69 skills + _shared (canonical, git-tracked)
 │   ├── quality-gate/
 │   ├── code-review-agent/
 │   └── .../
 ├── skills/                  # Junctions workspace (git-ignored)
-├── scripts/                 # 56 PowerShell scripts
+├── scripts/                 # 50 PowerShell scripts
 │   └── smoke/               # Smoke tests
 ├── docs/                    # Documentation
 │   ├── metricas/            # Session metrics
-│   ├── quality-standard.md  # Quality framework
+│   ├── ciclos/              # Self-improvement cycle reports
+│   ├── audits/              # External audit reports
+│   ├── errors/               # Error analysis reports
+│   ├── architecture/        # Architecture decisions & analysis
+│   ├── operations/          # Quality standard, runbooks
+│   ├── CHANGELOG.md         # Release history
+│   ├── CONTRIBUTING.md      # How to contribute
 │   └── ...
 ├── .learnings/              # Session mining + bias calibration
 ├── .project.json            # Auto-scored project state
@@ -172,6 +178,44 @@ gentleman-agent-gh/
 - **Verificación**: Triple verify (E1/E2/E3) antes de `!ship`
 - **Anti-patrones**: Catálogo con 20 patrones inmunizados
 - **Auto-metrics**: Post-task auto-evaluación en 7 dimensiones con bias calibration
+
+---
+
+---
+
+## Quick Reference
+
+### Flujo típico
+
+```
+1. gentleman-vmk               ← abrir agente
+2. "haz X"                     ← pedir tarea
+3. el agente resuelve solo     ← cambios triviales = sin ceremony
+4. !score                      ← opcional: medir resultado
+5. !close                      ← cerrar sesión
+```
+
+### Tips
+
+- **Ponytail `lite`** = default. Solo chequea si algo es necesario antes de codear.
+- **Ponytail `full`** = para cambios complejos. Activa más gates de calidad.
+- **No necesitas** acordarte de todo — el agente sabe cuándo aplicar cada cosa.
+- **Dudas**: `!health` para diagnóstico, `!manifest` para ver el ciclo actual.
+
+### Shortcuts principales
+
+| Shortcut | Acción |
+|----------|--------|
+| `!score` | Score-auto + docs update + cross-ref |
+| `!health` | Git status, drift, cross-ref, score |
+| `!close` | Pipeline de cierre unificado |
+| `!setup` | Setup máquina nueva (.ps1 o .sh según OS) |
+| `!dev` | Manage background dev servers |
+| `!gentleman` | Heredar config en otro proyecto |
+| `!analisis` | Análisis multi-agente profundo |
+| `!batch` | Batch auto-incremental + bitácora |
+| `!cycle` | Inter-track + score + upstream |
+| `!ponytail {lite\|full\|ultra\|off}` | Cambiar intensidad de ceremony |
 
 ---
 

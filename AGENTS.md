@@ -97,8 +97,8 @@ Post-task: si hay mejora obvia detectada → sugerir 1 línea al usuario. Si hay
 Global packages: rich, requests, httpx, beautifulsoup4, lxml, pandas, numpy, Pillow, aiohttp, fastapi, uvicorn, pydantic, sqlalchemy, alembic, pytest, pytest-asyncio, pytest-cov, flake8, mypy, black, isort, pre-commit, click, typer. If missing → `pip install`.
 
 ## Global Script Invocation
-Two-step: `. "$env:USERPROFILE\.config\opencode\scripts\bash-safe.ps1"` then `& "$env:GENTLEMAN_AGENT_ROOT\scripts\xxx.ps1" -args`.
-One-liner: `. "$env:USERPROFILE\.config\opencode\scripts\bash-safe.ps1"; & "$env:GENTLEMAN_AGENT_ROOT\scripts\xxx.ps1" -args`
+Two-step: `. "$env:GENTLEMAN_AGENT_ROOT\scripts\bash-safe.ps1"` then `& "$env:GENTLEMAN_AGENT_ROOT\scripts\xxx.ps1" -args`.
+One-liner: `. "$env:GENTLEMAN_AGENT_ROOT\scripts\bash-safe.ps1"; & "$env:GENTLEMAN_AGENT_ROOT\scripts\xxx.ps1" -args`
 > **Portability**: `$env:GENTLEMAN_AGENT_ROOT` is auto-set by `scripts/setup-machine.ps1` (Windows) or `scripts/setup-machine.sh` (Linux/macOS). On a new machine, clone the repo and run the appropriate setup script first.
 
 ## Bash-Safe (PowerShell 5.1)
@@ -160,7 +160,7 @@ Or use the `!dev` shortcut: `!dev start frontend -- npm run dev`
 ### Portability (new machine setup)
 When setting up on a new machine: `scripts/setup-machine.ps1` (Windows) or `scripts/setup-machine.sh` (Linux/macOS), or the `!setup` shortcut. This sets:
 - `$env:GENTLEMAN_AGENT_ROOT` (or `GENTLEMAN_AGENT_ROOT` on Linux/macOS) → repo root
-- Global shortcuts (opencode-vmk, gentleman-vmk)
+- Global shortcuts (gentleman-vmk)
 - OpenCode env vars (cache, config, db paths)
 - Skill junctions/symlinks in global config
 
@@ -168,7 +168,7 @@ When setting up on a new machine: `scripts/setup-machine.ps1` (Windows) or `scri
 Run `scripts/use-gentleman.ps1` (or `!gentleman` shortcut) in any project directory to:
 - Inherit gentleman-vMK as default agent (without copying agent definitions)
 - Auto-import global MCPs (context7, engram, sequential-thinking, headroom)
-- Access all 68 skills via global junction
+- Access all 69 skills via global junction
 - Auto-fix missing global setup by calling the appropriate setup script
 
 ## Contextual Skill Loading (MANDATORY)
@@ -176,7 +176,7 @@ Run `scripts/use-gentleman.ps1` (or `!gentleman` shortcut) in any project direct
 
 ## Project Context
 - **Repo**: Gentleman Agent — OpenCode skills, scripts & config
-- **Skills**: `.agents/skills/` (68 + `_shared`, git-tracked) · workspace `skills/` (junctions, git-ignored)
+- **Skills**: `.agents/skills/` (69 + `_shared`, git-tracked) · workspace `skills/` (junctions, git-ignored)
 - **Cycle manifest**: `CYCLE.md` — objectives, metrics, difficulty mapping
 - **Global config**: `~/.config/opencode/skills/` → `.agents/skills/{name}`
 
@@ -193,7 +193,7 @@ Run `scripts/use-gentleman.ps1` (or `!gentleman` shortcut) in any project direct
 | Quality standard | `docs/operations/quality-standard.md` (13-dim) |
 | Metrics | `docs/metricas/` — before/after for ≥3 step tasks |
 | Bridge file (machine) | `D:\TEMP\opencode-bridge.jsonl` |
-| Bridge checkpoint | `D:\TEMP\.bridge-checkpoint` (SHA256) |
+| Bridge checkpoint (v2) | `D:\TEMP\.bridge-checkpoint.<agent>` (per-agent byte offset) |
 
 <!-- /gentle-ai:persona -->
 
@@ -263,11 +263,34 @@ PSSA Gate: auto-heals BOM + switch defaults. Write-Host intentional. No `git com
 ### I. Self-Improvement System
 Manifest: `CYCLE.md` (solo proyecto local, NO upstream). Skill: `self-improvement`. Proceso: READ CYCLE.md → diagnose → 3 subagentes → verify → learn → `docs/ciclos/cycle<N>-*.md`. inter(30) minimum. Score drop >0.5 → full revert. Same fix fails 3x → SKIP.
 Plugin: `opencode-self-improve` (Hermes-style) — SkillForge→SQLite, Curator→re-score/merge, SkillInjector→top-3 pre-turn.
+### J. Pre-session Health Check — INBYPASSABLE
 
-### J. Pre-session Health Check
-0.5. `restore-project-score.ps1 -Quiet` 1. `git status --short` (alerta si cambios) 2. `check-skill-drift.ps1` (warning si drift) 2.5. (opt) `check-upstream.ps1 -Json` (NEW→engram info, no bloquea) 3. **Bridge hook (P2b)**: ejecutar `scripts\check-bridge.ps1` → si hasNew, mostrar entries al usuario antes de continuar. 4. **Health**: `health-check.ps1 -Json` rápido (exit 0/1/2). 5. Todo OK → seguí.
+**Bridge check es INBYPASSABLE — mismo nivel que factibilidad (rung 0). Se ejecuta SIEMPRE antes del primer mensaje al usuario.**
 
-### K. Project Score Auto-Report (first request)
+0. **Bridge detect (INBYPASSABLE)**: `vmk-bridge-detect.ps1` — corre al inicio de CADA sesión. Costo ~0 tokens si no hay cambios. Si hay mensajes del otro agente → procesarlos y responder ANTES de continuar con cualquier otra cosa.
+0.5. `restore-project-score.ps1 -Quiet` 1. `git status --short` (alerta si cambios) 2. `check-skill-drift.ps1` (warning si drift) 2.5. (opt) `check-upstream.ps1 -Json` (NEW→engram info, no bloquea) 3. ~~Bridge: `bridge.ps1 -Command checkpoint`~~ → **DEPRECADO** — usar step 0 (`vmk-bridge-detect.ps1`) 4. **Health**: `health-check.ps1 -Json` rápido (exit 0/1/2). 5. Todo OK → seguí.
+
+### K. Bridge Bilateral Protocol (v2 — per-project identity)
+
+**Acuerdo entre proyectos** — bridge v2 protocol:
+
+1. **Cada proyecto tiene su propio checkpoint**: per-project byte offset en `.bridge-checkpoint.<slug>`.
+   - IDENTIDAD = proyecto, NO agente. NUNCA uses "gentleman-vmk" como slug.
+   - gentleman-agent-gh → slug `gentleman-gh`, checkpoint `.bridge-checkpoint.gentleman-gh`
+   - opencode → slug `opencode`, checkpoint `.bridge-checkpoint.opencode`
+   - Nuevo proyecto → slug derivado del nombre del repo, checkpoint autogenerado.
+2. **Write NUNCA actualiza checkpoint** — solo el lector al procesar mensajes.
+3. **Detección**: stat() del JSONL → comparar Length vs lastOffset → delta read (~0 tokens).
+4. **Pre-session**: bridge check es INBYPASSABLE (ver §J) — corre antes del primer mensaje.
+5. **MCP server**: `bridge-mcp-server.ps1` expone tools `bridge_send`, `bridge_read`, `bridge_status`.
+   - Registrado en cada proyecto como MCP server "project-bridge" con `-ProjectId <slug>`.
+6. **vmk-bridge-detect.ps1** es el mecanismo legacy de pre-session (~0 tokens).
+7. **SHA256 checkpoint legacy** (`.bridge-checkpoint` sin sufijo) — zombie, no se usa más.
+   - `.bridge-checkpoint.gentleman-vmk` — zombie, eliminar.
+8. **Flujo**: arranca sesión → detecta (MCP bridge_read o vmk-bridge-detect) → procesa → responde por bridge → checkpoint.
+9. **Nuevo proyecto**: crear entrada MCP en su opencode.json con slug único, checkpoint nace en offset actual.
+
+### L. Project Score Auto-Report (first request)
 Buscar `.project.json`. Si existe: reportar score actual. Si >7d stale → fresh metrics + update. Si no existe → no informe. `mem_save(topic_key=project/score)`.
 
 ### L. Bias Calibration

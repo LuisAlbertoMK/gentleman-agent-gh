@@ -104,7 +104,7 @@ function Test-BashSafe {
 $__dir = Split-Path $MyInvocation.MyCommand.Path -Parent
 $__item = Get-Item $__dir
 if ($__item.LinkType -eq "Junction" -and $__item.Target) {
-    $env:GENTLEMAN_AGENT_ROOT = Split-Path $__item.Target -Parent
+    $env:GENTLEMAN_AGENT_ROOT = (Split-Path $__item.Target -Parent).Replace('\', '/')
 }
 
 # Self-test if run directly

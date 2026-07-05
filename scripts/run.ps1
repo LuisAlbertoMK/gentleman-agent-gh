@@ -23,9 +23,9 @@ $__dir = Split-Path $MyInvocation.MyCommand.Path -Parent
 $__item = Get-Item $__dir
 
 if ($__item.LinkType -eq "Junction" -and $__item.Target) {
-    $env:GENTLEMAN_AGENT_ROOT = Split-Path $__item.Target -Parent
+    $env:GENTLEMAN_AGENT_ROOT = (Split-Path $__item.Target -Parent).Replace('\', '/')
 } else {
-    $env:GENTLEMAN_AGENT_ROOT = Split-Path $__dir -Parent
+    $env:GENTLEMAN_AGENT_ROOT = (Split-Path $__dir -Parent).Replace('\', '/')
 }
 
 if (-not $args -or $args.Count -eq 0) {

@@ -13,7 +13,7 @@ metadata:
 Keep documentation in sync across multiple locations (READMEs across forks, changelogs in multiple repos, docs in different branches) from a single source of truth.
 
 ## When to use
-- Propagating changes from opencode → opencode-vmk → gentleman-vMK
+- Propagating changes from opencode → gentleman-vMK
 - Updating README across forks after significant changes
 - Syncing changelogs between repos
 - Keeping docs consistent across branches during a release

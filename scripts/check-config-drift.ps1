@@ -1,8 +1,8 @@
 #requires -Version 7.6
 <#
 .SYNOPSIS
-  3-way config drift detection between gentleman-agent-gh (canonical),
-  opencode-vMK (.vmk-config/), and opencode-global (~/.config/opencode/).
+  2-way config drift detection between gentleman-agent-gh (canonical)
+  and opencode-global (~/.config/opencode/).
   Part of P3b — Autonomous Integration Plan.
 #>
 param(
@@ -15,7 +15,6 @@ $ErrorActionPreference = 'Stop'
 
 # ── Config paths ─────────────────────────────────────────────────────────
 $canonicalPath = "D:\gentleman-agent-gh\opencode.json"
-$vmkPath       = "D:\opencode\.vmk-config\opencode.json"
 $globalPath    = "$env:USERPROFILE\.config\opencode\opencode.json"
 
 $results = [System.Collections.Generic.List[object]]::new()
@@ -48,51 +47,40 @@ function Get-SectionHash {
 
 $sectionKeys = @("agent", "skills", "mcp", "permission")
 $canonical = Get-SectionHash -Path $canonicalPath -SectionKeys $sectionKeys
-$vmk       = Get-SectionHash -Path $vmkPath -SectionKeys $sectionKeys
 $global    = Get-SectionHash -Path $globalPath -SectionKeys $sectionKeys
 
 # ── Compare ──────────────────────────────────────────────────────────────
 $totalDrift = 0
 foreach ($key in $sectionKeys) {
   $cHash = $canonical.sections[$key]
-  $vHash = $vmk.sections[$key]
   $gHash = $global.sections[$key]
 
-  $c_v = ($cHash -eq $vHash) -or ($null -eq $cHash -and $null -eq $vHash)
   $c_g = ($cHash -eq $gHash) -or ($null -eq $cHash -and $null -eq $gHash)
 
   $drift = @()
-  if (-not $c_v) { $drift += "canonical≠vmk"; $totalDrift++ }
   if (-not $c_g) { $drift += "canonical≠global"; $totalDrift++ }
 
   $status = if ($drift.Count -eq 0) { "OK" } else { "DRIFT" }
   $results.Add(@{
-    section  = $key
-    status   = $status
+    section   = $key
+    status    = $status
     canonical = $cHash
-    vmk       = $vHash
     global    = $gHash
     drift     = $drift
   })
 }
 
-# ── Fix mode: sync vmk from canonical ────────────────────────────────────
+# ── Fix mode: sync global from canonical ─────────────────────────────────
 if ($Fix -and $totalDrift -gt 0) {
-  Write-Output "[fix] Syncing vmk config from canonical..."
+  Write-Output "[fix] Syncing global config from canonical..."
   $canonicalContent = Get-Content -LiteralPath $canonicalPath -Raw -Encoding UTF8 | ConvertFrom-Json
-  $vmkContent = @{}
-  $vmkContent["`$schema"] = $canonicalContent.'$schema'
-  $vmkContent["default_agent"] = $canonicalContent.default_agent
-  $vmkContent["skills"] = @{paths = @(".vmk-config/skills/*")}
-  $vmkContent["agent"] = $canonicalContent.agent
-  # Preserve mcp from vmk's mcp.json, not from canonical or global
-  $vmkMCP = "D:\opencode\.vmk-config\mcp.json"
-  if (Test-Path $vmkMCP) {
-    $mcpData = Get-Content -LiteralPath $vmkMCP -Raw -Encoding UTF8 | ConvertFrom-Json
-    $vmkContent["mcpServers"] = $mcpData.mcpServers
-  }
-  $vmkContent | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $vmkPath -Encoding UTF8
-  Write-Output "[fix] vmk config updated → $vmkPath"
+  $globalContent = Get-Content -LiteralPath $globalPath -Raw -Encoding UTF8 | ConvertFrom-Json
+  $globalContent.default_agent = "gentleman-vMK"
+  $globalContent.agent = $canonicalContent.agent
+  $globalContent.permission = $canonicalContent.permission
+  $globalContent.skills = $canonicalContent.skills
+  $globalContent | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $globalPath -Encoding UTF8
+  Write-Output "[fix] global config updated → $globalPath"
 }
 
 # ── Output ──────────────────────────────────────────────────────────────
@@ -102,7 +90,6 @@ if ($Json) {
     version   = "1.0.0"
     files     = @{
       canonical = $canonicalPath
-      vmk       = $vmkPath
       global    = $globalPath
     }
     sections  = $results
@@ -111,7 +98,7 @@ if ($Json) {
   } -Depth 4
 } elseif (-not $Quiet) {
   Write-Output "`n═══════════════════════════════════════════"
-  Write-Output "  CONFIG DRIFT CHECK — 3-way Comparison"
+  Write-Output "  CONFIG DRIFT CHECK — 2-way Comparison"
   Write-Output "═══════════════════════════════════════════"
   $results | ForEach-Object {
     $icon = if ($_.status -eq "OK") { "✅" } else { "🔴" }
@@ -120,7 +107,6 @@ if ($Json) {
       $_.drift | ForEach-Object { Write-Output "   └─ $_" }
     }
     Write-Output "   canonical: $($_.canonical)"
-    Write-Output "   vmk:       $($_.vmk)"
     Write-Output "   global:    $($_.global)"
   }
   Write-Output "───────────────────────────────────────────"

@@ -112,19 +112,7 @@ if [ "$SKIP_SHORTCUTS" = false ]; then
     BIN_DIR="${HOME}/.local/bin"
     mkdir -p "$BIN_DIR"
 
-    # opencode-vmk
-    if [ ! -f "${BIN_DIR}/opencode-vmk" ]; then
-        cat > "${BIN_DIR}/opencode-vmk" << 'SCRIPT'
-#!/usr/bin/env bash
-exec opencode --agent gentleman-vMK "$@"
-SCRIPT
-        chmod +x "${BIN_DIR}/opencode-vmk"
-        ok "Created ${BIN_DIR}/opencode-vmk"
-    else
-        skip "${BIN_DIR}/opencode-vmk already exists"
-    fi
-
-    # gentleman-vmk (alias)
+    # gentleman-vmk
     if [ ! -f "${BIN_DIR}/gentleman-vmk" ]; then
         cat > "${BIN_DIR}/gentleman-vmk" << 'SCRIPT'
 #!/usr/bin/env bash
@@ -236,13 +224,6 @@ else
     all_ok=false
 fi
 
-if command -v opencode-vmk &>/dev/null; then
-    ok "Global shortcut: opencode-vmk"
-else
-    warn "Global shortcut: opencode-vmk — not in PATH"
-    all_ok=false
-fi
-
 if command -v gentleman-vmk &>/dev/null; then
     ok "Global shortcut: gentleman-vmk"
 else
@@ -253,8 +234,7 @@ fi
 echo ""
 if [ "$all_ok" = true ]; then
     printf "${GREEN}✅ Machine setup COMPLETE${NC}\n"
-    printf "   ${CYAN}→ Run 'opencode-vmk' to launch${NC}\n"
-    printf "   ${CYAN}→ Run 'gentleman-vmk' (alias)${NC}\n"
+    printf "   ${CYAN}→ Run 'gentleman-vmk' to launch${NC}\n"
 else
     printf "${YELLOW}⚠️  Setup PARTIAL — review warnings above${NC}\n"
 fi

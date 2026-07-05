@@ -6,7 +6,7 @@
 .DESCRIPTION
     Bootstraps a project directory with gentleman-vMK as default agent.
     Skills, scripts, AGENTS.md, and MCPs are inherited from the global config
-    (synced by sync-global.ps1 or setup-machine.ps1).
+    (synced by sync-vmk.ps1 or setup-machine.ps1).
 
     Call from any project directory:
       .\scripts\use-gentleman.ps1
@@ -91,7 +91,7 @@ if (Test-Path $globalCfgFile -PathType Leaf) {
         $cfg = Get-Content $globalCfgFile -Raw | ConvertFrom-Json
         $hasGentleman = $null -ne ($cfg.agent.PSObject.Properties['gentleman-vMK'])
         if (-not $hasGentleman) {
-            Out-Message "  [warn] gentleman-vMK not in global config. Run sync-global.ps1." -color Yellow
+            Out-Message "  [warn] gentleman-vMK not in global config. Run sync-vmk.ps1." -color Yellow
             $globalOk = $false
         }
     } catch {

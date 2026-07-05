@@ -5,7 +5,7 @@
 .DESCRIPTION
     Configures gentleman-agent-gh on Windows:
     - Sets GENTLEMAN_AGENT_ROOT and OpenCode environment variables
-    - Creates global shell shortcuts (opencode-vmk, gentleman-vmk)
+    - Creates global shell shortcuts (gentleman-vmk)
     - Links skills into OpenCode global config
     - Optionally installs gentle-ai CLI dependency
 .EXAMPLE
@@ -52,5 +52,4 @@ if (-not $hasGentleAI) {
 # ── Done ─────────────────────────────────────────────────────────────
 Write-Host ""
 Write-Host "✅ gentleman-agent-gh setup complete" -ForegroundColor Green
-Write-Host "   Run 'opencode-vmk' to launch" -ForegroundColor Cyan
-Write-Host "   Run 'gentleman-vmk' (alias)" -ForegroundColor Cyan
+Write-Host "   Run 'gentleman-vmk' to launch" -ForegroundColor Cyan
