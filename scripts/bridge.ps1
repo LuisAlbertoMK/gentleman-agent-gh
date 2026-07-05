@@ -20,7 +20,7 @@ param(
   [ValidateSet("critical","high","medium","low")]
   [string]$Severity,
   [string]$Component, [string]$Message, [string]$Fix, [string]$Refs,
-  # For read/status/close
+  # For read/status/close/checkpoint
   [string]$Id, [string]$Since, [string]$Status, [string]$Resolution,
   [switch]$Json, [switch]$Quiet
 )
@@ -28,17 +28,36 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $bridgeJsonl = "D:\TEMP\opencode-bridge.jsonl"
 $bridgeMd    = "D:\TEMP\opencode-error-analysis-report.md"
-$checkpoint  = "D:\TEMP\.bridge-checkpoint"
 
 # ── Ensure parent dir exists ─────────────────────────────────────────────
 $parent = Split-Path $bridgeJsonl -Parent
 if (-not (Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
 
-# ── Helpers ──────────────────────────────────────────────────────────────
-function Update-Checkpoint {
-  $hash = (Get-FileHash -LiteralPath $bridgeJsonl -Algorithm SHA256).Hash
-  Set-Content -LiteralPath $checkpoint -Value $hash -NoNewline
+# ── Per-agent byte-offset checkpoint ────────────────────────────────────
+# Each agent tracks its own cursor position in the JSONL file.
+# Write NEVER updates checkpoint — only the reader does, after processing.
+function Get-AgentCheckpoint {
+  param([string]$Agent)
+  if (-not $Agent) { $Agent = "gentleman-vmk" }
+  $cp = "D:\TEMP\.bridge-checkpoint.$Agent"
+  if (Test-Path $cp) {
+    $val = Get-Content $cp -Raw -ErrorAction SilentlyContinue
+    if ($val -match '^\d+') { return [long]$val }
+  }
+  # First time → init to current file size (ignore all existing content)
+  $sz = if (Test-Path $bridgeJsonl) { (Get-Item $bridgeJsonl).Length } else { 0L }
+  Set-Content $cp -Value $sz -NoNewline
+  return $sz
 }
+
+function Set-AgentCheckpoint {
+  param([string]$Agent, [long]$Offset)
+  if (-not $Agent) { $Agent = "gentleman-vmk" }
+  $cp = "D:\TEMP\.bridge-checkpoint.$Agent"
+  Set-Content $cp -Value $Offset -NoNewline
+}
+
+# ── Helpers ──────────────────────────────────────────────────────────────
 
 function Get-Prefix {
   param([string]$Source)
@@ -91,7 +110,9 @@ switch ($Command) {
       status = "open"
     }
     Add-Content $bridgeJsonl -Value (ConvertTo-Json $entry -Compress) -Encoding UTF8
-    Update-Checkpoint
+    # ponytail: Do NOT update checkpoint on write — writer must not destroy
+    # the detection signal for the other agent. Only the reader updates
+    # its own per-agent checkpoint after processing new entries.
     if (-not $Quiet) { Write-Output "$newId — $Message (from $Source)" }
   }
 
@@ -138,25 +159,52 @@ switch ($Command) {
     }
     if (-not $found) { Write-Error "ID not found: $Id"; exit 1 }
     $newLines | Set-Content $bridgeJsonl -Encoding UTF8
-    Update-Checkpoint
+    # ponytail: Do NOT update checkpoint on close — same reason as write.
+    # Note: close is NOT atomic (read-modify-write). Safe for sequential
+    # use; concurrent close+write risks data loss (known, tracked).
     if (-not $Quiet) { Write-Output "Closed: $Id" }
   }
 
   "checkpoint" {
+    $agent = if ($Source) { $Source } else { "gentleman-vmk" }
     if (-not (Test-Path $bridgeJsonl)) { if (-not $Quiet) { Write-Output "No bridge files" }; return }
-    $prevHash = Get-Content $checkpoint -ErrorAction SilentlyContinue
-    $currHash = (Get-FileHash -LiteralPath $bridgeJsonl -Algorithm SHA256).Hash
-    $changed = ($prevHash -and $currHash -and $prevHash -ne $currHash)
-    if ($changed) {
-      Set-Content -LiteralPath $checkpoint -Value $currHash -NoNewline
-      if (-not $Quiet) {
-        Write-Output "Bridge changed! Latest:"
-        Get-BridgeEntries | Select-Object -Last 3 | ForEach-Object {
-          Write-Output "  [$($_.source)] $($_.id): $($_.message)"
+
+    $lastOffset = Get-AgentCheckpoint $agent
+    $currentSize = (Get-Item $bridgeJsonl).Length
+    $hasNew = $currentSize -gt $lastOffset
+
+      if ($hasNew) {
+        # Read only the new bytes since last checkpoint
+        $stream = $null; $reader = $null
+        try {
+          $stream = [System.IO.File]::Open($bridgeJsonl, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+          $stream.Seek($lastOffset, [System.IO.SeekOrigin]::Begin) | Out-Null
+          $reader = [System.IO.StreamReader]::new($stream)
+          $text = $reader.ReadToEnd()
+          $newOffset = $stream.Position
+          Set-AgentCheckpoint $agent $newOffset
+        } finally {
+          if ($reader) { $reader.Dispose() }
+          if ($stream) { $stream.Dispose() }
         }
+
+        $newEntries = ($text -split '\r?\n' | Where-Object { $_ -match '\S' } |
+          ForEach-Object { Normalize-Entry ($_ | ConvertFrom-Json -ErrorAction SilentlyContinue) })
+        $count = ($newEntries | Measure-Object).Count
+
+        if (-not ($Quiet -or $Json)) {
+          Write-Output "Bridge changed! $count new entries for $agent :"
+          $newEntries | ForEach-Object {
+            $icon = switch ($_.status) { "resolved" { "✓" } default { "○" } }
+            Write-Output "  $icon [$($_.source)] $($_.id): $($_.message)"
+          }
+        }
+        if ($Json) {
+          ConvertTo-Json @{agent=$agent; lastOffset=$lastOffset; newOffset=$newOffset; newEntries=$count; entries=$newEntries} -Depth 3
+        }
+      } else {
+        if (-not ($Quiet -or $Json)) { Write-Output "Bridge unchanged for $agent" }
+        if ($Json) { ConvertTo-Json @{agent=$agent; lastOffset=$lastOffset; hasNew=$false} }
       }
-    }
-    else { if (-not $Quiet) { Write-Output "Bridge unchanged" } }
-    if ($Json) { ConvertTo-Json @{previousHash=$prevHash; currentHash=$currHash; changed=$changed} }
   }
 }

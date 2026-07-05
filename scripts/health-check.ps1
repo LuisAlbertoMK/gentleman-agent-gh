@@ -137,7 +137,20 @@ if (Test-Path $dbPath) {
   if ($exitCode -lt 1) { $exitCode = 1 }
 }
 
-# ── Check 6: Bridge file state ──────────────────────────────────────────
+# ── Check 6a: Bridge new entries (per-agent checkpoint) ────────────────
+$checkpointFile = "D:\TEMP\.bridge-checkpoint.gentleman-vmk"
+$bridgeJsonl = "D:\TEMP\opencode-bridge.jsonl"
+if (Test-Path $bridgeJsonl) {
+  $lastOffset = if (Test-Path $checkpointFile) { [long](Get-Content $checkpointFile -Raw -ErrorAction SilentlyContinue | ForEach-Object { $_.Trim() } | Where-Object { $_ -match '^\d+' }) } else { 0L }
+  $currentSize = (Get-Item $bridgeJsonl).Length
+  if ($currentSize -gt $lastOffset) {
+    $checks.Add(@{check = "bridge-new-entries"; status = "INFO"; detail = "New bridge messages since last checkpoint (offset $lastOffset → $currentSize bytes). Run 'bridge.ps1 -Command checkpoint -Source gentleman-vmk' to read." })
+  } else {
+    $checks.Add(@{check = "bridge-new-entries"; status = "OK"; detail = "No new messages ✅" })
+  }
+}
+
+# ── Check 6b: Bridge file state ─────────────────────────────────────────
 $bridgeMd = "D:\TEMP\opencode-error-analysis-report.md"
 $bridgeJsonl = "D:\TEMP\opencode-bridge.jsonl"
 $openItems = 0
