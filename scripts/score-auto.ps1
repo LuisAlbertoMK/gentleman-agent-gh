@@ -7,29 +7,63 @@
   Outputs JSON with -Json, quiet mode with -Quiet.
 #>
 param([switch]$Json,[switch]$Quiet)
+# ponytail: score cache — git-HEAD based composite hash, fast invalidation
+$cacheDir = Join-Path "$PSScriptRoot\.." ".learnings"
+$cacheFile = Join-Path $cacheDir "score-cache.json"
+try {
+    $gitHead = git -C "$PSScriptRoot\.." rev-parse HEAD 2>$null
+    $scriptsHash = (Get-ChildItem "$PSScriptRoot\..\scripts\*.ps1" -EA SilentlyContinue | ForEach-Object { "$($_.Name):$($_.Length)" } | Sort-Object) -join "|"
+    $skillsHash = (Get-ChildItem "$PSScriptRoot\..\.agents\skills\*\SKILL.md" -EA SilentlyContinue | ForEach-Object { "$($_.Name):$($_.Length)" } | Sort-Object) -join "|"
+    $cacheHash = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("$gitHead|$scriptsHash|$skillsHash"))
+    if (Test-Path $cacheFile) {
+        $cached = Get-Content $cacheFile -Raw -Encoding UTF8 | ConvertFrom-Json
+        if ($cached.hash -eq $cacheHash) {
+            if ($Json) { $cached.result | ConvertTo-Json -Depth 5 }
+            elseif ($Quiet) { Write-Host "Score: $($cached.result.score.current)/10 (trend: $($cached.result.score.trend)) [cached]" }
+            else { Write-Host "Score: $($cached.result.score.current)/10 (cached at $($cached.timestamp))" -ForegroundColor DarkGray }
+            exit 0
+        }
+    }
+} catch {}
 Set-Location "$PSScriptRoot\.."
 & "$PSScriptRoot\restore-project-score.ps1" -Quiet 2>&1 | Out-Null
 $m=[math];$h=@{};function a($n,$s,$e,$r){$h[$n]=@{s=$s;e=$e;r=$r}}
-$d=Get-ChildItem -Directory ".\.agents\skills" -Name
+# ponytail: batch file reads — cache Get-ChildItem results
+$skillDirs=Get-ChildItem -Directory ".\.agents\skills" -Name
+$skillMdFiles=Get-ChildItem ".\.agents\skills\*\SKILL.md" -EA SilentlyContinue
+$scriptFiles=Get-ChildItem ".\scripts\*.ps1" -EA SilentlyContinue
+$d=$skillDirs
 $c=$d.PSWhere({$_ -ne '_shared'}).Count
-& ".\scripts\cross-ref-check.ps1" *>$null;$x=($LASTEXITCODE -eq 0)
+# ponytail: parallel sub-scripts
+$scriptRoot = $PSScriptRoot
+$jobs = @()
+$jobs += Start-Job -ScriptBlock { & "$using:scriptRoot\cross-ref-check.ps1" -Json -Quiet }
+$jobs += Start-Job -ScriptBlock { & "$using:scriptRoot\pssa-gate.ps1" -Mode Check -Quiet }
+$jobs += Start-Job -ScriptBlock { & "$using:scriptRoot\check-backlog-integrity.ps1" -Json -Quiet }
+$parallelResults = $jobs | Wait-Job -Timeout 30 | Receive-Job
+$jobs | Remove-Job -Force 2>$null
+# ponytail: robust result parsing
+$x = $false; $po = ""; $bj = $null
+if ($parallelResults.Count -ge 1) { $x = ($parallelResults[0] | ConvertFrom-Json -EA SilentlyContinue).allClean -eq $true }
+if ($parallelResults.Count -ge 2) { $po = $parallelResults[1] | Out-String }
+if ($parallelResults.Count -ge 3) { $bj = $parallelResults[2] | Out-String | ConvertFrom-Json -EA SilentlyContinue }
 $h1=Test-Path "README.md";$h3=Test-Path ".project.json"
 $as=10;if(!$x){$as-=2};if(!$h1){$as-=2};if($c -lt 60){$as-=2};if(!$h3){$as-=1}
 a "PA" ($m::Max(0,$as)) @{skills=$c;cross_ref=$x;readme=$h1;project_json=$h3} "X-ref $x, $c skills"
 $s1=10;$wc=$false;$sf=$false
-$wk=@(Select-String -Path ".\scripts\*.ps1" -Pattern "MD5|SHA1\b").PSWhere({$_.Line -notmatch "SHA1ToSHA256|SHA256|#deprecat|#legacy|SHA1SHA256|Select-String.*MD5"})
+$wk=@(Select-String -Path $scriptFiles.FullName -Pattern "MD5|SHA1\b").PSWhere({$_.Line -notmatch "SHA1ToSHA256|SHA256|#deprecat|#legacy|SHA1SHA256|Select-String.*MD5"})
 if($wk){$wc=$true;$s1-=2}
-$sk=@(Select-String -Path ".\.agents\skills\*\SKILL.md", ".\scripts\*.ps1", ".\.github\workflows\*.yml", ".\opencode.json" -Pattern "(?i)(api[_-]?key|secret|password|token|credential)\s*[=:]\s*['""][^'""]{8,}")
+$sk=@(Select-String -Path ($skillMdFiles.FullName + $scriptFiles.FullName + @(".\.github\workflows\*.yml", ".\opencode.json")) -Pattern "(?i)(api[_-]?key|secret|password|token|credential)\s*[=:]\s*['""][^'""]{8,}")
 if($sk){$sf=$true;$s1-=3}
-if(Test-Path "docs/metricas/errors/LATEST_error.json"){$p1=Get-Content "docs/metricas/errors/LATEST_error.json" -Raw | ConvertFrom-Json;if($p1.source -ne "quality-gate" -or $p1.passed -lt 5){$s1-=1}}else{$po=& ".\scripts\pssa-gate.ps1" -Mode Check 2>&1;if($LASTEXITCODE -ne 0 -or $po -match "FAIL|violation|security"){$s1-=1}}
+if(Test-Path "docs/metricas/errors/LATEST_error.json"){$p1=Get-Content "docs/metricas/errors/LATEST_error.json" -Raw | ConvertFrom-Json;if($p1.source -ne "quality-gate" -or $p1.passed -lt 5){$s1-=1}}else{if($po -match "FAIL|violation|security"){$s1-=1}}
 a "Sec" ($m::Max(0,$m::Min(10,$s1))) @{weak_crypto=$wc;secrets=$sf} "Weak crypto: $wc, secrets: $sf"
 $ds=10;$wf=@(Get-ChildItem ".\skills" -File -EA SilentlyContinue);$oc=$wf.PSWhere({$_.Name -notin $d}).Count
 if($oc -gt 5){$ds-=2}elseif($oc -gt 0){$ds-=1}
 $ji=(Get-ChildItem ".\skills" -Directory -EA SilentlyContinue).PSWhere({ $_.Target -and -not (Test-Path $_.Target) }).Count
-if($ji -gt 0){$ds-=1};$co=@(Select-String -Path ".\scripts\*.ps1" -Pattern '^\s*#\s+function\s+\w+|^\s*#\s+if\s*\(|^\s*#\s+foreach\s*\(|^\s*#\s+for\s*\(|^\s*#\s+while\s*\(|^\s*#\s+switch\s*\(|^\s*#\s+try\s*\{|^\s*#\s+catch\s*\{').PSWhere({$_.Filename -ne "score-auto.ps1"})
+if($ji -gt 0){$ds-=1};$co=@(Select-String -Path $scriptFiles.FullName -Pattern '^\s*#\s*function\s+\w+|^\s*#\s*if\s*\(|^\s*#\s*foreach\s*\(|^\s*#\s*for\s*\(|^\s*#\s*while\s*\(|^\s*#\s*switch\s*\(|^\s*#\s*try\s*\{|^\s*#\s*catch\s*\{').PSWhere({$_.Filename -ne "score-auto.ps1"})
 if($co.Count -gt 10){$ds-=1}
 a "DC" ($m::Max(0,$m::Min(10,$ds))) @{orphans=$oc;dead_junctions=$ji;commented_out=$co.Count} "Orphans: $oc, dead junctions: $ji"
-$sc=@(Get-ChildItem ".\scripts\*.ps1");$ts=$sc.Count
+$sc=$scriptFiles;$ts=$sc.Count
 $scStats=$sc|ForEach-Object -Parallel{$c1=[IO.File]::ReadAllText($_.FullName);[PSCustomObject]@{h=[bool]($c1-match'<#');p=[bool]($c1-match'param\(');s=[bool]($c1-match'Set-StrictMode');t=[bool]($c1-match'try\s*\{')}} -ThrottleLimit 7
 $wh=@($scStats|?{$_.h}).Count;$wp=@($scStats|?{$_.p}).Count;$ws=@($scStats|?{$_.s}).Count;$wt=@($scStats|?{$_.t}).Count
 $cr=($wh,$wp,$ws).PSForEach({$m::Round(($_/$ts),2)})
@@ -37,7 +71,7 @@ a "CC" ($m::Round(($cr[0]+$cr[1]+$cr[2])/3*10,1)) @{total_scripts=$ts;with_help=
 $bp=$m::Round(($wp/$ts)*10,1)
 $tr=$wt/$ts;if($tr -ge 0.8){$bp=$m::Min(10,$bp+1)}elseif($tr -le 0.3){$bp=$m::Max(0,$bp-1)}
 a "BP" $bp @{param_cov=$wp;trycatch=$wt} "P:$wp/$ts T:$wt/$ts"
-$sf2=Get-ChildItem ".\.agents\skills\*\SKILL.md";$crp=@($sf2|ForEach-Object -Parallel{$f=$_;try{$b=[System.IO.File]::ReadAllBytes($f.FullName);for($i=0;$i -lt $b.Length-3;$i++){if($b[$i]-eq0xC3-and$b[$i+1]-eq0x83-and$b[$i+2]-ge0x80){$true;return};if($b[$i]-eq0xC3-and$b[$i+1]-eq0xA2-and$i+3-lt$b.Length-and$b[$i+2]-eq0xE2-and($b[$i+3]-eq0x80-or$b[$i+3]-eq0x82)){$true;return}};return $false}catch{$false}} -ThrottleLimit 4|?{$_}).Count
+$sf2=$skillMdFiles;$crp=@($sf2|ForEach-Object -Parallel{$f=$_;try{$b=[System.IO.File]::ReadAllBytes($f.FullName);for($i=0;$i -lt $b.Length-3;$i++){if($b[$i]-eq0xC3-and$b[$i+1]-eq0x83-and$b[$i+2]-ge0x80){$true;return};if($b[$i]-eq0xC3-and$b[$i+1]-eq0xA2-and$i+3-lt$b.Length-and$b[$i+2]-eq0xE2-and($b[$i+3]-eq0x80-or$b[$i+3]-eq0x82)){$true;return}};return $false}catch{$false}} -ThrottleLimit 4|?{$_}).Count
 $ort=10;if($crp -gt 10){$ort=4}elseif($crp -gt 5){$ort=7}elseif($crp -gt 0){$ort=9}
 a "Or" $ort @{corrupted=$crp;scanned=$sf2.Count} "Corruption: $crp/$($sf2.Count)"
 $bi=0;if(Test-Path "BITACORA.md"){$bc=Get-Content "BITACORA.md" -Raw;$bl=$bc.Split("`n").Count;if($bl -gt 10){$bi=10}elseif($bl -gt 5){$bi=7}else{$bi=5}}
@@ -48,7 +82,7 @@ a "Me" $mt @{md=$hm;ed=$he;ej=$hj;rp=$hr} "MD:$hm EJ:$hj"
 $ak=$m::Round(($sc | Measure-Object -Average Length).Average/1KB,1);$o5=$sc.PSWhere({$_.Length -gt 51200}).Count
 $pf=10;if($ts -lt 15 -or $ts -gt 50){$pf-=1};if($ak -gt 15){$pf-=1}elseif($ak -gt 20){$pf-=2};if($o5 -gt 0){$pf-=2}
 a "SP" ($m::Max(0,$m::Min(10,$pf))) @{sc=$ts;avg=$ak;huge=$o5} "S:$ts avg:${ak}KB"
-$s4=(Get-ChildItem ".\.agents\skills\*\SKILL.md").PSWhere({$_.Directory.Name -ne '_shared'});$tt=$s4.Count;$o3=$s4.PSWhere({$_.Length -gt 3072}).Count;$o6=$s4.PSWhere({$_.Length -gt 5120}).Count;$tb=($s4 | Measure-Object -Sum Length).Sum;$ak2=$m::Round($tb/$tt/1KB,1)
+$s4=$skillMdFiles.PSWhere({$_.Directory.Name -ne '_shared'});$tt=$s4.Count;$o3=$s4.PSWhere({$_.Length -gt 3072}).Count;$o6=$s4.PSWhere({$_.Length -gt 5120}).Count;$tb=($s4 | Measure-Object -Sum Length).Sum;$ak2=$m::Round($tb/$tt/1KB,1)
 # Extend overweight check to commands/ + prompts/ (H-019)
 $cmdFiles=Get-ChildItem "commands\*.md" -EA SilentlyContinue;$promptFiles=Get-ChildItem "prompts" -Recurse -File -EA SilentlyContinue
 $cmdOver3=$cmdFiles.PSWhere({$_.Length -gt 3072}).Count;$cmdOver5=$cmdFiles.PSWhere({$_.Length -gt 5120}).Count
@@ -59,8 +93,7 @@ a "SE" ($m::Round($m::Max(0,$m::Min(10,$ef)),1)) @{total=$tt;o3=$o3;o5=$o6;avg=$
 $ip=".learnings\inter-track.json";$cy=0;$ic=0;$it=30
 if(Test-Path $ip){try{$id=Get-Content $ip -Raw | ConvertFrom-Json;$ic=[int]$id.cycle.count;$it=[int]$id.cycle.target;$cy=$m::Min(10,$m::Round(($ic/$it)*10,1))}catch{$cy=0}}
 a "CA" $cy @{ic=$ic;it=$it} "IC:$ic/$it"
-$bp2=Join-Path $PSScriptRoot 'check-backlog-integrity.ps1'
-if(Test-Path $bp2){$bj=& $bp2 -Json 2>&1 | Out-String | ConvertFrom-Json;$bs=$bj.score;$bpp=$bj.passed;$bt=$bj.totalItems}else{$bs=0;$bpp=0;$bt=0}
+if($bj){$bs=$bj.score;$bpp=$bj.passed;$bt=$bj.totalItems}else{$bs=0;$bpp=0;$bt=0}
 a "BI2" $bs @{passed=$bpp;total=$bt} "$bpp/$bt items"
 $sd=@();$e1=$h["PA"].e
 $sd+=$(if($e1.readme){10}else{0});$sd+=$(if($e1.cross_ref){10}else{0});$sd+=($m::Min(10,$e1.skills/6));$sd+=$(if($e1.project_json){10}else{0})
@@ -82,4 +115,9 @@ $dn=@{"PA"="Project Artifacts";"Sec"="Security";"DC"="Dead Code";"CC"="Clean Cod
 $r=@{score=@{current=$fn;dimensions=[ordered]@{};last_updated=(Get-Date -Format "yyyy-MM-dd");trend="stable"};dimensions_detail=$h}
 foreach($k in $dn.Keys){$r.score.dimensions[$dn[$k]]=$h[$k].s}
 if(Test-Path ".project.json"){try{$pr=Get-Content ".project.json" -Raw -Encoding UTF8 | ConvertFrom-Json;$ps=$pr.score.current;if($fn -gt $ps){$r.score.trend="up"}elseif($fn -lt $ps){$r.score.trend="down"};$lu=$pr.score.last_updated;if($lu -and !$Json){$age=[int]((Get-Date)-(Get-Date $lu)).TotalDays;if($age -ge 1){Write-Host "WARNING: .project.json is $age day(s) stale (last: $lu)" -ForegroundColor Yellow}}}catch{Write-Warning "score-auto: .project.json parse failed ($($_.Exception.Message))"}}
+# Save to cache
+try {
+    if (-not (Test-Path $cacheDir)) { New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null }
+    @{ hash = $cacheHash; timestamp = (Get-Date -Format "o"); result = $r } | ConvertTo-Json -Depth 5 | Set-Content $cacheFile -Encoding UTF8
+} catch {}
 if($Json){$r | ConvertTo-Json -Depth 5}elseif($Quiet){Write-Host "Score: $fn/10 (trend: $($r.score.trend))"}else{Write-Host "$($r.score.last_updated) | $fn/10 ($($r.score.trend))" -ForegroundColor Cyan;Write-Host "Dimensions:" -ForegroundColor Yellow;foreach($k in $dn.Keys){$d2=$h[$k];$C=if($d2.s -ge 9){"Green"}elseif($d2.s -ge 7){"Yellow"}else{"Red"};Write-Host " $($dn[$k].PadRight(16))$($d2.s.ToString('F1').PadLeft(4))/10" -ForegroundColor $C};Write-Host $("-"*32);Write-Host " TOTAL$(''.PadLeft(12))$($fn.ToString('F1').PadLeft(4))/10" -ForegroundColor White}

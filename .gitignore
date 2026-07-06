@@ -114,3 +114,6 @@ credentials.json
 
 # SkillSpector clone (upstream NVIDIA)
 .skillspector/
+
+# Skill registry (auto-generated)
+scripts/skill-registry.json.backup-session-*/

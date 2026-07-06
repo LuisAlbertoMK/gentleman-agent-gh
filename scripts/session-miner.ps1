@@ -42,4 +42,4 @@ if($Mode-eq'apply'){$uncataloged=@($repeated | Where-Object {-not $_.Cataloged})
 if($uncataloged.Count-eq0){if(-not $Quiet){Write-Host '[OK] Nothing to apply'};return}
 if(-not $Quiet){Write-Host "Would add $($uncataloged.Count) new anti-pattern(s):"};foreach($u in $uncataloged){$sk=$u.PatternKey -replace '[^\w-]','_';if(-not $Quiet){Write-Host "  - [$($u.Count)x] $($u.PatternKey) -> ANTI-PATTERN-CATALOG.md + docs/anti-patterns/$sk.md"}}
 if(-not $Quiet){Write-Host 'Run manually: edit ANTI-PATTERN-CATALOG.md with pattern details'}}
-}finally{$catalog=$patternKeys=$errors=$repeated=$data=$uncataloged=$null;[GC]::Collect()}
+}finally{$catalog=$patternKeys=$errors=$repeated=$data=$uncataloged=$null} # ponytail: removed explicit GC.Collect — let .NET handle it

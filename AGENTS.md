@@ -100,7 +100,7 @@ Match user's language. Spanish: warm Rioplatense (voseo). English: natural, same
 ## Skills (Auto-load)
 Top 15: karpathy-loop · lean-context · quality-gate · auto-metrics · session-resume · code-memory · skill-creator · immune-system · dreaming · metricas · commit-crafter · code-review-agent · bitacora · triple-verify · self-improvement
 ### Anti-Pattern Catalog
-`{file:ANTI-PATTERN-CATALOG.md}` — scan BEFORE any task.
+`{file:ANTI-PATTERN-CHEATSHEET.md}` — scan BEFORE any task. Full catalog on-demand: `{file:ANTI-PATTERN-CATALOG.md}` (load when immune-system triggers).
 ### Skill Router
 **Primary**: `skill-graph.ps1 -Task "<task>" -Format Json` — resolves 4-8 relevant skills (−85-92%).
 **Fallback**: Resume→session-resume · Write→skill-creator, sdd-*, quality-gate · Fix→recovery-protocol, immune-system, sdd-verify · Design→senior-engineer, sdd-propose/design · Learn→research, prompt-engineering · Review→quality-gate, judgment-day, triple-verify · UI→baseline-ui, web-quality-audit, performance, accessibility · System→development-mode, execution-mode, skill-graph · Measure→metricas, auto-metrics, performance-tracker · Audit→external-auditor, gap-analysis · Optimize→karpathy-loop, lean-context, skill-improver · Coordinate→delivery-harness, subagent-isolation, command-wrapper · Commit→commit-crafter · Secure→security-scanner · Log→bitacora · Track→dreaming, skill-digestion · Issue→issue-creation · Improve→self-improvement, external-improvement · Setup→sdd-init, ci-cd, project-mapper · Recover→recovery-protocol, immune-system, context-watchdog · Unknown→skill-creator, research, recovery-protocol
@@ -162,13 +162,14 @@ PSSA Gate: auto-heals BOM + switch defaults. No `git commit -i`/`--force`/`push`
 ### I. Self-Improvement System
 Manifest: `CYCLE.md` (local only, NO upstream). Skill: `self-improvement`. Process: READ CYCLE.md → diagnose → 3 subagentes → verify → learn → `docs/ciclos/cycle<N>-*.md`. inter(30) minimum. Score drop >0.5 → revert. Same fix fails 3x → SKIP.
 Plugin: SkillForge→SQLite, Curator→re-score/merge, SkillInjector→top-3 pre-turn.
-### J. Pre-session Health Check
-0. `restore-project-score.ps1 -Quiet`
-1. `git status --short` (alerta si cambios)
-2. `check-skill-drift.ps1` (warning si drift)
-3. (opt) `check-upstream.ps1 -Json` (NEW→engram info)
-4. **Health**: `health-check.ps1 -Json` (exit 0/1/2)
-5. Todo OK → seguí
+### J. Pre-session Health Check — PARALLELIZED
+0. `restore-project-score.ps1 -Quiet` (must complete first — restores .project.json)
+1. **Parallel block** (run concurrently):
+   - `git status --short` (alerta si cambios)
+   - `check-skill-drift.ps1` (warning si drift, cached 5min)
+   - `health-check.ps1 -Json` (exit 0/1/2)
+2. (opt) `check-upstream.ps1 -Json` (NEW→engram info, async background)
+3. Todo OK → seguí
 ### K. Project Score Auto-Report (first request)
 Buscar `.project.json`. Si existe: reportar score. Si >7d stale → fresh metrics + update. `mem_save(topic_key=project/score)`.
 ### L. Bias Calibration

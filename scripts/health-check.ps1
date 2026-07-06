@@ -13,6 +13,29 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+# ── Cache check (1h TTL — junctions rarely change) ─────────────────────
+# ponytail: unified cache
+$cacheScript = Join-Path $PSScriptRoot "lib/cache.ps1"
+if (-not $AutoRepair) {
+  $cached = & $cacheScript -Action get -Key "health-check" -TtlSeconds 3600
+  if ($cached) {
+    if ($Json) { Write-Output ($cached | ConvertTo-Json -Depth 3) }
+    elseif (-not $Quiet) {
+      Write-Output "`n═══════════════════════════════════════════"
+      Write-Output "  HEALTH CHECK — gentleman-vMK (cached)"
+      Write-Output "═══════════════════════════════════════════"
+      $cached.checks | ForEach-Object {
+        $icon = switch ($_.status) { "OK" { "✅" } "WARN" { "🟡" } "FAIL" { "🔴" } default { "❓" } }
+        Write-Output "$icon $($_.check): $($_.detail)"
+      }
+      Write-Output "───────────────────────────────────────────"
+      $exitLabel = switch ($cached.exitCode) { 0 { "✅ ALL OK" } 1 { "🟡 WARNINGS" } 2 { "🔴 CRITICAL" } }
+      Write-Output "Exit: $($cached.exitCode) — $exitLabel"
+    }
+    exit $cached.exitCode
+  }
+}
+
 $gentlemanRoot = if ($env:GENTLEMAN_AGENT_ROOT) { $env:GENTLEMAN_AGENT_ROOT } else { (Get-Item $PSScriptRoot).Parent.FullName }
 
 $exitCode = 0
@@ -110,6 +133,16 @@ if (Test-Path $globalSkills) {
 }
 
 
+
+# ── Write cache ────────────────────────────────────────────────────────
+# ponytail: unified cache
+$healthResult = @{
+  timestamp = (Get-Date -Format "o")
+  version   = "1.0.0"
+  checks    = $checks
+  exitCode  = $exitCode
+}
+& $cacheScript -Action set -Key "health-check" -Data $healthResult
 
 # ── Output ──────────────────────────────────────────────────────────────
 if ($Json) {

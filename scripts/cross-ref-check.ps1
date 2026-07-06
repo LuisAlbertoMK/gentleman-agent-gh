@@ -9,15 +9,17 @@ if(-not(Test-Path $cd)){if(-not $Quiet){Write-Host "FATAL: missing $cd"-Foregrou
 if(-not $Quiet){Write-Host "[1/8] APC..."-N};$apc=Test-Path(Join-Path $RepoRoot "ANTI-PATTERN-CATALOG.md")
 if($apc){if(-not $Quiet){Write-Host " OK"}}else{$e+="APC not found";if(-not $Quiet){Write-Host " FAIL"}}
 if(-not $Quiet){Write-Host "[2/8] SKILL.md..."-N};$sb_ms = [System.Text.StringBuilder]::new(65536)
-try{$sd=Get-ChildItem (Join-Path $cd "*") -Directory}catch{if(-not $Quiet){Write-Host " FAIL`nFATAL: list: $_"-ForegroundColor Red};exit 1}
-$sd | ForEach-Object {$n=$_.Name;if($n -eq '_shared'){return};if(-not(Test-Path(Join-Path $_.FullName "SKILL.md"))){$null = $sb_ms.AppendLine($n)}}
+try{$sd=Get-ChildItem $cd -Directory}catch{if(-not $Quiet){Write-Host " FAIL`nFATAL: list: $_"-ForegroundColor Red};exit 1}
+# ponytail: cache non-shared dirs for reuse in steps 4,6,7
+$nsd=$sd.Where({$_.Name -ne '_shared'})
+$nsd | ForEach-Object {if(-not(Test-Path(Join-Path $_.FullName "SKILL.md"))){$null = $sb_ms.AppendLine($_.Name)}}
 $ms = @($sb_ms.ToString() -split '\r?\n' | Where-Object { $_ })
 if($ms.Count -eq 0){if(-not $Quiet){Write-Host " OK (all)"}}else{$w+="Missing SKILL.md: $($ms-join', ')";if(-not $Quiet){Write-Host " WARN"}}
 if(-not $Quiet){Write-Host "[3/8] INDEX count..."-N};$ac=$sd.Where({$_.Name -ne '_shared'}).Count
 $hl=Select-String -Path (Join-Path $RepoRoot "SKILLS-INDEX.md") -Pattern "all \d+ skills"
 if($hl-match"all (\d+) skills"){$dc=[int]$Matches[1];if($dc -eq $ac){if(-not $Quiet){Write-Host " OK ($ac)"}}else{$e+="INDEX says $dc, has $ac";if(-not $Quiet){Write-Host " FAIL ($dc vs $ac)"}}}else{$w+="INDEX header mismatch";if(-not $Quiet){Write-Host " WARN"}}
 if(-not $Quiet){Write-Host "[4/8] junctions..."-N};$sb_mg = [System.Text.StringBuilder]::new(65536)
-if(Test-Path $gd){(Get-ChildItem $cd -Directory).Where({$_.Name -ne '_shared'}) | ForEach-Object {$gp=Join-Path $gd $_.Name;if(-not(Test-Path $gp)){$null = $sb_mg.AppendLine($_.Name)}}}
+if(Test-Path $gd){$nsd | ForEach-Object {$gp=Join-Path $gd $_.Name;if(-not(Test-Path $gp)){$null = $sb_mg.AppendLine($_.Name)}}}
 $mg = @($sb_mg.ToString() -split '\r?\n' | Where-Object { $_ })
 if($mg.Count -eq 0){if(-not $Quiet){Write-Host " OK (all)"}}else{$w+="Missing junctions: $($mg-join', ')";if(-not $Quiet){Write-Host " WARN"}}
 if(-not $Quiet){Write-Host "[5/8] _shared..."-N}
@@ -25,12 +27,12 @@ $sf=@{'skill-resolver.md'=Test-Path(Join-Path $cd "_shared\skill-resolver.md");'
 $mh=@($sf.GetEnumerator().Where({-not $_.Value}) | ForEach-Object {$_.Key})
 if($mh.Count -eq 0){if(-not $Quiet){Write-Host " OK"}}else{$e+="Missing _shared: $($mh-join', ')";if(-not $Quiet){Write-Host " FAIL"}}
 if(-not $Quiet){Write-Host "[6/8] cross-refs..."-N};$sb_br = [System.Text.StringBuilder]::new(65536)
-$al=($sd.Where({$_.Name -ne '_shared'}) | ForEach-Object {$_.Name.ToLower()});$rp='Cross-Refs:\s*(.+)';$ap='Anti-Patterns:\s*(.+)'
-(Get-ChildItem $cd -Directory).Where({$_.Name -ne '_shared'}) | ForEach-Object {$sn=$_.Name;$mp=Join-Path $_.FullName "SKILL.md";if(-not(Test-Path $mp)){return};try{$c=[IO.File]::ReadAllText($mp)}catch{return};if($c -match $rp){$rf=($Matches[1]-split'\s*[\|,]\s*' | ForEach-Object {$_.Trim()}).Where({$_ -cmatch '^[a-z][a-z0-9_-]+$'});$rf | ForEach-Object {if($al -notcontains $_){$null = $sb_br.AppendLine("$sn cross-refs '$_' missing")}}};if($c -match $ap){$ax=($Matches[1]-split'\s*[\|,]\s*' | ForEach-Object {$_.Trim()}).Where({$_ -cmatch '^[a-z][a-z0-9_-]+$'});$ax | ForEach-Object {if($al -notcontains $_){$null = $sb_br.AppendLine("$sn anti-refs '$_' missing")}}}}
+$al=($nsd | ForEach-Object {$_.Name.ToLower()});$rp='Cross-Refs:\s*(.+)';$ap='Anti-Patterns:\s*(.+)'
+$nsd | ForEach-Object {$sn=$_.Name;$mp=Join-Path $_.FullName "SKILL.md";if(-not(Test-Path $mp)){return};try{$c=[IO.File]::ReadAllText($mp)}catch{return};if($c -match $rp){$rf=($Matches[1]-split'\s*[\|,]\s*' | ForEach-Object {$_.Trim()}).Where({$_ -cmatch '^[a-z][a-z0-9_-]+$'});$rf | ForEach-Object {if($al -notcontains $_){$null = $sb_br.AppendLine("$sn cross-refs '$_' missing")}}};if($c -match $ap){$ax=($Matches[1]-split'\s*[\|,]\s*' | ForEach-Object {$_.Trim()}).Where({$_ -cmatch '^[a-z][a-z0-9_-]+$'});$ax | ForEach-Object {if($al -notcontains $_){$null = $sb_br.AppendLine("$sn anti-refs '$_' missing")}}}}
 $br = @($sb_br.ToString() -split '\r?\n' | Where-Object { $_ })
 if($br.Count -eq 0){if(-not $Quiet){Write-Host " OK"}}else{$e+=$br;if(-not $Quiet){Write-Host " FAIL ($($br.Count))"}}
 if(-not $Quiet){Write-Host "[7/8] config_refs..."-N};$sb_mc = [System.Text.StringBuilder]::new(65536);$crp='config_refs:\s*(.+)'
-(Get-ChildItem $cd -Directory).Where({$_.Name -ne '_shared'}) | ForEach-Object {$sn=$_.Name;$mp=Join-Path $_.FullName "SKILL.md";if(-not(Test-Path $mp)){return};try{$c=[IO.File]::ReadAllText($mp)}catch{return};if($c -match $crp){$rf=($Matches[1]-split'\s*[\|,]\s*' | ForEach-Object {$_.Trim()}).Where({$_ -ne ''});$rf | ForEach-Object {$rp2=Join-Path $RepoRoot $_;if(-not(Test-Path $rp2)){$null = $sb_mc.AppendLine("$sn config_refs '$_' missing at $rp2")}}}}
+$nsd | ForEach-Object {$sn=$_.Name;$mp=Join-Path $_.FullName "SKILL.md";if(-not(Test-Path $mp)){return};try{$c=[IO.File]::ReadAllText($mp)}catch{return};if($c -match $crp){$rf=($Matches[1]-split'\s*[\|,]\s*' | ForEach-Object {$_.Trim()}).Where({$_ -ne ''});$rf | ForEach-Object {$rp2=Join-Path $RepoRoot $_;if(-not(Test-Path $rp2)){$null = $sb_mc.AppendLine("$sn config_refs '$_' missing at $rp2")}}}}
 $mc = @($sb_mc.ToString() -split '\r?\n' | Where-Object { $_ })
 if($mc.Count -eq 0){if(-not $Quiet){Write-Host " OK"}}else{$e+=$mc;if(-not $Quiet){Write-Host " FAIL ($($mc.Count))"}}
 if(-not $Quiet){Write-Host "[8/8] review-rules.jsonc..."-N};$rk=Join-Path $RepoRoot "review-rules.jsonc"
