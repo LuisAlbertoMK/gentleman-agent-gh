@@ -49,7 +49,7 @@ Thresholds en skill `triple-verify`. Modos: Normal (zona) · `!ship`=triple+qual
 | `!manifest` | Read CYCLE.md, report cycle + score, verify shortcuts |
 | `!5fases`/`!extimprove` | Load `external-improvement` — 5-phase cycle, 3+ sub/fase |
 | `!analisis` | Multi-agent analysis: gentleman-vMK + 3 subagentes + research → consolidated plan |
-| `!setup` | `scripts/setup-machine.ps1` (Win) / `.sh` (Linux/macOS) — bootstrap |
+| `!setup` | `scripts/global-setup.ps1` — one-click global config: sync AGENTS, prompts, scripts, MCPs, skill junctions |
 | `!dev` | `scripts/dev-server.ps1` — manage background dev servers |
 | `!gentleman` | `scripts/use-gentleman.ps1` — gentleman-ize any project |
 ### Analysis Mode (trigger: `!analisis`)
