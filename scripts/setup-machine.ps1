@@ -7,14 +7,17 @@
     - Creates global shell shortcuts (gentleman-vmk)
     - Sets GENTLEMAN_AGENT_ROOT environment variable
     - Configures OpenCode env vars
+    - Installs MCP server binaries (codebase-memory-mcp, engram, headroom)
     - Creates skill junction in global config
     - Verifies everything works
-.PARAMETER RepoDir
+.Parameter RepoDir
     Path to the cloned gentleman-agent-gh repo (default: current dir)
-.PARAMETER SkipEnvVar
+.Parameter SkipEnvVar
     Skip persistent env var registration (for containers/CI)
-.PARAMETER SkipShortcuts
+.Parameter SkipShortcuts
     Skip global shell shortcut creation
+.Parameter SkipMcp
+    Skip MCP server binary installation
 .EXAMPLE
     # From inside the cloned repo:
     .\scripts\setup-machine.ps1
@@ -25,7 +28,8 @@
 param(
     [string]$RepoDir = (Get-Location).Path,
     [switch]$SkipEnvVar,
-    [switch]$SkipShortcuts
+    [switch]$SkipShortcuts,
+    [switch]$SkipMcp
 )
 Set-StrictMode -Version Latest
 
@@ -226,12 +230,102 @@ if (Test-Path $repoAgentsMd) {
     warn "Repo AGENTS.md not found at $repoAgentsMd"
 }
 
-# ── Step 7: Verify ────────────────────────────────────────────────
+# ── Step 7: Install MCP server binaries ─────────────────────────
+# These binaries back the MCP servers configured in opencode.json.
+# Without them, OpenCode can load the config but the MCPs won't start.
+# context7 and sequential-thinking auto-install via npx (no action needed).
+function Install-McpServer {
+    param([string]$Name, [scriptblock]$Check, [scriptblock]$Install, [string]$ManualHint)
+    if (& $Check) { skip "$Name already installed"; return $false }
+    try {
+        info "Installing $Name..."
+        & $Install
+        if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw "exit code $LASTEXITCODE" }
+        ok "$Name installed"
+        return $true
+    } catch {
+        warn "$Name install failed — $ManualHint"
+        return $false
+    }
+}
+
+if (-not $SkipMcp) {
+    info "Installing MCP server binaries"
+    $anyMcp = $false
+
+    # 7a. codebase-memory-mcp — npm global
+    $anyMcp = (Install-McpServer -Name "codebase-memory-mcp" `
+        -Check { Get-Command "codebase-memory-mcp" -ErrorAction SilentlyContinue } `
+        -Install { npm install -g codebase-memory-mcp --no-fund --no-audit --loglevel error 2>$null } `
+        -ManualHint "npm install -g codebase-memory-mcp") -or $anyMcp
+
+    # 7b. headroom — pip
+    $anyMcp = (Install-McpServer -Name "headroom" `
+        -Check { Get-Command "headroom" -ErrorAction SilentlyContinue } `
+        -Install { pip install headroom-ai -q 2>$null } `
+        -ManualHint "pip install headroom-ai") -or $anyMcp
+
+    # 7c. engram — GitHub releases (GoReleaser binary)
+    $egCheck = { Get-Command "engram" -ErrorAction SilentlyContinue }
+    if (& $egCheck) {
+        skip "engram already installed"
+    } else {
+        info "Installing engram from GitHub releases..."
+        try {
+            $os = if ($global:IsWindows -or (-not $global:IsLinux -and -not $global:IsMacOS -and $env:OS -match "Windows")) { "windows" }
+                  elseif ($global:IsMacOS) { "darwin" } else { "linux" }
+            $arch = if ([Environment]::Is64BitOperatingSystem) { "amd64" } else { "arm64" }
+            $ext = if ($os -eq "windows") { "zip" } else { "tar.gz" }
+
+            $latest = Invoke-RestMethod -Uri "https://api.github.com/repos/Gentleman-Programming/engram/releases/latest" `
+                -ErrorAction SilentlyContinue -UseBasicParsing
+            if (-not $latest) { throw "Could not fetch engram release info" }
+
+            $version = $latest.tag_name.TrimStart('v')
+            $url = "https://github.com/Gentleman-Programming/engram/releases/download/v$version/engram_${version}_${os}_${arch}.${ext}"
+            $tmpDir = Join-Path $env:TEMP "engram-$(Get-Random)"
+            New-Item -ItemType Directory -Path $tmpDir -Force | Out-Null
+            $archive = Join-Path $tmpDir "engram.$ext"
+
+            Write-Host "       Downloading v$version ($os/$arch)..."
+            Invoke-WebRequest -Uri $url -OutFile $archive -UseBasicParsing
+
+            if ($os -eq "windows") {
+                Expand-Archive -Path $archive -DestinationPath $tmpDir -Force
+            } else {
+                tar -xzf $archive -C $tmpDir 2>$null
+            }
+
+            # Find the binary (GoReleaser may put it in a subdir)
+            $exeName = if ($os -eq "windows") { "engram.exe" } else { "engram" }
+            $binary = Get-ChildItem -Path $tmpDir -Recurse -Filter $exeName -ErrorAction SilentlyContinue | Select-Object -First 1
+            if (-not $binary) { throw "Binary not found in archive" }
+
+            # Install to npm global dir (already in PATH)
+            $binDir = "$env:APPDATA\npm"
+            if (-not (Test-Path $binDir)) { New-Item -ItemType Directory -Path $binDir -Force | Out-Null }
+            Copy-Item -Path $binary.FullName -Destination (Join-Path $binDir $exeName) -Force
+            Remove-Item -Path $tmpDir -Recurse -Force -ErrorAction SilentlyContinue
+
+            ok "engram v$version installed"
+            $anyMcp = $true
+        } catch {
+            warn "engram install failed — download manually from https://github.com/Gentleman-Programming/engram/releases"
+        }
+    }
+} else {
+    skip "MCP server binaries (via -SkipMcp)"
+}
+
+# ── Step 8: Verify ────────────────────────────────────────────────
 info "Verifying setup"
 $checks = @(
     @{ Label = "GENTLEMAN_AGENT_ROOT"; Test = { $env:GENTLEMAN_AGENT_ROOT -eq $__rootDir } },
     @{ Label = "opencode.json exists"; Test = { Test-Path (Join-Path $RepoDir "opencode.json") } },
-    @{ Label = "Global shortcut: gentleman-vmk"; Test = { Get-Command "gentleman-vmk" -ErrorAction SilentlyContinue } }
+    @{ Label = "Global shortcut: gentleman-vmk"; Test = { Get-Command "gentleman-vmk" -ErrorAction SilentlyContinue } },
+    @{ Label = "MCP: codebase-memory-mcp"; Test = { Get-Command "codebase-memory-mcp" -ErrorAction SilentlyContinue } },
+    @{ Label = "MCP: headroom"; Test = { Get-Command "headroom" -ErrorAction SilentlyContinue } },
+    @{ Label = "MCP: engram"; Test = { Get-Command "engram" -ErrorAction SilentlyContinue } }
 )
 $allOk = $true
 foreach ($c in $checks) {

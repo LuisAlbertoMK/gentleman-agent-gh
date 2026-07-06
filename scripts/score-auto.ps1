@@ -41,7 +41,7 @@ $sf2=Get-ChildItem ".\.agents\skills\*\SKILL.md";$crp=@($sf2|ForEach-Object -Par
 $ort=10;if($crp -gt 10){$ort=4}elseif($crp -gt 5){$ort=7}elseif($crp -gt 0){$ort=9}
 a "Or" $ort @{corrupted=$crp;scanned=$sf2.Count} "Corruption: $crp/$($sf2.Count)"
 $bi=0;if(Test-Path "BITACORA.md"){$bc=Get-Content "BITACORA.md" -Raw;$bl=$bc.Split("`n").Count;if($bl -gt 10){$bi=10}elseif($bl -gt 5){$bi=7}else{$bi=5}}
-a "Bi" $bi @{exists=(Test-Path "BITACORA.md");lines=if(Test-Path "BITACORA.md" -and $null -ne $bc){$bl}else{0}} "BI: $(Test-Path 'BITACORA.md')"
+a "Bi" $bi @{exists=(Test-Path "BITACORA.md");lines=if((Test-Path "BITACORA.md") -and ($null -ne $bc)){$bl}else{0}} "BI: $(Test-Path 'BITACORA.md')"
 $hm=Test-Path "docs/metricas";$he=Test-Path "docs/metricas/errors";$hj=Test-Path "docs/metricas/errors/LATEST_error.json";$hr=(Get-ChildItem "docs/metricas" -File -EA SilentlyContinue).Count -gt 0
 $mt=4;if($hm -and $hj){$mt=9}elseif($hm){$mt=7};if($hr -and $he){$mt=$m::Min(10,$mt+1)}
 a "Me" $mt @{md=$hm;ed=$he;ej=$hj;rp=$hr} "MD:$hm EJ:$hj"
