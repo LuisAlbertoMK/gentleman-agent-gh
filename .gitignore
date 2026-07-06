@@ -117,3 +117,4 @@ credentials.json
 
 # Skill registry (auto-generated)
 scripts/skill-registry.json.backup-session-*/
+scripts/skill-registry.json
