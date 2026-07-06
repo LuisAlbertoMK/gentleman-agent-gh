@@ -116,14 +116,14 @@ if(-not $SkipMCP -and (Test-Path $globalJson)){
     $config = Get-Content $globalJson -Raw -Encoding UTF8 | ConvertFrom-Json
     $mcpChanged = $false
     
-    # Ensure mcpServers section exists
-    if(-not ($config.PSObject.Properties['mcpServers'])){
-        $config | Add-Member -Name "mcpServers" -Value @{} -MemberType NoteProperty -Force
+    # Ensure mcp section exists (opencode uses 'mcp' not 'mcpServers')
+    if(-not ($config.PSObject.Properties['mcp'])){
+        $config | Add-Member -Name "mcp" -Value @{} -MemberType NoteProperty -Force
     }
     
     # Ensure engram MCP
-    if(-not ($config.mcpServers.PSObject.Properties['engram'])){
-        $config.mcpServers | Add-Member -Name "engram" -Value @{command="engram";args=@("serve")} -MemberType NoteProperty -Force
+    if(-not ($config.mcp.PSObject.Properties['engram'])){
+        $config.mcp | Add-Member -Name "engram" -Value @{type="local";command=@("engram","mcp","--tools=agent");enabled=$true} -MemberType NoteProperty -Force
         $mcpChanged = $true
         Add-Result "MCP:engram" "SYNCED" "Added engram MCP server"
     }else{
@@ -131,8 +131,8 @@ if(-not $SkipMCP -and (Test-Path $globalJson)){
     }
     
     # Ensure context7 MCP
-    if(-not ($config.mcpServers.PSObject.Properties['context7'])){
-        $config.mcpServers | Add-Member -Name "context7" -Value @{command="npx";args=@("-y","@upstash/context7-mcp@latest")} -MemberType NoteProperty -Force
+    if(-not ($config.mcp.PSObject.Properties['context7'])){
+        $config.mcp | Add-Member -Name "context7" -Value @{type="local";command=@("npx","-y","@upstash/context7-mcp@3.2.2");enabled=$true} -MemberType NoteProperty -Force
         $mcpChanged = $true
         Add-Result "MCP:context7" "SYNCED" "Added context7 MCP server"
     }else{
