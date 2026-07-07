@@ -56,7 +56,7 @@ if(-not $Quiet){Write-Output "`n═══ GLOBAL SETUP — opencode ═══`n"
 Sync-File (Join-Path $gentlemanRoot "AGENTS.md") (Join-Path $globalConfig "AGENTS.md") "AGENTS.md"
 
 # ── 2. Sync shared prompts ─────────────────────────────────────────────
-$sharedPrompts = @("core-behavior.md","analyze-only.md")
+$sharedPrompts = @("_core-behavior.md","_analyze-only-protocol.md")
 foreach($p in $sharedPrompts){
     $src = Join-Path $gentlemanRoot "prompts\shared\$p"
     $dst = Join-Path $globalConfig "prompts\shared\$p"
