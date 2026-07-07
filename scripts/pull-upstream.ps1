@@ -1,55 +1,278 @@
 ﻿#requires -Version 7.6
 <#
-.SYNOPSIS Pull-from-Upstream Workflow — detect, classify, and selectively apply upstream changes.
+.SYNOPSIS
+  Pull-from-Upstream Workflow — detect, classify, and selectively apply upstream changes.
+.DESCRIPTION
+  Connects to the upstream repository and classifies changes as NEW (files only in upstream),
+  MODIFIED (differ between upstream and local), or OURS ONLY (only local).
+  Supports Check, Apply-New, and Apply-File modes.
+.PARAMETER Mode
+  Check (default): list differences. Apply-New: apply new skills/scripts from upstream.
+  Apply-File: apply a specific file from upstream.
+.PARAMETER TargetFile
+  Path to target file (required for Apply-File mode).
+.PARAMETER Branch
+  Upstream branch to compare against (default: main).
+.PARAMETER Remote
+  Remote name (default: upstream).
+.NOTES
+  Excludes: install.ps1, install.sh, README.md, .env.example (local customizations).
 #>
-[CmdletBinding()]param([Parameter(Position=0)][ValidateSet('Check','Apply-New','Apply-File')][string]$Mode='Check',[string]$TargetFile='',[string]$Branch='main',[string]$Remote='upstream')
-$ErrorActionPreference='Stop';Set-StrictMode -Version Latest;$rr=Resolve-Path "$PSScriptRoot/.."
-trap{try{Pop-Location}catch{};exit 1};Push-Location $rr
-function Test-GitRemote([string]$N){(git remote) -contains $N}
+[CmdletBinding()]
+param(
+  [Parameter(Position = 0)]
+  [ValidateSet('Check', 'Apply-New', 'Apply-File')]
+  [string]$Mode = 'Check',
+  [string]$TargetFile = '',
+  [string]$Branch = 'main',
+  [string]$Remote = 'upstream'
+)
+
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version Latest
+
 # ponytail: files we customize locally — upstream must NOT overwrite
-$excludeList = @('install.ps1','install.sh','README.md','.env.example')
-$pm=@{u='skills/';p='.agents/skills/';n='Skills'},@{u='scripts/';p='scripts/';n='Scripts'},@{u='';p='';n='Root files'}
-if(-not(Test-GitRemote $Remote)){Write-Warning "Remote '$Remote' not found";Pop-Location;exit 1}
-Write-Host "Fetch $Remote/$Branch...";$e=$ErrorActionPreference;$ErrorActionPreference='Continue';git fetch $Remote $Branch 2>&1 | Out-Null;$ErrorActionPreference=$e
-if($LASTEXITCODE -ne 0){Write-Warning "Fetch failed";Pop-Location;exit 1}
-$rem="$Remote/$Branch";$loc='HEAD'
-$b=git rev-list --count "${loc}..${rem}" 2>&1;$a=git rev-list --count "${rem}..${loc}" 2>&1
-Write-Host "Behind:$b Ahead:$a Total:$([int]$b+[int]$a)"
-$nu=@();$mo=@();$ou=@()
-foreach($m in $pm){$up=$m.u;$lo=$m.p;$l=$m.n
-if([string]::IsNullOrEmpty($up)){$uf=@(git ls-tree -r --name-only $rem | Where-Object {$_ -notmatch '^skills/|^scripts/|^\.' -and $_ -notlike '*/'});$lf=@(git ls-tree -r --name-only $loc | Where-Object {$_ -notmatch '^\.agents/skills/|^scripts/|^\.' -and $_ -notlike '*/'})}
-else{$uf=@(git ls-tree -r --name-only $rem -- "$up" | ForEach-Object {if(-not[string]::IsNullOrEmpty($lo)-and$lo-ne$up){$_.Replace($up,$lo)}else{$_}});$lf=@(git ls-tree -r --name-only $loc -- "$lo" | ForEach-Object {$_})}
-$us=@($uf | Sort-Object -Unique);$ls=@($lf | Sort-Object -Unique)
-$n=@($us | Where-Object {$_ -notin $ls});$c=@($us | Where-Object {$_ -in $ls});$o=@($ls | Where-Object {$_ -notin $us})
-$n=$n | Where-Object {$_ -notin $excludeList};if($l-eq'Root files'){$n=$n | Where-Object {$_ -notmatch '\.md$|LICENSE'}}
-$mod=@()
-if($l-ne'Root files'){$uh=@{};if([string]::IsNullOrEmpty($up)){git ls-tree $rem | ForEach-Object {$p=$_-split'\s+';$uh[$p[3]]=$p[2]}}else{git ls-tree -r $rem -- "$up" | ForEach-Object {$p=$_-split'\s+';$fp=$p[3];if(-not[string]::IsNullOrEmpty($lo)-and$lo-ne$up){$fp=$fp.Replace($up,$lo)};$uh[$fp]=$p[2]}};$lh=@{};if([string]::IsNullOrEmpty($lo)){git ls-tree $loc | ForEach-Object {$p=$_-split'\s+';$lh[$p[3]]=$p[2]}}else{git ls-tree -r $loc -- "$lo" | ForEach-Object {$p=$_-split'\s+';$lh[$p[3]]=$p[2]}};$c | ForEach-Object {if($uh[$_]-and$lh[$_]-and$uh[$_]-ne$lh[$_]){$mod+=$_}};$mod=$mod | Where-Object {$_ -notin $excludeList}}
-Write-Host "--- $l ---"
-if($n.Count){Write-Host "NEW $($n.Count)";$n | ForEach-Object {Write-Host "  + $_"}}
-if($mod.Count){Write-Host "MOD $($mod.Count)";$mod | ForEach-Object {Write-Host "  ~ $_"}}
-if($o.Count){Write-Host "OURS $($o.Count)";$o | ForEach-Object {Write-Host "  - $_"}}
-if(-not$n.Count-and-not$mod.Count-and-not$o.Count){Write-Host "(none)"}
-$nu+=$n;$mo+=$mod;$ou+=$o}
-Write-Host "New:$($nu.Count) Mod:$($mo.Count) Ours:$($ou.Count)"
-if($Mode-eq'Apply-New'){$sf=$nu | Where-Object {$_ -match '^\.agents/skills/' -or $_ -match '^scripts/'};$sk=@($nu | Where-Object {$_ -notin $sf})
-if($sk.Count){Write-Host "Skip $($sk.Count) non-skill/script"}
-if(-not$sf.Count){Write-Host "No new skills/scripts";Pop-Location;exit 0}
-Write-Host "Apply $($sf.Count) files...";$app=0;$fail=0
-foreach($f in $sf){$up=$f
-foreach($m in $pm){if(-not[string]::IsNullOrEmpty($m.p)-and$f.StartsWith($m.p)){$up=$f.Replace($m.p,$m.u);break}}
-$pd=Split-Path $f -Parent
-if(-not[string]::IsNullOrEmpty($pd)-and-not(Test-Path $pd)){New-Item -ItemType Directory -Path $pd -Force | Out-Null}
-Write-Host "  + $f"
-$e2=$ErrorActionPreference;$ErrorActionPreference='Continue';git checkout "$Remote/$Branch" -- "$up" 2>&1 | Out-Null;$ErrorActionPreference=$e2
-if($LASTEXITCODE -eq 0){if($up-ne$f){if(Test-Path $up){Move-Item -Path $up -Destination $f -Force}};$null=git add $f 2>&1;$app++}else{Write-Warning "FAILED $up";$fail++}}
-Write-Host "$app applied, $fail failed"
-if($app){Write-Host "Staged. git status then commit"}}
-if($Mode-eq'Apply-File'){
-	if([string]::IsNullOrEmpty($TargetFile)){Write-Warning "Usage: -TargetFile path";Pop-Location;exit 1}
-	$fn=(Split-Path $TargetFile -Leaf);if($fn -in $excludeList -or $TargetFile -in $excludeList){Write-Warning "SKIP '$TargetFile' — excluded (local customization)";Pop-Location;exit 0}
-	$up=$TargetFile
-	foreach($m in $pm){if(-not[string]::IsNullOrEmpty($m.p)-and$TargetFile.StartsWith($m.p)){$up=$TargetFile.Replace($m.p,$m.u);break}}
-	Write-Host "Checkout '$up' from $Remote/$Branch..."
-	git checkout "$Remote/$Branch" -- "$up" 2>&1
-	if($LASTEXITCODE -eq 0){if($up-ne$TargetFile){$pd=Split-Path $TargetFile -Parent;if(-not[string]::IsNullOrEmpty($pd)-and-not(Test-Path $pd)){New-Item -ItemType Directory -Path $pd -Force | Out-Null};Move-Item -Path $up -Destination $TargetFile -Force};Write-Host "Done. git diff --cached $TargetFile"}else{Write-Warning "Failed $up"}}
-	Pop-Location;exit 0
+$excludeList = @('install.ps1', 'install.sh', 'README.md', '.env.example')
+
+# Mapping: upstream path → local path (with path translation)
+$pathMappings = @(
+  @{ UpstreamPath = 'skills/';        LocalPath = '.agents/skills/'; Label = 'Skills' }
+  @{ UpstreamPath = 'scripts/';       LocalPath = 'scripts/';       Label = 'Scripts' }
+  @{ UpstreamPath = '';               LocalPath = '';               Label = 'Root files' }
+)
+
+Push-Location (Resolve-Path "$PSScriptRoot/..")
+
+try {
+  # --- Helper: check if remote exists ---
+  function Test-GitRemote([string]$Name) {
+    (git remote) -contains $Name
+  }
+
+  # --- Validate remote ---
+  if (-not (Test-GitRemote $Remote)) {
+    Write-Warning "Remote '$Remote' not found"
+    exit 1
+  }
+
+  # --- Fetch upstream ---
+  Write-Host "Fetch $Remote/$Branch..."
+  git fetch $Remote $Branch 2>&1 | Out-Null
+  if ($LASTEXITCODE -ne 0) {
+    Write-Warning "Fetch failed"
+    exit 1
+  }
+
+  $remoteRef = "$Remote/$Branch"
+  $localRef = 'HEAD'
+
+  # --- Count ahead/behind ---
+  $behind = git rev-list --count "${localRef}..${remoteRef}" 2>&1
+  $ahead  = git rev-list --count "${remoteRef}..${localRef}" 2>&1
+  Write-Host "Behind: $behind  Ahead: $ahead  Total: $([int]$behind + [int]$ahead)"
+
+  # --- Classify changes by category ---
+  $allNew = @()
+  $allMod = @()
+  $allOurs = @()
+
+  foreach ($mapping in $pathMappings) {
+    $upstreamDir = $mapping.UpstreamPath
+    $localDir    = $mapping.LocalPath
+    $categoryLabel = $mapping.Label
+
+    # List upstream files
+    if ([string]::IsNullOrEmpty($upstreamDir)) {
+      $upstreamFiles = @(git ls-tree -r --name-only $remoteRef |
+        Where-Object { $_ -notmatch '^skills/|^scripts/|^\.' -and $_ -notlike '*/' })
+    } else {
+      $upstreamFiles = @(git ls-tree -r --name-only $remoteRef -- "$upstreamDir" |
+        ForEach-Object {
+          if (-not [string]::IsNullOrEmpty($localDir) -and $localDir -ne $upstreamDir) {
+            $_.Replace($upstreamDir, $localDir)
+          } else { $_ }
+        })
+    }
+
+    # List local files in the same scope
+    if ([string]::IsNullOrEmpty($localDir)) {
+      $localFiles = @(git ls-tree -r --name-only $localRef |
+        Where-Object { $_ -notmatch '^\.agents/skills/|^scripts/|^\.' -and $_ -notlike '*/' })
+    } else {
+      $localFiles = @(git ls-tree -r --name-only $localRef -- "$localDir" |
+        ForEach-Object { $_ })
+    }
+
+    $uniqueUpstream = @($upstreamFiles | Sort-Object -Unique)
+    $uniqueLocal    = @($localFiles | Sort-Object -Unique)
+
+    # NEW: in upstream but not local
+    $newItems = @($uniqueUpstream | Where-Object { $_ -notin $uniqueLocal })
+    # OURS: in local but not upstream
+    $oursItems = @($uniqueLocal | Where-Object { $_ -notin $uniqueUpstream })
+    # Candidates for MOD: in both
+    $commonItems = @($uniqueUpstream | Where-Object { $_ -in $uniqueLocal })
+
+    # Filter exclusions
+    $newItems = $newItems | Where-Object { $_ -notin $excludeList }
+    if ($categoryLabel -eq 'Root files') {
+      $newItems = $newItems | Where-Object { $_ -notmatch '\.md$|LICENSE' }
+    }
+
+    # MODIFIED: in both but with different hashes
+    $modifiedItems = @()
+    if ($categoryLabel -ne 'Root files') {
+      # Build upstream hash map
+      $upstreamHashes = @{}
+      if ([string]::IsNullOrEmpty($upstreamDir)) {
+        git ls-tree $remoteRef | ForEach-Object {
+          $parts = $_ -split '\s+'
+          $upstreamHashes[$parts[3]] = $parts[2]
+        }
+      } else {
+        git ls-tree -r $remoteRef -- "$upstreamDir" | ForEach-Object {
+          $parts = $_ -split '\s+'
+          $filePath = $parts[3]
+          if (-not [string]::IsNullOrEmpty($localDir) -and $localDir -ne $upstreamDir) {
+            $filePath = $filePath.Replace($upstreamDir, $localDir)
+          }
+          $upstreamHashes[$filePath] = $parts[2]
+        }
+      }
+
+      # Build local hash map
+      $localHashes = @{}
+      if ([string]::IsNullOrEmpty($localDir)) {
+        git ls-tree $localRef | ForEach-Object {
+          $parts = $_ -split '\s+'
+          $localHashes[$parts[3]] = $parts[2]
+        }
+      } else {
+        git ls-tree -r $localRef -- "$localDir" | ForEach-Object {
+          $parts = $_ -split '\s+'
+          $localHashes[$parts[3]] = $parts[2]
+        }
+      }
+
+      # Compare hashes
+      $commonItems | ForEach-Object {
+        if ($upstreamHashes[$_] -and $localHashes[$_] -and $upstreamHashes[$_] -ne $localHashes[$_]) {
+          $modifiedItems += $_
+        }
+      }
+      $modifiedItems = $modifiedItems | Where-Object { $_ -notin $excludeList }
+    }
+
+    # --- Output per category ---
+    Write-Host "--- $categoryLabel ---"
+    if ($newItems.Count)     { Write-Host "NEW $($newItems.Count)";     $newItems | ForEach-Object { Write-Host "  + $_" } }
+    if ($modifiedItems.Count){ Write-Host "MOD $($modifiedItems.Count)";$modifiedItems | ForEach-Object { Write-Host "  ~ $_" } }
+    if ($oursItems.Count)    { Write-Host "OURS $($oursItems.Count)";  $oursItems | ForEach-Object { Write-Host "  - $_" } }
+    if (-not $newItems.Count -and -not $modifiedItems.Count -and -not $oursItems.Count) {
+      Write-Host "(none)"
+    }
+
+    $allNew += $newItems
+    $allMod += $modifiedItems
+    $allOurs += $oursItems
+  }
+
+  Write-Host "New:$($allNew.Count) Mod:$($allMod.Count) Ours:$($allOurs.Count)"
+
+  # --- Apply-New mode ---
+  if ($Mode -eq 'Apply-New') {
+    $skillScriptItems = @($allNew | Where-Object {
+      $_ -match '^\.agents/skills/' -or $_ -match '^scripts/'
+    })
+    $otherItems = @($allNew | Where-Object { $_ -notin $skillScriptItems })
+
+    if ($otherItems.Count) {
+      Write-Host "Skip $($otherItems.Count) non-skill/script"
+    }
+
+    if (-not $skillScriptItems.Count) {
+      Write-Host "No new skills/scripts"
+      exit 0
+    }
+
+    Write-Host "Apply $($skillScriptItems.Count) files..."
+    $applied = 0
+    $failed = 0
+
+    foreach ($file in $skillScriptItems) {
+      # Reverse-map: local path → upstream path
+      $upstreamFile = $file
+      foreach ($mapping in $pathMappings) {
+        if (-not [string]::IsNullOrEmpty($mapping.LocalPath) -and $file.StartsWith($mapping.LocalPath)) {
+          $upstreamFile = $file.Replace($mapping.LocalPath, $mapping.UpstreamPath)
+          break
+        }
+      }
+
+      # Ensure parent directory exists
+      $parentDir = Split-Path $file -Parent
+      if (-not [string]::IsNullOrEmpty($parentDir) -and -not (Test-Path $parentDir)) {
+        New-Item -ItemType Directory -Path $parentDir -Force | Out-Null
+      }
+
+      Write-Host "  + $file"
+      git checkout "$Remote/$Branch" -- "$upstreamFile" 2>&1 | Out-Null
+      if ($LASTEXITCODE -eq 0) {
+        if ($upstreamFile -ne $file) {
+          if (Test-Path $upstreamFile) {
+            Move-Item -Path $upstreamFile -Destination $file -Force
+          }
+        }
+        $null = git add $file 2>&1
+        $applied++
+      } else {
+        Write-Warning "FAILED $upstreamFile"
+        $failed++
+      }
+    }
+
+    Write-Host "$applied applied, $failed failed"
+    if ($applied) { Write-Host "Staged. Run git status then commit" }
+  }
+
+  # --- Apply-File mode ---
+  if ($Mode -eq 'Apply-File') {
+    if ([string]::IsNullOrEmpty($TargetFile)) {
+      Write-Warning "Usage: -TargetFile path"
+      exit 1
+    }
+
+    $fileName = Split-Path $TargetFile -Leaf
+    if ($fileName -in $excludeList -or $TargetFile -in $excludeList) {
+      Write-Warning "SKIP '$TargetFile' — excluded (local customization)"
+      exit 0
+    }
+
+    # Reverse-map
+    $upstreamFile = $TargetFile
+    foreach ($mapping in $pathMappings) {
+      if (-not [string]::IsNullOrEmpty($mapping.LocalPath) -and $TargetFile.StartsWith($mapping.LocalPath)) {
+        $upstreamFile = $TargetFile.Replace($mapping.LocalPath, $mapping.UpstreamPath)
+        break
+      }
+    }
+
+    Write-Host "Checkout '$upstreamFile' from $Remote/$Branch..."
+    git checkout "$Remote/$Branch" -- "$upstreamFile" 2>&1
+
+    if ($LASTEXITCODE -eq 0) {
+      if ($upstreamFile -ne $TargetFile) {
+        $parentDir = Split-Path $TargetFile -Parent
+        if (-not [string]::IsNullOrEmpty($parentDir) -and -not (Test-Path $parentDir)) {
+          New-Item -ItemType Directory -Path $parentDir -Force | Out-Null
+        }
+        Move-Item -Path $upstreamFile -Destination $TargetFile -Force
+      }
+      Write-Host "Done. Run git diff --cached $TargetFile"
+    } else {
+      Write-Warning "Failed $upstreamFile"
+    }
+  }
+} finally {
+  Pop-Location
+}

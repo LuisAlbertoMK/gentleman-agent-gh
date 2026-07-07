@@ -1,13 +1,13 @@
 ---
 name: session-resume
-description: "Safe session resume — git state gate + sparse skill pre-load + Engram recall"
+description: "Session continuity — save/restore state, git gate, sparse skill pre-load, Engram recall"
 license: Apache-2.0
 metadata:
   tags: [engineering]
   author: gentleman-vMK
-  version: "2.1"
-  changelog: "2.1: karpathy compress"
-triggers: "session resume, dónde lo dejamos, continuá, session start"
+  version: "2.2"
+  changelog: "2.2: merged code-memory (Save State section + triggers)"
+triggers: "session resume, dónde lo dejamos, continuá, session start, code memory, memory, recordar, acordate, multi-session, donde quedamos, handoff"
 ---
 ## Gate
 1. is git repo? NO → `mem_context` only. YES → check 2 states.
@@ -39,3 +39,27 @@ Actions: commit→`git add -A`+msg · push→`git push` (quality-gate) · stash�
 ## Post-Check: `mem_context` = actual resume. Git is safety gate.
 ## Anti-Patterns: Auto-commit/push · mid-task runs · output >10 lines · skip "small project" · skip skill-graph pre-load
 ## Resources: Engram `mem_context` · quality-gate · recovery-protocol · skill-graph.ps1
+
+## Save State
+Saves exact state before session end for seamless resumption.
+
+### Handoff captures
+- **Current task**: what, why, where (files), status (blocked/ready/done)
+- **Next step**: exact next action (file:line, what to do)
+- **Context**: decisions made, rejected approaches, user preferences
+- **Open questions**: unresolved items for next session
+- **Files touched**: paths + what changed + pending changes
+
+### State format
+```json
+{session_id, last_update, task:{description,status,blockers}, next_step:{file,action}, ctx:{decisions:[],preferences:[],rejected:[]}, files:[{path,status,summary}], todos:[{id,desc,status}]}
+```
+
+### WORKFLOW
+- **Start**: find agent-state → load + show handoff | new → create
+- **During**: detect changes → update state
+- **End**: save full state → handoff summary → next step
+- **Session resumption**: present handoff automatically before work
+
+### AUTO-SAVE TRIGGERS
+file created/deleted · >20 line change · discovery · important question · decision made

@@ -1,24 +1,33 @@
 # Gentleman Agent — OpenCode AI Agent Skills & Scripts
 
-Suite de **69 skills** (+ `_shared`) + **50 scripts PowerShell** para [OpenCode](https://github.com/sst/opencode). Diseñadas para desarrollo de software con arquitectura limpia, TDD, y verificación multi-capa.
+Suite de **69 skills** (+ `_shared`) + **49 scripts PowerShell** para [OpenCode](https://github.com/sst/opencode). Diseñadas para desarrollo de software con arquitectura limpia, TDD, y verificación multi-capa.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
-> **Score**: 9.3/10 (13 dimensiones)
+> **Score**: 8.5/10 (13 dimensiones)
 > **Skills**: 69 (+ `_shared` = 70 SKILL.md)
-> **Cycle**: 18 completado (Stabilization & Regression Lock)
+> **Cycle**: 21 completado (Universal Optimization)
 
 ---
 
 ## Características
 
 ### Multi-Agent Architecture
-4 agentes especializados además del orquestador principal (`gentleman-vMK`):
+12 agentes especializados además del orquestador principal (`gentleman-vMK`):
+7 FREE TIER + implementer + 3 core + SDD orchestrator:
 
 | Agent | Model | Specialty |
 |-------|-------|-----------|
 | `gentleman-deep` | nemotron-3-ultra-free | Architecture, design, complex code |
 | `gentleman-codex` | deepseek-v4-flash-free | Code generation, boilerplate |
 | `gentleman-quick` | mimo-v2.5-free | Fast tasks, review, simple edits |
+| `gentleman-security` | nemotron-3-ultra-free | Vulnerability analysis, secure code (FREE TIER) |
+| `gentleman-seo` | nemotron-3-super-free | SEO, GEO, keyword analysis (FREE TIER) |
+| `gentleman-infra` | deepseek-v4-flash-free | IaC, Kubernetes, CI/CD (FREE TIER) |
+| `gentleman-frontend` | kimi-k2.5-free | React, Tailwind, accessibility (FREE TIER) |
+| `gentleman-performance` | nemotron-3-ultra-free | Code optimization, bottlenecks (FREE TIER) |
+| `gentleman-datascience` | mimo-v2.5-free | Pandas, SQL, stats (FREE TIER) |
+| `gentleman-docs` | big-pickle | Technical writing, docs (FREE TIER) |
+| `gentleman-implementer` | deepseek-v4-flash-free | Plan executor (FREE TIER) |
 | `sdd-orchestrator` | claude-sonnet-4-6 | SDD pipeline orchestration |
 
 ### Self-Improvement Cycle
@@ -91,7 +100,7 @@ El proyecto usa dos MCPs para memoria cross-session:
 | **Code Review** | code-review-agent, judgment-day |
 | **Memory** | session-resume, code-memory, dreaming |
 | **Skills Meta** | skill-creator, skill-registry, skill-improver, skill-digestion, skill-graph |
-| **SDD** | sdd-init, sdd-propose, sdd-spec, sdd-design, sdd-tasks, sdd-apply, sdd-verify, sdd-explore, sdd-archive, sdd-onboard + 9 backward-compat wrappers |
+| **SDD** | sdd, sdd-onboard (phases consolidated into unified pipeline) |
 | **Engineering** | senior-engineer, go-testing, python-async, refactoring-planner, project-mapper |
 | **Security** | security-scanner |
 | **UI/Web** | baseline-ui, accessibility, performance, seo, web-quality-audit, best-practices |
@@ -109,7 +118,7 @@ El proyecto usa dos MCPs para memoria cross-session:
 
 ---
 
-## Scripts (50 en scripts/)
+## Scripts (49 en scripts/)
 
 | Script | Propósito |
 |--------|-----------|
@@ -147,7 +156,7 @@ gentleman-agent-gh/
 │   ├── code-review-agent/
 │   └── .../
 ├── skills/                  # Junctions workspace (git-ignored)
-├── scripts/                 # 50 PowerShell scripts
+├── scripts/                 # 49 PowerShell scripts
 │   └── smoke/               # Smoke tests
 ├── docs/                    # Documentation
 │   ├── metricas/            # Session metrics
@@ -163,7 +172,7 @@ gentleman-agent-gh/
 ├── .project.json            # Auto-scored project state
 ├── AGENTS.md                # Full agent protocol (~350 lines)
 ├── CYCLE.md                 # Self-improvement cycle manifest
-├── ANTI-PATTERN-CATALOG.md  # 20 immunized patterns
+├── ANTI-PATTERN-CATALOG.md  # 23 immunized patterns
 ├── SKILLS-INDEX.md           # Skill registry with triggers
 └── review-rules.jsonc       # Zone-based verification policy
 ```
@@ -176,7 +185,7 @@ gentleman-agent-gh/
 - **TDD**: Test-first, code-after
 - **Memoria**: Engram persistent memory con protocolo MCP
 - **Verificación**: Triple verify (E1/E2/E3) antes de `!ship`
-- **Anti-patrones**: Catálogo con 20 patrones inmunizados
+- **Anti-patrones**: Catálogo con 23 patrones inmunizados
 - **Auto-metrics**: Post-task auto-evaluación en 7 dimensiones con bias calibration
 
 ---

@@ -1,4 +1,4 @@
----
+﻿---
 name: accessibility
 description: "Audit and improve web accessibility following WCAG 2.2 guidelines."
 triggers: "a11y, accessibility, WCAG, screen reader, keyboard navigation"

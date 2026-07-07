@@ -1,4 +1,4 @@
----
+﻿---
 name: seo
 description: "Search engine visibility & ranking — technical SEO, on-page, structured data"
 triggers: "seo, search engine, meta tags, structured data, sitemap, search optimization"

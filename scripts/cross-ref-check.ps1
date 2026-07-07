@@ -1,6 +1,6 @@
 #requires -Version 7.6
 <#
-.SYNOPSIS Validate internal refs (skills, SKILLS-INDEX, junctions, shared).
+.SYNOPSIS Validate internal refs (skills, SKILLS-INDEX, junctions, shared, README models).
 #>
 param([string]$RepoRoot=(Split-Path $PSScriptRoot -Parent),[switch]$Json,[switch]$Quiet)
 Set-StrictMode -Version Latest;$ErrorActionPreference='Stop';if($Quiet){$Json=$true}
@@ -37,5 +37,8 @@ $mc = @($sb_mc.ToString() -split '\r?\n' | Where-Object { $_ })
 if($mc.Count -eq 0){if(-not $Quiet){Write-Host " OK"}}else{$e+=$mc;if(-not $Quiet){Write-Host " FAIL ($($mc.Count))"}}
 if(-not $Quiet){Write-Host "[8/8] review-rules.jsonc..."-N};$rk=Join-Path $RepoRoot "review-rules.jsonc"
 if(Test-Path $rk){try{$b=Get-Content $rk -Raw -Encoding UTF8;$s=$b-replace'(?m)^\s*//.*$',''-replace'(?m)\s*//[^"\n]*$',''-replace'(?s)/\*.*?\*/','';$p=$s | ConvertFrom-Json;$zc=$p.zones.PSObject.Properties.Name.Count;$cc=$p.context_zones.PSObject.Properties.Name.Count;$md=$p.modes.PSObject.Properties.Name.Count;$pc=$p.jd_profiles.PSObject.Properties.Name.Count;$sc=$p.jd_profile_selector.Count;$is=@();if($zc -ne 3){$is+="zones $zc"};if($cc -ne 4){$is+="ctx $cc"};if($md -ne 5){$is+="modes $md"};if($pc -lt 1){$is+="profiles $pc"};if($sc -lt 1){$is+="selectors $sc"};if($is.Count -eq 0){if(-not $Quiet){Write-Host " OK (z$zc c$cc m$md p$pc s$sc)"}}else{$e+="review-rules.jsonc: $($is-join'; ')";if(-not $Quiet){Write-Host " FAIL"}}}catch{$e+="review-rules.jsonc parse: $_";if(-not $Quiet){Write-Host " FAIL"}}}else{$w+="review-rules.jsonc missing";if(-not $Quiet){Write-Host " WARN"}}
+# --- [9/9] README vs opencode.json agent models ---
+if(-not $Quiet){Write-Host "[9/9] README agents..."-N}
+try{$oc=Get-Content (Join-Path $RepoRoot "opencode.json") -Raw -Encoding UTF8|ConvertFrom-Json;$rm=Get-Content (Join-Path $RepoRoot "README.md") -Raw -Encoding UTF8;$ocAgents = $oc.agent.PSObject.Properties.Name.Where({$_ -notlike 'sdd-*'})|ForEach-Object{$_.ToLower()};$sb_ra=[System.Text.StringBuilder]::new(65536);foreach($an in $ocAgents){if($rm -notmatch [regex]::Escape($an)){$null=$sb_ra.AppendLine("README missing agent '$an' from opencode.json")}};$ra=@($sb_ra.ToString()-split'\r?\n'|Where-Object{$_});if($ra.Count -eq 0){if(-not $Quiet){Write-Host " OK ($($ocAgents.Count) agents match)"}}else{$e+=$ra;if(-not $Quiet){Write-Host " FAIL ($($ra.Count) missing)"}}}catch{if(-not $Quiet){Write-Host " WARN (parse: $($_.Exception.Message))"}}
 $res=@{timestamp=(Get-Date -Format "o");canonicalSkills=$ac;errors=$e;warnings=$w;brokenCrossRefs=$br.Count;allClean=($e.Count -eq 0 -and $w.Count -eq 0)}
 if($Json){Write-Output($res | ConvertTo-Json -Depth 2)}elseif($res.allClean){if(-not $Quiet){Write-Host "OK ALL CHECKS PASSED"-ForegroundColor Green};exit 0}else{if($e.Count -gt 0){if(-not $Quiet){Write-Host "ERRORS ($($e.Count)):"-ForegroundColor Red};$e | ForEach-Object {if(-not $Quiet){Write-Host " * $_"-ForegroundColor Red}}};if($w.Count -gt 0){if(-not $Quiet){Write-Host "WARNINGS ($($w.Count)):"-ForegroundColor Yellow};$w | ForEach-Object {if(-not $Quiet){Write-Host " * $_"-ForegroundColor Yellow}}};if($e.Count -gt 0){exit 1}else{exit 0}}

@@ -1,4 +1,4 @@
----
+﻿---
 name: baseline-ui
 description: Anti-slop UI enforcement — spacing, hierarchy, typography, layout. Use when the interface needs cleanup or polish.
 triggers: "ui cleanup, polish interface, fix layout, ui slop, generic ui, design review"

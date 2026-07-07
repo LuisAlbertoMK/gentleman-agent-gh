@@ -1,4 +1,4 @@
-#requires -Version 7.6
+﻿#requires -Version 7.6
 # ponytail: skill registry — build script
 # Generates skill-registry.json from SKILL.md frontmatter
 # Idempotent: overwrites existing registry on each run

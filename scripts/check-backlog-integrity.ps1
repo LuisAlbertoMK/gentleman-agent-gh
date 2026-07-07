@@ -51,8 +51,31 @@ if (-not (Test-Path $cyclePath)) { Write-Host 'CYCLE.md not found'; exit 1 }
 
 $cycleContent = Get-Content $cyclePath -Raw -Encoding UTF8
 
-# Extract table rows between "### Backlog" and the next "### "
-$tableSection = $cycleContent -split '(?=### )' | Where-Object { $_ -match '### Cycle \d+ Backlog' } | Select-Object -Last 1
+# Find active cycle number from "### Status: Cycle N Active"
+$activeCycle = if ($cycleContent -match '### Status: Cycle (\d+) Active') { [int]$Matches[1] } else { $null }
+
+# Extract the full active cycle section (from "### Cycle N:" to next "### Cycle" heading)
+$tableSection = ''
+if ($activeCycle) {
+    $start = $cycleContent.IndexOf("### Cycle $activeCycle")
+    if ($start -ge 0) {
+        # Look for next "### Cycle " heading (any cycle number)
+        $nextStart = $cycleContent.IndexOf("### Cycle ", $start + 10)
+        if ($nextStart -lt 0) { $nextStart = $cycleContent.Length }
+        $tableSection = $cycleContent.Substring($start, $nextStart - $start)
+    }
+}
+# Fallback: content between any "### Backlog" and next "###" heading
+if (-not $tableSection) {
+    $parts = $cycleContent -split '### Backlog'
+    if ($parts.Count -ge 2) {
+        $afterBacklog = $parts[1]
+        # Clip at next "### " heading
+        $clipIdx = $afterBacklog.IndexOf("`n### ")
+        if ($clipIdx -ge 0) { $afterBacklog = $afterBacklog.Substring(0, $clipIdx) }
+        $tableSection = "### Backlog$afterBacklog"
+    }
+}
 
 if (-not $tableSection) { Write-Host 'Backlog table not found in CYCLE.md'; exit 1 }
 
@@ -64,16 +87,18 @@ $rows = $rows | Where-Object { $_ -notmatch 'Item \| Impact \| Risk' }
 $items = @()
 foreach ($row in $rows) {
     $cols = $row -split '\|' | ForEach-Object { $_.Trim() }
-    if ($cols.Count -ge 7) {
+    # Determine offset: if first col is empty (old format: | Item |... ) offset=1, else offset=2 (new: | # | Item |...)
+    $offset = if ($cols.Count -ge 9 -and $cols[0] -eq '' -and $cols[1] -match '^\d+$') { 2 } else { 1 }
+    if ($cols.Count -ge (6 + $offset)) {
         $items += @{
             raw          = $row
-            description  = $cols[1]
-            impact       = $cols[2]
-            risk         = $cols[3]
-            ir           = $cols[4]
-            estInter     = $cols[5]
-            status       = $cols[6]
-            doneCriteria = if ($cols.Count -ge 8) { $cols[7] } else { '' }
+            description  = $cols[0 + $offset]
+            impact       = $cols[1 + $offset]
+            risk         = $cols[2 + $offset]
+            ir           = $cols[3 + $offset]
+            estInter     = $cols[4 + $offset]
+            status       = $cols[5 + $offset]
+            doneCriteria = if ($cols.Count -ge (7 + $offset)) { $cols[6 + $offset] } else { '' }
         }
     }
 }
@@ -88,8 +113,8 @@ foreach ($item in $items) {
     $status = $item.status -replace '\s+', ' '
     $criteria = $item.doneCriteria.Trim()
 
-    if ($status -match 'Done') {
-        # Item claims done â€” verify criteria
+    if ($status -match 'Done|🟢|✅|✔') {
+        # Item claims done — verify criteria
         if ($criteria -match 'commit\s+([a-f0-9]{7,})') {
             $commitHash = $Matches[1]
             if (Test-CommitExists $commitHash) {
@@ -110,8 +135,8 @@ foreach ($item in $items) {
         } else {
             Add-Check -Item $desc -Passed $true -Detail "Done (no auto-verifiable criteria)"
         }
-    } elseif ($status -match 'Pending') {
-        # Item claims pending â€” verify it's NOT accidentally done
+    } elseif ($status -match 'Pending|🔴|🟡|🟠') {
+        # Item claims pending — verify it's NOT accidentally done
         if ($criteria -match 'script exists at (.+?)(?:[|]|$)') {
             $scriptPath = $Matches[1].Trim()
             $fullPath = Join-Path $RepoRoot $scriptPath

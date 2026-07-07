@@ -1,4 +1,4 @@
-#requires -Version 7.6
+﻿#requires -Version 7.6
 <#
 .SYNOPSIS
   Sync canonical config from gentleman-agent-gh to opencode-global.

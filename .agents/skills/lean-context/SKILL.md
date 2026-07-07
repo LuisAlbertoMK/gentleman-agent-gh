@@ -1,4 +1,4 @@
----
+﻿---
 name: lean-context
 description: "Unified compression levels — LEAN, ULTRA, and CAVEMAN modes for token-efficient responses with acronyms and budget gates"
 triggers: "Ultra-lean default, compact responses, caveman, /caveman"

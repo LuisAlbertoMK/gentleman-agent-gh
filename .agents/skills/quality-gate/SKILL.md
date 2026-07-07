@@ -15,7 +15,7 @@ metadata:
 ## Trigger: Before ANY `git commit`/`push`/`gh pr create` — ALL gates MUST pass
 ## 1. TDD Gate: Runner auto-detect (go.mod→`go test` · package.json→`npm/pnpm/bun test` · Cargo.toml→`cargo test` · pyproject→`pytest`). Fail→DO NOT commit. Report file:line:error.
 ## 2. Secrets Scan: `git diff --cached` for secrets pattern (api keys, tokens, passwords, credentials, private keys) + long base64 strings · AKIA/ASIA keys · ghp_ tokens. Match→BLOCK.
-## 3. Conventional Commit: `^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9\._-]+\))?!?: .+`. Invalid→BLOCK+show format.
+## 3. Conventional Commit: `^(build|chore|ci|cycle|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9\._-]+\))?!?: .+`. Invalid→BLOCK+show format.
 ## 4. PSSA Gate: `$env:GENTLEMAN_AGENT_ROOT/scripts/pssa-gate.ps1 -Mode Check`. Auto-fixable→`-Mode Fix`. Manual MUST be 0 or user-approved.
 ## Decision Tree
 ```

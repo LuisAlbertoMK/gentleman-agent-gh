@@ -30,6 +30,17 @@
     }
   },
   "default_agent": "gentleman-vMK",
+  "experimental": {
+    "mcp_timeout": 60000
+  },
+  "compaction": {
+    "prune": true,
+    "reserved": 20000
+  },
+  "tools": {
+    "codebase-memory*": false,
+    "engram*": false
+  },
   "mcp": {
         "codebase-memory-mcp": {
       "type": "local",
@@ -59,7 +70,7 @@
       "type": "local"
     },
     "sequential-thinking": {
-      "enabled": true,
+      "enabled": false,
       "type": "local",
       "command": [
         "npx",
@@ -76,7 +87,7 @@
         "serve"
       ],
       "environment": {
-        "HEADROOM_PROXY_URL": "http://127.0.0.1:8787"
+        "HEADROOM_PROXY_URL": "{env:HEADROOM_PROXY_URL}"
       }
     }
   },
@@ -89,6 +100,10 @@
       "permission": {
         "edit": "allow",
         "write": "allow"
+      },
+      "tools": {
+        "codebase-memory*": true,
+        "engram*": true
       }
     },
     "gentleman-deep": {
@@ -101,6 +116,10 @@
         "edit": "allow",
         "read": "allow",
         "write": "allow"
+      },
+      "tools": {
+        "codebase-memory*": true,
+        "engram*": true
       }
     },
     "gentleman-quick": {
@@ -128,8 +147,8 @@
       }
     },
     "gentleman-security": {
-      "description": "Security specialist - vulnerability analysis, secure code review, attack pattern detection (ANALYZE ONLY)",
-      "model": "opencode-go/qwen3.7-max",
+      "description": "Security specialist - vulnerability analysis, secure code review, attack pattern detection (FREE TIER)",
+      "model": "opencode/nemotron-3-ultra-free",
       "mode": "primary",
       "prompt": "You are a security specialist. Focus on vulnerability analysis, secure code review, and attack pattern detection. Be methodical and exhaustive. Prioritize OWASP Top 10, supply chain, and LLM-specific risks.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
@@ -140,8 +159,8 @@
       }
     },
     "gentleman-seo": {
-      "description": "SEO specialist - content optimization, keyword analysis, schema markup, GEO strategy (ANALYZE ONLY)",
-      "model": "opencode-go/qwen3.7-plus",
+      "description": "SEO specialist - content optimization, keyword analysis, schema markup, GEO strategy (FREE TIER)",
+      "model": "opencode/nemotron-3-super-free",
       "mode": "primary",
       "prompt": "You are an SEO and content specialist. Focus on content optimization, keyword analysis, schema markup, and generative engine optimization (GEO). Leverage large context windows (1M tokens) for full-site analysis.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
@@ -152,8 +171,8 @@
       }
     },
     "gentleman-infra": {
-      "description": "Infrastructure specialist - IaC, Kubernetes, Terraform, CI/CD pipelines, cloud architecture (ANALYZE ONLY)",
-      "model": "opencode-go/glm-5.2",
+      "description": "Infrastructure specialist - IaC, Kubernetes, Terraform, CI/CD pipelines, cloud architecture (FREE TIER)",
+      "model": "opencode/deepseek-v4-flash-free",
       "mode": "primary",
       "prompt": "You are an infrastructure and DevOps specialist. Focus on IaC (Terraform, Helm), Kubernetes, CI/CD pipelines, and cloud architecture. Prioritize logical reasoning and dependency management to avoid breaking production.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
@@ -164,8 +183,8 @@
       }
     },
     "gentleman-frontend": {
-      "description": "Frontend specialist - UI/UX, React, Tailwind, Vue, accessibility, design systems (ANALYZE ONLY)",
-      "model": "opencode-go/kimi-k2.6",
+      "description": "Frontend specialist - UI/UX, React, Tailwind, Vue, accessibility, design systems (FREE TIER)",
+      "model": "opencode/kimi-k2.5-free",
       "mode": "primary",
       "prompt": "You are a frontend and UI/UX specialist. Focus on converting designs to code (React, Tailwind, Vue), improving accessibility (WCAG 2.2 AA), and creating consistent design systems. Leverage long context to read entire component libraries.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
@@ -176,8 +195,8 @@
       }
     },
     "gentleman-performance": {
-      "description": "Performance specialist - code optimization, query tuning, load testing, bottleneck analysis (ANALYZE ONLY)",
-      "model": "opencode-go/qwen3.7-max",
+      "description": "Performance specialist - code optimization, query tuning, load testing, bottleneck analysis (FREE TIER)",
+      "model": "opencode/nemotron-3-ultra-free",
       "mode": "primary",
       "prompt": "You are a performance optimization specialist. Focus on refactoring slow code, optimizing database queries, improving load times, and analyzing bottlenecks. Prioritize algorithmic complexity (Big O) and profiling.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
@@ -188,8 +207,8 @@
       }
     },
     "gentleman-datascience": {
-      "description": "Data science specialist - Python (Pandas, Polars), SQL, data visualization, statistical analysis (ANALYZE ONLY)",
-      "model": "opencode-go/glm-5.1",
+      "description": "Data science specialist - Python (Pandas, Polars), SQL, data visualization, statistical analysis (FREE TIER)",
+      "model": "opencode/mimo-v2.5-free",
       "mode": "primary",
       "prompt": "You are a data science specialist. Focus on Python (Pandas, Polars), advanced SQL, data visualization, and statistical analysis. Prioritize mathematical precision and avoid hallucinating formulas or libraries.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
@@ -200,8 +219,8 @@
       }
     },
     "gentleman-docs": {
-      "description": "Documentation specialist - technical writing, API docs, READMEs, ADRs, clean structured output (ANALYZE ONLY)",
-      "model": "opencode-go/mimo-v2.5-pro",
+      "description": "Documentation specialist - technical writing, API docs, READMEs, ADRs, clean structured output (FREE TIER)",
+      "model": "opencode/big-pickle",
       "mode": "primary",
       "prompt": "You are a documentation specialist. Focus on technical writing, API documentation, READMEs, ADRs, and clean structured output. Prioritize clarity, consistency, and cognitive load reduction.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
@@ -212,8 +231,8 @@
       }
     },
     "gentleman-implementer": {
-      "description": "Plan executor specialist - implements detailed plans from specialized agents, follows step-by-step instructions precisely (BEST INSTRUCTION FOLLOWER)",
-      "model": "opencode-go/mimo-v2.5-pro",
+      "description": "Plan executor specialist - implements detailed plans from specialized agents, follows step-by-step instructions precisely (FREE TIER)",
+      "model": "opencode/deepseek-v4-flash-free",
       "mode": "primary",
       "prompt": "You are a plan execution specialist. Your job is to implement detailed implementation plans created by specialized agents (security, seo, infra, frontend, performance, datascience, docs). You follow step-by-step instructions precisely and verify each step before proceeding.\n\nWHY YOU WERE CHOSEN: You are the best model at following instructions without deviating or 'improving' things that weren't asked. You execute complex plans exactly as specified.\n\nCORE BEHAVIOR:\n- You receive a plan from docs/agentes/{agent}-{task}/02-plan-implementacion.md\n- You execute tasks in the exact order specified in the plan\n- For each task, you:\n  1. Read the task details (files to modify, changes to make, commands to run)\n  2. Execute the changes exactly as specified\n  3. Run verification commands and check expected output\n  4. Run tests and verify they pass\n  5. Mark the task as complete\n- If a task fails, you STOP and report the error. Do NOT continue to the next task.\n- If a task is unclear, you STOP and ask for clarification.\n- After completing all tasks, you verify the success metrics from the plan.\n- You create a completion report in docs/agentes/{agent}-{task}/05-implementacion-completada.md\n\nCRITICAL RULES:\n- DO NOT deviate from the plan. Execute exactly as specified.\n- DO NOT 'improve' or 'optimize' the plan. Just execute it.\n- DO NOT question the plan. If something seems wrong, STOP and ask.\n- DO NOT skip verification steps. Run every test and check every output.\n- If you encounter ambiguity, STOP and ask for clarification.\n\nVERIFICATION RULES:\n- After each task, run the verification commands specified in the plan\n- If expected output doesn't match, STOP and report\n- If tests fail, STOP and report\n- Never skip verification steps\n\nROLLBACK RULES:\n- If something goes wrong, follow the rollback plan from the implementation plan\n- Document what went wrong and what you tried\n- Ask the user before proceeding with alternative solutions\n\n{file:prompts/shared/_core-behavior.md}",
       "permission": {
@@ -371,5 +390,13 @@
         "write": "allow"
       }
     }
-  }
+  },
+  "plugin": [
+    "context-mode",
+    "opencode-ralph-loop",
+    "opencode-skill-creator",
+    "@braintrust/trace-opencode",
+    "opencode-lazy-loader",
+    "opencode-personality"
+  ]
 }

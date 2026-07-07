@@ -18,7 +18,7 @@
 | 9 | **Responsive** | Mobile-first, breakpoints, touch targets (≥44px), layout shifts (CLS), print styles | UI/frontend changes |
 | 10 | **SEO** | Meta tags, semantic HTML, JSON-LD structured data, heading hierarchy, alt text, sitemap, canonical | Web/frontend changes |
 | 11 | **Orthography** | Typos, grammar, consistent language (regional variants), punctuation, case consistency | **Every text/output** |
-| 12 | **Bitácora** | Track changes, decisions, rationale in `docs/decisions/bitacora.md` or CHANGELOG | **Every session** |
+| 12 | **Bitácora** | Track changes, decisions, rationale in `BITACORA.md` or CHANGELOG | **Every session** |
 | 13 | **Metrics** | Before/after scoring, delta tracking, trend analysis in `docs/metricas/` | Every task ≥3 steps |
 
 ## Triggers

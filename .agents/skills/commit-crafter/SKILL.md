@@ -7,7 +7,7 @@ metadata:
     - engineering
   author: gentleman-vMK
   version: "1.1"
-triggers: "commit/mensaje/commit message/conventional commit"
+  triggers: "commit/mensaje/commit message/conventional commit"
 ---
 
 ## When & Workflow

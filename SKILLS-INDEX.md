@@ -1,9 +1,9 @@
 # SKILLS INDEX
 
-> Full trigger table for all 69 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 64 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 3.2 | **Changelog**: 3.2 (+1 skill: external-improvement); 3.1 (+3 skills: caveman, doc-sync, sdd-onboard); 3.0 (-3 skills post-audit: karpathy-prompt→karpathy-loop, core-web-vitals→performance, skill-refresher→skill-improver)
+> **Version**: 3.3 | **Changelog**: 3.3 (-9 SDD phase stubs consolidated into unified sdd); 3.2 (+1 skill: external-improvement); 3.1 (+3 skills: caveman, doc-sync, sdd-onboard); 3.0 (-3 skills post-audit: karpathy-prompt→karpathy-loop, core-web-vitals→performance, skill-refresher→skill-improver)
 
 ## Triggers → Skill
 
@@ -24,15 +24,6 @@
 | Context >100K tokens, context explosion | context-watchdog |
 | Recovery, "no es eso", frustration | recovery-protocol |
 | Resume, "dónde lo dejamos", "continuá", git state gate | session-resume |
-| SDD init, bootstrap | sdd-init |
-| Explore codebase, pre-design | sdd-explore |
-| Proposal, intent, approach | sdd-propose |
-| Technical design, HOW | sdd-design |
-| Specs, Given/When/Then | sdd-spec |
-| Task breakdown, implementation plan | sdd-tasks |
-| Apply tasks, implement | sdd-apply |
-| Validate vs specs, verify | sdd-verify |
-| Archive changes, delta to main | sdd-archive |
 | SDD pipeline, unified pipeline, orchestrate SDD phases | sdd |
 | Decision capture, trade-off log | decision-capture |
 | Execution mode, resource-adaptive zones, quick/thorough/draft | execution-mode |
@@ -88,7 +79,7 @@
 - **Skills meta**: skill-creator, skill-registry, skill-improver, skill-digestion, skill-graph
 - **Coordination**: delivery-harness, chained-pr, branch-pr, issue-creation, subagent-isolation, command-wrapper, opencode-model-router
 - **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner
-- **SDD**: sdd-init, sdd-explore, sdd-propose, sdd-spec, sdd-design, sdd-tasks, sdd-apply, sdd-verify, sdd-archive, sdd-onboard, plus sdd (unified pipeline wrapper)
+- **SDD**: sdd, sdd-onboard (unified pipeline — phases consolidated)
 - **UI/Design**: baseline-ui, accessibility, performance, seo, web-quality-audit
 
 - **Communication**: comment-writer, cognitive-doc-design

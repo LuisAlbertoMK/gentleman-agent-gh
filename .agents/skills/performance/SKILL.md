@@ -1,4 +1,4 @@
----
+﻿---
 name: performance
 description: "Optimize web performance — Lighthouse/CWV checklist. NOT app scoring (see performance-tracker)."
 triggers: "performance, speed up, load time, slow loading, page speed, performance audit"

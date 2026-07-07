@@ -1,4 +1,4 @@
-#requires -Version 7.6
+﻿#requires -Version 7.6
 <#
 .SYNOPSIS
   Unified pre-session health check for gentleman-vMK and opencode-ai ecosystem.
@@ -96,14 +96,14 @@ function Repair-Junction {
 }
 
 # ── Check 1: vmk skills junction ────────────────────────────────────────
-$check1 = Test-Junction -Path "D:\opencode\.vmk-config\skills" `
+$check1 = Test-Junction -Path "$env:USERPROFILE\.config\opencode\skills" `
   -ExpectedTarget "$gentlemanRoot/.agents/skills" `
   -Label "vmk-skills-junction"
 if ($check1.status -eq "FAIL" -and $AutoRepair) {
-  Repair-Junction -Path "D:\opencode\.vmk-config\skills" `
+  Repair-Junction -Path "$env:USERPROFILE\.config\opencode\skills" `
     -Target "$gentlemanRoot/.agents/skills" `
     -Label "vmk-skills"
-  $check1 = Test-Junction -Path "D:\opencode\.vmk-config\skills" `
+  $check1 = Test-Junction -Path "$env:USERPROFILE\.config\opencode\skills" `
     -ExpectedTarget "$gentlemanRoot/.agents/skills" `
     -Label "vmk-skills-junction"
 }
@@ -111,14 +111,14 @@ $checks.Add($check1)
 if ($check1.status -eq "FAIL") { $exitCode = 2 }
 
 # ── Check 2: vmk prompts junction ───────────────────────────────────────
-$check2 = Test-Junction -Path "D:\opencode\prompts\sdd" `
+$check2 = Test-Junction -Path "$env:USERPROFILE\.config\opencode\prompts\sdd" `
   -ExpectedTarget "$gentlemanRoot/prompts/sdd" `
   -Label "vmk-prompts-junction"
 if ($check2.status -eq "FAIL" -and $AutoRepair) {
-  Repair-Junction -Path "D:\opencode\prompts\sdd" `
+  Repair-Junction -Path "$env:USERPROFILE\.config\opencode\prompts\sdd" `
     -Target "$gentlemanRoot/prompts/sdd" `
     -Label "vmk-prompts"
-  $check2 = Test-Junction -Path "D:\opencode\prompts\sdd" `
+  $check2 = Test-Junction -Path "$env:USERPROFILE\.config\opencode\prompts\sdd" `
     -ExpectedTarget "$gentlemanRoot/prompts/sdd" `
     -Label "vmk-prompts-junction"
 }

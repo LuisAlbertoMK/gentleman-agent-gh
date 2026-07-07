@@ -75,6 +75,17 @@ if ($hasChanges) {
     }
 }
 $needsAudit = $touchedProtected.Count -gt 0
+# --- AGENTS.md bloat gate ---
+$agentsPath = Join-Path -Path $repoRoot -ChildPath "AGENTS.md"
+$bloatWarning = $null
+if (Test-Path -LiteralPath $agentsPath) {
+    $agentsBytes = (Get-Item -LiteralPath $agentsPath).Length
+    if ($agentsBytes -gt 15KB) {
+        $bloatWarning = "AGENTS.md is $([math]::Round($agentsBytes/1KB,1))KB — exceeds 15KB threshold. Consider compressing."
+    } elseif ($agentsBytes -gt 10KB) {
+        $bloatWarning = "AGENTS.md is $([math]::Round($agentsBytes/1KB,1))KB — approaching 15KB threshold."
+    }
+}
 # --- External auditor gate ---
 $auditGatePassed = $true
 if ($needsAudit) {
@@ -90,6 +101,7 @@ $result = [PSCustomObject]@{
     needsAudit        = $needsAudit
     protectedTouched  = $touchedProtected
     auditGatePassed   = $auditGatePassed
+    bloatWarning      = $bloatWarning
 }
 # Compact prompt: show if explicitly requested, or when changes exist and not explicitly disabled
 $showCompact = $CompactPrompt -or ($hasChanges -and -not $PSBoundParameters.ContainsKey('CompactPrompt'))
@@ -118,6 +130,10 @@ if ($Quiet) {
     Write-Host "Branch : $branch"
     Write-Host "Changes: $(if($hasChanges){ "$($result.changeCount) file(s) modified" }else{ 'clean' })" -ForegroundColor Yellow
     Write-Host ""
+    if ($bloatWarning) {
+        Write-Host "⚠️  $bloatWarning" -ForegroundColor Yellow
+        Write-Host ""
+    }
     if ($needsAudit) {
         Write-Host "⚠️  REQUIRED: External auditor gate BLOCKED" -ForegroundColor Red
         Write-Host "    Protected files modified:" -ForegroundColor Red

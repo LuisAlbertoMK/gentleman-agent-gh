@@ -1,4 +1,4 @@
-#requires -Version 7.6
+﻿#requires -Version 7.6
 <# .SYNOPSIS Mine session histories for error patterns and propose corrections #>
 param([ValidateSet('scan','apply','check')][string]$Mode='scan',[switch]$Json,[switch]$Quiet,[int]$Threshold=2)
 if($Quiet){$Json=$true}

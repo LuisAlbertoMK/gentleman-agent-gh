@@ -1,7 +1,8 @@
+﻿#requires -Version 7.6
 Set-StrictMode -Version 5.1
 $ErrorActionPreference = 'Stop'
 
-# tokenize.ps1 â€” Compare tokenization of before/after text
+# tokenize.ps1 — Compare tokenization of before/after text
 # Usage: .\tokenize.ps1 "verbose text" "concise text"
 #        .\tokenize.ps1 -FileBefore path -FileAfter path
 

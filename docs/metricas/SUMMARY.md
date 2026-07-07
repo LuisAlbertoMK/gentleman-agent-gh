@@ -5,17 +5,17 @@
 
 ---
 
-## 🏆 Benchmark Actual (2026-06-26)
+## 🏆 Benchmark Actual (2026-07-06)
 
 | Métrica | Valor |
 |---------|-------|
 | Skills totales | 69 |
-| Total skill bytes | 136,000B |
+| Total skill bytes | ~124,000B |
 | Skills >3KB | 0 |
-| Avg skill size | 2,000B |
+| Avg skill size | 1,800B |
 | Junctions globales OK | 69/69 |
 | Frontmatter coverage | 100% |
-| Scripts | 50 |
+| Scripts | 49 |
 
 ## 🚦 Quality Gate (2026-06-26)
 

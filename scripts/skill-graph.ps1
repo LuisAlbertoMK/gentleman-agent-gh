@@ -1,83 +1,480 @@
-#requires -Version 7.6
-<# .SYNOPSIS Skill dependency graph - sparse loading resolver #>
-param([string]$Task="",[ValidateRange(0,3)][int]$Expand=1,[switch]$ListAll,[switch]$RecommendAgent,[ValidateSet("Text","Json","Csv")][string]$Format="Text",[switch]$Quiet)
-Set-StrictMode -Version Latest;$ErrorActionPreference='Stop'
-$r=@()
-function as($n,$t,$c,$e,$d,$r2,$desc){$script:r+=[PSCustomObject]@{Name=$n;Triggers=$t.Split('|');Category=$c;DependsOn=if($d){,$d.Split('|')}else{,@()};Related=if($r2){,$r2.Split('|')}else{,@()};Description=$desc;Effort=$e}}
-as karpathy-loop "karpathy|less tokens|context compression|compact prompt|karpathy loop|optimize prompt|measure tokens" compression low "" "" "Karpathy-style compression + iterative loop"
-as lean-context "compact|less tokens|caveman|ultra-lean|minimal context" compression low "" "" "Ultra-lean context mode"
-as execution-mode "execution mode|quick|thorough|draft|modo" compression low "" "" "Quick/Thorough/Draft execution modes"
-as skill-digestion "skill digestion|compact on load|compress skill" compression low "" "" "Digest and compact skills when loaded"
-as caveman "caveman|ultra-lean|compression|minimal context|emergency mode" compression low "" "" "Ultra-minimal compressed context mode - L3 emergency"
-as quality-gate "quality gate|pre-commit|validate commit" quality medium "" "auto-metrics|commit-crafter" "Pre-commit quality gate"
-as auto-metrics "auto-score|metrics|post-task|evaluate|self-evaluate" quality medium skill-validate "" "Post-task self-evaluation with 7-dim scoring"
-as immune-system "immune system|anti-pattern|permanent immunity|nunca mas|bug|fix|error" quality high "" "" "Permanent immunity catalog for repeated errors"
-as code-review-agent "code review|CR|revisar codigo|review code" quality medium best-practices "" "Automated code review with standards"
-as skill-testing "test skill|verify skill|coverage|skill test" quality medium "" "" "Test and verify skill coverage"
-as skill-validate "skill validation|benchmark|multi-trial|validate skill|3 trials" quality medium "" "" "3-trial benchmark validation"
-as judgment-day "judgment day|dual review|juzgar|evaluar skill" quality high "" "" "Dual review and judgment for skills"
-as triple-verify "triple verify|triangulate|3 enfoques|verificacion profunda|!ship|!listo|!fast|!draft" quality high "" "" "Triple verification - 3 enfoques, thresholds por zona"
-as external-auditor "external audit|blind review|second opinion|verifica mi auto-score|contralor externo" quality medium "" "" "Blind second-opinion audit via subagent"
-as session-resume "resume|donde lo dejamos|continua|session start|git state" memory medium dreaming "" "Safe session resume with git state gate"
-as code-memory "code memory|memory|recordar|acordate|multi-session" memory medium "" "session-resume|dreaming" "Cross-session code memory and recall"
-as dreaming "dreaming|cross-session|pattern extraction|memory curation|engram" memory high auto-metrics "" "Cross-session pattern extraction via Engram"
-as bitacora "bitacora|historial|historico|request log" memory low "" "" "Session activity log and history tracking"
-as metricas "metricas|before after|percent improvement|delta" memory low "" "" "Before/after metrics tracking for improvements"
-as decision-capture "decision|trade-off|decision log" memory medium "" "" "Capture and log architectural decisions"
-as skill-creator "create skill|new skill|crear skill" meta medium "" "" "Create new AI skills from requirements"
-as skill-registry "skill registry|catalog|registro skills" meta medium "" "" "Skill registry management and catalog"
-as skill-improver "skill improvement|audit skills|refactor skills" meta medium "" "" "Audit and improve existing skills"
-as skill-graph "sparse loading|skill resolution|relevant skills|which skill|resolver skill|minimo skills" meta low "" "" "Sparse loading - resolve only relevant skills + dependencies"
-as gap-analysis "gap analysis|system audit|identificar gaps|project intake" meta high "project-mapper|security-scanner" "" "Complete 8-dim gap analysis"
-as commit-crafter "commit|commit message|conventional commit" code-ops low "" "quality-gate" "Craft conventional commit messages from diff"
-as refactoring-planner "refactor|refactoring|reestructurar|migrate" code-ops medium "" "" "Plan and execute code refactoring"
-as project-mapper "mapear|project map|estructura|tech stack" code-ops medium "" "gap-analysis" "Map project structure, stack, and architecture"
-as security-scanner "security|seguridad|vulnerabilidad|auditar" code-ops medium best-practices "" "Security audit and vulnerability scanner"
-as performance-tracker "performance score|mobile perf|desktop perf|rendimiento|app score|benchmark" code-ops medium "" "" "Score and track app performance across 6 dimensions"
-as doc-sync "doc sync|documentation sync|sync docs|propagate docs" code-ops low "" "" "Sync documentation across repos, branches, and locations"
-as sdd "SDD pipeline|SDD phase|spec-driven development" SDD medium "" "sdd-init|sdd-explore|sdd-propose|sdd-spec|sdd-design|sdd-tasks|sdd-apply|sdd-verify|sdd-archive" "Unified SDD pipeline - 9 phases"
-as sdd-init "SDD init|bootstrap|iniciar SDD" SDD medium "" "" "SDD init - bootstrap project context"
-as sdd-explore "explore codebase|pre-design|investigar|codebase exploration" SDD medium "" "" "Explore codebase"
-as sdd-propose "proposal|intent|approach|change proposal" SDD medium sdd-explore "" "Create change proposals"
-as sdd-spec "specs|specification|Given When Then|requisitos|spec" SDD medium sdd-propose "" "Write specifications from proposals"
-as sdd-design "technical design|HOW|diseno tecnico" SDD medium sdd-spec "" "Create technical design from specs"
-as sdd-tasks "task breakdown|implementation plan|tareas|task list" SDD medium sdd-design "" "Break down designs into tasks"
-as sdd-apply "apply tasks|implement|aplicar" SDD medium sdd-tasks "commit-crafter" "Apply tasks to implement changes"
-as sdd-verify "validate vs specs|verify|verificar" SDD medium sdd-spec "" "Validate implementation against specs"
-as sdd-archive "archive changes|delta to main|archivar" SDD medium "sdd-verify|sdd-apply" "" "Archive completed changes"
-as sdd-onboard "SDD onboard|onboarding|nuevo proyecto SDD|guia SDD" SDD medium "" "" "Guide users through complete SDD cycle"
-as delivery-harness "coordinate|orchestrate|multi-agent|delegate work" coordination high "subagent-isolation|work-unit-commits" "chained-pr" "Orchestrate multi-agent work delivery"
-as chained-pr "stacked PR|chained PR|sequential branches|PR chain" coordination medium work-unit-commits "delivery-harness|branch-pr" "Manage stacked sequential PRs"
-as branch-pr "branch PR|branch naming|create PR|open pull request" coordination medium "" "chained-pr|issue-creation" "Branch creation and PR workflow"
-as issue-creation "create issue|GitHub issue|bug report|feature request" coordination medium "" branch-pr "GitHub issue creation"
-as subagent-isolation "subagent isolation|context boundaries|delegation" coordination medium "" "" "Isolate subagent contexts and prevent contamination"
-as command-wrapper "command wrapper|safe execution|error handling|output parse" coordination low "" "" "Safe command execution with error handling"
-as opencode-model-router "model router|routing|que modelo|delegate or direct|que hacer con esta tarea|trial risk|security gate" coordination high "" "" "Route tasks by model strength with security gates"
-as accessibility "accessibility|a11y|WCAG|screen reader|keyboard nav|make accessible" web-quality medium "" "" "Audit and improve web accessibility"
-as performance "web performance|speed up|reduce load time|page speed|performance audit" web-quality medium "" "" "Optimize web performance"
-as seo "SEO|search engine|meta tags|structured data|sitemap" web-quality medium "" "" "Optimize for search engine visibility"
-as best-practices "best practices|security audit|modernize code|code quality review" web-quality medium "" "" "Apply modern web development best practices"
-as web-quality-audit "web quality audit|lighthouse audit|review web quality" web-quality medium "accessibility|performance|seo|best-practices" "" "Comprehensive web quality audit"
-as development-mode "performance mode|dev mode|modo desarrollo|high performance|modo rendimiento" web-quality medium "" "" "System resource prioritization mode"
-as baseline-ui "ui cleanup|polish interface|fix layout|ui slop|generic ui|design review" web-quality medium accessibility "" "Anti-slop UI enforcement"
-as research "research|investigar|technical investigation|learn|compare solutions|evaluate" research medium "" "" "Structured research workflow for technical investigations"
-as recovery-protocol "recovery|no es eso|frustration|stuck|bloqueado|bug|fix|error" specialized medium "" "" "Recovery protocol for frustration and errors"
-as context-watchdog "context overflow|token limit|context explosion" specialized medium "" "" "Monitor and prevent context window overflow"
-as ci-cd "CI/CD|pipeline|GitHub Actions|continuous integration" specialized medium "" "" "CI/CD pipeline automation"
-as work-unit-commits "work-unit|commit organization" specialized low "" "" "Organize commits into logical work units"
-as self-improvement "self-improvement|improvement cycle|auto-improve|inter 30|cycle|self-reflection|Hermes|error patterns|reflexion" specialized high "" "dreaming" "Self-improvement cycle with inter(30) minimum + per-task reflection"
-as cognitive-doc-design "doc design|documentation patterns|cognitive load|progressive disclosure" specialized medium "" "" "Design docs that reduce cognitive load"
-as comment-writer "comment writer|PR feedback|review comment|write feedback" specialized low "" "" "Write warm, direct collaboration comments"
-as senior-engineer "senior architect|trade-offs|system design|arquitectura" specialized high "" "" "Senior engineer persona for architecture decisions"
-as prompt-engineering "improve prompt|ReAct|multi-agent|prompt engineering" specialized medium "" "" "Advanced prompt engineering techniques"
-as go-testing "Go tests|Bubbletea TUI|golang test" specialized medium "" "" "Go testing patterns and tools"
-as python-async "Python async|asyncio" specialized medium "" "" "Python async/await patterns"
-function New-Graph{$g=@{Nodes=@{};AdjList=@{}};foreach($s in $r){$n=$s.Name;$g.Nodes[$n]=$s;$g.AdjList[$n]=@{to=@{};from=@{}}}foreach($s in $r){foreach($d in $s.DependsOn){if($g.AdjList.ContainsKey($d)){$g.AdjList[$d].to[$s.Name]="depends_on";$g.AdjList[$s.Name].from[$d]="depended_by"}}foreach($rl in $s.Related){if($g.AdjList.ContainsKey($rl)){$g.AdjList[$rl].to[$s.Name]="related";$g.AdjList[$s.Name].from[$rl]="related"}}}$g}
-function Resolve-Skill{param([string]$tt,[int]$md=1);$tk=$tt.ToLowerInvariant()-split'\s+|[-_/.,!?;:()]'|?{$_.Length-gt2}|Select-Object -Unique;$sc=@{};$scResults=$r|ForEach-Object -Parallel{$mc=0;$tk=$using:tk;foreach($t in $tk){$re=[regex]::Escape($t);foreach($tr in $_.Triggers){if($tr.ToLowerInvariant()-match$re){$mc++;break}}};if($mc-gt0){[PSCustomObject]@{Name=$_.Name;MatchCount=$mc}}} -ThrottleLimit ([Math]::Max(2,[int]([Environment]::ProcessorCount/2)));foreach($res in $scResults){if($res){$sc[$res.Name]=$res.MatchCount}};$mt=$sc.Keys|Sort-Object{$sc[$_]}-Descending;$g=New-Graph;$vs=@{};$q=[System.Collections.Queue]::new();$dp=@{};foreach($m in $mt){$q.Enqueue($m);$dp[$m]=0;$vs[$m]=$true};while($q.Count-gt0){$c=$q.Dequeue();if($dp[$c]-ge$md){continue};foreach($nb in $g.AdjList[$c].to.Keys){if(-not$vs[$nb]){$vs[$nb]=$true;$dp[$nb]=$dp[$c]+1;$q.Enqueue($nb)}}};$rs=$vs.Keys|%{$s=$skl[$_];[PSCustomObject]@{Name=$_;Score=if($sc.ContainsKey($_)){$sc[$_]}else{0};Depth=$dp[$_];DependsOn=$s.DependsOn;Related=$s.Related;Category=$s.Category;Effort=$s.Effort;Description=$s.Description}};return($rs|Sort-Object Depth,{-$_.Score})}
-$ar=@(@{P='(?i)(?:review|audit|check|quality|verify|validate)\s.*(?:code|security|skill|pr)';S=@('code-review-agent','security-scanner','quality-gate','triple-verify')},@{P='(?i)(?:fix|bug|error|crash|issue|problem|broken|not\s+working)';S=@('recovery-protocol','immune-system','triple-verify')},@{P='(?i)(?:design|architecture|plan|propose|proposal)';S=@('senior-engineer','sdd-propose','sdd-design')},@{P='(?i)(?:test|testing|coverage|spec|specification)';S=@('skill-testing','sdd-spec','sdd-verify','go-testing')},@{P='(?i)(?:doc|documentation|readme|guide|manual|help)';S=@('cognitive-doc-design','doc-sync')},@{P='(?i)(?:commit|pr|pull.request|merge|ship|push)';S=@('commit-crafter','quality-gate','branch-pr','chained-pr')},@{P='(?i)(?:deploy|ci|cd|pipeline|github.action|release)';S=@('ci-cd','command-wrapper')},@{P='(?i)(?:refactor|restructur|clean|migrat|extract)';S=@('refactoring-planner','lean-context')},@{P='(?i)(?:performance|speed|slow|lazy|load\s+time|render|optimize|compress)';S=@('karpathy-loop','performance','lean-context','caveman')},@{P='(?i)(?:accessib|a11y|wcad|screen\s+reader)';S=@('accessibility')},@{P='(?i)(?:seo|search|meta|sitemap|structured.data)';S=@('seo')},@{P='(?i)(?:research|investigar|compare|evaluate|learn)';S=@('research','prompt-engineering')},@{P='(?i)(?:mapear|map|project\s+structure|tech\s+stack|audit\s+project)';S=@('project-mapper','gap-analysis')})
-function Get-AgentRecommendation{param([string]$tt);$res=$ar|ForEach-Object -Parallel{if($using:tt-match$_.P){$_.S}} -ThrottleLimit ([Math]::Max(2,[int]([Environment]::ProcessorCount/2)));$ra=@($res|?{$_}|Select-Object -Unique);if($ra.Count-eq0){$rv=@(Resolve-Skill $tt 1);$ra=@($rv|?{$_.Depth-eq0}|Sort-Object Score-Descending|%{$_.Name})};return @($ra)}
-$skl=@{};foreach($s in $r){$skl[$s.Name]=$s}
-if($ListAll){$gr=$r|Group-Object Category;if($Format-eq"Json"){$gr|%{$g=$_;@{Category=$g.Name;Skills=@($g.Group|Sort-Object Name|%{@{Name=$_.Name;Effort=$_.Effort;DependsOn=@($_.DependsOn);Related=@($_.Related)}})}}|ConvertTo-Json -Depth 3;exit 0};if($Format-eq"Csv"){$fl=foreach($g in $gr){foreach($s in $g.Group|Sort-Object Name){[PSCustomObject]@{Category=$g.Name;Skill=$s.Name;Effort=$s.Effort;DependsOn=if($s.DependsOn.Count-gt0){$s.DependsOn-join"; "}else{""};Related=if($s.Related.Count-gt0){$s.Related-join"; "}else{""}}}};$fl|ConvertTo-Csv -NoTypeInformation;exit 0};foreach($g in $gr){if(-not$Quiet){Write-Host("`n["+$g.Name.ToUpper()+"]  ("+$g.Count+" skills)")-ForegroundColor Green};$g.Group|Sort-Object Name|%{$dp=if($_.DependsOn.Count-gt0){"  deps: "+($_.DependsOn-join", ")}else{""};$ef=if($_.Effort-ne"medium"){"  ["+$_.Effort+"]"}else{""};Write-Host("  "+$_.Name+$ef+$dp)-ForegroundColor White}};if(-not$Quiet){Write-Host("`nTotal: "+$r.Count+" skills in "+$gr.Count+" categories")-ForegroundColor Cyan};exit 0}
-if([string]::IsNullOrWhiteSpace($Task)){if(-not$Quiet){Write-Host"Usage:"-ForegroundColor Yellow;Write-Host("  .\scripts\skill-graph.ps1 -Task `"<task>`" [-Expand N] [-Format Json|Csv]")-ForegroundColor Cyan;Write-Host("  .\scripts\skill-graph.ps1 -ListAll [-Format Json|Csv]")-ForegroundColor Cyan;Write-Host("  .\scripts\skill-graph.ps1 -Task `"<task>`" -RecommendAgent")-ForegroundColor Cyan;Write-Host("`nRegistry: "+$r.Count+" skills")-ForegroundColor Green};exit 0}
-if($RecommendAgent){$rc=@(Get-AgentRecommendation $Task);if($Format-eq"Json"){@{Task=$Task;Recommendations=$rc;RegistrySize=$r.Count}|ConvertTo-Json;exit 0};if(-not$Quiet){Write-Host("Recommendations for: $Task")-ForegroundColor Cyan};$rc|%{Write-Host("  skill: $_")-ForegroundColor White};if(-not$Quiet){Write-Host("`n("+$rc.Count+" skills recommended)")-ForegroundColor Green};exit 0}
-$rv=@(Resolve-Skill $Task $Expand);if($Format-eq"Json"){$rv|Select-Object Name,Score,Depth,Category,Effort,Description|ConvertTo-Json -Depth 2;exit 0};if($Format-eq"Csv"){$rv|Select-Object Name,Score,Depth,Category,Effort|ConvertTo-Csv -NoTypeInformation;exit 0};if($rv.Count-eq0){if(-not$Quiet){Write-Host"No matching skills for: $Task"-ForegroundColor Yellow};exit 0};if(-not$Quiet){Write-Host("Skills for: $Task  (depth=$Expand)")-ForegroundColor Cyan};$rv|%{$d=if($_.Depth-gt0){" hop=$($_.Depth)"}else{""};Write-Host("  "+$_.Name+" [score=$($_.Score)]$d")-ForegroundColor White};if(-not$Quiet){Write-Host("`n("+$rv.Count+" skills resolved)")-ForegroundColor Green}
+﻿#requires -Version 7.6
+
+<#
+.SYNOPSIS
+    Skill dependency graph - sparse loading resolver
+
+.PARAMETER Task
+    Natural language task description to resolve relevant skills
+
+.PARAMETER Expand
+    Graph expansion depth (0-3, default 1). Controls how many hops of
+    dependencies to include in results
+
+.PARAMETER ListAll
+    List all registered skills grouped by category
+
+.PARAMETER RecommendAgent
+    Recommend agent skills for a given task using regex pattern matching
+
+.PARAMETER Format
+    Output format: Text (default), Json, or Csv
+
+.PARAMETER Quiet
+    Suppress informational messages, output raw data only
+#>
+
+param(
+    [string]$Task = "",
+    [ValidateRange(0, 3)][int]$Expand = 1,
+    [switch]$ListAll,
+    [switch]$RecommendAgent,
+    [ValidateSet("Text", "Json", "Csv")][string]$Format = "Text",
+    [switch]$Quiet
+)
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+
+# ============================================================================
+# Registry — skill definitions
+# ============================================================================
+
+$skillRegistry = @()
+
+function Register-Skill(
+    $Name,
+    $TriggersRaw,
+    $Category,
+    $Effort,
+    $DependsOnRaw,
+    $RelatedRaw,
+    $Description
+) {
+    $script:skillRegistry += [PSCustomObject]@{
+        Name        = $Name
+        Triggers    = $TriggersRaw.Split('|')
+        Category    = $Category
+        DependsOn   = if ($DependsOnRaw) { , $DependsOnRaw.Split('|') } else { , @() }
+        Related     = if ($RelatedRaw) { , $RelatedRaw.Split('|') } else { , @() }
+        Description = $Description
+        Effort      = $Effort
+    }
+}
+
+# --- compression ---
+Register-Skill karpathy-loop "karpathy|less tokens|context compression|compact prompt|karpathy loop|optimize prompt|measure tokens" compression low "" "" "Karpathy-style compression + iterative loop"
+Register-Skill lean-context "compact|less tokens|caveman|ultra-lean|minimal context" compression low "" "" "Ultra-lean context mode"
+Register-Skill execution-mode "execution mode|quick|thorough|draft|modo" compression low "" "" "Quick/Thorough/Draft execution modes"
+Register-Skill skill-digestion "skill digestion|compact on load|compress skill" compression low "" "" "Digest and compact skills when loaded"
+Register-Skill caveman "caveman|ultra-lean|compression|minimal context|emergency mode" compression low "" "" "Ultra-minimal compressed context mode - L3 emergency"
+
+# --- quality ---
+Register-Skill quality-gate "quality gate|pre-commit|validate commit" quality medium "" "auto-metrics|commit-crafter" "Pre-commit quality gate"
+Register-Skill auto-metrics "auto-score|metrics|post-task|evaluate|self-evaluate" quality medium skill-validate "" "Post-task self-evaluation with 7-dim scoring"
+Register-Skill immune-system "immune system|anti-pattern|permanent immunity|nunca mas|bug|fix|error" quality high "" "" "Permanent immunity catalog for repeated errors"
+Register-Skill code-review-agent "code review|CR|revisar codigo|review code" quality medium best-practices "" "Automated code review with standards"
+Register-Skill skill-testing "test skill|verify skill|coverage|skill test" quality medium "" "" "Test and verify skill coverage"
+Register-Skill skill-validate "skill validation|benchmark|multi-trial|validate skill|3 trials" quality medium "" "" "3-trial benchmark validation"
+Register-Skill judgment-day "judgment day|dual review|juzgar|evaluar skill" quality high "" "" "Dual review and judgment for skills"
+Register-Skill triple-verify "triple verify|triangulate|3 enfoques|verificacion profunda|!ship|!listo|!fast|!draft" quality high "" "" "Triple verification - 3 enfoques, thresholds por zona"
+Register-Skill external-auditor "external audit|blind review|second opinion|verifica mi auto-score|contralor externo" quality medium "" "" "Blind second-opinion audit via subagent"
+
+# --- memory ---
+Register-Skill session-resume "resume|donde lo dejamos|continua|session start|git state" memory medium dreaming "" "Safe session resume with git state gate"
+Register-Skill code-memory "code memory|memory|recordar|acordate|multi-session" memory medium "" "session-resume|dreaming" "Cross-session code memory and recall"
+Register-Skill dreaming "dreaming|cross-session|pattern extraction|memory curation|engram" memory high auto-metrics "" "Cross-session pattern extraction via Engram"
+Register-Skill bitacora "bitacora|historial|historico|request log" memory low "" "" "Session activity log and history tracking"
+Register-Skill metricas "metricas|before after|percent improvement|delta" memory low "" "" "Before/after metrics tracking for improvements"
+Register-Skill decision-capture "decision|trade-off|decision log" memory medium "" "" "Capture and log architectural decisions"
+
+# --- meta ---
+Register-Skill skill-creator "create skill|new skill|crear skill" meta medium "" "" "Create new AI skills from requirements"
+Register-Skill skill-registry "skill registry|catalog|registro skills" meta medium "" "" "Skill registry management and catalog"
+Register-Skill skill-improver "skill improvement|audit skills|refactor skills" meta medium "" "" "Audit and improve existing skills"
+Register-Skill skill-graph "sparse loading|skill resolution|relevant skills|which skill|resolver skill|minimo skills" meta low "" "" "Sparse loading - resolve only relevant skills + dependencies"
+Register-Skill gap-analysis "gap analysis|system audit|identificar gaps|project intake" meta high "project-mapper|security-scanner" "" "Complete 8-dim gap analysis"
+
+# --- code-ops ---
+Register-Skill commit-crafter "commit|commit message|conventional commit" code-ops low "" "quality-gate" "Craft conventional commit messages from diff"
+Register-Skill refactoring-planner "refactor|refactoring|reestructurar|migrate" code-ops medium "" "" "Plan and execute code refactoring"
+Register-Skill project-mapper "mapear|project map|estructura|tech stack" code-ops medium "" "gap-analysis" "Map project structure, stack, and architecture"
+Register-Skill security-scanner "security|seguridad|vulnerabilidad|auditar" code-ops medium best-practices "" "Security audit and vulnerability scanner"
+Register-Skill performance-tracker "performance score|mobile perf|desktop perf|rendimiento|app score|benchmark" code-ops medium "" "" "Score and track app performance across 6 dimensions"
+Register-Skill doc-sync "doc sync|documentation sync|sync docs|propagate docs" code-ops low "" "" "Sync documentation across repos, branches, and locations"
+
+# --- SDD ---
+Register-Skill sdd "SDD pipeline|SDD phase|spec-driven development" SDD medium "" "sdd-init|sdd-explore|sdd-propose|sdd-spec|sdd-design|sdd-tasks|sdd-apply|sdd-verify|sdd-archive" "Unified SDD pipeline - 9 phases"
+Register-Skill sdd-init "SDD init|bootstrap|iniciar SDD" SDD medium "" "" "SDD init - bootstrap project context"
+Register-Skill sdd-explore "explore codebase|pre-design|investigar|codebase exploration" SDD medium "" "" "Explore codebase"
+Register-Skill sdd-propose "proposal|intent|approach|change proposal" SDD medium sdd-explore "" "Create change proposals"
+Register-Skill sdd-spec "specs|specification|Given When Then|requisitos|spec" SDD medium sdd-propose "" "Write specifications from proposals"
+Register-Skill sdd-design "technical design|HOW|diseno tecnico" SDD medium sdd-spec "" "Create technical design from specs"
+Register-Skill sdd-tasks "task breakdown|implementation plan|tareas|task list" SDD medium sdd-design "" "Break down designs into tasks"
+Register-Skill sdd-apply "apply tasks|implement|aplicar" SDD medium sdd-tasks "commit-crafter" "Apply tasks to implement changes"
+Register-Skill sdd-verify "validate vs specs|verify|verificar" SDD medium sdd-spec "" "Validate implementation against specs"
+Register-Skill sdd-archive "archive changes|delta to main|archivar" SDD medium "sdd-verify|sdd-apply" "" "Archive completed changes"
+Register-Skill sdd-onboard "SDD onboard|onboarding|nuevo proyecto SDD|guia SDD" SDD medium "" "" "Guide users through complete SDD cycle"
+
+# --- coordination ---
+Register-Skill delivery-harness "coordinate|orchestrate|multi-agent|delegate work" coordination high "subagent-isolation|work-unit-commits" "chained-pr" "Orchestrate multi-agent work delivery"
+Register-Skill chained-pr "stacked PR|chained PR|sequential branches|PR chain" coordination medium work-unit-commits "delivery-harness|branch-pr" "Manage stacked sequential PRs"
+Register-Skill branch-pr "branch PR|branch naming|create PR|open pull request" coordination medium "" "chained-pr|issue-creation" "Branch creation and PR workflow"
+Register-Skill issue-creation "create issue|GitHub issue|bug report|feature request" coordination medium "" branch-pr "GitHub issue creation"
+Register-Skill subagent-isolation "subagent isolation|context boundaries|delegation" coordination medium "" "" "Isolate subagent contexts and prevent contamination"
+Register-Skill command-wrapper "command wrapper|safe execution|error handling|output parse" coordination low "" "" "Safe command execution with error handling"
+Register-Skill opencode-model-router "model router|routing|que modelo|delegate or direct|que hacer con esta tarea|trial risk|security gate" coordination high "" "" "Route tasks by model strength with security gates"
+
+# --- web-quality ---
+Register-Skill accessibility "accessibility|a11y|WCAG|screen reader|keyboard nav|make accessible" web-quality medium "" "" "Audit and improve web accessibility"
+Register-Skill performance "web performance|speed up|reduce load time|page speed|performance audit" web-quality medium "" "" "Optimize web performance"
+Register-Skill seo "SEO|search engine|meta tags|structured data|sitemap" web-quality medium "" "" "Optimize for search engine visibility"
+Register-Skill best-practices "best practices|security audit|modernize code|code quality review" web-quality medium "" "" "Apply modern web development best practices"
+Register-Skill web-quality-audit "web quality audit|lighthouse audit|review web quality" web-quality medium "accessibility|performance|seo|best-practices" "" "Comprehensive web quality audit"
+Register-Skill development-mode "performance mode|dev mode|modo desarrollo|high performance|modo rendimiento" web-quality medium "" "" "System resource prioritization mode"
+Register-Skill baseline-ui "ui cleanup|polish interface|fix layout|ui slop|generic ui|design review" web-quality medium accessibility "" "Anti-slop UI enforcement"
+
+# --- research ---
+Register-Skill research "research|investigar|technical investigation|learn|compare solutions|evaluate" research medium "" "" "Structured research workflow for technical investigations"
+
+# --- specialized ---
+Register-Skill recovery-protocol "recovery|no es eso|frustration|stuck|bloqueado|bug|fix|error" specialized medium "" "" "Recovery protocol for frustration and errors"
+Register-Skill context-watchdog "context overflow|token limit|context explosion" specialized medium "" "" "Monitor and prevent context window overflow"
+Register-Skill ci-cd "CI/CD|pipeline|GitHub Actions|continuous integration" specialized medium "" "" "CI/CD pipeline automation"
+Register-Skill work-unit-commits "work-unit|commit organization" specialized low "" "" "Organize commits into logical work units"
+Register-Skill self-improvement "self-improvement|improvement cycle|auto-improve|inter 30|cycle|self-reflection|Hermes|error patterns|reflexion" specialized high "" "dreaming" "Self-improvement cycle with inter(30) minimum + per-task reflection"
+Register-Skill cognitive-doc-design "doc design|documentation patterns|cognitive load|progressive disclosure" specialized medium "" "" "Design docs that reduce cognitive load"
+Register-Skill comment-writer "comment writer|PR feedback|review comment|write feedback" specialized low "" "" "Write warm, direct collaboration comments"
+Register-Skill senior-engineer "senior architect|trade-offs|system design|arquitectura" specialized high "" "" "Senior engineer persona for architecture decisions"
+Register-Skill prompt-engineering "improve prompt|ReAct|multi-agent|prompt engineering" specialized medium "" "" "Advanced prompt engineering techniques"
+Register-Skill go-testing "Go tests|Bubbletea TUI|golang test" specialized medium "" "" "Go testing patterns and tools"
+Register-Skill python-async "Python async|asyncio" specialized medium "" "" "Python async/await patterns"
+
+# ============================================================================
+# Graph — build adjacency graph from registry
+# ============================================================================
+
+function New-Graph {
+    $graph = @{Nodes = @{}; AdjList = @{}}
+
+    foreach ($skill in $skillRegistry) {
+        $name = $skill.Name
+        $graph.Nodes[$name] = $skill
+        $graph.AdjList[$name] = @{to = @{}; from = @{}}
+    }
+
+    foreach ($skill in $skillRegistry) {
+        foreach ($dep in $skill.DependsOn) {
+            if ($graph.AdjList.ContainsKey($dep)) {
+                $graph.AdjList[$dep].to[$skill.Name] = "depends_on"
+                $graph.AdjList[$skill.Name].from[$dep] = "depended_by"
+            }
+        }
+        foreach ($rel in $skill.Related) {
+            if ($graph.AdjList.ContainsKey($rel)) {
+                $graph.AdjList[$rel].to[$skill.Name] = "related"
+                $graph.AdjList[$skill.Name].from[$rel] = "related"
+            }
+        }
+    }
+
+    return $graph
+}
+
+# ============================================================================
+# Resolver — BFS graph resolution from task text
+# ============================================================================
+
+function Resolve-Skill {
+    param(
+        [string]$TaskText,
+        [int]$MaxDepth = 1
+    )
+
+    $Tokens = $TaskText.ToLowerInvariant() -split '\s+|[-_/.,!?;:()]' |
+        Where-Object { $_.Length -gt 2 } |
+        Select-Object -Unique
+
+    $SkillScores = @{}
+    $MatchResults = $skillRegistry | ForEach-Object -Parallel {
+        $matchCount = 0
+        $tokens = $using:Tokens
+        foreach ($token in $tokens) {
+            $pattern = [regex]::Escape($token)
+            foreach ($trigger in $_.Triggers) {
+                if ($trigger.ToLowerInvariant() -match $pattern) {
+                    $matchCount++
+                    break
+                }
+            }
+        }
+        if ($matchCount -gt 0) {
+            [PSCustomObject]@{Name = $_.Name; MatchCount = $matchCount}
+        }
+    } -ThrottleLimit ([Math]::Max(2, [int]([Environment]::ProcessorCount / 2)))
+
+    foreach ($match in $MatchResults) {
+        if ($match) {
+            $SkillScores[$match.Name] = $match.MatchCount
+        }
+    }
+
+    $MatchedNames = $SkillScores.Keys |
+        Sort-Object { $SkillScores[$_] } -Descending
+
+    $Graph = New-Graph
+    $Visited = @{}
+    $Queue = [System.Collections.Queue]::new()
+    $Depths = @{}
+
+    foreach ($name in $MatchedNames) {
+        $Queue.Enqueue($name)
+        $Depths[$name] = 0
+        $Visited[$name] = $true
+    }
+
+    while ($Queue.Count -gt 0) {
+        $current = $Queue.Dequeue()
+        if ($Depths[$current] -ge $MaxDepth) { continue }
+
+        foreach ($neighbor in $Graph.AdjList[$current].to.Keys) {
+            if (-not $Visited[$neighbor]) {
+                $Visited[$neighbor] = $true
+                $Depths[$neighbor] = $Depths[$current] + 1
+                $Queue.Enqueue($neighbor)
+            }
+        }
+    }
+
+    $results = $Visited.Keys | ForEach-Object {
+        $skill = $skillLookup[$_]
+        [PSCustomObject]@{
+            Name        = $_
+            Score       = if ($SkillScores.ContainsKey($_)) { $SkillScores[$_] } else { 0 }
+            Depth       = $Depths[$_]
+            DependsOn   = $skill.DependsOn
+            Related     = $skill.Related
+            Category    = $skill.Category
+            Effort      = $skill.Effort
+            Description = $skill.Description
+        }
+    }
+
+    return ($results | Sort-Object Depth, { -$_.Score })
+}
+
+# ============================================================================
+# Agent Recommender — regex pattern matching against task text
+# ============================================================================
+
+$agentRecommendations = @(
+    @{
+        P = '(?i)(?:review|audit|check|quality|verify|validate)\s.*(?:code|security|skill|pr)'
+        S = @('code-review-agent', 'security-scanner', 'quality-gate', 'triple-verify')
+    }
+    @{
+        P = '(?i)(?:fix|bug|error|crash|issue|problem|broken|not\s+working)'
+        S = @('recovery-protocol', 'immune-system', 'triple-verify')
+    }
+    @{
+        P = '(?i)(?:design|architecture|plan|propose|proposal)'
+        S = @('senior-engineer', 'sdd-propose', 'sdd-design')
+    }
+    @{
+        P = '(?i)(?:test|testing|coverage|spec|specification)'
+        S = @('skill-testing', 'sdd-spec', 'sdd-verify', 'go-testing')
+    }
+    @{
+        P = '(?i)(?:doc|documentation|readme|guide|manual|help)'
+        S = @('cognitive-doc-design', 'doc-sync')
+    }
+    @{
+        P = '(?i)(?:commit|pr|pull.request|merge|ship|push)'
+        S = @('commit-crafter', 'quality-gate', 'branch-pr', 'chained-pr')
+    }
+    @{
+        P = '(?i)(?:deploy|ci|cd|pipeline|github.action|release)'
+        S = @('ci-cd', 'command-wrapper')
+    }
+    @{
+        P = '(?i)(?:refactor|restructur|clean|migrat|extract)'
+        S = @('refactoring-planner', 'lean-context')
+    }
+    @{
+        P = '(?i)(?:performance|speed|slow|lazy|load\s+time|render|optimize|compress)'
+        S = @('karpathy-loop', 'performance', 'lean-context', 'caveman')
+    }
+    @{
+        P = '(?i)(?:accessib|a11y|wcad|screen\s+reader)'
+        S = @('accessibility')
+    }
+    @{
+        P = '(?i)(?:seo|search|meta|sitemap|structured.data)'
+        S = @('seo')
+    }
+    @{
+        P = '(?i)(?:research|investigar|compare|evaluate|learn)'
+        S = @('research', 'prompt-engineering')
+    }
+    @{
+        P = '(?i)(?:mapear|map|project\s+structure|tech\s+stack|audit\s+project)'
+        S = @('project-mapper', 'gap-analysis')
+    }
+)
+
+function Get-AgentRecommendation {
+    param([string]$TaskText)
+
+    $results = $agentRecommendations | ForEach-Object -Parallel {
+        if ($using:TaskText -match $_.P) { $_.S }
+    } -ThrottleLimit ([Math]::Max(2, [int]([Environment]::ProcessorCount / 2)))
+
+    $recommended = @($results | Where-Object { $_ } | Select-Object -Unique)
+
+    if ($recommended.Count -eq 0) {
+        $resolved = @(Resolve-Skill $TaskText 1)
+        $recommended = @($resolved | Where-Object { $_.Depth -eq 0 } |
+            Sort-Object Score -Descending | ForEach-Object { $_.Name })
+    }
+
+    return @($recommended)
+}
+
+# ============================================================================
+# Lookup table — name -> skill object (used by Resolve-Skill)
+# ============================================================================
+
+$skillLookup = @{}
+foreach ($skill in $skillRegistry) {
+    $skillLookup[$skill.Name] = $skill
+}
+
+# ============================================================================
+# Output
+# ============================================================================
+
+if ($ListAll) {
+    $grouped = $skillRegistry | Group-Object Category
+
+    if ($Format -eq "Json") {
+        $grouped | ForEach-Object {
+            $group = $_
+            @{
+                Category = $group.Name
+                Skills   = @($group.Group | Sort-Object Name | ForEach-Object {
+                        @{
+                            Name      = $_.Name
+                            Effort    = $_.Effort
+                            DependsOn = @($_.DependsOn)
+                            Related   = @($_.Related)
+                        }
+                    })
+            }
+        } | ConvertTo-Json -Depth 3
+        exit 0
+    }
+
+    if ($Format -eq "Csv") {
+        $flatList = foreach ($group in $grouped) {
+            foreach ($skill in ($group.Group | Sort-Object Name)) {
+                [PSCustomObject]@{
+                    Category  = $group.Name
+                    Skill     = $skill.Name
+                    Effort    = $skill.Effort
+                    DependsOn = if ($skill.DependsOn.Count -gt 0) {
+                        $skill.DependsOn -join "; "
+                    } else { "" }
+                    Related   = if ($skill.Related.Count -gt 0) {
+                        $skill.Related -join "; "
+                    } else { "" }
+                }
+            }
+        }
+        $flatList | ConvertTo-Csv -NoTypeInformation
+        exit 0
+    }
+
+    foreach ($group in $grouped) {
+        if (-not $Quiet) {
+            Write-Host ("`n[" + $group.Name.ToUpper() + "]  (" + $group.Count + " skills)") -ForegroundColor Green
+        }
+        $group.Group | Sort-Object Name | ForEach-Object {
+            $depString = if ($_.DependsOn.Count -gt 0) {
+                "  deps: " + ($_.DependsOn -join ", ")
+            } else { "" }
+            $effortBadge = if ($_.Effort -ne "medium") {
+                "  [" + $_.Effort + "]"
+            } else { "" }
+            Write-Host ("  " + $_.Name + $effortBadge + $depString) -ForegroundColor White
+        }
+    }
+    if (-not $Quiet) {
+        Write-Host ("`nTotal: " + $skillRegistry.Count + " skills in " + $grouped.Count + " categories") -ForegroundColor Cyan
+    }
+    exit 0
+}
+
+if ([string]::IsNullOrWhiteSpace($Task)) {
+    if (-not $Quiet) {
+        Write-Host "Usage:" -ForegroundColor Yellow
+        Write-Host ("  .\scripts\skill-graph.ps1 -Task `"<task>`" [-Expand N] [-Format Json|Csv]") -ForegroundColor Cyan
+        Write-Host ("  .\scripts\skill-graph.ps1 -ListAll [-Format Json|Csv]") -ForegroundColor Cyan
+        Write-Host ("  .\scripts\skill-graph.ps1 -Task `"<task>`" -RecommendAgent") -ForegroundColor Cyan
+        Write-Host ("`nRegistry: " + $skillRegistry.Count + " skills") -ForegroundColor Green
+    }
+    exit 0
+}
+
+if ($RecommendAgent) {
+    $recommended = @(Get-AgentRecommendation $Task)
+    if ($Format -eq "Json") {
+        @{
+            Task            = $Task
+            Recommendations = $recommended
+            RegistrySize    = $skillRegistry.Count
+        } | ConvertTo-Json
+        exit 0
+    }
+    if (-not $Quiet) {
+        Write-Host ("Recommendations for: $Task") -ForegroundColor Cyan
+    }
+    $recommended | ForEach-Object {
+        Write-Host ("  skill: $_") -ForegroundColor White
+    }
+    if (-not $Quiet) {
+        Write-Host ("`n(" + $recommended.Count + " skills recommended)") -ForegroundColor Green
+    }
+    exit 0
+}
+
+$resolved = @(Resolve-Skill $Task $Expand)
+
+if ($Format -eq "Json") {
+    $resolved | Select-Object Name, Score, Depth, Category, Effort, Description |
+        ConvertTo-Json -Depth 2
+    exit 0
+}
+
+if ($Format -eq "Csv") {
+    $resolved | Select-Object Name, Score, Depth, Category, Effort |
+        ConvertTo-Csv -NoTypeInformation
+    exit 0
+}
+
+if ($resolved.Count -eq 0) {
+    if (-not $Quiet) {
+        Write-Host ("No matching skills for: $Task") -ForegroundColor Yellow
+    }
+    exit 0
+}
+
+if (-not $Quiet) {
+    Write-Host ("Skills for: $Task  (depth=$Expand)") -ForegroundColor Cyan
+}
+$resolved | ForEach-Object {
+    $depthMarker = if ($_.Depth -gt 0) { " hop=$($_.Depth)" } else { "" }
+    Write-Host ("  " + $_.Name + " [score=$($_.Score)]" + $depthMarker) -ForegroundColor White
+}
+if (-not $Quiet) {
+    Write-Host ("`n(" + $resolved.Count + " skills resolved)") -ForegroundColor Green
+}

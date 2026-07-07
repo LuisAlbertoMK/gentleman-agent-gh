@@ -48,17 +48,26 @@ Thresholds en skill `triple-verify`. Modos: Normal (zona) · `!ship`=triple+qual
 | `!ponytail` | Set intensity: `!ponytail [lite|full|ultra|off]` |
 | `!manifest` | Read CYCLE.md, report cycle + score, verify shortcuts |
 | `!5fases`/`!extimprove` | Load `external-improvement` — 5-phase cycle, 3+ sub/fase |
-| `!analisis` | Multi-agent analysis: gentleman-vMK + 3 subagentes + research → consolidated plan |
+| `!analisis` | Smart multi-agent analysis: project-mapper → selecciona 6 especialistas FREE + research → consolidated plan |
 | `!setup` | `scripts/setup-machine.ps1` (Win) / `.sh` (Linux/macOS) — bootstrap |
 | `!dev` | `scripts/dev-server.ps1` — manage background dev servers |
 | `!gentleman` | `scripts/use-gentleman.ps1` — gentleman-ize any project |
 ### Analysis Mode (trigger: `!analisis`)
 Overrides DEFAULT/SIMPLE/COMPLEX. Trigger with `!analisis` as first token (case-insensitive).
-MULTI-AGENT ANALYSIS: gentleman-vMK + 3 subagentes + 1 research web → consolidated plan.
+MULTI-AGENT ANALYSIS: project-mapper → selecciona 6 especialistas FREE + 1 research web → consolidated plan.
 PRESERVED: Ponytail rung 0, engram save, session close on request.
 SKIPPED: TRIANGULATE, Security §D, quality gate, commit pipeline, auto-metrics, Ponytail rungs 1-8.
 EXEMPT from §A Skill combo (uses Q&A load: karpathy-loop + lean-context).
-PROCESS: 1) Load karpathy-loop + lean-context. 2) Parallel analysis: gentleman-vMK + 3 subagentes + 1 web research. 3) Synthesize into plan with consensos, divergencias, fundamentos.
+PROCESS:
+  0) **Project-mapper**: detect stack (lenguajes, frameworks, DB, infra) vía skill `project-mapper`.
+  1) **Smart selection**: según stack, elige 6 especialistas de 7 disponibles (FREE TIER):
+     - security (nemotron-3-ultra-free) ↔ infra (deepseek-v4-flash-free) ↔ frontend (kimi-k2.5-free)
+     - performance (nemotron-3-ultra-free) ↔ datascience (mimo-v2.5-free) ↔ docs (big-pickle)
+     - seo (nemotron-3-super-free) — solo si el proyecto es sitio público
+     - Excluye automáticamente especialistas irrelevantes (ej: frontend en backend-only, SEO en API)
+  2) Load karpathy-loop + lean-context.
+  3) Parallel analysis: gentleman-vMK + 6 subagentes + 1 web research.
+  4) Synthesize into plan with consensos, divergencias, fundamentos.
 OUTPUT: Plan only — NO code, NO commit. Must exit analysis mode before implementing.
 ## Subagent-First
 Read-heavy (>3 files) → delegate `explore`. Main context = synthesis/decisions. Saves 2-5K tokens.

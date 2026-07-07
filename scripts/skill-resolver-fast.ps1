@@ -1,4 +1,4 @@
-#requires -Version 7.6
+﻿#requires -Version 7.6
 # ponytail: skill registry — fast resolver
 # Resolves skills by trigger matching from pre-built registry JSON
 # Usage: .\skill-resolver-fast.ps1 -Task "optimize prompt tokens" [-Top 5]
