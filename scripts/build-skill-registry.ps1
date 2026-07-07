@@ -1,13 +1,20 @@
 ﻿#requires -Version 7.6
-# ponytail: skill registry — build script
-# Generates skill-registry.json from SKILL.md frontmatter
-# Idempotent: overwrites existing registry on each run
-
+<#
+.SYNOPSIS
+    Build skill registry — generates skill-registry.json from SKILL.md frontmatter. Idempotent.
+.DESCRIPTION
+    Scans all skill directories under .agents/skills/, parses SKILL.md frontmatter (name, description),
+    and writes a consolidated JSON registry at scripts/skill-registry.json. Used by skill-resolver-fast.ps1.
+.PARAMETER SkillsDir
+    Directory containing skill subdirectories. Default: .agents/skills/
+.PARAMETER OutputFile
+    Path to write registry JSON. Default: scripts/skill-registry.json
+#>
 param(
     [string]$SkillsDir = "$PSScriptRoot\..\.agents\skills",
     [string]$OutputFile = "$PSScriptRoot\skill-registry.json"
 )
-
+Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 function Parse-Frontmatter {

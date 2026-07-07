@@ -1,8 +1,18 @@
 ﻿#requires -Version 7.6
-# ponytail: skill registry — fast resolver
-# Resolves skills by trigger matching from pre-built registry JSON
-# Usage: .\skill-resolver-fast.ps1 -Task "optimize prompt tokens" [-Top 5]
-
+<#
+.SYNOPSIS
+    Fast skill resolver — matches tasks to skills from pre-built registry JSON via keyword scoring.
+.DESCRIPTION
+    Loads skill-registry.json and scores each skill's description against the task string
+    using token overlap (BFS keyword matching). Returns top-N results sorted by relevance.
+    Much faster than skill-graph.ps1's full BFS resolution — use for CI/automation.
+.PARAMETER Task
+    Task description to match against skill descriptions. Required.
+.PARAMETER Top
+    Number of top matches to return. Default: 8.
+.PARAMETER RegistryPath
+    Path to skill-registry.json. Default: scripts/skill-registry.json
+#>
 param(
     [Parameter(Mandatory = $true)]
     [string]$Task,
@@ -10,7 +20,7 @@ param(
     [int]$Top = 8,
     [string]$RegistryPath = "$PSScriptRoot\skill-registry.json"
 )
-
+Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 if (-not (Test-Path $RegistryPath)) {

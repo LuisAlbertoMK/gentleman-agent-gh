@@ -28,6 +28,7 @@ param(
     [string]$Mode = 'full',
     [string]$OutDir = ''
 )
+Set-StrictMode -Version Latest
 
 $ErrorActionPreference = 'Stop'
 

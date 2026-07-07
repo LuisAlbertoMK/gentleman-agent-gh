@@ -4,7 +4,11 @@
   Pester tests for score-auto.ps1 core logic.
   Tests: Add-Dimension, cache hash computation, evidence merging.
   Compatible with Pester 3.4.
+.PARAMETER SkipPester
+  Skip Pester discovery — for manual function extraction only.
 #>
+param([switch]$SkipPester)
+Set-StrictMode -Version Latest
 
 # --- Setup: extract and define functions once ---
 $scriptContent = Get-Content -Path "$PSScriptRoot\score-auto.ps1" -Raw
