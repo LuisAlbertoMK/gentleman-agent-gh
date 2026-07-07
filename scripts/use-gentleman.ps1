@@ -85,8 +85,13 @@ Out-Message "==> Gentleman Portability — $TargetDir" -color Cyan
 
 $globalOk = $true
 
-# Check skills junction
-if (-not (Test-Path "$globalSkills\gentleman-vMK\SKILL.md" -PathType Leaf)) {
+# Check skills junction (the whole skills/ dir is a junction to repo .agents/skills/)
+$skillsJunction = Get-Item $globalSkills -ErrorAction SilentlyContinue
+$skillsOk = $skillsJunction -and (
+    ($skillsJunction.Attributes -band [IO.FileAttributes]::ReparsePoint) -or
+    (Test-Path "$globalSkills\_shared" -PathType Container)
+)
+if (-not $skillsOk) {
     Out-Message "  [warn] Global skills junction not found. Run setup-machine.ps1 first." -color Yellow
     $globalOk = $false
 }
@@ -163,7 +168,7 @@ if ($cfg.permission) {
 $projectCfg | ConvertTo-Json -Depth 10 | Set-Content $projectCfgFile -Encoding UTF8 -Force
 Out-Message "  Created $projectCfgFile" -color Green
 Out-Message "    default_agent: $DefaultAgent" -color DarkGray
-Out-Message "    MCPs inherited from global: $(if($hasMcp){'project own'}else{'yes'})" -color DarkGray
+Out-Message "    MCPs inherited from global: $(if($mergedMcp){'project own'}else{'yes'})" -color DarkGray
 
 # ── 3. Verify end-to-end ─────────────────────────────────────────────
 $verifyOk = $true
