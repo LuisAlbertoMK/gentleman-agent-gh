@@ -1,4 +1,4 @@
----
+﻿---
 name: auto-metrics
 description: "Self-evaluation scoring. Trigger via !score or !metrics — not automatic."
 license: Apache-2.0
@@ -13,10 +13,11 @@ triggers: "!score, !metrics, explicit score/metric request, session end via !clo
 Only run on explicit request (!score, !metrics, !close) or user asking for score.
 NOT automatic after every task — eliminated to reduce ceremony for trivial changes.
 
-## PRE-FLIGHT
+## PRE-FLIGHT (HARD GATE)
 If `.learnings/bias-calibration.json` exists with `samples >= 2`:
 - Check bitácora for today's audit entry (`[audit] {today}`)
-- If no audit found: skip bias correction, log "no audit today — scoring without bias correction"
+- If no audit found: **FAIL** — "no audit today — scoring without bias correction is forbidden. Run !audit first."
+- This is a HARD gate. Do NOT skip. Do NOT score without audit if biases exist.
 
 ## CORRECTION (if audit available)
 1. Subtract each dim's avg offset from self-score BEFORE threshold checks

@@ -1,11 +1,12 @@
-#requires -Version 7.6
+﻿#requires -Version 7.6
 <#
 .SYNOPSIS
-  Unified session close — BITACORA + git status + mem_session_summary template.
+  Unified session close — BITACORA + git status + protected files + external auditor gate + mem_session_summary template.
   Designed for the !close workflow shortcut.
 .DESCRIPTION
   Run this at session end BEFORE calling mem_session_summary.
-  Handles: BITACORA log, git status check.
+  Handles: BITACORA log, git status check, protected files verification,
+  external auditor gate (REQUIRED when code changes touch critical files).
   Outputs the structured info needed for the agent's Engram close protocol.
 .PARAMETER Goal
   What was the session goal? Pre-fills the summary template.
@@ -32,6 +33,17 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $bitacoraPath = Join-Path -Path $repoRoot -ChildPath "BITACORA.md"
+# ponytail: protected files — changes to these REQUIRE external audit
+$protectedFiles = @(
+    '.agents/skills/security-scanner/',
+    '.agents/skills/quality-gate/',
+    '.agents/skills/auto-metrics/',
+    '.agents/skills/external-auditor/',
+    '.agents/skills/immune-system/',
+    'ANTI-PATTERN-CATALOG.md',
+    'ANTI-PATTERN-CHEATSHEET.md',
+    '.project.json'
+)
 # Log to BITACORA
 $entry = "$(Get-Date -Format 'yyyy-MM-dd') - $Description"
 if (Test-Path -LiteralPath $bitacoraPath) {
@@ -45,13 +57,39 @@ try {
     $branch = git rev-parse --abbrev-ref HEAD 2>$null
     if (-not $branch) { $branch = "unknown" }
 } catch { $branch = "unknown" }
+# --- Protected files gate ---
+$touchedProtected = @()
+if ($hasChanges) {
+    $changedFiles = @($gitStatus | ForEach-Object {
+        if ($_ -match '^\s*[MADRCU\?]\s+(.+)$') { $matches[1] }
+    })
+    foreach ($pf in $protectedFiles) {
+        # Match both / and \ in paths
+        $escd = [regex]::Escape($pf).Replace('/', '[/\\]')
+        foreach ($cf in $changedFiles) {
+            if ($cf -match $escd) {
+                $touchedProtected += $pf
+                break
+            }
+        }
+    }
+}
+$needsAudit = $touchedProtected.Count -gt 0
+# --- External auditor gate ---
+$auditGatePassed = $true
+if ($needsAudit) {
+    $auditGatePassed = $false  # Blocks !close until external auditor runs
+}
 $result = [PSCustomObject]@{
-    action      = "close-session"
-    timestamp   = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
-    branch      = $branch
-    hasChanges  = $hasChanges
-    changeCount = if ($hasChanges) { @($gitStatus | Where-Object { $_ -match '\S' }).Count } else { 0 }
-    goal        = $Goal
+    action            = "close-session"
+    timestamp         = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
+    branch            = $branch
+    hasChanges        = $hasChanges
+    changeCount       = if ($hasChanges) { @($gitStatus | Where-Object { $_ -match '\S' }).Count } else { 0 }
+    goal              = $Goal
+    needsAudit        = $needsAudit
+    protectedTouched  = $touchedProtected
+    auditGatePassed   = $auditGatePassed
 }
 # Compact prompt: show if explicitly requested, or when changes exist and not explicitly disabled
 $showCompact = $CompactPrompt -or ($hasChanges -and -not $PSBoundParameters.ContainsKey('CompactPrompt'))
@@ -60,7 +98,9 @@ if ($showCompact) {
         ($gitStatus | Where-Object { $_ -match '\S' } | ForEach-Object { "  - $_" }) -join "`n"
     } else { "" }
     $keyDecisions = if ($Goal) { $Goal } else { "None recorded" }
-    $nextActions = if ($hasChanges) {
+    $nextActions = if ($needsAudit) {
+        "⚠️ AUDIT GATE BLOCKED: run !audit first (protected files changed)"
+    } elseif ($hasChanges) {
         "Review & commit $($result.changeCount) modified file(s), then run !score"
     } else { "Run !score if needed" }
 @"
@@ -78,7 +118,17 @@ if ($Quiet) {
     Write-Host "Branch : $branch"
     Write-Host "Changes: $(if($hasChanges){ "$($result.changeCount) file(s) modified" }else{ 'clean' })" -ForegroundColor Yellow
     Write-Host ""
-    if ($hasChanges) {
+    if ($needsAudit) {
+        Write-Host "⚠️  REQUIRED: External auditor gate BLOCKED" -ForegroundColor Red
+        Write-Host "    Protected files modified:" -ForegroundColor Red
+        foreach ($pf in $touchedProtected) {
+            Write-Host "    - $pf" -ForegroundColor Red
+        }
+        Write-Host "    Run '!audit' before '!close' to pass the gate." -ForegroundColor Red
+        Write-Host "    Gate: external-auditor must PASS before this session can close." -ForegroundColor Red
+        Write-Host ""
+    }
+    if ($hasChanges -and -not $needsAudit) {
         Write-Host "Run '!score' to update project score after changes." -ForegroundColor Yellow
         Write-Host ""
     }
