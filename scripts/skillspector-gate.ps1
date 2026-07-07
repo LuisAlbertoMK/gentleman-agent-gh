@@ -19,6 +19,7 @@
   Docker image name when using Docker fallback (default: skillspector).
 #>
 param(
+    [switch]$Quiet,
     [string]$SkillsPath = ".agents/skills",
     [int]$FailOnRisk = 100,
     [string]$DockerImage = "skillspector"

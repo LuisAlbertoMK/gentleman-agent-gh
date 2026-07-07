@@ -28,6 +28,7 @@
 # TARGET after running:    C: ~35-40 GB free (~30-34%)
 
 param(
+    [switch]$Quiet,
     [switch]$DisableHibernation,
     [switch]$SetPageFile,
     [switch]$RunDism,

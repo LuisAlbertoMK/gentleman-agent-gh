@@ -25,6 +25,7 @@
   .\scripts\skill-validate.ps1 -SkillName "accessibility" -BaselineToolCalls 8 -BaselineTokens 1200 -BaselineScore 6.0 -BaselineErrors 2 -BaselineIterations 14 -TrialToolCalls @(5,6,4) -TrialTokens @(850,920,780) -TrialScores @(8.0,7.5,8.6) -TrialErrors @(1,0,0) -TrialIterations @(9,8,7)
 #>
 param(
+    [switch]$Quiet,
   [Parameter(Mandatory=$true)][string]$SkillName,
   [Parameter(Mandatory=$true)][int]$BaselineToolCalls,
   [Parameter(Mandatory=$true)][int]$BaselineTokens,

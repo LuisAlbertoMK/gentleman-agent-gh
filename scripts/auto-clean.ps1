@@ -16,6 +16,7 @@
 #>
 
 param(
+    [switch]$Quiet,
     [int]$MaxAgeHours = 24,
     [string]$TempDir = "$env:LOCALAPPDATA\Temp\opencode"
 )

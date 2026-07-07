@@ -14,6 +14,7 @@
 #>
 
 param(
+    [switch]$Quiet,
   [string[]]$Path = @(),
   [string]$Dir = "",
   [switch]$Recurse

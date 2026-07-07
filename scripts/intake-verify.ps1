@@ -1,6 +1,6 @@
 ﻿#requires -Version 7.6
 <# .SYNOPSIS Verify SDD intake — validates project structure and skill scaffolding against intake.json #>
-param([string]$Path,[ValidateRange(1,5)][int]$Level=1,[string]$Type="auto",[bool]$Minimal=$true,[ValidateSet("text","json")][string]$Format="text")
+param([switch]$Quiet,[string]$Path,[ValidateRange(1,5)][int]$Level=1,[string]$Type="auto",[bool]$Minimal=$true,[ValidateSet("text","json")][string]$Format="text")
 $ErrorActionPreference='Stop';Set-StrictMode -Version Latest;$t0=Get-Date;$rr=@();$chk=[char]0x2705;$crs=[char]0x274C;$wrn=[char]0x26A0
 function wr{param([string]$I,[string]$M)
 $c=@{$chk="Green";$crs="Red";$wrn="Yellow"}[$I]

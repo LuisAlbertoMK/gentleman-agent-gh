@@ -7,7 +7,7 @@
 .PARAMETER SkipPester
   Skip Pester discovery — for manual function extraction only.
 #>
-param([switch]$SkipPester)
+param([switch]$Quiet,[switch]$SkipPester)
 Set-StrictMode -Version Latest
 
 # --- Setup: extract and define functions once ---

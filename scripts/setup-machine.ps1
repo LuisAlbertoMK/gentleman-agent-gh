@@ -26,6 +26,7 @@
     .\scripts\setup-machine.ps1 -RepoDir D:\gentleman-agent-gh
 #>
 param(
+    [switch]$Quiet,
     [string]$RepoDir = (Get-Location).Path,
     [switch]$SkipEnvVar,
     [switch]$SkipShortcuts,

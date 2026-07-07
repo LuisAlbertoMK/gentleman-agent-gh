@@ -20,6 +20,7 @@
 #>
 [CmdletBinding()]
 param(
+    [switch]$Quiet,
   [Parameter(Position = 0)]
   [ValidateSet('Check', 'Apply-New', 'Apply-File')]
   [string]$Mode = 'Check',

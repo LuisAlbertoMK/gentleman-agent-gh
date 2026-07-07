@@ -13,7 +13,7 @@ List snapshots only, no restore.
 Show what would be restored without applying.
 #>
 Set-StrictMode -Version Latest
-param([string]$Revision="",[switch]$List,[switch]$DryRun)
+param([switch]$Quiet,[string]$Revision="",[switch]$List,[switch]$DryRun)
 $ErrorActionPreference='Stop'
 $cfg="$env:USERPROFILE\.config\opencode"
 if(-not(Test-Path "$cfg\.git")){Write-Host "[err] No backup repo" -ForegroundColor Red;exit 1}

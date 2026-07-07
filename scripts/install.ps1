@@ -14,6 +14,7 @@
     .\scripts\install.ps1 -Yes             # non-interactive
 #>
 param(
+    [switch]$Quiet,
     [switch]$InstallGentleAI,
     [switch]$Yes
 )

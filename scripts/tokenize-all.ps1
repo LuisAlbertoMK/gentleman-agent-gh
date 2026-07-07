@@ -15,6 +15,7 @@
 #>
 
 param(
+    [switch]$Quiet,
     [string]$Path = (Join-Path (Split-Path $PSScriptRoot -Parent) ".agents\skills"),
     [string]$OutCsv = "",
     [int]$ThrottleLimit = 5

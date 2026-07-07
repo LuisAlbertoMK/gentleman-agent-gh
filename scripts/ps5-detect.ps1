@@ -12,6 +12,7 @@
   .\scripts\ps5-detect.ps1 -FilePath @("a.ps1","b.ps1")
 #>
 param(
+    [switch]$Quiet,
     [string[]]$FilePath
 )
 

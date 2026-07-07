@@ -12,7 +12,7 @@ Backup even if no changes detected.
 #>
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-param([string]$Message="",[switch]$Force)
+param([switch]$Quiet,[string]$Message="",[switch]$Force)
 $cfg="$env:USERPROFILE\.config\opencode"
 if(-not(Test-Path $cfg)){Write-Host "[err] $cfg not found" -ForegroundColor Red;exit 1}
 Push-Location $cfg

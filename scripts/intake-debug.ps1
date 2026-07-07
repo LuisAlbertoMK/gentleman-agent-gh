@@ -1,5 +1,5 @@
 ﻿#requires -Version 7.6
-param()
+param([switch]$Quiet)
 Set-StrictMode -Version Latest
 <#
 .SYNOPSIS

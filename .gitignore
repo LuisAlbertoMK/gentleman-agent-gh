@@ -56,6 +56,7 @@ temp/
 scratch/
 *.log
 logs/
+score-debug.json
 
 # ============================================
 # Node (if user adds Node tooling later)

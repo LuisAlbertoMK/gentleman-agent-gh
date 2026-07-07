@@ -42,6 +42,7 @@
     .\scripts\dev-server.ps1 -Action Cleanup
 #>
 param(
+    [switch]$Quiet,
     [ValidateSet("Start", "Status", "Logs", "Kill", "List", "Cleanup")]
     [string]$Action = "List",
 

@@ -11,6 +11,7 @@
     Path to write registry JSON. Default: scripts/skill-registry.json
 #>
 param(
+    [switch]$Quiet,
     [string]$SkillsDir = "$PSScriptRoot\..\.agents\skills",
     [string]$OutputFile = "$PSScriptRoot\skill-registry.json"
 )

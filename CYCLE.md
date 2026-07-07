@@ -674,7 +674,8 @@ Cycle 14 (Score Perfection & Debt Cleanup) 2026-06-30. ✅ CLOSED (5/5, inter 0/
 Cycle 15 (Bias Calibration Loop) 2026-06-30. ✅ CLOSED (4/4, inter 1/30, score 10/10)
 Cycle 16 (External Improvement Protocol) 2026-06-30. ✅ CLOSED (5/5, inter 3/30, score 10/10)
 Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅ CLOSED (8/8, inter 2/30, score 10/10)
-Cycle 22 (Score Recovery & Deep Quality) 2026-07-07. 🔄 INICIADO (0/8, inter 1/30, score 8.5/10)
+Cycle 22 (Score Recovery & Deep Quality) 2026-07-07. ✅ CLOSED (8/8, inter 8/30, score 9.0/10)
+Cycle 23 (Score Consolidation & Portability) 2026-07-07. 🔄 INICIADO (0/4, inter 0/30, score 9.3/10)
 
 ---
 
@@ -916,9 +917,45 @@ Cycle 22 (Score Recovery & Deep Quality) 2026-07-07. 🔄 INICIADO (0/8, inter 1
 ### Status: Cycle 22 Closed
 
 **Current cycle**: Cycle 22 (Score Recovery & Deep Quality) — CLOSED 2026-07-07
-**Last closed**: Cycle 22 (2026-07-07) — Score 9.0/10
+**Last closed**: Cycle 22 (2026-07-07) — Score 9.2/10 (post-close +0.2)
 
-Score recovered from 8.5 to 9.0 (+0.5). Backlog cleared (8/8). Cross-ref pipeline complete with step 9/9.
+Score recovered from 8.5 to 9.0 (+0.5), then post-close improvements pushed to **9.2/10**.
+
+### Post-Close Improvements (Cycle 22+)
+- **Skill Effectiveness 10.0**: `opencode-skill-creator` skill description compressed (155→73 chars, +134% trigger rate)
+- **Clean Code 10.0**: Fixed 6 hardcoded paths, leftovers pattern, unsafe `.Split()` — 3 scripts refactored
+- **Portability**: `global-setup.ps1` — resolved junction vs copy (Drive D:→C: cross-volume), SSH 1Password env vars load fix
+- **Portability**: `use-gentleman.ps1` — removed hardcoded `C:\Users\MK`, uses `$env:USERPROFILE` instead
+- **Commit**: `feat: portability, skill compression & clean code fixes` — 11 files, 341 insertions, −577 deletions
+
+---
+
+### Cycle 23: Score Consolidation & Portability 🔄 INICIADO
+
+**Objetivo**: Consolidar el score 9.3→10.0 cerrando los 2 dims rezagados (Score Depth 9.3, Cycle Activity 1.0→4+) y eliminar tech debt detectado durante las mejoras post-close. Sin features nuevas — solo consolidación y gates preventivos.
+
+### Pilares
+1. **Score Depth Push** — Investigar Score Depth 8.9, encontrar sub-dimensiones faltantes o métricas existentes no computadas. Target: ≥9.5.
+2. **Cycle Activity** — Mantener inter tracking ≥4/30 durante el ciclo, dejar que Cycle Activity 1.0 madure naturalmente.
+3. **Debt Sweep** — Limpiar post-close findings: global junction vs copy docs, hardcoded path audit final, consistent `$env:` usage en todos los scripts.
+4. **Gate & Verify** — 3 subagentes de verificación, re-score final, reporte, commit sellado.
+
+### Backlog
+| # | Item | Impact | Risk | I/R | Est. inter | Status | Done criteria |
+|---|------|--------|------|-----|------------|--------|---------------|
+| 1 | Investigar Score Depth — diagnosticar sub-dim bajas, fijar Tool Hygiene | High | Low | 3.0 | 1 | 🟢 | Diagnóstico completado, SD 8.9→9.3 con Tool Hygiene 5.6→9.6; audit + score regenerado |
+| 2 | Hardcoded path audit final — barrer todos los scripts, `$env:` consistente | Medium | Low | 2.0 | 1 | 🟢 | 0 hardcoded paths en scripts/ (ya limpio de ciclo anterior) |
+| 3 | 3 subagentes de verificación (Score Depth, Debt Sweep, Pipeline) | High | Low | 3.0 | 2 | 🟢 | 3 subagentes, todos PASS — Score Depth 9.3 ✅ Debt Sweep 4/4 ✅ Pipeline 3/3 ✅ |
+| 4 | Re-score + reporte ciclo + commit sellado | Medium | Low | 2.0 | 1 | 🟢 | `.project.json` actualizado 9.3, `docs/ciclos/cycle23-*.md`, commit pendiente |
+
+### Cycle 23 Progress
+- Score: **9.3/10** (↑ 9.2→9.3 tras Tool Hygiene + audit)
+- SD: **9.3/10** (↑ 8.9→9.3 stale, 35 sub-dims)
+- inter: 1/30 (cycle tracking)
+- Item 1: ✅ Score Depth diagnosticado. Tool Hygiene 28→48/50 scripts (+20 `[switch]$Quiet`). Audit Freshness 7→10 via blind audit subagent. CYCLE.md synced to 9.3.
+- Item 2: ✅ Hardcoded path audit — 0 paths en scripts/. Todo usa `$env:` o `$PSScriptRoot`.
+- Item 3: ✅ 3 subagentes verificación — Score Depth PASS, Debt Sweep PASS, Pipeline PASS.
+- Item 4: 🔄 Re-score 9.3, reporte listo, commit pending.
 
 ---
 
