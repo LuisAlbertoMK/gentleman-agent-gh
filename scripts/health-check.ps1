@@ -72,8 +72,22 @@ function Test-Junction {
 
 function Repair-Junction {
   param([string]$Path, [string]$Target, [string]$Label)
+  # ponytail: validate LinkType before destructive Remove-Item — avoid nuking real dirs
   if (Test-Path $Path) {
-    Remove-Item -LiteralPath $Path -Force -Recurse -ErrorAction SilentlyContinue
+    $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+    if ($item -and $item.LinkType -eq 'Junction') {
+      Remove-Item -LiteralPath $Path -Force -Recurse -ErrorAction SilentlyContinue
+    } elseif ($item -and $item.LinkType) {
+      Write-Warning "[repair] skipping $($Path): existing LinkType $($item.LinkType) is not Junction"
+      Write-Output "[skipped] $Label (not a junction)"
+      return
+    }
+    # else: real dir/file — refuse remove to be safe
+    elseif ($item) {
+      Write-Warning "[repair] refusing to remove $($Path): real entry, not a junction"
+      Write-Output "[refused] $Label (real entry)"
+      return
+    }
   }
   $parent = Split-Path $Path -Parent
   if (-not (Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }

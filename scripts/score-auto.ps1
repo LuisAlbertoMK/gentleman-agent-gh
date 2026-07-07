@@ -24,8 +24,9 @@ try {
             exit 0
         }
     }
-} catch {}
-Set-Location "$PSScriptRoot\.."
+} catch { Write-Debug "score-cache: $($_.Exception.Message)" }
+# ponytail: Push-Location preserves caller CWD (AGENTS.md forbids Set-Location)
+Push-Location "$PSScriptRoot\.."
 & "$PSScriptRoot\restore-project-score.ps1" -Quiet 2>&1 | Out-Null
 $m=[math];$h=@{};function a($n,$s,$e,$r){$h[$n]=@{s=$s;e=$e;r=$r}}
 # ponytail: batch file reads — cache Get-ChildItem results
@@ -109,7 +110,7 @@ $sd+=($m::Min(10,$ic/$it*10));$sd+=$(if($bt -gt 0){$bpp/$bt*10}else{0})
 $dp=($sd | Measure-Object -Average).Average;if($dp -is [double]){$dp=$m::Round($dp,1)}
 a "SD" $dp @{subd=$sd.Count} "Depth: $($sd.Count) sub-dims: $dp/10"
 # Bias calibration warning (auto-metrics correction, not project score)
-$bp3=".learnings/bias-calibration.json";if(!$Json-and(Test-Path $bp3)){try{$bc2=Get-Content $bp3 -Raw|ConvertFrom-Json;if($bc2.samples -ge 2){Write-Host "⚠️ Active bias offsets (auto-metrics):" -ForegroundColor DarkYellow;$bc2.offsets.PSObject.Properties|Sort-Object Name|ForEach-Object{Write-Host "  $($_.Name): $($_.Value)" -ForegroundColor DarkYellow}}}catch{}}
+$bp3=".learnings/bias-calibration.json";if(!$Json-and(Test-Path $bp3)){try{$bc2=Get-Content $bp3 -Raw|ConvertFrom-Json;if($bc2.samples -ge 2){Write-Host "⚠️ Active bias offsets (auto-metrics):" -ForegroundColor DarkYellow;$bc2.offsets.PSObject.Properties|Sort-Object Name|ForEach-Object{Write-Host "  $($_.Name): $($_.Value)" -ForegroundColor DarkYellow}}}catch{Write-Debug "bias-cal read: $($_.Exception.Message)"}}
 $all=$h.Values.PSForEach({$_.s});$fn=$m::Round(($all | Measure-Object -Average).Average,1)
 $dn=@{"PA"="Project Artifacts";"Sec"="Security";"DC"="Dead Code";"CC"="Clean Code";"BP"="Best Practices";"Or"="Orthography";"Bi"="Bitacora";"Me"="Metrics";"SP"="Script Performance";"SE"="Skill Effectiveness";"CA"="Cycle Activity";"BI2"="Backlog Integrity";"SD"="Score Depth"}
 $r=@{score=@{current=$fn;dimensions=[ordered]@{};last_updated=(Get-Date -Format "yyyy-MM-dd");trend="stable"};dimensions_detail=$h}
@@ -119,5 +120,6 @@ if(Test-Path ".project.json"){try{$pr=Get-Content ".project.json" -Raw -Encoding
 try {
     if (-not (Test-Path $cacheDir)) { New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null }
     @{ hash = $cacheHash; timestamp = (Get-Date -Format "o"); result = $r } | ConvertTo-Json -Depth 5 | Set-Content $cacheFile -Encoding UTF8
-} catch {}
+} catch { Write-Debug "score-cache save: $($_.Exception.Message)" }
+Pop-Location
 if($Json){$r | ConvertTo-Json -Depth 5}elseif($Quiet){Write-Host "Score: $fn/10 (trend: $($r.score.trend))"}else{Write-Host "$($r.score.last_updated) | $fn/10 ($($r.score.trend))" -ForegroundColor Cyan;Write-Host "Dimensions:" -ForegroundColor Yellow;foreach($k in $dn.Keys){$d2=$h[$k];$C=if($d2.s -ge 9){"Green"}elseif($d2.s -ge 7){"Yellow"}else{"Red"};Write-Host " $($dn[$k].PadRight(16))$($d2.s.ToString('F1').PadLeft(4))/10" -ForegroundColor $C};Write-Host $("-"*32);Write-Host " TOTAL$(''.PadLeft(12))$($fn.ToString('F1').PadLeft(4))/10" -ForegroundColor White}

@@ -22,7 +22,7 @@ function Get-Cache {
         $age = [int]((Get-Date) - $cachedAt).TotalSeconds
         if ($age -lt $TtlSeconds) { return $entry.data }
         return $null
-    } catch { return $null }
+    } catch { Write-Debug "cache.get($Key): $($_.Exception.Message)"; return $null }
 }
 
 function Set-Cache {
@@ -33,7 +33,7 @@ function Set-Cache {
         try {
             $raw = Get-Content $cacheFile -Raw -Encoding UTF8 | ConvertFrom-Json
             if ($raw) { $raw.PSObject.Properties | ForEach-Object { $cache[$_.Name] = $_.Value } }
-        } catch {}
+} catch { Write-Debug "cache.set load: $($_.Exception.Message)" }
     }
     $cache[$Key] = @{ timestamp = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ"); data = $Data }
     $cache | ConvertTo-Json -Depth 5 | Set-Content $cacheFile -Encoding UTF8
@@ -49,7 +49,7 @@ function Clear-Cache {
         if ($Section) { $cache.Remove($Section) }
         else { $cache = @{} }
         $cache | ConvertTo-Json -Depth 5 | Set-Content $cacheFile -Encoding UTF8
-    } catch {}
+    } catch { Write-Debug "cache.clear($Section): $($_.Exception.Message)" }
 }
 
 switch ($Action) {

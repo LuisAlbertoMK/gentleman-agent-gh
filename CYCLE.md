@@ -16,13 +16,35 @@
 
 **Cycle 10** (CLOSED): Full-Spectrum Quality. PSSA zero-warnings, doc sync, upstream gentle-ai integration, automation robustness. ✅ CLOSED (16/18, inter 105/30, score 10/10)
 
+**Cycle 11** (🟢 ACTIVE): Self-Improvement, Token Compression & Quality Hardening. Multi-agent analysis: upstream gentle-ai diff, overhead audit, code quality audit, MCP research. See `docs/mejoras/PLAN-ciclo11-self-improvement.md`.
+- Items 1–7 in-cycle (this commit); Items 8–15 queued for Cycle 12.
+- Token savings: ~6,500/sessão (AGENTS dup + ANTI-PATTERN-CATALOG lazy fix + 8-agent prompt DRY).
+- Security: ANALYZE-ONLY agents reinforced with shared protocol forbidding Set-Content/Out-File via bash outside docs/agentes/.
+- Code quality: score-auto Set-Location→Push-Location, 7 catch-vacíos → Write-Debug, health-check Repair-Junction validates LinkType.
+- Sync with upstream gentle-ai: 18/20 skills overlap confirmed; queued: trigger-rules declarativas, skill-registry index-first, hermes-ephemeral-delegation, branch-pr v2.0, golden snapshots.
+
 ### Pillars
 1. **Script Performance** — reduce avg script size from 6.4KB to <5KB. Compress scripts >8KB. (✅ Cycle 8)
 2. **Score expansion** — implement sub-dimension taxonomy to break the 10.0 ceiling on key metrics. (✅ Cycle 8)
 3. **Clean Code refinement** — add `[Parameter(Mandatory)]` to remaining script without params → 36/36. (✅ Cycle 8)
 4. **Skill Resolution** — BFS resolution with keyword scoring + 13-route agent routing table. (✅ Cycle 9)
-5. **PSSA Zero-Warnings** — Fix BOM + replace aliases → <50 real PSSA warnings. (🟢 Cycle 10 active)
-6. **Doc Sync & Automation** — README/CHANGELOG actualizados, BITACORA limpia, upstream integrado. (🟢 Cycle 10 active)
+5. **PSSA Zero-Warnings** — Fix BOM + replace aliases → <50 real PSSA warnings. (✅ Cycle 10)
+6. **Doc Sync & Automation** — README/CHANGELOG actualizados, BITACORA limpia, upstream integrado. (✅ Cycle 10)
+7. **Token Compression** — eliminate AGENTS.md local dup, fix anti-pattern load order, DRY 8-agent prompts. (🟢 Cycle 11 active)
+8. **Security Hardening** — ANALYZE-ONLY protocol forbids destructive bash writes. (🟢 Cycle 11 active)
+9. **Code Quality** — Set-Location→Push-Location, catch {} logging, LinkType guard. (🟢 Cycle 11 active)
+
+### Cycle 11 Backlog (ACTIVE)
+| Item | Impact | Risk | I/R | Status | Done criteria |
+|------|--------|------|-----|--------|---------------|
+| Eliminar AGENTS.md local (duplicado del global) | 3 | 1 | 3.0 | ✅ Done | `git rm AGENTS.md` confirmed; gentleman-vMK prompt no longer ref `{file:AGENTS.md}` |
+| Fix AGENTS L107 ANTI-PATTERN-CATALOG → CHEATSHEET | 3 | 1 | 3.0 | ✅ Done | Local + global AGENTS.md updated (sync via global) |
+| Security: ANALYZE-ONLY shared protocol forbids Set-Content/Out-File via bash | 3 | 1 | 3.0 | ✅ Done | `prompts/shared/_analyze-only-protocol.md` created; 7 specialist prompts ref it |
+| DRY: extract boilerplate → `prompts/shared/{_core-behavior,_analyze-only-protocol}.md` | 3 | 2 | 1.5 | ✅ Done | 10 agent prompts refactored (deep/quick/codex/implementer + 7 specialists) |
+| `score-auto.ps1` Set-Location → Push-Location | 3 | 1 | 3.0 | ✅ Done | L28 swapped; Pop-Location added before output |
+| 7 `catch {}` vacíos → Write-Debug (score-auto×3 + lib/cache×2 + skillspector×1 + bias×1) | 3 | 1 | 3.0 | ✅ Done | 7 catches with Write-Debug logging |
+| `health-check.ps1 Repair-Junction`:validate LinkType before remove | 3 | 1 | 3.0 | ✅ Done | Get-Item LinkType check; refuse on real entries |
+| **Cycle 11 closes** — next: golden snapshots, trigger rules declaratives, branch-pr v2 (Cycle 12) | - | - | - | 🟢 | Verify triple-passes; commit; CYCLE updated |
 
 ### Cycle 6 Backlog (CLOSED)
 | Item | Impact | Risk | I/R | Est. inter | Status | Done criteria |
