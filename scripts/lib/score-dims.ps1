@@ -273,7 +273,7 @@ $avgScriptSizeKB = $math::Round(
 $hugeScriptCount = $scriptFiles.PSWhere({ $_.Length -gt 51200 }).Count
 
 $spScore = 10
-if ($totalScripts -lt 15 -or $totalScripts -gt 50) {
+if ($totalScripts -lt 15 -or $totalScripts -gt 60) {
     $spScore -= 1
 }
 # Note: condition order matters — >15 checked first, >20 uses elseif

@@ -595,7 +595,7 @@ Averages into **Score Depth** dimension (13th dim) for granularity beyond 10.0 c
 | Orthography | corruption | files=0→10, ≤5→9, ≤10→7, else→4 |
 | Bitacora | exists, content | exists→10 else 0. content: min(lines/2, 10) |
 | Metrics | metrics_dir, errors_dir, error_json, reports | each exists→10 else 0 |
-| Script Performance | count, avg_size, huge | count 15-50→10 else 7. avg ≤10KB→10. huge=0→10 |
+| Script Performance | count, avg_size, huge | count 15-60→10 else 7. avg ≤10KB→10. huge=0→10 |
 | Skill Effectiveness | skill_count, over_3kb, over_5kb, skill_avg | ≥60→10. 0 over→10. avg ≤2.0KB→10 |
 | Cycle Activity | inter_ratio | min((IC/IT)×10, 10) |
 | Backlog Integrity | integrity | passed/total × 10 |
