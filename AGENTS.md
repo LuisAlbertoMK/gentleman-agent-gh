@@ -40,6 +40,7 @@ Thresholds en skill `triple-verify`. Modos: Normal (zona) · `!ship`=triple+qual
 | `!compress` | Karpathy compression skills >2.5KB + score update |
 | `!score` | `score-auto.ps1 -Json` + docs update + cross-ref |
 | `!sync` | `pull-upstream.ps1 -Mode Check` → sync-vmk.ps1 + check-config-drift.ps1 → score |
+| `!sync-all` | `sync-all.ps1` — full global sync (global-setup + sync-vmk) |
 | `!health` | health-check.ps1 + check-config-drift.ps1 + git status |
 | `!batch` | `batch.ps1` — batch auto-incremental + log |
 | `!cycle` | `inter-track.ps1 -Show` + score + upstream |
