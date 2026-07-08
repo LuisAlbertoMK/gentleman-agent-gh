@@ -18,7 +18,7 @@ triggers: "session resume, dónde lo dejamos, continuá, session start, code mem
 
 ## Proactive Recall
 1. `mem_search(query="<last session>", limit=5)` — past work
-2. If user msg has keywords → search matching observations
+2. If user msg has keywords → `mem_search(query="<keywords>", type="bugfix|pattern|decision", limit=3)` → inject top 3 as context
 3. Present relevant decisions/bugfixes
 4. `mem_search(query="project/{name}", scope=project, limit=1)`
 5. If missing → trigger Project fingerprint (dreaming)
@@ -55,6 +55,12 @@ Start→load handoff|create. During→detect→update. End→save+handoff+next s
 
 ### Auto-save triggers
 file created/deleted · >20 line change · discovery · important question · decision
+
+## Cross-Project Wisdom
+1. Check `docs/cross-project/patterns/` exists
+2. If yes → quick scan: load patterns matching session keywords via `cross-project-wisdom` skill
+3. Present max 3 HIGH/CRITICAL patterns as advisory context
+4. `ponytail:` lite — only runs if `ponytail` mode is lite/full/ultra (not off)
 
 ## Post-Check
 `mem_context` = resume. Git is safety gate.
