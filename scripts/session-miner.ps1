@@ -32,7 +32,16 @@ if($Mode-eq'check'){$data=[PSCustomObject]@{CatalogEntries=@($catalog).Count;Pat
 if($Json){return($data | ConvertTo-Json)}
 if(-not $Quiet){Write-Host "  Catalog: $(@($catalog).Count) entries`n  Patterns: $(@($patternKeys).Count) keys`n  Errors: $(@($errors).Count) entries`n  Repeated: $(@($repeated).Count) patterns`n  Status: $($data.Status)"};return}
 if($Mode-eq'scan'){$uncataloged=@($repeated | Where-Object {-not $_.Cataloged})
-$data=[PSCustomObject]@{CatalogCount=@($catalog).Count;PatternKeyCount=@($patternKeys).Count;ErrorCount=@($errors).Count;RepeatedPatterns=$repeated;UnCatalogedCount=$uncataloged.Count;CanApply=$uncataloged.Count-gt0}
+# ponytail: cross-project wisdom cross-check
+$wisdomPatterns=@();$wisdomDir=Join-Path $rr 'docs' 'cross-project' 'patterns'
+if(Test-Path $wisdomDir){$wisdomFiles=Get-ChildItem $wisdomDir -Filter '*.json' -ErrorAction SilentlyContinue
+foreach($wf in $wisdomFiles){try{$wp=Get-Content $wf.FullName -Raw|ConvertFrom-Json
+$wpPattern=$wp.rule.summary
+$wpTitle=$wp.title
+if($wpPattern -or $wpTitle){$matched=$patternKeys|Where-Object{$_ -match [regex]::Escape(($wpPattern -replace '.{0,80}','')) -or $_ -cmatch $wpTitle}
+if($matched){$wisdomPatterns+=[PSCustomObject]@{PatternId=$wp.id;Title=$wp.title;Severity=$wp.severity;Summary=$wp.rule.summary;MatchKey=$matched -join ',';File=$wf.Name}}}}
+catch{Write-Debug "sm: wisdom cross-check skip $($wf.Name)"}}}
+$data=[PSCustomObject]@{CatalogCount=@($catalog).Count;PatternKeyCount=@($patternKeys).Count;ErrorCount=@($errors).Count;RepeatedPatterns=$repeated;UnCatalogedCount=$uncataloged.Count;CanApply=$uncataloged.Count-gt0;WisdomMatchCount=@($wisdomPatterns).Count;WisdomMatches=$wisdomPatterns}
 if($Json){return($data | ConvertTo-Json -Depth 3)}
 if(-not $Quiet){Write-Host "Catalog: $($catalog.Count) anti-patterns cataloged`nPattern keys: $($patternKeys.Count) from learnings`nErrors: $($errors.Count) entries"}
 if($repeated.Count-eq0){if(-not $Quiet){Write-Host "[OK] No repeated patterns found (threshold: $Threshold)"};return}
