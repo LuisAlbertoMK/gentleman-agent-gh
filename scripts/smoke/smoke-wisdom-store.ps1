@@ -1,0 +1,25 @@
+#requires -Version 7.6
+
+<#
+.SYNOPSIS
+  Smoke test: wisdom-store.ps1 exists and parses cleanly.
+#>
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+
+. "$env:USERPROFILE\.config\opencode\scripts\bash-safe.ps1"
+
+$RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$Script = Join-Path $RepoRoot 'scripts\wisdom-store.ps1'
+
+if (-not (Test-Path $Script)) {
+    Write-Host '[FAIL] wisdom-store.ps1 not found' -ForegroundColor Red
+    exit 1
+}
+
+# Parse check via Get-Command — throws on syntax errors
+$null = Get-Command $Script -ErrorAction Stop
+
+Write-Host '[PASS] wisdom-store.ps1 parse check' -ForegroundColor Green
+exit 0

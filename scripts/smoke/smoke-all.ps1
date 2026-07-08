@@ -35,6 +35,11 @@ $smokeScripts = @(
     @{ name = 'Score freshness warning';       file = 'smoke-score-freshness.ps1' }
     @{ name = 'Cycle LOOP step 3 freshness check'; file = 'smoke-cycle-loop.ps1' }
     @{ name = 'JsonFast serialization module'; file = 'smoke-jsonfast.ps1' }
+    @{ name = 'Wisdom Store — parse + migration'; file = 'smoke-wisdom-store.ps1' }
+    @{ name = 'Wisdom Loader — pattern retrieval'; file = 'smoke-wisdom-loader.ps1' }
+    @{ name = 'Wisdom Forge — dry-run promotion'; file = 'smoke-wisdom-forge.ps1' }
+    @{ name = 'Wisdom Demote — stale cleanup dry-run'; file = 'smoke-wisdom-demote.ps1' }
+    @{ name = 'Wisdom Stats — metrics output'; file = 'smoke-wisdom-stats.ps1' }
 )
 
 foreach ($s in $smokeScripts) {

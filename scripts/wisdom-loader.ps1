@@ -52,8 +52,10 @@ if ($patternFiles.Length -eq 0) {
 }
 
 # Parse params
-$techList = if ($Technology -and $Technology.Trim()) { @($Technology -split ',' | ForEach-Object { $_.Trim().ToLower() }) } else { [string[]]@() }
-$keywordList = if ($Keywords -and $Keywords.Trim()) { @($Keywords -split ',' | ForEach-Object { $_.Trim().ToLower() }) } else { [string[]]@() }
+$techList = [string[]]@()
+if ($Technology -and $Technology.Trim()) { $techList = @($Technology -split ',' | ForEach-Object { $_.Trim().ToLower() }) }
+$keywordList = [string[]]@()
+if ($Keywords -and $Keywords.Trim()) { $keywordList = @($Keywords -split ',' | ForEach-Object { $_.Trim().ToLower() }) }
 $sevOrder = @{ "LOW" = 0; "MEDIUM" = 1; "HIGH" = 2; "CRITICAL" = 3 }
 $minSev = if ($sevOrder.ContainsKey($Severity)) { $sevOrder[$Severity] } else { 0 }
 

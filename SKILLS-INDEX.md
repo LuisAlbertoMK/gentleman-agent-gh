@@ -1,6 +1,6 @@
 # SKILLS INDEX
 
-> Full trigger table for all 56 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 57 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
 > **Version**: 3.4 | **Changelog**: 3.4 (-10 skills post-audit: deprecated/redundant/lang-specific removed); 3.3 (-9 SDD phase stubs consolidated into unified sdd)

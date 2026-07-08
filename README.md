@@ -114,7 +114,7 @@ El proyecto usa dos MCPs para memoria cross-session:
 | **Testing** | skill-testing |
 | **Others** | recovery-protocol, context-watchdog, performance-tracker, metricas, issue-creation, development-mode, execution-mode |
 
-**Total: 56 skills + `_shared`** — todas con SKILL.md, frontmatter YAML, versionado, cambio previo y licencia Apache-2.0.
+**Total: 57 skills + `_shared`** — todas con SKILL.md, frontmatter YAML, versionado, cambio previo y licencia Apache-2.0.
 
 ---
 

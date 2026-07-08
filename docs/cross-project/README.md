@@ -12,8 +12,9 @@ docs/cross-project/
 │   ├── ux-a11y-hero-btn-contrast.json
 │   ├── ux-a11y-footer-span-color.json
 │   └── css-rgb-black-vs-transparent.json
-├── backlog/           # Patrones pendientes de clasificar
-└── PLAN.md            # Diseño completo del sistema
+├── backlog/           # Patrones pendientes de clasificar (vacíos — migrados)
+├── PLAN.md            # Diseño completo del sistema
+└── scripts/           # F2+F3: store/loader/guard/forge/demote/stats
 ```
 
 ## ¿Qué es un patrón?
@@ -50,19 +51,25 @@ Cada patrón en `patterns/` tiene:
 1. **Rung 0b** en Pre-Flight Gate: cross-check cruzado entre factibilidad y YAGNI
 2. **`!wisdom`**: shortcut para cargar patrones relevantes al contexto
 3. **session-resume**: carga patrones de alta prioridad al inicio de sesión
-4. **Engram personal**: búsqueda rápida cross-sesión
-5. **Pattern Guard** (Fase 2): detección automática desde cambios en código
+4. **Engram scope:personal**: búsqueda rápida cross-sesión + guardado automático
+5. **Pattern Guard** (F2): detección LAZY desde cambios en código (`pattern-guard.ps1`)
+6. **Wisdom Store** (F2): migración y validación de patrones (`wisdom-store.ps1`)
+7. **Wisdom Stats** (F2): métricas de uso y distribución (`wisdom-stats.ps1`)
+8. **Wisdom Forge** (F3): auto-forja de skills al superar thresholds (`wisdom-forge.ps1`)
+9. **Wisdom Demote** (F3): ciclo de vida — demotion/remove/archive (`wisdom-demote.ps1`)
+10. **!analisis** (F2): inyección de wisdom en análisis multi-agente
 
 ## Cómo contribuir un patrón nuevo
 
 1. Creá `docs/cross-project/backlog/<nombre>.json` con el formato de pattern
-2. En la próxima session review, se clasifica y migra a `patterns/`
-3. Si el patrón se repite 3+ veces → considerar forjar skill
+2. Migralo con: `scripts/wisdom-store.ps1 -MigrateBacklog`
+3. Auto-detectá en código existente con: `scripts/pattern-guard.ps1 -Mode BATCH`
+4. Si el patrón acumula hits → se forja solo vía `wisdom-forge.ps1`
 
 ## Fases
 
 | Fase | Estado | Qué incluye |
 |------|--------|-------------|
 | F1 · HOY | ✅ Implementada | Estructura, 3 patrones seed, skill, rung 0b, `!wisdom` |
-| F2 · MAÑANA | 🔲 Pendiente | Scripts de store/load/guard, Pattern Guard automatizado |
-| F3 · PASADO | 🔲 Pendiente | Auto-forja de skills, democión, dreaming integration |
+| F2 · MAÑANA | ✅ Implementada | Store/loader/guard/stats + Pattern Guard + immune-system scope:personal + `!analisis` wisdom injection |
+| F3 · PASADO | ✅ Implementada | Forge pipeline (9 quality gates), demote/remove/archive, dreaming integration, rollback |

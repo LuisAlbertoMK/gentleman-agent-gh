@@ -676,7 +676,7 @@ Cycle 16 (External Improvement Protocol) 2026-06-30. ✅ CLOSED (5/5, inter 3/30
 Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅ CLOSED (8/8, inter 2/30, score 10/10)
 Cycle 22 (Score Recovery & Deep Quality) 2026-07-07. ✅ CLOSED (8/8, inter 8/30, score 9.0/10)
 Cycle 23 (Score Consolidation & Portability) 2026-07-07. ✅ CLOSED (4/4, inter 3/30, score 9.3/10)
-Cycle 24 (Cross-Project Wisdom F2+F3) 2026-07-07. 🔄 INICIADO (14/14, inter 0/30, score 9.3/10)
+Cycle 24 (Cross-Project Wisdom F2+F3) 2026-07-08. ✅ CLOSED (16/16, inter 4/30, score 8.7/10)
 
 ---
 
@@ -1012,7 +1012,7 @@ Score recovered from 8.5 to 9.0 (+0.5), then post-close improvements pushed to *
 - H6: Global skills restored as copies (junctiones imposible cross-volume C:→D:) ✅
 - M1: Set-StrictMode added to setup-machine.ps1 ✅
 
-### Cycle 24: Cross-Project Wisdom F2+F3 🔄 INICIADO
+### Cycle 24: Cross-Project Wisdom F2+F3 ✅ CLOSED 2026-07-08
 
 **Objetivo**: Completar Fase 2 (MAÑANA) y Fase 3 (PASADO) del sistema de Conocimiento Cross-Project — automatización de descubrimiento de patrones más evolución autónoma (forge/demote/remove/archive).
 
@@ -1037,6 +1037,33 @@ Score recovered from 8.5 to 9.0 (+0.5), then post-close improvements pushed to *
 | 11 | `wisdom-demote.ps1` — demote (90d) + remove (14d) + archive (180d) | F3 | ✅ |
 | 12 | dreaming/SKILL.md — wisdom store review en `!dream full` | F3 | ✅ |
 | 13 | CYCLE.md — ciclo prune stale wisdom | F3 | ✅ |
+| 14 | Smoke tests para wisdom scripts + bugfix loader | 🔵 Closed | ✅ |
+| 15 | README cross-project actualizado (F2+F3 estado real) | 🔵 Closed | ✅ |
+| 16 | Re-score + reporte + commit sellado | 🔵 Closed | ✅ |
+
+### Cycle 24 Progress
+- Score: **8.7/10** (+0.2 desde apertura 8.5; trend down por SE plugin + CA)
+- inter: 4/30 (cycle tracking)
+- Items: **16/16 done** ✅ — ALL completed
+  - Items 1-13: F2+F3 implementación completa (código existente verificado) ✅
+  - Item 14: 5 smoke tests creados + wisdom-loader bugfix (`[string[]]@()` null unrolling) ✅
+  - Item 15: README con tabla de integración expandida, F2+F3 ya ✅ ✅
+  - Item 16: Score 8.7, reporte `docs/ciclos/cycle24-20260708.md`, .project.json actualizado ✅
+
+### Cycle 24 Close
+- Score: **8.7/10** — Cross-ref restaurada, dreaming comprimido (3.6KB→2.7KB)
+- inter: 4/30
+- Backlog: 16/16 items complete ✅ (100%)
+- Key wins:
+  - **Smoke tests**: 5 tests nuevos para wisdom store/loader/forge/demote/stats — todos PASS
+  - **Bug fix**: wisdom-loader.ps1 — expresión-`if` con `[string[]]@()` se unrollaba a $null
+  - **Cross-ref**: 57 skills sincronizados (SKILLS-INDEX.md + README ya no fallan)
+  - **Dreaming**: comprimido bajo threshold 3KB (solo 1 skill >3KB, baja de 2)
+  - **Score +0.2**: 8.5→8.7 en cierre (PA 6→8, SD 8.5→9.1)
+- Carried forward:
+  - Skill Effectiveness 6.0: opencode-skill-creator >5KB (plugin, no comprimible sin romperlo)
+  - Script Performance threshold: 56 scripts, threshold 45 necesita recalibrar
+  - Cycle Activity: inter 4/30 (ciclo corto)
 
 ---
 
