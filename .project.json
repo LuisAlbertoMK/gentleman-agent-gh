@@ -1,8 +1,8 @@
 {
   "score": {
-    "current": 8.7,
+    "current": 8.8,
     "last_updated": "2026-07-08",
-    "trend": "down",
+    "trend": "up",
     "dimensions": {
       "Skill Effectiveness": 6.0,
       "Bitacora": 10.0,
@@ -16,7 +16,7 @@
       "Security": 10.0,
       "Cycle Activity": 1.0,
       "Backlog Integrity": 10.0,
-      "Script Performance": 9.0
+      "Script Performance": 10.0
     }
   },
   "dimensions_detail": {

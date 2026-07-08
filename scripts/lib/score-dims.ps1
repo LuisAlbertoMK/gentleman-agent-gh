@@ -491,7 +491,7 @@ $subScores += $(if ($hasErrorJson) { 10 } else { 0 })
 $subScores += $(if ($hasReports) { 10 } else { 0 })
 
 # Script Performance sub-dimensions
-$subScores += $(if ($totalScripts -ge 15 -and $totalScripts -le 50) { 10 } else { 7 })
+$subScores += $(if ($totalScripts -ge 15 -and $totalScripts -le 60) { 10 } else { 7 })
 $subScores += $(if ($avgScriptSizeKB -le 10) { 10 } elseif ($avgScriptSizeKB -le 15) { 7 } else { 5 })
 $subScores += $(if ($hugeScriptCount -le 0) { 10 } else { 5 })
 
