@@ -675,7 +675,8 @@ Cycle 15 (Bias Calibration Loop) 2026-06-30. ✅ CLOSED (4/4, inter 1/30, score 
 Cycle 16 (External Improvement Protocol) 2026-06-30. ✅ CLOSED (5/5, inter 3/30, score 10/10)
 Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅ CLOSED (8/8, inter 2/30, score 10/10)
 Cycle 22 (Score Recovery & Deep Quality) 2026-07-07. ✅ CLOSED (8/8, inter 8/30, score 9.0/10)
-Cycle 23 (Score Consolidation & Portability) 2026-07-07. 🔄 INICIADO (0/4, inter 0/30, score 9.3/10)
+Cycle 23 (Score Consolidation & Portability) 2026-07-07. ✅ CLOSED (4/4, inter 3/30, score 9.3/10)
+Cycle 24 (Cross-Project Wisdom F2+F3) 2026-07-07. 🔄 INICIADO (14/14, inter 0/30, score 9.3/10)
 
 ---
 
@@ -1010,6 +1011,32 @@ Score recovered from 8.5 to 9.0 (+0.5), then post-close improvements pushed to *
 - H2: CI step test-downstream.ps1 removed (script was deliberately purged) ✅
 - H6: Global skills restored as copies (junctiones imposible cross-volume C:→D:) ✅
 - M1: Set-StrictMode added to setup-machine.ps1 ✅
+
+### Cycle 24: Cross-Project Wisdom F2+F3 🔄 INICIADO
+
+**Objetivo**: Completar Fase 2 (MAÑANA) y Fase 3 (PASADO) del sistema de Conocimiento Cross-Project — automatización de descubrimiento de patrones más evolución autónoma (forge/demote/remove/archive).
+
+### Pilares
+1. **Automatización (F2)** — Scripts de store/loader/guard/stats para discover and retrieve
+2. **Evolución autónoma (F3)** — Forge pipeline, demotion, removal, dreaming integration
+3. **Integración** — session-resume, immune-system, pre-flight gate, !analisis
+
+### Backlog (F2 + F3 merged)
+| # | Item | Fase | Status | 
+|---|------|------|--------|
+| 1 | `wisdom-store.ps1` — guardar/migrar patrones | F2 | ✅ |
+| 2 | `wisdom-loader.ps1` — retrieval con ranking | F2 | ✅ |
+| 3 | immune-system guarda en scope:personal | F2 | ✅ |
+| 4 | session-miner extrae patrones al !close | F2 | ✅ |
+| 5 | `pattern-guard.ps1` — LAZY detection | F2 | ✅ |
+| 6 | !analisis inyecta wisdom | F2 | ✅ |
+| 7 | cross-project-forge skill (manual pipeline) | F2 | ✅ |
+| 8 | `wisdom-stats.ps1` — hit rate y métricas | F2 | ✅ |
+| 9 | `wisdom-forge.ps1` — auto-crear skills con 9 quality gates | F3 | ✅ |
+| 10 | `forge-rollback.ps1` — rollback de skills forjados | F3 | ✅ |
+| 11 | `wisdom-demote.ps1` — demote (90d) + remove (14d) + archive (180d) | F3 | ✅ |
+| 12 | dreaming/SKILL.md — wisdom store review en `!dream full` | F3 | ✅ |
+| 13 | CYCLE.md — ciclo prune stale wisdom | F3 | ✅ |
 
 ---
 
