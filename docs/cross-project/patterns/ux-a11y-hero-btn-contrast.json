@@ -1,0 +1,72 @@
+{
+  "id": "ux/a11y/hero-btn-contrast",
+  "title": "Hero button contrast on gradient backgrounds",
+  "domain": "ux",
+  "subdomain": "a11y",
+  "severity": "HIGH",
+  "confidence": 0.9,
+  "status": "active",
+  "created": "2026-07-07",
+  "updated": "2026-07-07",
+  "context": {
+    "project": "farmacia-landing",
+    "files": [
+      "styles.css",
+      "themes/theme-azul.css",
+      "themes/theme-oscuro.css",
+      "themes/theme-verde.css"
+    ],
+    "technologies": [
+      "CSS custom properties",
+      "gradient backgrounds",
+      "theme switching"
+    ]
+  },
+  "signal": {
+    "patterns": [
+      ".hero .btn { background: var(--clr-accent); color: var(--clr-white); }",
+      "button on linear-gradient background",
+      "theme-switched hero without companion button override"
+    ],
+    "keywords": [
+      "hero",
+      "btn",
+      "accent",
+      "gradient",
+      "contrast"
+    ],
+    "css_selectors": [
+      ".hero .btn"
+    ]
+  },
+  "rule": {
+    "summary": "When theming a hero section with gradient backgrounds, each theme MUST provide an explicit `.hero .btn` override — inheriting `--clr-accent` from the base style sheet produces invisible buttons on dark gradients.",
+    "details": "The base `styles.css` hero btn uses `background: var(--clr-primary)` with `color: var(--clr-white)` — safe because `--clr-primary` is always dark. But theme variants like Azul and Oscuro redefine `--clr-accent` as a bright blue (#3182ce, #38bdf8). If the hero btn references `--clr-accent` instead of `--clr-primary`, the button merges into the gradient. Fix: each theme CSS must include `.hero .btn { background: <solid-readable> }`.",
+    "check": "For each theme, assert `window.getComputedStyle(document.querySelector('.hero .btn')).backgroundColor` !== `'rgba(0,0,0,0)'` and contrast ratio >= 4.5:1 against both the hero background and the button text.",
+    "fix": "`.hero .btn { background: var(--clr-primary); color: var(--clr-white); }` — use a color that contrasts against BOTH the background gradient AND the text color.",
+    "test_id": "contrast-hero-btn"
+  },
+  "evidence": [
+    {
+      "type": "fix",
+      "description": "Azul/Oscuro themes: changed hero btn from `var(--clr-accent)` to `var(--clr-primary)`",
+      "file": "themes/theme-azul.css",
+      "line": 22
+    },
+    {
+      "type": "verification",
+      "description": "44/44 checks pass after fix — Playwright rendered audit across 4 themes",
+      "method": "Playwright page.evaluate per theme, contrast ratio math"
+    }
+  ],
+  "hits": 4,
+  "tags": [
+    "theme-switching",
+    "gradient",
+    "button",
+    "wcag-contrast"
+  ],
+  "related_patterns": [
+    "css/footer-span-color"
+  ]
+}

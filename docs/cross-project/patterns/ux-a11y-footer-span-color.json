@@ -1,0 +1,43 @@
+{
+  "id": "ux/a11y/footer-span-color",
+  "title": "Footer span inherits accent color from theme, invisible on dark footer",
+  "domain": "ux",
+  "subdomain": "a11y",
+  "severity": "HIGH",
+  "confidence": 0.95,
+  "status": "active",
+  "created": "2026-07-07",
+  "updated": "2026-07-07",
+  "context": {
+    "project": "farmacia-landing",
+    "files": ["styles.css", "themes/theme-azul.css", "themes/theme-oscuro.css"],
+    "technologies": ["CSS custom properties", "theme switching", "footer layout"]
+  },
+  "signal": {
+    "patterns": [
+      "footer span { color: var(--clr-accent); }",
+      "accent-colored text on dark footer background",
+      "theme switch makes footer span invisible"
+    ],
+    "keywords": ["footer", "span", "accent", "contrast", "background"],
+    "css_selectors": [".footer span"]
+  },
+  "rule": {
+    "summary": "When a footer has a dark background, any `<span>` inside it must NOT rely on the theme's `--clr-accent` color — accent is often bright over dark and produces < 3:1 contrast.",
+    "details": "In the base CSS, `.footer span` uses `color: var(--clr-accent)`. On a `background: var(--clr-primary-dark)` footer, the accent color (#3182ce, #38bdf8, #52b788, etc.) can drop below 3:1 contrast. Each theme MUST override `.footer span { color: var(--clr-white) }` or another high-contrast value.",
+    "check": "`window.getComputedStyle(document.querySelector('.footer span')).color` contrast against `.footer` background color — must be >= 4.5:1 for normal text.",
+    "fix": "Add `.footer span { color: var(--clr-white); }` to each theme CSS.",
+    "test_id": "contrast-footer-span"
+  },
+  "evidence": [
+    {
+      "type": "fix",
+      "description": "Azul theme: added `.footer span { color: var(--clr-white) }` and verified 44/44",
+      "file": "themes/theme-azul.css",
+      "line": 23
+    }
+  ],
+  "hits": 2,
+  "tags": ["theme-switching", "footer", "span", "wcag-contrast"],
+  "related_patterns": ["ux/a11y/hero-btn-contrast"]
+}

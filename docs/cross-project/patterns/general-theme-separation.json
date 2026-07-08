@@ -1,0 +1,50 @@
+{
+  "id": "general/architecture/theme-separation",
+  "title": "Múltiples temas visuales → CSS custom properties, NO archivos separados",
+  "domain": "general",
+  "subdomain": "architecture",
+  "severity": "MEDIUM",
+  "confidence": 0.88,
+  "status": "active",
+  "created": "2026-07-07",
+  "updated": "2026-07-07",
+  "context": {
+    "project": "gentleman-agent-gh",
+    "technologies": ["CSS custom properties", "theming", "landing-page"],
+    "files": ["docs/revisiones/tortilleria/index.html"]
+  },
+  "signal": {
+    "keywords": ["theme", "tema", "variante", "separar", "archivos", "css-vars", "unificar", "multi-tema"],
+    "patterns": [
+      "crear N archivos HTML separados para N variantes visuales",
+      "duplicar estructura HTML por cada tema",
+      "copiar/pegar el mismo contenido en archivos distintos solo por el CSS"
+    ]
+  },
+  "rule": {
+    "summary": "Cuando necesités múltiples variantes visuales de una misma página, NO crees un archivo por variante. Usá CSS custom properties + un switcher JS en un solo HTML. Cada tema es un bloque de --vars, no un archivo nuevo.",
+    "details": "La tentación de forkear el HTML por cada tema es fuerte porque es lo más rápido en el momento. Pero cada nuevo archivo multiplica el mantenimiento ×N: cambiás un precio, un texto, un link — tenés que tocarlo N veces. Con CSS custom properties todos los temas comparten la misma estructura y solo cambian las variables. Además: (1) el usuario puede switchear sin recargar, (2) no hay drift entre versiones, (3) el costo marginal de agregar un tema es ~10 líneas de CSS.",
+    "check": "Antes de crear el 2do archivo HTML para una variante visual, preguntate: '¿Puedo resolver esto con variables CSS en el mismo archivo?'. Si la respuesta es sí — no crees el archivo.",
+    "fix": "Mover todos los estilos de tema a bloques de CSS custom properties (.theme-X { --var: valor }). El HTML queda único. Un switcher JS cambia la clase del body y actualiza textos si es necesario.",
+    "test_id": "N/A — patrón de arquitectura, no de testing"
+  },
+  "evidence": [
+    {
+      "type": "fix",
+      "description": "4 archivos separados (clásico, urbano, rústico, solar) → unificados a 1 HTML con 4 bloques de CSS vars + switcher JS",
+      "file": "docs/revisiones/tortilleria/index.html",
+      "line": 1
+    }
+  ],
+  "hits": 2,
+  "tags": [
+    "theming",
+    "css-vars",
+    "architecture",
+    "yagni",
+    "minimum-code",
+    "mantenibilidad",
+    "ponytail-ladder"
+  ],
+  "related_patterns": []
+}

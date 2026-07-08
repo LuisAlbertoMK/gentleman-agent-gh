@@ -1,0 +1,43 @@
+{
+  "id": "css/rgb-black-vs-transparent",
+  "title": "rgb(0,0,0) vs rgba(0,0,0,0) in Playwright contrast audits",
+  "domain": "css",
+  "subdomain": "testing",
+  "severity": "MEDIUM",
+  "confidence": 0.9,
+  "status": "active",
+  "created": "2026-07-07",
+  "updated": "2026-07-07",
+  "context": {
+    "project": "farmacia-landing",
+    "technologies": ["Playwright", "CSS auditing", "color parsing"],
+    "files": ["contrast-audit.ps1"]
+  },
+  "signal": {
+    "patterns": [
+      "page.evaluate() + getComputedStyle",
+      "color contrast assertion returning false positive",
+      "```.filter(rgb => rgb !== 'rgba(0,0,0,0)')```",
+      "```getComputedStyle(el).backgroundColor``` returns rgb(0,0,0) for unset elements"
+    ],
+    "keywords": ["rgba", "transparent", "getComputedStyle", "color", "audit"],
+    "code_patterns": ["getComputedStyle", "backgroundColor", "rgb(0,0,0)"]
+  },
+  "rule": {
+    "summary": "`getComputedStyle(el).backgroundColor` returns `rgb(0,0,0)` when an element has NO explicit background — NOT `rgba(0,0,0,0)` as expected. Filtering `rgba(0,0,0,0)` alone produces false positives. You must ALSO check for `rgb(0,0,0)` and then verify via a DOM climb whether the element actually has a background.",
+    "details": "Playwright's `page.evaluate` with `getComputedStyle(el).backgroundColor` returns `rgb(0,0,0)` for elements whose background resolves to the page default (typically body's white or transparent ancestors). The naive filter `filter(c => c !== 'rgba(0,0,0,0)')` misses this. Fix: also filter `rgb(0,0,0)` but ONLY when the element's opacity resolves to 0 at the computed layer, OR implement a DOM climb that walks parents checking for actual background definitions.",
+    "check": "For any element where `getComputedStyle(el).backgroundColor === 'rgb(0,0,0)'`, walk up the DOM tree checking parent `backgroundColor` values. If no ancestor has a defined background, the element is effectively transparent and should be excluded from contrast checks.",
+    "fix": "```js\n// Bad: only filters rgba(0,0,0,0)\ncolors.filter(c => c !== 'rgba(0,0,0,0)')\n\n// Good: also filters rgb(0,0,0) when element is unset\ncolors.filter(c => {\n  if (c !== 'rgba(0,0,0,0)') return true;\n  // Climb DOM to check if ANY ancestor sets background\n  let el = target;\n  while (el && el !== document.body) {\n    const bg = getComputedStyle(el).backgroundColor;\n    if (bg !== 'rgba(0,0,0,0)' && bg !== 'rgb(0,0,0)') return true;\n    el = el.parentElement;\n  }\n  return false;\n})\n```",
+    "test_id": "contrast-rgb-filter"
+  },
+  "evidence": [
+    {
+      "type": "bugfix",
+      "description": "False positives in contrast audit due to rgb(0,0,0) not being filtered",
+      "resolution": "Added DOM climb with `rgb(0,0,0)` detection in the rgbHex filtering pipeline"
+    }
+  ],
+  "hits": 1,
+  "tags": ["playwright", "color-parsing", "false-positive", "getComputedStyle", "testing"],
+  "related_patterns": []
+}
