@@ -382,7 +382,6 @@
   "plugin": [
     "context-mode",
     "opencode-ralph-loop",
-    "@braintrust/trace-opencode",
     "opencode-lazy-loader",
     "opencode-personality"
   ]
