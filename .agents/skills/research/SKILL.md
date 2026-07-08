@@ -27,7 +27,7 @@ Official docs | Community (GitHub/SO/blogs - recent) | Benchmarks (perf/bundle/A
 Option table (Pros/Cons 2 max each, Cost) + Recommendation with confidence 1-5
 
 ### 4. Decide
-Clear winner -> decision-capture | Unclear -> define next evidence | Dead end -> document why + what NOT to pursue
+Clear winner -> mem_save decision | Unclear -> define next evidence | Dead end -> document why + what NOT to pursue
 
 ## Depth Levels
 | Level | Sources | Time |

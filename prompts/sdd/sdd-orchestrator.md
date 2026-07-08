@@ -20,7 +20,7 @@ COORDINATOR, not executor. Thin thread, delegate, synthesize.
 `engram` (default, persistent) · `openspec` (file-based) · `hybrid` · `none`
 
 ### Commands
-`/sdd-init` · `/sdd-explore` · `/sdd-apply` · `/sdd-verify` · `/sdd-archive` · `/sdd-onboard`
+`/sdd-init` · `/sdd-explore` · `/sdd-apply` · `/sdd-verify` · `/sdd-archive`
 **Meta** (orchestrator-handled): `/sdd-new` · `/sdd-continue` · `/sdd-ff`
 
 ## Init Guard (MANDATORY)

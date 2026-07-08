@@ -1,9 +1,9 @@
 # SKILLS INDEX
 
-> Full trigger table for all 66 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 56 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 3.3 | **Changelog**: 3.3 (-9 SDD phase stubs consolidated into unified sdd); 3.2 (+1 skill: external-improvement); 3.1 (+3 skills: caveman, doc-sync, sdd-onboard); 3.0 (-3 skills post-audit: karpathy-prompt→karpathy-loop, core-web-vitals→performance, skill-refresher→skill-improver)
+> **Version**: 3.4 | **Changelog**: 3.4 (-10 skills post-audit: deprecated/redundant/lang-specific removed); 3.3 (-9 SDD phase stubs consolidated into unified sdd)
 
 ## Triggers → Skill
 
@@ -11,13 +11,10 @@
 |------------------|-------|
 | Karpathy, less tokens, context compression, optimize prompt, measure tokens | karpathy-loop |
 | Improve prompt, security, ReAct, multi-agent | prompt-engineering |
-| Compact, less tokens, caveman, /caveman, ultra-lean | lean-context |
-| Code-memory, multi-session | code-memory |
+| Compact, less tokens, /caveman, ultra-lean | lean-context |
 | Test/verify skill, coverage | skill-testing |
 | Judgment day, dual review, juzgar | judgment-day |
 | Senior architect, trade-offs, system design | senior-engineer |
-| Go tests, Bubbletea TUI | go-testing |
-| Python async, asyncio | python-async |
 | Create AI skill | skill-creator |
 | Skill registry, catalog | skill-registry |
 | Quality gate, pre-commit | quality-gate |
@@ -25,9 +22,7 @@
 | Recovery, "no es eso", frustration | recovery-protocol |
 | Resume, "dónde lo dejamos", "continuá", git state gate | session-resume |
 | SDD pipeline, unified pipeline, orchestrate SDD phases | sdd |
-| Decision capture, trade-off log | decision-capture |
 | Execution mode, resource-adaptive zones, quick/thorough/draft | execution-mode |
-| Skill digestion, compact on load | skill-digestion |
 | Subagent isolation, context boundaries | subagent-isolation |
 | Delivery harness, orchestrate, multi-agent, delegate work | delivery-harness |
 | Chained PR, stacked PR, sequential branches, PR chain | chained-pr |
@@ -67,28 +62,22 @@
 | Self-improvement, improvement cycle, auto-mejora, ciclo de mejora, comienza ciclo | self-improvement |
 | External improvement, 5-phase cycle, external project, analyze project, improve external, cliente, proyecto externo | external-improvement |
 | Model router, routing, qué modelo, delegate or direct, qué hacer con esta tarea, trial risk, security gate | opencode-model-router |
-| Caveman, ultra-lean, compression, minimal context, emergency mode | caveman |
-| Bias calibration, calibrate scoring, audit bias, self-score correction, external audit correction | bias-calibration |
-| Doc sync, documentation sync, sync docs, propagate docs | doc-sync |
-| SDD onboarding, guided walkthrough, SDD cycle, teach SDD | sdd-onboard |
 
 ## Quick groups
 - **Compression/style**: karpathy-loop (merged karpathy-prompt), lean-context
 - **Quality**: quality-gate, auto-metrics, external-auditor, immune-system, code-review-agent, performance-tracker, triple-verify, self-improvement, external-improvement
-- **Memory**: session-resume, code-memory, dreaming
-- **Skills meta**: skill-creator, skill-registry, skill-improver, skill-digestion, skill-graph
+- **Memory**: session-resume, dreaming, bitacora
+- **Skills meta**: skill-creator, skill-registry, skill-improver, skill-graph
 - **Coordination**: delivery-harness, chained-pr, branch-pr, issue-creation, subagent-isolation, command-wrapper, opencode-model-router
 - **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner
-- **SDD**: sdd, sdd-onboard (unified pipeline — phases consolidated)
+- **SDD**: sdd (unified pipeline — phases consolidated)
 - **UI/Design**: baseline-ui, accessibility, performance, seo, web-quality-audit
-
 - **Communication**: comment-writer, cognitive-doc-design
-
-- **Specialized**: metricas, bitacora, context-watchdog, recovery-protocol
+- **Specialized**: metricas, context-watchdog, recovery-protocol
 
 ## Load rule
 1. `read` this file → find trigger match → get skill name
-2. `skill` tool with name (skills.paths now registered in opencode.json — 55 skills globally discoverable)
+2. `skill` tool with name (skills.paths now registered in opencode.json — 56 skills globally discoverable)
 3. If `skill` tool fails → `read skills/{name}/SKILL.md` directly from disk
 4. If skill has assets → `read skills/{name}/references/` or `read skills/{name}/assets/` for templates
 

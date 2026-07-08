@@ -95,26 +95,26 @@ El proyecto usa dos MCPs para memoria cross-session:
 
 | Categoría | Skills |
 |-----------|--------|
-| **Compression** | karpathy-loop, lean-context, caveman |
+| **Compression** | karpathy-loop, lean-context |
 | **Quality** | quality-gate, auto-metrics, external-auditor, immune-system, triple-verify |
 | **Code Review** | code-review-agent, judgment-day |
-| **Memory** | session-resume, code-memory, dreaming |
-| **Skills Meta** | skill-creator, skill-registry, skill-improver, skill-digestion, skill-graph |
-| **SDD** | sdd, sdd-onboard (phases consolidated into unified pipeline) |
-| **Engineering** | senior-engineer, go-testing, python-async, refactoring-planner, project-mapper |
+| **Memory** | session-resume, dreaming, bitacora |
+| **Skills Meta** | skill-creator, skill-registry, skill-improver, skill-graph |
+| **SDD** | sdd (unified pipeline — phases consolidated) |
+| **Engineering** | senior-engineer, refactoring-planner, project-mapper |
 | **Security** | security-scanner |
 | **UI/Web** | baseline-ui, accessibility, performance, seo, web-quality-audit, best-practices |
 | **PR/Workflow** | commit-crafter, work-unit-commits, branch-pr, chained-pr |
 | **Orchestration** | delivery-harness, subagent-isolation, command-wrapper, opencode-model-router |
-| **Decisions** | decision-capture, cognitive-doc-design |
-| **Docs** | doc-sync, bitacora, comment-writer |
+| **Decisions** | cognitive-doc-design |
+| **Docs** | bitacora, comment-writer |
 | **Research** | research, prompt-engineering |
 | **Self-Improvement** | self-improvement (merged self-reflection) |
 | **DevOps** | ci-cd |
 | **Testing** | skill-testing |
 | **Others** | recovery-protocol, context-watchdog, performance-tracker, metricas, issue-creation, development-mode, execution-mode |
 
-**Total: 69 skills + `_shared`** — todas con SKILL.md, frontmatter YAML, versionado, cambio previo y licencia Apache-2.0.
+**Total: 56 skills + `_shared`** — todas con SKILL.md, frontmatter YAML, versionado, cambio previo y licencia Apache-2.0.
 
 ---
 

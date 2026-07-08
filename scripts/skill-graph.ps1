@@ -66,8 +66,7 @@ function Register-Skill(
 Register-Skill karpathy-loop "karpathy|less tokens|context compression|compact prompt|karpathy loop|optimize prompt|measure tokens" compression low "" "" "Karpathy-style compression + iterative loop"
 Register-Skill lean-context "compact|less tokens|caveman|ultra-lean|minimal context" compression low "" "" "Ultra-lean context mode"
 Register-Skill execution-mode "execution mode|quick|thorough|draft|modo" compression low "" "" "Quick/Thorough/Draft execution modes"
-Register-Skill skill-digestion "skill digestion|compact on load|compress skill" compression low "" "" "Digest and compact skills when loaded"
-Register-Skill caveman "caveman|ultra-lean|compression|minimal context|emergency mode" compression low "" "" "Ultra-minimal compressed context mode - L3 emergency"
+
 
 # --- quality ---
 Register-Skill quality-gate "quality gate|pre-commit|validate commit" quality medium "" "auto-metrics|commit-crafter" "Pre-commit quality gate"
@@ -82,11 +81,11 @@ Register-Skill external-auditor "external audit|blind review|second opinion|veri
 
 # --- memory ---
 Register-Skill session-resume "resume|donde lo dejamos|continua|session start|git state" memory medium dreaming "" "Safe session resume with git state gate"
-Register-Skill code-memory "code memory|memory|recordar|acordate|multi-session" memory medium "" "session-resume|dreaming" "Cross-session code memory and recall"
+
 Register-Skill dreaming "dreaming|cross-session|pattern extraction|memory curation|engram" memory high auto-metrics "" "Cross-session pattern extraction via Engram"
 Register-Skill bitacora "bitacora|historial|historico|request log" memory low "" "" "Session activity log and history tracking"
 Register-Skill metricas "metricas|before after|percent improvement|delta" memory low "" "" "Before/after metrics tracking for improvements"
-Register-Skill decision-capture "decision|trade-off|decision log" memory medium "" "" "Capture and log architectural decisions"
+
 
 # --- meta ---
 Register-Skill skill-creator "create skill|new skill|crear skill" meta medium "" "" "Create new AI skills from requirements"
@@ -101,7 +100,7 @@ Register-Skill refactoring-planner "refactor|refactoring|reestructurar|migrate" 
 Register-Skill project-mapper "mapear|project map|estructura|tech stack" code-ops medium "" "gap-analysis" "Map project structure, stack, and architecture"
 Register-Skill security-scanner "security|seguridad|vulnerabilidad|auditar" code-ops medium best-practices "" "Security audit and vulnerability scanner"
 Register-Skill performance-tracker "performance score|mobile perf|desktop perf|rendimiento|app score|benchmark" code-ops medium "" "" "Score and track app performance across 6 dimensions"
-Register-Skill doc-sync "doc sync|documentation sync|sync docs|propagate docs" code-ops low "" "" "Sync documentation across repos, branches, and locations"
+
 
 # --- SDD ---
 Register-Skill sdd "SDD pipeline|SDD phase|spec-driven development" SDD medium "" "sdd-init|sdd-explore|sdd-propose|sdd-spec|sdd-design|sdd-tasks|sdd-apply|sdd-verify|sdd-archive" "Unified SDD pipeline - 9 phases"
@@ -114,7 +113,7 @@ Register-Skill sdd-tasks "task breakdown|implementation plan|tareas|task list" S
 Register-Skill sdd-apply "apply tasks|implement|aplicar" SDD medium sdd-tasks "commit-crafter" "Apply tasks to implement changes"
 Register-Skill sdd-verify "validate vs specs|verify|verificar" SDD medium sdd-spec "" "Validate implementation against specs"
 Register-Skill sdd-archive "archive changes|delta to main|archivar" SDD medium "sdd-verify|sdd-apply" "" "Archive completed changes"
-Register-Skill sdd-onboard "SDD onboard|onboarding|nuevo proyecto SDD|guia SDD" SDD medium "" "" "Guide users through complete SDD cycle"
+
 
 # --- coordination ---
 Register-Skill delivery-harness "coordinate|orchestrate|multi-agent|delegate work" coordination high "subagent-isolation|work-unit-commits" "chained-pr" "Orchestrate multi-agent work delivery"
@@ -147,8 +146,7 @@ Register-Skill cognitive-doc-design "doc design|documentation patterns|cognitive
 Register-Skill comment-writer "comment writer|PR feedback|review comment|write feedback" specialized low "" "" "Write warm, direct collaboration comments"
 Register-Skill senior-engineer "senior architect|trade-offs|system design|arquitectura" specialized high "" "" "Senior engineer persona for architecture decisions"
 Register-Skill prompt-engineering "improve prompt|ReAct|multi-agent|prompt engineering" specialized medium "" "" "Advanced prompt engineering techniques"
-Register-Skill go-testing "Go tests|Bubbletea TUI|golang test" specialized medium "" "" "Go testing patterns and tools"
-Register-Skill python-async "Python async|asyncio" specialized medium "" "" "Python async/await patterns"
+
 
 # ============================================================================
 # Graph — build adjacency graph from registry

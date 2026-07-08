@@ -302,18 +302,6 @@
         "write": "allow"
       }
     },
-    "sdd-onboard": {
-      "description": "Guide user through a complete SDD cycle using their real codebase",
-      "hidden": true,
-      "mode": "subagent",
-      "prompt": "{file:prompts/sdd/sdd-onboard.md}",
-      "permission": {
-        "bash": "allow",
-        "edit": "allow",
-        "read": "allow",
-        "write": "allow"
-      }
-    },
     "sdd-orchestrator": {
       "description": "SDD Orchestrator - coordinates sub-agents, never does work inline",
       "model": "claude-sonnet-4-6",
@@ -333,7 +321,7 @@
           "sdd-design": "allow",
           "sdd-explore": "allow",
           "sdd-init": "allow",
-          "sdd-onboard": "allow",
+
           "sdd-propose": "allow",
           "sdd-spec": "allow",
           "sdd-tasks": "allow",
@@ -394,7 +382,6 @@
   "plugin": [
     "context-mode",
     "opencode-ralph-loop",
-    "opencode-skill-creator",
     "@braintrust/trace-opencode",
     "opencode-lazy-loader",
     "opencode-personality"

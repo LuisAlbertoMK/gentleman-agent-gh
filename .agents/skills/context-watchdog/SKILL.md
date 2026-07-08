@@ -29,4 +29,4 @@ metadata:
 ## DECISION TREE: Tokens% < Turns#> → Action<40% <8→Normal | <40% ≥8→L1 | 40-60%≥20→L1+L2 | 60-80%→L2+L3 | >80%→mem_save+break
 TALE: Each skill load ~200 tokens. After 25 tool calls (checkpoint), recalc budget.
 ## CHECKPOINT: Every 25 tool calls → mem_save(topic_key=checkpoint/session-state, type=checkpoint) with state, done, next, decisions
-## CROSS-REFS: Schedule AGENTS.md B | Lean: lean-context | Tokens: karpathy-loop | State: code-memory
+## CROSS-REFS: Schedule AGENTS.md B | Lean: lean-context | Tokens: karpathy-loop | State: session-resume
