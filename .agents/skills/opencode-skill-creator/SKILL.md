@@ -3,18 +3,14 @@ name: opencode-skill-creator
 description: Create, test, evaluate, optimize, and package OpenCode skills with the opencode-skill-creator plugin. Use when users explicitly mention opencode-skill-creator, OpenCode Skill Creator, creating an OpenCode skill, editing an OpenCode SKILL.md, running skill evals, benchmarking skill performance, or optimizing an OpenCode skill description. Do not use for generic Claude Code or Superpowers skill creation unless the user asks to port that workflow to OpenCode.
 ---
 
-# OpenCode Skill Creator
-
-Create & iteratively improve OpenCode skills. Core loop: capture intent → write → eval → iterate → install.
-
 ## Workflow
 
-1. **Intake** (mandatory) — 3-5 targeted questions. See `references/intake.md`.
-2. **Write SKILL.md** — Stage in `%TEMP%\opencode-skills\<name>\`. Bundled resources in `scripts/`, `references/`. See `references/skill-writing.md`.
-3. **Eval** — Run with-skill + baseline in same turn via Task tool. Draft assertions during runs. Launch viewer via `skill_serve_review`. See `references/eval.md`.
+1. **Intake** — 3-5 targeted Qs. See `references/intake.md`.
+2. **Write** — Stage in `%TEMP%\opencode-skills\<name>\`. Resources in `scripts/`, `references/`. See `references/skill-writing.md`.
+3. **Eval** — Run with-skill + baseline via Task. Draft assertions during runs. Launch viewer via `skill_serve_review`. See `references/eval.md`.
 4. **Iterate** — Apply feedback, improve, re-run. See `references/iterate.md`.
-5. **Optimize description** — Generate 20 trigger eval queries. Run `skill_optimize_loop`. Apply `best_description`. See `references/description-optimization.md`.
-6. **Install** — Validate with `skill_validate`, copy to project or global skills dir.
+5. **Optimize** — 20 trigger queries, `skill_optimize_loop`, apply `best_description`. See `references/description-optimization.md`.
+6. **Install** — `skill_validate`, copy to project or global skills dir.
 
 ## Available Tools
 

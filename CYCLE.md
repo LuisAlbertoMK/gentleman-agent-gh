@@ -946,16 +946,28 @@ Score recovered from 8.5 to 9.0 (+0.5), then post-close improvements pushed to *
 | 1 | Investigar Score Depth — diagnosticar sub-dim bajas, fijar Tool Hygiene | High | Low | 3.0 | 1 | 🟢 | Diagnóstico completado, SD 8.9→9.3 con Tool Hygiene 5.6→9.6; audit + score regenerado |
 | 2 | Hardcoded path audit final — barrer todos los scripts, `$env:` consistente | Medium | Low | 2.0 | 1 | 🟢 | 0 hardcoded paths en scripts/ (ya limpio de ciclo anterior) |
 | 3 | 3 subagentes de verificación (Score Depth, Debt Sweep, Pipeline) | High | Low | 3.0 | 2 | 🟢 | 3 subagentes, todos PASS — Score Depth 9.3 ✅ Debt Sweep 4/4 ✅ Pipeline 3/3 ✅ |
-| 4 | Re-score + reporte ciclo + commit sellado | Medium | Low | 2.0 | 1 | 🟢 | `.project.json` actualizado 9.3, `docs/ciclos/cycle23-*.md`, commit pendiente |
+| 4 | Re-score + reporte ciclo + commit sellado | Medium | Low | 2.0 | 1 | 🟢 | `.project.json` actualizado (SD 9.3→9.4), `docs/ciclos/cycle23-report.md`, commit fe5f31b |
 
 ### Cycle 23 Progress
-- Score: **9.3/10** (↑ 9.2→9.3 tras Tool Hygiene + audit)
-- SD: **9.3/10** (↑ 8.9→9.3 stale, 35 sub-dims)
-- inter: 1/30 (cycle tracking)
+- Score: **9.3/10** (stable, consolidado en 13 dims, 10 at 10.0)
+- SD: **9.4/10** (↑ 9.3→9.4 post-close, 35 sub-dims)
+- inter: 3/30 (cycle tracking)
 - Item 1: ✅ Score Depth diagnosticado. Tool Hygiene 28→48/50 scripts (+20 `[switch]$Quiet`). Audit Freshness 7→10 via blind audit subagent. CYCLE.md synced to 9.3.
 - Item 2: ✅ Hardcoded path audit — 0 paths en scripts/. Todo usa `$env:` o `$PSScriptRoot`.
 - Item 3: ✅ 3 subagentes verificación — Score Depth PASS, Debt Sweep PASS, Pipeline PASS.
-- Item 4: 🔄 Re-score 9.3, reporte listo, commit pending.
+- Item 4: ✅ Re-score 9.3 + SD 9.4, score-dims.ps1 extraction, 14 skills compressed, commit fe5f31b.
+
+### Status: Cycle 23 Closed ✅
+
+**Current cycle**: Cycle 23 (Score Consolidation & Portability) — CLOSED 2026-07-07
+**Last closed**: Cycle 23 (2026-07-07) — Score 9.3/10 (SD 9.4)
+
+**Key wins**:
+- score-auto.ps1 refactored: 13 dims → `lib/score-dims.ps1` (527 lines), score-auto −514 lines
+- 14 skills compressed (−636 lines total, avg skill 1.9KB)
+- -Quiet mode outputs JSON (machine-friendly, not Write-Host string)
+- Score Depth 9.3→9.4 via Tool Hygiene + fresh audit
+- Cycle 20 items carried forward: 0 remaining
 
 ---
 

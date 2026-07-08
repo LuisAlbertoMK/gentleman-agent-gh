@@ -2,16 +2,16 @@
   "score": {
     "current": 9.3,
     "last_updated": "2026-07-07",
-    "trend": "up",
+    "trend": "stable",
     "dimensions": {
       "Skill Effectiveness": 10.0,
       "Bitacora": 10.0,
       "Orthography": 10.0,
       "Metrics": 10.0,
-      "Score Depth": 9.3,
+      "Score Depth": 9.4,
       "Best Practices": 10.0,
       "Dead Code": 10.0,
-      "Clean Code": 10.0,
+      "Clean Code": 9.9,
       "Project Artifacts": 10.0,
       "Security": 10.0,
       "Cycle Activity": 1.0,
@@ -21,11 +21,11 @@
   },
   "dimensions_detail": {
     "CC": {
-      "r": "S:50 H:50 P:50 S:50",
+      "r": "S:50 H:50 P:50 S:49",
       "s": 10.0,
       "e": {
         "with_params": 50,
-        "with_strictmode": 50,
+        "with_strictmode": 49,
         "with_help": 50,
         "total_scripts": 50
       }

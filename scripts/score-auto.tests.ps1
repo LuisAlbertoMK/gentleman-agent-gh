@@ -15,7 +15,7 @@ $scriptContent = Get-Content -Path "$PSScriptRoot\score-auto.ps1" -Raw
 
 # Extract Add-Dimension function definition
 if ($scriptContent -match '(function Add-Dimension[\s\S]*?\n\})') {
-    Invoke-Expression $Matches[1]
+    . ([ScriptBlock]::Create($Matches[1]))
 }
 
 # Helper: simulate cache hash computation

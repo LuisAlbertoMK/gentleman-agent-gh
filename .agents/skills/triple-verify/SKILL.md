@@ -28,26 +28,26 @@ Zones, thresholds, verify depth defined in `review-rules.jsonc`.
 ## Workflow
 
 **Mode routing** (keyword overrides):
-- `!ship/!listo` → quality-gate → triple-verify (por zona, incl. capture-learnings) → commit-crafter → commit+push
+- `!ship/!listo` → quality-gate → triple-verify (por zona, + capture-learnings) → commit-crafter → commit+push
 - `!fast` → quality-gate → commit+push (skip verify)
 - `!check` → quality-gate only (no commit)
-- `!draft` → solo aviso (no gates)
-- (sin keyword) → zona determina profundidad verify
+- `!draft` → no gates
+- (no keyword) → zona determina verify depth
 
-**quality-gate ALWAYS mandatory** in `!ship`/`!fast`/`!check` regardless of zone. Zone only affects triple-verify (E1+E2+E3), NOT quality gate.
+**quality-gate ALWAYS mandatory** in `!ship`/`!fast`/`!check` regardless of zone. Zone only affects triple-verify, NOT quality-gate.
 
-**Zone routing** (verify depth, only when keyword didn't route):
-- Verde → SKIP verify → quality-gate si hay commit
+**Zone routing** (verify depth, when keyword didn't route):
+- Verde → SKIP verify → quality-gate if commit
 - Amarilla ≤10L → quality-gate
 - Rojo/Amarilla >10L → TRIPLE VERIFY (E1+E2+E3 parallel)
-- Falla? → STOP + evidencia · Pasa → continuar
+- Fail → STOP + evidence · Pass → continue
 
 ## Rules
 1. **3 DISTINCT approaches**: behavior + quality + compilation
 2. **Default-FAIL**: no evidence of 3 steps → not verified
 3. **Build mandatory** for compilable code
 4. **!ship = responsibility**: quality-gate NEVER optional
-5. **capture-learnings** (inline — previously separate skill): run `$env:GENTLEMAN_AGENT_ROOT\scripts\session-miner.ps1 -Mode scan -Json` after task completion or pre-commit. Parses JSON output for new pattern proposals → stores in `.learnings/`. Also `mem_save` significant decisions/bugfixes to Engram. Skip gracefully if session-miner unavailable. Stage `.learnings/` files for commit tracking.
+5. **capture-learnings** (inline): run `scripts/session-miner.ps1 -Mode scan -Json` post-task or pre-commit. Parse JSON for new patterns → store in `.learnings/`. `mem_save` decisions/bugfixes to Engram. Skip if unavailable. Stage `.learnings/`.
 6. **Override**: `!ship --no-verify` emergency only
 7. **Self-improvement override**: difficulty levels from CYCLE.md override verify depth
 

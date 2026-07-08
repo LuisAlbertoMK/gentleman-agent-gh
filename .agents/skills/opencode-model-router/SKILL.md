@@ -9,10 +9,6 @@ metadata:
   version: "3.0"
 ---
 
-# opencode-model-router v3
-
-Delegate vs direct based on task type and model strength.
-
 ## ⚠️ SECURITY GATE (always first)
 1. Credentials/secrets/PII? → **DIRECT**
 2. Recurring task (cron/CI)? → **DIRECT**
@@ -20,7 +16,6 @@ Delegate vs direct based on task type and model strength.
 4. Otherwise → route below.
 
 ## 🎯 ROUTING TABLE (FREE TIER)
-
 | Task | Action | Agent | Model | Fallback |
 |------|--------|-------|-------|----------|
 | Security/vulnerability | DELEGATE | `gentleman-security` | Nemotron 3 Ultra Free (1M) | `gentleman-deep` → `gentleman-vMK` |
@@ -37,13 +32,10 @@ Delegate vs direct based on task type and model strength.
 | Default | DIRECT | `gentleman-vMK` | — | — |
 
 ## 🔧 IMPLEMENTER
-
-`gentleman-implementer` (DeepSeek V4 Flash Free) — executes plans precisely. Does NOT "improve" things not asked.
-
-**DO NOT use**: Qwen3.7 Max (re-plans, paid), Nemotron 3 Ultra (over-analyzes for execution).
+`gentleman-implementer` (DeepSeek V4 Flash Free) — precise plan execution. No unrequested changes.
+**Avoid**: Qwen3.7 Max (re-plans, paid), Nemotron 3 Ultra (over-analyzes).
 
 ## 📏 CONTEXT → ACTION
-
 | Context | Action |
 |---------|--------|
 | <50K | Normal routing |
@@ -51,10 +43,7 @@ Delegate vs direct based on task type and model strength.
 | >150K | Direct forced |
 
 ## 💡 STRATEGY (FREE)
-
-- **100% Free**: All agents use Zen free models — no subscription needed
+- **100% Free**: All Zen free models, no subscription
 - **1M context**: Nemotron 3 Ultra Free, DeepSeek V4 Flash Free
 - **Vision**: Kimi K2.5 Free, MiMo V2.5 Free
-- **Always free fallback**: Big Pickle (docs, SEO, general)
-
-`ponytail:` v4 routing. All free. Specialized analyze, implementer executes. No mid-task changes.
+- **Fallback**: Big Pickle (docs, SEO, general)

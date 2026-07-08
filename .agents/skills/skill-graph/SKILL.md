@@ -10,91 +10,52 @@ metadata:
   version: "2.0"
   changelog: "2.0: merged skill-digestion (context-aware loading strategy + resolution feedback)"
 ---
-
-# Skill Graph — Sparse Loading Resolver
-
-Instead of loading all skills, resolve only the relevant ones + dependencies, then load per context budget.
-
----
-
-## PHASE 1: RESOLVE — Which skills?
-
+## PHASE 1: RESOLVE
 ```powershell
-.\scripts\skill-graph.ps1 -Task "<task description>"
-                              [-Expand N]     # dep depth (default 1, max 3)
-                              [-Format Json|Csv]
+.\scripts\skill-graph.ps1 -Task "<task>" [-Expand N] [-Format Json|Csv]
 ```
-
-### Resolution strategy
-
-1. **Match** — task keywords matched against skill triggers (fuzzy, min 3 chars)
+1. **Match** — task keywords vs skill triggers (fuzzy, min 3 chars)
 2. **Expand** — BFS 1-hop through dependency + related edges
 3. **Output** — matched skills + dependencies
 
-### Examples
-```
-Input:  -Task "security audit"
-Output: security-scanner + best-practices (depends_on)
+Ex: `-Task "security audit"` → security-scanner + best-practices. `-Task "implement feature"` → sdd-tasks + sdd-design + sdd-spec.
 
-Input:  -Task "implement feature from spec"
-Output: sdd-tasks + sdd-design + sdd-spec
-```
-
----
-
-## PHASE 2: DIGEST — How much to load?
-
-After resolving WHICH skills, decide HOW MUCH to load based on context:
-
-| Context | Load strategy | Token target |
-|---------|--------------|--------------|
+## PHASE 2: DIGEST
+| Context | Load strategy | Target |
+|---------|--------------|--------|
 | <60% | Full skill | No limit |
-| 60-80% (YELLOW) | Rules + decision tree only | ~300 tokens |
-| >80% (RED) | 1-line summary + critical rules | ~100 tokens |
-| <40% (first load) | Full skill (no usage data yet) | No limit |
+| 60-80% (YELLOW) | Rules + decision tree | ~300 tok |
+| >80% (RED) | 1-line + critical rules | ~100 tok |
+| <40% (first load) | Full skill | No limit |
+Always check context % before loading. If YELLOW/RED, truncate output.
 
-**Always check context % before loading.** If YELLOW/RED, truncate output.
-
----
-
-## PHASE 3: RESOLUTION FEEDBACK (post-task)
-
-Log to Engram after task if skill was loaded:
-
+## PHASE 3: RESOLUTION FEEDBACK
+Log to Engram post-task:
 ```yaml
 title: "Skill resolution: {name}"
 type: learning
 content: |
-  Skill: {name}
-  Trigger: {trigger}
-  Applied: Y/N
-  Effective: Y/P/N
-  Notes: ...
+  Skill: {name} | Trigger: {trigger} | Applied: Y/N | Effective: Y/P/N | Notes: ...
 ```
 
----
-
-## AUTO-IMPROVEMENT TRIGGERS
-
+## AUTO-IMPROVEMENT
 | Signal | Action |
 |--------|--------|
-| Loaded but NOT applied | Trigger too broad? Narrow it |
+| Loaded but NOT applied | Trigger too broad? Narrow |
 | Applied but NOT effective | Update skill patterns |
 | Improvised missing guidance | Create new skill |
 | Same skill loaded 3+ times | Flag heavy — digest more |
 
----
-
 ## When to use
-- **Task start**: resolve before requesting any `skill` tool call
-- **Unfamiliar task**: let the graph find related skills you might miss
-- **Token budget tight**: skip loading skills that don't match
+- **Task start**: resolve before any `skill` tool call
+- **Unfamiliar task**: find related skills you might miss
+- **Token tight**: skip non-matching skills
 
 ## When NOT to use
 - Single-step Q&A (cheaper to use skill directly)
-- When you already know exactly which skill you need
+- Already know exact skill needed
 
-## Cross-References
-- **SKILLS-INDEX.md**: full trigger table (fallback)
-- **session-resume**: uses skill-graph for context-aware resume
-- **execution-mode**: QUICK mode prefers graph resolution
+## Cross-Ref
+- SKILLS-INDEX.md: full trigger table
+- session-resume: uses skill-graph for context-aware resume
+- execution-mode: QUICK mode prefers graph resolution

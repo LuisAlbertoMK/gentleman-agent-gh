@@ -8,7 +8,4 @@ metadata:
   status: merged
   merged-into: session-resume
 ---
-
-This skill has been merged into **session-resume**.
-
-→ Load `session-resume` instead for memory save/restore + session continuity.
+⚠️ **MERGED** — Use `skill("session-resume")` instead.

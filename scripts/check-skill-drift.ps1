@@ -25,8 +25,8 @@ if(-not $skipCache){
 $cd=Join-Path $PSScriptRoot "..\.agents\skills"
 $gd="$env:USERPROFILE\.config\opencode\skills"
 $e=@();$w=@();$d=@()
-if(-not (Test-Path $cd)){if(-not $Quiet){Write-Error "Canonical dir not found: $cd"};exit 2}
-if(-not (Test-Path $gd)){if(-not $Quiet){Write-Error "Global dir not found: $gd"};exit 2}
+if(-not (Test-Path $cd)){Write-Error "Canonical dir not found: $cd";exit 2}
+if(-not (Test-Path $gd)){Write-Error "Global dir not found: $gd";exit 2}
 $cs=(Get-ChildItem $cd -Directory).PSWhere({$_.Name -ne '_shared'})
 foreach($s in $cs){
   $sn=$s.Name
@@ -47,13 +47,13 @@ if($AutoFix){
     if(-not $Quiet){Write-Output "Creating $($fix.Count) junctions..."}
     foreach($x in $fix){
       $t=Join-Path $cd $x.Skill;$l=Join-Path $gd $x.Skill
-      try{New-Item -ItemType Junction -Path $l -Target $t -Force | Out-Null;if(-not $Quiet){Write-Output "  $l -> $t"}}catch{if(-not $Quiet){Write-Warning "FAIL $l ($($_.Exception.Message))"}}
+      try{New-Item -ItemType Junction -Path $l -Target $t -Force | Out-Null;if(-not $Quiet){Write-Output "  $l -> $t"}}catch{Write-Warning "FAIL $l ($($_.Exception.Message))"}
     }
     $e=$e.PSWhere({$_ -and $_.Status -ne "GLOBAL_MISSING"})
   }
   $gsd="$env:USERPROFILE\.config\opencode\scripts"
   $rsd=Join-Path $PSScriptRoot "."
-  if(-not (Test-Path $gsd)){if(-not $Quiet){Write-Output "Creating scripts junction..."};try{New-Item -ItemType Junction -Path $gsd -Target $rsd -Force | Out-Null;if(-not $Quiet){Write-Output "  $gsd -> $rsd"}}catch{if(-not $Quiet){Write-Warning "FAIL $gsd ($($_.Exception.Message))"}}}
+  if(-not (Test-Path $gsd)){if(-not $Quiet){Write-Output "Creating scripts junction..."};try{New-Item -ItemType Junction -Path $gsd -Target $rsd -Force | Out-Null;if(-not $Quiet){Write-Output "  $gsd -> $rsd"}}catch{Write-Warning "FAIL $gsd ($($_.Exception.Message))"}}
 }
 $junctionSkills=$cs.PSWhere({$g=Get-Item (Join-Path $gd $_.Name) -EA SilentlyContinue;$g -and $g.LinkType -eq "Junction"}).Count
 $realFileSkills=$cs.PSWhere({$g=Get-Item (Join-Path $gd $_.Name) -EA SilentlyContinue;$g -and $g.LinkType -ne "Junction"}).Count
@@ -95,8 +95,8 @@ function Sync-AgentDefinition{
   $an=@("gentleman-vMK","gentleman-deep","gentleman-codex","gentleman-quick")
   $sr=@{synced=@();skipped=@()}
   if(-not $Quiet){Write-Output "--- Syncing agents (project -> global) ---"}
-  if(-not (Test-Path $pcp)){if(-not $Quiet){Write-Warning "No project opencode.json at $pcp"};return $sr}
-  if(-not (Test-Path $gcp)){if(-not $Quiet){Write-Warning "No global opencode.json at $gcp"};return $sr}
+  if(-not (Test-Path $pcp)){Write-Warning "No project opencode.json at $pcp";return $sr}
+  if(-not (Test-Path $gcp)){Write-Warning "No global opencode.json at $gcp";return $sr}
   $pj=(Get-Content $pcp -Raw) | ConvertFrom-Json;$gj=(Get-Content $gcp -Raw) | ConvertFrom-Json
   # Ensure agent section exists in global
   $gha=$gj.PSObject.Properties.Match('agent').Count -gt 0
@@ -112,7 +112,7 @@ function Sync-AgentDefinition{
   $sa=Join-Path (Split-Path $pcp -Parent) "AGENTS.md"
   $da=Join-Path (Split-Path $gcp -Parent) "AGENTS.md"
   if(Test-Path $sa -PathType Leaf){Copy-Item -LiteralPath $sa -Destination $da -Force;if(-not $Quiet){Write-Output "  [synced] AGENTS.md"}}
-  else{if(-not $Quiet){Write-Warning "  AGENTS.md not found at $sa"}}
+  else{Write-Warning "  AGENTS.md not found at $sa"}
   # Write updated config
   $gj | ConvertTo-Json -Depth 10 | Set-Content $gcp -Encoding UTF8 -Force
   if(-not $Quiet){Write-Output "  -> Updated $gcp ($($sr.synced.Count) agents, AGENTS.md)"}

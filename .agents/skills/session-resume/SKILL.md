@@ -16,50 +16,51 @@ triggers: "session resume, dónde lo dejamos, continuá, session start, code mem
 4. Both clean → silent, `mem_context` only.
 5. One question, max 4 options. Terse (numbers+paths).
 
-## Proactive Recall (post-gate)
-1. `mem_search(query="<last session>", limit=5)` — past work context
+## Proactive Recall
+1. `mem_search(query="<last session>", limit=5)` — past work
 2. If user msg has keywords → search matching observations
 3. Present relevant decisions/bugfixes
-4. Check project fingerprint: `mem_search(query="project/{name}", scope=project, limit=1)`
-5. If missing → trigger Project fingerprint (dreaming skill)
-## Skill Pre-load (mandatory)
+4. `mem_search(query="project/{name}", scope=project, limit=1)`
+5. If missing → trigger Project fingerprint (dreaming)
+
+## Skill Pre-load
 ```powershell
 .\scripts\skill-graph.ps1 -Task "<session keywords>" -Format Text
-# Then skill_use with resolved names
 ```
-Typical reduction: 55→4-8 (−85-92%)
+Typical: 55→4-8 (−85-92%)
+
 ## Commands
 `git status --porcelain` · `git log @{u}.. --oneline 2>/dev/null` · `git branch --show-current; git log -1 --oneline`
+
 ## Output (dirty)
 ```
 {branch}: {N} uncommitted ({paths}) + {M} unpushed ({sha} {msg})
 Action: commit/push/stash/continue?
 ```
-Actions: commit→`git add -A`+msg · push→`git push` (quality-gate) · stash→`git stash push -m "auto-stash"` · continue→Engram.
-## Post-Check: `mem_context` = actual resume. Git is safety gate.
-## Anti-Patterns: Auto-commit/push · mid-task runs · output >10 lines · skip "small project" · skip skill-graph pre-load
-## Resources: Engram `mem_context` · quality-gate · recovery-protocol · skill-graph.ps1
+commit→`git add -A`+msg · push→`git push` (quality-gate) · stash→`git stash push -m "auto-stash"` · continue→Engram.
 
 ## Save State
-Saves exact state before session end for seamless resumption.
-
-### Handoff captures
-- **Current task**: what, why, where (files), status (blocked/ready/done)
-- **Next step**: exact next action (file:line, what to do)
-- **Context**: decisions made, rejected approaches, user preferences
-- **Open questions**: unresolved items for next session
-- **Files touched**: paths + what changed + pending changes
+### Handoff
+- **Current task**: what, why, where (files), status
+- **Next step**: exact action (file:line, what)
+- **Context**: decisions, rejected approaches, preferences
+- **Open questions**: unresolved items
+- **Files touched**: paths + changes + pending
 
 ### State format
-```json
-{session_id, last_update, task:{description,status,blockers}, next_step:{file,action}, ctx:{decisions:[],preferences:[],rejected:[]}, files:[{path,status,summary}], todos:[{id,desc,status}]}
-```
+JSON: `{session_id, task:{description,status,blockers}, next_step:{file,action}, ctx:{decisions:[],preferences:[],rejected:[]}, files:[{path,status,summary}], todos:[{id,desc,status}]}`
 
-### WORKFLOW
-- **Start**: find agent-state → load + show handoff | new → create
-- **During**: detect changes → update state
-- **End**: save full state → handoff summary → next step
-- **Session resumption**: present handoff automatically before work
+### Workflow
+Start→load handoff|create. During→detect→update. End→save+handoff+next step.
 
-### AUTO-SAVE TRIGGERS
-file created/deleted · >20 line change · discovery · important question · decision made
+### Auto-save triggers
+file created/deleted · >20 line change · discovery · important question · decision
+
+## Post-Check
+`mem_context` = resume. Git is safety gate.
+
+## Anti-Patterns
+Auto-commit/push · mid-task runs · output >10 lines · skip "small project" · skip skill-graph
+
+## Resources
+Engram `mem_context` · quality-gate · recovery-protocol · skill-graph.ps1

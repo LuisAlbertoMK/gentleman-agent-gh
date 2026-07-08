@@ -74,7 +74,7 @@ foreach ($key in $sectionKeys) {
 
 # ── Fix mode: sync global from canonical ─────────────────────────────────
 if ($Fix -and $totalDrift -gt 0) {
-  Write-Output "[fix] Syncing global config from canonical..."
+  if (-not $Quiet) { Write-Output "[fix] Syncing global config from canonical..." }
   $canonicalContent = Get-Content -LiteralPath $canonicalPath -Raw -Encoding UTF8 | ConvertFrom-Json
   $globalContent = Get-Content -LiteralPath $globalPath -Raw -Encoding UTF8 | ConvertFrom-Json
   $globalContent.default_agent = "gentleman-vMK"
@@ -82,11 +82,11 @@ if ($Fix -and $totalDrift -gt 0) {
   $globalContent.permission = $canonicalContent.permission
   $globalContent.skills = $canonicalContent.skills
   $globalContent | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $globalPath -Encoding UTF8
-  Write-Output "[fix] global config updated → $globalPath"
+  if (-not $Quiet) { Write-Output "[fix] global config updated → $globalPath" }
 }
 
 # ── Output ──────────────────────────────────────────────────────────────
-if ($Json) {
+if ($Json -or $Quiet) {
   ConvertTo-Json @{
     timestamp = (Get-Date -Format "o")
     version   = "1.0.0"
@@ -98,7 +98,7 @@ if ($Json) {
     totalDrift = $totalDrift
     exitCode  = [Math]::Min($totalDrift, 2)
   } -Depth 4
-} elseif (-not $Quiet) {
+} else {
   Write-Output "`n═══════════════════════════════════════════"
   Write-Output "  CONFIG DRIFT CHECK — 2-way Comparison"
   Write-Output "═══════════════════════════════════════════"

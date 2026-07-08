@@ -105,7 +105,7 @@ $result = [PSCustomObject]@{
 }
 # Compact prompt: show if explicitly requested, or when changes exist and not explicitly disabled
 $showCompact = $CompactPrompt -or ($hasChanges -and -not $PSBoundParameters.ContainsKey('CompactPrompt'))
-if ($showCompact) {
+if ($showCompact -and -not $Quiet) {
     $diffFiles = if ($hasChanges) {
         ($gitStatus | Where-Object { $_ -match '\S' } | ForEach-Object { "  - $_" }) -join "`n"
     } else { "" }

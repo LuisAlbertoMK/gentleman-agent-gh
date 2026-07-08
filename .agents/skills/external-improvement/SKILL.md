@@ -25,11 +25,11 @@ Each phase: 3+ subagents via `task()` or `delivery-harness`. Return 4-field: `De
 **Rule**: If P3 finds no batch with I/R ≥ 1.0 → STOP (project healthy).
 
 ## Behaviors
-- Running in **gentleman-agent-gh (internal)**: P1 skip, P2 ↔ existing score-auto.ps1, P3 light, P4 full, P5 full
-- Running in **any other project**: full 5 phases with standalone fallback (generic subagents if delivery-harness/project-mapper unavailable)
+- **Internal** (gentleman-agent-gh): P1 skip, P2 ↔ score-auto.ps1, P3 light, P4 full, P5 full
+- **External**: full 5 phases with standalone fallback
 - Serial batches unless dep graph says parallel. Rollback per batch.
-- Max 3 consecutive SKIP → abort cycle. Score drop >0.5 → full revert.
-- Stdlib doesn't cover this because project analysis (structure + arch + deps) needs 3 tool types in one pass.
+- Max 3 consecutive SKIP → abort. Score drop >0.5 → full revert.
+- Stdlib doesn't cover this (needs 3 tool types in one pass).
 
 ## Output
 ```

@@ -79,20 +79,20 @@ function Repair-Junction {
       Remove-Item -LiteralPath $Path -Force -Recurse -ErrorAction SilentlyContinue
     } elseif ($item -and $item.LinkType) {
       Write-Warning "[repair] skipping $($Path): existing LinkType $($item.LinkType) is not Junction"
-      Write-Output "[skipped] $Label (not a junction)"
+      if (-not $Quiet) { Write-Output "[skipped] $Label (not a junction)" }
       return
     }
     # else: real dir/file — refuse remove to be safe
     elseif ($item) {
       Write-Warning "[repair] refusing to remove $($Path): real entry, not a junction"
-      Write-Output "[refused] $Label (real entry)"
+      if (-not $Quiet) { Write-Output "[refused] $Label (real entry)" }
       return
     }
   }
   $parent = Split-Path $Path -Parent
   if (-not (Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
   New-Item -ItemType Junction -Path $Path -Target $Target -Force | Out-Null
-  Write-Output "[repair] $Label → $Target"
+  if (-not $Quiet) { Write-Output "[repair] $Label → $Target" }
 }
 
 # ── Check 1: vmk skills junction ────────────────────────────────────────
@@ -166,7 +166,9 @@ if ($Json) {
     checks    = $checks
     exitCode  = $exitCode
   } -Depth 3
-} elseif (-not $Quiet) {
+} elseif ($Quiet) {
+  $healthResult | ConvertTo-Json -Depth 3
+} else {
   Write-Output "`n═══════════════════════════════════════════"
   Write-Output "  HEALTH CHECK — gentleman-vMK"
   Write-Output "═══════════════════════════════════════════"

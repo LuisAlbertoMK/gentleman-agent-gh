@@ -8,7 +8,4 @@ metadata:
   status: merged
   merged-into: external-auditor
 ---
-
-This skill has been merged into **external-auditor**.
-
-→ Load `external-auditor` instead for bias calibration logic.
+⚠️ **MERGED** — Use `skill("external-auditor")` instead.

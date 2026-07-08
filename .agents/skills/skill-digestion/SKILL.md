@@ -8,7 +8,4 @@ metadata:
   status: merged
   merged-into: skill-graph
 ---
-
-This skill has been merged into **skill-graph** (v2.0).
-
-→ Load `skill-graph` instead for both skill resolution AND context-aware loading strategy.
+⚠️ **MERGED** — Use `skill("skill-graph")` instead.
