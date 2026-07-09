@@ -54,7 +54,7 @@ $manual=@($manual | Where-Object {$sp=$_.ScriptPath.Replace('\','/');$sk=$false;
 $kx=@('bash-safe.ps1','pssa-gate.ps1');$av=[IO.Directory]::EnumerateFiles($target, '*.ps1', [IO.SearchOption]::AllDirectories) | ForEach-Object -Parallel {$rp=$_.Replace($using:target,'').TrimStart('\');$sk=$false;foreach($ex in $using:kx){if($rp-match[regex]::Escape($ex)){$sk=$true}};foreach($d in $using:xd){if($rp-match"^$d[\\/]"){$sk=$true}};if($sk){return}
 try{$ln=[IO.File]::ReadAllText($_)}catch{return};$ln=$ln -split '\r?\n'
 $results=@();for($i=0;$i-lt$ln.Count;$i++){$t=$ln[$i].Trim();if($t-eq''-or$t.StartsWith('#')){continue};if($t-match'(^|[^""])&&([^""]|$)'){$results+=[PSCustomObject]@{ScriptName=$rp;Line=$i+1;Text=$t}}};$results} -ThrottleLimit 4
-$av=@($av|?{$_})
+$av=@($av|Where-Object{$_})
 $ac=$av.Count
 
 if(-not$Quiet){Write-Host "`n-- Summary --"
