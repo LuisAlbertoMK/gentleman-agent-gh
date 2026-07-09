@@ -223,7 +223,7 @@ if ($Json) {
     Write-Host "  Agent   : $DefaultAgent" -ForegroundColor White
     Write-Host "  Status  : $(if($verifyOk){'✅ OK'}else{'❌ FAIL'})" -ForegroundColor $(if($verifyOk){'Green'}else{'Red'})
     Write-Host ""
-    Write-Host "  To use: cd $TargetDir && opencode" -ForegroundColor Cyan
+    Write-Host ("  To use: cd {0} {1}{1} opencode" -f $TargetDir, '&') -ForegroundColor Cyan
     Write-Host "  Skills : $globalSkills (junction, auto-synced)" -ForegroundColor DarkGray
     Write-Host "  MCPs   : Inherited from global config" -ForegroundColor DarkGray
     Write-Host "═══════════════════════════════════════════════" -ForegroundColor Cyan

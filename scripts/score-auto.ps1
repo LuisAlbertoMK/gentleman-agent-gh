@@ -22,6 +22,8 @@ param(
     [switch]$Quiet
 )
 
+Set-StrictMode -Version Latest
+
 # ponytail: score cache — git-HEAD based composite hash, fast invalidation
 
 # ============================================================
