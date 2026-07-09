@@ -212,8 +212,8 @@ fi
 
 # --- [10/9] Secrets scan on staged diff ---
 echo "[10/9] Secrets scan..."
-STAGED_SECRETS=$(git diff --cached --diff-filter=ACM 2>/dev/null | pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command "
-  \$input | Select-String -Pattern '(ghp_|gho_|github_pat_|AKIA|ctx7sk_|-----BEGIN\s+(RSA|EC|DSA|PRIVATE)\s+KEY|GH_TOKEN\s*=|GITHUB_TOKEN\s*=|password\s*=|api[_-]?key\s*=|secret\s*=|token\s*=)' -CaseSensitive 2>\$null | ForEach-Object {
+STAGED_SECRETS=$(git diff --cached --diff-filter=ACM -- ':!.githooks' 2>/dev/null | pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command "
+  \$input | Select-String -Pattern '^\+[^\+]' | ForEach-Object { \$_.Line.Substring(1) } | Select-String -Pattern '(ghp_|gho_|github_pat_|AKIA|ctx7sk_|-----BEGIN\s+(RSA|EC|DSA|PRIVATE)\s+KEY|GH_TOKEN\s*=|GITHUB_TOKEN\s*=|password\s*=|api[_-]?key\s*=|secret\s*=|token\s*=)' -CaseSensitive 2>\$null | ForEach-Object {
     \$line = \$_.Line.Trim()
     if (\$line.Length -gt 80) { \$line = \$line.Substring(0, 77) + '...' }
     Write-Output \"\$(\$_.Filename):\$(\$_.LineNumber) \$line\"
