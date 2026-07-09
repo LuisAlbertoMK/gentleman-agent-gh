@@ -35,7 +35,7 @@
   },
   "compaction": {
     "prune": true,
-    "reserved": 20000
+    "reserved": 12000
   },
   "tools": {
     "codebase-memory*": false,
@@ -52,9 +52,7 @@
       "enabled": true,
       "type": "local",
       "command": [
-        "npx",
-        "-y",
-        "@upstash/context7-mcp@3.2.2"
+        "context7-mcp"
       ],
       "environment": {
         "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
@@ -67,7 +65,8 @@
         "mcp",
         "--tools=agent"
       ],
-      "type": "local"
+      "type": "local",
+      "timeout": 30000
     },
     "sequential-thinking": {
       "enabled": false,

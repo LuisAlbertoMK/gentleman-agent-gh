@@ -87,6 +87,29 @@ Two-step: `. "$env:GENTLEMAN_AGENT_ROOT\scripts\bash-safe.ps1"` then `& "$env:GE
 One-liner: `. "$env:GENTLEMAN_AGENT_ROOT\scripts\bash-safe.ps1"; & "$env:GENTLEMAN_AGENT_ROOT\scripts\xxx.ps1" -args`
 ## Bash-Safe (PowerShell 5.1)
 PS 5.1 rejects `&&`, `||`. Use `Invoke-Bash` wrapper. **Forbidden**: raw bash calls.
+## Server Commands — LONG-LIVED PROCESSES
+Commands like `ng serve`, `npm run dev`, `dotnet run`, `python -m http.server`
+start SERVERS that **never finish**. DO NOT run them via the bash tool directly.
+
+**Correct flow**:
+1. Start: `scripts/dev-server.ps1 -Action Start -Name <name> -Command <cmd> -Arguments <args>`
+2. Check:  `scripts/dev-server.ps1 -Action Status -Name <name>`
+3. Logs:   `scripts/dev-server.ps1 -Action Logs -Name <name> -Tail 10`
+4. Kill:   `scripts/dev-server.ps1 -Action Kill -Name <name>`
+
+**Detection**: If the bash tool would run a server command, use dev-server.ps1 instead.
+If `Invoke-Bash` warns that a command is a server, re-run with `-Background` or
+use `dev-server.ps1`. If unsure, check `Test-IsServerCommand "$cmd"` first.
+
+**Port conflict**: Before starting, check if the port is already in use. The system
+auto-detects common ports (ng=4200, vite=5173, dotnet=5000, etc.) and warns you.
+Manual check:
+```powershell
+Get-NetTCPConnection -LocalPort <port> -ErrorAction SilentlyContinue
+# Or use the built-in function:
+Test-PortInUse 4200
+Get-ServerPort "ng serve --port 4300"
+```
 ## Execution & Resource-Adaptive Mode
 Infer: QUICK (simple→min) · THOROUGH (risky→full SDD) · DRAFT (explore→findings).
 | Zona | Response | Compression | Verify | Autonomía | Condition |

@@ -4,7 +4,7 @@
   Sync canonical config from gentleman-agent-gh to opencode-global.
   Part of P3 — Autonomous Integration Plan.
 .DESCRIPTION
-  Sync: agent section, skills paths, permission rules.
+  Sync: agent section, skills paths, permission rules, plugin list.
   Does NOT sync: MCP servers, default_agent (vmk uses vmk.cmd), DB schema.
 .PARAMETER Target
   vmk | global | all (default: all)
@@ -62,6 +62,12 @@ function Sync-Config {
   $canonicalSkills = $canonical.skills | ConvertTo-Json -Depth 5 -Compress
   $targetSkills = $target.skills | ConvertTo-Json -Depth 5 -Compress
   if ($canonicalSkills -ne $targetSkills) { $changes += "skills" }
+  # plugin list (from canonical — replace, don't merge)
+  if ($canonical.plugin) {
+    $canonicalPlugin = $canonical.plugin | ConvertTo-Json -Compress
+    $targetPlugin = if ($target.plugin) { $target.plugin | ConvertTo-Json -Compress } else { "[]" }
+    if ($canonicalPlugin -ne $targetPlugin) { $changes += "plugin" }
+  }
 
   if ($changes.Count -eq 0) {
     $results.Add(@{target=$Label; status="OK"; detail="No changes needed"})
@@ -77,6 +83,7 @@ function Sync-Config {
   if ($changes -contains "agent")      { $target.agent = $canonical.agent }
   if ($changes -contains "permission") { $target.permission = $canonical.permission }
   if ($changes -contains "skills")     { $target.skills = $canonical.skills }
+  if ($changes -contains "plugin")     { $target.plugin = $canonical.plugin }
 
   # Preserve MCP if needed
   if ($PreserveMCP -and $null -ne $target.mcpServers) {

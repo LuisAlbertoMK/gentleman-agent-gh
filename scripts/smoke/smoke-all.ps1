@@ -3,9 +3,14 @@
 <#
 .SYNOPSIS
   Run all automation claim smoke tests for CYCLE.md metrics.
+  Cachea resultados por hash de contenido + git HEAD.
+.PARAMETER Json
+  JSON output for agent consumption.
+.PARAMETER Force
+  Bypass cache y forzar ejecución de todos los tests.
 #>
 
-param([switch]$Json)
+param([switch]$Json, [switch]$Force)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -16,6 +21,7 @@ $RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $script:passed = 0
 $script:failed = 0
 $script:smokeResults = @()
+$CachePath = "$env:TEMP\gentleman-smoke-cache.json"
 
 function Add-SmokeResult {
     param([string]$Name, [bool]$Passed, [string]$Detail)
@@ -42,14 +48,62 @@ $smokeScripts = @(
     @{ name = 'Wisdom Stats — metrics output'; file = 'smoke-wisdom-stats.ps1' }
 )
 
-foreach ($s in $smokeScripts) {
-    $path = Join-Path $smokeDir $s.file
-    if (-not (Test-Path $path)) {
-        Add-SmokeResult -Name $s.name -Passed $false -Detail "script not found: $($s.file)"
-    } else {
-        & $path *>&1 | Out-Null
-        Add-SmokeResult -Name $s.name -Passed ($LASTEXITCODE -eq 0) -Detail "exit $LASTEXITCODE"
+# ── Cache check ────────────────────────────────────────────────────────
+function Compute-SmokeHash {
+    $gitHead = & git rev-parse HEAD 2>$null
+    if (-not $gitHead) { $gitHead = "no-git" }
+    $content = Get-ChildItem $smokeDir -Filter "*.ps1" | Sort-Object Name | ForEach-Object {
+        "$($_.Name):$(Get-Content $_.FullName -Raw)"
     }
+    $combined = "$gitHead|$($content -join '|')"
+    $bytes = [Text.Encoding]::UTF8.GetBytes($combined)
+    $hash = [System.Security.Cryptography.SHA256]::Create().ComputeHash($bytes)
+    return [Convert]::ToBase64String($hash)
+}
+
+$currentHash = Compute-SmokeHash
+$cached = $null
+if (-not $Force -and (Test-Path $CachePath)) {
+    try { $cached = Get-Content $CachePath -Raw | ConvertFrom-Json } catch {}
+}
+
+if ($cached -and $cached.hash -eq $currentHash) {
+    Write-Host "[cache] No changes detected — usando resultados anteriores" -ForegroundColor Cyan
+    $script:passed = $cached.passed
+    $script:failed = $cached.failed
+    $script:smokeResults = $cached.results
+    foreach ($r in $script:smokeResults) {
+        $color = if ($r.passed) { 'Green' } else { 'Red' }
+        $symbol = if ($r.passed) { 'PASS' } else { 'FAIL' }
+        Write-Host "[$symbol] $($r.name) (cached)" -ForegroundColor $color
+        if (-not $r.passed -and $r.detail) { Write-Host "  -> $($r.detail)" -ForegroundColor DarkGray }
+    }
+} else {
+    # ── Parallel execution ────────────────────────────────────────────────
+    $parallelResults = $smokeScripts | ForEach-Object -Parallel -ThrottleLimit 4 {
+        $path = Join-Path $using:smokeDir $_.file
+        if (-not (Test-Path $path)) {
+            @{ name = $_.name; passed = $false; detail = "script not found: $($_.file)" }
+        } else {
+            $null = & $path *>&1
+            @{ name = $_.name; passed = ($LASTEXITCODE -eq 0); detail = "exit $LASTEXITCODE" }
+        }
+    }
+
+    # Serialize results (parallel block can't modify script scope)
+    foreach ($r in $parallelResults) {
+        Add-SmokeResult -Name $r.name -Passed $r.passed -Detail $r.detail
+    }
+
+    # ── Save cache ────────────────────────────────────────────────────────
+    $cache = @{
+        hash      = $currentHash
+        timestamp = (Get-Date -Format "o")
+        passed    = $script:passed
+        failed    = $script:failed
+        results   = $script:smokeResults
+    }
+    $cache | ConvertTo-Json -Depth 2 | Set-Content $CachePath
 }
 
 # --- Summary ---

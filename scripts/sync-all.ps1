@@ -5,18 +5,45 @@
 .DESCRIPTION
   1. global-setup.ps1 -Force — AGENTS.md, prompts, scripts, MCPs, junctions, registry
   2. sync-vmk.ps1 -Force — opencode.json agent/permission/skills sections
+  Compatible with PowerShell 7+. Auto-redirects from PS5 to pwsh if available.
 .PARAMETER Json
   JSON output for agent consumption
 .PARAMETER Quiet
   Minimal output
 .EXAMPLE
-  .\scripts\sync-all.ps1
+  scripts\sync-all.ps1
+  scripts\sync-all.bat
 .EXAMPLE
-  .\scripts\sync-all.ps1 -Json
+  scripts\sync-all.ps1 -Json
 #>
 param([switch]$Json,[switch]$Quiet)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+# ── PowerShell version check — graceful redirect ──────────────
+if ($PSVersionTable.PSVersion.Major -lt 7) {
+    $pwsh = Get-Command pwsh.exe -ErrorAction SilentlyContinue
+    if ($pwsh) {
+        Write-Warning "PowerShell $($PSVersionTable.PSVersion) no es compatible."
+        Write-Warning "Redirigiendo a pwsh.exe..."
+        $params = @("-NoLogo", "-NoProfile", "-File", $PSCommandPath)
+        if ($Json)  { $params += "-Json" }
+        if ($Quiet) { $params += "-Quiet" }
+        & $pwsh.Source $params
+        exit $LASTEXITCODE
+    }
+    Write-Error "╔══════════════════════════════════════════════════════╗"
+    Write-Error "║  Requiere PowerShell 7+                              ║"
+    Write-Error "║  Versión actual: $($PSVersionTable.PSVersion)                      ║"
+    Write-Error "║  Usá sync-all.bat o instalá pwsh:                     ║"
+    Write-Error "║    winget install Microsoft.PowerShell                ║"
+    Write-Error "╚══════════════════════════════════════════════════════╝"
+    exit 1
+}
+if ($PSVersionTable.PSVersion -lt [Version]"7.6") {
+    Write-Warning "PS $($PSVersionTable.PSVersion) puede tener limitaciones. "
+    Write-Warning "Versión recomendada: 7.6+"
+}
 
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $globalSetup = Join-Path $repoRoot "scripts\global-setup.ps1"

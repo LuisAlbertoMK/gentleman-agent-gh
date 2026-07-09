@@ -130,11 +130,17 @@ if(-not $SkipMCP -and (Test-Path $globalJson)){
         Add-Result "MCP:engram" "OK" "Already configured"
     }
     
-    # Ensure context7 MCP
+    # Ensure context7 MCP (compare full command, not just existence)
+    $c7Cmd = @("context7-mcp")
+    $c7Config = @{type="local";command=$c7Cmd;enabled=$true}
     if(-not ($config.mcp.PSObject.Properties['context7'])){
-        $config.mcp | Add-Member -Name "context7" -Value @{type="local";command=@("npx","-y","@upstash/context7-mcp@3.2.2");enabled=$true} -MemberType NoteProperty -Force
+        $config.mcp | Add-Member -Name "context7" -Value $c7Config -MemberType NoteProperty -Force
         $mcpChanged = $true
         Add-Result "MCP:context7" "SYNCED" "Added context7 MCP server"
+    }elseif(($config.mcp.context7.command -join ' ') -ne ($c7Cmd -join ' ')){
+        $config.mcp.context7.command = $c7Cmd
+        $mcpChanged = $true
+        Add-Result "MCP:context7" "SYNCED" "Updated context7 command"
     }else{
         Add-Result "MCP:context7" "OK" "Already configured"
     }
