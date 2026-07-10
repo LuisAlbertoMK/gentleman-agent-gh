@@ -330,7 +330,7 @@ $seScore -= $overweightPenalty
 if ($avgSkillSizeKB -le 2.5) {
     $seScore = $math::Min(10, $seScore + 0.5)
 }
-if ($totalSkills -lt 60) {
+if ($totalSkills -lt 58) {
     $seScore -= 2
 }
 
