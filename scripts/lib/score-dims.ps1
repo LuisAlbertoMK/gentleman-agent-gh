@@ -550,7 +550,28 @@ foreach ($tf in $testFiles) {
 $testCoverageScore = if ($totalScripts -gt 0) { $math::Round($testedScripts.Count / $totalScripts * 10, 1) } else { 0 }
 $subScores += $testCoverageScore
 
-# ponytail: 38 sub-dims total (35 base + 3 new)
+# Skill Changelog Coverage: % of skills with changelog in frontmatter
+$skillsWithChangelog = @($skillMdFiles.PSWhere({ (Get-Content $_.FullName -Raw -EA SilentlyContinue) -match 'changelog:' })).Count
+$changelogScore = if ($totalSkills -gt 0) { $math::Round($skillsWithChangelog / $totalSkills * 10, 1) } else { 0 }
+$subScores += $changelogScore
+
+# Skill Trigger Coverage: % of skills with triggers in frontmatter
+$skillsWithTriggers = @($skillMdFiles.PSWhere({ (Get-Content $_.FullName -Raw -EA SilentlyContinue) -match 'triggers:' })).Count
+$triggerScore = if ($totalSkills -gt 0) { $math::Round($skillsWithTriggers / $totalSkills * 10, 1) } else { 0 }
+$subScores += $triggerScore
+
+# Skill Refs Coverage: % of skills with ## Refs section
+$skillsWithRefs = @($skillMdFiles.PSWhere({ (Get-Content $_.FullName -Raw -EA SilentlyContinue) -match '##\s*Refs' })).Count
+$refsScore = if ($totalSkills -gt 0) { $math::Round($skillsWithRefs / $totalSkills * 10, 1) } else { 0 }
+$subScores += $refsScore
+
+# README Skill Count Accuracy: does README match actual skill count?
+$readmeContent = if (Test-Path "README.md") { Get-Content "README.md" -Raw } else { "" }
+$readmeSkillMatch = if ($readmeContent -match '(\d+)\s*skills') { [int]$Matches[1] -eq $totalSkills } else { $false }
+$readmeAccuracyScore = if ($readmeSkillMatch) { 10 } else { 5 }
+$subScores += $readmeAccuracyScore
+
+# ponytail: 42 sub-dims total (35 base + 3 SD extra + 4 new)
 $depthScore = ($subScores | Measure-Object -Average).Average
 if ($depthScore -is [double]) {
     $depthScore = $math::Round($depthScore, 1)

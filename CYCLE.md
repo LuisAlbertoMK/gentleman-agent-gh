@@ -678,7 +678,7 @@ Cycle 22 (Score Recovery & Deep Quality) 2026-07-07. ✅ CLOSED (8/8, inter 8/30
 Cycle 23 (Score Consolidation & Portability) 2026-07-07. ✅ CLOSED (4/4, inter 3/30, score 9.3/10)
 Cycle 24 (Cross-Project Wisdom F2+F3) 2026-07-08. ✅ CLOSED (16/16, inter 4/30, score 8.8/10)
 Cycle 25 (Karpathy Compression & External Research) 2026-07-09. ✅ CLOSED (5/5, inter 4/30, score 9.1/10)
-Cycle 26 (Skill Merge & DCP Stale Detection) 2026-07-09. 🔵 IN PROGRESS (4/4, inter 6/30, score 9.2/10)
+Cycle 26 (Skill Merge & DCP Stale Detection) 2026-07-10. ✅ CLOSED (4/4, inter 8/30, score 9.2/10)
 
 ---
 
@@ -1140,19 +1140,20 @@ Score recovered from 8.5 to 9.0 (+0.5), then post-close improvements pushed to *
   - Item 4: ✅ Stats: 59 skills, 155KB total, o3=7, o5=1
 
 ### Cycle 26 Close
-- Score: **9.2/10** ↑ (SE 8.0→9.0, CA 1.0→1.3, demás estable)
-- inter: 6/30
+- Score: **9.2/10** ↑ (SE 8.0→9.0→9.5, CA 1.0→1.3, SD 8.9→9.1)
+- inter: 8/30
 - Backlog: 4/4 items complete ✅ (100%)
 - Key wins:
   - **Skill Merge**: 4→1, 18.5KB→10KB (−46%), o3 10→7, o5 2→1
   - **DCP Stale Detection**: 5 señales + prune protocol integrado en context-watchdog
-  - **SE Recovery**: 8.0→9.0 via compression + merge
-  - **CA Increment**: 1.0→1.3 (IC 3→6)
+  - **Karpathy Post-Close**: 7 skills comprimidas (o3 7→1, o5 1→0, avg 2.6→2.4KB)
+  - **Score Depth**: 35→42 sub-dims (+4: changelog, trigger, refs, readme accuracy)
+  - **SE Recovery**: 8.0→9.5 via compression + merge
+  - **CA Increment**: 1.0→1.3 (IC 4→8)
 - Carried forward:
-  - CA 1.3 (IC 6/30): target 30
-  - Context-watchdog 4.5KB (>3KB por stale detection section)
-  - Score Depth 8.9: 35 sub-dims
-  - P3 (Subagent-First) + P4 (Gentle-ai ecosystem) del plan sin empezar
+  - CA 1.3 (IC 8/30): target 30 — needs more inter per session
+  - ui-engine 3.2KB: functional floor, accept as-is
+  - P3 (Subagent-First) + P4 (Gentle-ai ecosystem) del plan post-Cycle26
 
 ---
 
