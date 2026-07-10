@@ -6,6 +6,7 @@ license: MIT
 metadata:
   author: gentleman-vMK
   version: "1.0"
+  changelog: "1.0: initial tracked version"
 ---
 
 # Ralph Loop Help

@@ -8,6 +8,7 @@ metadata:
     - engineering
   author: gentleman-vMK
   version: "1.1"
+  changelog: "1.1: initial tracked version"
 ---
 
 Trigger: After creating/modifying skill, before production use.

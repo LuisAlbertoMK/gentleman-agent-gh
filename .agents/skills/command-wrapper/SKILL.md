@@ -8,6 +8,7 @@ metadata:
     - engineering
   author: gentleman-vMK
   version: "1.1"
+  changelog: "1.1: initial tracked version"
 ---
 
 Trigger: Running bash commands, detecting errors, parsing output.

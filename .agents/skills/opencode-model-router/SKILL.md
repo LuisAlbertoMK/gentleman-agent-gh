@@ -7,6 +7,7 @@ metadata:
   tags: [engineering, routing, orchestration, multi-model]
   author: gentleman-vMK
   version: "3.0"
+  changelog: "3.0: initial tracked version"
 ---
 
 ## ⚠️ SECURITY GATE (always first)

@@ -7,6 +7,7 @@ metadata:
   tags: [engineering]
   author: gentleman-vMK
   version: "1.3"
+  changelog: "1.3: initial tracked version"
 ---
 <!-- karpathy-compressed: 2026-07-10 -->
 

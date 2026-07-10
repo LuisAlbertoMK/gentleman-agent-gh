@@ -6,6 +6,7 @@ license: Apache-2.0
 metadata:
   author: gentleman-programming
   version: "2.0"
+  changelog: "2.0: initial tracked version"
 ---
 ## Rules
 1. **PR MUST link approved issue** — `Closes/Fixes/Resolves #<N>` in body. Issue MUST have `status:approved`. No link → CI rejects.

@@ -6,6 +6,7 @@ license: Apache-2.0
 metadata:
   author: gentleman-programming
   version: "1.0"
+  changelog: "1.0: initial tracked version"
 ---
 
 ## When to Use

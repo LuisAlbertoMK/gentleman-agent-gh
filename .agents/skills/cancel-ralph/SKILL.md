@@ -6,6 +6,7 @@ license: MIT
 metadata:
   author: gentleman-vMK
   version: "1.1"
+  changelog: "1.1: initial tracked version"
 ---
 
 # Cancel Ralph

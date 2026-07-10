@@ -8,6 +8,7 @@ metadata:
     - engineering
   author: web-quality-skills
   version: "1.2"
+  changelog: "1.2: initial tracked version"
 ---
 # Best practices — modern web dev standards
 ## Security

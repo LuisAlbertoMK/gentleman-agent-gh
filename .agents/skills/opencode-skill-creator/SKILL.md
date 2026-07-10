@@ -6,6 +6,7 @@ license: MIT
 metadata:
   author: gentleman-vMK
   version: "1.0"
+  changelog: "1.0: initial tracked version"
 ---
 <!-- karpathy-compressed: 2026-07-09 -->
 Loop: Decide → Draft → Test prompts → Run (with-skill & baseline) → Review → Iterate → Install.

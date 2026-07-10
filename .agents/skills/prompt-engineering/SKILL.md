@@ -8,6 +8,7 @@ metadata:
     - engineering
   author: gentleman-vMK
   version: "1.2"
+  changelog: "1.2: initial tracked version"
 ---
 <!-- karpathy-compressed: 2026-07-09 -->
 ## Rules

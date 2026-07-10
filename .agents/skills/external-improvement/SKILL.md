@@ -7,6 +7,7 @@ metadata:
   tags: [improvement, external, analysis]
   author: gentleman-vMK
   version: "1.0"
+  changelog: "1.0: initial tracked version"
   standalone: true
 ---
 

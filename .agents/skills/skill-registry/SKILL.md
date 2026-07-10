@@ -8,6 +8,7 @@ metadata:
     - engineering
   author: gentleman-vMK
   version: "1.0"
+  changelog: "1.0: initial tracked version"
 ---
 
 Trigger: "update skills", after install/remove skills.

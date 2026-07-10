@@ -1,4 +1,4 @@
-﻿---
+---
 name: bitacora
 description: "Historical log of user requests per session — auto-append to BITACORA.md, search, date filtering"
 triggers: "Bitacora, historial, histórico, qué pedí, request log"
@@ -8,6 +8,7 @@ metadata:
     - content
   author: gentleman-vMK
   version: "1.0"
+  changelog: "1.0: initial tracked version"
 ---
 
 Historical log of user requests per session. Auto-append on session end.

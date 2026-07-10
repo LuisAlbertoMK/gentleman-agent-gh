@@ -7,6 +7,7 @@ metadata:
   tags: [security]
   author: gentleman-vMK
   version: "1.1"
+  changelog: "1.1: initial tracked version"
 ---
 ## WHEN: Before committing sensitive code, deploying, or user asks "is this secure"
 ## SCAN DIMENSIONS

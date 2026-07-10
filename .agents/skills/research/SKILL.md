@@ -8,6 +8,7 @@ metadata:
     - engineering
   author: gentleman-vMK
   version: "1.0"
+  changelog: "1.0: initial tracked version"
 ---
 
 Structured research: scope, gather, synthesize, decide.
