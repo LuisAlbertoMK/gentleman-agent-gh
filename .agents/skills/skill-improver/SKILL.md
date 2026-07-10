@@ -6,114 +6,74 @@ license: Apache-2.0
 metadata:
   tags: [engineering]
   author: gentleman-vMK
-  version: "2.2"
-  changelog: "2.1->2.2: Added code examples, anti-patterns table, cross-refs section, clarified audit output contract"
+  version: "2.3"
+  changelog: "2.2->2.3: Karpathy re-compress to ≤2.5KB"
 ---
-<!-- karpathy-compressed: 2026-07-09 -->
+<!-- karpathy-compressed: 2026-07-10 -->
 
 # Skill Improver
 
-Detect, diagnose, and repair skill degradation — drift, stale content, tutorial prose.
+Diagnose/repair skill degradation — drift, stale content, tutorial prose.
 
 ## Rules
 
-1. **Preserve**: author intent, critical rules, activation semantics, output contract
-2. **Default**: audit-only — modify only when asked
-3. **Never delete**: content → move to `references/` instead
-4. **Don't invent**: triggers/policies — mark ambiguous for human
-5. **Boundaries**: don't touch `opencode.json` or AGENTS.md — skills only
+1. **Preserve** author intent, critical rules, activation semantics
+2. **Audit-only** by default
+3. **Never delete**: content → `references/`
+4. **Don't invent** triggers — mark ambiguous
+5. **Skills only** — no opencode.json, no AGENTS.md
 
 ## Decision Gates
 
-| Input Signal | Action |
-|-------------|--------|
-| Missing/invalid frontmatter | Fix metadata |
-| Tutorial prose | Convert to runtime rules, background → `references/` |
-| Over token budget | Preserve rules, move examples to `references/` |
-| Branching prose | Replace with decision table |
-| Conflicting rules | Report both, don't rewrite — escalate |
+| Signal | Action |
+|---|---|
+| Invalid frontmatter | Fix metadata |
+| Tutorial prose | Convert to rules, bg → `references/` |
+| Over budget | Rules stay, examples → `references/` |
+| Branching prose | Decision table |
+| Conflicting rules | Report both — escalate |
 
-## Audit Steps
+## Audit
 
-```
-1. Read all SKILL.md files in target
-2. Audit each: metadata · trigger clarity · section order · body budget · actionability · decision gates · output contract
-3. Check usage: mem_search(last 50 loads)
-4. Flag 90d+ untouched as deprecated
-5. Return grouped-by-skill report with severity
-6. Edit safe issues, create supporting files
-```
+1. Read all SKILL.md in target
+2. Audit: metadata · triggers · budget · actionability · gates
+3. `mem_search(last 50)` — flag 90d+ untouched
+4. Report grouped-by-skill with severity
 
-## Drift Detection
+## Drift
 
-Trigger: same bug 2x · unused 5+ sessions · user correction 2x · Karpathy loss >5%
+Trigger: same bug 2x · unused 5+ · correction 2x · loss >5%
 
 | Signal | Action |
-|--------|--------|
-| Same bug 2+ times | Skill missed pattern → update |
-| Not loaded 5+ sessions | Flag or merge into broader skill |
-| User corrects same thing 2+ | Skill too vague → clarify rules |
-| Karpathy loss >5% | Revert change, rewrite denser |
+|---|---|
+| Same bug 2+ | Update skill |
+| Not loaded 5+ sessions | Flag or merge |
+| Corrects same 2+ | Clarify rules |
+| Loss >5% | Revert, rewrite |
 
-**Healing**: Engram log `(skill, session, why not, suggested fix)`. Self-test returns `{healthy: bool, issues: []}`.
+**Healing**: Engram log `(skill, session, why, fix)`.
 
-## Regeneration Flow
+## Regeneration
 
-```
-1. Audit SKILL.md + Engram usage (last 10 sessions)
-2. Check drift: do triggers still match usage?
-3. Update: fix gaps, tighten triggers, add patterns
-4. Compress if >5% new content (karpathy-loop)
-5. Bump version (major=structural, minor=content)
-6. Log changelog + commit
-```
-
-## Example
-
-```bash
-# Audit a skill — last 50 loads
-mem_search('skill.*' (scope: tag))
-# Returns: [{name: "commit-crafter", loads: 12, last: "2026-06-01"}]
-# → 90d untouched? Flag deprecated.
-
-# Self-test output
-{healthy: false, issues: [
-  "missing output contract",
-  "triggers don't match recent usage",
-  "anti-patterns section missing"
-]}
-```
+1. Audit + Engram (10 sessions) → 2. Drift check → 3. Fix gaps → 4. Compress if >5% new → 5. Version + changelog
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why | Do Instead |
-|---|---|---|
-| Rewriting entire skill at once | Loses author intent | Audit → fix specific gaps → repeat |
-| Adding unintended triggers | Skill fires incorrectly | Mark ambiguous — let human decide |
-| Deleting content instead of archiving | Data loss, no audit trail | Move to `references/` |
-| Bumping major for trivial changes | Version inflation | major=structural, minor=content |
-| Ignoring Engram usage | Flying blind | Always check `mem_search` before changes |
-| Merging active+deprecated skills silently | User confusion | Flag deprecated, don't silently merge |
-| Over-compressing losing actionable content | Skill becomes useless | Preserve rules, compress examples |
+| Anti-Pattern | Fix |
+|---|---|
+| Rewrite entire skill | Audit → fix gaps → repeat |
+| Add unintended triggers | Mark ambiguous |
+| Delete instead of archive | `references/` |
+| Major bump for trivial | minor=content |
+| Ignore Engram | `mem_search` first |
+| Over-compress rules | Preserve rules, compress examples |
 
-## Output Contract
+## Output
 
 ```json
-{
-  "audited": ["skill-a", "skill-b"],
-  "issues": [
-    {"skill": "skill-a", "severity": "high", "description": "missing output contract"}
-  ],
-  "drifted": ["skill-b"],
-  "deprecated": ["skill-c"],
-  "edits_made": ["skill-a: added output contract"]
-}
+{"audited":["skill-a"],"issues":[{"skill":"skill-a","severity":"high"}],"drifted":["skill-b"]}
 ```
 
 ## Refs
 
-- [karpathy-loop](../karpathy-loop/SKILL.md) — compression when skills exceed budget
-- [skill-creator](../skill-creator/SKILL.md) — creating new skills from scratch
-- [skill-testing](../skill-testing/SKILL.md) — verify skill quality before production
-- [immune-system](../immune-system/SKILL.md) — permanent fixes for repeated issues
-- [drift](../dreaming/SKILL.md) — cross-session pattern extraction
+- [karpathy-loop](../karpathy-loop/SKILL.md) · [skill-creator](../skill-creator/SKILL.md) · [skill-testing](../skill-testing/SKILL.md) · [immune-system](../immune-system/SKILL.md) · [drift](../dreaming/SKILL.md)

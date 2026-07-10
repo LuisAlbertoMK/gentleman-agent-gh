@@ -1,7 +1,7 @@
 {
   "score": {
     "current": 9.2,
-    "last_updated": "2026-07-09",
+    "last_updated": "2026-07-10",
     "trend": "stable",
     "dimensions": {
       "Skill Effectiveness": 9.0,
@@ -108,18 +108,18 @@
       }
     },
     "SE": {
-      "r": "T:59R >3:7 >5:1 avg:2.6KB merged UI→ui-engine, Karpathy 15 skills",
-      "s": 9.0,
+      "r": "T:63R >3:1 >5:0 avg:2.4KB Karpathy 7 skills compressed",
+      "s": 9.5,
       "e": {
-        "total": 59,
-        "bytes": 158987.0,
+        "total": 63,
+        "bytes": 149712,
         "prO5": 0,
-        "o3": 7,
+        "o3": 1,
         "cmdO3": 0,
         "cmdO5": 0,
         "prO3": 0,
-        "o5": 1,
-        "avg": 2.6
+        "o5": 0,
+        "avg": 2.4
       }
     },
     "Bi": {
