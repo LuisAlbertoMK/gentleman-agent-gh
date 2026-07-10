@@ -73,3 +73,9 @@ Suggested order: foundation + tests first, then integration, then docs. That giv
 # Inspect a PR before writing review feedback
 gh pr view <PR_NUMBER> --json title,body,additions,deletions,changedFiles
 ```
+
+## Refs
+code-review-agent · cognitive-doc-design · comment-writer · branch-pr · senior-engineer
+
+## Anti-Patterns
+Write before reading the PR · Recapitulate entire diff · Pile-on every nit · Use em dashes · Skip "why" when requesting change

@@ -46,3 +46,6 @@ webfetch(URL)
 websearch("TOPIC vs ALTERNATIVE pros cons 2026" numResults=10)
 mem_save(title="Research: TOPIC" type="discovery")
 ```
+
+## Refs
+cross-project-wisdom · prompt-engineering · senior-engineer · execution-mode · skill-graph

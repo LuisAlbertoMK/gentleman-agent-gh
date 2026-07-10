@@ -50,3 +50,9 @@ title: "Command: {summary}"
 type: discovery (if gotcha) or config (if setup)
 content: "**What**: command | **Exit code**: N | **Output**: summary | **Learned**: gotchas"
 ```
+
+## Refs
+security-scanner · delivery-harness · subagent-isolation · recovery-protocol · context-watchdog
+
+## Anti-Patterns
+Skip description · Ignore stderr · Parse output by eye · Use raw bash for destructive ops · No timeout

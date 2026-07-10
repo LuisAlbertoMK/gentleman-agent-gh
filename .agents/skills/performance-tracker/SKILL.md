@@ -30,3 +30,6 @@ Trend (every 10 or session end): `mem_search(query="perf-score:", limit=20)` →
 ## Action by Avg
 ≥8 Maintain · 6-7.9 Light review + profile · 4-5.9 gap-analysis + fix · <4 Critical perf sprint
 ## Anti-Patterns: Score without real data · cross-platform in same trend · skip bundle/cache · score once
+
+## Refs
+auto-metrics · gap-analysis · web-quality-audit · performance · metricas

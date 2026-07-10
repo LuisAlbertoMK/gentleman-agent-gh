@@ -44,3 +44,9 @@ Every delegation output MUST include this 4-field block AS-IS (never summarized)
 
 ## Context cleanup
 After delegation: extract only needed output, reference by delegation ID, summarize large outputs. Never retain full subagent output in main context.
+
+## Refs
+delivery-harness · command-wrapper · lean-context · context-watchdog · execution-mode
+
+## Anti-Patterns
+Share state between subagents · Parallelize dependent tasks · Skip 4-field contract · Keep full subagent output in context · No error isolation

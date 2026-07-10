@@ -35,3 +35,6 @@ metadata:
 6. **Adaptive profile**: `mem_search("review-profile/{project}")` before, `mem_save(...)` after.
 7.
 ## Anti-patterns: Vague "looks good" · Only praise no critique · Skipping one R · Repeated findings every session
+
+## Refs
+judgment-day · senior-engineer · skill-improver · quality-gate · triple-verify

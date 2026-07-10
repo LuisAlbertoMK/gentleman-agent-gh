@@ -29,3 +29,9 @@ LEAN/ULTRA: default. CAVEMAN: on-demand extreme.Trigger: "modo normal", /lean-of
 | Mid-session, context >40% | ULTRA |
 | Token budget critical (<10 turns left) | CAVEMAN lite |
 | Emergency compression (RED zone) | CAVEMAN ultra |
+
+## Refs
+karpathy-loop · context-watchdog · execution-mode · metricas · skill-graph
+
+## Anti-Patterns
+CAVEMAN for code/PRs · Cut safety warnings · Apply ULTRA without checking context % · Over-abbreviate in explanations · Skip disclaimer for destructive ops

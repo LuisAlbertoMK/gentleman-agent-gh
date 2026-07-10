@@ -37,3 +37,9 @@ PSSA manual?
 `$secretsPattern = '(api[_-]?key|' + 'secret|' + 'token|-----BEGIN)'; git diff --cached | Select-String -Pattern $secretsPattern`
 `"$env:GENTLEMAN_AGENT_ROOT/scripts/pssa-gate.ps1" -Mode Check`
 `"$env:GENTLEMAN_AGENT_ROOT/scripts/run-tests.ps1" -Quiet`
+
+## Refs
+security-scanner · triple-verify · commit-crafter · ci-cd · code-review-agent
+
+## Anti-Patterns
+Skip gate for "small" changes · Commit without test · Bypass credential scan · Use non-conventional message · Gate after push

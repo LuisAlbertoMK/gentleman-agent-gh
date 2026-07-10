@@ -27,3 +27,6 @@ metadata:
 
 ## Templates
 See [assets/](assets/) for per-project-type intake templates: api, desktop, ecom, erp, mobile, saas, web.
+
+## Refs
+project-mapper · security-scanner · code-review-agent · senior-engineer · performance-tracker

@@ -33,3 +33,9 @@ Trigger: "update skills", after install/remove skills.
 - Same trigger on multiple skills → keep the more specific one
 - Identical rules → merge, keep the shorter version
 - Empty or skeleton skills (only frontmatter) → skip
+
+## Refs
+skill-graph · skill-testing · skill-improver · opencode-skill-creator · dreaming
+
+## Anti-Patterns
+Include sdd-* sub-skills in registry · Dedupe to global when project has override · Keep stale entries · Skip mem_save after update

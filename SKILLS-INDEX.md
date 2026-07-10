@@ -1,9 +1,9 @@
 # SKILLS INDEX
 
-> Full trigger table for all 57 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 62 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 3.4 | **Changelog**: 3.4 (-10 skills post-audit: deprecated/redundant/lang-specific removed); 3.3 (-9 SDD phase stubs consolidated into unified sdd)
+> **Version**: 3.6 | **Changelog**: 3.6 (Merged css-layout + responsive-design + ui-animation + design-tokens → ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills); 3.4 (-10 skills post-audit); 3.3 (-9 SDD phase stubs consolidated)
 
 ## Triggers → Skill
 
@@ -62,6 +62,7 @@
 | Self-improvement, improvement cycle, auto-mejora, ciclo de mejora, comienza ciclo | self-improvement |
 | External improvement, 5-phase cycle, external project, analyze project, improve external, cliente, proyecto externo | external-improvement |
 | Model router, routing, qué modelo, delegate or direct, qué hacer con esta tarea, trial risk, security gate | opencode-model-router |
+| UI, layout, responsive, animation, design tokens, css, grid, flexbox, container query, dark mode, easing, scroll animation, flexbox, grid, subgrid, cascade layers, @layer, has selector, css nesting, intrinsic sizing, logical properties, oklch, spacing, 8pt, fluid typography, clamp, theme, style dictionary, container query, subgrid, fluid grid, auto-fit, auto-fill, style query, cqi, cqw, breakpoints, mobile-first, page scaffold, animation, transition, motion, micro-interaction, easing, scroll animation, view transition, WAAPI, keyframe, scroll-driven, compositor, motion budget, animate, 60fps | ui-engine |
 
 ## Quick groups
 - **Compression/style**: karpathy-loop (merged karpathy-prompt), lean-context
@@ -71,7 +72,7 @@
 - **Coordination**: delivery-harness, chained-pr, branch-pr, issue-creation, subagent-isolation, command-wrapper, opencode-model-router
 - **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner
 - **SDD**: sdd (unified pipeline — phases consolidated)
-- **UI/Design**: baseline-ui, accessibility, performance, seo, web-quality-audit
+- **UI/Design**: baseline-ui, accessibility, performance, seo, web-quality-audit, ui-engine
 - **Communication**: comment-writer, cognitive-doc-design
 - **Specialized**: metricas, context-watchdog, recovery-protocol
 

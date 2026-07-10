@@ -1,6 +1,11 @@
 ---
 name: ralph-loop
 description: Start Ralph Loop - auto-continues until task completion
+triggers: "ralph, ralph loop, auto-continue, iterative loop, /ralph-loop, continuous task, autonomous loop"
+license: MIT
+metadata:
+  author: gentleman-vMK
+  version: "1.0"
 ---
 
 # Ralph Loop
@@ -80,3 +85,9 @@ Your original task prompt
 ```
 
 Add `.opencode/ralph-loop.local.md` to your `.gitignore`.
+
+## Refs
+cancel-ralph · help · execution-mode · context-watchdog · recovery-protocol
+
+## Anti-Patterns
+Output DONE prematurely · Lie to escape loop · Never check iteration state · Ignore max iterations · Skip <promise>DONE</promise> on completion

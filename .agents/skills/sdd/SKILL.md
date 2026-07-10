@@ -36,3 +36,9 @@ All phases share: `{file:sdd/references/sdd-phase-common.md}`
 
 Individual wrapper skills (`sdd-init`, `sdd-explore`, etc.) each load their phase from this shared structure.
 Common protocol migrated from `_shared/sdd-phase-common.md`.
+
+## Refs
+execution-mode · quality-gate · triple-verify · delivery-harness · project-mapper
+
+## Anti-Patterns
+Skip phases in THOROUGH mode · Archive without verification · Design before scope · Spec without edge cases · Apply before verify

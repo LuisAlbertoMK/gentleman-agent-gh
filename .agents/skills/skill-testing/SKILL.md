@@ -22,3 +22,9 @@ Trigger: After creating/modifying skill, before production use.
 ## Skill Test Report | {name} | {version}| Test | Status || Syntax | ✅/❌ |
 ### Verdict: ✅ APPROVED / ⚠ NEEDS WORK / ❌ REJECTED
 ```
+
+## Refs
+skill-registry · opencode-skill-creator · skill-improver · quality-gate · karpathy-loop
+
+## Anti-Patterns
+Test only syntax, skip integration · Never verify triggers · Ship with <7 score · Skip token budget check · Test without real prompts

@@ -70,3 +70,6 @@ Auto-commit/push · mid-task runs · output >10 lines · skip "small project" ·
 
 ## Resources
 Engram `mem_context` · quality-gate · recovery-protocol · skill-graph.ps1
+
+## Refs
+dreaming · skill-graph · recovery-protocol · context-watchdog · quality-gate

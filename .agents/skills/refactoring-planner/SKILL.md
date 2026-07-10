@@ -47,3 +47,9 @@ metadata:
 3. [RISKY] Action -- integration tests, revert + rebase
 ### Acceptance: after each step -> tests pass
 ```
+
+## Refs
+metricas · quality-gate · sdd · code-review-agent · triple-verify
+
+## Anti-Patterns
+Refactor without test baseline · Batch steps before testing · Skip impact analysis · No rollback plan · Change API in same refactor

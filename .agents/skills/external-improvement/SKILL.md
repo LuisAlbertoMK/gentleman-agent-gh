@@ -52,3 +52,6 @@ docs/external/<project>/
 
 ## Refs
 delivery-harness · project-mapper · gap-analysis · sdd-propose/verify · triple-verify · codebase-memory · bitacora · commit-crafter · CYCLE.md (§5-Phase Cycle Loop)
+
+## Anti-Patterns
+Skip P1/P2 (explore/diagnose) · Parallelize dependent phases · Ignore score drop threshold · Over-commit on SKIP · Mix internal/external checklist

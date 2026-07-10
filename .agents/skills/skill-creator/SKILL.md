@@ -62,3 +62,9 @@ metadata: author: gentleman-vMK, version: "1.0"
 - Empty `references/` -> omit dir entirely
 - Triggers must match real user language -- test with real queries
 - Experimental -> `# experimental` note, skip registration
+
+## Refs
+opencode-skill-creator · skill-testing · skill-registry · skill-improver · skill-graph
+
+## Anti-Patterns
+Create skill for existing docs · Register untriggered skills · Duplicate names · Skip AGENTS.md registration · Add web URLs as primary content

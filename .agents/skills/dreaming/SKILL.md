@@ -1,13 +1,13 @@
 ---
 name: dreaming
 description: "Cross-session pattern extraction via Engram. Run via !dream — not automatic."
+triggers: "!dream, dreaming, patrones, memory review, session end, !close, pattern extraction"
 license: Apache-2.0
 metadata:
   tags: [engineering]
   author: gentleman-vMK
   version: "1.4"
   changelog: "1.4: added auto-pattern-detector + learning-stats. 1.3: opt-in !dream only."
-  triggers: "!dream, dreaming, patrones, 'memory review', session end via !close"
 ---
 ## TRIGGER
 Only on explicit request (`!dream`) or user asking. Recommended weekly or after milestone.
@@ -53,3 +53,6 @@ When `auto-pattern-detector.ps1` returns `Status: PATTERNS_FOUND`:
 2. Same error 3+ times → mandatory catalog entry + AGENTS.md rule
 3. Cross-ref with `learning-stats.ps1` to validate trend before promotion
 4. Flow: `auto-pattern-detector.ps1` → immune-system detect → ANTI-PATTERN-CATALOG.md → AGENTS.md rule
+
+## Refs
+immune-system · cross-project-wisdom · auto-metrics · session-resume · bitacora

@@ -50,3 +50,9 @@ After map, auto-trigger gap-analysis matching project type. Present as: "Project
 5. >50 files -> summary counts, not tree
 6. Adapt output format to project size
 7. After mapping -> suggest gap-analysis with matching template
+
+## Refs
+gap-analysis · research · execution-mode · sdd · skill-graph
+
+## Anti-Patterns
+Print full tree for 200+ file projects · Skip architecture detection · Auto-chain without asking · Ignore test coverage · Classify before reading signals

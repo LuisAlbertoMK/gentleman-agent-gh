@@ -69,3 +69,9 @@ Remove element?
 - Fits in 1 line
 
 **NEVER**: sacrifice correctness for tokens, or leave uncovered edge cases.
+
+## Refs
+lean-context · skill-improver · prompt-engineering · metricas · context-watchdog
+
+## Anti-Patterns
+Over-optimize before measuring · Cut context before identity · Sacrifice correctness for tokens · Skip edge case coverage · Optimize beyond diminishing returns

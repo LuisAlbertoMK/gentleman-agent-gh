@@ -31,3 +31,6 @@ Valid HTML(no dup IDs) | Semantic HTML5 | Explicit img dims | Event delegation |
 ## Audit: HTTPS | npm audit clean | CSP | Trusted Types | SRI | HSTS+headers | no deprecated APIs | passive listeners | no console errors | valid HTML | error handling | no interstitials
 ## Tools: npm audit | SecurityHeaders.com | W3C Validator | Lighthouse | Mozilla Observatory
 ## Refs: MDN Web Security | OWASP Top 10 | web-quality-audit skill
+
+## Anti-Patterns
+Blindly copy-paste headers without verifying · Ignore FP alerts · Apply all rules to every project · No Context7 check for current API versions · Skip audit step

@@ -42,3 +42,6 @@ STOP code → Ask "¿Podés mostrarme exactamente qué esperás?" → Offer rest
 | Keep generating after "no" | STOP immediately |
 | Repeat same solution differently | Change approach entirely |
 | Blame model/tools/environment | Own the mistake |
+
+## Refs
+immune-system · session-resume · context-watchdog · bitacora · lean-context

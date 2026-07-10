@@ -39,3 +39,9 @@ Multi-read: `Get-ChildItem "*.log" -Recurse | ForEach-Object -Parallel { [System
 - Run `"$env:GENTLEMAN_AGENT_ROOT/scripts/optimize-system.ps1"` once per machine (sets up registry keys)
 - Admin rights needed for power plan change (silent fail if unavailable)
 - GPU priority only affects DirectX apps
+
+## Refs
+execution-mode · lean-context · context-watchdog · performance-tracker · command-wrapper
+
+## Anti-Patterns
+Activate dev mode for 1MB files · Forget to deactivate · Run before optimize-system.ps1 · Expect GPU boost for CLI tools

@@ -33,3 +33,9 @@ jobs:
 - No test files → skip test step, note in CI output
 - Monorepo → detect subproject test runners per directory
 - SDD mode requires specs dir exists — if missing, skip spec coverage check
+
+## Refs
+quality-gate · triple-verify · security-scanner · project-mapper · execution-mode
+
+## Anti-Patterns
+Run quality gate after tests · Block on lint · Ignore monorepo config · Hardcode runner instead of auto-detect

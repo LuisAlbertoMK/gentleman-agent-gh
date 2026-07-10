@@ -26,3 +26,9 @@ metadata:
 ```
 ## RULES
 1. Run `grep` before manual inspection. Tool first. 2. Critical+High must fix before commit. Medium→suggest. 3. Verify FPs — don't auto-flag env vars. 4. Issues found? Always provide fix, not just warning. 5. End with: "Remaining risk: NONE/LOW/MED/HIGH (why)"
+
+## Refs
+quality-gate · best-practices · command-wrapper · research · code-review-agent
+
+## Anti-Patterns
+Flag env vars as secrets · Skip dependency audit · Fix without providing solution · Ignore medium severity · No risk summary

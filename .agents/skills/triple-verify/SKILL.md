@@ -53,3 +53,6 @@ Zones, thresholds, verify depth defined in `review-rules.jsonc`.
 
 ## References
 quality-gate · code-review-agent · judgment-day · commit-crafter · CYCLE.md
+
+## Anti-Patterns
+Ship without quality-gate · Two approaches instead of three · Skip build for compilable code · Ignore zone thresholds · !ship --no-verify as default

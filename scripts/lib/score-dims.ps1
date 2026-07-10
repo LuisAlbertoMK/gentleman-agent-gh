@@ -386,7 +386,7 @@ Add-Dimension "BI2" $backlogScore @{
     total  = $backlogTotalItems
 } "$backlogPassed/$backlogTotalItems items"
 
-# --- SD: Score Depth (35+ sub-dimensions) ---
+# --- SD: Score Depth (38+ sub-dimensions) ---
 
 # Compute new sub-dimension values
 # Tool Hygiene: % scripts with Quiet/Json switches
@@ -518,7 +518,39 @@ $subScores += $crossRefFreshScore
 # Audit Freshness sub-dimension
 $subScores += $auditFreshScore
 
-# ponytail: 35 sub-dims total (30 base + 5 new)
+# --- SD extra sub-dims ---
+
+# Skill Redirect Validation: % of redirect skills pointing to valid targets
+$redirectSkills = $skillMdFiles.PSWhere({ $_.Directory.Name -ne '_shared' -and (Get-Content $_.FullName -Raw -EA SilentlyContinue) -match 'MERGED into|redirect' })
+$validRedirects = 0
+foreach ($rs in $redirectSkills) {
+    $targetMatch = [regex]::Match((Get-Content $rs.FullName -Raw), 'MERGED into (\S+)')
+    if ($targetMatch.Success) {
+        $targetName = $targetMatch.Groups[1].Value
+        if (Test-Path ".agents/skills/$targetName/SKILL.md") { $validRedirects++ }
+    }
+}
+$redirectScore = if ($redirectSkills.Count -gt 0) { $math::Round($validRedirects / $redirectSkills.Count * 10, 1) } else { 10 }
+$subScores += $redirectScore
+
+# AGENTS.md Section Coverage: % of required sections present
+$requiredSections = @('Rules', 'Personality', 'Pre-Flight Gate', 'Subagent-First', 'Learning Loop', 'Default-FAIL', 'Skills', 'Delegation Rules')
+$agentsMdContent = if (Test-Path "AGENTS.md") { Get-Content "AGENTS.md" -Raw } else { "" }
+$sectionsFound = @($requiredSections | Where-Object { $agentsMdContent -match "##.*$_" }).Count
+$agentsMdScore = $math::Round($sectionsFound / $requiredSections.Count * 10, 1)
+$subScores += $agentsMdScore
+
+# Script Test Coverage: % of scripts with Pester test files
+$testFiles = Get-ChildItem "scripts\tests\*.Tests.ps1" -EA SilentlyContinue
+$testedScripts = @()
+foreach ($tf in $testFiles) {
+    $baseName = $tf.Name -replace '\.Tests\.ps1$', ''
+    if ($scriptFiles.Name -contains "$baseName.ps1") { $testedScripts += $baseName }
+}
+$testCoverageScore = if ($totalScripts -gt 0) { $math::Round($testedScripts.Count / $totalScripts * 10, 1) } else { 0 }
+$subScores += $testCoverageScore
+
+# ponytail: 38 sub-dims total (35 base + 3 new)
 $depthScore = ($subScores | Measure-Object -Average).Average
 if ($depthScore -is [double]) {
     $depthScore = $math::Round($depthScore, 1)

@@ -47,3 +47,6 @@ If `.learnings/bias-calibration.json` exists with `samples >= 2`:
 
 ## ANTI-PATTERNS
 Score w/o data · Always 7+ (be critical, 5 is fine) · Skip simple tasks · Score+ignore · No baseline
+
+## Refs
+external-auditor · dreaming · immune-system · metricas · bitacora

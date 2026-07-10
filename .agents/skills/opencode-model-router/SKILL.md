@@ -47,3 +47,9 @@ metadata:
 - **1M context**: Nemotron 3 Ultra Free, DeepSeek V4 Flash Free
 - **Vision**: Kimi K2.5 Free, MiMo V2.5 Free
 - **Fallback**: Big Pickle (docs, SEO, general)
+
+## Refs
+execution-mode · delivery-harness · subagent-isolation · skill-graph · senior-engineer
+
+## Anti-Patterns
+Route sensitive data to subagent · Delegate when context >150K · Skip fallback chain · Route to paid model when free covers it · Forget security gate

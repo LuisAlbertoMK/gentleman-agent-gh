@@ -34,3 +34,9 @@ Validate: [Rich Results Test](https://search.google.com/test/rich-results)
 4. Run Lighthouse for CWV
 5. Check mobile-friendliness
 6. Review internal linking structure
+
+## Refs
+web-quality-audit · performance · best-practices · research · accessibility
+
+## Anti-Patterns
+Keyword-stuff · Duplicate titles across pages · Ignore structured data · Skip mobile check · Submit without validation

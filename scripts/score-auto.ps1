@@ -5,7 +5,7 @@
     Auto-score project metrics across 13 dimensions.
 .DESCRIPTION
     Evaluates project health across 13 dimensions (PA, Sec, DC, CC, BP, Or, Bi, Me, SP, SE, CA, BI2, SD)
-    with 35+ sub-dimensions. Caches results based on git HEAD + script hashes + skill hashes.
+    with 38+ sub-dimensions. Caches results based on git HEAD + script hashes + skill hashes.
     Spawns parallel jobs for cross-ref-check, pssa-gate, and check-backlog-integrity.
 .PARAMETER Json
     Output results as JSON (depth 5).

@@ -1,6 +1,11 @@
 ---
 name: help
 description: Explain Ralph Loop plugin and available commands
+triggers: "help, ralph help, commands, available commands, what can you do, /help"
+license: MIT
+metadata:
+  author: gentleman-vMK
+  version: "1.0"
 ---
 
 # Ralph Loop Help
@@ -64,3 +69,9 @@ Your original task prompt
 
 - Inspired by [Anthropic's Ralph Wiggum](https://github.com/anthropics/claude-code/tree/main/plugins/ralph-wiggum) plugin for Claude Code
 - Standalone extraction from [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode)
+
+## Refs
+ralph-loop · cancel-ralph · skill-creator · session-resume
+
+## Anti-Patterns
+Over-document well-known commands · Duplicate ralph-loop/SKILL.md · List every shortcut inline · Update without checking actual plugin behavior

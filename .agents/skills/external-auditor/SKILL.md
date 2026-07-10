@@ -45,3 +45,6 @@ Rolling from `.learnings/bias-calibration.json`:
 ```
 1. Check bitácora for today's `[audit]` entry. No audit → skip, warn. 2. Subtract avg offset per dim from self-score BEFORE thresholds. 3. Log: `"Bias corrected: {dim}={offset}"`. 4. <7→immune, ≥9→mem_save. 5. Append (self, audit), keep rolling 3.
 - No data → OK. Offsets ±>3.0 → flag. Only runs during `!audit` or `!score`.
+
+## Refs
+auto-metrics · immune-system · bitacora · session-resume · quality-gate

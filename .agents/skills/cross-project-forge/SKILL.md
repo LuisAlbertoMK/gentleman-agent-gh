@@ -91,3 +91,6 @@ git checkout AGENTS.md
 
 `wisdom-store.ps1` · `wisdom-loader.ps1` · `pattern-guard.ps1` · `skill-graph.ps1`
 `docs/cross-project/patterns/*.json` · `docs/cross-project/PLAN.md`
+
+## Refs
+cross-project-wisdom · skill-creator · skill-registry · skill-graph · dreaming

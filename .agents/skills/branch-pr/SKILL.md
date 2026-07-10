@@ -1,6 +1,7 @@
 ---
 name: branch-pr
 description: "Create Gentle AI pull requests with issue-first checks. Trigger: creating, opening, or preparing PRs for review."
+triggers: "pull request, create PR, open PR, branch naming, PR creation, review PR, github pull request"
 license: Apache-2.0
 metadata:
   author: gentleman-programming
@@ -42,3 +43,9 @@ gh pr create --repo Gentleman-Programming/gentle-ai --title "<type>(<scope>): <d
 gh pr checks --repo Gentleman-Programming/gentle-ai <PR#> && gh pr view <PR#>
 gh pr edit <PR#> --repo Gentleman-Programming/gentle-ai --add-label "type:bug"
 ```
+
+## Refs
+issue-creation · commit-crafter · work-unit-commits · chained-pr · quality-gate
+
+## Anti-Patterns
+Create PR without approved issue · Skip local tests · Force-push to main · Add multiple type labels · Co-Authored-By trailers

@@ -1,6 +1,7 @@
 ---
 name: work-unit-commits
-description: "Plan commits as reviewable work units. Trigger: implementation, commit splitting, chained PRs, or keeping tests and docs with code."
+description: "Plan commits as reviewable work units."
+triggers: "work unit, commit splitting, commit organization, reviewable commits, split commit, stacked PR, chained PR commits"
 license: Apache-2.0
 metadata:
   author: gentleman-programming
@@ -58,3 +59,9 @@ git diff --stat
 git diff --cached --stat
 git log --oneline -5
 ```
+
+## Refs
+commit-crafter · chained-pr · branch-pr · sdd · quality-gate
+
+## Anti-Patterns
+Commit by file type instead of work unit · Separate tests from code · >400 lines without chaining · Messages that list files · No SDD forecast check

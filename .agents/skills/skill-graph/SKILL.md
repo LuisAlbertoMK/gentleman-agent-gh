@@ -59,3 +59,9 @@ content: |
 - SKILLS-INDEX.md: full trigger table
 - session-resume: uses skill-graph for context-aware resume
 - execution-mode: QUICK mode prefers graph resolution
+
+## Refs
+session-resume · execution-mode · skill-registry · skill-testing · lean-context
+
+## Anti-Patterns
+Resolve every task · Skip resolution for known skills · Load full skills in RED zone · Ignore resolution feedback · Never update stale triggers

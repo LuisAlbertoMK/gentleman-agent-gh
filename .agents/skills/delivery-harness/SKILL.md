@@ -49,3 +49,9 @@ Trigger: Multi-step tasks, parallel subagent work, complex deliverables.
 - subagent-isolation (context boundaries)
 - work-unit-commits (commit organization)
 - command-wrapper (safe command execution)
+
+## Refs
+subagent-isolation · work-unit-commits · command-wrapper · execution-mode · chained-pr
+
+## Anti-Patterns
+Parallelize dependent units · Share context between subagents · No rollback plan · Skip unit success criteria · Collect without verifying

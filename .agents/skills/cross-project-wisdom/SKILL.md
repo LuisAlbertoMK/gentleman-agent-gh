@@ -70,3 +70,6 @@ Each pattern JSON carries `hits` — increment on confirmed re-encounter.
 ## Resources
 
 `docs/cross-project/patterns/*.json` · `docs/cross-project/PLAN.md` · `docs/cross-project/README.md`
+
+## Refs
+cross-project-forge · dreaming · immune-system · research · session-resume

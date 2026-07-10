@@ -37,3 +37,9 @@ Script: `. agents/skills/metricas/assets/tokenize.ps1`
 4. Verify EACH metric with tool output. No self-assessment
 5. No bookmark + no git base → ask user
 6. Anti-pattern: claim w/o evidence · unrelated baselines · skip "too complex" · Δ% w/o absolute
+
+## Anti-Patterns
+Claim improvement without evidence · Compare unrelated baselines · Skip metrics because "too complex" · Report Δ% without absolute values · Use before=0 without "new" marker
+
+## Refs
+auto-metrics · performance-tracker · karpathy-loop · lean-context · quality-gate

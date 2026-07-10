@@ -63,3 +63,6 @@ Pre-task: "Seen this before?" If yes -> apply prevention BEFORE starting.
 ## Anti-patterns
 - Silent retry -> Document first | "I'll remember" -> Write catalog
 - Fix symptom -> Trace root cause | Fix current case -> Generalize prevention
+
+## Refs
+dreaming · recovery-protocol · cross-project-wisdom · session-resume · bitacora

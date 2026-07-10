@@ -80,3 +80,9 @@ git diff --name-only -- '*.md'
 # Inspect PR changed-line count for cognitive load
 gh pr view <PR_NUMBER> --json additions,deletions,changedFiles
 ```
+
+## Refs
+cross-project-wisdom · senior-engineer · comment-writer · branch-pr · chained-pr
+
+## Anti-Patterns
+Lead with context, bury the answer · No progressive disclosure · Walls of prose · Same doc template for PR and RFC

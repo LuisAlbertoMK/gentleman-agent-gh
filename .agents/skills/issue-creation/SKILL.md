@@ -1,6 +1,7 @@
 ---
 name: issue-creation
-description: "Create Gentle AI issues with issue-first checks. Trigger: creating GitHub issues, bug reports, or feature requests."
+description: "Create Gentle AI issues with issue-first checks."
+triggers: "create issue, GitHub issue, bug report, feature request, open issue, issue creation, report bug"
 license: Apache-2.0
 metadata:
   author: gentleman-programming
@@ -49,3 +50,9 @@ gh issue view <N> -R Gentleman-Programming/gentle-ai
 ```
 
 Valid scopes: `tui`, `cli`, `installer`, `catalog`, `system`, `agent`, `e2e`, `ci`, `docs`
+
+## Refs
+branch-pr · commit-crafter · quality-gate · work-unit-commits · skill-creator
+
+## Anti-Patterns
+Create issue without searching duplicates · Skip template · Work before approved · Use issue for questions · Start PR without Closes #N

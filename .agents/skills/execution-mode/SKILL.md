@@ -33,3 +33,9 @@ Compression: L1 summary (-60-70%) · L2 decisions+Engram (-40-50%) · L3 1-liner
 QUICK: No SDD. Code+tests. Score+move.
 THOROUGH: Full SDD. Every decision→Engram. Quality gate. PR with evidence.
 DRAFT: Explore first. No commit without user OK.
+
+## Refs
+development-mode · context-watchdog · lean-context · quality-gate · sdd
+
+## Anti-Patterns
+DRAFT when user asked for THOROUGH · Skip zone re-evaluation · Ignore RED zone compression · Stay in one mode for entire session

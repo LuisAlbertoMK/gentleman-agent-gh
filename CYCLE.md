@@ -677,6 +677,8 @@ Cycle 17 (Portability, Background Processes & External Research) 2026-07-02. ✅
 Cycle 22 (Score Recovery & Deep Quality) 2026-07-07. ✅ CLOSED (8/8, inter 8/30, score 9.0/10)
 Cycle 23 (Score Consolidation & Portability) 2026-07-07. ✅ CLOSED (4/4, inter 3/30, score 9.3/10)
 Cycle 24 (Cross-Project Wisdom F2+F3) 2026-07-08. ✅ CLOSED (16/16, inter 4/30, score 8.8/10)
+Cycle 25 (Karpathy Compression & External Research) 2026-07-09. ✅ CLOSED (5/5, inter 4/30, score 9.1/10)
+Cycle 26 (Skill Merge & DCP Stale Detection) 2026-07-09. 🔵 IN PROGRESS (4/4, inter 6/30, score 9.2/10)
 
 ---
 
@@ -1064,6 +1066,93 @@ Score recovered from 8.5 to 9.0 (+0.5), then post-close improvements pushed to *
   - Skill Effectiveness 6.0: opencode-skill-creator >5KB (plugin, no comprimible sin romperlo)
   - Script Performance threshold: 56 scripts, threshold 45 necesita recalibrar
   - Cycle Activity: inter 4/30 (ciclo corto)
+
+---
+
+### Cycle 25: Karpathy Compression & External Research 🔵 IN PROGRESS
+
+**Objetivo**: Comprimir skills >3KB pendientes vía subagentes paralelos y realizar research externo para mejora continua del agente. Score en 9.1 con SE 8.0 y CA 1.0 como bottlenecks.
+
+### Pilares
+1. **Karpathy Compression** — Reducir 15 skills >3KB mediante 4 subagentes concurrentes
+2. **External Research** — Gentleman ecosystem, Dudev, OpenCode SDD, DCP stale detection
+3. **Cascade Fix** — Overflow horizontal en demo + `<style>` dup correction
+
+### Backlog
+| # | Item | Impact | Risk | I/R | Status | Done criteria |
+|---|------|--------|------|-----|--------|---------------|
+| 1 | Comprimir 15 skills >3KB (6 subagentes en paralelo) | High | Low | 3.0 | ✅ | 15 skills con `karpathy-compressed` marker |
+| 2 | CSS overflow fix: cascade bug + cqi→cqw | High | Low | 3.0 | ✅ | demo-after sin scroll, sin cqi fuera de containers |
+| 3 | External research: Gentleman, Dudev, SDD, DCP | Medium | Low | 2.0 | ✅ | 4 fuentes docum. en AGENT-IMPROVEMENT-PLAN.md |
+| 4 | Plan mejora en docs/mejoras/ | High | Low | 3.0 | ✅ | Plan creado con fases y prioridades |
+| 5 | 3 subagentes de verificación | High | Low | 3.0 | ✅ | 4 subagentes para compresión + verificación |
+
+### Cycle 25 Progress
+- Score: **9.1/10** (estable)
+- inter: 4/30
+- Items: 5/5 done ✅ — ALL completed
+  - Item 1: ✅ 15 skills comprimidas (4 batches, 14 with karpathy marker)
+  - Item 2: ✅ CSS cascade bug (`<style>` duplicado) corregido, overflow-x hidden
+  - Item 3: ✅ Research 4 fuentes: Gentleman ecosystem, Dudev, SDD, DCP
+  - Item 4: ✅ `docs/mejoras/AGENT-IMPROVEMENT-PLAN.md` creado
+  - Item 5: ✅ 4 subagentes ejecutados, compressions 12-28% en skills con margen
+
+### Cycle 25 Close
+- Score: **9.1/10** (estable — SE pending score-auto refresh)
+- inter: 4/30
+- Backlog: 5/5 items complete ✅ (100%)
+- Key wins:
+  - **Skill compression**: 15 skills comprimidas vía 4 subagentes paralelos (primera vez)
+  - **Parallel delegation**: 4 batches concurrentes demostraron speedup
+  - **External research**: Gentleman ecosystem, Dudev, SDD v1, DCP stale detection
+  - **CSS fix**: Horizontal scroll corregido, cascade layers implementados
+- Carried forward:
+  - CA 1.0 (inter 4/30): necesita más interacciones por sesión
+  - SE 8.0 (10 skills aún >3KB pero pre-comprimidas al máximo)
+  - Score Depth 8.9: 35 sub-dims, target 9.5+
+
+---
+
+### Cycle 26: Skill Merge & DCP Stale Detection 🔵 IN PROGRESS
+
+**Objetivo**: Ejecutar P0 (Cycle Activity) y P2 (DCP) del plan de mejora. Merge de 4 skills UI superpuestas + stale detection en context-watchdog.
+
+### Pilares
+1. **DCP Stale Detection** — Agregar stale prune protocol a context-watchdog (5 señales: stale ref, superseded, echo chamber, aged chunk, repeated quote)
+2. **Skill Merge** — Fusionar css-layout + responsive-design + ui-animation + design-tokens → ui-engine (18.5KB→10KB)
+3. **Cross-Ref Hygiene** — Actualizar refs en baseline-ui, accessibility, web-quality-audit, performance
+
+### Backlog
+| # | Item | Impact | Risk | I/R | Status | Done criteria |
+|---|------|--------|------|-----|--------|---------------|
+| 1 | DCP stale detection en context-watchdog | High | Low | 3.0 | ✅ | Stale prune protocol + 5 signals |
+| 2 | Merge UI skills → ui-engine | High | Medium | 1.5 | ✅ | 4 redirects, 10KB merged, sin dups |
+| 3 | Cross-ref update: 4 skills refs | High | Low | 3.0 | ✅ | baseline-ui, a11y, wqa, perf → ui-engine |
+| 4 | Stats verificación | High | Low | 3.0 | ✅ | 59 skills, o3 10→7, o5 2→1 |
+
+### Cycle 26 Progress
+- Score: **9.2/10** (↑ 9.1 — SE 8.0→9.0, CA 1.0→1.3)
+- inter: 6/30 (↑ 4)
+- Items: 4/4 done ✅ — ALL completed
+  - Item 1: ✅ Stale detection con 5 signals + prune protocol
+  - Item 2: ✅ ui-engine creado (9.95KB), 4 redirects
+  - Item 3: ✅ 4 skills cross-ref actualizadas
+  - Item 4: ✅ Stats: 59 skills, 155KB total, o3=7, o5=1
+
+### Cycle 26 Close
+- Score: **9.2/10** ↑ (SE 8.0→9.0, CA 1.0→1.3, demás estable)
+- inter: 6/30
+- Backlog: 4/4 items complete ✅ (100%)
+- Key wins:
+  - **Skill Merge**: 4→1, 18.5KB→10KB (−46%), o3 10→7, o5 2→1
+  - **DCP Stale Detection**: 5 señales + prune protocol integrado en context-watchdog
+  - **SE Recovery**: 8.0→9.0 via compression + merge
+  - **CA Increment**: 1.0→1.3 (IC 3→6)
+- Carried forward:
+  - CA 1.3 (IC 6/30): target 30
+  - Context-watchdog 4.5KB (>3KB por stale detection section)
+  - Score Depth 8.9: 35 sub-dims
+  - P3 (Subagent-First) + P4 (Gentle-ai ecosystem) del plan sin empezar
 
 ---
 

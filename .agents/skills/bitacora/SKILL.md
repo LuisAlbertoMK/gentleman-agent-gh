@@ -51,3 +51,9 @@ After session end: prepend new entry to `BITACORA.md`.
 - Empty BITACORA.md → create with header "# Bitácora" + first entry
 - Search across sessions: BITACORA.md only covers current project — cross-session search uses Engram
 - `--since` accepts ISO dates only (YYYY-MM-DD)
+
+## Refs
+dreaming · session-resume · immune-system · auto-metrics · bitacora
+
+## Anti-Patterns
+Write novel-length entries · Edit past entries · Skip session-end append · Use bitacora for debug logs

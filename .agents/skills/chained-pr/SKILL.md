@@ -1,6 +1,7 @@
 ---
 name: chained-pr
-description: "Trigger: PRs over 400 lines, stacked PRs, review slices. Split oversized changes into chained PRs that protect review focus."
+description: "Split oversized changes into chained PRs that protect review focus."
+triggers: "chained PR, stacked PR, sequential branches, PR chain, stacked branches, PR stack, oversized PR, 400 lines, review slices"
 license: Apache-2.0
 metadata:
   author: gentleman-programming
@@ -48,3 +49,6 @@ Return the chosen strategy, PR order, current PR boundary, dependency diagram, r
 ## References
 
 - [references/chaining-details.md](references/chaining-details.md) — strategy diagrams, PR body section, branch commands, and reviewer guidance.
+
+## Anti-Patterns
+Split without clear boundaries · Mix strategies · Skip dependency diagram · Let chain grow stale · Bypass size:exception process

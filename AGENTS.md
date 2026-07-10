@@ -74,7 +74,27 @@ PROCESS:
   4) Synthesize into plan with consensos, divergencias, fundamentos.
 OUTPUT: Plan only — NO code, NO commit. Must exit analysis mode before implementing.
 ## Subagent-First
-Read-heavy (>3 files) → delegate `explore`. Main context = synthesis/decisions. Saves 2-5K tokens.
+**RULE**: Main context = synthesis/decisions ONLY. Never read raw data >3 files.
+
+| Task Type | Action | Token Savings |
+|-----------|--------|---------------|
+| Read >3 files | Delegate `explore` | 2-5K tokens |
+| Multi-file grep | Delegate `explore` | 3-8K tokens |
+| Codebase analysis | Delegate `explore` | 5-15K tokens |
+| Research + synthesis | Delegate `general` | 4-10K tokens |
+
+**Pattern**: 
+1. Delegate explore → get summary
+2. Main context: synthesize, decide, instruct
+3. Delegate implementation if >3 files
+
+**NEVER delegate**: 
+- Single file edits
+- Git operations
+- Script execution
+- Final verification
+
+**Anti-pattern**: Reading 10+ files manually = context pollution. If you're scrolling, you should be delegating.
 ## Learning Loop
 Capture→Extract→Evaluate→Apply. Triggers: same fix 2x · gotcha · user corrected 2x · repeat workflow · pattern 3+ files. Score/metrics via `!score`.
 ## Default-FAIL

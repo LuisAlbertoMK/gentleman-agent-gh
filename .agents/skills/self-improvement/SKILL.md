@@ -26,3 +26,6 @@ Frustration signals → `recovery-protocol`.
 ## Buffer Formats
 Schemas: `.learnings/rejected-edits.json` (id/timestamp/target/edit/reason/delta) and `accepted-edits.json` (id/timestamp/target/edit/delta/pattern).
 ## Refs: CYCLE.md · inter-track · extract-skill · run-improvement-cycle · score-auto · SkillOpt arXiv:2605.23904 · SkillSpector · recovery-protocol · external-improvement (5-phase cycle for external projects)
+
+## Anti-Patterns
+Skip learning extraction · Bump score without data · Ignore CYCLE.md guardrails · Never prune unused skills · Same fix fails 3x without abort
