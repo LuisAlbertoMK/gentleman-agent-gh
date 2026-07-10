@@ -1,9 +1,9 @@
 # SKILLS INDEX
 
-> Full trigger table for all 62 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 59 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 3.6 | **Changelog**: 3.6 (Merged css-layout + responsive-design + ui-animation + design-tokens → ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills); 3.4 (-10 skills post-audit); 3.3 (-9 SDD phase stubs consolidated)
+> **Version**: 3.7 | **Changelog**: 3.7 (Removed 4 redirect skills: css-layout, design-tokens, responsive-design, ui-animation); 3.6 (Merged into ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills)
 
 ## Triggers → Skill
 

@@ -35,53 +35,47 @@ Default `lite`. Set via `!ponytail [lite|full|ultra|off]`. Persists in `~/.confi
 3. Ejecutar los 3 · Si alguno falla → **BLOQUEAR**
 Thresholds en skill `triple-verify`. Modos: Normal (zona) · `!ship`=triple+quality+security+skillspector-gate+commit · `!check`=verify sin commit · `!fast`=build+commit+push · `!draft`=exploración.
 ### Workflow Shortcuts
-| Shortcut | Acción |
+| Shortcut | Action |
 |----------|--------|
-| `!compress` | Karpathy compression skills >2.5KB + score update |
-| `!score` | `score-auto.ps1 -Json` + docs update + cross-ref |
-| `!sync` | `pull-upstream.ps1 -Mode Check` → sync-vmk.ps1 + check-config-drift.ps1 → score |
-| `!sync-all` | `sync-all.ps1` — full global sync (global-setup + sync-vmk) |
-| `!health` | health-check.ps1 + check-config-drift.ps1 + git status |
-| `!batch` | `batch.ps1` — batch auto-incremental + log |
+| `!compress` | Karpathy compression >2.5KB + score |
+| `!score` | `score-auto.ps1 -Json` + docs update |
+| `!sync` | `pull-upstream.ps1 -Mode Check` → sync-vmk + check-drift → score |
+| `!sync-all` | `sync-all.ps1` — full global sync |
+| `!health` | health-check + check-drift + git status |
+| `!batch` | `batch.ps1` — batch auto-incremental |
 | `!cycle` | `inter-track.ps1 -Show` + score + upstream |
-| `!close` | `close-session.ps1` — unified close pipeline |
-| `!pdebt` | `ponytail-audit.ps1` — scan `ponytail:` comments |
+| `!close` | `close-session.ps1` — unified close |
+| `!pdebt` | `ponytail-audit.ps1` — scan `ponytail:` |
 | `!paudit` | `ponytail-audit.ps1 -Audit` — detect over-engineering |
-| `!ponytail` | Set intensity: `!ponytail [lite|full|ultra|off]` |
-| `!manifest` | Read CYCLE.md, report cycle + score, verify shortcuts |
-| `!5fases`/`!extimprove` | Load `external-improvement` — 5-phase cycle, 3+ sub/fase |
-| `!analisis` | Smart multi-agent analysis: project-mapper → selecciona 6 especialistas FREE + research → consolidated plan |
-| `!setup` | `scripts/setup-machine.ps1` (Win) / `.sh` (Linux/macOS) — bootstrap |
-| `!dev` | `scripts/dev-server.ps1` — manage background dev servers |
-| `!gentleman` | `scripts/use-gentleman.ps1` — gentleman-ize any project |
-| `!wisdom` | Load cross-project patterns matching current task — `cross-project-wisdom` skill |
+| `!ponytail` | Set intensity: `!ponytail [lite\|full\|ultra\|off]` |
+| `!manifest` | Read CYCLE.md, report cycle + score |
+| `!5fases`/`!extimprove` | Load `external-improvement` — 5-phase |
+| `!analisis` | Smart multi-agent analysis → consolidated plan |
+| `!setup` | `scripts/setup-machine.ps1` (Win) / `.sh` (Linux/macOS) |
+| `!dev` | `scripts/dev-server.ps1` — manage dev servers |
+| `!gentleman` | `scripts/use-gentleman.ps1` — gentleman-ize project |
+| `!wisdom` | Load cross-project patterns — `cross-project-wisdom` |
 ### Analysis Mode (trigger: `!analisis`)
 Overrides DEFAULT/SIMPLE/COMPLEX. Trigger with `!analisis` as first token (case-insensitive).
-MULTI-AGENT ANALYSIS: project-mapper → selecciona 6 especialistas FREE + 1 research web → consolidated plan.
+MULTI-AGENT ANALYSIS: project-mapper → selecciona 6 especialistas FREE + 1 web research → consolidated plan.
 PRESERVED: Ponytail rung 0, engram save, session close on request.
 SKIPPED: TRIANGULATE, Security §D, quality gate, commit pipeline, auto-metrics, Ponytail rungs 1-8.
 EXEMPT from §A Skill combo (uses Q&A load: karpathy-loop + lean-context).
 PROCESS:
-  0) **Project-mapper**: detect stack (lenguajes, frameworks, DB, infra) vía skill `project-mapper`.
-  0.5) **Wisdom injection**: Load `wisdom-loader.ps1 -Technology "<stack>"` → add matching patterns as "known gotchas" to sub-agent briefings.
-  1) **Smart selection**: según stack, elige 6 especialistas de 7 disponibles (FREE TIER):
-     - security (nemotron-3-ultra-free) ↔ infra (deepseek-v4-flash-free) ↔ frontend (kimi-k2.5-free)
-     - performance (nemotron-3-ultra-free) ↔ datascience (mimo-v2.5-free) ↔ docs (big-pickle)
-     - seo (nemotron-3-super-free) — solo si el proyecto es sitio público
-     - Excluye automáticamente especialistas irrelevantes (ej: frontend en backend-only, SEO en API)
-  2) Load karpathy-loop + lean-context.
-  3) Parallel analysis: gentleman-vMK + 6 subagentes + 1 web research.
-  4) Synthesize into plan with consensos, divergencias, fundamentos.
+  0) **Project-mapper**: detect stack → wisdom injection via `wisdom-loader.ps1 -Technology "<stack>"` → smart selection (6 FREE specialists: security/infra/frontend/perf/datascience/docs, seo for public sites, auto-exclude irrelevant).
+  1) Load karpathy-loop + lean-context.
+  2) Parallel analysis: gentleman-vMK + 6 subagentes + 1 web research.
+  3) Synthesize into plan with consensos, divergencias, fundamentos.
 OUTPUT: Plan only — NO code, NO commit. Must exit analysis mode before implementing.
 ## Subagent-First
 **RULE**: Main context = synthesis/decisions ONLY. Never read raw data >3 files.
 
-| Task Type | Action | Token Savings |
-|-----------|--------|---------------|
-| Read >3 files | Delegate `explore` | 2-5K tokens |
-| Multi-file grep | Delegate `explore` | 3-8K tokens |
-| Codebase analysis | Delegate `explore` | 5-15K tokens |
-| Research + synthesis | Delegate `general` | 4-10K tokens |
+| Task Type | Action | Savings |
+|-----------|--------|---------|
+| Read >3 files | Delegate `explore` | 2-5K |
+| Multi-file grep | Delegate `explore` | 3-8K |
+| Codebase analysis | Delegate `explore` | 5-15K |
+| Research + synthesis | Delegate `general` | 4-10K |
 
 **Pattern**: 
 1. Delegate explore → get summary
@@ -95,6 +89,12 @@ OUTPUT: Plan only — NO code, NO commit. Must exit analysis mode before impleme
 - Final verification
 
 **Anti-pattern**: Reading 10+ files manually = context pollution. If you're scrolling, you should be delegating.
+### Delegation Rules
+- **Threshold**: Delegate when >3 files or exploratory task
+- **Max concurrent**: 6 subagents
+- **Max depth**: 1 (no nested delegation)
+- **Min steps**: Do NOT delegate tasks <3 steps (overhead > savings)
+- **Pattern**: Partition independent work → parallel subagents → merge results → verify
 ## Learning Loop
 Capture→Extract→Evaluate→Apply. Triggers: same fix 2x · gotcha · user corrected 2x · repeat workflow · pattern 3+ files. Score/metrics via `!score`.
 ## Default-FAIL
@@ -123,29 +123,13 @@ use `dev-server.ps1`. If unsure, check `Test-IsServerCommand "$cmd"` first.
 
 **Port conflict**: Before starting, check if the port is already in use. The system
 auto-detects common ports (ng=4200, vite=5173, dotnet=5000, etc.) and warns you.
-Manual check:
-```powershell
-Get-NetTCPConnection -LocalPort <port> -ErrorAction SilentlyContinue
-# Or use the built-in function:
-Test-PortInUse 4200
-Get-ServerPort "ng serve --port 4300"
-```
+Manual check: `Get-NetTCPConnection -LocalPort <port>` or `Test-PortInUse 4200`
 ## Execution & Resource-Adaptive Mode
 Infer: QUICK (simple→min) · THOROUGH (risky→full SDD) · DRAFT (explore→findings).
-| Zona | Response | Compression | Verify | Autonomía | Condition |
-|------|----------|-------------|--------|-----------|----------|
-| GREEN | Full | L1 | Full | Auto-ejecutar | All LOW |
-| YELLOW | Brief+expand | L1+L2 | Essential | Pedir nod humano | ctx>40% or MEDIUM |
-| ORANGE | Headline | L2 forced | Non-critical skip | Escalar a usuario | ctx>60% or any HIGH |
-| RED | 1-liner/file | L3 emergency | Skip all | Solo informar | ctx>80% or err rate 2+ |
+GREEN: Full/L1/Full/Auto-ejecutar · YELLOW: Brief+expand/L1+L2/Essential/Pedir nod humano (ctx>40%) · ORANGE: Headline/L2/Non-critical skip/Escalar a usuario (ctx>60%) · RED: 1-liner/file/L3/Skip all/Solo informar (ctx>80%)
 ## Risk-Adaptive Ceremony Zones (diff-based)
 Auto-detect from diff:
-| Risk Level | Diff Signal | Ceremony |
-|------------|-------------|----------|
-| TRIVIAL | 1 file, ≤3 lines, no fn/class, only comments/whitespace/strings | git add + commit + secrets scan |
-| LOW | ≤3 files, test-only, local refactor | quality-gate + commit-crafter + security |
-| MEDIUM | 3-8 files, touches existing logic | quality-gate + triple-verify + security + commit-crafter |
-| HIGH | >8 files, or touches auth/storage/API/schema | Full pipeline + suggest `!audit` + `!score` |
+TRIVIAL (1 file, ≤3 lines, comments/whitespace): git add + commit + secrets scan · LOW (≤3 files, test-only): quality-gate + commit-crafter + security · MEDIUM (3-8 files): quality-gate + triple-verify + security + commit-crafter · HIGH (>8 files or auth/storage/API/schema): Full pipeline + suggest `!audit` + `!score`
 Default: **LOW**. No auto-metrics/auditor for trivial/low.
 ## Language, Tone & Scope
 Match user's language. Spanish: warm Rioplatense (voseo). English: natural, same warmth.
@@ -159,50 +143,20 @@ Top 15: karpathy-loop · lean-context · quality-gate · auto-metrics · session
 `{file:ANTI-PATTERN-CATALOG.md}` — scan BEFORE any task.
 ### Skill Router
 **Primary**: `skill-graph.ps1 -Task "<task>" -Format Json` — resolves 4-8 relevant skills (−85-92%).
-**Fallback**: Resume→session-resume · Write→skill-creator, sdd-*, quality-gate · Fix→recovery-protocol, immune-system, sdd-verify · Design→senior-engineer, sdd-propose/design · Learn→research, prompt-engineering · Review→quality-gate, judgment-day, triple-verify · UI→baseline-ui, web-quality-audit, performance, accessibility · System→development-mode, execution-mode, skill-graph · Measure→metricas, auto-metrics, performance-tracker · Audit→external-auditor, gap-analysis · Optimize→karpathy-loop, lean-context, skill-improver · Coordinate→delivery-harness, subagent-isolation, command-wrapper · Commit→commit-crafter · Secure→security-scanner · Wisdom/patterns→cross-project-wisdom · Log→bitacora · Track→dreaming, skill-graph · Issue→issue-creation · Improve→self-improvement, external-improvement · Setup→sdd-init, ci-cd, project-mapper · Recover→recovery-protocol, immune-system, context-watchdog · Unknown→skill-creator, research, recovery-protocol
+**Fallback**: Resume→session-resume · Write→skill-creator, sdd-*, quality-gate · Fix→recovery-protocol, immune-system, sdd-verify · Review→quality-gate, judgment-day, triple-verify · UI→baseline-ui, web-quality-audit, performance, accessibility · System→development-mode, execution-mode, skill-graph · Commit→commit-crafter · Secure→security-scanner · Wisdom→cross-project-wisdom · Unknown→skill-creator, research, recovery-protocol
+**Avoid**: Q&A→sdd-*,judgment-day · Setup→judgment-day · Bug fix→sdd-propose · Hotfix→triple-verify
 Load order: 1) ANTI-PATTERN-CATALOG 2) Behavioral match 3) Trigger match 4) Default-FAIL 5) Mini-dream every 5th
 ## Project Context
 - **Repo**: Gentleman Agent — OpenCode skills, scripts & config
-- **Skills**: `.agents/skills/` (69 + `_shared`, git-tracked) · workspace `skills/` (junctions, git-ignored). Overrides: `skill-validate.ps1`, `check-skill-drift.ps1`, `check-config-drift.ps1`, `skill-graph.ps1`, `health-check.ps1`, `sync-vmk.ps1`.
+- **Skills**: `.agents/skills/` (59 + `_shared`, git-tracked) · workspace `skills/` (junctions, git-ignored). Overrides: `skill-validate.ps1`, `check-skill-drift.ps1`, `check-config-drift.ps1`, `skill-graph.ps1`, `health-check.ps1`, `sync-vmk.ps1`.
 - **Cycle manifest**: `CYCLE.md` | **Global config**: `~/.config/opencode/skills/` | **Quality standard**: `docs/operations/quality-standard.md` | **Metrics**: `docs/metricas/`
 <!-- /gentle-ai:persona -->
 <!-- gentle-ai:engram-protocol -->
-## Engram Persistent Memory — Protocol
-Save after: arch decisions · bugs fixed · tool/lib choices · config changes · gotchas · patterns · user preferences.
-- Diff topics → reuse `topic_key`. Same key → upsert. Unsure → `mem_suggest_topic_key`.
-- Critical saves immediate, minor accumulate → flush at session end.
-### Memory Search
-On "remember"/"recall": 1) `mem_context` 2) `mem_search` 3) `mem_get_observation`.
-Proactive: known-area work · unfamiliar topic · first msg references project.
-**Task injection**: Before ANY non-trivial task → extract 3-5 keywords, `mem_search(query="<keywords>", type="bugfix|pattern|decision", limit=3)`, inject top 3 into context as "recordatorio: esto ya pasó".
-### Dreaming (periodic)
-`mem_search(type="error|bugfix")`. Same error 2x→catalog. 3x→AGENTS.md rule.
-Auto: `session-miner.ps1 -Mode scan -Json` every 5th error/bugfix.
-### Auto-Clean
-Delete `$env:TEMP\opencode\` >24h at session start.
-### Session Close (mandatory)
-`!close` → `mem_session_summary` (Goal/Discoveries/Accomplished/Next/Files). Scoring via `!score`/`!dream`. Mandatory unless pure chat.
-### After Compaction
-1) `mem_session_summary` 2) `mem_context` 3) Continue.
+> **Engram protocol**: Moved to `.agents/skills/engram-protocol/SKILL.md`. Load via skill when needed.
 <!-- /gentle-ai:engram-protocol -->
 <!-- gentle-ai:agent-protocol -->
 ## Protocol — agente-optimizado v1.0
 Orquestador de skills + token budget + persistencia + seguridad. Review: 2 weeks/20 sessions.
-### A. Skill combo
-| Task | Load | Don't load |
-|------|------|------------|
-| Q&A | karpathy-loop, lean-context | sdd-*, judgment-day |
-| Setup | sdd-init, senior-engineer | judgment-day |
-| Bug fix | recovery-protocol, immune-system, sdd-verify | sdd-propose |
-| Architecture | senior-engineer, sdd-propose | — |
-| Code review | code-review-agent, judgment-day | — |
-| Refactor | karpathy-loop, lean-context, metricas | — |
-| Verify/!check | verify.ps1 → pssa-gate.ps1 | — |
-| Commit/!ship | triple-verify→quality-gate→security-scanner→skillspector-gate→commit-crafter | — |
-| Hotfix !fast | quality-gate + commit-crafter | triple-verify |
-| Security | security-scanner | — |
-| Wisdom/patterns | cross-project-wisdom | — |
-| Long/thorough | sdd-* + quality-gate | — |
 ### B. Token budget
 - >500 tokens → summary first. 5 turns no progress → `lean-context CAVEMAN lite`. 10 turns → `mem_session_summary` + reset. Self-check every 5 calls. Every 25 calls → checkpoint: `mem_save(topic_key=checkpoint/session-state)`.
 - **Compression**: L1 (~8msgs/15calls): full summary −60-70%. L2 (~20msgs/>3L1): 1-2 line decisions + Engram ID −40-50%. L3 (YELLOW>60%): 1-liner/topic + `Ref: engram-obs-{id}` −80-90%.
@@ -239,11 +193,5 @@ After EVERY turn (before next response):
 3. **Decision made?** → `mem_save(type="decision", title="...")`
 4. **Discovery/gotcha?** → `mem_save(type="discovery", title="...")`
 Propósito: nada se pierde entre turns. No esperar a session close.
-## Delegation Rules
-- **Threshold**: Delegate when >3 files or exploratory task
-- **Max concurrent**: 6 subagents
-- **Max depth**: 1 (no nested delegation)
-- **Min steps**: Do NOT delegate tasks <3 steps (overhead > savings)
-- **Pattern**: Partition independent work → parallel subagents → merge results → verify
 <!-- /gentle-ai:agent-protocol -->
 <!-- agent-version: 2.2 — Project: gentleman-agent-gh, self-contained -->
