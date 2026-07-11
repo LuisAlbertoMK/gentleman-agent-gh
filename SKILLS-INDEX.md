@@ -1,9 +1,9 @@
 # SKILLS INDEX
 
-> Full trigger table for all 59 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 63 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 3.7 | **Changelog**: 3.7 (Removed 4 redirect skills: css-layout, design-tokens, responsive-design, ui-animation); 3.6 (Merged into ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills)
+> **Version**: 3.8 | **Changelog**: 3.8 (+4 new skills: sdd-quick, visual-testing, image-pipeline, pdf-utils); 3.7 (Removed 4 redirect skills: css-layout, design-tokens, responsive-design, ui-animation); 3.6 (Merged into ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills)
 
 ## Triggers → Skill
 
@@ -63,6 +63,9 @@
 | External improvement, 5-phase cycle, external project, analyze project, improve external, cliente, proyecto externo | external-improvement |
 | Model router, routing, qué modelo, delegate or direct, qué hacer con esta tarea, trial risk, security gate | opencode-model-router |
 | UI, layout, responsive, animation, design tokens, css, grid, flexbox, container query, dark mode, easing, scroll animation, flexbox, grid, subgrid, cascade layers, @layer, has selector, css nesting, intrinsic sizing, logical properties, oklch, spacing, 8pt, fluid typography, clamp, theme, style dictionary, container query, subgrid, fluid grid, auto-fit, auto-fill, style query, cqi, cqw, breakpoints, mobile-first, page scaffold, animation, transition, motion, micro-interaction, easing, scroll animation, view transition, WAAPI, keyframe, scroll-driven, compositor, motion budget, animate, 60fps | ui-engine |
+| screenshot, visual diff, visual bug, regression test, VRT, UI broken, text overflow, layout shift, responsive test | visual-testing |
+| compress image, optimize image, resize image, convert webp, convert avif, describe image, image too heavy, slow images, image bug, visual bug description | image-pipeline |
+| PDF, extract PDF, parse PDF, merge PDF, generate PDF, PDF table, PDF invoice, read PDF, PDF to text, PDF to markdown | pdf-utils |
 
 ## Quick groups
 - **Compression/style**: karpathy-loop (merged karpathy-prompt), lean-context
@@ -73,6 +76,8 @@
 - **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner
 - **SDD**: sdd (unified pipeline — phases consolidated)
 - **UI/Design**: baseline-ui, accessibility, performance, seo, web-quality-audit, ui-engine
+- **Visual/Testing**: visual-testing, image-pipeline
+- **Documents**: pdf-utils
 - **Communication**: comment-writer, cognitive-doc-design
 - **Specialized**: metricas, context-watchdog, recovery-protocol
 

@@ -74,17 +74,17 @@ Register-Skill auto-metrics "auto-score|metrics|post-task|evaluate|self-evaluate
 Register-Skill immune-system "immune system|anti-pattern|permanent immunity|nunca mas|bug|fix|error" quality high "" "" "Permanent immunity catalog for repeated errors"
 Register-Skill code-review-agent "code review|CR|revisar codigo|review code" quality medium best-practices "" "Automated code review with standards"
 Register-Skill skill-testing "test skill|verify skill|coverage|skill test" quality medium "" "" "Test and verify skill coverage"
-Register-Skill skill-validate "skill validation|benchmark|multi-trial|validate skill|3 trials" quality medium "" "" "3-trial benchmark validation"
 Register-Skill judgment-day "judgment day|dual review|juzgar|evaluar skill" quality high "" "" "Dual review and judgment for skills"
 Register-Skill triple-verify "triple verify|triangulate|3 enfoques|verificacion profunda|!ship|!listo|!fast|!draft" quality high "" "" "Triple verification - 3 enfoques, thresholds por zona"
 Register-Skill external-auditor "external audit|blind review|second opinion|verifica mi auto-score|contralor externo" quality medium "" "" "Blind second-opinion audit via subagent"
 
 # --- memory ---
-Register-Skill session-resume "resume|donde lo dejamos|continua|session start|git state" memory medium dreaming "" "Safe session resume with git state gate"
+Register-Skill session-resume "session resume|donde lo dejamos|continua|session start|git state|memory|recordar|acordate|multi-session|donde quedamos|handoff" memory medium dreaming "" "Safe session resume with git state gate"
 
 Register-Skill dreaming "dreaming|cross-session|pattern extraction|memory curation|engram" memory high auto-metrics "" "Cross-session pattern extraction via Engram"
 Register-Skill bitacora "bitacora|historial|historico|request log" memory low "" "" "Session activity log and history tracking"
 Register-Skill metricas "metricas|before after|percent improvement|delta" memory low "" "" "Before/after metrics tracking for improvements"
+Register-Skill engram-protocol "engram|persistent memory|mem save|mem search|memory protocol" memory medium "" "" "Persistent memory protocol via Engram MCP"
 
 
 # --- meta ---
@@ -93,6 +93,10 @@ Register-Skill skill-registry "skill registry|catalog|registro skills" meta medi
 Register-Skill skill-improver "skill improvement|audit skills|refactor skills" meta medium "" "" "Audit and improve existing skills"
 Register-Skill skill-graph "sparse loading|skill resolution|relevant skills|which skill|resolver skill|minimo skills" meta low "" "" "Sparse loading - resolve only relevant skills + dependencies"
 Register-Skill gap-analysis "gap analysis|system audit|identificar gaps|project intake" meta high "project-mapper|security-scanner" "" "Complete 8-dim gap analysis"
+Register-Skill cross-project-forge "forge|promote pattern|auto-skill|forjar|convertir patron|skill desde patron" meta medium "" "" "Promote recurring patterns to auto-generated skills"
+Register-Skill cross-project-wisdom "patterns|wisdom|lesson learned|in another project|last time this|cross-project|retrospectiva|experiencia previa|!wisdom|pattern guard" meta low "" "" "Load patterns from prior projects"
+Register-Skill external-improvement "5 fases|extimprove|external improvement|mejora externa" meta high "" "" "5-phase improvement cycle for external projects"
+Register-Skill opencode-skill-creator "create opencode skill|opencode skill|new opencode skill" meta medium "" "" "Create OpenCode-specific skills with intake interview"
 
 # --- code-ops ---
 Register-Skill commit-crafter "commit|commit message|conventional commit" code-ops low "" "quality-gate" "Craft conventional commit messages from diff"
@@ -104,6 +108,7 @@ Register-Skill performance-tracker "performance score|mobile perf|desktop perf|r
 
 # --- SDD ---
 Register-Skill sdd "SDD pipeline|SDD phase|spec-driven development" SDD medium "" "sdd-init|sdd-explore|sdd-propose|sdd-spec|sdd-design|sdd-tasks|sdd-apply|sdd-verify|sdd-archive" "Unified SDD pipeline - 9 phases"
+Register-Skill sdd-quick "SDD quick|fast path|quick SDD|low risk SDD|simple change SDD" SDD low "" "sdd-propose|sdd-apply|sdd-verify" "3-phase fast path for LOW-risk changes"
 Register-Skill sdd-init "SDD init|bootstrap|iniciar SDD" SDD medium "" "" "SDD init - bootstrap project context"
 Register-Skill sdd-explore "explore codebase|pre-design|investigar|codebase exploration" SDD medium "" "" "Explore codebase"
 Register-Skill sdd-propose "proposal|intent|approach|change proposal" SDD medium sdd-explore "" "Create change proposals"
@@ -123,6 +128,8 @@ Register-Skill issue-creation "create issue|GitHub issue|bug report|feature requ
 Register-Skill subagent-isolation "subagent isolation|context boundaries|delegation" coordination medium "" "" "Isolate subagent contexts and prevent contamination"
 Register-Skill command-wrapper "command wrapper|safe execution|error handling|output parse" coordination low "" "" "Safe command execution with error handling"
 Register-Skill opencode-model-router "model router|routing|que modelo|delegate or direct|que hacer con esta tarea|trial risk|security gate" coordination high "" "" "Route tasks by model strength with security gates"
+Register-Skill ralph-loop "ralph loop|auto-continue|keep going|continue task|loop until done" coordination medium "" "" "Auto-continues until task completion"
+Register-Skill cancel-ralph "cancel ralph|stop loop|abort loop|cancel auto" coordination low "" "" "Cancel active Ralph Loop"
 
 # --- web-quality ---
 Register-Skill accessibility "accessibility|a11y|WCAG|screen reader|keyboard nav|make accessible" web-quality medium "" "" "Audit and improve web accessibility"
@@ -131,7 +138,13 @@ Register-Skill seo "SEO|search engine|meta tags|structured data|sitemap" web-qua
 Register-Skill best-practices "best practices|security audit|modernize code|code quality review" web-quality medium "" "" "Apply modern web development best practices"
 Register-Skill web-quality-audit "web quality audit|lighthouse audit|review web quality" web-quality medium "accessibility|performance|seo|best-practices" "" "Comprehensive web quality audit"
 Register-Skill development-mode "performance mode|dev mode|modo desarrollo|high performance|modo rendimiento" web-quality medium "" "" "System resource prioritization mode"
-Register-Skill baseline-ui "ui cleanup|polish interface|fix layout|ui slop|generic ui|design review" web-quality medium accessibility "" "Anti-slop UI enforcement"
+Register-Skill baseline-ui "ui cleanup|polish interface|fix layout|ui slop|generic ui|design review|baseline ui|anti-slop" web-quality medium accessibility "" "Anti-slop UI enforcement"
+Register-Skill ui-engine "ui system|grid|flexbox|container queries|oklch|tokens|animation|compositor" web-quality medium "" "" "UI system — Grid/Flexbox/@layer/:has(), container queries, compositor-only animation, OKLCH tokens"
+
+# --- visual/images/documents ---
+Register-Skill visual-testing "screenshot|visual diff|visual bug|regression test|VRT|UI broken|text overflow|layout shift|responsive test" testing medium "" "" "Visual verification — screenshots, visual regression, UI bug detection"
+Register-Skill image-pipeline "compress image|optimize image|resize image|convert webp|convert avif|describe image|image too heavy|slow images|image bug" performance medium "" "" "Image optimization — compress, convert, resize, describe"
+Register-Skill pdf-utils "PDF|extract PDF|parse PDF|merge PDF|generate PDF|PDF table|PDF invoice|read PDF|PDF to text|PDF to markdown" documents medium "" "" "PDF processing — extract text, parse tables, generate reports"
 
 # --- research ---
 Register-Skill research "research|investigar|technical investigation|learn|compare solutions|evaluate" research medium "" "" "Structured research workflow for technical investigations"
@@ -146,6 +159,7 @@ Register-Skill cognitive-doc-design "doc design|documentation patterns|cognitive
 Register-Skill comment-writer "comment writer|PR feedback|review comment|write feedback" specialized low "" "" "Write warm, direct collaboration comments"
 Register-Skill senior-engineer "senior architect|trade-offs|system design|arquitectura" specialized high "" "" "Senior engineer persona for architecture decisions"
 Register-Skill prompt-engineering "improve prompt|ReAct|multi-agent|prompt engineering" specialized medium "" "" "Advanced prompt engineering techniques"
+Register-Skill help "ralph help|commands|plugin help|available commands" specialized low "" "" "Explain Ralph Loop plugin and available commands"
 
 
 # ============================================================================

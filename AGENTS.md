@@ -138,17 +138,17 @@ Match user's language. Spanish: warm Rioplatense (voseo). English: natural, same
 - **Scope**: Persona governs reply TEXT only — NOT artifacts. Artifacts default to English. No Rioplatense in code.
 - **Behavior**: No code without context. Correct errors with WHY.
 ## Skills (Auto-load)
-Top 15: karpathy-loop · lean-context · quality-gate · auto-metrics · session-resume · cross-project-wisdom · skill-creator · immune-system · dreaming · metricas · commit-crafter · code-review-agent · bitacora · triple-verify · self-improvement
+Top 18: karpathy-loop · lean-context · quality-gate · auto-metrics · session-resume · cross-project-wisdom · skill-creator · immune-system · dreaming · metricas · commit-crafter · code-review-agent · bitacora · triple-verify · self-improvement · visual-testing · image-pipeline · pdf-utils
 ### Anti-Pattern Catalog
 `{file:ANTI-PATTERN-CATALOG.md}` — scan BEFORE any task.
 ### Skill Router
 **Primary**: `skill-graph.ps1 -Task "<task>" -Format Json` — resolves 4-8 relevant skills (−85-92%).
-**Fallback**: Resume→session-resume · Write→skill-creator, sdd-*, quality-gate · Fix→recovery-protocol, immune-system, sdd-verify · Review→quality-gate, judgment-day, triple-verify · UI→baseline-ui, web-quality-audit, performance, accessibility · System→development-mode, execution-mode, skill-graph · Commit→commit-crafter · Secure→security-scanner · Wisdom→cross-project-wisdom · Unknown→skill-creator, research, recovery-protocol
+**Fallback**: Resume→session-resume · Write→skill-creator, sdd-*, quality-gate · Fix→recovery-protocol, immune-system, sdd-verify · Review→quality-gate, judgment-day, triple-verify · UI→baseline-ui, web-quality-audit, performance, accessibility, visual-testing · System→development-mode, execution-mode, skill-graph · Commit→commit-crafter · Secure→security-scanner · Wisdom→cross-project-wisdom · Images→image-pipeline · Documents→pdf-utils · Unknown→skill-creator, research, recovery-protocol
 **Avoid**: Q&A→sdd-*,judgment-day · Setup→judgment-day · Bug fix→sdd-propose · Hotfix→triple-verify
 Load order: 1) ANTI-PATTERN-CATALOG 2) Behavioral match 3) Trigger match 4) Default-FAIL 5) Mini-dream every 5th
 ## Project Context
 - **Repo**: Gentleman Agent — OpenCode skills, scripts & config
-- **Skills**: `.agents/skills/` (59 + `_shared`, git-tracked) · workspace `skills/` (junctions, git-ignored). Overrides: `skill-validate.ps1`, `check-skill-drift.ps1`, `check-config-drift.ps1`, `skill-graph.ps1`, `health-check.ps1`, `sync-vmk.ps1`.
+- **Skills**: `.agents/skills/` (63 + `_shared`, git-tracked) · workspace `skills/` (junctions, git-ignored). Overrides: `skill-validate.ps1`, `check-skill-drift.ps1`, `check-config-drift.ps1`, `skill-graph.ps1`, `health-check.ps1`, `sync-vmk.ps1`.
 - **Cycle manifest**: `CYCLE.md` | **Global config**: `~/.config/opencode/skills/` | **Quality standard**: `docs/operations/quality-standard.md` | **Metrics**: `docs/metricas/`
 <!-- /gentle-ai:persona -->
 <!-- gentle-ai:engram-protocol -->

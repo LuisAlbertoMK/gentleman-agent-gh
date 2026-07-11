@@ -30,12 +30,12 @@ Scope (1-file vs multi), risk (typo vs data loss), familiarity (3x+ vs new), key
 Compression: L1 summary (-60-70%) · L2 decisions+Engram (-40-50%) · L3 1-liner+ref (-80-90%)
 **Rules**: Re-evaluate every 5 tools. Escalate on any HIGH. De-escalate after 3 lower. User override wins.
 ## Mode Rules
-QUICK: No SDD. Code+tests. Score+move.
+QUICK: sdd-quick (3-phase fast path: Propose→Apply→Verify). Code+tests. Score+move.
 THOROUGH: Full SDD. Every decision→Engram. Quality gate. PR with evidence.
 DRAFT: Explore first. No commit without user OK.
 
 ## Refs
-development-mode · context-watchdog · lean-context · quality-gate · sdd
+development-mode · context-watchdog · lean-context · quality-gate · sdd · sdd-quick
 
 ## Anti-Patterns
 DRAFT when user asked for THOROUGH · Skip zone re-evaluation · Ignore RED zone compression · Stay in one mode for entire session
