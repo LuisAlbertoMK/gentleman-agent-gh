@@ -19,7 +19,7 @@ jobs:
       - name: Generate release notes
         run: |
           # Extract unreleased section from CHANGELOG
-          awk '/^## \[Unreleased\]/{flag=1; next} /^## \[/{flag=0} flag' CHANGELOG.md > release-notes.md
+          awk '/^## \[Unreleased\]/{flag=1; next} /^## \[/{flag=0} flag' docs/CHANGELOG.md > release-notes.md
           echo "Release notes:"
           cat release-notes.md
 

@@ -102,9 +102,9 @@ $skillDirCount = $skillDirs.PSWhere({ $_ -ne '_shared' }).Count
 $scriptRoot = $PSScriptRoot
 $jobs       = @()
 
-$jobs += Start-Job -Name "crossref"  -ScriptBlock { & "$using:scriptRoot\cross-ref-check.ps1" -Json -Quiet }
-$jobs += Start-Job -Name "pssa"     -ScriptBlock { & "$using:scriptRoot\pssa-gate.ps1" -Mode Check -Quiet }
-$jobs += Start-Job -Name "backlog"  -ScriptBlock { & "$using:scriptRoot\check-backlog-integrity.ps1" -Json }
+$jobs += Start-ThreadJob -Name "crossref" -ScriptBlock { & "$using:scriptRoot\cross-ref-check.ps1" -Json -Quiet }
+$jobs += Start-ThreadJob -Name "pssa"    -ScriptBlock { & "$using:scriptRoot\pssa-gate.ps1" -Mode Check -Quiet }
+$jobs += Start-ThreadJob -Name "backlog" -ScriptBlock { & "$using:scriptRoot\check-backlog-integrity.ps1" -Json }
 
 $jobs | Wait-Job -Timeout 30 | Out-Null
 

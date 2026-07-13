@@ -17,17 +17,22 @@
   Set lower for strict CI: skillspector-gate.ps1 -FailOnRisk 50
 .PARAMETER DockerImage
   Docker image name when using Docker fallback (default: skillspector).
+.PARAMETER Strict
+  Exit with code 1 when scanner is unavailable or risk exceeds threshold.
+  Required for CI: skillspector-gate.ps1 -Strict -FailOnRisk 50
 #>
 param(
     [switch]$Quiet,
     [string]$SkillsPath = ".agents/skills",
     [int]$FailOnRisk = 100,
-    [string]$DockerImage = "skillspector"
+    [string]$DockerImage = "skillspector",
+    [switch]$Strict
 )
 Set-StrictMode -Version Latest
 
 $ErrorActionPreference = "Stop"
 $scriptName = "skillspector-gate"
+$script:RiskExceeded = $false
 
 # Resolve full path
 $resolvedPath = Resolve-Path $SkillsPath -ErrorAction SilentlyContinue
@@ -72,6 +77,7 @@ function Write-Report {
 
     if ($riskScore -ge $FailOnRisk) {
         Write-Warning "⚠️ Risk score $riskScore exceeds threshold $FailOnRisk ($realCount non-RA1 findings)"
+        $script:RiskExceeded = $true
     }
 
     if ($riskScore -ge 30) {
@@ -108,6 +114,7 @@ if ($sp) {
     Write-Host "🔍 [CLI] Scanning skills with SkillSpector (static only)..."
     $jsonOutput = & skillspector scan $resolvedPath --no-llm --format json 2>&1 | Out-String
     Run-Scan -Runner "CLI" -JsonOutput $jsonOutput
+    if ($Strict -and $script:RiskExceeded) { exit 1 }
     exit 0
 }
 
@@ -124,6 +131,7 @@ if ($dockerOk) {
     $scanTarget = "/scan/$(Split-Path $resolvedPath.Path -Leaf)"
     $jsonOutput = docker run --rm -v "${hostPath}:/scan" $DockerImage scan $scanTarget --no-llm --format json 2>&1 | Out-String
     Run-Scan -Runner "Docker" -JsonOutput $jsonOutput
+    if ($Strict -and $script:RiskExceeded) { exit 1 }
     exit 0
 }
 
@@ -131,4 +139,8 @@ if ($dockerOk) {
 Write-Host "⚪ SkillSpector not installed — skipping"
 Write-Host "   CLI: pip install git+https://github.com/NVIDIA/SkillSpector.git"
 Write-Host "   Docker: docker build -t skillspector . (from repo clone)"
+if ($Strict) {
+    Write-Warning "⚠️ SkillSpector unavailable in strict mode — failing gate"
+    exit 1
+}
 exit 0

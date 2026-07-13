@@ -154,7 +154,7 @@
         "bash": "allow",
         "edit": "deny",
         "read": "allow",
-        "write": "allow"
+        "write": "deny"
       }
     },
     "gentleman-seo": {
@@ -166,7 +166,7 @@
         "bash": "allow",
         "edit": "deny",
         "read": "allow",
-        "write": "allow"
+        "write": "deny"
       }
     },
     "gentleman-infra": {
@@ -178,7 +178,7 @@
         "bash": "allow",
         "edit": "deny",
         "read": "allow",
-        "write": "allow"
+        "write": "deny"
       }
     },
     "gentleman-frontend": {
@@ -190,7 +190,7 @@
         "bash": "allow",
         "edit": "deny",
         "read": "allow",
-        "write": "allow"
+        "write": "deny"
       }
     },
     "gentleman-performance": {
@@ -202,7 +202,7 @@
         "bash": "allow",
         "edit": "deny",
         "read": "allow",
-        "write": "allow"
+        "write": "deny"
       }
     },
     "gentleman-datascience": {
@@ -214,7 +214,7 @@
         "bash": "allow",
         "edit": "deny",
         "read": "allow",
-        "write": "allow"
+        "write": "deny"
       }
     },
     "gentleman-docs": {
@@ -226,7 +226,7 @@
         "bash": "allow",
         "edit": "deny",
         "read": "allow",
-        "write": "allow"
+        "write": "deny"
       }
     },
     "gentleman-implementer": {

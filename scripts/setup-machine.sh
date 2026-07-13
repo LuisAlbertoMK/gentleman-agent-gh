@@ -206,7 +206,131 @@ else
     skip "Skills already configured"
 fi
 
-# ── Step 6: Verify ──────────────────────────────────────────────────
+# ── Step 6: Global prompts symlink ────────────────────────────────
+# The global config may contain {file:prompts/sdd/*.md} references from agent
+# definitions synced in Step 4. Those resolve relative to the global config dir,
+# so we need the prompts directory there too.
+info "Setting up global prompts symlink"
+GLOBAL_PROMPTS_DIR="${HOME}/.config/opencode/prompts"
+REPO_SDD_DIR="${REPO_DIR}/prompts/sdd"
+SDD_LINK="${GLOBAL_PROMPTS_DIR}/sdd"
+
+if [ -d "$REPO_SDD_DIR" ]; then
+    if [ ! -e "$SDD_LINK" ]; then
+        mkdir -p "$GLOBAL_PROMPTS_DIR"
+        ln -s "$REPO_SDD_DIR" "$SDD_LINK" 2>/dev/null || cp -r "$REPO_SDD_DIR" "$SDD_LINK"
+        ok "Prompts symlink created at ${SDD_LINK}"
+    else
+        skip "Prompts symlink already exists"
+    fi
+else
+    warn "Repo prompts/sdd not found at ${REPO_SDD_DIR}"
+fi
+
+# ── Step 7: Global AGENTS.md ──────────────────────────────────────
+# {file:AGENTS.md} in gentleman-vMK agent prompt resolves relative to global config
+info "Copying AGENTS.md to global config"
+GLOBAL_AGENTS_MD="${HOME}/.config/opencode/AGENTS.md"
+REPO_AGENTS_MD="${REPO_DIR}/AGENTS.md"
+
+if [ -f "$REPO_AGENTS_MD" ]; then
+    if [ ! -f "$GLOBAL_AGENTS_MD" ]; then
+        cp "$REPO_AGENTS_MD" "$GLOBAL_AGENTS_MD"
+        ok "AGENTS.md copied to global config"
+    else
+        skip "AGENTS.md already exists in global config"
+    fi
+else
+    warn "Repo AGENTS.md not found at ${REPO_AGENTS_MD}"
+fi
+
+# ── Step 8: Install MCP server binaries ─────────────────────────
+# These binaries back the MCP servers configured in opencode.json.
+# Without them, OpenCode can load the config but the MCPs won't start.
+info "Installing MCP server binaries"
+any_mcp=false
+
+# 8a. codebase-memory-mcp — npm global
+if command -v codebase-memory-mcp &>/dev/null; then
+    skip "codebase-memory-mcp already installed"
+else
+    info "Installing codebase-memory-mcp..."
+    if npm install -g codebase-memory-mcp --no-fund --no-audit --loglevel error 2>/dev/null; then
+        ok "codebase-memory-mcp installed"
+        any_mcp=true
+    else
+        warn "codebase-memory-mcp install failed — run 'npm install -g codebase-memory-mcp' manually"
+    fi
+fi
+
+# 8b. headroom — pip
+if command -v headroom &>/dev/null; then
+    skip "headroom already installed"
+else
+    info "Installing headroom..."
+    if pip install headroom-ai -q 2>/dev/null; then
+        ok "headroom installed"
+        any_mcp=true
+    else
+        warn "headroom install failed — run 'pip install headroom-ai' manually"
+    fi
+fi
+
+# 8c. engram — GitHub releases
+if command -v engram &>/dev/null; then
+    skip "engram already installed"
+else
+    info "Installing engram from GitHub releases..."
+    os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+    case "$os" in
+        linux*)  os="linux" ;;
+        darwin*) os="darwin" ;;
+        *)       os="linux" ;;
+    esac
+    arch="$(uname -m)"
+    case "$arch" in
+        x86_64|amd64) arch="amd64" ;;
+        aarch64|arm64) arch="arm64" ;;
+        *)            arch="amd64" ;;
+    esac
+    ext="tar.gz"
+
+    tmp_dir=$(mktemp -d)
+    trap "rm -rf '$tmp_dir'" EXIT
+
+    # Get latest version from GitHub API
+    latest=$(curl -s "https://api.github.com/repos/Gentleman-Programming/engram/releases/latest" 2>/dev/null)
+    if [ -z "$latest" ]; then
+        warn "engram: Could not fetch release info — download manually from https://github.com/Gentleman-Programming/engram/releases"
+    else
+        version=$(echo "$latest" | grep -o '"tag_name":\s*"[^"]*"' | cut -d'"' -f4 | sed 's/^v//')
+        url="https://github.com/Gentleman-Programming/engram/releases/download/v${version}/engram_${version}_${os}_${arch}.${ext}"
+
+        if curl -sL "$url" -o "${tmp_dir}/engram.${ext}" 2>/dev/null; then
+            tar -xzf "${tmp_dir}/engram.${ext}" -C "$tmp_dir" 2>/dev/null
+
+            # Find the binary
+            engram_bin=$(find "$tmp_dir" -name "engram" -type f 2>/dev/null | head -1)
+            if [ -n "$engram_bin" ]; then
+                bin_dir="${HOME}/.local/bin"
+                mkdir -p "$bin_dir"
+                cp "$engram_bin" "${bin_dir}/engram"
+                chmod +x "${bin_dir}/engram"
+                ok "engram v${version} installed"
+                any_mcp=true
+            else
+                warn "engram: Binary not found in archive"
+            fi
+        else
+            warn "engram: Download failed — download manually from https://github.com/Gentleman-Programming/engram/releases"
+        fi
+    fi
+
+    rm -rf "$tmp_dir"
+    trap - EXIT
+fi
+
+# ── Step 9: Verify ──────────────────────────────────────────────────
 info "Verifying setup"
 all_ok=true
 

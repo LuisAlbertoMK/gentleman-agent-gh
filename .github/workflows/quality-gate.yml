@@ -71,6 +71,15 @@ jobs:
           if ($bad) { $bad | ForEach-Object { Write-Output "::warning title=Missing PS7::$($_.Name)" }; exit 1 }
           else { Write-Output "OK: All .ps1 scripts require PS7+" }
 
+      - name: Pester unit tests — core script logic
+        run: |
+          $results = Invoke-Pester -Path './scripts/*.tests.ps1' -PassThru
+          if ($results.FailedCount -gt 0) {
+            Write-Error "Pester: $($results.FailedCount) test(s) failed"
+            exit 1
+          }
+          Write-Output "OK: $($results.PassedCount)/$($results.TotalCount) tests passed"
+
       - name: Benchmark report — system health snapshot
         run: ./scripts/benchmark.ps1
 
@@ -114,9 +123,18 @@ jobs:
           ./scripts/verify.ps1 -Quiet
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: SkillSpector security gate — Docker fallback (blocking on failures)
+      - name: SkillSpector — install (Linux only)
+        if: runner.os == 'Linux'
+        run: pip install git+https://github.com/NVIDIA/SkillSpector.git --quiet || echo "SkillSpector install failed — gate will fail in strict mode"
+
+      - name: SkillSpector security gate — static analysis (blocking on failures)
+        if: runner.os == 'Linux'
         continue-on-error: false
-        run: ./scripts/skillspector-gate.ps1
+        run: ./scripts/skillspector-gate.ps1 -Strict -FailOnRisk 50
+
+      - name: SkillSpector security gate — skip (not available on Windows)
+        if: runner.os == 'Windows'
+        run: Write-Output "⚪ SkillSpector not available on Windows — skipping"
 
       - name: Error snapshot — persist CI quality gate results
         if: always()

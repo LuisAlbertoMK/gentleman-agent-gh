@@ -12,11 +12,11 @@ Suite de **59 skills** (+ `_shared`) + **75 scripts PowerShell** para [OpenCode]
 ## Características
 
 ### Multi-Agent Architecture
-12 agentes especializados además del orquestador principal (`gentleman-vMK`):
-7 FREE TIER + implementer + 3 core + SDD orchestrator:
+22 agentes en total: orquestador principal (`gentleman-vMK`) + 12 especialistas + 9 SDD pipeline agents:
 
 | Agent | Model | Specialty |
 |-------|-------|-----------|
+| `gentleman-vMK` | default | Senior Architect mentor — orquestador principal |
 | `gentleman-deep` | nemotron-3-ultra-free | Architecture, design, complex code |
 | `gentleman-codex` | deepseek-v4-flash-free | Code generation, boilerplate |
 | `gentleman-quick` | mimo-v2.5-free | Fast tasks, review, simple edits |
@@ -29,6 +29,21 @@ Suite de **59 skills** (+ `_shared`) + **75 scripts PowerShell** para [OpenCode]
 | `gentleman-docs` | big-pickle | Technical writing, docs (FREE TIER) |
 | `gentleman-implementer` | deepseek-v4-flash-free | Plan executor (FREE TIER) |
 | `sdd-orchestrator` | claude-sonnet-4-6 | SDD pipeline orchestration |
+
+#### SDD Pipeline Agents (subagents)
+9 agentes que ejecutan las fases del pipeline SDD. **No tienen modelo asignado explícito** — heredan el default global de OpenCode. Todos tienen permisos completos (`bash: allow, edit: allow, write: allow`).
+
+| Agent | Phase | Description |
+|-------|-------|-------------|
+| `sdd-init` | Init | Bootstrap SDD context and project configuration |
+| `sdd-explore` | Explore | Investigate codebase and think through ideas |
+| `sdd-propose` | Propose | Create change proposals from explorations |
+| `sdd-spec` | Spec | Write detailed specifications from proposals |
+| `sdd-design` | Design | Create technical design from proposals |
+| `sdd-tasks` | Tasks | Break down specs and designs into implementation tasks |
+| `sdd-apply` | Apply | Implement code changes from task definitions |
+| `sdd-verify` | Verify | Validate implementation against specs |
+| `sdd-archive` | Archive | Archive completed change artifacts |
 
 ### Self-Improvement Cycle
 El proyecto ejecuta ciclos de mejora continua (CYCLE.md):

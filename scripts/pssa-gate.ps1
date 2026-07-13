@@ -5,14 +5,16 @@
 .DESCRIPTION Check: scan+report. Fix: auto-fix BOM+switch defaults. Trend: compare vs baseline.
 #>
 [CmdletBinding()]param(
-[Parameter(Position=0)][ValidateSet('Check','Fix','Trend')][string]$Mode='Check',
+[Parameter(Position=0)][ValidateSet('Check','Fix','Trend','Incremental')][string]$Mode='Check',
 [string]$Path=(Get-Location).Path,[switch]$Quiet,
 [string]$BaselineFile=(Join-Path $Path 'docs\metricas\pssa-baseline.json'))
 Set-StrictMode -Version Latest;$ErrorActionPreference='Stop'
 $xd=@('experiments','skills');$fr=@('PSUseBOMForUnicodeEncodedFile','PSAvoidDefaultValueSwitchParameter');$tr=@('PSAvoidUsingWriteHost')
 
 function Write-Status { param([string]$Message) if (-not $Quiet) { Write-Host "  $Message" } }
-function Get-PSSAViolation { param([string]$TargetPath) @(Invoke-ScriptAnalyzer -Path (Resolve-Path $TargetPath) -Recurse -Severity Warning,Error 2>$null) }
+function Get-PSSAViolation { param([string]$TargetPath,[string[]]$Files)
+if($Files -and $Files.Count -gt 0){$all=@();foreach($f in $Files){if(Test-Path $f){$all+=@(Invoke-ScriptAnalyzer -Path $f -Severity Warning,Error 2>$null)}};return $all}
+@(Invoke-ScriptAnalyzer -Path (Resolve-Path $TargetPath) -Recurse -Severity Warning,Error 2>$null) }
 function Get-FullPath { param([string]$ScriptName,[string]$BasePath)
 if ([System.IO.Path]::IsPathRooted($ScriptName)){return $ScriptName}
 $j=Join-Path $BasePath $ScriptName;if(Test-Path $j){return (Resolve-Path $j).Path}
@@ -41,11 +43,17 @@ $di=Split-Path $BaselineFile -Parent;if(-not(Test-Path $di)){New-Item -ItemType 
 $bl | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $BaselineFile -Encoding UTF8;return $bl}
 
 $target=Resolve-Path $Path
+$scanFiles=$null
+if($Mode -eq 'Incremental'){
+  $changed=@(git diff --cached --name-only --diff-filter=ACMR -- '*.ps1' 2>$null | Where-Object {$_ -and (Test-Path $_)})
+  if($changed.Count -gt 0){$scanFiles=$changed;Write-Status "Incremental: $($changed.Count) changed file(s)"}
+  else{Write-Status "Incremental: no cached .ps1 changes — falling back to full scan"}
+}
 if(-not$Quiet){Write-Host "== PSSA Gate - $Mode ==";Write-Host "  Target: $target"}
 Write-Status "Scanning..."
-$results=Get-PSSAViolation -TargetPath $target
+$results=Get-PSSAViolation -TargetPath $target -Files $scanFiles
 
-if($Mode -eq 'Fix'){Write-Host "`n-- Auto-fix --";$bf=Resolve-BomEncoding -Violations ($results | Where-Object {$_.RuleName -eq 'PSUseBOMForUnicodeEncodedFile'});$sf=Resolve-SwitchDefault -Violations ($results | Where-Object {$_.RuleName -eq 'PSAvoidDefaultValueSwitchParameter'});Write-Host "  BOM: $bf | Switch: $sf";Write-Status "Re-scanning...";$results=Get-PSSAViolation -TargetPath $target}
+if($Mode -eq 'Fix'){Write-Host "`n-- Auto-fix --";$bf=Resolve-BomEncoding -Violations ($results | Where-Object {$_.RuleName -eq 'PSUseBOMForUnicodeEncodedFile'});$sf=Resolve-SwitchDefault -Violations ($results | Where-Object {$_.RuleName -eq 'PSAvoidDefaultValueSwitchParameter'});Write-Host "  BOM: $bf | Switch: $sf";Write-Status "Re-scanning...";$results=Get-PSSAViolation -TargetPath $target -Files $scanFiles}
 
 $af=@($results | Where-Object {$_.RuleName -in $fr});$td=@($results | Where-Object {$_.RuleName -in $tr});$manual=@($results | Where-Object {$_.RuleName -notin ($fr+$tr)})
 $ev=@($manual | Where-Object {$sp=$_.ScriptPath.Replace('\','/');$sk=$false;foreach($d in $xd){if($sp-match"/$d/"){$sk=$true;break}};$sk})
@@ -58,7 +66,8 @@ $av=@($av|Where-Object{$_})
 $ac=$av.Count
 
 if(-not$Quiet){Write-Host "`n-- Summary --"
-Write-Host "  Total: $($results.Count) | &&: $ac | Auto: $($af.Count) | Tracked: $($td.Count) | Excluded: $(@($ev).Count) | Manual: $($manual.Count)"
+$modeLabel=if($Mode -eq 'Incremental' -and $scanFiles){" (incremental: $($scanFiles.Count) files)"}else{""}
+Write-Host "  Total: $($results.Count)$modeLabel | &&: $ac | Auto: $($af.Count) | Tracked: $($td.Count) | Excluded: $(@($ev).Count) | Manual: $($manual.Count)"
 if($ac-gt0){Write-Host "`n-- && violations (PS5.1) --";$av | Select-Object ScriptName,Line,Text | Format-Table -AutoSize | Out-String | Write-Host}
 if($manual.Count-gt0){Write-Host "`n-- Manual review (PSSA) --";$manual | Group-Object RuleName | ForEach-Object {Write-Host "  $($_.Name): $($_.Count)"};$manual | Select-Object RuleName,Line,ScriptName | Format-Table -AutoSize | Out-String | Write-Host}}
 
@@ -67,7 +76,7 @@ switch($Mode){
 if($prior){$d=$results.Count-$prior.total;$s=if($d-gt0){'+'}else{''};$pa=if($prior.PSObject.Properties['ampersandCount']){($prior.ampersandCount -as[int])}else{0};$ad=$ac-$pa;$as=if($ad-gt0){'+'}else{''}
 Write-Host "`n-- Trend --";Write-Host "  PSSA: $($prior.total)->$($results.Count)|D:$s$d";Write-Host "  &&: $($prior.ampersandCount)->$ac|D:$as$ad"
 if($d-gt0-or$ad-gt0){Write-Warning "  Some INCREASED"}elseif($d-lt0-and$ad-le0){Write-Host "  DECREASED - good!"}else{Write-Host "  Steady."}}else{Write-Host "  No prior data."}}
-'Check'{if(-not(Test-Path $BaselineFile)){Save-Baseline -Results $results -AmpersandCount $ac | Out-Null;Write-Status "Baseline saved to $BaselineFile"}}}
+{$_ -in 'Check','Incremental'}{if(-not(Test-Path $BaselineFile)){Save-Baseline -Results $results -AmpersandCount $ac | Out-Null;Write-Status "Baseline saved to $BaselineFile"}}}
 
 $ec=0
 if($manual.Count-gt0-and$Mode-ne'Trend'){Write-Warning "PSSA Gate: $($manual.Count) need manual review.";$ec=1}

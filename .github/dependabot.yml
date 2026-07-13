@@ -1,16 +1,6 @@
 # Dependabot auto-PRs — zero-code dependency scanning
 version: 2
 updates:
-  - package-ecosystem: "nuget"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-    commit-message:
-      prefix: "deps"
-
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

@@ -1,0 +1,9 @@
+# Gitleaks configuration
+# https://github.com/gitleaks/gitleaks/blob/master/config/config.go
+
+[allowlist]
+  description = "Global allowlist — path-based (works with non-stdin sources)"
+  paths = [
+    '''\.learnings/.*''',
+    '''\.backup-.*/.*''',
+  ]

@@ -95,7 +95,7 @@ foreach ($p in $patterns) {
             $created = [DateTime]::ParseExact($p.created, "yyyy-MM-dd", $null)
             $ageDays = ($now - $created).Days
             $ages += $ageDays
-        } catch {}
+        } catch { Write-Debug "Failed to parse date '$($p.created)': $_" }
     }
 }
 $avgAgeDays = if ($ages.Count -gt 0) { [Math]::Round(($ages | Measure-Object -Average).Average, 0) } else { 0 }
