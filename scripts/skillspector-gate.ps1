@@ -1,4 +1,5 @@
-﻿#requires -Version 7.6
+#requires -Version 5.1
+Set-StrictMode -Version Latest
 <#
 .SYNOPSIS
     SkillSpector security gate for agent skills. Scans .agents/skills/
@@ -19,12 +20,10 @@
   Docker image name when using Docker fallback (default: skillspector).
 #>
 param(
-    [switch]$Quiet,
     [string]$SkillsPath = ".agents/skills",
     [int]$FailOnRisk = 100,
     [string]$DockerImage = "skillspector"
 )
-Set-StrictMode -Version Latest
 
 $ErrorActionPreference = "Stop"
 $scriptName = "skillspector-gate"
@@ -72,6 +71,7 @@ function Write-Report {
 
     if ($riskScore -ge $FailOnRisk) {
         Write-Warning "⚠️ Risk score $riskScore exceeds threshold $FailOnRisk ($realCount non-RA1 findings)"
+        exit 1
     }
 
     if ($riskScore -ge 30) {
@@ -108,7 +108,7 @@ if ($sp) {
     Write-Host "🔍 [CLI] Scanning skills with SkillSpector (static only)..."
     $jsonOutput = & skillspector scan $resolvedPath --no-llm --format json 2>&1 | Out-String
     Run-Scan -Runner "CLI" -JsonOutput $jsonOutput
-    exit 0
+    exit $LASTEXITCODE
 }
 
 # --- Try Docker ---
@@ -116,7 +116,7 @@ $dockerOk = $false
 try {
     $null = docker ps 2>&1
     if ($LASTEXITCODE -eq 0) { $dockerOk = $true }
-} catch { Write-Debug "docker probe: $($_.Exception.Message)" }
+} catch { }
 
 if ($dockerOk) {
     Write-Host "🔍 [Docker] Scanning skills with SkillSpector (static only)..."
@@ -124,7 +124,7 @@ if ($dockerOk) {
     $scanTarget = "/scan/$(Split-Path $resolvedPath.Path -Leaf)"
     $jsonOutput = docker run --rm -v "${hostPath}:/scan" $DockerImage scan $scanTarget --no-llm --format json 2>&1 | Out-String
     Run-Scan -Runner "Docker" -JsonOutput $jsonOutput
-    exit 0
+    exit $LASTEXITCODE
 }
 
 # --- Neither available ---
