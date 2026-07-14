@@ -1,6 +1,10 @@
 # Force LF in working tree (write tool outputs LF, avoids CRLF noise)
 * text=auto eol=lf
 
+# PowerShell consistency
+*.ps1 text eol=lf
+*.psm1 text eol=lf
+
 # Specific binary files
 *.png binary
 *.jpg binary

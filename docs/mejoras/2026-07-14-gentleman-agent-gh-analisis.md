@@ -222,10 +222,10 @@ Covered in UX section. Tooling is solid: markdownlint, yamllint, PSSA gate, skil
 6. **Add `.EXAMPLE` blocks** to user-facing scripts (health-check, install, setup-machine) ✅ **DONE** — `health-check.ps1` now has .DESCRIPTION + .PARAMETER + .EXAMPLE (install.ps1 and setup-machine.ps1 already had .EXAMPLE). Files: `scripts/health-check.ps1`
 
 ### P3 — Backlog
-7. **Expand CONTRIBUTING.md** with "how to create a skill" section
-8. **Add isolated skills** to `skill-graph.ps1` keyword map
-9. **Implement BITACORA structured schema** — replace regex parsing
-10. **Add `*.ps1 text eol=lf`** to `.gitattributes`
+7. **Expand CONTRIBUTING.md** with "how to create a skill" section ✅ **DONE** — Added skill creation guide (8 steps), script guide, skill structure rules. Files: `docs/CONTRIBUTING.md`
+8. **Add isolated skills** (vision-analyze, workflow-optimizer) to `skill-graph.ps1` keyword map ✅ **DONE** — Added 2 Register-Skill entries. Note: engram-protocol, self-improvement, help were already registered. Files: `scripts/skill-graph.ps1`
+9. **Implement BITACORA structured schema** — replace regex parsing ⏸️ **DEFERRED** — Affects scoring pipeline (score-dims.ps1 regex parsing). Needs dedicated analysis to avoid breaking Cycle Activity dimension. Recommend separate `!analisis` for BITACORA modernization.
+10. **Add `*.ps1 text eol=lf`** to `.gitattributes` ✅ **DONE** — Added `*.ps1` and `*.psm1` rules. Files: `.gitattributes`
 
 ---
 

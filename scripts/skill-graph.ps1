@@ -160,6 +160,8 @@ Register-Skill comment-writer "comment writer|PR feedback|review comment|write f
 Register-Skill senior-engineer "senior architect|trade-offs|system design|arquitectura" specialized high "" "" "Senior engineer persona for architecture decisions"
 Register-Skill prompt-engineering "improve prompt|ReAct|multi-agent|prompt engineering" specialized medium "" "" "Advanced prompt engineering techniques"
 Register-Skill help "ralph help|commands|plugin help|available commands" specialized low "" "" "Explain Ralph Loop plugin and available commands"
+Register-Skill vision-analyze "vision analyze|image analysis|screenshot analysis|visual inspection|describe screenshot" testing medium "" "" "Local vision analysis — screenshots, UI review, error detection via Ollama"
+Register-Skill workflow-optimizer "workflow optimize|process optimize|streamline|reduce steps|automate workflow" specialized low "" "" "Optimize workflow patterns — faster info access, reduced token waste"
 
 
 # ============================================================================
