@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+#requires -Version 7.6
 <#
 .SYNOPSIS
     Sync gentleman-agent-gh to global OpenCode config — PS 5.1 compatible.

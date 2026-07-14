@@ -1,9 +1,9 @@
 # SKILLS INDEX
 
-> Full trigger table for all 63 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 66 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 3.8 | **Changelog**: 3.8 (+4 new skills: sdd-quick, visual-testing, image-pipeline, pdf-utils); 3.7 (Removed 4 redirect skills: css-layout, design-tokens, responsive-design, ui-animation); 3.6 (Merged into ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills)
+> **Version**: 3.9 | **Changelog**: 3.9 (+3 new: vision-analyze, workflow-optimizer, skills-link mirror; count 63→66); 3.8 (+4 new skills: sdd-quick, visual-testing, image-pipeline, pdf-utils); 3.7 (Removed 4 redirect skills: css-layout, design-tokens, responsive-design, ui-animation); 3.6 (Merged into ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills)
 
 ## Triggers → Skill
 
@@ -66,6 +66,8 @@
 | screenshot, visual diff, visual bug, regression test, VRT, UI broken, text overflow, layout shift, responsive test | visual-testing |
 | compress image, optimize image, resize image, convert webp, convert avif, describe image, image too heavy, slow images, image bug, visual bug description | image-pipeline |
 | PDF, extract PDF, parse PDF, merge PDF, generate PDF, PDF table, PDF invoice, read PDF, PDF to text, PDF to markdown | pdf-utils |
+| Vision analyze, image analysis, screenshot analysis, visual inspection, describe screenshot | vision-analyze |
+| Workflow optimize, process optimize, streamline, reduce steps, automate workflow | workflow-optimizer |
 
 ## Quick groups
 - **Compression/style**: karpathy-loop (merged karpathy-prompt), lean-context
@@ -79,7 +81,8 @@
 - **Visual/Testing**: visual-testing, image-pipeline
 - **Documents**: pdf-utils
 - **Communication**: comment-writer, cognitive-doc-design
-- **Specialized**: metricas, context-watchdog, recovery-protocol
+- **Specialized**: metricas, context-watchdog, recovery-protocol, vision-analyze, workflow-optimizer
+- **Internal**: skills-link (mirror, not invokable)
 
 ## Load rule
 1. `read` this file → find trigger match → get skill name

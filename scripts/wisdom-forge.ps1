@@ -1,4 +1,5 @@
-﻿<#
+#requires -Version 7.6
+<#
 .SYNOPSIS
     Auto-forge a skill from a pattern when it reaches its promotion threshold.
 .DESCRIPTION

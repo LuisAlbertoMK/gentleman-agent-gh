@@ -1,4 +1,5 @@
-﻿<#
+#requires -Version 7.6
+<#
 .SYNOPSIS
     Wisdom store metrics: pattern count, severity distribution, hit rates.
 .DESCRIPTION

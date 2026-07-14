@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+﻿#requires -Version 7.6
 <#
 .SYNOPSIS
     Benchmark comparativo: backup pre-sprint3 vs gentleman-agent-gh (actual)
