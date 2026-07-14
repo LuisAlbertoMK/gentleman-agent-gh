@@ -19,12 +19,13 @@ Only on explicit request (`!dream`) or user asking. Recommended weekly or after 
 | **Quick scan** | `!dream quick` | `mem_context` + `mem_search(recent work)` + `auto-pattern-detector.ps1` |
 | **Harvest** | `!close` | `mem_session_summary` + extract patterns (error→catalog, workflow→skill) |
 | **Full dream** | `!dream` (weekly) | `mem_search(error\|bugfix\|pattern\|decision)` + detector + stats. ≥2→anti-pattern. ≥3→AGENTS.md rule. |
+| **Feed** | `!dream feed` | Extract patterns → JSON for skill-graph. Use: `run-dreaming.ps1 -Mode feed -OutputPath .learnings\skill-graph-patterns.json` |
 | **Wisdom review** | `!dream full` (monthly) | `wisdom-demote.ps1 -All -DryRun` → report → ask → proceed. See `scripts/` below. |
 
 ## SCRIPTS
 | Script | Purpose |
 |--------|---------|
-| `run-dreaming.ps1` | Full dreaming orchestrator |
+| `run-dreaming.ps1` | Full dreaming orchestrator (supports `-Mode feed` for skill-graph bridge) |
 | `session-miner.ps1` | Mine session histories for error patterns |
 | `auto-pattern-detector.ps1` | Scan learnings + errors → anti-pattern proposals |
 | `learning-stats.ps1` | Pattern health metrics |
@@ -35,6 +36,17 @@ Only on explicit request (`!dream`) or user asking. Recommended weekly or after 
 | `forge-rollback.ps1` | Revert forge |
 | `pattern-guard.ps1` | LAZY pre-flight detection |
 | `wisdom-stats.ps1` | Store metrics |
+
+## SKILL-GRAPH BRIDGE
+Dreaming feeds extracted patterns back to skill-graph for smarter resolution:
+```powershell
+# Generate patterns from dreaming
+.\scripts\run-dreaming.ps1 -Mode feed -OutputPath .learnings\skill-graph-patterns.json
+
+# Use patterns in skill resolution
+.\scripts\skill-graph.ps1 -Task "fix auth bug" -PatternsFile .learnings\skill-graph-patterns.json
+```
+Pattern format: `{ keywords: [], boost: "skill-name", reason: "..." }`
 
 ## RECALL
 Extract 3-5 keywords, `mem_search(query="<keywords>", limit=3)` → apply past learnings.

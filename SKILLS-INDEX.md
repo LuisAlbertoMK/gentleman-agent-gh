@@ -1,9 +1,9 @@
 # SKILLS INDEX
 
-> Full trigger table for all 66 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 68 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 4.0 | **Changelog**: 4.0 (+8 missing triggers: cancel-ralph, cross-project-forge, cross-project-wisdom, engram-protocol, help, opencode-skill-creator, ralph-loop, sdd-quick; fixed 57→65 discoverable count); 3.9 (+3 new: vision-analyze, workflow-optimizer, skills-link mirror; count 63→66); 3.8 (+4 new skills: sdd-quick, visual-testing, image-pipeline, pdf-utils); 3.7 (Removed 4 redirect skills: css-layout, design-tokens, responsive-design, ui-animation); 3.6 (Merged into ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills)
+> **Version**: 4.1 | **Changelog**: 4.1 (+2 new: server-commands, analysis-mode; count 66→68); 4.0 (+8 missing triggers: cancel-ralph, cross-project-forge, cross-project-wisdom, engram-protocol, help, opencode-skill-creator, ralph-loop, sdd-quick; fixed 57→65 discoverable count); 3.9 (+3 new: vision-analyze, workflow-optimizer, skills-link mirror; count 63→66); 3.8 (+4 new skills: sdd-quick, visual-testing, image-pipeline, pdf-utils); 3.7 (Removed 4 redirect skills: css-layout, design-tokens, responsive-design, ui-animation); 3.6 (Merged into ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills)
 
 ## Triggers → Skill
 
@@ -76,6 +76,8 @@
 | Create skill, edit skill, opencode skill, skill eval, evaluate prompt, benchmark skill | opencode-skill-creator |
 | Ralph, ralph loop, auto-continue, iterative loop, /ralph-loop, continuous task | ralph-loop |
 | SDD quick, fast path, quick SDD, low risk SDD, simple change SDD | sdd-quick |
+| Server, ng serve, npm run dev, dotnet run, dev server, background process, long-lived, !dev | server-commands |
+| !analisis, analysis mode, multi-agent analysis, smart analysis, 8 dimensions, perspective validation | analysis-mode |
 
 ## Quick groups
 - **Compression/style**: karpathy-loop (merged karpathy-prompt), lean-context

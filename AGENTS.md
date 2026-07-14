@@ -28,12 +28,8 @@ Default `lite`. Set via `!ponytail [lite|full|ultra|off]`. Persists in `~/.confi
 - `full`: rungs 0-8 + security — full gate for complex/risky tasks
 - `ultra`: rungs 0-8 + aggressive debt review — for refactoring sessions
 - `off`: bypass all gates — debugging only
-**SIMPLE** (chat/Q&A/theory) → respond direct. **MEDIUM** (1-file refactor) → decompose→parallel→merge. **COMPLEX** (multi-file, risky, arch) → full gate: 0) Factibilidad 1) skill-graph→Router 2) Load skill 3) ANTI-PATTERN-CATALOG 4) Engram 5) Triangulación 6) Execute with checkpoint mid-task: verify alignment → continue or replan/abort.
-## TRIANGULATE — Triple Verify (REGLAMENTARIO)
-1. Determinar **Zona** del cambio (Roja/Amarilla/Verde)
-2. Generar **3 enfoques** (E1: testing, E2: estático, E3: build/runtime)
-3. Ejecutar los 3 · Si alguno falla → **BLOQUEAR**
-Thresholds en skill `triple-verify`. Modos: Normal (zona) · `!ship`=triple+quality+security+skillspector-gate+commit · `!check`=verify sin commit · `!fast`=build+commit+push · `!draft`=exploración.
+**SIMPLE** (chat/Q&A/theory) → respond direct. **MEDIUM** (1-file refactor) → decompose→parallel→merge. **COMPLEX** (multi-file, risky, arch) → full gate: 0) Factibilidad 1) skill-graph→Router 2) Load skill 3) ANTI-PATTERN-CATALOG 4) Engram 5) Load skill: triple-verify 6) Execute with checkpoint mid-task: verify alignment → continue or replan/abort.
+> **TRIANGULATE**: Load skill `triple-verify`. Zones: Roja/Amarilla/Verde · 3 approaches (E1 testing, E2 static, E3 build) · If any fails → BLOQUEAR. Modes: Normal · `!ship` · `!check` · `!fast` · `!draft`.
 ### Workflow Shortcuts
 | Shortcut | Action |
 |----------|--------|
@@ -56,38 +52,7 @@ Thresholds en skill `triple-verify`. Modos: Normal (zona) · `!ship`=triple+qual
 | `!gentleman` | `scripts/use-gentleman.ps1` — gentleman-ize project |
 | `!wisdom` | Load cross-project patterns — `cross-project-wisdom` |
 ### Analysis Mode (trigger: `!analisis`)
-Overrides DEFAULT/SIMPLE/COMPLEX. Trigger with `!analisis` as first token (case-insensitive).
-**ANALYSIS-ONLY GATE**: During `!analisis`, NO code execution, NO file writes EXCEPT the output plan. Any write attempt → BLOQUEAR + log to plan as "blocked action". Must exit analysis mode before implementing.
-PRESERVED: Ponytail rung 0, engram save, session close on request.
-SKIPPED: TRIANGULATE, Security §D, quality gate, commit pipeline, auto-metrics, Ponytail rungs 1-8.
-EXEMPT from §A Skill combo (uses Q&A load: karpathy-loop + lean-context).
-PROCESS:
-  0) **Project-mapper**: detect stack (lenguajes, frameworks, DB, infra) vía skill `project-mapper`.
-  0.5) **Wisdom injection**: `. "$env:GENTLEMAN_AGENT_ROOT\scripts\bash-safe.ps1"; & "$env:GENTLEMAN_AGENT_ROOT\scripts\wisdom-loader.ps1" -Technology "<stack>"` → add matching patterns as "known gotchas" to sub-agent briefings.
-  1) **Smart selection**: según stack, elige 6 especialistas de 7 disponibles (FREE TIER):
-     - security (nemotron-3-ultra-free) ↔ infra (deepseek-v4-flash-free) ↔ frontend (kimi-k2.5-free)
-     - performance (nemotron-3-ultra-free) ↔ datascience (mimo-v2.5-free) ↔ docs (big-pickle)
-     - seo (nemotron-3-super-free) — solo si el proyecto es sitio público
-     - Excluye automáticamente especialistas irrelevantes (ej: frontend en backend-only, SEO en API)
-  2) Load karpathy-loop + lean-context.
-  3) Parallel analysis: 6 subagentes + 1 web research. Each subagent returns 4-field contract (Decision Taken | Files Changed | Key Findings | Nuance).
-  4) **Perspective validation**: Verify ALL 8 mandatory dimensions covered. Missing → FAIL, do not generate plan:
-     | # | Dimension | Subagent | Validates |
-     |---|-----------|----------|-----------|
-     | 1 | Security | security | Auth, injection, secrets, vulns, compliance |
-     | 2 | Performance | performance | Load time, latency, N+1, cache, bundle |
-     | 3 | UX | frontend | Flows, a11y, design system, touch targets |
-     | 4 | Infra | infra | Docker, scaling, DR, CI/CD, monitoring |
-     | 5 | Data | datascience | DB schema, queries, pipelines, integrity |
-     | 6 | Architecture | main agent | Coupling, patterns, tech debt, modularity |
-     | 7 | DX | docs | Dev experience, docs, onboarding, tooling |
-     | 8 | Business | main agent | Roadmap alignment, priorities, ROI |
-  5) Synthesize into plan: consensos, divergencias, fundamentos, risk score per finding.
-OUTPUT:
-  - **Location**: `docs/mejoras/YYYY-MM-DD-<project-name>-analisis.md`
-  - **Format**: Structured plan with sections: Executive Summary, Per-Dimension Findings, Consensus, Divergence, Risk Matrix, Recommendations
-  - **Lifecycle**: First run → create v1. Subsequent runs → update existing file (increment version in header).
-  - **Gate**: Plan only — NO code, NO commit. Must exit analysis mode before implementing.
+> Load skill `analysis-mode` for multi-agent analysis pipeline, 8 dimensions, specialist selection.
 ## Subagent-First
 **RULE**: Main context = synthesis/decisions ONLY. Never read raw data >3 files.
 
@@ -129,22 +94,7 @@ One-liner: `. "$env:GENTLEMAN_AGENT_ROOT\scripts\bash-safe.ps1"; & "$env:GENTLEM
 ## Bash-Safe (PowerShell 5.1)
 PS 5.1 rejects `&&`, `||`. Use `Invoke-Bash` wrapper. **Forbidden**: raw bash calls.
 ## Server Commands — LONG-LIVED PROCESSES
-Commands like `ng serve`, `npm run dev`, `dotnet run`, `python -m http.server`
-start SERVERS that **never finish**. DO NOT run them via the bash tool directly.
-
-**Correct flow**:
-1. Start: `scripts/dev-server.ps1 -Action Start -Name <name> -Command <cmd> -Arguments <args>`
-2. Check:  `scripts/dev-server.ps1 -Action Status -Name <name>`
-3. Logs:   `scripts/dev-server.ps1 -Action Logs -Name <name> -Tail 10`
-4. Kill:   `scripts/dev-server.ps1 -Action Kill -Name <name>`
-
-**Detection**: If the bash tool would run a server command, use dev-server.ps1 instead.
-If `Invoke-Bash` warns that a command is a server, re-run with `-Background` or
-use `dev-server.ps1`. If unsure, check `Test-IsServerCommand "$cmd"` first.
-
-**Port conflict**: Before starting, check if the port is already in use. The system
-auto-detects common ports (ng=4200, vite=5173, dotnet=5000, etc.) and warns you.
-Manual check: `Get-NetTCPConnection -LocalPort <port>` or `Test-PortInUse 4200`
+> Load skill `server-commands` for dev-server.ps1 workflow, port detection, background management.
 ## Execution & Resource-Adaptive Mode
 Infer: QUICK (simple→min) · THOROUGH (risky→full SDD) · DRAFT (explore→findings).
 GREEN: Full/L1/Full/Auto-ejecutar · YELLOW: Brief+expand/L1+L2/Essential/Pedir nod humano (ctx>40%) · ORANGE: Headline/L2/Non-critical skip/Escalar a usuario (ctx>60%) · RED: 1-liner/file/L3/Skip all/Solo informar (ctx>80%)
@@ -159,14 +109,7 @@ Match user's language. Spanish: warm Rioplatense (voseo). English: natural, same
 - **Scope**: Persona governs reply TEXT only — NOT artifacts. Artifacts default to English. No Rioplatense in code.
 - **Behavior**: No code without context. Correct errors with WHY.
 ## Skills (Auto-load)
-Top 18: karpathy-loop · lean-context · quality-gate · auto-metrics · session-resume · cross-project-wisdom · skill-creator · immune-system · dreaming · metricas · commit-crafter · code-review-agent · bitacora · triple-verify · self-improvement · visual-testing · image-pipeline · pdf-utils
-### Anti-Pattern Catalog
-`{file:ANTI-PATTERN-CATALOG.md}` — scan BEFORE any task.
-### Skill Router
-**Primary**: `skill-graph.ps1 -Task "<task>" -Format Json` — resolves 4-8 relevant skills (−85-92%).
-**Fallback**: Resume→session-resume · Write→skill-creator, sdd-*, quality-gate · Fix→recovery-protocol, immune-system, sdd-verify · Review→quality-gate, judgment-day, triple-verify · UI→baseline-ui, web-quality-audit, performance, accessibility, visual-testing · System→development-mode, execution-mode, skill-graph · Commit→commit-crafter · Secure→security-scanner · Wisdom→cross-project-wisdom · Images→image-pipeline · Documents→pdf-utils · Unknown→skill-creator, research, recovery-protocol
-**Avoid**: Q&A→sdd-*,judgment-day · Setup→judgment-day · Bug fix→sdd-propose · Hotfix→triple-verify
-Load order: 1) ANTI-PATTERN-CATALOG 2) Behavioral match 3) Trigger match 4) Default-FAIL 5) Mini-dream every 5th
+> Load skill `skill-graph` for resolution, Top 18 list, Anti-Pattern Catalog, fallback routing, load order.
 ## Project Context
 - **Repo**: Gentleman Agent — OpenCode skills, scripts & config
 - **Skills**: `.agents/skills/` (63 + `_shared`, git-tracked) · workspace `skills/` (junctions, git-ignored). Overrides: `skill-validate.ps1`, `check-skill-drift.ps1`, `check-config-drift.ps1`, `skill-graph.ps1`, `health-check.ps1`, `sync-vmk.ps1`.
@@ -176,43 +119,6 @@ Load order: 1) ANTI-PATTERN-CATALOG 2) Behavioral match 3) Trigger match 4) Defa
 > **Engram protocol**: Moved to `.agents/skills/engram-protocol/SKILL.md`. Load via skill when needed.
 <!-- /gentle-ai:engram-protocol -->
 <!-- gentle-ai:agent-protocol -->
-## Protocol — agente-optimizado v1.0
-Orquestador de skills + token budget + persistencia + seguridad. Review: 2 weeks/20 sessions.
-### B. Token budget
-- >500 tokens → summary first. 5 turns no progress → `lean-context CAVEMAN lite`. 10 turns → `mem_session_summary` + reset. Self-check every 5 calls. Every 25 calls → checkpoint: `mem_save(topic_key=checkpoint/session-state)`.
-- **Compression**: L1 (~8msgs/15calls): full summary −60-70%. L2 (~20msgs/>3L1): 1-2 line decisions + Engram ID −40-50%. L3 (YELLOW>60%): 1-liner/topic + `Ref: engram-obs-{id}` −80-90%.
-### C. Persistence
-- Arch decision → `mem_save` with stable topic_key. Bug fix → type=bugfix. Session close → MANDATORY `mem_session_summary`.
-- Same error 2x → immune-system + catalog. Same flow 3+ → skill or AGENTS.md rule.
-- **Error auto-capture**: After ANY tool error or non-zero exit → `mem_save(type="bugfix", title="Auto: {error_short}")` BEFORE retry. User correction → `mem_save(type="learning", title="Correction: {topic}")` immediately.
-### D. Security (no opt-in)
-Pre-commit/PR: quality-gate + security-scanner + skillspector-gate.ps1 + pssa-gate.ps1 -Mode Check.
-PSSA Gate: auto-heals BOM + switch defaults. No `git commit -i`/`--force`/`push` unless asked. EXCEPTION: documented self-improvement cycles auto-commit OK. Never secrets, never `git config` without asking.
-### E-H. Workflow rules
-- **Subagent-first**: Read-heavy delegate explore. Batch independent calls.
-- **Hard rules**: 1Q→STOP, Zero filler, Default-FAIL. Destructive ops gate: NEVER delete/move without explicit approval OR ≥3 subagent verification + content read + cross-ref.
-- **Post-task**: `!score`/`!audit` only for HIGH-risk changes (8+ files, auth/storage/API). No auto-metrics.
-- **Upstream**: `pull-upstream.ps1 -Mode Check` → NEW auto-merge, MODIFIED manual, OURS ONLY ignored.
-### I. Self-Improvement System
-Manifest: `CYCLE.md` (local only, NO upstream). Skill: `self-improvement`. Process: READ CYCLE.md → diagnose → 3 subagentes → verify → learn → `docs/ciclos/cycle<N>-*.md`. inter(30) minimum. Score drop >0.5 → revert. Same fix fails 3x → SKIP.
-Plugin: SkillForge→SQLite, Curator→re-score/merge, SkillInjector→top-3 pre-turn.
-### J. Pre-session Health Check
-0. `restore-project-score.ps1 -Quiet`
-1. `git status --short` (alerta si cambios)
-2. `check-skill-drift.ps1` (warning si drift)
-3. (opt) `check-upstream.ps1 -Json` (NEW→engram info)
-4. **Health**: `health-check.ps1 -Json` (exit 0/1/2)
-5. Todo OK → seguí
-### K. Project Score Auto-Report (first request)
-Buscar `.project.json`. Si existe: reportar score. Si >7d stale → fresh metrics + update. `mem_save(topic_key=project/score)`.
-### L. Bias Calibration
-`.learnings/bias-calibration.json` — rolling window of last 3 audits. Checked during `!score`/`!audit` only.
-### M. Capture Pipeline — Cero Pérdida
-After EVERY turn (before next response):
-1. **Tool fail?** → `mem_save(type="bugfix", title="Auto: {error_short}")` (error trap, §C)
-2. **User correction?** → `mem_save(type="learning", title="Correction: {topic}")` + immune-system
-3. **Decision made?** → `mem_save(type="decision", title="...")`
-4. **Discovery/gotcha?** → `mem_save(type="discovery", title="...")`
-Propósito: nada se pierde entre turns. No esperar a session close.
+> **Agent protocol**: Load skill `engram-protocol` for token budget, capture pipeline, persistence, security, self-improvement, health check, bias calibration.
 <!-- /gentle-ai:agent-protocol -->
 <!-- agent-version: 2.2 — Project: gentleman-agent-gh, self-contained -->

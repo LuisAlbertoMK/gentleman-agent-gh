@@ -30,7 +30,8 @@ param(
     [switch]$ListAll,
     [switch]$RecommendAgent,
     [ValidateSet("Text", "Json", "Csv")][string]$Format = "Text",
-    [switch]$Quiet
+    [switch]$Quiet,
+    [string]$PatternsFile = ""
 )
 
 Set-StrictMode -Version Latest
@@ -84,7 +85,7 @@ Register-Skill session-resume "session resume|donde lo dejamos|continua|session 
 Register-Skill dreaming "dreaming|cross-session|pattern extraction|memory curation|engram" memory high auto-metrics "" "Cross-session pattern extraction via Engram"
 Register-Skill bitacora "bitacora|historial|historico|request log" memory low "" "" "Session activity log and history tracking"
 Register-Skill metricas "metricas|before after|percent improvement|delta" memory low "" "" "Before/after metrics tracking for improvements"
-Register-Skill engram-protocol "engram|persistent memory|mem save|mem search|memory protocol" memory medium "" "" "Persistent memory protocol via Engram MCP"
+Register-Skill engram-protocol "engram|persistent memory|mem save|mem search|memory protocol|token budget|compression|L1 L2 L3|capture pipeline|project score|bias calibration" memory medium "" "" "Persistent memory protocol via Engram MCP"
 
 
 # --- meta ---
@@ -96,6 +97,7 @@ Register-Skill gap-analysis "gap analysis|system audit|identificar gaps|project 
 Register-Skill cross-project-forge "forge|promote pattern|auto-skill|forjar|convertir patron|skill desde patron" meta medium "" "" "Promote recurring patterns to auto-generated skills"
 Register-Skill cross-project-wisdom "patterns|wisdom|lesson learned|in another project|last time this|cross-project|retrospectiva|experiencia previa|!wisdom|pattern guard" meta low "" "" "Load patterns from prior projects"
 Register-Skill external-improvement "5 fases|extimprove|external improvement|mejora externa" meta high "" "" "5-phase improvement cycle for external projects"
+Register-Skill analysis-mode "!analisis|analysis mode|multi-agent analysis|smart analysis|8 dimensions|perspective validation" meta high "" "" "Smart multi-agent analysis — 6 specialists, 8 dimensions, consolidated plan output"
 Register-Skill opencode-skill-creator "create opencode skill|opencode skill|new opencode skill" meta medium "" "" "Create OpenCode-specific skills with intake interview"
 
 # --- code-ops ---
@@ -127,6 +129,7 @@ Register-Skill branch-pr "branch PR|branch naming|create PR|open pull request" c
 Register-Skill issue-creation "create issue|GitHub issue|bug report|feature request" coordination medium "" branch-pr "GitHub issue creation"
 Register-Skill subagent-isolation "subagent isolation|context boundaries|delegation" coordination medium "" "" "Isolate subagent contexts and prevent contamination"
 Register-Skill command-wrapper "command wrapper|safe execution|error handling|output parse" coordination low "" "" "Safe command execution with error handling"
+Register-Skill server-commands "server|ng serve|npm run dev|dotnet run|python -m http.server|dev server|background process|long-lived|!dev" coordination medium "" "" "Run long-lived server processes safely — dev-server.ps1, port detection, background management"
 Register-Skill opencode-model-router "model router|routing|que modelo|delegate or direct|que hacer con esta tarea|trial risk|security gate" coordination high "" "" "Route tasks by model strength with security gates"
 Register-Skill ralph-loop "ralph loop|auto-continue|keep going|continue task|loop until done" coordination medium "" "" "Auto-continues until task completion"
 Register-Skill cancel-ralph "cancel ralph|stop loop|abort loop|cancel auto" coordination low "" "" "Cancel active Ralph Loop"
@@ -233,6 +236,32 @@ function Resolve-Skill {
         }
     }
 
+    # Apply external pattern boosts (from dreaming feed)
+    if ($externalPatterns.Count -gt 0) {
+        foreach ($pattern in $externalPatterns) {
+            $patternMatched = $false
+            foreach ($kw in $pattern.keywords) {
+                $kwLower = $kw.ToLowerInvariant()
+                foreach ($token in $Tokens) {
+                    if ($token -match [regex]::Escape($kwLower)) {
+                        $patternMatched = $true
+                        break
+                    }
+                }
+                if ($patternMatched) { break }
+            }
+            
+            if ($patternMatched -and $pattern.boost) {
+                $boostSkill = $pattern.boost
+                if ($SkillScores.ContainsKey($boostSkill)) {
+                    $SkillScores[$boostSkill] += 2  # Boost existing match
+                } else {
+                    $SkillScores[$boostSkill] = 2  # Add new match
+                }
+            }
+        }
+    }
+
     $MatchedNames = $SkillScores.Keys |
         Sort-Object { $SkillScores[$_] } -Descending
 
@@ -296,11 +325,11 @@ $agentRecommendations = @(
     }
     @{
         P = '(?i)(?:test|testing|coverage|spec|specification)'
-        S = @('skill-testing', 'sdd-spec', 'sdd-verify', 'go-testing')
+        S = @('skill-testing', 'sdd-spec', 'sdd-verify')
     }
     @{
         P = '(?i)(?:doc|documentation|readme|guide|manual|help)'
-        S = @('cognitive-doc-design', 'doc-sync')
+        S = @('cognitive-doc-design')
     }
     @{
         P = '(?i)(?:commit|pr|pull.request|merge|ship|push)'
@@ -316,7 +345,7 @@ $agentRecommendations = @(
     }
     @{
         P = '(?i)(?:performance|speed|slow|lazy|load\s+time|render|optimize|compress)'
-        S = @('karpathy-loop', 'performance', 'lean-context', 'caveman')
+        S = @('karpathy-loop', 'performance', 'lean-context')
     }
     @{
         P = '(?i)(?:accessib|a11y|wcad|screen\s+reader)'
@@ -361,6 +390,27 @@ function Get-AgentRecommendation {
 $skillLookup = @{}
 foreach ($skill in $skillRegistry) {
     $skillLookup[$skill.Name] = $skill
+}
+
+# ============================================================================
+# Patterns — load external patterns from dreaming feed
+# ============================================================================
+
+$externalPatterns = @()
+if ($PatternsFile -and (Test-Path $PatternsFile)) {
+    try {
+        $patternData = Get-Content $PatternsFile -Raw | ConvertFrom-Json
+        if ($patternData.patterns) {
+            $externalPatterns = $patternData.patterns
+            if (-not $Quiet) {
+                Write-Host ("Loaded " + $externalPatterns.Count + " pattern(s) from " + $PatternsFile) -ForegroundColor DarkGray
+            }
+        }
+    } catch {
+        if (-not $Quiet) {
+            Write-Host ("Warning: Could not load patterns file: " + $_.Exception.Message) -ForegroundColor Yellow
+        }
+    }
 }
 
 # ============================================================================

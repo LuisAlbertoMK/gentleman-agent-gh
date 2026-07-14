@@ -10,9 +10,10 @@
   Modo de ejecución: full (complete cycle), quick (summary only), report (default).
 #>
 param(
-    [ValidateSet('full','quick','report')]
+    [ValidateSet('full','quick','report','feed')]
     [string]$Mode = 'report',
-    [switch]$Quiet
+    [switch]$Quiet,
+    [string]$OutputPath = ""
 )
 
 $ErrorActionPreference = 'Stop'
@@ -170,6 +171,136 @@ if ($Mode -in 'full','report') {
     }
 }
 
+# ---- Feed mode: output patterns for skill-graph ----
+if ($Mode -eq 'feed') {
+    if(-not $Quiet){Write-Host '[FEED] Running scans first...'}
+    
+    # Run scans to populate data
+    $errorCounts = @{}
+    $repeated = @()
+    $learningCounts = @{}
+    $workflowPatterns = @()
+    
+    if (Test-Path $errorFile) {
+        foreach ($line in [System.IO.File]::ReadLines($errorFile)) {
+            $startsWithPipe = $line.StartsWith('|')
+            $startsWithPipeTS = $line.StartsWith('| Timestamp')
+            if ($startsWithPipe -and (-not $startsWithPipeTS)) {
+                $parts = $line.Split('|')
+                if ($parts.Count -ge 4) {
+                    $errText = $parts[3].Trim()
+                    $key = $errText -replace '\[.*?\]',''
+                    $key = $key -replace '\s+',' '
+                    $key = $key -replace '^error[:\s]+',''
+                    $key = $key -replace '^fix[:\s]+',''
+                    if ($key.Length -gt 3) {
+                        if ($errorCounts.ContainsKey($key)) {
+                            $val = $errorCounts[$key]
+                            $val.Count = $val.Count + 1
+                            $val.Lines = $val.Lines + @($line)
+                        } else {
+                            $errorCounts[$key] = @{
+                                Text = $errText
+                                Count = 1
+                                Lines = @($line)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    foreach ($key in $errorCounts.Keys) {
+        $entry = $errorCounts[$key]
+        if ($entry.Count -ge 2) {
+            $repeated += $entry
+        }
+    }
+    
+    if (Test-Path $logFile) {
+        foreach ($line in [System.IO.File]::ReadLines($logFile)) {
+            $startsWithPipe = $line.StartsWith('|')
+            $startsWithPipeTS = $line.StartsWith('| Timestamp')
+            if ($startsWithPipe -and (-not $startsWithPipeTS)) {
+                $parts = $line.Split('|')
+                if ($parts.Count -ge 4) {
+                    $section = $parts[2].Trim()
+                    $msg = $parts[3].Trim()
+                    $key = "$section/$msg"
+                    if ($learningCounts.ContainsKey($key)) {
+                        $val = $learningCounts[$key]
+                        $val.Count = $val.Count + 1
+                    } else {
+                        $learningCounts[$key] = @{
+                            Section = $section
+                            Message = $msg
+                            Count = 1
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    foreach ($key in $learningCounts.Keys) {
+        $entry = $learningCounts[$key]
+        if ($entry.Count -ge 3) {
+            $workflowPatterns += $entry
+        }
+    }
+    
+    if(-not $Quiet){Write-Host '[FEED] Generating skill-graph patterns...'}
+    
+    $feedPatterns = @()
+    
+    # Convert repeated errors to skill-graph patterns
+    if ($repeated.Count -gt 0) {
+        foreach ($r in $repeated) {
+            $keywords = $r.Text -replace '[^\w\s]','' -split '\s+' |
+                Where-Object { $_.Length -gt 2 } |
+                Select-Object -Unique
+            if ($keywords.Count -gt 0) {
+                $feedPatterns += @{
+                    keywords = @($keywords)
+                    boost = if ($r.Count -ge 3) { "immune-system" } else { "recovery-protocol" }
+                    reason = "Error repeated $($r.Count)x: $($r.Text)"
+                    source = "dreaming-error"
+                }
+            }
+        }
+    }
+    
+    # Convert workflow patterns to skill-graph patterns
+    if ($workflowPatterns.Count -gt 0) {
+        foreach ($wp in $workflowPatterns) {
+            $keywords = "$($wp.Section) $($wp.Message)" -replace '[^\w\s]','' -split '\s+' |
+                Where-Object { $_.Length -gt 2 } |
+                Select-Object -Unique
+            if ($keywords.Count -gt 0) {
+                $feedPatterns += @{
+                    keywords = @($keywords)
+                    boost = $wp.Section
+                    reason = "Workflow pattern $($wp.Count)x: $($wp.Message)"
+                    source = "dreaming-workflow"
+                }
+            }
+        }
+    }
+    
+    # Output to file or stdout
+    $feedOutput = @{ patterns = $feedPatterns; generated = $timestamp; cycleId = $cycleId }
+    
+    if ($OutputPath) {
+        $feedOutput | ConvertTo-Json -Depth 3 | Set-Content -Path $OutputPath -Encoding UTF8
+        if(-not $Quiet){Write-Host "  Patterns written to: $OutputPath"}
+    } else {
+        $feedOutput | ConvertTo-Json -Depth 3
+    }
+    
+    if(-not $Quiet){Write-Host "  Generated $($feedPatterns.Count) pattern(s) for skill-graph"}
+}
+
 if(-not $Quiet){Write-Host ''}
 
 if(-not $Quiet){Write-Host "=== Dreaming Complete: $cycleId ==="}
@@ -177,6 +308,6 @@ $finalRepeated = 0; $finalPatterns = 0
 if ($repeated.Count -gt 0) { $finalRepeated = $repeated.Count }
 if ($learningCounts.Count -gt 0) { $finalPatterns = $learningCounts.Keys.Count }
 # ponytail: explicit GC at session boundary — regex+pattern processing may hold large strings
-$errorCounts=$learningCounts=$repeated=$workflowPatterns=$null;[GC]::Collect()
+$errorCounts=$learningCounts=$repeated=$workflowPatterns=$feedPatterns=$null;[GC]::Collect()
 $msg = "Mode=$Mode | Repeated=$finalRepeated | Patterns=$finalPatterns"
 Write-Log -Section 'Dreaming' -Message $msg

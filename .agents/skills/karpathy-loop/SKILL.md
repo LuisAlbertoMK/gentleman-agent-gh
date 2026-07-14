@@ -21,9 +21,9 @@ Trigger: "optimize prompt", "reduce tokens", "Karpathy prompt", "less tokens", "
 5. **IMPLICIT CoT** — no "step by step"; "Reason ONLY if ambiguous"
 
 ### WIKI: Compression Levels
-- **L1**: Raw full content
-- **L2**: LLM-compiled summary
-- **L3**: index.md (~200t)
+- **T1**: Raw full content
+- **T2**: LLM-compiled summary
+- **T3**: index.md (~200t)
 - Pre-compile files → ~3-5K map → use as input
 
 ### ANTI-Patterns
@@ -50,9 +50,9 @@ Trigger: "optimize prompt", "reduce tokens", "Karpathy prompt", "less tokens", "
 4. **REPEAT**: score improves + tokens down → continue. Score drops → revert. Stagnant → try new tactic.
 
 ## 4. TACTICS by Compression Level
-- **L1** (20-30%): filler, transitions, "step by step"
-- **L2** (30-50%): merge redundant → bullets, remove context
-- **L3** (50-70%): template structures, shortcuts, minimal identity
+- **T1** (20-30%): filler, transitions, "step by step"
+- **T2** (30-50%): merge redundant → bullets, remove context
+- **T3** (50-70%): template structures, shortcuts, minimal identity
 
 ## 5. DECISION — Remove Element?
 ```
