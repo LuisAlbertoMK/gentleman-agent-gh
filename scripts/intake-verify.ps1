@@ -4,7 +4,7 @@ param([switch]$Quiet,[string]$Path,[ValidateRange(1,5)][int]$Level=1,[string]$Ty
 $ErrorActionPreference='Stop';Set-StrictMode -Version Latest;$t0=Get-Date;$rr=@();$chk=[char]0x2705;$crs=[char]0x274C;$wrn=[char]0x26A0
 function wr{param([string]$I,[string]$M)
 $c=@{$chk="Green";$crs="Red";$wrn="Yellow"}[$I]
-if(-not$c){$c="White"}if($Format-ne"json"){Write-Host "$I $M" -ForegroundColor $c}}
+if(-not$c){$c="White"}if($Format-ne"json"-and-not$Quiet){Write-Host "$I $M" -ForegroundColor $c}}
 function sz{param([string]$x)
 if(Test-Path $x){$l=(Get-Item $x).Length;if($l-gt1KB){$r=[math]::Round($l/1KB,1);return "${r}KB"};return "$l B"}return ""}
 function ic{param([int]$R,[string]$pp)
@@ -55,12 +55,12 @@ elseif($hl){wr $wrn "Monitoring logging only";$res.mo=$wrn;$sm.mo=5}
 else{wr $crs "No monitoring";$res.mo=$crs;$sm.mo=0}
 $ts=($sm.Values | Measure-Object -Sum).Sum;$ms=$sm.Count*10
 $pct=if($ms-gt0){[math]::Round(($ts/$ms)*100,1)}else{0}
-Write-Host "  Score: $ts/$ms ($pct%)" -ForegroundColor $(if($pct-ge80){"Green"}elseif($pct-ge50){"Yellow"}else{"Red"})
+if(-not$Quiet){Write-Host "  Score: $ts/$ms ($pct%)" -ForegroundColor $(if($pct-ge80){"Green"}elseif($pct-ge50){"Yellow"}else{"Red"})}
 $miss=@()
 if($res.rm-eq$crs){$miss+="Roadmap"}
 if($res.pd-eq$crs){$miss+="PRD"}
 if($res.rd-eq$crs){$miss+="README"}
-if($miss.Count-gt0){Write-Host "  MISSING: $($miss-join', ')" -ForegroundColor Red}
+if($miss.Count-gt0 -and -not$Quiet){Write-Host "  MISSING: $($miss-join', ')" -ForegroundColor Red}
 return @{round=$R;results=$res;scores=$sm;totalScore=$ts;maxScore=$ms;pct=$pct;criticalMissing=$miss}}
 try {
 if(-not(Test-Path $Path)){Write-Error "Path not found: $Path";exit 2}
@@ -81,11 +81,11 @@ if(-not(Test-Path $Path)){Write-Error "Path not found: $Path";exit 2}
 for($j=1;$j-le$Level;$j++){$round=ic -R $j -pp $Path;$rr+=$round;if($j-lt$Level){Start-Sleep 1}}
 $el=[math]::Round(((Get-Date)-$t0).TotalSeconds,1)
 $ar=@("rm","pr","pd","rd","ts","ci","mo")
-foreach($a in $ar){$b=$rr[0].scores.$a;$c=$rr[-1].scores.$a;$d=$c-$b;$ds=if($d-gt0){"+$d"}elseif($d-lt0){"$d"}else{"-"};Write-Host "  $a $b->$c ($ds)"}
-$bt=$rr[0].totalScore;$lt=$rr[-1].totalScore;$dt=$lt-$bt;$ds=if($dt-gt0){"+$dt"}elseif($dt-lt0){"$dt"}else{"-"};Write-Host "  TOTAL $bt->$lt ($ds)" -ForegroundColor Gray
+foreach($a in $ar){$b=$rr[0].scores.$a;$c=$rr[-1].scores.$a;$d=$c-$b;$ds=if($d-gt0){"+$d"}elseif($d-lt0){"$d"}else{"-"};if(-not$Quiet){Write-Host "  $a $b->$c ($ds)"}}
+$bt=$rr[0].totalScore;$lt=$rr[-1].totalScore;$dt=$lt-$bt;$ds=if($dt-gt0){"+$dt"}elseif($dt-lt0){"$dt"}else{"-"};if(-not$Quiet){Write-Host "  TOTAL $bt->$lt ($ds)" -ForegroundColor Gray}
 $opct=$rr[-1].pct;$g=if($opct-ge90){"A"}elseif($opct-ge80){"B"}elseif($opct-ge60){"C"}elseif($opct-ge40){"D"}else{"F"}
-Write-Host "`n  Grade: $g ($opct%)" -ForegroundColor $(if($opct-ge80){"Green"}elseif($opct-ge60){"Yellow"}else{"Red"})
-if($rr[-1].criticalMissing.Count-gt0){Write-Host "  Critical: $($rr[-1].criticalMissing-join', ')" -ForegroundColor Red}
+if(-not$Quiet){Write-Host "`n  Grade: $g ($opct%)" -ForegroundColor $(if($opct-ge80){"Green"}elseif($opct-ge60){"Yellow"}else{"Red"})}
+if($rr[-1].criticalMissing.Count-gt0 -and -not$Quiet){Write-Host "  Critical: $($rr[-1].criticalMissing-join', ')" -ForegroundColor Red}
     if($Minimal){
     $dv="$Path\docs\metricas";if(-not(Test-Path $dv)){try{New-Item $dv -ItemType Directory | Out-Null}catch{Write-Warning "dv: $_"}}
     $x=@{timestamp=(Get-Date -Format "yyyy-MM-dd HH:mm:ss");project=$Path;type=$Type;iterations=$Level;el=$el;baseline=@{};current=@{};delta=@{};pct=$opct;gaps=$rr[-1].criticalMissing}
@@ -93,7 +93,7 @@ if($rr[-1].criticalMissing.Count-gt0){Write-Host "  Critical: $($rr[-1].critical
     foreach($a in $ar){$b=$rr[0].scores.$a;$c=$rr[-1].scores.$a;$d=$c-$b;$ds2=if($d-gt0){"+$d"}elseif($d-lt0){"$d"}else{"-"};$x.baseline[$a]=$b;$x.current[$a]=$c;$x.delta[$a]=$d;$md+="`n$a $b->$c ($ds2)"}
     if($rr[-1].criticalMissing.Count-gt0){$md+="`nCritical: $($rr[-1].criticalMissing-join',')"}
     try{($x | ConvertTo-Json) | Out-File "$dv\intake-baseline.json" -en utf8}catch{Write-Warning "json: $_"}
-    try{$md | Out-File "$dv\intake-report.md" -en utf8}catch{Write-Warning "rpt: $_"};Write-Host "  $dv\intake-..." -ForegroundColor Cyan}
+    try{$md | Out-File "$dv\intake-report.md" -en utf8}catch{Write-Warning "rpt: $_"};if(-not$Quiet){Write-Host "  $dv\intake-..." -ForegroundColor Cyan}}
 if($rr[-1].criticalMissing.Count-gt0){exit 2}
 if($opct-lt80){exit 1}
 exit 0}catch{Write-Error "Intake failed: $_";exit 1}

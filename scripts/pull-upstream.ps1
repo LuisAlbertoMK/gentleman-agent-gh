@@ -57,7 +57,7 @@ try {
   }
 
   # --- Fetch upstream ---
-  Write-Host "Fetch $Remote/$Branch..."
+  if(-not $Quiet) { Write-Host "Fetch $Remote/$Branch..." }
   git fetch $Remote $Branch 2>&1 | Out-Null
   if ($LASTEXITCODE -ne 0) {
     Write-Warning "Fetch failed"
@@ -70,7 +70,7 @@ try {
   # --- Count ahead/behind ---
   $behind = git rev-list --count "${localRef}..${remoteRef}" 2>&1
   $ahead  = git rev-list --count "${remoteRef}..${localRef}" 2>&1
-  Write-Host "Behind: $behind  Ahead: $ahead  Total: $([int]$behind + [int]$ahead)"
+  if(-not $Quiet) { Write-Host "Behind: $behind  Ahead: $ahead  Total: $([int]$behind + [int]$ahead)" }
 
   # --- Classify changes by category ---
   $allNew = @()
@@ -165,12 +165,14 @@ try {
     }
 
     # --- Output per category ---
-    Write-Host "--- $categoryLabel ---"
-    if ($newItems.Count)     { Write-Host "NEW $($newItems.Count)";     $newItems | ForEach-Object { Write-Host "  + $_" } }
-    if ($modifiedItems.Count){ Write-Host "MOD $($modifiedItems.Count)";$modifiedItems | ForEach-Object { Write-Host "  ~ $_" } }
-    if ($oursItems.Count)    { Write-Host "OURS $($oursItems.Count)";  $oursItems | ForEach-Object { Write-Host "  - $_" } }
-    if (-not $newItems.Count -and -not $modifiedItems.Count -and -not $oursItems.Count) {
-      Write-Host "(none)"
+    if(-not $Quiet) {
+      Write-Host "--- $categoryLabel ---"
+      if ($newItems.Count)     { Write-Host "NEW $($newItems.Count)";     $newItems | ForEach-Object { Write-Host "  + $_" } }
+      if ($modifiedItems.Count){ Write-Host "MOD $($modifiedItems.Count)";$modifiedItems | ForEach-Object { Write-Host "  ~ $_" } }
+      if ($oursItems.Count)    { Write-Host "OURS $($oursItems.Count)";  $oursItems | ForEach-Object { Write-Host "  - $_" } }
+      if (-not $newItems.Count -and -not $modifiedItems.Count -and -not $oursItems.Count) {
+        Write-Host "(none)"
+      }
     }
 
     $allNew += $newItems
@@ -178,7 +180,7 @@ try {
     $allOurs += $oursItems
   }
 
-  Write-Host "New:$($allNew.Count) Mod:$($allMod.Count) Ours:$($allOurs.Count)"
+  if(-not $Quiet) { Write-Host "New:$($allNew.Count) Mod:$($allMod.Count) Ours:$($allOurs.Count)" }
 
   # --- Apply-New mode ---
   if ($Mode -eq 'Apply-New') {
@@ -188,15 +190,15 @@ try {
     $otherItems = @($allNew | Where-Object { $_ -notin $skillScriptItems })
 
     if ($otherItems.Count) {
-      Write-Host "Skip $($otherItems.Count) non-skill/script"
+      if(-not $Quiet) { Write-Host "Skip $($otherItems.Count) non-skill/script" }
     }
 
     if (-not $skillScriptItems.Count) {
-      Write-Host "No new skills/scripts"
+      if(-not $Quiet) { Write-Host "No new skills/scripts" }
       exit 0
     }
 
-    Write-Host "Apply $($skillScriptItems.Count) files..."
+    if(-not $Quiet) { Write-Host "Apply $($skillScriptItems.Count) files..." }
     $applied = 0
     $failed = 0
 
@@ -216,7 +218,7 @@ try {
         New-Item -ItemType Directory -Path $parentDir -Force | Out-Null
       }
 
-      Write-Host "  + $file"
+      if(-not $Quiet) { Write-Host "  + $file" }
       git checkout "$Remote/$Branch" -- "$upstreamFile" 2>&1 | Out-Null
       if ($LASTEXITCODE -eq 0) {
         if ($upstreamFile -ne $file) {
@@ -232,8 +234,8 @@ try {
       }
     }
 
-    Write-Host "$applied applied, $failed failed"
-    if ($applied) { Write-Host "Staged. Run git status then commit" }
+    if(-not $Quiet) { Write-Host "$applied applied, $failed failed" }
+    if ($applied -and -not $Quiet) { Write-Host "Staged. Run git status then commit" }
   }
 
   # --- Apply-File mode ---
@@ -258,7 +260,7 @@ try {
       }
     }
 
-    Write-Host "Checkout '$upstreamFile' from $Remote/$Branch..."
+    if(-not $Quiet) { Write-Host "Checkout '$upstreamFile' from $Remote/$Branch..." }
     git checkout "$Remote/$Branch" -- "$upstreamFile" 2>&1
 
     if ($LASTEXITCODE -eq 0) {
@@ -269,7 +271,7 @@ try {
         }
         Move-Item -Path $upstreamFile -Destination $TargetFile -Force
       }
-      Write-Host "Done. Run git diff --cached $TargetFile"
+      if(-not $Quiet) { Write-Host "Done. Run git diff --cached $TargetFile" }
     } else {
       Write-Warning "Failed $upstreamFile"
     }

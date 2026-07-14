@@ -110,5 +110,5 @@ $registry = @{
 
 $registry | ConvertTo-Json -Depth 5 | Set-Content -Path $OutputFile -Encoding UTF8
 
-Write-Host "✓ Registry built: $($skills.Count) skills, $($triggerIndex.Count) triggers → $OutputFile" -ForegroundColor Green
+if (-not $Quiet) { Write-Host "✓ Registry built: $($skills.Count) skills, $($triggerIndex.Count) triggers → $OutputFile" -ForegroundColor Green }
 

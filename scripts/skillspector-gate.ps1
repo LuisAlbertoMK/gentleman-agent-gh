@@ -43,14 +43,16 @@ if (-not $resolvedPath) {
 
 function Write-Report {
     param($report)
-    if (-not $report) { Write-Host "   ⚪ No report to parse"; return }
+    if (-not $report) { if(-not $Quiet) { Write-Host "   ⚪ No report to parse" }; return }
 
     $riskScore = $report.risk_assessment.score
     $severity = $report.risk_assessment.severity
     $findingsCount = ($report.issues | Measure-Object).Count
 
-    Write-Host "   Risk score: $riskScore/100 ($severity)"
-    Write-Host "   Findings: $findingsCount"
+    if(-not $Quiet) {
+      Write-Host "   Risk score: $riskScore/100 ($severity)"
+      Write-Host "   Findings: $findingsCount"
+    }
 
     if ($findingsCount -gt 0 -and $report.issues) {
         foreach ($f in $report.issues) {
@@ -62,7 +64,7 @@ function Write-Report {
                 Line     = $f.location.start_line
                 Confidence = "{0:P0}" -f $f.confidence
             }
-            $row | Format-Table -AutoSize | Out-Host
+            if(-not $Quiet) { $row | Format-Table -AutoSize | Out-Host }
         }
     }
 
@@ -71,7 +73,7 @@ function Write-Report {
     $realCount = ($realFindings | Measure-Object).Count
 
     if ($realCount -eq 0) {
-        Write-Host "   ✅ Only RA1 findings (self-modification by design) — clean"
+        if(-not $Quiet) { Write-Host "   ✅ Only RA1 findings (self-modification by design) — clean" }
         return
     }
 
@@ -81,9 +83,9 @@ function Write-Report {
     }
 
     if ($riskScore -ge 30) {
-        Write-Host "   → Revisar hallazgos antes de commit. RA1 ignorados por diseño."
+        if(-not $Quiet) { Write-Host "   → Revisar hallazgos antes de commit. RA1 ignorados por diseño." }
     } else {
-        Write-Host "   ✅ Skills clean (non-RA1 risk < threshold)"
+        if(-not $Quiet) { Write-Host "   ✅ Skills clean (non-RA1 risk < threshold)" }
     }
 }
 
@@ -103,15 +105,17 @@ function Run-Scan {
         Write-Report $report
     } catch {
         Write-Warning "${scriptName}: Could not parse $Runner output — skipping gate"
-        Write-Host "Raw output (first 500 chars):"
-        Write-Host ($JsonOutput.Substring(0, [Math]::Min(500, $JsonOutput.Length)))
+        if(-not $Quiet) {
+          Write-Host "Raw output (first 500 chars):"
+          Write-Host ($JsonOutput.Substring(0, [Math]::Min(500, $JsonOutput.Length)))
+        }
     }
 }
 
 # --- Try CLI ---
 $sp = Get-Command "skillspector" -ErrorAction SilentlyContinue
 if ($sp) {
-    Write-Host "🔍 [CLI] Scanning skills with SkillSpector (static only)..."
+    if(-not $Quiet) { Write-Host "🔍 [CLI] Scanning skills with SkillSpector (static only)..." }
     $jsonOutput = & skillspector scan $resolvedPath --no-llm --format json 2>&1 | Out-String
     Run-Scan -Runner "CLI" -JsonOutput $jsonOutput
     if ($Strict -and $script:RiskExceeded) { exit 1 }
@@ -126,7 +130,7 @@ try {
 } catch { Write-Debug "docker probe: $($_.Exception.Message)" }
 
 if ($dockerOk) {
-    Write-Host "🔍 [Docker] Scanning skills with SkillSpector (static only)..."
+    if(-not $Quiet) { Write-Host "🔍 [Docker] Scanning skills with SkillSpector (static only)..." }
     $hostPath = (Split-Path $resolvedPath.Path -Parent) -replace '\\', '/'
     $scanTarget = "/scan/$(Split-Path $resolvedPath.Path -Leaf)"
     $jsonOutput = docker run --rm -v "${hostPath}:/scan" $DockerImage scan $scanTarget --no-llm --format json 2>&1 | Out-String
@@ -136,9 +140,11 @@ if ($dockerOk) {
 }
 
 # --- Neither available ---
-Write-Host "⚪ SkillSpector not installed — skipping"
-Write-Host "   CLI: pip install git+https://github.com/NVIDIA/SkillSpector.git"
-Write-Host "   Docker: docker build -t skillspector . (from repo clone)"
+if(-not $Quiet) {
+  Write-Host "⚪ SkillSpector not installed — skipping"
+  Write-Host "   CLI: pip install git+https://github.com/NVIDIA/SkillSpector.git"
+  Write-Host "   Docker: docker build -t skillspector . (from repo clone)"
+}
 if ($Strict) {
     Write-Warning "⚠️ SkillSpector unavailable in strict mode — failing gate"
     exit 1

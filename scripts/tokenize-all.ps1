@@ -24,7 +24,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-if (-not (Test-Path $Path)) { Write-Host "[tokenize] Skills dir not found: $Path" -ForegroundColor Red; exit 1 }
+if (-not (Test-Path $Path)) { Write-Error "[tokenize] Skills dir not found: $Path"; exit 1 }
 
 $skills = Get-ChildItem $Path -Directory
 $rows = $skills | ForEach-Object -Parallel {
@@ -46,12 +46,14 @@ $rows = $skills | ForEach-Object -Parallel {
         TokensReal = if ($tokens) { [int]$tokens } else { -1 }
     }
 } -ThrottleLimit $ThrottleLimit
-$rows | Sort-Object Chars -Descending | Format-Table Skill, Chars, TokensHeur, TokensReal -AutoSize
-$totalChars = ($rows | Measure-Object -Property Chars -Sum).Sum
-$totalTokens = ($rows | Where-Object { $_.TokensReal -gt 0 } | Measure-Object -Property TokensReal -Sum).Sum
-Write-Host "Skills: $($rows.Count) | Total chars: $totalChars | Total tokens (real): $totalTokens" -ForegroundColor Cyan
+if (-not $Quiet) {
+  $rows | Sort-Object Chars -Descending | Format-Table Skill, Chars, TokensHeur, TokensReal -AutoSize
+  $totalChars = ($rows | Measure-Object -Property Chars -Sum).Sum
+  $totalTokens = ($rows | Where-Object { $_.TokensReal -gt 0 } | Measure-Object -Property TokensReal -Sum).Sum
+  Write-Host "Skills: $($rows.Count) | Total chars: $totalChars | Total tokens (real): $totalTokens" -ForegroundColor Cyan
+}
 
 if ($OutCsv) {
     $rows | Sort-Object Chars -Descending | Export-Csv $OutCsv -NoTypeInformation
-    Write-Host "Output: $OutCsv"
+    if (-not $Quiet) { Write-Host "Output: $OutCsv" }
 }

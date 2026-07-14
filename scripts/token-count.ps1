@@ -68,11 +68,14 @@ try {
   # Sort by tokens descending
   $results = $results | Sort-Object Tokens -Descending
 
-  Write-Host "=== TOKEN COUNT ===" -ForegroundColor Cyan
-  $results | ForEach-Object {
-    Write-Host ("  {0,-$($maxNameLen+2)} {1,7} tokens  ({2,6} KB)") -f $_.File, $_.Tokens, $_.SizeKB
+  # ponytail: guard informational display — data output is the return value
+  if (-not $Quiet) {
+    Write-Host "=== TOKEN COUNT ===" -ForegroundColor Cyan
+    $results | ForEach-Object {
+      Write-Host ("  {0,-$($maxNameLen+2)} {1,7} tokens  ({2,6} KB)") -f $_.File, $_.Tokens, $_.SizeKB
+    }
+    Write-Host ("  {0,-$($maxNameLen+2)} {1,7} tokens  TOTAL") -f "---", $grandTotal -ForegroundColor Green
   }
-  Write-Host ("  {0,-$($maxNameLen+2)} {1,7} tokens  TOTAL") -f "---", $grandTotal -ForegroundColor Green
 
   return $grandTotal
 } catch {

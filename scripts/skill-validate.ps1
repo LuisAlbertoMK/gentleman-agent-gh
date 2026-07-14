@@ -148,32 +148,33 @@ if ($countGe10 -ge 3 -and $avgScore -ge 7) { $scoring += "`n| Delta >=10% in >=3
 if ($countGe5 -ge 2) { $scoring += "`n| Delta >=5% in >=2 metrics | YES | $countGe5 metrics |" } else { $scoring += "`n| Delta >=5% in >=2 metrics | no | $countGe5 metrics |" }
 if ($countNeg -ge 2 -or $avgScore -lt 7) { $scoring += "`n| Delta <5% in >=2 or avg<7 | YES | $countNeg metrics <5% |" } else { $scoring += "`n| Delta <5% in >=2 or avg<7 | no | $countNeg metrics <5% |" }
 
-if ($OutputJson) {
-  $result = @{
-    skill = $SkillName
-    verdict = $verdict
-    symbol = $symbol
-    action = $action
-    avgScore = $avgScore
-    deltas = @{
-      toolCalls = $deltaCalls
-      tokens = $deltaTokens
-      score = $deltaScore
-      errors = $deltaErrors
-      iterations = $deltaIter
+  # ponytail: -Quiet suppresses informational report/scoring tables, keeps JSON data only
+  if ($OutputJson -or $Quiet) {
+    $result = @{
+      skill = $SkillName
+      verdict = $verdict
+      symbol = $symbol
+      action = $action
+      avgScore = $avgScore
+      deltas = @{
+        toolCalls = $deltaCalls
+        tokens = $deltaTokens
+        score = $deltaScore
+        errors = $deltaErrors
+        iterations = $deltaIter
+      }
+      counts = @{
+        ge20 = $countGe20
+        ge10 = $countGe10
+        ge5 = $countGe5
+        neg = $countNeg
+      }
     }
-    counts = @{
-      ge20 = $countGe20
-      ge10 = $countGe10
-      ge5 = $countGe5
-      neg = $countNeg
-    }
+    Write-Output ($result | ConvertTo-Json -Depth 3)
+  } else {
+    Write-Output $report
+    Write-Output $scoring
   }
-  Write-Output ($result | ConvertTo-Json -Depth 3)
-} else {
-  Write-Output $report
-  Write-Output $scoring
-}
 } catch {
     Write-Error "skill-validate failed: $_"
     throw
