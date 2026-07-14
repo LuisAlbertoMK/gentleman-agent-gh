@@ -1,4 +1,5 @@
-﻿#requires -Version 7.6
+#requires -Version 5.1
+Set-StrictMode -Version Latest
 <#
 .SYNOPSIS
     SkillSpector security gate for agent skills. Scans .agents/skills/
@@ -22,13 +23,11 @@
   Required for CI: skillspector-gate.ps1 -Strict -FailOnRisk 50
 #>
 param(
-    [switch]$Quiet,
     [string]$SkillsPath = ".agents/skills",
     [int]$FailOnRisk = 100,
     [string]$DockerImage = "skillspector",
     [switch]$Strict
 )
-Set-StrictMode -Version Latest
 
 $ErrorActionPreference = "Stop"
 $scriptName = "skillspector-gate"
@@ -127,7 +126,7 @@ $dockerOk = $false
 try {
     $null = docker ps 2>&1
     if ($LASTEXITCODE -eq 0) { $dockerOk = $true }
-} catch { Write-Debug "docker probe: $($_.Exception.Message)" }
+} catch { }
 
 if ($dockerOk) {
     if(-not $Quiet) { Write-Host "🔍 [Docker] Scanning skills with SkillSpector (static only)..." }

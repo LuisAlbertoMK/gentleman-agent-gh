@@ -1,0 +1,63 @@
+---
+name: sdd-spec
+description: "Write detailed specifications with Given/When/Then scenarios using RFC 2119 requirements language (MUST/SHOULD/MAY)"
+triggers: "Specs, Given/When/Then"
+license: MIT
+metadata:
+  tags:
+    - engineering
+  author: gentleman-vMK
+  version: "2.3"
+---
+
+Trigger: Orchestrator launches specs.
+
+Common protocol: `{file:sdd/references/sdd-phase-common.md}`
+
+## GATE
+Orchestrator loaded this? → STOP, delegate to `sdd-spec` sub-agent.
+Executor sub-agent? → proceed.
+
+## DELTA FORMAT
+```markdown
+## ADDED |
+### Requirement | RFC 2119 | GIVEN→WHEN→THEN
+## MODIFIED |
+### Requirement | (Previously: X) | updated scenarios
+## REMOVED |
+### Requirement | (Reason:)
+```
+
+## MODIFIED (critical)
+1. COPY ENTIRE req block (req + ALL scenarios) from main spec
+2. PASTE under MODIFIED → EDIT
+3. ADD `(Previously: one-liner)`
+
+Why full block? Archive REPLACES — partial loses scenarios.
+
+## NEW SPEC (no existing)
+Purpose → Requirements (MUST/SHOULD/MAY) → G/W/T scenarios
+
+## RULES
+- G/W/T · RFC 2119: MUST/SHALL/SHOULD/MAY
+- Every req ≥1 scenario (happy+edge) · Testable · No impl
+- MODIFIED = FULL block · Budget: <650 words
+
+## EXAMPLE NEW
+```markdown
+## Requirement | MUST validate 3-50 chars
+### GIVEN valid name WHEN PUT /profile/name THEN 200
+### GIVEN name <3 chars WHEN PUT /profile/name THEN 400
+```
+
+## EXAMPLE MODIFIED (delta)
+```markdown
+## MODIFIED | Validate display name
+### Requirement | MUST validate 3-50 chars | (Previously: must not be empty)
+### GIVEN name <3 chars WHEN PUT /profile/name THEN 400
+```
+
+## EDGE CASES
+- No existing spec → create NEW spec with full Purpose + Requirements + Scenarios
+- Empty delta (no changes) → note "no spec changes needed" and skip
+- Budget exceeded → split into multiple spec files by domain

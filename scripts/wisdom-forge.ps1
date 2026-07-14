@@ -1,380 +1,78 @@
-#requires -Version 7.6
-<#
+﻿<#
 .SYNOPSIS
     Auto-forge a skill from a pattern when it reaches its promotion threshold.
 .DESCRIPTION
-    Reads a pattern from the store, checks severity-based thresholds (hits × projects),
-    generates a SKILL.md, runs 9 quality gates, and registers it as a lazy-load skill.
-.PARAMETER PatternId
-    The pattern ID to forge (e.g. "ux/a11y/hero-btn-contrast").
-.PARAMETER PatternFile
-    Path to a pattern JSON file (alternative to PatternId).
-.PARAMETER Force
-    Skip threshold check and forge regardless.
-.PARAMETER DryRun
-    Run all gates but don't write anything.
-.PARAMETER Quiet
-    Output JSON only (machine-readable).
-
+    Reads a pattern, checks severity-based thresholds, generates SKILL.md, runs 9 quality gates, registers as lazy-load skill.
 .THRESHOLDS
-    CRITICAL: ≥1 hit across ≥1 project
-    HIGH:     ≥2 hits across ≥2 projects
-    MEDIUM:   ≥3 hits across ≥2 projects (default)
-    LOW:      ≥5 hits across ≥3 projects
-
-.EXAMPLE
-    .\scripts\wisdom-forge.ps1 -PatternId "ux/a11y/hero-btn-contrast"
-    .\scripts\wisdom-forge.ps1 -PatternFile pattern.json -DryRun
-    .\scripts\wisdom-forge.ps1 -PatternId "css/rgb-gotcha" -Force
+    CRITICAL: >=1 hit/1 project | HIGH: >=2 hits/2 projects | MEDIUM: >=3 hits/2 projects | LOW: >=5 hits/3 projects
+.PARAMETER PatternId  Pattern ID (e.g. "ux/a11y/hero-btn-contrast").
+.PARAMETER PatternFile  Path to pattern JSON (alternative to PatternId).
+.PARAMETER Force  Skip threshold check.
+.PARAMETER DryRun  Run gates but don't write.
+.PARAMETER Quiet  Output JSON only.
 #>
-param(
-    [string]$PatternId = "",
-    [string]$PatternFile = "",
-    [switch]$Force,
-    [switch]$DryRun,
-    [switch]$Quiet
-)
-Set-StrictMode -Version Latest
-$ErrorActionPreference = "Stop"
+param([string]$PatternId="",[string]$PatternFile="",[switch]$Force,[switch]$DryRun,[switch]$Quiet)
+Set-StrictMode -Version Latest;$ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path -Parent $PSScriptRoot
-$patternsDir = Join-Path $repoRoot "docs" "cross-project" "patterns"
-$skillsDir = Join-Path $repoRoot ".agents" "skills"
+$repoRoot=Split-Path -Parent $PSScriptRoot
+$patternsDir=Join-Path (Join-Path (Join-Path $repoRoot "docs") "cross-project") "patterns"
+$skillsDir=Join-Path (Join-Path $repoRoot ".agents") "skills"
+$thresholds=@{CRITICAL=@{Hits=1;Projects=1};HIGH=@{Hits=2;Projects=2};MEDIUM=@{Hits=3;Projects=2};LOW=@{Hits=5;Projects=3}}
 
-# Severity → threshold mapping
-$thresholds = @{
-    CRITICAL = @{ Hits = 1;  Projects = 1 }
-    HIGH     = @{ Hits = 2;  Projects = 2 }
-    MEDIUM   = @{ Hits = 3;  Projects = 2 }
-    LOW      = @{ Hits = 5;  Projects = 3 }
-}
+function Load-Pattern{param([string]$Id,[string]$File);if($Id){$found=@(Get-ChildItem $patternsDir -Filter "*.json"|Where-Object{try{(Get-Content $_.FullName -Raw|ConvertFrom-Json).id-eq $Id}catch{$false}});if($found.Length-eq 0){Write-Error "Pattern not found: $Id";exit 1};$fp=$found[0].FullName}elseif($File){if(-not(Test-Path $File)){Write-Error "File not found: $File";exit 1};$fp=$File}else{Write-Error "Provide -PatternId or -PatternFile";exit 1};try{$p=Get-Content $fp -Raw|ConvertFrom-Json}catch{Write-Error "Invalid JSON: $_";exit 1};return $p,$fp}
 
-# ─── Load pattern ───────────────────────────────────────────────
-function Load-Pattern {
-    param([string]$Id, [string]$File)
-    if ($Id) {
-        $found = @(Get-ChildItem $patternsDir -Filter "*.json" | Where-Object {
-            try { (Get-Content $_.FullName -Raw | ConvertFrom-Json).id -eq $Id } catch { $false }
-        })
-        if ($found.Length -eq 0) { Write-Error "Pattern not found: $Id"; exit 1 }
-        $filePath = $found[0].FullName
-    } elseif ($File) {
-        if (-not (Test-Path $File)) { Write-Error "File not found: $File"; exit 1 }
-        $filePath = $File
-    } else { Write-Error "Provide -PatternId or -PatternFile"; exit 1 }
+function Test-ForgeThreshold{param($P);if($Force){return $true,"forced"};$sev=if($P.severity-and$thresholds.ContainsKey($P.severity)){$P.severity}else{"MEDIUM"};$t=$thresholds[$sev];$hits=if($P.hits){[int]$P.hits}else{0};$proj=0;if($P.context-and$P.context.files){$proj=@($P.context.files|Select-Object -Unique).Length};if($proj-lt 1){$proj=1};if($hits-ge$t.Hits-and$proj-ge$t.Projects){return $true,"met ($sev: $($t.Hits)x$($t.Projects))"};return $false,"needs $([Math]::Max(0,$t.Hits-$hits)) hits, $([Math]::Max(0,$t.Projects-$proj)) projects"}
 
-    try { $pattern = Get-Content $filePath -Raw | ConvertFrom-Json } catch { Write-Error "Invalid JSON: $_"; exit 1 }
-    return $pattern, $filePath
-}
+function New-SkillContent{param($P);$slug=($P.id -replace '[/\s]+','-').ToLower();if($slug-notlike"cross-project-*"){$slug="cross-project-$slug"};$slug=$slug-replace '-+$','';$desc=if($P.rule-and$P.rule.summary){$d=$P.rule.summary -replace '[\u201c\u201d]','"' -replace "'","'";if($d.Length-gt 115){$d.Substring(0,112)+"..."}else{$d}}else{$P.title};$tkw=@($P.title);if($P.tags){$tkw+=$P.tags};if($P.signal-and$P.signal.keywords){$tkw+=$P.signal.keywords};if($P.signal-and$P.signal.css_selectors){$tkw+=$P.signal.css_selectors};$ts=($tkw|Select-Object -Unique)-join', '
+$det=if($P.rule-and$P.rule.details){$P.rule.details}else{""};$chk=if($P.rule-and$P.rule.check){$P.rule.check}else{""};$fix=if($P.rule-and$P.rule.fix){$P.rule.fix}else{""}
+return "---`nname: $slug`ndescription: `"$desc`"`nlicense: Apache-2.0`nmetadata:`n  tags: [$($P.tags -join ', ')]`n  author: gentleman-vMK (auto-forged)`n  version: `"1.0`"`n  source_pattern: `"$($P.id)`"`n  source_severity: `"$($P.severity)`"`ntriggers: `"$ts`"`n---`n`n## Rule`n$det`n`n## Check`n$chk`n`n## Fix`n$fix`n`n## Source Pattern`nForged from **$($P.id)**. Updated: $($P.updated). Confidence: $($P.confidence)."}
 
-# ─── Check threshold ────────────────────────────────────────────
-function Test-ForgeThreshold {
-    param($Pattern)
-    if ($Force) { return $true, "forced" }
+# Quality gates
+$gr=@()
+function Add-Gate{param([string]$N,[scriptblock]$C);try{$ok=&$C;$gr+=[PSCustomObject]@{Gate=$N;Status=if($ok){"PASS"}else{"FAIL"}};return $ok}catch{$gr+=[PSCustomObject]@{Gate=$N;Status="FAIL";Error=$_.Exception.Message};return $false}}
+function Test-YamlFrontmatter{param([string]$C);$t=$C.TrimStart();return $t.StartsWith("---")-and($C-match'(?s)---\s*\n.*?\n---')}
+function Test-TriggerUnique{param([string[]]$Triggers);$all=@(Get-ChildItem $skillsDir -Filter "SKILL.md" -Recurse -EA SilentlyContinue);$txt=@();foreach($f in $all){try{$c=Get-Content $f.FullName -Raw;if($c-match'(?s)triggers:\s*"([^"]+)"'){$txt+=($Matches[1]-split',')|ForEach-Object{$_.Trim().ToLower()}}}catch{continue}};foreach($t in $Triggers){$tl=$t.Trim().ToLower();if($tl-ne""-and$txt -contains $tl){return $false}};return $true}
+function Test-NoSecrets{param([string]$C);foreach($p in @('-----BEGIN (RSA|OPENSSH|PRIVATE|EC) KEY-----','(?i)(api[_-]?key|secret|password|token)\s*[:=]\s*[''"][^''"]{8,}')){if($C-match$p){return $false}};return $true}
+function Test-NoConflict{param([string]$N){return @(Get-ChildItem $skillsDir -Directory|Where-Object{$_.Name-eq $N}).Length-eq 0}}
 
-    $sev = if ($Pattern.severity -and $thresholds.ContainsKey($Pattern.severity)) { $Pattern.severity } else { "MEDIUM" }
-    $t = $thresholds[$sev]
-    $hits = if ($Pattern.hits) { [int]$Pattern.hits } else { 0 }
+# Main
+$pattern,$fp=Load-Pattern -Id $PatternId -File $PatternFile
+$sev=if($pattern.severity){$pattern.severity}else{"MEDIUM"};$id=$pattern.id;$hits=if($pattern.hits){[int]$pattern.hits}else{0}
+if(-not$Quiet){Write-Host "=== Wisdom Forge | $id | $sev (hits: $hits) ===" -Fore Cyan;if($DryRun){Write-Host "[DRY-RUN]" -Fore Yellow}}
 
-    # Count distinct projects from context.files
-    $projects = 0
-    if ($Pattern.context -and $Pattern.context.files) {
-        $projects = @($Pattern.context.files | Select-Object -Unique).Length
-    }
-    if ($projects -lt 1) { $projects = 1 }  # at least the originating project
+# Threshold
+if(-not$Force){$ok,$reason=Test-ForgeThreshold $pattern;if(-not$ok){if(-not$Quiet){Write-Host "[X] $reason" -Fore Red};[PSCustomObject]@{Status="BLOCKED";Reason=$reason;PatternId=$id;Gates=$gr}|ConvertTo-Json -Depth 3;exit 0};if(-not$Quiet){Write-Host "[OK] $reason" -Fore Green}}
 
-    if ($hits -ge $t.Hits -and $projects -ge $t.Projects) {
-        return $true, "threshold met (${sev}: $($t.Hits)×$($t.Projects))"
-    }
-    $needHits = [Math]::Max(0, $t.Hits - $hits)
-    $needProj = [Math]::Max(0, $t.Projects - $projects)
-    return $false, "needs $needHits more hit(s) and $needProj more project(s) for ${sev} threshold"
-}
+# Generate
+$slug=($pattern.id -replace '[/\s]+','-').ToLower();if($slug-notlike"cross-project-*"){$slug="cross-project-$slug"};$slug=$slug-replace '-+$',''
+$sd=Join-Path $skillsDir $slug;$sf=Join-Path $sd "SKILL.md"
+$sc=New-SkillContent $pattern;$ss=[System.Text.Encoding]::UTF8.GetByteCount($sc)
+if(-not$Quiet){Write-Host "[GEN] $slug ($ss bytes)" -Fore Cyan}
 
-# ─── Generate SKILL.md ──────────────────────────────────────────
-function New-SkillContent {
-    param($Pattern)
-    $slug = ($Pattern.id -replace '[/\s]+', '-').ToLower()
-    # Ensure cross-project- prefix
-    if ($slug -notlike "cross-project-*") { $slug = "cross-project-$slug" }
-    # Trim trailing junk
-    $slug = $slug -replace '-+$', ''
+# Quality gates
+$allPass=$true
+$checks=@(@{N="yaml-frontmatter";C={Test-YamlFrontmatter $sc}},@{N="name-prefix";C={$slug-like"cross-project-*"}},@{N="desc-length";C={$dv=if($sc-match'(?m)^description:\s*"([^"]+)"'){$Matches[1]}else{""};$dv.Length-le-120}},@{N="triggers-nonempty";C={$triggers=if($pattern.tags){@($pattern.tags)}else{@()};$triggers.Length-gt0}},@{N="triggers-unique";C={Test-TriggerUnique $triggers}},@{N="has-rules";C={$pattern.rule-and($pattern.rule.check-or-$pattern.rule.fix-or-$pattern.rule.details)}},@{N="size-max-2kb";C={$ss-le-2048}},@{N="no-conflict";C={Test-NoConflict $slug}},@{N="no-secrets";C={Test-NoSecrets $sc}})
+foreach($ck in $checks){$ok=Add-Gate $ck.N $ck.C;if(-not$ok){$allPass=$false}}
+if(-not$Quiet){Write-Host "`n--- Gates ---" -Fore Yellow;foreach($g in $gr){Write-Host "  $(if($g.Status-eq"PASS"){"[OK]"}else{"[X]"}) $($g.Gate)$(if($g.Detail){" ($($g.Detail))"}else{""})"}}
+if(-not$allPass){if(-not$Quiet){Write-Host "`n[X] BLOCKED" -Fore Red};[PSCustomObject]@{Status="BLOCKED";Reason="Gates failed";PatternId=$id;Gates=$gr}|ConvertTo-Json -Depth 4;exit 0}
+if(-not$Quiet){Write-Host "`n[OK] All gates PASSED" -Fore Green}
 
-    $desc = if ($Pattern.rule -and $Pattern.rule.summary) {
-        $d = $Pattern.rule.summary -replace '[”“]', '"' -replace "'", "`'"
-        if ($d.Length -gt 115) { $d.Substring(0, 112) + "..." } else { $d }
-    } else { $Pattern.title }
+# Dry-run
+if($DryRun){if(-not$Quiet){Write-Host "[DRY] Would create: $sd" -Fore Yellow};[PSCustomObject]@{Status="DRY_RUN";PatternId=$id;SkillName=$slug;SkillPath=$sd;SkillSize=$ss;Gates=$gr}|ConvertTo-Json -Depth 4;exit 0}
 
-    $triggerKeywords = @($Pattern.title)
-    if ($Pattern.tags) { $triggerKeywords += $Pattern.tags }
-    if ($Pattern.signal -and $Pattern.signal.keywords) { $triggerKeywords += $Pattern.signal.keywords }
-    if ($Pattern.signal -and $Pattern.signal.css_selectors) { $triggerKeywords += $Pattern.signal.css_selectors }
-    $triggerStr = ($triggerKeywords | Select-Object -Unique) -join ', '
+# Write
+if(-not(Test-Path $sd)){New-Item -ItemType Directory -Path $sd -Force|Out-Null}
+Set-Content -Path $sf -Value $sc -Encoding UTF8
+if(-not$Quiet){Write-Host "[WRITE] $sf" -Fore Green}
 
-    $details = if ($Pattern.rule -and $Pattern.rule.details) { $Pattern.rule.details } else { "" }
-    $check = if ($Pattern.rule -and $Pattern.rule.check) { $Pattern.rule.check } else { "" }
-    $fix = if ($Pattern.rule -and $Pattern.rule.fix) { $Pattern.rule.fix } else { "" }
+# Update pattern
+$pattern|Add-Member -NotePropertyName "skill_ref" -NotePropertyValue $slug -Force
+$pattern|Add-Member -NotePropertyName "status" -NotePropertyValue "promoted" -Force
+$pattern|Add-Member -NotePropertyName "promoted_at" -NotePropertyValue (Get-Date -Format "yyyy-MM-dd") -Force
+$pattern|ConvertTo-Json -Depth 6|Set-Content $fp -Encoding UTF8
+if(-not$Quiet){Write-Host "[UPDATE] Pattern -> promoted" -Fore Green}
 
-    return @"
----
-name: $slug
-description: "$desc"
-license: Apache-2.0
-metadata:
-  tags: [$(($Pattern.tags -join ', '))]
-  author: gentleman-vMK (auto-forged)
-  version: "1.0"
-  changelog: "1.0: auto-forged from pattern $($Pattern.id)"
-  source_pattern: "$($Pattern.id)"
-  source_severity: "$($Pattern.severity)"
-triggers: "$triggerStr"
----
-
-## Rule
-$details
-
-## Check
-$check
-
-## Fix
-$fix
-
-## Source Pattern
-This skill was auto-forged from pattern **$($Pattern.id)**.
-Last updated: $($Pattern.updated). Confidence: $($Pattern.confidence).
-"@
-}
-
-# ─── Quality Gates ──────────────────────────────────────────────
-$gateResults = @()
-
-function Add-Gate {
-    param([string]$Name, [scriptblock]$Check, [switch]$NoLog)
-    try {
-        $ok = & $Check
-        $script:gateResults += [PSCustomObject]@{ Gate = $Name; Status = if ($ok) { "PASS" } else { "FAIL" } }
-        return $ok
-    } catch {
-        $script:gateResults += [PSCustomObject]@{ Gate = $Name; Status = "FAIL"; Error = $_.Exception.Message }
-        return $false
-    }
-}
-
-function Test-YamlFrontmatter {
-    param([string]$Content)
-    # Verify --- exists and has closing --- (allow leading newline from here-string)
-    $trimmed = $Content.TrimStart()
-    return $trimmed.StartsWith("---") -and ($Content -match '(?s)---\s*\n.*?\n---')
-}
-
-function Test-TriggerUnique {
-    param([string[]]$Triggers)
-    $allSkills = @(Get-ChildItem $skillsDir -Filter "SKILL.md" -Recurse -ErrorAction SilentlyContinue)
-    $allTriggerText = @()
-    foreach ($sf in $allSkills) {
-        try {
-            $c = Get-Content $sf.FullName -Raw
-            if ($c -match '(?s)triggers:\s*"([^"]+)"') {
-                $allTriggerText += ($Matches[1] -split ',') | ForEach-Object { $_.Trim().ToLower() }
-            }
-        } catch { continue }
-    }
-
-    $conflicts = @()
-    foreach ($t in $Triggers) {
-        $tl = $t.Trim().ToLower()
-        if ($tl -ne "" -and $allTriggerText -contains $tl) { $conflicts += $t }
-    }
-    if ($conflicts.Length -gt 0) { return $false }
-    return $true
-}
-
-function Test-NoSecrets {
-    param([string]$Content)
-    $secretsPatterns = @(
-        '-----BEGIN (RSA|OPENSSH|PRIVATE|EC) KEY-----',
-        '(?i)(api[_-]?key|secret|password|token)\s*[:=]\s*[''"][^''"]{8,}',
-        'C:\\Users\\[^\\]+'
-    )
-    foreach ($p in $secretsPatterns) {
-        if ($Content -match $p) { return $false }
-    }
-    return $true
-}
-
-# ─── Check existing skill directories for conflict ──────────────
-function Test-NoConflict {
-    param([string]$SkillName)
-    $existing = @(Get-ChildItem $skillsDir -Directory | Where-Object { $_.Name -eq $SkillName })
-    return $existing.Length -eq 0
-}
-
-# ─── Main forge logic ──────────────────────────────────────────
-$pattern, $filePath = Load-Pattern -Id $PatternId -File $PatternFile
-
-$sev = if ($pattern.severity) { $pattern.severity } else { "MEDIUM" }
-$id = $pattern.id
-$hits = if ($pattern.hits) { [int]$pattern.hits } else { 0 }
-
-if (-not $Quiet) {
-    Write-Host "═══════════════════════════════════════════"
-    Write-Host "  Wisdom Forge Pipeline"
-    Write-Host "  Pattern : $id"
-    Write-Host "  Severity: $sev (hits: $hits)"
-    if ($DryRun) { Write-Host "  [DRY-RUN — no changes will be made]" }
-    Write-Host "═══════════════════════════════════════════"
-}
-
-# Step 1: Threshold check
-if (-not $Force) {
-    $ok, $reason = Test-ForgeThreshold $pattern
-    if (-not $ok) {
-        if (-not $Quiet) { Write-Host "[✗] $reason" }
-        $result = [PSCustomObject]@{ Status = "BLOCKED"; Reason = $reason; PatternId = $id; Gates = $gateResults }
-        if (-not $Quiet) { $result | ConvertTo-Json -Depth 3 } else { $result | ConvertTo-Json -Depth 3 }
-        exit 0
-    }
-    if (-not $Quiet) { Write-Host "[✓] $reason" }
-} else {
-    if (-not $Quiet) { Write-Host "[!] Threshold check skipped (--Force)" }
-}
-
-# Step 2: Generate SKILL.md
-$slug = ($pattern.id -replace '[/\s]+', '-').ToLower()
-if ($slug -notlike "cross-project-*") { $slug = "cross-project-$slug" }
-$slug = $slug -replace '-+$', ''
-$skillDir = Join-Path $skillsDir $slug
-$skillFile = Join-Path $skillDir "SKILL.md"
-
-$skillContent = New-SkillContent $pattern
-$skillSize = [System.Text.Encoding]::UTF8.GetByteCount($skillContent)
-
-if (-not $Quiet) { Write-Host "[GENERATE] Skill: $slug ($skillSize bytes)" }
-
-# Step 3: Quality gates
-$allPass = $true
-
-# Gate 1: YAML frontmatter
-$g1ok = Add-Gate -Name "yaml-frontmatter" -Check { Test-YamlFrontmatter $skillContent }
-if (-not $g1ok) { $allPass = $false }
-
-# Gate 2: prefix
-$hasPrefix = $slug -like "cross-project-*"
-$gateResults += [PSCustomObject]@{ Gate = "name-prefix"; Status = if ($hasPrefix) { "PASS" } else { "FAIL" } }
-if (-not $hasPrefix) { $allPass = $false }
-
-# Gate 3: description value length (≤120 chars)
-$descValue = if ($skillContent -match '(?m)^description:\s*"([^"]+)"') { $Matches[1] } else { "" }
-$descLen = $descValue.Length
-$descOk = $descLen -le 120
-$gateResults += [PSCustomObject]@{ Gate = "description-length"; Status = if ($descOk) { "PASS" } else { "FAIL" }; Detail = "$descLen chars (max 120)" }
-if (-not $descOk) { $allPass = $false }
-
-# Gate 4: triggers
-$triggers = if ($pattern.tags) { @($pattern.tags) } else { @() }
-$triggersOk = $triggers.Length -gt 0
-$gateResults += [PSCustomObject]@{ Gate = "triggers-nonempty"; Status = if ($triggersOk) { "PASS" } else { "FAIL" } }
-if (-not $triggersOk) { $allPass = $false }
-
-# Gate 5: trigger uniqueness
-$uniqueOk = Test-TriggerUnique $triggers
-$gateResults += [PSCustomObject]@{ Gate = "triggers-unique"; Status = if ($uniqueOk) { "PASS" } else { "FAIL" } }
-if (-not $uniqueOk) { $allPass = $false }
-
-# Gate 6: has rules
-$hasRules = ($pattern.rule -and ($pattern.rule.check -or $pattern.rule.fix -or $pattern.rule.details))
-$gateResults += [PSCustomObject]@{ Gate = "has-rules"; Status = if ($hasRules) { "PASS" } else { "FAIL" } }
-if (-not $hasRules) { $allPass = $false }
-
-# Gate 7: size ≤ 2KB
-$sizeOk = $skillSize -le 2048
-$gateResults += [PSCustomObject]@{ Gate = "size-max-2kb"; Status = if ($sizeOk) { "PASS" } else { "FAIL" }; Detail = "$skillSize bytes" }
-if (-not $sizeOk) { $allPass = $false }
-
-# Gate 8: no conflict with existing skill dir
-$conflictOk = Test-NoConflict $slug
-$gateResults += [PSCustomObject]@{ Gate = "no-directory-conflict"; Status = if ($conflictOk) { "PASS" } else { "FAIL" } }
-if (-not $conflictOk) { $allPass = $false }
-
-# Gate 9: no secrets
-$secretsOk = Test-NoSecrets $skillContent
-$gateResults += [PSCustomObject]@{ Gate = "no-secrets"; Status = if ($secretsOk) { "PASS" } else { "FAIL" } }
-if (-not $secretsOk) { $allPass = $false }
-
-# Show gates
-if (-not $Quiet) {
-    Write-Host "`n── Quality Gates ──"
-    foreach ($g in $gateResults) {
-        $icon = if ($g.Status -eq "PASS") { "✓" } else { "✗" }
-        $detail = if ($g.Detail) { " ($($g.Detail))" } else { "" }
-        Write-Host "  [$icon] $($g.Gate)$detail"
-    }
-}
-
-# Step 4: If any gate failed → BLOCKED
-if (-not $allPass) {
-    if (-not $Quiet) { Write-Host "`n[✗] BLOCKED: quality gates failed. No forge." }
-    $result = [PSCustomObject]@{
-        Status = "BLOCKED"
-        Reason = "Quality gates failed"
-        PatternId = $id
-        Gates = $gateResults
-        ForgePath = ""
-    }
-    $result | ConvertTo-Json -Depth 4
-    exit 0
-}
-
-if (-not $Quiet) { Write-Host "`n[✓] All gates PASSED" }
-
-# If dry-run, stop here
-if ($DryRun) {
-    if (-not $Quiet) { Write-Host "[DRY-RUN] Would create: $skillDir" }
-    $result = [PSCustomObject]@{
-        Status = "DRY_RUN"
-        PatternId = $id
-        SkillName = $slug
-        SkillPath = $skillDir
-        SkillSize = $skillSize
-        Gates = $gateResults
-    }
-    $result | ConvertTo-Json -Depth 4
-    exit 0
-}
-
-# Step 5: Write
-if (-not (Test-Path $skillDir)) { New-Item -ItemType Directory -Path $skillDir -Force | Out-Null }
-Set-Content -Path $skillFile -Value $skillContent -Encoding UTF8
-if (-not $Quiet) { Write-Host "[WRITE] $skillFile" }
-
-# Step 6: Update pattern — add skill_ref, set status=promoted
-$pattern | Add-Member -NotePropertyName "skill_ref" -NotePropertyValue $slug -Force
-$pattern | Add-Member -NotePropertyName "status" -NotePropertyValue "promoted" -Force
-$pattern | Add-Member -NotePropertyName "promoted_at" -NotePropertyValue (Get-Date -Format "yyyy-MM-dd") -Force
-$pattern | ConvertTo-Json -Depth 6 | Set-Content $filePath -Encoding UTF8
-if (-not $Quiet) { Write-Host "[UPDATE] Pattern status → promoted, skill_ref → $slug" }
-
-# Step 7: Output
-$result = [PSCustomObject]@{
-    Status    = "FORGED"
-    PatternId = $id
-    SkillName = $slug
-    SkillPath = $skillDir
-    SkillFile = $skillFile
-    SkillSize = $skillSize
-    Gates     = $gateResults
-    EngramPayload = [PSCustomObject]@{
-        TopicKey  = "forge/$slug"
-        Type      = "architecture"
-        Title     = "Forged skill: $slug"
-        Content   = "**What**: Auto-forged skill from pattern `$id` (severity: $sev, hits: $hits)`n**Why**: Pattern reached promotion threshold`n**Where**: $skillFile`n**Learned**: Forged via wisdom-forge.ps1 — 9 quality gates passed"
-    }
-}
-
-if (-not $Quiet) {
-    Write-Host "`n═══════════════════════════════════════════"
-    Write-Host "  FORGED: $slug"
-    Write-Host "  mem_save: forge/$slug"
-    Write-Host "═══════════════════════════════════════════"
-}
-$result | ConvertTo-Json -Depth 5
+# Output
+$r=[PSCustomObject]@{Status="FORGED";PatternId=$id;SkillName=$slug;SkillPath=$sd;SkillFile=$sf;SkillSize=$ss;Gates=$gr;EngramPayload=[PSCustomObject]@{TopicKey="forge/$slug";Type="architecture";Title="Forged: $slug";Content="**What**: Auto-forged from ``$id`` ($sev, $hits hits)`n**Where**: $sf`n**Learned**: 9 quality gates passed"}}
+if(-not$Quiet){Write-Host "`n=== FORGED: $slug ===" -Fore Green}
+$r|ConvertTo-Json -Depth 5

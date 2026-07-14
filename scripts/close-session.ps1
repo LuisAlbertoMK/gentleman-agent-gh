@@ -103,6 +103,20 @@ $result = [PSCustomObject]@{
     auditGatePassed   = $auditGatePassed
     bloatWarning      = $bloatWarning
 }
+# --- Session miner: scan for repeated error patterns ---
+$minerOutput = $null
+try {
+    $minerResult = & "$PSScriptRoot\session-miner.ps1" -Mode check -Json 2>$null
+    if ($minerResult) {
+        $minerData = $minerResult | ConvertFrom-Json -ErrorAction SilentlyContinue
+        if ($minerData -and $minerData.RepeatedPatterns -gt 0) {
+            $minerOutput = "$($minerData.RepeatedPatterns) repeated pattern(s) detected — run dreaming to review"
+        }
+    }
+} catch {
+    Write-Debug "close-session: session-miner skipped ($($_.Exception.Message))"
+}
+if ($minerOutput) { $result | Add-Member -NotePropertyName "minerWarning" -NotePropertyValue $minerOutput }
 # Compact prompt: show if explicitly requested, or when changes exist and not explicitly disabled
 $showCompact = $CompactPrompt -or ($hasChanges -and -not $PSBoundParameters.ContainsKey('CompactPrompt'))
 if ($showCompact -and -not $Quiet) {
@@ -112,6 +126,8 @@ if ($showCompact -and -not $Quiet) {
     $keyDecisions = if ($Goal) { $Goal } else { "None recorded" }
     $nextActions = if ($needsAudit) {
         "⚠️ AUDIT GATE BLOCKED: run !audit first (protected files changed)"
+    } elseif ($minerOutput) {
+        "Review miner warning + commit $($result.changeCount) file(s), then run !dream"
     } elseif ($hasChanges) {
         "Review & commit $($result.changeCount) modified file(s), then run !score"
     } else { "Run !score if needed" }
@@ -120,6 +136,7 @@ if ($showCompact -and -not $Quiet) {
 - **Accomplished**: $Description
 - **Key decisions**: $keyDecisions
 - **Next actions**: $nextActions
+$(if ($minerOutput) { "- **⚠️ Miner**: $minerOutput" })
 $(if ($diffFiles) { "- **Pending changes**:`n$diffFiles" })
 "@
 }
@@ -132,6 +149,11 @@ if ($Quiet) {
     Write-Host ""
     if ($bloatWarning) {
         Write-Host "⚠️  $bloatWarning" -ForegroundColor Yellow
+        Write-Host ""
+    }
+    if ($minerOutput) {
+        Write-Host "⛏️  $minerOutput" -ForegroundColor DarkYellow
+        Write-Host "    Run '!dream' to review repeated patterns." -ForegroundColor DarkYellow
         Write-Host ""
     }
     if ($needsAudit) {

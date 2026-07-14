@@ -1,5 +1,4 @@
-#requires -Version 7.6
-<#
+﻿<#
 .SYNOPSIS
     Wisdom store metrics: pattern count, severity distribution, hit rates.
 .DESCRIPTION
@@ -20,7 +19,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$patternsDir = Join-Path $repoRoot "docs" "cross-project" "patterns"
+$patternsDir = Join-Path (Join-Path (Join-Path $repoRoot "docs") "cross-project") "patterns"
 
 $timestamp = Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ"
 
@@ -95,7 +94,9 @@ foreach ($p in $patterns) {
             $created = [DateTime]::ParseExact($p.created, "yyyy-MM-dd", $null)
             $ageDays = ($now - $created).Days
             $ages += $ageDays
-        } catch { Write-Debug "Failed to parse date '$($p.created)': $_" }
+        } catch {
+            Write-Debug "wisdom-stats: Could not parse date '$($p.created)' for pattern"
+        }
     }
 }
 $avgAgeDays = if ($ages.Count -gt 0) { [Math]::Round(($ages | Measure-Object -Average).Average, 0) } else { 0 }

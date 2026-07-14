@@ -65,11 +65,30 @@ foreach($p in $sharedPrompts){
 
 # ── 3. Sync shared scripts ─────────────────────────────────────────────
 $sharedScripts = @(
+    # Core utilities
     @{Src="scripts\lib\cache.ps1";Dst="scripts\lib\cache.ps1"},
     @{Src="scripts\skill-resolver-fast.ps1";Dst="scripts\skill-resolver-fast.ps1"},
     @{Src="scripts\build-skill-registry.ps1";Dst="scripts\build-skill-registry.ps1"},
     @{Src="scripts\auto-pattern-detector.ps1";Dst="scripts\auto-pattern-detector.ps1"},
-    @{Src="scripts\learning-stats.ps1";Dst="scripts\learning-stats.ps1"}
+    @{Src="scripts\learning-stats.ps1";Dst="scripts\learning-stats.ps1"},
+    # Compressed scripts (v16 improvements)
+    @{Src="scripts\wisdom-forge.ps1";Dst="scripts\wisdom-forge.ps1"},
+    @{Src="scripts\check-mcp-security.ps1";Dst="scripts\check-mcp-security.ps1"},
+    @{Src="scripts\wisdom-demote.ps1";Dst="scripts\wisdom-demote.ps1"},
+    @{Src="scripts\sync-global-ps5.ps1";Dst="scripts\sync-global-ps5.ps1"},
+    @{Src="scripts\project-cycle.ps1";Dst="scripts\project-cycle.ps1"},
+    @{Src="scripts\sync-global.ps1";Dst="scripts\sync-global.ps1"},
+    @{Src="scripts\wisdom-stats.ps1";Dst="scripts\wisdom-stats.ps1"},
+    @{Src="scripts\skillspector-gate.ps1";Dst="scripts\skillspector-gate.ps1"},
+    # New scripts
+    @{Src="scripts\analyze-screenshot.ps1";Dst="scripts\analyze-screenshot.ps1"},
+    @{Src="scripts\bench-compare.ps1";Dst="scripts\bench-compare.ps1"},
+    @{Src="scripts\bench-file-io.ps1";Dst="scripts\bench-file-io.ps1"},
+    @{Src="scripts\bootstrap.ps1";Dst="scripts\bootstrap.ps1"},
+    @{Src="scripts\list-skills.ps1";Dst="scripts\list-skills.ps1"},
+    @{Src="scripts\project-profile.ps1";Dst="scripts\project-profile.ps1"},
+    @{Src="scripts\skill-test-suite.ps1";Dst="scripts\skill-test-suite.ps1"},
+    @{Src="scripts\test-downstream.ps1";Dst="scripts\test-downstream.ps1"}
 )
 foreach($s in $sharedScripts){
     $src = Join-Path $gentlemanRoot $s.Src
