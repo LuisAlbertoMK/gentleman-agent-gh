@@ -31,22 +31,23 @@ param(
 $cacheDir  = Join-Path "$PSScriptRoot\.." ".learnings"
 $cacheFile = Join-Path $cacheDir "score-cache.json"
 
+# ponytail: init before try — ensures vars exist even if cache check throws
+$scriptFiles  = @()
+$skillMdFiles = @()
+$skillDirs    = @()
+
 try {
     $repoRoot = "$PSScriptRoot\.."
 
     $gitHead = git -C $repoRoot rev-parse HEAD 2>$null
 
-    $scriptsHash = (
-        Get-ChildItem "$repoRoot\scripts\*.ps1" -EA SilentlyContinue |
-            ForEach-Object { "$($_.Name):$($_.Length)" } |
-            Sort-Object
-    ) -join "|"
+    # ponytail: consolidated reads — single pass for cache hash + scoring
+    $scriptFiles  = @(Get-ChildItem "$repoRoot\scripts\*.ps1" -EA SilentlyContinue)
+    $skillMdFiles = @(Get-ChildItem "$repoRoot\.agents\skills\*\SKILL.md" -EA SilentlyContinue)
+    $skillDirs    = @(Get-ChildItem -Directory "$repoRoot\.agents\skills" -EA SilentlyContinue | Select-Object -ExpandProperty Name)
 
-    $skillsHash = (
-        Get-ChildItem "$repoRoot\.agents\skills\*\SKILL.md" -EA SilentlyContinue |
-            ForEach-Object { "$($_.Name):$($_.Length)" } |
-            Sort-Object
-    ) -join "|"
+    $scriptsHash = ($scriptFiles | ForEach-Object { "$($_.Name):$($_.Length)" } | Sort-Object) -join "|"
+    $skillsHash  = ($skillMdFiles | ForEach-Object { "$($_.Name):$($_.Length)" } | Sort-Object) -join "|"
 
     $compositeKey = "$gitHead|$scriptsHash|$skillsHash"
     $cacheHash    = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($compositeKey))
@@ -84,12 +85,8 @@ function Add-Dimension([string]$name, [double]$score, [hashtable]$evidence, [str
 }
 
 # ============================================================
-# BATCH FILE READS — cache Get-ChildItem results
+# BATCH FILE READS — reuse from cache section (consolidated)
 # ============================================================
-
-$skillDirs    = Get-ChildItem -Directory ".\.agents\skills" -Name
-$skillMdFiles = Get-ChildItem ".\.agents\skills\*\SKILL.md" -EA SilentlyContinue
-$scriptFiles  = Get-ChildItem ".\scripts\*.ps1" -EA SilentlyContinue
 
 $skillDirCount = $skillDirs.PSWhere({ $_ -ne '_shared' }).Count
 
