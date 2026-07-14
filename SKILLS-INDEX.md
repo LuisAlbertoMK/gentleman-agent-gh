@@ -3,7 +3,7 @@
 > Full trigger table for all 66 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 3.9 | **Changelog**: 3.9 (+3 new: vision-analyze, workflow-optimizer, skills-link mirror; count 63→66); 3.8 (+4 new skills: sdd-quick, visual-testing, image-pipeline, pdf-utils); 3.7 (Removed 4 redirect skills: css-layout, design-tokens, responsive-design, ui-animation); 3.6 (Merged into ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills)
+> **Version**: 4.0 | **Changelog**: 4.0 (+8 missing triggers: cancel-ralph, cross-project-forge, cross-project-wisdom, engram-protocol, help, opencode-skill-creator, ralph-loop, sdd-quick; fixed 57→65 discoverable count); 3.9 (+3 new: vision-analyze, workflow-optimizer, skills-link mirror; count 63→66); 3.8 (+4 new skills: sdd-quick, visual-testing, image-pipeline, pdf-utils); 3.7 (Removed 4 redirect skills: css-layout, design-tokens, responsive-design, ui-animation); 3.6 (Merged into ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills)
 
 ## Triggers → Skill
 
@@ -68,6 +68,14 @@
 | PDF, extract PDF, parse PDF, merge PDF, generate PDF, PDF table, PDF invoice, read PDF, PDF to text, PDF to markdown | pdf-utils |
 | Vision analyze, image analysis, screenshot analysis, visual inspection, describe screenshot | vision-analyze |
 | Workflow optimize, process optimize, streamline, reduce steps, automate workflow | workflow-optimizer |
+| Cancel ralph, stop loop, cancel loop, ralph stop, end loop | cancel-ralph |
+| Forge, promote pattern, auto-skill, forjar, convertir patrón, skill desde patrón | cross-project-forge |
+| Patterns, wisdom, lesson learned, cross-project, retrospectiva, experiencia previa, !wisdom | cross-project-wisdom |
+| Remember, recall, engram, mem_save, mem_search, session close, memory | engram-protocol |
+| Help, ralph help, commands, available commands, what can you do, /help | help |
+| Create skill, edit skill, opencode skill, skill eval, evaluate prompt, benchmark skill | opencode-skill-creator |
+| Ralph, ralph loop, auto-continue, iterative loop, /ralph-loop, continuous task | ralph-loop |
+| SDD quick, fast path, quick SDD, low risk SDD, simple change SDD | sdd-quick |
 
 ## Quick groups
 - **Compression/style**: karpathy-loop (merged karpathy-prompt), lean-context
@@ -86,7 +94,7 @@
 
 ## Load rule
 1. `read` this file → find trigger match → get skill name
-2. `skill` tool with name (skills.paths now registered in opencode.json — 56 skills globally discoverable)
+2. `skill` tool with name (skills.paths now registered in opencode.json — 65 skills globally discoverable)
 3. If `skill` tool fails → `read skills/{name}/SKILL.md` directly from disk
 4. If skill has assets → `read skills/{name}/references/` or `read skills/{name}/assets/` for templates
 

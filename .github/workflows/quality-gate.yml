@@ -110,7 +110,7 @@ jobs:
           }
 
       - name: trufflehog — deep secrets scan
-        uses: trufflesecurity/trufflehog@main
+        uses: trufflesecurity/trufflehog@v3.95.9
         with:
           path: ./
           base: ${{ github.event.repository.default_branch }}
