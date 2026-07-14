@@ -8,6 +8,7 @@
     - Sets GENTLEMAN_AGENT_ROOT environment variable
     - Configures OpenCode env vars
     - Installs MCP server binaries (codebase-memory-mcp, engram, headroom)
+    - Installs Ollama + moondream model for vision analysis
     - Creates skill junction in global config
     - Verifies everything works
 .Parameter RepoDir
@@ -30,7 +31,8 @@ param(
     [string]$RepoDir = (Get-Location).Path,
     [switch]$SkipEnvVar,
     [switch]$SkipShortcuts,
-    [switch]$SkipMcp
+    [switch]$SkipMcp,
+    [switch]$SkipVision
 )
 Set-StrictMode -Version Latest
 
@@ -318,6 +320,40 @@ if (-not $SkipMcp) {
     skip "MCP server binaries (via -SkipMcp)"
 }
 
+# ── Step 7b: Ollama (vision analysis) ──────────────────────────────
+if (-not $SkipVision) {
+    info "Setting up Ollama for local vision analysis"
+    $ollamaCmd = Get-Command "ollama" -ErrorAction SilentlyContinue
+    if (-not $ollamaCmd) {
+        # Check scoop installed
+        $scoopCmd = Get-Command "scoop" -ErrorAction SilentlyContinue
+        if ($scoopCmd) {
+            info "Installing Ollama via scoop..."
+            scoop install ollama 2>$null
+            if ($?) { ok "Ollama installed via scoop" } else { warn "Ollama scoop install failed — download from https://ollama.com/download" }
+        } else {
+            warn "scoop not found — install Ollama manually from https://ollama.com/download"
+        }
+    } else {
+        skip "Ollama already installed"
+    }
+
+    # Pull moondream model (1.7GB, vision analysis)
+    $ollamaExe = if ($ollamaCmd) { $ollamaCmd.Source } else { "$env:USERPROFILE\scoop\apps\ollama\current\ollama.exe" }
+    if (Test-Path $ollamaExe) {
+        $models = & $ollamaExe list 2>$null
+        if ($models -notmatch "moondream") {
+            info "Pulling moondream:latest model (~1.7GB, vision analysis)..."
+            & $ollamaExe pull moondream:latest 2>$null
+            if ($?) { ok "moondream:latest pulled" } else { warn "moondream pull failed — run: ollama pull moondream:latest" }
+        } else {
+            skip "moondream:latest already pulled"
+        }
+    }
+} else {
+    skip "Vision setup (via -SkipVision)"
+}
+
 # ── Step 8: Verify ────────────────────────────────────────────────
 info "Verifying setup"
 $checks = @(
@@ -326,7 +362,9 @@ $checks = @(
     @{ Label = "Global shortcut: gentleman-vmk"; Test = { Get-Command "gentleman-vmk" -ErrorAction SilentlyContinue } },
     @{ Label = "MCP: codebase-memory-mcp"; Test = { Get-Command "codebase-memory-mcp" -ErrorAction SilentlyContinue } },
     @{ Label = "MCP: headroom"; Test = { Get-Command "headroom" -ErrorAction SilentlyContinue } },
-    @{ Label = "MCP: engram"; Test = { Get-Command "engram" -ErrorAction SilentlyContinue } }
+    @{ Label = "MCP: engram"; Test = { Get-Command "engram" -ErrorAction SilentlyContinue } },
+    @{ Label = "Vision: Ollama"; Test = { Get-Command "ollama" -ErrorAction SilentlyContinue } },
+    @{ Label = "Vision: moondream model"; Test = { & ollama list 2>$null -match "moondream" } }
 )
 $allOk = $true
 foreach ($c in $checks) {

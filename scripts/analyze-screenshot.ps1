@@ -1,5 +1,4 @@
 #requires -Version 7.6
-Set-StrictMode -Version Latest
 <#
 .SYNOPSIS
     Capture screenshot and analyze via local Ollama multimodal model.
@@ -23,7 +22,7 @@ Set-StrictMode -Version Latest
 #>
 param(
     [string]$ImagePath,
-    [string]$Model = "moondream",
+    [string]$Model = "moondream:latest",
     [ValidateSet("ui", "error", "design", "accessibility", "performance")]
     [string]$Mode = "ui",
     [string]$Prompt,
@@ -32,6 +31,7 @@ param(
     [string]$Compare
 )
 
+Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $scriptName = "analyze-screenshot"
 

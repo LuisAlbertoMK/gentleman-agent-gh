@@ -6,23 +6,53 @@ triggers: [screenshot, capture, vision, analyze-ui, visual-review, captura, anal
 
 # Vision Analyze — Local Screenshot Analysis
 
-## Setup
-1. Install Ollama: https://ollama.com/download
-2. Pull model: `ollama pull moondream` (1.7GB, fast) or `ollama pull llava:7b` (4.5GB, better)
-3. Start: `ollama serve` (default: localhost:11434)
+## Setup (This Machine)
+1. **Ollama installed**: `$env:USERPROFILE\scoop\apps\ollama\current\ollama.exe`
+2. **Model pulled**: `moondream:latest` (1.7GB) — run `ollama pull moondream:latest`
+3. **Server**: `ollama serve` (default: localhost:11434)
+
+### Verify Setup
+```powershell
+# Check Ollama running
+Invoke-RestMethod -Uri "http://localhost:11434/api/version"
+
+# List available models
+& "$env:USERPROFILE\scoop\apps\ollama\current\ollama.exe" list
+```
 
 ## Usage
 
 ### PowerShell — Capture + Analyze
 ```powershell
-& "$env:GENTLEMAN_AGENT_ROOT\scripts\analyze-screenshot.ps1"  # captures screenshot
-& "$env:GENTLEMAN_AGENT_ROOT\scripts\analyze-screenshot.ps1" -ImagePath "img.png" -Mode ui
+# Auto-capture screenshot + analyze (error mode)
+& "$env:GENTLEMAN_AGENT_ROOT\scripts\analyze-screenshot.ps1" -Mode error -SaveScreenshot
+
+# Analyze existing image
+& "$env:GENTLEMAN_AGENT_ROOT\scripts\analyze-screenshot.ps1" -ImagePath "C:\path\to\image.png" -Mode ui
+
+# Compare before/after
+& "$env:GENTLEMAN_AGENT_ROOT\scripts\analyze-screenshot.ps1" -ImagePath "before.png" -Compare "after.png"
 ```
 
-### Python — Analyze Existing
+### Quick Ollama API Test
+```powershell
+$body = @{ model = "moondream:latest"; prompt = "Describe this image"; stream = $false } | ConvertTo-Json
+Invoke-RestMethod -Uri "http://localhost:11434/api/generate" -Method Post -Body $body -ContentType "application/json"
+```
+
+### Python — Analyze Existing Images
 ```bash
-python scripts/analyze-image.py screenshot.png --mode ui
-python scripts/analyze-image.py before.png after.png --compare
+# Single image analysis
+py scripts/analyze-image.py screenshot.png --mode error
+
+# Compare before/after
+py scripts/analyze-image.py before.png after.png --compare
+
+# Custom prompt
+py scripts/analyze-image.py screenshot.png --prompt "What fonts are used?"
+
+# JSON output (for programmatic use)
+py scripts/analyze-image.py screenshot.png --mode ui --json
 ```
 
 ### Fallback (No Ollama)
@@ -38,11 +68,11 @@ Use `Read` tool to view image directly, then analyze visually.
 | `performance` | CLS, missing images, loading indicators |
 
 ## Model Selection
-| RAM | Model | Speed |
-|-----|-------|-------|
-| <4GB | moondream | ~2s |
-| 8GB+ | llava:7b | ~5s |
-| 16GB+ | llava:13b | ~10s |
+| RAM | Model | Speed | Status |
+|-----|-------|-------|--------|
+| <4GB | moondream:latest | ~75s | ✅ Installed & tested |
+| 8GB+ | llava:7b | ~5s | Not installed |
+| 16GB+ | qwen3-vl:8b | ~10s | Not installed (slow download) |
 
 ## Integration
 - **Code Review**: capture UI → analyze → feed to code-review-agent
