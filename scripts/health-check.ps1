@@ -4,6 +4,24 @@
   Unified pre-session health check for gentleman-vMK and opencode-ai ecosystem.
   Checks: skills junctions (vmk + global), prompts junction.
   Part of P1 — Autonomous Integration Plan.
+.DESCRIPTION
+  Validates environment health before starting a session:
+  - Skills junctions (canonical + global config)
+  - Prompts junction
+  - Git status
+  - Skill drift detection
+  Uses lib/cache.ps1 with 1h TTL for performance.
+.PARAMETER AutoRepair
+  Auto-fix broken junctions instead of just reporting.
+.PARAMETER Json
+  Output results as JSON for agent consumption.
+.PARAMETER Quiet
+  Exit code only, minimal output (0=OK, 1=warnings, 2=failures).
+.EXAMPLE
+  .\scripts\health-check.ps1              # interactive health check
+  .\scripts\health-check.ps1 -Json        # JSON for agent
+  .\scripts\health-check.ps1 -AutoRepair  # fix broken junctions
+  .\scripts\health-check.ps1 -Quiet       # exit code only
 #>
 param(
   [switch]$AutoRepair,      # Auto-fix broken junctions

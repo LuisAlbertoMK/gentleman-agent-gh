@@ -81,7 +81,7 @@ jobs:
           Write-Output "OK: $($results.PassedCount)/$($results.TotalCount) tests passed"
 
       - name: Benchmark report — system health snapshot
-        run: ./scripts/benchmark.ps1
+        run: ./scripts/benchmark.ps1 -Snapshot
 
       - name: Overweight skill check — warn if any skill >3KB
         run: |
