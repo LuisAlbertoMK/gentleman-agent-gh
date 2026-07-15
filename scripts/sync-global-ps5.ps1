@@ -30,7 +30,7 @@ function Sync-DirectoryFiles { param([string]$SrcDir,[string]$DstDir,[switch]$Is
 function Sync-SingleFile { param([string]$Src,[string]$Dst,[string]$Name,[switch]$IsDryRun,[ref]$Count)
     if (-not (Test-Path $Src -PathType Leaf)) { return }
     $needsCopy = -not (Test-Path $Dst)
-    if (-not $needsCopy) { try { $needsCopy = (Get-FileHash -Path $Src -Algorithm MD5).Hash -ne (Get-FileHash -Path $Dst -Algorithm MD5).Hash } catch { $needsCopy = $true } }
+    if (-not $needsCopy) { try { $needsCopy = (Get-FileHash -Path $Src).Hash -ne (Get-FileHash -Path $Dst -EA SilentlyContinue).Hash } catch { $needsCopy = $true } }
     if ($needsCopy) { if (-not $IsDryRun) { Copy-Item -LiteralPath $Src -Destination $Dst -Force }; $Count.Value++ }
 }
 
@@ -55,7 +55,7 @@ $scriptsCopied = 0; $scriptsTotal = 0
 foreach ($script in Get-ChildItem -Path $srcScripts -File) {
     $scriptsTotal++; $dst = Join-Path $dstScripts $script.Name
     $needsCopy = -not (Test-Path $dst)
-    if (-not $needsCopy) { try { $needsCopy = (Get-FileHash -Path $script.FullName -Algorithm MD5).Hash -ne (Get-FileHash -Path $dst -Algorithm MD5).Hash } catch { $needsCopy = $true } }
+    if (-not $needsCopy) { try { $needsCopy = (Get-FileHash -Path $script.FullName).Hash -ne (Get-FileHash -Path $dst -EA SilentlyContinue).Hash } catch { $needsCopy = $true } }
     if ($needsCopy) { if ($DryRun) { Write-Host "  [dry-run] $($script.Name)" -Fore Yellow } else { Copy-Item -LiteralPath $script.FullName -Destination $dst -Force; Write-Host "  [copied] $($script.Name)" -Fore Green }; $scriptsCopied++ }
 }
 Write-Host "  Scripts: $scriptsCopied/$scriptsTotal" -Fore Green

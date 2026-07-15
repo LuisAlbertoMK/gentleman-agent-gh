@@ -21,27 +21,26 @@ EXEMPT from §A Skill combo (uses Q&A load: karpathy-loop + lean-context).
 ## PROCESS
 0. **Project-mapper**: detect stack (lenguajes, frameworks, DB, infra) via skill `project-mapper`.
 0.5. **Wisdom injection**: `. "$env:GENTLEMAN_AGENT_ROOT\scripts\bash-safe.ps1"; & "$env:GENTLEMAN_AGENT_ROOT\scripts\wisdom-loader.ps1" -Technology "<stack>"` → add matching patterns as "known gotchas" to sub-agent briefings.
-1. **Smart selection**: segun stack, choose 6 specialists from 7 available (FREE TIER):
-   - security (nemotron-3-ultra-free) <-> infra (deepseek-v4-flash-free) <-> frontend (kimi-k2.5-free)
-   - performance (nemotron-3-ultra-free) <-> datascience (mimo-v2.5-free) <-> docs (big-pickle)
-   - seo (nemotron-3-super-free) — only if project is public site
-   - Auto-exclude irrelevant specialists (e.g: frontend in backend-only, SEO in API)
-2. Load karpathy-loop + lean-context.
-3. Parallel analysis: 6 subagents + 1 web research. Each subagent returns 4-field contract (Decision Taken | Files Changed | Key Findings | Nuance).
-4. **Perspective validation**: Verify ALL 8 mandatory dimensions covered. Missing → FAIL, do not generate plan:
+1. **Smart selection**: pick 6 of 7 specialists per stack (FREE TIER), auto-exclude irrelevant:
+   - security=nemotron-3-ultra-free · infra=deepseek-v4-flash-free · frontend=kimi-k2.5-free
+   - performance=nemotron-3-ultra-free · datascience=mimo-v2.5-free · docs=big-pickle
+   - seo=nemotron-3-super-free (public sites only)
+2. Load karpathy-loop + lean-context. Parallel: 6 subagents + 1 web research.
+3. Each subagent returns: `Decision Taken | Files Changed | Key Findings | Nuance`.
+4. **Perspective validation** — ALL 8 mandatory dimensions or FAIL:
 
-| # | Dimension | Subagent | Validates |
-|---|-----------|----------|-----------|
-| 1 | Security | security | Auth, injection, secrets, vulns, compliance |
-| 2 | Performance | performance | Load time, latency, N+1, cache, bundle |
-| 3 | UX | frontend | Flows, a11y, design system, touch targets |
-| 4 | Infra | infra | Docker, scaling, DR, CI/CD, monitoring |
-| 5 | Data | datascience | DB schema, queries, pipelines, integrity |
-| 6 | Architecture | main agent | Coupling, patterns, tech debt, modularity |
-| 7 | DX | docs | Dev experience, docs, onboarding, tooling |
-| 8 | Business | main agent | Roadmap alignment, priorities, ROI |
+| # | Dim | Agent | Scope |
+|---|-----|-------|-------|
+| 1 | Security | security | Auth, injection, secrets, vulns |
+| 2 | Performance | performance | Load, latency, N+1, cache, bundle |
+| 3 | UX | frontend | Flows, a11y, design system |
+| 4 | Infra | infra | Docker, scaling, DR, CI/CD |
+| 5 | Data | datascience | DB schema, queries, pipelines |
+| 6 | Architecture | main | Coupling, patterns, tech debt |
+| 7 | DX | docs | Docs, onboarding, tooling |
+| 8 | Business | main | Roadmap, priorities, ROI |
 
-5. Synthesize into plan: consensos, divergencias, fundamentos, risk score per finding.
+5. Synthesize: consensos, divergencias, fundamentos, risk score per finding.
 
 ## OUTPUT
 - **Location**: `docs/mejoras/YYYY-MM-DD-<project-name>-analisis.md`
