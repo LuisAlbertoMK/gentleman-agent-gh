@@ -37,6 +37,7 @@ param(
 Set-StrictMode -Version Latest
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot "lib" "platform.ps1")
 
 # ── Helpers ─────────────────────────────────────────────────────────
 function info  { Write-Host "==> " -ForegroundColor Cyan -NoNewline; Write-Host "$args" }
@@ -148,7 +149,7 @@ if (-not $SkipShortcuts) {
 
 # ── Step 5: Global opencode config ─────────────────────────────────
 info "Syncing global opencode config from repo"
-$globalConfigPath = "$env:USERPROFILE\.config\opencode\opencode.json"
+$globalConfigPath = Join-Path (Get-GlobalConfigDir) "opencode.json"
 $repoConfigPath = Join-Path $RepoDir "opencode.json"
 if ((Test-Path $globalConfigPath) -and (Test-Path $repoConfigPath)) {
     $globalConfig = Get-Content $globalConfigPath -Raw | ConvertFrom-Json
@@ -180,7 +181,7 @@ if ((Test-Path $globalConfigPath) -and (Test-Path $repoConfigPath)) {
 
 # ── Step 6: Global skill config ────────────────────────────────────
 info "Setting up global skill config"
-$globalSkillsDir = "$env:USERPROFILE\.config\opencode\skills"
+$globalSkillsDir = Join-Path (Get-GlobalConfigDir) "skills"
 $repoSkillsDir = Join-Path $RepoDir ".agents\skills"
 if (-not (Test-Path $globalSkillsDir)) {
     New-Item -ItemType Directory -Path $globalSkillsDir -Force | Out-Null
@@ -188,7 +189,7 @@ if (-not (Test-Path $globalSkillsDir)) {
 # Check junction or directory exists
 if (-not (Test-Path "$globalSkillsDir\_shared")) {
     # Create junction to repo skills
-    New-Item -ItemType Junction -Path "$globalSkillsDir" -Target $repoSkillsDir -Force 2>$null
+    New-CrossPlatLink -Path "$globalSkillsDir" -Target $repoSkillsDir
     if ($?) { ok "Skills junction created at $globalSkillsDir" }
     else { warn "Could not create junction (needs admin/elevation). Copy skills manually." }
 } else {
@@ -200,7 +201,7 @@ if (-not (Test-Path "$globalSkillsDir\_shared")) {
 # definitions synced in Step 4. Those resolve relative to the global config dir,
 # so we need the prompts directory there too.
 info "Setting up global prompts junction"
-$globalPromptsDir = "$env:USERPROFILE\.config\opencode\prompts"
+$globalPromptsDir = Join-Path (Get-GlobalConfigDir) "prompts"
 $repoSddDir = Join-Path $RepoDir "prompts\sdd"
 if (Test-Path $repoSddDir) {
     $sddJunction = "$globalPromptsDir\sdd"
@@ -208,7 +209,7 @@ if (Test-Path $repoSddDir) {
         if (-not (Test-Path $globalPromptsDir)) {
             New-Item -ItemType Directory -Path $globalPromptsDir -Force | Out-Null
         }
-        New-Item -ItemType Junction -Path $sddJunction -Target $repoSddDir -Force 2>$null
+        New-CrossPlatLink -Path $sddJunction -Target $repoSddDir
         if ($?) { ok "Prompts junction created at $sddJunction" }
         else { warn "Could not create prompts junction. Copy prompts manually: Copy-Item '$repoSddDir' '$sddJunction' -Recurse" }
     } else {
@@ -220,7 +221,7 @@ if (Test-Path $repoSddDir) {
 
 # ── Step 6c: Global AGENTS.md ──────────────────────────────────────
 # {file:AGENTS.md} in gentleman-vMK agent prompt resolves relative to global config
-$globalAgentsMd = "$env:USERPROFILE\.config\opencode\AGENTS.md"
+$globalAgentsMd = Join-Path (Get-GlobalConfigDir) "AGENTS.md"
 $repoAgentsMd = Join-Path $RepoDir "AGENTS.md"
 if (Test-Path $repoAgentsMd) {
     if (-not (Test-Path $globalAgentsMd)) {
@@ -339,7 +340,7 @@ if (-not $SkipVision) {
     }
 
     # Pull moondream model (1.7GB, vision analysis)
-    $ollamaExe = if ($ollamaCmd) { $ollamaCmd.Source } else { "$env:USERPROFILE\scoop\apps\ollama\current\ollama.exe" }
+    $ollamaExe = if ($ollamaCmd) { $ollamaCmd.Source } else { Join-Path $HOME "scoop" "apps" "ollama" "current" "ollama.exe" }
     if (Test-Path $ollamaExe) {
         $models = & $ollamaExe list 2>$null
         if ($models -notmatch "moondream") {

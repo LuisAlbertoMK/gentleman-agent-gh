@@ -47,6 +47,7 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot "lib" "platform.ps1")
 
 # ── Load GENTLEMAN_AGENT_ROOT from User env if not in session ────────
 if (-not $env:GENTLEMAN_AGENT_ROOT) {
@@ -55,7 +56,7 @@ if (-not $env:GENTLEMAN_AGENT_ROOT) {
 }
 
 # ── Paths ────────────────────────────────────────────────────────────
-$globalCfgDir   = "$env:USERPROFILE\.config\opencode"
+$globalCfgDir   = Get-GlobalConfigDir
 $globalCfgFile  = "$globalCfgDir\opencode.json"
 $globalSkills   = "$globalCfgDir\skills"
 $projectCfgFile = "$TargetDir\opencode.json"

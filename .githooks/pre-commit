@@ -10,6 +10,16 @@ REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
 # Escape single quotes for PowerShell -Command blocks
 REPO_ROOT_ESC=$(echo "$REPO_ROOT" | sed "s/'/''/g")
 
+# Detect PowerShell 7 (cross-platform)
+if command -v pwsh >/dev/null 2>&1; then
+  PWSH="pwsh"
+elif command -v $PWSH >/dev/null 2>&1; then
+  PWSH="$PWSH"
+else
+  echo "ERROR: PowerShell 7 (pwsh) not found"
+  exit 1
+fi
+
 CHECKS_PASSED=0
 CHECKS_FAILED=0
 
@@ -62,7 +72,7 @@ CHECKS_PASSED=$((CHECKS_PASSED + 1))
 echo "[3/10] Cross-ref check..."
 STAGED_SKILLS=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.agents/skills/' | head -3)
 if [ -n "$STAGED_SKILLS" ]; then
-  pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/cross-ref-check.ps1" 2>&1
+  $PWSH -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/cross-ref-check.ps1" 2>&1
   if [ $? -eq 0 ]; then
     green "  OK"
     CHECKS_PASSED=$((CHECKS_PASSED + 1))
@@ -78,7 +88,7 @@ fi
 # --- [4/10] Skill drift check on skill changes ---
 echo "[4/10] Skill drift..."
 if [ -n "$STAGED_SKILLS" ]; then
-  pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/check-skill-drift.ps1" 2>&1
+  $PWSH -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/check-skill-drift.ps1" 2>&1
   if [ $? -eq 0 ]; then
     green "  OK"
     CHECKS_PASSED=$((CHECKS_PASSED + 1))
@@ -93,7 +103,7 @@ fi
 
 # --- [5/10] Improvement cycle assessment ---
 echo "[5/10] Improvement cycle..."
-OVERWEIGHT_SKILLS=$(pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command "
+OVERWEIGHT_SKILLS=$($PWSH -NoProfile -ExecutionPolicy Bypass -Command "
   \$canonical = '$REPO_ROOT_ESC/.agents/skills'
   if (-not (Test-Path \$canonical)) { exit 0 }
   Get-ChildItem \$canonical -Directory | Where-Object { \$_.Name -ne '_shared' } | ForEach-Object {
@@ -121,7 +131,7 @@ fi
 echo "[6/10] .project.json integrity..."
 STAGED_PROJECT_JSON=$(git diff --cached --name-only --diff-filter=ACM | grep '\.project\.json$')
 if [ -n "$STAGED_PROJECT_JSON" ]; then
-  POWERSHELL_OUT=$(pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command "
+  POWERSHELL_OUT=$($PWSH -NoProfile -ExecutionPolicy Bypass -Command "
     \$json = Get-Content '$REPO_ROOT/.project.json' -Raw -Encoding UTF8 | ConvertFrom-Json
     \$dims = \$json.score.dimensions.PSObject.Properties.Name.Count
     \$current = \$json.score.current
@@ -145,7 +155,7 @@ fi
 echo "[7/10] review-rules.jsonc integrity..."
 STAGED_RULES=$(git diff --cached --name-only --diff-filter=ACM | grep 'review-rules\.jsonc$')
 if [ -n "$STAGED_RULES" ]; then
-  RULES_VALID=$(pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command "
+  RULES_VALID=$($PWSH -NoProfile -ExecutionPolicy Bypass -Command "
     try {
       \$json = Get-Content '$REPO_ROOT/review-rules.jsonc' -Raw -Encoding UTF8
       \$parsed = \$json -replace '(?m)^\s*//.*$','' -replace '(?m)\s*//[^\"\n]*$','' -replace '(?s)/\*.*?\*/','' | ConvertFrom-Json
@@ -182,7 +192,7 @@ fi
 echo "[8/10] Benchmark check..."
 STAGED_AGENTS=$(git diff --cached --name-only --diff-filter=ACM | grep -E 'AGENTS\.md|\.agents/skills/')
 if [ -n "$STAGED_AGENTS" ]; then
-  BENCHMARK_OUT=$(pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/benchmark.ps1" -Gate 2>&1)
+  BENCHMARK_OUT=$($PWSH -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/benchmark.ps1" -Gate 2>&1)
   if echo "$BENCHMARK_OUT" | grep -q "REGRESSIONS"; then
     yellow "  WARN — benchmark regressions detected:"
     echo "$BENCHMARK_OUT" | while read -r line; do echo "    $line"; done
@@ -212,7 +222,7 @@ fi
 
 # --- [10/10] Secrets scan on staged diff ---
 echo "[10/10] Secrets scan..."
-STAGED_SECRETS=$(git diff --cached --diff-filter=ACM -- ':!.githooks' ':!*.tests.ps1' ':!scripts/check-mcp-security.ps1' ':!.agents/skills/*/references/*' 2>/dev/null | pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command "
+STAGED_SECRETS=$(git diff --cached --diff-filter=ACM -- ':!.githooks' ':!*.tests.ps1' ':!scripts/check-mcp-security.ps1' ':!.agents/skills/*/references/*' 2>/dev/null | $PWSH -NoProfile -ExecutionPolicy Bypass -Command "
   \$input | Select-String -Pattern '^\+[^\+]' | ForEach-Object { \$_.Line.Substring(1) } | Select-String -Pattern '(ghp_|gho_|github_pat_|AKIA|ctx7sk_|-----BEGIN\s+(RSA|EC|DSA|PRIVATE)\s+KEY|GH_TOKEN\s*=|GITHUB_TOKEN\s*=|password\s*=|api[_-]?key\s*=|secret\s*=|token\s*=)' -CaseSensitive 2>\$null | ForEach-Object {
     \$line = \$_.Line.Trim()
     if (\$line.Length -gt 80) { \$line = \$line.Substring(0, 77) + '...' }
@@ -242,7 +252,7 @@ else
 fi
 
 # --- Capture gate result to error tracking (non-blocking, silent) ---
-pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/capture-errors.ps1" -Source quality-gate -Passed $CHECKS_PASSED -Failed $CHECKS_FAILED -Blocked $BLOCKED > /dev/null 2>&1
+$PWSH -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/capture-errors.ps1" -Source quality-gate -Passed $CHECKS_PASSED -Failed $CHECKS_FAILED -Blocked $BLOCKED > /dev/null 2>&1
 
 if [ "$BLOCKED" = "yes" ]; then
   exit 1

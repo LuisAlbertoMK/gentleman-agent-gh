@@ -166,7 +166,7 @@ $maturity = "unknown"
 if ($gitLog) {
     try {
         $gitDir = Join-Path $resolved ".git"
-        $firstCommit = & "git.exe" "--git-dir=$gitDir" "--work-tree=$resolved" "log" "--reverse" "--format=%ci" "HEAD" 2>$null | Select-Object -First 1
+        $firstCommit = & "git" "--git-dir=$gitDir" "--work-tree=$resolved" "log" "--reverse" "--format=%ci" "HEAD" 2>$null | Select-Object -First 1
         if ($firstCommit) {
             $age = [datetime]::UtcNow - [datetime]::ParseExact($firstCommit.Substring(0,10), "yyyy-MM-dd", $null)
             $maturity = if ($age.TotalDays -gt 1095) { "established" }

@@ -15,7 +15,9 @@ param([switch]$Json, [switch]$Force)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-. "$env:USERPROFILE\.config\opencode\scripts\bash-safe.ps1"
+# Cross-platform config dir
+$globalConfig = if ($IsLinux -or $IsMacOS) { Join-Path $HOME ".config" "opencode" } else { Join-Path $env:USERPROFILE ".config" "opencode" }
+. (Join-Path $globalConfig "scripts" "bash-safe.ps1")
 
 $RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $script:passed = 0

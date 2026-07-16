@@ -1,13 +1,14 @@
 ﻿#requires -Version 7.6
 <#.SYNOPSIS Benchmark system — score skill fitness, system health, track trends.#>param([switch]$Snapshot,[switch]$Gate,[switch]$Json)
 $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot "lib" "platform.ps1")
 $r=Convert-Path "$PSScriptRoot\.."
 $cd="$r\.agents\skills";$am="$r\AGENTS.md";$sd="$r\scripts";$sn="$r\docs\metricas\snapshots"
 $sk=@(Get-ChildItem $cd -Directory).PSWhere({$_.Name -ne '_shared'}).PSForEach({$m="$($_.FullName)\SKILL.md";if(!(test-path $m)){return};$c=Get-Content $m -Raw;@{Name=$_.Name;Bytes=$c.Length;Lines=($c-split"`n").Count;F=$c-match"^---";W=$c-match"(?m)^## When to Use";R=$c-match"(?m)^## (Rules|Critical Rules)"}})
 $ac=if(test-path $am){Get-Content $am -Raw}else{""}
 $sc=Get-ChildItem $sd -Filter *.ps1 -EA 0
-$gd="$env:USERPROFILE\.config\opencode\skills";$jo=0
-foreach($i in $sk){$it=Get-Item "$gd\$($i.Name)"-EA 0;if($it -and $it.LinkType -eq "Junction"){$jo++}}
+$gd=Join-Path (Get-GlobalConfigDir) "skills";$jo=0
+foreach($i in $sk){$it=Get-Item "$gd\$($i.Name)"-EA 0;if($it -and $it.LinkType -in @("Junction", "SymbolicLink")){$jo++}}
 $ab=($sk.PSForEach({$_.Bytes}) | Measure-Object -Sum).Sum;$al=($sk.PSForEach({$_.Lines}) | Measure-Object -Sum).Sum
 $o3=$sk.PSWhere({$_.Bytes -gt 3072}).Count;$sb=@($sk.PSForEach({$_.Bytes}) | Sort-Object);$ct=$sb.Count
 $md=if($ct-gt0){if($ct%2-eq1){$sb[($ct-1)/2]}else{[math]::Round(($sb[$ct/2-1]+$sb[$ct/2])/2)}}else{0}

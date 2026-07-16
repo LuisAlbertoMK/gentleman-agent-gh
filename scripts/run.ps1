@@ -3,6 +3,7 @@
 Set-StrictMode -Version Latest
 param([switch]$Quiet,[string[]]$Args)
 $ErrorActionPreference = 'Continue'
+. (Join-Path $PSScriptRoot "lib" "platform.ps1")
 <#
 .SYNOPSIS
     Universal runner — discover GENTLEMAN_AGENT_ROOT and invoke a repo script.
@@ -16,8 +17,8 @@ $ErrorActionPreference = 'Continue'
     No PS Profile dependency.
 
 .EXAMPLE
-    & "$env:USERPROFILE\.config\opencode\scripts\run.ps1" check-skill-drift.ps1 -Json
-    & "$env:USERPROFILE\.config\opencode\scripts\run.ps1" close-session.ps1
+    & "~/.config/opencode/scripts/run.ps1" check-skill-drift.ps1 -Json
+    & "~/.config/opencode/scripts/run.ps1" close-session.ps1
 #>
 $__dir = Split-Path $MyInvocation.MyCommand.Path -Parent
 $__item = Get-Item $__dir

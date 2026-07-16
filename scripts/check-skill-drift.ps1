@@ -8,6 +8,7 @@ param([switch]$Thorough,[switch]$AutoFix,[switch]$SyncAgents,[switch]$Json,[swit
 if($Quiet){$Json=$true}
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
+. (Join-Path $PSScriptRoot "lib" "platform.ps1")
 
 # ── Adaptive polling cache ─────────────────────────────────────────────
 # ponytail: unified cache
@@ -23,7 +24,7 @@ if(-not $skipCache){
 }
 
 $cd=Join-Path $PSScriptRoot "..\.agents\skills"
-$gd="$env:USERPROFILE\.config\opencode\skills"
+$gd=Join-Path (Get-GlobalConfigDir) "skills"
 $e=@();$w=@();$d=@()
 if(-not (Test-Path $cd)){Write-Error "Canonical dir not found: $cd";exit 2}
 if(-not (Test-Path $gd)){Write-Error "Global dir not found: $gd";exit 2}
@@ -34,8 +35,8 @@ foreach($s in $cs){
   if(-not (Test-Path $cp)){$e+=[PSCustomObject]@{Skill=$sn;Status="CANON_MISSING";Detail="No SKILL.md"};continue}
   $gi=Get-Item (Join-Path $gd $sn) -EA SilentlyContinue
   if(-not $gi){$e+=[PSCustomObject]@{Skill=$sn;Status="GLOBAL_MISSING";Detail="No global dir"};continue}
-  if($gi.LinkType -ne "Junction"){$w+=[PSCustomObject]@{Skill=$sn;Status="GLOBAL_NOT_JUNCTION";Detail="Real file, not junction"}}
-  if($gi.LinkType -ne "Junction"){
+  if($gi.LinkType -notin @("Junction", "SymbolicLink")){$w+=[PSCustomObject]@{Skill=$sn;Status="GLOBAL_NOT_JUNCTION";Detail="Real file, not junction"}}
+  if($gi.LinkType -notin @("Junction", "SymbolicLink")){
     if($Thorough){$m=(Get-FileHash $cp).Hash -eq (Get-FileHash (Join-Path $gd "$sn\SKILL.md")).Hash}
     else{$cl=([IO.File]::ReadAllText($cp) -split "`n").Count;$gl=([IO.File]::ReadAllText((Join-Path $gd "$sn\SKILL.md")) -split "`n").Count;$m=$cl -eq $gl}
     if(-not $m){$d+=[PSCustomObject]@{Skill=$sn;Status="DRIFT";Detail=if($Thorough){"Hash mismatch"}else{"Lines: canon=$cl glob=$gl"}}}
@@ -47,16 +48,16 @@ if($AutoFix){
     if(-not $Quiet){Write-Output "Creating $($fix.Count) junctions..."}
     foreach($x in $fix){
       $t=Join-Path $cd $x.Skill;$l=Join-Path $gd $x.Skill
-      try{New-Item -ItemType Junction -Path $l -Target $t -Force | Out-Null;if(-not $Quiet){Write-Output "  $l -> $t"}}catch{Write-Warning "FAIL $l ($($_.Exception.Message))"}
+      try{New-CrossPlatLink -Path $l -Target $t;if(-not $Quiet){Write-Output "  $l -> $t"}}catch{Write-Warning "FAIL $l ($($_.Exception.Message))"}
     }
     $e=$e.PSWhere({$_ -and $_.Status -ne "GLOBAL_MISSING"})
   }
-  $gsd="$env:USERPROFILE\.config\opencode\scripts"
+  $gsd=Join-Path (Get-GlobalConfigDir) "scripts"
   $rsd=Join-Path $PSScriptRoot "."
-  if(-not (Test-Path $gsd)){if(-not $Quiet){Write-Output "Creating scripts junction..."};try{New-Item -ItemType Junction -Path $gsd -Target $rsd -Force | Out-Null;if(-not $Quiet){Write-Output "  $gsd -> $rsd"}}catch{Write-Warning "FAIL $gsd ($($_.Exception.Message))"}}
+  if(-not (Test-Path $gsd)){if(-not $Quiet){Write-Output "Creating scripts junction..."};try{New-CrossPlatLink -Path $gsd -Target $rsd;if(-not $Quiet){Write-Output "  $gsd -> $rsd"}}catch{Write-Warning "FAIL $gsd ($($_.Exception.Message))"}}
 }
-$junctionSkills=$cs.PSWhere({$g=Get-Item (Join-Path $gd $_.Name) -EA SilentlyContinue;$g -and $g.LinkType -eq "Junction"}).Count
-$realFileSkills=$cs.PSWhere({$g=Get-Item (Join-Path $gd $_.Name) -EA SilentlyContinue;$g -and $g.LinkType -ne "Junction"}).Count
+$junctionSkills=$cs.PSWhere({$g=Get-Item (Join-Path $gd $_.Name) -EA SilentlyContinue;$g -and $g.LinkType -in @("Junction", "SymbolicLink")}).Count
+$realFileSkills=$cs.PSWhere({$g=Get-Item (Join-Path $gd $_.Name) -EA SilentlyContinue;$g -and $g.LinkType -notin @("Junction", "SymbolicLink")}).Count
 $r=@{
   timestamp=(Get-Date -Format "o")
   totalSkills=$cs.Count
@@ -91,7 +92,7 @@ function Sync-AgentDefinition{
   Sync gentleman-* agent definitions + AGENTS.md from project to global config.
   Project opencode.json is canonical source; global config gets a copy for cross-project availability.
 #>
-  $pcp=Join-Path $PSScriptRoot "..\opencode.json";$gcp="$env:USERPROFILE\.config\opencode\opencode.json"
+  $pcp=Join-Path $PSScriptRoot "..\opencode.json";$gcp=Join-Path (Get-GlobalConfigDir) "opencode.json"
   $an=@("gentleman-vMK","gentleman-deep","gentleman-codex","gentleman-quick")
   $sr=@{synced=@();skipped=@()}
   if(-not $Quiet){Write-Output "--- Syncing agents (project -> global) ---"}

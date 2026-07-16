@@ -11,12 +11,13 @@
 #>
 param([switch]$DryRun,[switch]$Force,[switch]$NoAgentSync,[switch]$Json,[switch]$NoAgentsMd)
 $ErrorActionPreference = "Stop"; Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot "lib" "platform.ps1")
 
 $srcSkills = Resolve-Path "$PSScriptRoot\..\.agents\skills" -EA Stop
-$dstSkills = "$env:USERPROFILE\.config\opencode\skills"
+$dstSkills = Join-Path (Get-GlobalConfigDir) "skills"
 $srcScripts = Resolve-Path "$PSScriptRoot" -EA Stop
-$dstScripts = "$env:USERPROFILE\.config\opencode\scripts"
-$globalCfg = "$env:USERPROFILE\.config\opencode\opencode.jsonc"
+$dstScripts = Join-Path (Get-GlobalConfigDir) "scripts"
+$globalCfg = Join-Path (Get-GlobalConfigDir) "opencode.jsonc"
 $projectCfg = Resolve-Path "$PSScriptRoot\..\opencode.json" -EA Stop
 $report = @{timestamp=(Get-Date -Format "o");steps=@{};errors=@();warnings=@()}
 
@@ -25,13 +26,13 @@ function Write-Step([string]$N,[scriptblock]$B) { if($DryRun){Write-Host "[dry-r
 # Step 1: Skill junctions
 Write-Step "Skill junctions" {
     if (-not (Test-Path $dstSkills)) { New-Item -ItemType Directory -Path $dstSkills -Force | Out-Null }
-    $count=0;$total=0; foreach ($skill in Get-ChildItem -Directory -Path $srcSkills) { $total++;$link=Join-Path $dstSkills $skill.Name; if(-not(Test-Path $link)){New-Item -ItemType Junction -Path $link -Target $skill.FullName -EA Stop | Out-Null;$count++} }
+    $count=0;$total=0; foreach ($skill in Get-ChildItem -Directory -Path $srcSkills) { $total++;$link=Join-Path $dstSkills $skill.Name; if(-not(Test-Path $link)){New-CrossPlatLink -Path $link -Target $skill.FullName;$count++} }
     Write-Host "  $count new junctions (total: $total)" -Fore Green; $report.steps["skill_junctions"]=@{created=$count;total=$total}
 }
 
 # Step 2: Scripts junction
 Write-Step "Scripts junction" {
-    if (-not (Test-Path $dstScripts)) { New-Item -ItemType Junction -Path $dstScripts -Target $srcScripts -EA Stop | Out-Null; Write-Host "  Created" -Fore Green } else { Write-Host "  Exists" -Fore Yellow }
+    if (-not (Test-Path $dstScripts)) { New-CrossPlatLink -Path $dstScripts -Target $srcScripts; Write-Host "  Created" -Fore Green } else { Write-Host "  Exists" -Fore Yellow }
 }
 
 # Step 3: Global config (MCPs + permissions + agents)

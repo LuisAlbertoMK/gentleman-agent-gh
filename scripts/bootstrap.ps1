@@ -1,29 +1,28 @@
 ﻿#requires -Version 7.6
 <#
 .SYNOPSIS
-    Gentleman Agent — Windows bootstrap entry point
+    Gentleman Agent — bootstrap entry point (cross-platform).
 .DESCRIPTION
-    Clones the repo and runs install.ps1. Supports both curl|powershell one-liner
-    and local execution.
+    Clones the repo and runs install.ps1. Supports Windows, Linux, and macOS.
 .PARAMETER RepoUrl
-    Override repository URL (default: https://github.com/anomalco/opencode.git)
+    Override repository URL (default: https://github.com/Gentleman-Programming/gentleman-agent-gh.git)
 .PARAMETER Branch
     Override git branch (default: master)
 .PARAMETER InstallDir
-    Override install directory (default: $env:LOCALAPPDATA\gentleman-agent)
+    Override install directory (default: platform-specific)
 .PARAMETER Update
     Update existing installation instead of fresh clone
 .EXAMPLE
-    iex "& { $(irm https://gentleman.sh/install.ps1) }"
+    .\scripts\bootstrap.ps1
 .EXAMPLE
     .\scripts\bootstrap.ps1 -Update
 .NOTES
-    Auto-detects scoop/choco for dependency installation.
+    Auto-detects package managers: scoop/choco (Windows), apt/brew (Linux/macOS).
 #>
 param(
-    [string]$RepoUrl = "https://github.com/anomalco/opencode.git",
+    [string]$RepoUrl = "https://github.com/Gentleman-Programming/gentleman-agent-gh.git",
     [string]$Branch = "master",
-    [string]$InstallDir = "$env:LOCALAPPDATA\gentleman-agent",
+    [string]$InstallDir = $(if ($IsLinux -or $IsMacOS) { Join-Path $HOME ".local" "gentleman-agent" } else { Join-Path $env:LOCALAPPDATA "gentleman-agent" }),
     [switch]$Update
 )
 
@@ -36,7 +35,7 @@ function ok    { Write-Host "[ok] " -ForegroundColor Green -NoNewline; Write-Hos
 function warn  { Write-Host "[warn] " -ForegroundColor Yellow -NoNewline; Write-Host "$args" }
 function err   { Write-Host "[err] " -ForegroundColor Red -NoNewline; Write-Host "$args"; exit 1 }
 
-info "Gentleman Agent Bootstrap v1.0.0 (Windows)"
+info "Gentleman Agent Bootstrap v1.0.0"
 
 # ── Check Git ─────────────────────────────────────────────────────
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
@@ -45,8 +44,12 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
         & scoop install git 2>$null; if (-not $?) { err "scoop install git failed" }
     } elseif (Get-Command choco -ErrorAction SilentlyContinue) {
         & choco install git -y 2>$null; if (-not $?) { err "choco install git failed" }
+    } elseif (Get-Command apt -ErrorAction SilentlyContinue) {
+        & sudo apt install -y git 2>$null; if (-not $?) { err "apt install git failed" }
+    } elseif (Get-Command brew -ErrorAction SilentlyContinue) {
+        & brew install git 2>$null; if (-not $?) { err "brew install git failed" }
     } else {
-        err "Install Git for Windows from https://git-scm.com/download/win, then re-run."
+        err "Install Git from https://git-scm.com/downloads, then re-run."
     }
 }
 

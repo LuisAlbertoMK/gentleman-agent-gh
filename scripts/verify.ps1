@@ -10,6 +10,7 @@ param(
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
+. (Join-Path $PSScriptRoot "lib" "platform.ps1")
 $r=@{profile=$ProfileName;checks=@();passed=0;failed=0;errors=@()}
 if($Quiet){$Json=$true}
 function Add-Check{
@@ -77,7 +78,7 @@ function Invoke-E2Checks{
 }
 function Invoke-E3Checks{
     $cd=Join-Path $Root '.agents\skills'
-    $gd="$env:USERPROFILE\.config\opencode\skills"
+    $gd=Join-Path (Get-GlobalConfigDir) "skills"
     $sb_mj = [System.Text.StringBuilder]::new(65536)
     if((Test-Path $cd)-and(Test-Path $gd)){
         Get-ChildItem $cd -Directory | Where-Object {$_.Name -ne '_shared'} | ForEach-Object {

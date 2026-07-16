@@ -4,11 +4,12 @@
     Benchmark comparativo: backup pre-sprint3 vs gentleman-agent-gh (actual)
 #>
 param(
-  [string]$BDir = "$env:USERPROFILE\.config\opencode\.bak\pre-sprint3-apply-20260607-005330",
+  [string]$BDir = (Join-Path $HOME ".config" "opencode" ".bak" "pre-sprint3-apply-20260607-005330"),
   [string]$RDir = "$PSScriptRoot\.."
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot "lib" "platform.ps1")
 $RDir = (Resolve-Path $RDir).Path
 try {
 function Get-Line { param($P) try { if (test-path $P) { (Get-Content $P -EA Stop | Measure-Object -Line).Lines } else { 0 } } catch { Write-Warning "GL $($P): $_"; 0 } }
@@ -16,7 +17,7 @@ function Get-Byte { param($P) try { if (test-path $P) { (Get-Item $P -EA Stop).L
 Write-Host "<<< AGENTS.md 3-way >>>"
 $bA = Join-Path $BDir "AGENTS.md"
 $rA = Join-Path $RDir "AGENTS.md"
-$gA = "$env:USERPROFILE\.config\opencode\AGENTS.md"
+$gA = Join-Path (Get-GlobalConfigDir) "AGENTS.md"
 Write-Host ("  vMK (Go): ?L")
 Write-Host ("  Backup: " + (Get-Line $bA) + "L, " + (Get-Byte $bA) + "B")
 Write-Host ("  Repo:   " + (Get-Line $rA) + "L, " + (Get-Byte $rA) + "B")

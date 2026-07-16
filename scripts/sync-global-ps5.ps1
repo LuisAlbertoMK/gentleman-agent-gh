@@ -8,12 +8,13 @@
 #>
 param([switch]$DryRun)
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot "lib" "platform.ps1")
 $repoRoot = Resolve-Path "$PSScriptRoot\.." -ErrorAction Stop
 $srcSkills = Join-Path $repoRoot ".agents\skills"
 $srcScripts = Join-Path $repoRoot "scripts"
-$dstSkills = "$env:USERPROFILE\.config\opencode\skills"
-$dstScripts = "$env:USERPROFILE\.config\opencode\scripts"
-$globalCfg = "$env:USERPROFILE\.config\opencode"
+$dstSkills = Join-Path (Get-GlobalConfigDir) "skills"
+$dstScripts = Join-Path (Get-GlobalConfigDir) "scripts"
+$globalCfg = Get-GlobalConfigDir
 
 function Sync-DirectoryFiles { param([string]$SrcDir,[string]$DstDir,[switch]$IsDryRun,[ref]$Count)
     if (-not (Test-Path $DstDir)) { New-Item -ItemType Directory -Path $DstDir -Force | Out-Null }
@@ -43,7 +44,7 @@ $skillsCreated = 0; $skillsTotal = 0
 foreach ($skill in Get-ChildItem -Directory -Path $srcSkills) {
     $skillsTotal++; $link = Join-Path $dstSkills $skill.Name
     if (-not (Test-Path $link)) {
-        if ($DryRun) { Write-Host "  [dry-run] junction: $($skill.Name)" -Fore Yellow } else { New-Item -ItemType Junction -Path $link -Target $skill.FullName -EA Stop | Out-Null; Write-Host "  [created] $($skill.Name)" -Fore Green }
+        if ($DryRun) { Write-Host "  [dry-run] junction: $($skill.Name)" -Fore Yellow } else { New-CrossPlatLink -Path $link -Target $skill.FullName; Write-Host "  [created] $($skill.Name)" -Fore Green }
         $skillsCreated++
     }
 }
