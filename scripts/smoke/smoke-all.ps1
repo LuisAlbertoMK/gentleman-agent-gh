@@ -64,7 +64,7 @@ function Compute-SmokeHash {
 $currentHash = Compute-SmokeHash
 $cached = $null
 if (-not $Force -and (Test-Path $CachePath)) {
-    try { $cached = Get-Content $CachePath -Raw | ConvertFrom-Json } catch {}
+    try { $cached = Get-Content $CachePath -Raw | ConvertFrom-Json } catch { Write-Debug "Cache read failed: $_" }
 }
 
 if ($cached -and $cached.hash -eq $currentHash) {

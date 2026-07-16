@@ -126,7 +126,7 @@ $dockerOk = $false
 try {
     $null = docker ps 2>&1
     if ($LASTEXITCODE -eq 0) { $dockerOk = $true }
-} catch { }
+} catch { Write-Debug "Docker check failed: $_" }
 
 if ($dockerOk) {
     if(-not $Quiet) { Write-Host "🔍 [Docker] Scanning skills with SkillSpector (static only)..." }

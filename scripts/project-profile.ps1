@@ -100,7 +100,7 @@ elseif (Get-File "go.mod") {
     try {
         $gomod = Get-Content (Get-File "go.mod") -TotalCount 1
         if ($gomod -match '^module\s+(\S+)') { $frameworks += $Matches[1] }
-    } catch {}
+    } catch { Write-Debug "go.mod parse failed: $_" }
 }
 
 # Python
@@ -157,7 +157,7 @@ $fileCount = (Get-ChildItem $resolved -File -Recurse -ErrorAction SilentlyContin
 }).Count
 $loc = 0
 Get-ChildItem $resolved -File -Recurse -ErrorAction SilentlyContinue -Include *.js,*.ts,*.jsx,*.tsx,*.go,*.py,*.rs,*.cs,*.rb,*.php,*.json,*.yaml,*.yml,*.toml,*.css,*.scss,*.html,*.md,*.ps1,*.psm1 | ForEach-Object {
-    try { $loc += (Get-Content $_.FullName -ReadCount 0).Count } catch {}
+    try { $loc += (Get-Content $_.FullName -ReadCount 0).Count } catch { Write-Debug "LOC count failed for $($_.Name): $_" }
 }
 
 # ── Maturity heuristic ────────────────────────────────────────

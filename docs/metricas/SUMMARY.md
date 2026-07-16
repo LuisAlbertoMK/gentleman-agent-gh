@@ -9,13 +9,13 @@
 
 | Métrica | Valor |
 |---------|-------|
-| Skills totales | 69 |
+| Skills totales | 68 |
 | Total skill bytes | ~124,000B |
 | Skills >3KB | 0 |
 | Avg skill size | 1,800B |
-| Junctions globales OK | 69/69 |
+| Junctions globales OK | 68/68 |
 | Frontmatter coverage | 100% |
-| Scripts | 49 |
+| Scripts | 68 |
 
 ## 🚦 Quality Gate (2026-06-26)
 

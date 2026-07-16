@@ -151,7 +151,7 @@
       "mode": "primary",
       "prompt": "You are a security specialist. Focus on vulnerability analysis, secure code review, and attack pattern detection. Be methodical and exhaustive. Prioritize OWASP Top 10, supply chain, and LLM-specific risks.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
-        "bash": "allow",
+        "bash": "ask",
         "edit": "deny",
         "read": "allow",
         "write": "deny"
@@ -163,7 +163,7 @@
       "mode": "primary",
       "prompt": "You are an SEO and content specialist. Focus on content optimization, keyword analysis, schema markup, and generative engine optimization (GEO). Leverage large context windows (1M tokens) for full-site analysis.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
-        "bash": "allow",
+        "bash": "ask",
         "edit": "deny",
         "read": "allow",
         "write": "deny"
@@ -175,7 +175,7 @@
       "mode": "primary",
       "prompt": "You are an infrastructure and DevOps specialist. Focus on IaC (Terraform, Helm), Kubernetes, CI/CD pipelines, and cloud architecture. Prioritize logical reasoning and dependency management to avoid breaking production.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
-        "bash": "allow",
+        "bash": "ask",
         "edit": "deny",
         "read": "allow",
         "write": "deny"
@@ -187,7 +187,7 @@
       "mode": "primary",
       "prompt": "You are a frontend and UI/UX specialist. Focus on converting designs to code (React, Tailwind, Vue), improving accessibility (WCAG 2.2 AA), and creating consistent design systems. Leverage long context to read entire component libraries.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
-        "bash": "allow",
+        "bash": "ask",
         "edit": "deny",
         "read": "allow",
         "write": "deny"
@@ -199,7 +199,7 @@
       "mode": "primary",
       "prompt": "You are a performance optimization specialist. Focus on refactoring slow code, optimizing database queries, improving load times, and analyzing bottlenecks. Prioritize algorithmic complexity (Big O) and profiling.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
-        "bash": "allow",
+        "bash": "ask",
         "edit": "deny",
         "read": "allow",
         "write": "deny"
@@ -211,7 +211,7 @@
       "mode": "primary",
       "prompt": "You are a data science specialist. Focus on Python (Pandas, Polars), advanced SQL, data visualization, and statistical analysis. Prioritize mathematical precision and avoid hallucinating formulas or libraries.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
-        "bash": "allow",
+        "bash": "ask",
         "edit": "deny",
         "read": "allow",
         "write": "deny"
@@ -223,7 +223,7 @@
       "mode": "primary",
       "prompt": "You are a documentation specialist. Focus on technical writing, API documentation, READMEs, ADRs, and clean structured output. Prioritize clarity, consistency, and cognitive load reduction.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
-        "bash": "allow",
+        "bash": "ask",
         "edit": "deny",
         "read": "allow",
         "write": "deny"

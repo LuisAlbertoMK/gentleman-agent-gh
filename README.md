@@ -3,7 +3,7 @@
 Suite de **68 skills** (+ `_shared`) + **91 scripts PowerShell** para [OpenCode](https://github.com/sst/opencode). Diseñadas para desarrollo de software con arquitectura limpia, TDD, y verificación multi-capa.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
-> **Score**: 9.2/10 (13 dimensiones)
+> **Score**: 7.3/10 (bias-adjusted, 13 dimensiones)
 > **Skills**: 68 (+ `_shared` = 69 SKILL.md)
 > **Cycle**: 26 completado (Skill Merge & DCP Stale Detection)
 
