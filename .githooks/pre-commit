@@ -24,8 +24,8 @@ yellow(){ printf '\033[33m%s\033[0m\n' "$1"; }
 echo ""
 echo "=== Gentleman Quality Gate ==="
 
-# --- [1/9] Trailing whitespace check ---
-echo "[1/9] Trailing whitespace..."
+# --- [1/10] Trailing whitespace check ---
+echo "[1/10] Trailing whitespace..."
 WHITESPACE_FILES=$(git diff --cached --check 2>&1 | grep -E "^[^+]" | head -20)
 if [ -z "$WHITESPACE_FILES" ]; then
   green "  OK"
@@ -36,8 +36,8 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [2/9] PS7 requirement check on changed .ps1 files ---
-echo "[2/9] PS7 #requires (staged .ps1)..."
+# --- [2/10] PS7 requirement check on changed .ps1 files ---
+echo "[2/10] PS7 #requires (staged .ps1)..."
 STAGED_PS1=$(git diff --cached --name-only --diff-filter=ACM | grep '\.ps1$' | grep -v 'ps5-detect\.ps1')
 PS7_BLOCK=""
 if [ -n "$STAGED_PS1" ]; then
@@ -58,8 +58,8 @@ else
 fi
 CHECKS_PASSED=$((CHECKS_PASSED + 1))
 
-# --- [3/9] Cross-ref check on skill changes ---
-echo "[3/9] Cross-ref check..."
+# --- [3/10] Cross-ref check on skill changes ---
+echo "[3/10] Cross-ref check..."
 STAGED_SKILLS=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.agents/skills/' | head -3)
 if [ -n "$STAGED_SKILLS" ]; then
   pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/cross-ref-check.ps1" 2>&1
@@ -75,8 +75,8 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [4/9] Skill drift check on skill changes ---
-echo "[4/9] Skill drift..."
+# --- [4/10] Skill drift check on skill changes ---
+echo "[4/10] Skill drift..."
 if [ -n "$STAGED_SKILLS" ]; then
   pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/check-skill-drift.ps1" 2>&1
   if [ $? -eq 0 ]; then
@@ -91,8 +91,8 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [5/9] Improvement cycle assessment ---
-echo "[5/9] Improvement cycle..."
+# --- [5/10] Improvement cycle assessment ---
+echo "[5/10] Improvement cycle..."
 OVERWEIGHT_SKILLS=$(pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command "
   \$canonical = '$REPO_ROOT_ESC/.agents/skills'
   if (-not (Test-Path \$canonical)) { exit 0 }
@@ -117,8 +117,8 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [6/9] .project.json integrity check ---
-echo "[6/9] .project.json integrity..."
+# --- [6/10] .project.json integrity check ---
+echo "[6/10] .project.json integrity..."
 STAGED_PROJECT_JSON=$(git diff --cached --name-only --diff-filter=ACM | grep '\.project\.json$')
 if [ -n "$STAGED_PROJECT_JSON" ]; then
   POWERSHELL_OUT=$(pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command "
@@ -141,8 +141,8 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [7/9] review-rules.jsonc integrity (if changed) ---
-echo "[7/9] review-rules.jsonc integrity..."
+# --- [7/10] review-rules.jsonc integrity (if changed) ---
+echo "[7/10] review-rules.jsonc integrity..."
 STAGED_RULES=$(git diff --cached --name-only --diff-filter=ACM | grep 'review-rules\.jsonc$')
 if [ -n "$STAGED_RULES" ]; then
   RULES_VALID=$(pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command "
@@ -178,8 +178,8 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [8/9] Benchmark check (on skill or AGENTS.md changes) ---
-echo "[8/9] Benchmark check..."
+# --- [8/10] Benchmark check (on skill or AGENTS.md changes) ---
+echo "[8/10] Benchmark check..."
 STAGED_AGENTS=$(git diff --cached --name-only --diff-filter=ACM | grep -E 'AGENTS\.md|\.agents/skills/')
 if [ -n "$STAGED_AGENTS" ]; then
   BENCHMARK_OUT=$(pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/scripts/benchmark.ps1" -Gate 2>&1)
@@ -197,8 +197,8 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [9/9] JD review check (ROJA zone files) ---
-echo "[9/9] JD review check (ROJA zone)..."
+# --- [9/10] JD review check (ROJA zone files) ---
+echo "[9/10] JD review check (ROJA zone)..."
 STAGED_ROJA=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^(src/|test/|scripts/|migrations/|ci/|\.github/)' | head -10)
 if [ -n "$STAGED_ROJA" ]; then
   yellow "  WARN — ROJA zone files staged without JD dual review:"
@@ -210,8 +210,8 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [10/9] Secrets scan on staged diff ---
-echo "[10/9] Secrets scan..."
+# --- [10/10] Secrets scan on staged diff ---
+echo "[10/10] Secrets scan..."
 STAGED_SECRETS=$(git diff --cached --diff-filter=ACM -- ':!.githooks' ':!*.tests.ps1' ':!scripts/check-mcp-security.ps1' ':!.agents/skills/*/references/*' 2>/dev/null | pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command "
   \$input | Select-String -Pattern '^\+[^\+]' | ForEach-Object { \$_.Line.Substring(1) } | Select-String -Pattern '(ghp_|gho_|github_pat_|AKIA|ctx7sk_|-----BEGIN\s+(RSA|EC|DSA|PRIVATE)\s+KEY|GH_TOKEN\s*=|GITHUB_TOKEN\s*=|password\s*=|api[_-]?key\s*=|secret\s*=|token\s*=)' -CaseSensitive 2>\$null | ForEach-Object {
     \$line = \$_.Line.Trim()

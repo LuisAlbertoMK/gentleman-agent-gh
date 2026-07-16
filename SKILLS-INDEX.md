@@ -1,6 +1,6 @@
 # SKILLS INDEX
 
-> Full trigger table for all 69 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 68 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
 > **Version**: 4.2 | **Changelog**: 4.2 (+1 new: e2e-testing; count 68→69); 4.1 (+2 new: server-commands, analysis-mode; count 66→68); 4.0 (+8 missing triggers: cancel-ralph, cross-project-forge, cross-project-wisdom, engram-protocol, help, opencode-skill-creator, ralph-loop, sdd-quick; fixed 57→65 discoverable count); 3.9 (+2 new: vision-analyze, workflow-optimizer; count 63→65); 3.8 (+4 new skills: sdd-quick, visual-testing, image-pipeline, pdf-utils); 3.7 (Removed 4 redirect skills: css-layout, design-tokens, responsive-design, ui-animation); 3.6 (Merged into ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills)
@@ -97,7 +97,7 @@
 
 ## Load rule
 1. `read` this file → find trigger match → get skill name
-2. `skill` tool with name (skills.paths now registered in opencode.json — 69 skills globally discoverable)
+2. `skill` tool with name (skills.paths now registered in opencode.json — 68 skills globally discoverable)
 3. If `skill` tool fails → `read skills/{name}/SKILL.md` directly from disk
 4. If skill has assets → `read skills/{name}/references/` or `read skills/{name}/assets/` for templates
 

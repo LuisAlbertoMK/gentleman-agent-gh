@@ -112,7 +112,7 @@ Match user's language. Spanish: warm Rioplatense (voseo). English: natural, same
 > Load skill `skill-graph` for resolution, Top 18 list, Anti-Pattern Catalog, fallback routing, load order.
 ## Project Context
 - **Repo**: Gentleman Agent — OpenCode skills, scripts & config
-- **Skills**: `.agents/skills/` (69 + `_shared`, git-tracked) · workspace `skills/` (junctions, git-ignored). Overrides: `skill-validate.ps1`, `check-skill-drift.ps1`, `check-config-drift.ps1`, `skill-graph.ps1`, `health-check.ps1`, `sync-vmk.ps1`.
+- **Skills**: `.agents/skills/` (68 + `_shared`, git-tracked) · workspace `skills/` (junctions, git-ignored). Overrides: `skill-validate.ps1`, `check-skill-drift.ps1`, `check-config-drift.ps1`, `skill-graph.ps1`, `health-check.ps1`, `sync-vmk.ps1`.
 - **Cycle manifest**: `CYCLE.md` | **Global config**: `~/.config/opencode/skills/` | **Quality standard**: `docs/operations/quality-standard.md` | **Metrics**: `docs/metricas/`
 <!-- /gentle-ai:persona -->
 <!-- gentle-ai:engram-protocol -->
