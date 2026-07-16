@@ -7,8 +7,8 @@
 
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
 [ -z "$REPO_ROOT" ] && REPO_ROOT="."
-# Escape single quotes for PowerShell -Command blocks
-REPO_ROOT_ESC=$(echo "$REPO_ROOT" | sed "s/'/''/g")
+# Escape for PowerShell -Command blocks (single quotes, backticks, dollar signs)
+REPO_ROOT_ESC=$(echo "$REPO_ROOT" | sed "s/'/''/g" | sed 's/`/``/g' | sed 's/\$/`$/g')
 
 # Detect PowerShell 7 (cross-platform)
 if command -v pwsh >/dev/null 2>&1; then
@@ -48,7 +48,7 @@ fi
 
 # --- [2/10] PS7 requirement check on changed .ps1 files ---
 echo "[2/10] PS7 #requires (staged .ps1)..."
-STAGED_PS1=$(git diff --cached --name-only --diff-filter=ACM | grep '\.ps1$' | grep -v 'ps5-detect\.ps1')
+STAGED_PS1=$(git diff --cached --name-only --diff-filter=ACM | grep '\.ps1$')
 PS7_BLOCK=""
 if [ -n "$STAGED_PS1" ]; then
   MISSING=$(for f in $STAGED_PS1; do

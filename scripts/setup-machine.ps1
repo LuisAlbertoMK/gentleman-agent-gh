@@ -64,12 +64,25 @@ if (-not $SkipEnvVar) {
     # Current session
     $env:GENTLEMAN_AGENT_ROOT = $__rootDir
     # Persistent (user-level)
-    $current = [Environment]::GetEnvironmentVariable("GENTLEMAN_AGENT_ROOT", "User")
-    if ($current -ne $__rootDir) {
-        [Environment]::SetEnvironmentVariable("GENTLEMAN_AGENT_ROOT", $__rootDir, "User")
-        ok "GENTLEMAN_AGENT_ROOT set (takes effect in new shells)"
+    if ($IsLinux -or $IsMacOS) {
+        # Linux/macOS: write to shell profile
+        $profileFile = if ($IsMacOS) { "$HOME/.zshrc" } else { "$HOME/.bashrc" }
+        $exportLine = "export GENTLEMAN_AGENT_ROOT=`"$__rootDir`""
+        if (-not (Test-Path $profileFile) -or -not (Select-String -Path $profileFile -Pattern "GENTLEMAN_AGENT_ROOT" -Quiet)) {
+            Add-Content -Path $profileFile -Value "`n# Gentleman Agent`n$exportLine"
+            ok "GENTLEMAN_AGENT_ROOT added to $profileFile (restart shell to apply)"
+        } else {
+            skip "GENTLEMAN_AGENT_ROOT already in $profileFile"
+        }
     } else {
-        skip "GENTLEMAN_AGENT_ROOT already set correctly"
+        # Windows: use registry
+        $current = [Environment]::GetEnvironmentVariable("GENTLEMAN_AGENT_ROOT", "User")
+        if ($current -ne $__rootDir) {
+            [Environment]::SetEnvironmentVariable("GENTLEMAN_AGENT_ROOT", $__rootDir, "User")
+            ok "GENTLEMAN_AGENT_ROOT set (takes effect in new shells)"
+        } else {
+            skip "GENTLEMAN_AGENT_ROOT already set correctly"
+        }
     }
 } else {
     skip "GENTLEMAN_AGENT_ROOT (via -SkipEnvVar)"
@@ -293,6 +306,13 @@ if (-not $SkipMcp) {
 
             Write-Host "       Downloading v$version ($os/$arch)..."
             Invoke-WebRequest -Uri $url -OutFile $archive -UseBasicParsing
+
+            # Verify download integrity (basic check)
+            $fileInfo = Get-Item $archive
+            if ($fileInfo.Length -lt 1MB) {
+                throw "Downloaded file too small ($($fileInfo.Length) bytes) — likely corrupted"
+            }
+            # TODO: Add SHA256 verification when release provides checksums
 
             if ($os -eq "windows") {
                 Expand-Archive -Path $archive -DestinationPath $tmpDir -Force

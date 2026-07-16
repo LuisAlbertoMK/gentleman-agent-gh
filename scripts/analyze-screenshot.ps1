@@ -62,18 +62,40 @@ if (-not $ImagePath -or -not (Test-Path $ImagePath)) {
     $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
     $ImagePath = Join-Path $tempDir "screenshot_$timestamp.png"
 
-    # Use .NET Screen Capture
-    Add-Type -AssemblyName System.Windows.Forms
-    Add-Type -AssemblyName System.Drawing
+    if ($IsWindows) {
+        # Use .NET Screen Capture (Windows only)
+        Add-Type -AssemblyName System.Windows.Forms
+        Add-Type -AssemblyName System.Drawing
 
-    $screen = [System.Windows.Forms.Screen]::PrimaryScreen
-    $bounds = $screen.Bounds
-    $bitmap = New-Object System.Drawing.Bitmap($bounds.Width, $bounds.Height)
-    $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
-    $graphics.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
-    $bitmap.Save($ImagePath, [System.Drawing.Imaging.ImageFormat]::Png)
-    $graphics.Dispose()
-    $bitmap.Dispose()
+        $screen = [System.Windows.Forms.Screen]::PrimaryScreen
+        $bounds = $screen.Bounds
+        $bitmap = New-Object System.Drawing.Bitmap($bounds.Width, $bounds.Height)
+        $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+        $graphics.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
+        $bitmap.Save($ImagePath, [System.Drawing.Imaging.ImageFormat]::Png)
+        $graphics.Dispose()
+        $bitmap.Dispose()
+    } elseif ($IsLinux) {
+        # Linux: try gnome-screenshot or scrot
+        if (Get-Command gnome-screenshot -ErrorAction SilentlyContinue) {
+            & gnome-screenshot -f $ImagePath 2>$null
+        } elseif (Get-Command scrot -ErrorAction SilentlyContinue) {
+            & scrot $ImagePath 2>$null
+        } else {
+            Write-Host "⚠️  No screenshot tool found. Install gnome-screenshot or scrot."
+            Write-Host "   Or provide -ImagePath with an existing screenshot."
+            exit 1
+        }
+    } elseif ($IsMacOS) {
+        # macOS: use screencapture
+        if (Get-Command screencapture -ErrorAction SilentlyContinue) {
+            & screencapture -x $ImagePath 2>$null
+        } else {
+            Write-Host "⚠️  screencapture not found."
+            Write-Host "   Or provide -ImagePath with an existing screenshot."
+            exit 1
+        }
+    }
 
     Write-Host "   Saved: $ImagePath"
 }

@@ -1,13 +1,9 @@
 {
-  "trackedCount": 20,
-  "autoFixableCount": 6,
-  "timestamp": "2026-07-05T04:30:13",
-  "total": 320.0,
+  "trackedCount": 16,
+  "autoFixableCount": 5,
+  "timestamp": "2026-07-16T00:00:00",
+  "total": 279.0,
   "byFile": [
-    {
-      "count": 3,
-      "file": "auto-clean.ps1"
-    },
     {
       "count": 19,
       "file": "bash-safe.ps1"
@@ -39,14 +35,6 @@
     {
       "count": 5,
       "file": "inter-track.ps1"
-    },
-    {
-      "count": 38,
-      "file": "optimize-system.ps1"
-    },
-    {
-      "count": 1,
-      "file": "ps5-detect.ps1"
     },
     {
       "count": 23,
@@ -92,7 +80,7 @@
     },
     {
       "rule": "PSAvoidUsingWriteHost",
-      "count": 500
+      "count": 446
     },
     {
       "rule": "PSUseSingularNouns",
