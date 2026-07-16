@@ -63,7 +63,7 @@ $ErrorActionPreference = 'Stop'
 # Servers are stored in a module-level hashtable. Since this script is
 # invoked fresh each time (not dot-sourced), we use a JSON file as
 # lightweight IPC so actions in the same session can find each other.
-$RegistryPath = "$env:TEMP\gentleman-dev-servers.json"
+$RegistryPath = Join-Path $env:TEMP "gentleman-dev-servers.json"
 
 function Get-Registry {
     if (Test-Path $RegistryPath) {
@@ -79,7 +79,7 @@ function Save-Registry {
 }
 
 function Get-ServerDir {
-    $dir = "$env:TEMP\gentleman-dev-servers"
+    $dir = Join-Path $env:TEMP "gentleman-dev-servers"
     if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
     return $dir
 }

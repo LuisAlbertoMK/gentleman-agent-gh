@@ -4,6 +4,5 @@
 [allowlist]
   description = "Global allowlist — path-based (works with non-stdin sources)"
   paths = [
-    '''\.learnings/.*''',
     '''\.backup-.*/.*''',
   ]
