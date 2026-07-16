@@ -1,0 +1,94 @@
+#requires -Version 7.6
+<#
+.SYNOPSIS
+    E2E testing wrapper — simple interactive tests with Playwright
+    
+.DESCRIPTION
+    Like analyze-page.ps1 but with interactive actions (click, fill, type, etc.)
+    
+.PARAMETER Url
+    URL to test
+    
+.PARAMETER Actions
+    Comma-separated actions: click:#selector,fill:#selector,value,wait:#selector
+    
+.PARAMETER Analyze
+    Run Ollama analysis on final screenshot
+    
+.PARAMETER Model
+    Ollama model for analysis (default: moondream:latest)
+    
+.PARAMETER Screenshot
+    Filename for final screenshot (default: e2e-final.png)
+    
+.EXAMPLE
+    .\e2e-test.ps1 -Url "http://localhost:3000" -Actions "click:#login,fill:#email,user@test.com"
+    
+.EXAMPLE
+    .\e2e-test.ps1 -Url "http://localhost:3000" -Actions "click:#login" -Analyze
+#>
+
+[CmdletBinding()]
+param(
+    [Parameter(Mandatory = $true)]
+    [string]$Url,
+    
+    [Parameter(Mandatory = $false)]
+    [string]$Actions = '',
+    
+    [switch]$Analyze,
+    
+    [string]$Model = 'moondream:latest',
+    
+    [string]$Screenshot = 'e2e-final.png',
+    
+    [int]$Timeout = 30000
+)
+
+$ErrorActionPreference = 'Stop'
+
+# Resolve script path
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$jsScript = Join-Path $scriptDir 'e2e-test.js'
+
+if (-not (Test-Path $jsScript)) {
+    Write-Error "e2e-test.js not found at: $jsScript"
+    exit 1
+}
+
+# Build arguments
+$nodeArgs = @($jsScript, '--url', $Url)
+
+if ($Actions) {
+    $nodeArgs += '--actions'
+    $nodeArgs += $Actions
+}
+
+if ($Analyze) {
+    $nodeArgs += '--analyze'
+    $nodeArgs += '--model'
+    $nodeArgs += $Model
+}
+
+if ($Screenshot) {
+    $nodeArgs += '--screenshot'
+    $nodeArgs += $Screenshot
+}
+
+if ($Timeout) {
+    $nodeArgs += '--timeout'
+    $nodeArgs += $Timeout.ToString()
+}
+
+# Execute
+Write-Host "=== E2E Test ===" -ForegroundColor Cyan
+Write-Host "URL: $Url"
+Write-Host "Actions: $Actions"
+Write-Host ""
+
+try {
+    & node @nodeArgs
+} catch {
+    Write-Error "E2E test failed: $_"
+    exit 1
+}

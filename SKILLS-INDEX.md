@@ -1,9 +1,9 @@
 # SKILLS INDEX
 
-> Full trigger table for all 68 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 69 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 4.1 | **Changelog**: 4.1 (+2 new: server-commands, analysis-mode; count 66→68); 4.0 (+8 missing triggers: cancel-ralph, cross-project-forge, cross-project-wisdom, engram-protocol, help, opencode-skill-creator, ralph-loop, sdd-quick; fixed 57→65 discoverable count); 3.9 (+3 new: vision-analyze, workflow-optimizer, skills-link mirror; count 63→66); 3.8 (+4 new skills: sdd-quick, visual-testing, image-pipeline, pdf-utils); 3.7 (Removed 4 redirect skills: css-layout, design-tokens, responsive-design, ui-animation); 3.6 (Merged into ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills)
+> **Version**: 4.2 | **Changelog**: 4.2 (+1 new: e2e-testing; count 68→69); 4.1 (+2 new: server-commands, analysis-mode; count 66→68); 4.0 (+8 missing triggers: cancel-ralph, cross-project-forge, cross-project-wisdom, engram-protocol, help, opencode-skill-creator, ralph-loop, sdd-quick; fixed 57→65 discoverable count); 3.9 (+3 new: vision-analyze, workflow-optimizer, skills-link mirror; count 63→66); 3.8 (+4 new skills: sdd-quick, visual-testing, image-pipeline, pdf-utils); 3.7 (Removed 4 redirect skills: css-layout, design-tokens, responsive-design, ui-animation); 3.6 (Merged into ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills)
 
 ## Triggers → Skill
 
@@ -78,6 +78,7 @@
 | SDD quick, fast path, quick SDD, low risk SDD, simple change SDD | sdd-quick |
 | Server, ng serve, npm run dev, dotnet run, dev server, background process, long-lived, !dev | server-commands |
 | !analisis, analysis mode, multi-agent analysis, smart analysis, 8 dimensions, perspective validation | analysis-mode |
+| test, e2e, playwright, browser testing, interactive testing, form testing, click test, navigate test | e2e-testing |
 
 ## Quick groups
 - **Compression/style**: karpathy-loop (merged karpathy-prompt), lean-context
@@ -88,7 +89,7 @@
 - **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner
 - **SDD**: sdd (unified pipeline — phases consolidated)
 - **UI/Design**: baseline-ui, accessibility, performance, seo, web-quality-audit, ui-engine
-- **Visual/Testing**: visual-testing, image-pipeline
+- **Visual/Testing**: visual-testing, image-pipeline, e2e-testing
 - **Documents**: pdf-utils
 - **Communication**: comment-writer, cognitive-doc-design
 - **Specialized**: metricas, context-watchdog, recovery-protocol, vision-analyze, workflow-optimizer
@@ -96,7 +97,7 @@
 
 ## Load rule
 1. `read` this file → find trigger match → get skill name
-2. `skill` tool with name (skills.paths now registered in opencode.json — 65 skills globally discoverable)
+2. `skill` tool with name (skills.paths now registered in opencode.json — 69 skills globally discoverable)
 3. If `skill` tool fails → `read skills/{name}/SKILL.md` directly from disk
 4. If skill has assets → `read skills/{name}/references/` or `read skills/{name}/assets/` for templates
 
