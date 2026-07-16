@@ -27,5 +27,8 @@
     "agent-config",
     "karpathy-compression",
     "sdd"
-  ]
+  ],
+  "devDependencies": {
+    "playwright": "^1.61.1"
+  }
 }
