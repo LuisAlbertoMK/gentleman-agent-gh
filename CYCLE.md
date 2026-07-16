@@ -620,3 +620,41 @@ Cycle 26 (Skill Merge & DCP Stale Detection) 2026-07-10. ✅ CLOSED (4/4, inter 
 Cycles 6-17: `docs/ciclos/cycle-archive-6-17.md`
 Cycles 18-25: `docs/ciclos/cycle-archive-18-26.md`
 Only Cycle 26+ is maintained in this file for active reference.
+
+### Cycle 27: Audit Cleanup & Skill Enrichment ✅ CLOSED (ad-hoc)
+
+**Objetivo**: Deep audit, fix, and refactor del repo — syntax analysis, gap detection, cleanup, and applying verified fixes.
+
+### Backlog
+| # | Item | Impact | Risk | I/R | Status | Done criteria |
+|---|------|--------|------|-----|--------|---------------|
+| 1 | Fix CI bug, parse errors, stale files | High | Low | 3.0 | ✅ | quality-gate CI passes, 0 parse errors |
+| 2 | Remove stale skills-link mirror (128 dirs) | High | Low | 3.0 | ✅ | 128 dirs deleted, -6614 lines |
+| 3 | Fix counts, CI test path, dead code | High | Low | 3.0 | ✅ | Pester path correct, 68 skills consistent |
+| 4 | Fix catch blocks, score, analyze-only agents | High | Low | 3.0 | ✅ | 4 empty catches fixed, 7 agents locked |
+| 5 | Refactor top-3 compressed scripts | High | Medium | 1.5 | ✅ | cross-ref-check 887→142, wisdom-forge 620→110 chars/line |
+| 6 | Add 3 new Pester test files | High | Low | 3.0 | ✅ | 127/127 tests passing, 11 test files |
+| 7 | Expand 10 thin skills with examples | High | Low | 3.0 | ✅ | 10 skills expanded (+109 lines) |
+| 8 | Score normalization + benchmark update | Medium | Low | 2.0 | ✅ | .project.json 9.1, SUMMARY.md current |
+| 9 | Create skill-template.md reference | Medium | Low | 2.0 | ✅ | scripts/skill-template.md exists |
+| 10 | Compress opencode-skill-creator >3KB | Medium | Low | 2.0 | ✅ | 3176→2930 bytes |
+
+### Cycle 27 Progress
+- Score: **9.1/10** (auto-scorer, bias-adjusted 7.3)
+- inter: 0/30 (ad-hoc session, no inter-track run)
+- Items: 10/10 done ✅ — ALL completed
+- Key wins:
+  - **CI**: Pester path fixed, 127/127 tests green
+  - **Dead code**: 128 stale dirs removed (-6614 lines)
+  - **Scripts**: 3 worst scripts refactored (887→142 avg chars/line)
+  - **Skills**: 10 skills expanded with examples, 1 compressed under 3KB
+  - **Tests**: 3 new test files (health-check, sync-vmk, setup-machine)
+  - **Agents**: 7 analyze-only agents locked (bash: ask)
+
+### Cycle 27 Close
+- Score: **9.1/10** — unchanged (skill docs don't affect scoring dimensions)
+- inter: 0/30
+- Backlog: 10/10 items complete ✅ (100%)
+- Carried forward:
+  - CA 1.3 (IC 8/30): needs more sessions with inter-track
+  - Bias-adjusted score 7.3: real improvement requires completing more cycle iterations

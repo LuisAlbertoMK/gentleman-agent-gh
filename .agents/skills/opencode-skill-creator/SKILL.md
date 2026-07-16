@@ -1,6 +1,6 @@
 ---
 name: opencode-skill-creator
-description: "Create, test, evaluate, and iterate OpenCode skills. For new skills, conduct mandatory intake interview (3-5 questions). Do NOT use for non-OpenCode skill creation unless user asks to port that workflow."
+description: "Create, test, evaluate, and iterate OpenCode skills with mandatory intake interview."
 triggers: "create skill, edit skill, opencode skill, skill eval, evaluate prompt, benchmark skill, iterate skill, skill testing, skill creation"
 license: MIT
 metadata:
@@ -30,7 +30,7 @@ Workspace: `<skill>-workspace/`. Results in `iteration-N/eval-ID/{with_skill,bas
 ## Iteration: Apply → re-run into `iteration-N+1/` → `skill_serve_review` with `previousWorkspace` → repeat until done. Don't overfit. Prefer explanation over MUST/ALWAYS.
 
 ## Installation: Copy to `.opencode/skills/<name>/` (project) or `~/.config/opencode/skills/<name>/` (global). Validate with `skill_validate`.
-## Plugin tools: `skill_validate` · `skill_parse` · `skill_eval` · `skill_improve_description` · `skill_optimize_loop` · `skill_aggregate_benchmark` · `skill_generate_report` · `skill_serve_review` · `skill_stop_review` · `skill_export_static_review`
+## Plugin tools: skill_validate · skill_parse · skill_eval · skill_aggregate_benchmark · skill_serve_review · skill_stop_review
 ## Refs: skill-creator · skill-testing · skill-registry · skill-improver · karpathy-loop
 ## Anti-Patterns: Skip intake · One-shot · No baseline · Overfit evals · Install before validate
 
