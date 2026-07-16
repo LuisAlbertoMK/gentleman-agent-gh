@@ -70,7 +70,7 @@ Phase 3 (complex task):          19,839 tok (9.9%)
 
 | Finding | Impact | Details |
 |---------|--------|---------|
-| skills-link drift (57/58 differ from source) | ~4,674 tokens | Sync mechanism broken |
+| ~~skills-link drift (57/58 differ from source)~~ | ~~4,674 tokens~~ | **RESOLVED**: skills-link deleted (2026-07-16) |
 | No skill caching | Minor | Graph rebuilt every call |
 | `New-Graph` called per resolution | ~3ms waste | Static graph, should be cached |
 
@@ -209,7 +209,7 @@ commit-crafter → work-unit-commits → commit-crafter
 ### P3 — Long-term
 13. **Fold karpathy-loop into prompt-engineering** (methodology belongs there)
 14. **Fold lean-context behavioral rules into AGENTS.md** (LEAN/ULTRA/CAVEMAN = output formatting)
-15. **Fix skills-link sync** (57/58 junctions have drifted from source)
+15. ~~**Fix skills-link sync** (57/58 junctions have drifted from source)~~ **RESOLVED**: skills-link deleted (2026-07-16)
 
 ---
 

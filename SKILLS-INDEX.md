@@ -3,7 +3,7 @@
 > Full trigger table for all 69 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 4.2 | **Changelog**: 4.2 (+1 new: e2e-testing; count 68→69); 4.1 (+2 new: server-commands, analysis-mode; count 66→68); 4.0 (+8 missing triggers: cancel-ralph, cross-project-forge, cross-project-wisdom, engram-protocol, help, opencode-skill-creator, ralph-loop, sdd-quick; fixed 57→65 discoverable count); 3.9 (+3 new: vision-analyze, workflow-optimizer, skills-link mirror; count 63→66); 3.8 (+4 new skills: sdd-quick, visual-testing, image-pipeline, pdf-utils); 3.7 (Removed 4 redirect skills: css-layout, design-tokens, responsive-design, ui-animation); 3.6 (Merged into ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills)
+> **Version**: 4.2 | **Changelog**: 4.2 (+1 new: e2e-testing; count 68→69); 4.1 (+2 new: server-commands, analysis-mode; count 66→68); 4.0 (+8 missing triggers: cancel-ralph, cross-project-forge, cross-project-wisdom, engram-protocol, help, opencode-skill-creator, ralph-loop, sdd-quick; fixed 57→65 discoverable count); 3.9 (+2 new: vision-analyze, workflow-optimizer; count 63→65); 3.8 (+4 new skills: sdd-quick, visual-testing, image-pipeline, pdf-utils); 3.7 (Removed 4 redirect skills: css-layout, design-tokens, responsive-design, ui-animation); 3.6 (Merged into ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills)
 
 ## Triggers → Skill
 
@@ -93,7 +93,7 @@
 - **Documents**: pdf-utils
 - **Communication**: comment-writer, cognitive-doc-design
 - **Specialized**: metricas, context-watchdog, recovery-protocol, vision-analyze, workflow-optimizer
-- **Internal**: skills-link (mirror, not invokable)
+- **Internal**: _shared (not invokable)
 
 ## Load rule
 1. `read` this file → find trigger match → get skill name

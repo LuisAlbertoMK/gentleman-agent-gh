@@ -92,7 +92,7 @@ Análisis verificado del proyecto gentleman-agent-gh (82 skills, 69 scripts). Se
 | Componente | Estado | Notas |
 |------------|--------|-------|
 | Scripts | 69 | 8 comprimidos, 8 nuevos |
-| Skills | 82 | 25 nuevos (skills-link) |
+| Skills | 69 | 25 nuevos (~~skills-link~~ eliminado 2026-07-16) |
 | Config | opencode.json | Permisos fix aplicado |
 | .learnings/ | ⚠️ VACÍO | Necesita bootstrap |
 | Learning pipeline | 🔴 MUERTO | Sin datos = sin aprendizaje |
