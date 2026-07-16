@@ -31,19 +31,21 @@ Suite de **69 skills** (+ `_shared`) + **94 scripts PowerShell** para [OpenCode]
 | `sdd-orchestrator` | claude-sonnet-4-6 | SDD pipeline orchestration |
 
 #### SDD Pipeline Agents (subagents)
-9 agentes que ejecutan las fases del pipeline SDD. **No tienen modelo asignado explícito** — heredan el default global de OpenCode. Todos tienen permisos completos (`bash: allow, edit: allow, write: allow`).
+9 agentes que ejecutan las fases del pipeline SDD. **Heradan el modelo del orchestrator** (`claude-sonnet-4-6`, pago) a menos que tengan `model` explícito en `opencode.json`. Todos tienen permisos completos (`bash: allow, edit: allow, write: allow`).
 
-| Agent | Phase | Description |
-|-------|-------|-------------|
-| `sdd-init` | Init | Bootstrap SDD context and project configuration |
-| `sdd-explore` | Explore | Investigate codebase and think through ideas |
-| `sdd-propose` | Propose | Create change proposals from explorations |
-| `sdd-spec` | Spec | Write detailed specifications from proposals |
-| `sdd-design` | Design | Create technical design from proposals |
-| `sdd-tasks` | Tasks | Break down specs and designs into implementation tasks |
-| `sdd-apply` | Apply | Implement code changes from task definitions |
-| `sdd-verify` | Verify | Validate implementation against specs |
-| `sdd-archive` | Archive | Archive completed change artifacts |
+| Agent | Phase | Model | Description |
+|-------|-------|-------|-------------|
+| `sdd-init` | Init | hereda orchestrator | Bootstrap SDD context and project configuration |
+| `sdd-explore` | Explore | hereda orchestrator | Investigate codebase and think through ideas |
+| `sdd-propose` | Propose | hereda orchestrator | Create change proposals from explorations |
+| `sdd-spec` | Spec | hereda orchestrator | Write detailed specifications from proposals |
+| `sdd-design` | Design | hereda orchestrator | Create technical design from proposals |
+| `sdd-tasks` | Tasks | hereda orchestrator | Break down specs and designs into implementation tasks |
+| `sdd-apply` | Apply | hereda orchestrator | Implement code changes from task definitions |
+| `sdd-verify` | Verify | hereda orchestrator | Validate implementation against specs |
+| `sdd-archive` | Archive | hereda orchestrator | Archive completed change artifacts |
+
+> **Cost**: `sdd-orchestrator` + 9 sub-agents = 10 agents using `claude-sonnet-4-6`. This is intentional — SDD pipeline is high-risk and benefits from a capable model. To reduce cost, add `"model": "opencode/nemotron-3-ultra-free"` to individual SDD agents in `opencode.json`.
 
 ### Self-Improvement Cycle
 El proyecto ejecuta ciclos de mejora continua (CYCLE.md):
