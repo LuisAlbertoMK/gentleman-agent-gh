@@ -35,9 +35,9 @@ Default `lite`. Set via `!ponytail [lite|full|ultra|off]`. Persists in `~/.confi
 |----------|--------|
 | `!compress` | Karpathy compression >2.5KB + score |
 | `!score` | `score-auto.ps1 -Json` + docs update |
-| `!sync` | `pull-upstream.ps1 -Mode Check` → sync-vmk + check-drift → score |
+| `!sync` | `pull-upstream.ps1 -Mode Check` → sync-vmk + check-skill-drift → score |
 | `!sync-all` | `sync-all.ps1` — full global sync |
-| `!health` | health-check + check-drift + git status |
+| `!health` | health-check + check-config-drift + git status |
 | `!batch` | `batch.ps1` — batch auto-incremental |
 | `!cycle` | `inter-track.ps1 -Show` + score + upstream |
 | `!close` | `close-session.ps1` — unified close |
