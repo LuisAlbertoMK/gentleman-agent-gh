@@ -3,15 +3,16 @@
  * e2e-test.js — Simple E2E testing with Playwright
  * 
  * Usage:
- *   node e2e-test.js --url http://localhost:3000 --actions "click:#login,fill:#email,test.com"
+ *   node e2e-test.js --url http://localhost:3000 --actions "click:#login,fill:#email=test.com"
  *   node e2e-test.js --url http://localhost:3000 --actions "click:#login" --analyze
  *   node e2e-test.js --url http://localhost:3000 --actions "click:#login" --screenshot after.png
+ *   node e2e-test.js --url http://localhost:3000 --actions "click:#login" --headed
  * 
  * Actions:
  *   click:#selector          — Click element
- *   fill:#selector,value     — Fill input field
- *   type:#selector,value     — Type text (keyboard events)
- *   select:#selector,value   — Select dropdown option
+ *   fill:#selector=value     — Fill input field (use = as separator)
+ *   type:#selector=value     — Type text (keyboard events)
+ *   select:#selector=value   — Select dropdown option
  *   wait:#selector           — Wait for element to appear
  *   wait:1000                — Wait N milliseconds
  *   screenshot:name.png      — Take screenshot
@@ -31,7 +32,8 @@ function parseArgs() {
     analyze: false,
     model: 'moondream:latest',
     screenshot: null,
-    timeout: 30000
+    timeout: 30000,
+    headed: false
   };
   
   for (let i = 0; i < args.length; i++) {
@@ -58,6 +60,9 @@ function parseArgs() {
       case '--timeout':
       case '-t':
         config.timeout = parseInt(args[++i]);
+        break;
+      case '--headed':
+        config.headed = true;
         break;
     }
   }
@@ -198,7 +203,7 @@ async function main() {
   console.log(`Actions: ${actions.length}`);
   console.log('');
   
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ headless: !config.headed });
   const context = await browser.newContext();
   const page = await context.newPage();
   

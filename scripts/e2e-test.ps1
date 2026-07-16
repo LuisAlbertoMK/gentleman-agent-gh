@@ -10,7 +10,7 @@
     URL to test
     
 .PARAMETER Actions
-    Comma-separated actions: click:#selector,fill:#selector,value,wait:#selector
+    Comma-separated actions: click:#selector,fill:#selector=value,wait:#selector
     
 .PARAMETER Analyze
     Run Ollama analysis on final screenshot
@@ -21,11 +21,17 @@
 .PARAMETER Screenshot
     Filename for final screenshot (default: e2e-final.png)
     
+.PARAMETER Headed
+    Open browser visually (not headless)
+    
 .EXAMPLE
-    .\e2e-test.ps1 -Url "http://localhost:3000" -Actions "click:#login,fill:#email,user@test.com"
+    .\e2e-test.ps1 -Url "http://localhost:3000" -Actions "click:#login,fill:#email=user@test.com"
     
 .EXAMPLE
     .\e2e-test.ps1 -Url "http://localhost:3000" -Actions "click:#login" -Analyze
+    
+.EXAMPLE
+    .\e2e-test.ps1 -Url "http://localhost:3000" -Actions "click:#login" -Headed
 #>
 
 [CmdletBinding()]
@@ -42,7 +48,9 @@ param(
     
     [string]$Screenshot = 'e2e-final.png',
     
-    [int]$Timeout = 30000
+    [int]$Timeout = 30000,
+    
+    [switch]$Headed
 )
 
 $ErrorActionPreference = 'Stop'
@@ -78,6 +86,10 @@ if ($Screenshot) {
 if ($Timeout) {
     $nodeArgs += '--timeout'
     $nodeArgs += $Timeout.ToString()
+}
+
+if ($Headed) {
+    $nodeArgs += '--headed'
 }
 
 # Execute

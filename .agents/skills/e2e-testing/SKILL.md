@@ -20,14 +20,27 @@ Hybrid approach: **simple scripts** for quick checks + **Playwright test runner*
 
 Like vision-analyze but interactive. Good for quick checks.
 
+### Flags
+
+- `--url` / `-u` — URL to test (required)
+- `--actions` / `-a` — Comma-separated actions
+- `--headed` — Open browser visually (not headless)
+- `--analyze` — Run Ollama analysis on final screenshot
+- `--model` / `-m` — Ollama model (default: moondream:latest)
+- `--screenshot` / `-s` — Filename for final screenshot
+- `--timeout` / `-t` — Timeout in ms (default: 30000)
+
 ### Commands
 
 ```powershell
-# Basic interactive test
+# Basic interactive test (headless)
 e2t http://localhost:3000 --actions "click:#login"
 
+# Visual test (browser opens)
+e2t http://localhost:3000 --actions "click:#login" --headed
+
 # With form filling
-e2t http://localhost:3000 --actions "fill:#email,user@test.com,fill:#password,pass123,click:#submit"
+e2t http://localhost:3000 --actions "fill:#email=test,fill:#pass=test,click:#submit"
 
 # With AI analysis
 e2t http://localhost:3000 --actions "click:#login" --analyze
@@ -73,8 +86,8 @@ test('login flow', async ({ page }) => {
   await page.goto('http://localhost:3000');
   
   // Fill form
-  await page.fill('#email', 'user@test.com');
-  await page.fill('#password', 'pass123');
+  await page.fill('#email', 'test');
+  await page.fill('#pass', 'test');
   
   // Click submit
   await page.click('#submit');
