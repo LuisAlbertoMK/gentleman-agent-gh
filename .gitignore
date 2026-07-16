@@ -9,6 +9,11 @@ Desktop.ini
 ehthumbs.db
 ehthumbs_vista.db
 
+# Screenshots / debug images
+*.png
+*.jpg
+*.jpeg
+
 # IDE / Editor
 .vscode/
 .idea/

@@ -1,5 +1,4 @@
 #requires -Version 7.6
-Set-StrictMode -Version Latest
 <#
 .SYNOPSIS
     SkillSpector security gate for agent skills. Scans .agents/skills/
@@ -28,6 +27,7 @@ param(
     [string]$DockerImage = "skillspector",
     [switch]$Strict
 )
+Set-StrictMode -Version Latest
 
 $ErrorActionPreference = "Stop"
 $scriptName = "skillspector-gate"

@@ -15,7 +15,7 @@ $repoRoot=Resolve-Path (Join-Path $PSScriptRoot "..")
 $configPath=Resolve-Path (Join-Path $repoRoot "opencode.json")
 $archivedServers=@('server-postgres','server-puppeteer','server-slack','server-sentry','server-sqlite','server-brave-search','server-github','server-google-drive','server-google-maps','server-redis','server-filesystem','server-git')
 $trustedVendors=@('@modelcontextprotocol','@upstash','@playwright','github/github-mcp-server','brave/','mcp/','zencoderai/','@anthropic','engram','sentry','docker')
-$knownToolCounts=@{context7=2;engram=18;memory=9;sequential-thinking=3;fetch=1;playwright=22;'github-mcp-server'=56;filesystem=12;git=12}
+$knownToolCounts=@{context7=2;engram=18;memory=9;'sequential-thinking'=3;fetch=1;playwright=22;'github-mcp-server'=56;filesystem=12;git=12}
 
 function Write-Status{param([string]$M)if(-not$Quiet -and -not$Json){Write-Host "  $M"}}
 function Test-ArchivedServer{param([string]$Name,[string[]]$Command);foreach($a in $archivedServers){if($Name-like"*$a*"-or($Command-join' ')-like"*$a*"){return $true}};return $false}

@@ -2,8 +2,8 @@
 name: e2e-testing
 description: |
   E2E testing toolkit — hybrid: simple scripts + Playwright test runner.
-  Triggers: test, e2e, playwright, browser testing, interactive testing, form testing.
   Requires: Playwright (npm install -D playwright), Ollama (optional)
+triggers: test, e2e, playwright, browser testing, interactive testing, form testing
 ---
 
 # E2E Testing Skill

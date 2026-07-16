@@ -15,7 +15,7 @@ Set-StrictMode -Version Latest
 
 BeforeAll {
     # --- Extract functions only (skip top-level Register-Skill calls) ---
-    $raw = Get-Content (Join-Path $PSScriptRoot 'skill-graph.ps1') -Raw
+    $raw = Get-Content (Join-Path (Split-Path $PSScriptRoot -Parent) 'skill-graph.ps1') -Raw
 
     # Extract function blocks — skill-graph.ps1 uses C#-style signatures:
     #   function Register-Skill(\n    $Name,\n    ...\n)\n{ ... }

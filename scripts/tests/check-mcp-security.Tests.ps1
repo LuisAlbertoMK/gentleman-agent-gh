@@ -14,27 +14,27 @@ Set-StrictMode -Version Latest
 
 BeforeAll {
     # Extract functions only (skip main execution)
-    $raw = Get-Content (Join-Path $PSScriptRoot 'check-mcp-security.ps1') -Raw
+    $raw = Get-Content (Join-Path (Split-Path $PSScriptRoot -Parent) 'check-mcp-security.ps1') -Raw
 
-    # Extract data arrays and hashtables needed by functions
+    # Extract data arrays and hashtables needed by functions — all single-line, no (?s)
     # $archivedServers
-    if ($raw -match '(?s)(\$archivedServers\s*=\s*@\(.+?\n\))') {
+    if ($raw -match '(\$archivedServers\s*=\s*@\([^\)]+\))') {
         . ([ScriptBlock]::Create($Matches[1]))
     }
     # $trustedVendors
-    if ($raw -match '(?s)(\$trustedVendors\s*=\s*@\(.+?\n\))') {
+    if ($raw -match '(\$trustedVendors\s*=\s*@\([^\)]+\))') {
         . ([ScriptBlock]::Create($Matches[1]))
     }
     # $knownToolCounts
-    if ($raw -match '(?s)(\$knownToolCounts\s*=\s*@\{.+?\n\})') {
+    if ($raw -match '(\$knownToolCounts\s*=\s*@\{[^}]+\})') {
         . ([ScriptBlock]::Create($Matches[1]))
     }
 
-    # Extract functions
+    # Extract functions — all single-line
     $functionNames = @('Test-ArchivedServer', 'Test-TrustedSource', 'Test-HardcodedToken',
                        'Get-ServerIdentifier', 'Get-EstimatedToolCount')
     foreach ($fn in $functionNames) {
-        if ($raw -match "(?s)(function\s+$fn\s*[\(\{].+?\n\})") {
+        if ($raw -match "(function\s+$fn\s*\{[^\n]+\})") {
             . ([ScriptBlock]::Create($Matches[1]))
         }
     }
