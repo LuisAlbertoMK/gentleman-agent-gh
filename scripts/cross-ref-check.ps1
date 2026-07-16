@@ -1,44 +1,285 @@
 #requires -Version 7.6
 <#
-.SYNOPSIS Validate internal refs (skills, SKILLS-INDEX, junctions, shared, README models).
+.SYNOPSIS
+  Validate internal refs (skills, SKILLS-INDEX, junctions, shared, README models).
+.DESCRIPTION
+  Checks cross-references, anti-pattern refs, config refs, review-rules, and agent consistency.
+.PARAMETER RepoRoot
+  Root of the repository. Defaults to parent of scripts/.
+.PARAMETER Json
+  Output results as JSON instead of colored text.
+.PARAMETER Quiet
+  Suppress console output. Implies -Json.
 #>
-param([string]$RepoRoot=(Split-Path $PSScriptRoot -Parent),[switch]$Json,[switch]$Quiet)
-Set-StrictMode -Version Latest;$ErrorActionPreference='Stop';if($Quiet){$Json=$true}
-$e=@();$w=@();$cd=Join-Path $RepoRoot ".agents\skills";$gd=(Join-Path $(if($env:USERPROFILE){$env:USERPROFILE}else{$env:HOME}) ".config/opencode/skills")
-if(-not(Test-Path $cd)){if(-not $Quiet){Write-Host "FATAL: missing $cd"-ForegroundColor Red};exit 1}
-if(-not $Quiet){Write-Host "[1/8] APC..."-N};$apc=Test-Path(Join-Path $RepoRoot "ANTI-PATTERN-CATALOG.md")
-if($apc){if(-not $Quiet){Write-Host " OK"}}else{$e+="APC not found";if(-not $Quiet){Write-Host " FAIL"}}
-if(-not $Quiet){Write-Host "[2/8] SKILL.md..."-N};$sb_ms = [System.Text.StringBuilder]::new(65536)
-try{$sd=Get-ChildItem $cd -Directory}catch{if(-not $Quiet){Write-Host " FAIL`nFATAL: list: $_"-ForegroundColor Red};exit 1}
-# ponytail: cache non-shared dirs for reuse in steps 4,6,7
-$nsd=$sd.Where({$_.Name -ne '_shared'})
-$nsd | ForEach-Object {if(-not(Test-Path(Join-Path $_.FullName "SKILL.md"))){$null = $sb_ms.AppendLine($_.Name)}}
-$ms = @($sb_ms.ToString() -split '\r?\n' | Where-Object { $_ })
-if($ms.Count -eq 0){if(-not $Quiet){Write-Host " OK (all)"}}else{$w+="Missing SKILL.md: $($ms-join', ')";if(-not $Quiet){Write-Host " WARN"}}
-if(-not $Quiet){Write-Host "[3/8] INDEX count..."-N};$ac=$sd.Where({$_.Name -ne '_shared'}).Count
-$hl=Select-String -Path (Join-Path $RepoRoot "SKILLS-INDEX.md") -Pattern "all \d+ skills"
-if($hl-match"all (\d+) skills"){$dc=[int]$Matches[1];if($dc -eq $ac){if(-not $Quiet){Write-Host " OK ($ac)"}}else{$e+="INDEX says $dc, has $ac";if(-not $Quiet){Write-Host " FAIL ($dc vs $ac)"}}}else{$w+="INDEX header mismatch";if(-not $Quiet){Write-Host " WARN"}}
-if(-not $Quiet){Write-Host "[4/8] junctions..."-N};$sb_mg = [System.Text.StringBuilder]::new(65536)
-if(Test-Path $gd){$nsd | ForEach-Object {$gp=Join-Path $gd $_.Name;if(-not(Test-Path $gp)){$null = $sb_mg.AppendLine($_.Name)}}}
-$mg = @($sb_mg.ToString() -split '\r?\n' | Where-Object { $_ })
-if($mg.Count -eq 0){if(-not $Quiet){Write-Host " OK (all)"}}else{$w+="Missing junctions: $($mg-join', ')";if(-not $Quiet){Write-Host " WARN"}}
-if(-not $Quiet){Write-Host "[5/8] _shared..."-N}
-$sf=@{'skill-resolver.md'=Test-Path(Join-Path $cd "_shared\skill-resolver.md");'sdd-phase-common.md'=Test-Path(Join-Path $cd "sdd\references\sdd-phase-common.md");'persistence-contract.md'=Test-Path(Join-Path $cd "_shared\persistence-contract.md");'engram-convention.md'=Test-Path(Join-Path $cd "_shared\engram-convention.md")}
-$mh=@($sf.GetEnumerator().Where({-not $_.Value}) | ForEach-Object {$_.Key})
-if($mh.Count -eq 0){if(-not $Quiet){Write-Host " OK"}}else{$e+="Missing _shared: $($mh-join', ')";if(-not $Quiet){Write-Host " FAIL"}}
-if(-not $Quiet){Write-Host "[6/8] cross-refs..."-N};$sb_br = [System.Text.StringBuilder]::new(65536)
-$al=($nsd | ForEach-Object {$_.Name.ToLower()});$rp='Cross-Refs:\s*(.+)';$ap='Anti-Patterns:\s*(.+)'
-$nsd | ForEach-Object {$sn=$_.Name;$mp=Join-Path $_.FullName "SKILL.md";if(-not(Test-Path $mp)){return};try{$c=[IO.File]::ReadAllText($mp)}catch{return};if($c -match $rp){$rf=($Matches[1]-split'\s*[\|,]\s*' | ForEach-Object {$_.Trim()}).Where({$_ -cmatch '^[a-z][a-z0-9_-]+$'});$rf | ForEach-Object {if($al -notcontains $_){$null = $sb_br.AppendLine("$sn cross-refs '$_' missing")}}};if($c -match $ap){$ax=($Matches[1]-split'\s*[\|,]\s*' | ForEach-Object {$_.Trim()}).Where({$_ -cmatch '^[a-z][a-z0-9_-]+$'});$ax | ForEach-Object {if($al -notcontains $_){$null = $sb_br.AppendLine("$sn anti-refs '$_' missing")}}}}
-$br = @($sb_br.ToString() -split '\r?\n' | Where-Object { $_ })
-if($br.Count -eq 0){if(-not $Quiet){Write-Host " OK"}}else{$e+=$br;if(-not $Quiet){Write-Host " FAIL ($($br.Count))"}}
-if(-not $Quiet){Write-Host "[7/8] config_refs..."-N};$sb_mc = [System.Text.StringBuilder]::new(65536);$crp='config_refs:\s*(.+)'
-$nsd | ForEach-Object {$sn=$_.Name;$mp=Join-Path $_.FullName "SKILL.md";if(-not(Test-Path $mp)){return};try{$c=[IO.File]::ReadAllText($mp)}catch{return};if($c -match $crp){$rf=($Matches[1]-split'\s*[\|,]\s*' | ForEach-Object {$_.Trim()}).Where({$_ -ne ''});$rf | ForEach-Object {$rp2=Join-Path $RepoRoot $_;if(-not(Test-Path $rp2)){$null = $sb_mc.AppendLine("$sn config_refs '$_' missing at $rp2")}}}}
-$mc = @($sb_mc.ToString() -split '\r?\n' | Where-Object { $_ })
-if($mc.Count -eq 0){if(-not $Quiet){Write-Host " OK"}}else{$e+=$mc;if(-not $Quiet){Write-Host " FAIL ($($mc.Count))"}}
-if(-not $Quiet){Write-Host "[8/8] review-rules.jsonc..."-N};$rk=Join-Path $RepoRoot "review-rules.jsonc"
-if(Test-Path $rk){try{$b=Get-Content $rk -Raw -Encoding UTF8;$s=$b-replace'(?m)^\s*//.*$',''-replace'(?m)\s*//[^"\n]*$',''-replace'(?s)/\*.*?\*/','';$p=$s | ConvertFrom-Json;$zc=$p.zones.PSObject.Properties.Name.Count;$cc=$p.context_zones.PSObject.Properties.Name.Count;$md=$p.modes.PSObject.Properties.Name.Count;$pc=$p.jd_profiles.PSObject.Properties.Name.Count;$sc=$p.jd_profile_selector.Count;$is=@();if($zc -ne 3){$is+="zones $zc"};if($cc -ne 4){$is+="ctx $cc"};if($md -ne 5){$is+="modes $md"};if($pc -lt 1){$is+="profiles $pc"};if($sc -lt 1){$is+="selectors $sc"};if($is.Count -eq 0){if(-not $Quiet){Write-Host " OK (z$zc c$cc m$md p$pc s$sc)"}}else{$e+="review-rules.jsonc: $($is-join'; ')";if(-not $Quiet){Write-Host " FAIL"}}}catch{$e+="review-rules.jsonc parse: $_";if(-not $Quiet){Write-Host " FAIL"}}}else{$w+="review-rules.jsonc missing";if(-not $Quiet){Write-Host " WARN"}}
-# --- [9/9] README vs opencode.json agent models ---
-if(-not $Quiet){Write-Host "[9/9] README agents..."-N}
-try{$oc=Get-Content (Join-Path $RepoRoot "opencode.json") -Raw -Encoding UTF8|ConvertFrom-Json;$rm=Get-Content (Join-Path $RepoRoot "README.md") -Raw -Encoding UTF8;$ocAgents = $oc.agent.PSObject.Properties.Name.Where({$_ -notlike 'sdd-*'})|ForEach-Object{$_.ToLower()};$sb_ra=[System.Text.StringBuilder]::new(65536);foreach($an in $ocAgents){if($rm -notmatch [regex]::Escape($an)){$null=$sb_ra.AppendLine("README missing agent '$an' from opencode.json")}};$ra=@($sb_ra.ToString()-split'\r?\n'|Where-Object{$_});if($ra.Count -eq 0){if(-not $Quiet){Write-Host " OK ($($ocAgents.Count) agents match)"}}else{$e+=$ra;if(-not $Quiet){Write-Host " FAIL ($($ra.Count) missing)"}}}catch{if(-not $Quiet){Write-Host " WARN (parse: $($_.Exception.Message))"}}
-$res=@{timestamp=(Get-Date -Format "o");canonicalSkills=$ac;errors=$e;warnings=$w;brokenCrossRefs=$br.Count;allClean=($e.Count -eq 0 -and $w.Count -eq 0)}
-if($Json){Write-Output($res | ConvertTo-Json -Depth 2)}elseif($res.allClean){if(-not $Quiet){Write-Host "OK ALL CHECKS PASSED"-ForegroundColor Green};exit 0}else{if($e.Count -gt 0){if(-not $Quiet){Write-Host "ERRORS ($($e.Count)):"-ForegroundColor Red};$e | ForEach-Object {if(-not $Quiet){Write-Host " * $_"-ForegroundColor Red}}};if($w.Count -gt 0){if(-not $Quiet){Write-Host "WARNINGS ($($w.Count)):"-ForegroundColor Yellow};$w | ForEach-Object {if(-not $Quiet){Write-Host " * $_"-ForegroundColor Yellow}}};if($e.Count -gt 0){exit 1}else{exit 0}}
+param(
+    [string]$RepoRoot = (Split-Path $PSScriptRoot -Parent),
+    [switch]$Json,
+    [switch]$Quiet
+)
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+if ($Quiet) { $Json = $true }
+
+# --- State ---
+$errors = @()
+$warnings = @()
+$skillsDir = Join-Path $RepoRoot ".agents\skills"
+$globalSkills = Join-Path $(if ($env:USERPROFILE) { $env:USERPROFILE } else { $env:HOME }) ".config/opencode/skills"
+
+if (-not (Test-Path $skillsDir)) {
+    if (-not $Quiet) { Write-Host "FATAL: missing $skillsDir" -ForegroundColor Red }
+    exit 1
+}
+
+# --- Helper: Get non-shared skill directories ---
+function Get-SkillDirs {
+    param([string]$Dir)
+    (Get-ChildItem $Dir -Directory).Where({ $_.Name -ne '_shared' })
+}
+
+# --- Helper: Read SKILL.md content safely ---
+function Read-SkillContent {
+    param([string]$SkillPath)
+    $md = Join-Path $SkillPath "SKILL.md"
+    if (-not (Test-Path $md)) { return $null }
+    try { return [IO.File]::ReadAllText($md) } catch { return $null }
+}
+
+# --- Helper: Parse comma/pipe separated refs from SKILL.md ---
+function Get-SkillRefs {
+    param([string]$Content, [string]$Pattern)
+    if ($Content -match $Pattern) {
+        return ($Matches[1] -split '\s*[\|,]\s*' |
+            ForEach-Object { $_.Trim() } |
+            Where-Object { $_ -cmatch '^[a-z][a-z0-9_-]+$' })
+    }
+    return @()
+}
+
+# --- [1/9] APC check ---
+if (-not $Quiet) { Write-Host "[1/9] APC..." -N }
+$apcPath = Join-Path $RepoRoot "ANTI-PATTERN-CATALOG.md"
+if (Test-Path $apcPath) {
+    if (-not $Quiet) { Write-Host " OK" }
+} else {
+    $errors += "APC not found"
+    if (-not $Quiet) { Write-Host " FAIL" }
+}
+
+# --- [2/9] SKILL.md presence ---
+if (-not $Quiet) { Write-Host "[2/9] SKILL.md..." -N }
+$missingSkills = [System.Collections.Generic.List[string]]::new()
+$skillDirs = Get-SkillDirs $skillsDir
+foreach ($skill in $skillDirs) {
+    if (-not (Test-Path (Join-Path $skill.FullName "SKILL.md"))) {
+        $missingSkills.Add($skill.Name)
+    }
+}
+if ($missingSkills.Count -eq 0) {
+    if (-not $Quiet) { Write-Host " OK (all)" }
+} else {
+    $warnings += "Missing SKILL.md: $($missingSkills -join ', ')"
+    if (-not $Quiet) { Write-Host " WARN" }
+}
+
+# --- [3/9] INDEX count ---
+if (-not $Quiet) { Write-Host "[3/9] INDEX count..." -N }
+$actualCount = $skillDirs.Count
+$indexLine = Select-String -Path (Join-Path $RepoRoot "SKILLS-INDEX.md") -Pattern "all \d+ skills"
+if ($indexLine -match "all (\d+) skills") {
+    $declaredCount = [int]$Matches[1]
+    if ($declaredCount -eq $actualCount) {
+        if (-not $Quiet) { Write-Host " OK ($actualCount)" }
+    } else {
+        $errors += "INDEX says $declaredCount, has $actualCount"
+        if (-not $Quiet) { Write-Host " FAIL ($declaredCount vs $actualCount)" }
+    }
+} else {
+    $warnings += "INDEX header mismatch"
+    if (-not $Quiet) { Write-Host " WARN" }
+}
+
+# --- [4/9] Junctions ---
+if (-not $Quiet) { Write-Host "[4/9] junctions..." -N }
+$missingJunctions = [System.Collections.Generic.List[string]]::new()
+if (Test-Path $globalSkills) {
+    foreach ($skill in $skillDirs) {
+        $junctionPath = Join-Path $globalSkills $skill.Name
+        if (-not (Test-Path $junctionPath)) {
+            $missingJunctions.Add($skill.Name)
+        }
+    }
+}
+if ($missingJunctions.Count -eq 0) {
+    if (-not $Quiet) { Write-Host " OK (all)" }
+} else {
+    $warnings += "Missing junctions: $($missingJunctions -join ', ')"
+    if (-not $Quiet) { Write-Host " WARN" }
+}
+
+# --- [5/9] _shared files ---
+if (-not $Quiet) { Write-Host "[5/9] _shared..." -N }
+$requiredShared = @{
+    'skill-resolver.md'     = Test-Path (Join-Path $skillsDir "_shared\skill-resolver.md")
+    'sdd-phase-common.md'   = Test-Path (Join-Path $skillsDir "sdd\references\sdd-phase-common.md")
+    'persistence-contract.md' = Test-Path (Join-Path $skillsDir "_shared\persistence-contract.md")
+    'engram-convention.md'  = Test-Path (Join-Path $skillsDir "_shared\engram-convention.md")
+}
+$missingShared = @($requiredShared.GetEnumerator().Where({ -not $_.Value }) | ForEach-Object { $_.Key })
+if ($missingShared.Count -eq 0) {
+    if (-not $Quiet) { Write-Host " OK" }
+} else {
+    $errors += "Missing _shared: $($missingShared -join ', ')"
+    if (-not $Quiet) { Write-Host " FAIL" }
+}
+
+# --- [6/9] Cross-refs ---
+if (-not $Quiet) { Write-Host "[6/9] cross-refs..." -N }
+$allSkillNames = @($skillDirs | ForEach-Object { $_.Name.ToLower() })
+$brokenRefs = [System.Collections.Generic.List[string]]::new()
+
+foreach ($skill in $skillDirs) {
+    $content = Read-SkillContent $skill.FullName
+    if (-not $content) { continue }
+
+    # Check Cross-Refs
+    $crossRefs = Get-SkillRefs $content 'Cross-Refs:\s*(.+)'
+    foreach ($ref in $crossRefs) {
+        if ($allSkillNames -notcontains $ref) {
+            $brokenRefs.Add("$($skill.Name) cross-refs '$ref' missing")
+        }
+    }
+
+    # Check Anti-Patterns
+    $antiRefs = Get-SkillRefs $content 'Anti-Patterns:\s*(.+)'
+    foreach ($ref in $antiRefs) {
+        if ($allSkillNames -notcontains $ref) {
+            $brokenRefs.Add("$($skill.Name) anti-refs '$ref' missing")
+        }
+    }
+}
+
+if ($brokenRefs.Count -eq 0) {
+    if (-not $Quiet) { Write-Host " OK" }
+} else {
+    $errors += $brokenRefs
+    if (-not $Quiet) { Write-Host " FAIL ($($brokenRefs.Count))" }
+}
+
+# --- [7/9] Config refs ---
+if (-not $Quiet) { Write-Host "[7/9] config_refs..." -N }
+$missingConfigRefs = [System.Collections.Generic.List[string]]::new()
+
+foreach ($skill in $skillDirs) {
+    $content = Read-SkillContent $skill.FullName
+    if (-not $content) { continue }
+
+    $configRefs = Get-SkillRefs $content 'config_refs:\s*(.+)'
+    foreach ($ref in $configRefs) {
+        $refPath = Join-Path $RepoRoot $ref
+        if (-not (Test-Path $refPath)) {
+            $missingConfigRefs.Add("$($skill.Name) config_refs '$ref' missing at $refPath")
+        }
+    }
+}
+
+if ($missingConfigRefs.Count -eq 0) {
+    if (-not $Quiet) { Write-Host " OK" }
+} else {
+    $errors += $missingConfigRefs
+    if (-not $Quiet) { Write-Host " FAIL ($($missingConfigRefs.Count))" }
+}
+
+# --- [8/9] review-rules.jsonc ---
+if (-not $Quiet) { Write-Host "[8/9] review-rules.jsonc..." -N }
+$rulesPath = Join-Path $RepoRoot "review-rules.jsonc"
+
+if (Test-Path $rulesPath) {
+    try {
+        $raw = Get-Content $rulesPath -Raw -Encoding UTF8
+        # Strip comments (JSONC -> JSON)
+        $stripped = $raw `
+            -replace '(?m)^\s*//.*$', '' `
+            -replace '(?m)\s*//[^"\n]*$', '' `
+            -replace '(?s)/\*.*?\*/', ''
+        $parsed = $stripped | ConvertFrom-Json
+
+        $zoneCount = $parsed.zones.PSObject.Properties.Name.Count
+        $ctxCount = $parsed.context_zones.PSObject.Properties.Name.Count
+        $modeCount = $parsed.modes.PSObject.Properties.Name.Count
+        $profileCount = $parsed.jd_profiles.PSObject.Properties.Name.Count
+        $selectorCount = $parsed.jd_profile_selector.Count
+
+        $issues = @()
+        if ($zoneCount -ne 3) { $issues += "zones $zoneCount" }
+        if ($ctxCount -ne 4) { $issues += "ctx $ctxCount" }
+        if ($modeCount -ne 5) { $issues += "modes $modeCount" }
+        if ($profileCount -lt 1) { $issues += "profiles $profileCount" }
+        if ($selectorCount -lt 1) { $issues += "selectors $selectorCount" }
+
+        if ($issues.Count -eq 0) {
+            if (-not $Quiet) { Write-Host " OK (z$zoneCount c$ctxCount m$modeCount p$profileCount s$selectorCount)" }
+        } else {
+            $errors += "review-rules.jsonc: $($issues -join '; ')"
+            if (-not $Quiet) { Write-Host " FAIL" }
+        }
+    } catch {
+        $errors += "review-rules.jsonc parse: $_"
+        if (-not $Quiet) { Write-Host " FAIL" }
+    }
+} else {
+    $warnings += "review-rules.jsonc missing"
+    if (-not $Quiet) { Write-Host " WARN" }
+}
+
+# --- [9/9] README vs opencode.json agents ---
+if (-not $Quiet) { Write-Host "[9/9] README agents..." -N }
+try {
+    $oc = Get-Content (Join-Path $RepoRoot "opencode.json") -Raw -Encoding UTF8 | ConvertFrom-Json
+    $readme = Get-Content (Join-Path $RepoRoot "README.md") -Raw -Encoding UTF8
+    $ocAgents = $oc.agent.PSObject.Properties.Name.Where({ $_ -notlike 'sdd-*' }) | ForEach-Object { $_.ToLower() }
+
+    $missingInReadme = [System.Collections.Generic.List[string]]::new()
+    foreach ($agentName in $ocAgents) {
+        if ($readme -notmatch [regex]::Escape($agentName)) {
+            $missingInReadme.Add("README missing agent '$agentName' from opencode.json")
+        }
+    }
+
+    if ($missingInReadme.Count -eq 0) {
+        if (-not $Quiet) { Write-Host " OK ($($ocAgents.Count) agents match)" }
+    } else {
+        $errors += $missingInReadme
+        if (-not $Quiet) { Write-Host " FAIL ($($missingInReadme.Count) missing)" }
+    }
+} catch {
+    if (-not $Quiet) { Write-Host " WARN (parse: $($_.Exception.Message))" }
+}
+
+# --- Output ---
+$result = @{
+    timestamp        = (Get-Date -Format "o")
+    canonicalSkills  = $actualCount
+    errors           = $errors
+    warnings         = $warnings
+    brokenCrossRefs  = $brokenRefs.Count
+    allClean         = ($errors.Count -eq 0 -and $warnings.Count -eq 0)
+}
+
+if ($Json) {
+    Write-Output ($result | ConvertTo-Json -Depth 2)
+} elseif ($result.allClean) {
+    if (-not $Quiet) { Write-Host "OK ALL CHECKS PASSED" -ForegroundColor Green }
+    exit 0
+} else {
+    if ($errors.Count -gt 0) {
+        if (-not $Quiet) { Write-Host "ERRORS ($($errors.Count)):" -ForegroundColor Red }
+        $errors | ForEach-Object { if (-not $Quiet) { Write-Host " * $_" -ForegroundColor Red } }
+    }
+    if ($warnings.Count -gt 0) {
+        if (-not $Quiet) { Write-Host "WARNINGS ($($warnings.Count)):" -ForegroundColor Yellow }
+        $warnings | ForEach-Object { if (-not $Quiet) { Write-Host " * $_" -ForegroundColor Yellow } }
+    }
+    if ($errors.Count -gt 0) { exit 1 } else { exit 0 }
+}

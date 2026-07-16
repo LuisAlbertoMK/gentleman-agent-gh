@@ -1,43 +1,20 @@
 #requires -Version 7.6
 <#
 .SYNOPSIS
-  Pester tests for check-mcp-security.ps1 core logic.
-  Tests: Test-ArchivedServer, Test-TrustedSource, Test-HardcodedToken,
-         Get-ServerIdentifier, Get-EstimatedToolCount.
-  Compatible with Pester 5.x / 6.x.
+    Pester tests for check-mcp-security.ps1 core logic.
+    Tests: Test-ArchivedServer, Test-TrustedSource, Test-HardcodedToken,
+           Get-ServerIdentifier, Get-EstimatedToolCount.
+    Compatible with Pester 5.x / 6.x.
 .NOTES
-  Test fixtures construct fake token prefixes dynamically (char arrays)
-  to avoid triggering secrets-scan false positives.
+    Test fixtures construct fake token prefixes dynamically (char arrays)
+    to avoid triggering secrets-scan false positives.
 #>
 param([switch]$Quiet)
 Set-StrictMode -Version Latest
 
 BeforeAll {
-    # Extract functions only (skip main execution)
-    $raw = Get-Content (Join-Path (Split-Path $PSScriptRoot -Parent) 'check-mcp-security.ps1') -Raw
-
-    # Extract data arrays and hashtables needed by functions — all single-line, no (?s)
-    # $archivedServers
-    if ($raw -match '(\$archivedServers\s*=\s*@\([^\)]+\))') {
-        . ([ScriptBlock]::Create($Matches[1]))
-    }
-    # $trustedVendors
-    if ($raw -match '(\$trustedVendors\s*=\s*@\([^\)]+\))') {
-        . ([ScriptBlock]::Create($Matches[1]))
-    }
-    # $knownToolCounts
-    if ($raw -match '(\$knownToolCounts\s*=\s*@\{[^}]+\})') {
-        . ([ScriptBlock]::Create($Matches[1]))
-    }
-
-    # Extract functions — all single-line
-    $functionNames = @('Test-ArchivedServer', 'Test-TrustedSource', 'Test-HardcodedToken',
-                       'Get-ServerIdentifier', 'Get-EstimatedToolCount')
-    foreach ($fn in $functionNames) {
-        if ($raw -match "(function\s+$fn\s*\{[^\n]+\})") {
-            . ([ScriptBlock]::Create($Matches[1]))
-        }
-    }
+    # Dot-source the script to get functions + data. Script runs main logic (harmless).
+    . (Join-Path (Split-Path $PSScriptRoot -Parent) 'check-mcp-security.ps1')
 }
 
 # ============================================================
@@ -110,7 +87,7 @@ Describe 'Test-TrustedSource' {
 Describe 'Test-HardcodedToken' {
     BeforeAll {
         # Construct fake tokens dynamically to avoid secrets-scan false positives
-        # pon ytail: test fixtures — NOT real secrets
+        # ponytail: test fixtures — NOT real secrets
         # Build prefix strings char-by-char so no literal secret patterns appear in source
         $script:fakePrefix = [char[]]@(103,104,112,95) -join ''  # ghp + underscore
         $script:fakeSuffix = '1234567890'
