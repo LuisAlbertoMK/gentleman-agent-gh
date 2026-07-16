@@ -152,6 +152,9 @@ Register-Skill pdf-utils "PDF|extract PDF|parse PDF|merge PDF|generate PDF|PDF t
 # --- research ---
 Register-Skill research "research|investigar|technical investigation|learn|compare solutions|evaluate" research medium "" "" "Structured research workflow for technical investigations"
 
+# --- testing ---
+Register-Skill e2e-testing "e2e|end to end|browser test|playwright|visual test|screenshot test|page test" testing medium "" "playwright|vision-analyze" "E2E testing toolkit — hybrid: simple scripts + Playwright test runner"
+
 # --- specialized ---
 Register-Skill recovery-protocol "recovery|no es eso|frustration|stuck|bloqueado|bug|fix|error" specialized medium "" "" "Recovery protocol for frustration and errors"
 Register-Skill context-watchdog "context overflow|token limit|context explosion" specialized medium "" "" "Monitor and prevent context window overflow"

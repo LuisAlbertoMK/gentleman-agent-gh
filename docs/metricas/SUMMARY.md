@@ -11,12 +11,12 @@
 |---------|-------|
 | Skills totales | 68 |
 | Total skill bytes | ~168,560B |
-| Skills >3KB | 2 |
+| Skills >3KB | 1 |
 | Avg skill size | 2,400B |
 | Junctions globales OK | 68/68 |
 | Frontmatter coverage | 100% |
 | Scripts root | 68 |
-| Scripts total (c/ subdirs) | 91 |
+| Scripts total (c/ subdirs) | 93 |
 | Score (raw) | 9.1/10 |
 | Score (bias-adjusted) | 7.3/10 |
 
