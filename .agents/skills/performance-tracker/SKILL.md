@@ -31,5 +31,13 @@ Trend (every 10 or session end): `mem_search(query="perf-score:", limit=20)` →
 ≥8 Maintain · 6-7.9 Light review + profile · 4-5.9 gap-analysis + fix · <4 Critical perf sprint
 ## Anti-Patterns: Score without real data · cross-platform in same trend · skip bundle/cache · score once
 
+## Example: Quick Score
+Run `npx lighthouse http://localhost:3000 --output json` → extract:
+- Load: LCP 2.1s → **8** | Render: CLS 0.15 → **6** | Memory: 120MB → **7**
+- Network: p95 400ms → **8** | Bundle: JS 250KB → **7** | Energy: N/A (desktop)
+- **Avg: 7.2** → Light review + profile recommended
+
+Save via `mem_save` for trend tracking. Next run: compare delta.
+
 ## Refs
 auto-metrics · gap-analysis · web-quality-audit · performance · metricas

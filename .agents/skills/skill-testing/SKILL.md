@@ -29,3 +29,15 @@ skill-registry · opencode-skill-creator · skill-improver · quality-gate · ka
 
 ## Anti-Patterns
 Test only syntax, skip integration · Never verify triggers · Ship with <7 score · Skip token budget check · Test without real prompts
+
+## Example: Test Report
+```markdown
+## Skill Test Report | server-commands | 1.0
+| Test | Status |
+| Frontmatter valid | ✅ |
+| Required sections | ✅ |
+| Triggers unique | ✅ |
+| Token budget (<500 tokens) | ✅ (~180) |
+| Integration (load + apply) | ✅ |
+### Verdict: ✅ APPROVED (9.2/10)
+```

@@ -33,3 +33,13 @@ Workspace: `<skill>-workspace/`. Results in `iteration-N/eval-ID/{with_skill,bas
 ## Plugin tools: `skill_validate` · `skill_parse` · `skill_eval` · `skill_improve_description` · `skill_optimize_loop` · `skill_aggregate_benchmark` · `skill_generate_report` · `skill_serve_review` · `skill_stop_review` · `skill_export_static_review`
 ## Refs: skill-creator · skill-testing · skill-registry · skill-improver · karpathy-loop
 ## Anti-Patterns: Skip intake · One-shot · No baseline · Overfit evals · Install before validate
+
+## Example: Creating a Skill
+```
+User: "Create a skill for Docker best practices"
+Agent (intake): 1. What scenarios? (dev, prod, multi-stage) 2. Triggers? 3. Output format?
+Agent (draft): Write SKILL.md → %TEMP%/opencode-skills/docker-best-practices/
+Agent (test): 2 test prompts → run with-skill + baseline → compare
+Agent (iterate): Fix trigger coverage → re-test → approve
+Agent (install): Copy to .opencode/skills/docker-best-practices/
+```

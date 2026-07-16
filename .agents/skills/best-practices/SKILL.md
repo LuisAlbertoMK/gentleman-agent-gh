@@ -35,3 +35,9 @@ Valid HTML(no dup IDs) | Semantic HTML5 | Explicit img dims | Event delegation |
 
 ## Anti-Patterns
 Blindly copy-paste headers without verifying · Ignore FP alerts · Apply all rules to every project · No Context7 check for current API versions · Skip audit step
+
+## Example: CSP Header
+```http
+Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-{random}'; style-src 'self' 'nonce-{random}'; img-src 'self' data: https:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+```
+Generate nonce: `$nonce = [Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(16))`

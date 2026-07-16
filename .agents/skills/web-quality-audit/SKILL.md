@@ -31,3 +31,13 @@ OKLCH (not HSL/RGB) · 8pt spacing · 3-tier tokens (primitive→semantic→comp
 ## Site-wide: `npx unlighthouse --site <url>`
 ## Anti-Patterns: Lighthouse once · Skip internal a11y · No anim budget · Mix CQ/MQ without strategy · No token audit
 ## Refs: baseline-ui · accessibility · performance · seo · best-practices · ui-engine
+
+## Example: Quick Audit
+```bash
+# Full site audit
+npx unlighthouse --site https://example.com
+
+# Per-page check
+npx lighthouse http://localhost:3000 --view
+# Check: Perf≥90, A11y=100, BP≥95, SEO≥95
+```

@@ -29,3 +29,13 @@ Schemas: `.learnings/rejected-edits.json` (id/timestamp/target/edit/reason/delta
 
 ## Anti-Patterns
 Skip learning extraction · Bump score without data · Ignore CYCLE.md guardrails · Never prune unused skills · Same fix fails 3x without abort
+
+## Example: Per-Task Micro-Loop
+After fixing a bug (e.g. "catch block was empty"):
+1. **Observe**: Write-Debug added to 3 catch blocks
+2. **Reflect**: Why were they empty? Copied from template without thinking
+3. **Optimize**: Add rule to immune-system: "empty catch → Write-Debug with context"
+4. **Apply**: Template now includes Write-Debug by default
+5. **Score**: Run `!score` — delta = +0.2 (caught earlier in review)
+
+Same error 2x → catalog entry. 3x → AGENTS.md rule.

@@ -27,3 +27,25 @@ use `dev-server.ps1`. If unsure, check `Test-IsServerCommand "$cmd"` first.
 **Port conflict**: Before starting, check if the port is already in use. The system
 auto-detects common ports (ng=4200, vite=5173, dotnet=5000, etc.) and warns you.
 Manual check: `Get-NetTCPConnection -LocalPort <port>` or `Test-PortInUse 4200`
+
+## Example
+
+```powershell
+# Start an Angular dev server
+.\scripts\dev-server.ps1 -Action Start -Name "myapp" -Command "npx ng serve" -Arguments "--port 4200"
+
+# Check status
+.\scripts\dev-server.ps1 -Action Status -Name "myapp"
+
+# View last 20 log lines
+.\scripts\dev-server.ps1 -Action Logs -Name "myapp" -Tail 20
+
+# Kill the server
+.\scripts\dev-server.ps1 -Action Kill -Name "myapp"
+```
+
+**Wrong** (will hang the agent):
+```powershell
+npx ng serve  # ❌ Server never exits, blocks session
+npm run dev   # ❌ Same problem
+```

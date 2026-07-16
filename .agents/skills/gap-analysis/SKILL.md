@@ -25,6 +25,17 @@ metadata:
 ## Cross-Ref: project-mapper · security-scanner · code-review-agent · senior-engineer · performance-tracker
 ## Anti-Patterns: Skip intake · Ignore velocity · Skip responsive · Infra afterthought · Score w/o evidence
 
+## Example: Scoring a Web App
+For a SaaS web app (UX 40% / Tech 30% / Security 25% / Ops 5%):
+- UI/UX: 6 (Needs attention — no loading states)
+- Security: 5 (No CSP headers, no rate limiting)
+- Optimization: 7 (Code-split ok, no lazy images)
+- Performance: 8 (Fast API, good caching)
+- Priority = (10-5)×1.0×2.0 = **10.0** → Security fix first
+- Next: (10-6)×0.7×1.0 = **2.8** → UI/UX loading states
+
+Output: prioritized list with scores, evidence, and recommended fixes.
+
 ## Templates
 See [assets/](assets/) for per-project-type intake templates: api, desktop, ecom, erp, mobile, saas, web.
 

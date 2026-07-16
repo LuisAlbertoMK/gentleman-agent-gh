@@ -35,3 +35,8 @@ karpathy-loop · context-watchdog · execution-mode · metricas · skill-graph
 
 ## Anti-Patterns
 CAVEMAN for code/PRs · Cut safety warnings · Apply ULTRA without checking context % · Over-abbreviate in explanations · Skip disclaimer for destructive ops
+
+## Example
+**User**: "What's the best way to handle errors in PowerShell?"
+**LEAN**: Use `try/catch/finally` with `$ErrorActionPreference = 'Stop'`. Trap terminating errors, log non-terminating.
+**CAVEMAN**: try/catch. $ErrorActionPreference='Stop'. log err.
