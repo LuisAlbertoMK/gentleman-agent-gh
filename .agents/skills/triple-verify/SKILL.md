@@ -8,7 +8,7 @@ metadata:
   author: gentleman-vMK
   version: "1.2"
   changelog: "1.2: karpathy compress"
-  dependencies: [quality-gate, code-review-agent, commit-crafter, session-miner]
+  dependencies: [quality-gate, code-review-agent, commit-crafter]
 ---
 ## Zones
 Zones, thresholds, verify depth defined in `review-rules.jsonc`.
@@ -28,7 +28,7 @@ Zones, thresholds, verify depth defined in `review-rules.jsonc`.
 ## Workflow
 
 **Mode routing** (keyword overrides):
-- `!ship/!listo` → quality-gate → triple-verify (por zona, + capture-learnings) → commit-crafter → commit+push
+- `!ship/!listo` → quality-gate → triple-verify (por zona) → commit-crafter → commit+push
 - `!fast` → quality-gate → commit+push (skip verify)
 - `!check` → quality-gate only (no commit)
 - `!draft` → no gates

@@ -1,144 +1,81 @@
 ---
 name: e2e-testing
 description: |
-  E2E testing toolkit — hybrid approach: simple scripts for quick checks + Playwright test runner for comprehensive testing.
-  
-  Triggers: test, e2e, playwright, browser testing, interactive testing, form testing, click test, navigate test.
-  
-  Usage:
-  - Quick check: `e2t http://localhost:3000 --actions "click:#login,fill:#email,test.com"`
-  - Full test: `npx playwright test` with custom test files
-  
-  Requires: Playwright (npm install -D playwright), Ollama (optional for AI analysis)
+  E2E testing toolkit — hybrid: simple scripts + Playwright test runner.
+  Triggers: test, e2e, playwright, browser testing, interactive testing, form testing.
+  Requires: Playwright (npm install -D playwright), Ollama (optional)
 ---
 
 # E2E Testing Skill
 
-Hybrid approach: **simple scripts** for quick checks + **Playwright test runner** for comprehensive testing.
+Hybrid: **simple scripts** for quick checks + **Playwright test runner** for comprehensive testing.
 
 ## Quick Mode (Simple Scripts)
 
-Like vision-analyze but interactive. Good for quick checks.
-
 ### Flags
-
 - `--url` / `-u` — URL to test (required)
 - `--actions` / `-a` — Comma-separated actions
-- `--headed` — Open browser visually (not headless)
-- `--analyze` — Run Ollama analysis on final screenshot
+- `--headed` — Open browser visually
+- `--analyze` — Ollama analysis on final screenshot
 - `--model` / `-m` — Ollama model (default: moondream:latest)
 - `--screenshot` / `-s` — Filename for final screenshot
-- `--timeout` / `-t` — Timeout in ms (default: 30000)
 
 ### Commands
-
 ```powershell
-# Basic interactive test (headless)
 e2t http://localhost:3000 --actions "click:#login"
-
-# Visual test (browser opens)
 e2t http://localhost:3000 --actions "click:#login" --headed
-
-# With form filling
 e2t http://localhost:3000 --actions "fill:#email=test,fill:#pass=test,click:#submit"
-
-# With AI analysis
 e2t http://localhost:3000 --actions "click:#login" --analyze
-
-# Screenshot after actions
-e2t http://localhost:3000 --actions "click:#login" --screenshot after-login.png
 ```
 
 ### Action Syntax
-
 ```
 click:#selector          — Click element
-fill:#selector=value     — Fill input field (use = as separator)
-type:#selector=value     — Type text (keyboard events)
-select:#selector=value   — Select dropdown option
-wait:#selector           — Wait for element to appear
-wait:1000                — Wait N milliseconds
+fill:#selector=value     — Fill input (use = as separator)
+type:#selector=value     — Type text
+select:#selector=value   — Select dropdown
+wait:#selector           — Wait for element
+wait:1000                — Wait N ms
 screenshot:name.png      — Take screenshot
 ```
 
 ## Full Mode (Playwright Test Runner)
 
-For comprehensive testing with assertions, parallel execution, and reporting.
-
 ### Structure
-
 ```
-tests/
-  e2e/
-    login.spec.js        — Login flow tests
-    dashboard.spec.js    — Dashboard tests
-    api.spec.js          — API response tests
-    visual.spec.js       — Visual regression tests
+tests/e2e/
+  login.spec.js        — Login flow tests
+  dashboard.spec.js    — Dashboard tests
 ```
 
-### Example Test
-
+### Example
 ```javascript
-// tests/e2e/login.spec.js
 const { test, expect } = require('@playwright/test');
-
 test('login flow', async ({ page }) => {
   await page.goto('http://localhost:3000');
-  
-  // Fill form
   await page.fill('#email', 'test');
-  await page.fill('#pass', 'test');
-  
-  // Click submit
   await page.click('#submit');
-  
-  // Assert redirect
   await expect(page).toHaveURL(/dashboard/);
-  
-  // Assert element visible
-  await expect(page.locator('.welcome')).toBeVisible();
 });
 ```
 
-### Run Tests
-
+### Run
 ```bash
-# All tests
-npx playwright test
-
-# Specific file
-npx playwright test tests/e2e/login.spec.js
-
-# With UI
-npx playwright test --ui
-
-# Generate report
-npx playwright show-report
+npx playwright test                    # All tests
+npx playwright test tests/e2e/login.spec.js  # Specific
+npx playwright test --ui               # With UI
+npx playwright show-report             # View report
 ```
 
 ## When to Use Which
-
 | Scenario | Mode | Why |
 |----------|------|-----|
 | Quick smoke test | Simple | Fast, no setup |
 | Form validation | Simple | Interactive actions |
 | CI/CD pipeline | Full | Assertions, reporting |
 | Visual regression | Full | Screenshot comparisons |
-| API testing | Full | Response assertions |
-| Multi-step workflow | Full | Complex scenarios |
-
-## AI Analysis (Optional)
-
-Add `--analyze` to any simple command for Ollama analysis:
-
-```powershell
-e2t http://localhost:3000 --actions "click:#login" --analyze
-```
-
-Uses moondream by default. Add `--model llava:7b` for better quality (slower).
 
 ## Requirements
-
 - Playwright: `npm install -D playwright`
 - Chromium: `npx playwright install chromium`
 - Ollama (optional): For AI analysis

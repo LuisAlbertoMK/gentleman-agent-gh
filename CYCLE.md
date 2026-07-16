@@ -572,7 +572,7 @@ Cycle 26 (Skill Merge & DCP Stale Detection) 2026-07-10. ✅ CLOSED (4/4, inter 
 
 ---
 
-### Cycle 26: Skill Merge & DCP Stale Detection 🔵 IN PROGRESS
+### Cycle 26: Skill Merge & DCP Stale Detection ✅ CLOSED
 
 **Objetivo**: Ejecutar P0 (Cycle Activity) y P2 (DCP) del plan de mejora. Merge de 4 skills UI superpuestas + stale detection en context-watchdog.
 
@@ -587,7 +587,7 @@ Cycle 26 (Skill Merge & DCP Stale Detection) 2026-07-10. ✅ CLOSED (4/4, inter 
 | 1 | DCP stale detection en context-watchdog | High | Low | 3.0 | ✅ | Stale prune protocol + 5 signals |
 | 2 | Merge UI skills → ui-engine | High | Medium | 1.5 | ✅ | 4 redirects, 10KB merged, sin dups |
 | 3 | Cross-ref update: 4 skills refs | High | Low | 3.0 | ✅ | baseline-ui, a11y, wqa, perf → ui-engine |
-| 4 | Stats verificación | High | Low | 3.0 | ✅ | 59 skills, o3 10→7, o5 2→1 |
+| 4 | Stats verificación | High | Low | 3.0 | ✅ | 69 skills, o3 10→7, o5 2→1 |
 
 ### Cycle 26 Progress
 - Score: **9.2/10** (↑ 9.1 — SE 8.0→9.0, CA 1.0→1.3)
@@ -596,7 +596,7 @@ Cycle 26 (Skill Merge & DCP Stale Detection) 2026-07-10. ✅ CLOSED (4/4, inter 
   - Item 1: ✅ Stale detection con 5 signals + prune protocol
   - Item 2: ✅ ui-engine creado (9.95KB), 4 redirects
   - Item 3: ✅ 4 skills cross-ref actualizadas
-  - Item 4: ✅ Stats: 59 skills, 155KB total, o3=7, o5=1
+  - Item 4: ✅ Stats: 69 skills, 167KB total, o3=7, o5=1
 
 ### Cycle 26 Close
 - Score: **9.2/10** ↑ (SE 8.0→9.0→9.5, CA 1.0→1.3, SD 8.9→9.1)

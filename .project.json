@@ -77,11 +77,11 @@
       }
     },
     "PA": {
-      "r": "X-ref True, 61 skills, global skill improvement completed",
+      "r": "X-ref True, 69 skills, global skill improvement completed",
       "s": 10.0,
       "e": {
         "cross_ref": true,
-        "skills": 61,
+        "skills": 69,
         "readme": true,
         "project_json": true
       }
@@ -110,11 +110,11 @@
       }
     },
     "SE": {
-      "r": "T:63R >3:1 >5:0 avg:2.4KB Karpathy 7 skills compressed",
+      "r": "T:69R >3:4 >5:0 avg:2.4KB Karpathy 7 skills compressed",
       "s": 9.5,
       "e": {
-        "total": 63,
-        "bytes": 149712,
+        "total": 69,
+        "bytes": 167334,
         "prO5": 0,
         "o3": 1,
         "cmdO3": 0,
