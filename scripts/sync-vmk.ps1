@@ -24,10 +24,14 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+# ── Cross-platform helpers ──────────────────────────────────────────────
+. (Join-Path $PSScriptRoot "lib" "platform.ps1")
+
 $gentlemanRoot = if ($env:GENTLEMAN_AGENT_ROOT) { $env:GENTLEMAN_AGENT_ROOT } else { (Get-Item $PSScriptRoot).Parent.FullName }
 
 $canonicalPath = (Join-Path $gentlemanRoot "opencode.json")
-$globalPath    = "$env:USERPROFILE\.config\opencode\opencode.json"
+$globalConfig  = Get-GlobalConfigDir
+$globalPath    = Join-Path $globalConfig "opencode.json"
 
 # ── Validate canonical exists ────────────────────────────────────────────
 if (-not (Test-Path $canonicalPath)) { Write-Error "Canonical config not found: $canonicalPath"; exit 1 }
@@ -97,7 +101,8 @@ function Sync-Config {
 # ── Execute ──────────────────────────────────────────────────────────────
 if ($Target -eq "global") {
   Sync-Config -TargetPath $globalPath -Label "global" -PreserveMCP $false
-  Copy-Item -LiteralPath (Join-Path $gentlemanRoot "AGENTS.md") "$env:USERPROFILE\.config\opencode\AGENTS.md" -Force -ErrorAction SilentlyContinue
+  $agentsMdDest = Join-Path $globalConfig "AGENTS.md"
+  Copy-Item -LiteralPath (Join-Path $gentlemanRoot "AGENTS.md") $agentsMdDest -Force -ErrorAction SilentlyContinue
   $results.Add(@{target="global-agents-md"; status="SYNCED"; detail="AGENTS.md copied"})
 }
 

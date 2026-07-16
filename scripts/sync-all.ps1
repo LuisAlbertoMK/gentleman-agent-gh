@@ -20,23 +20,31 @@ param([switch]$Json,[switch]$Quiet)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+# ── Cross-platform helpers ──────────────────────────────────────────────
+. (Join-Path $PSScriptRoot "lib" "platform.ps1")
+
 # ── PowerShell version check — graceful redirect ──────────────
 if ($PSVersionTable.PSVersion.Major -lt 7) {
-    $pwsh = Get-Command pwsh.exe -ErrorAction SilentlyContinue
+    $pwsh = Find-Pwsh
     if ($pwsh) {
         Write-Warning "PowerShell $($PSVersionTable.PSVersion) no es compatible."
-        Write-Warning "Redirigiendo a pwsh.exe..."
+        Write-Warning "Redirigiendo a $($pwsh.Name)..."
         $params = @("-NoLogo", "-NoProfile", "-File", $PSCommandPath)
         if ($Json)  { $params += "-Json" }
         if ($Quiet) { $params += "-Quiet" }
         & $pwsh.Source $params
         exit $LASTEXITCODE
     }
+    $installHint = if ($IsLinux -or $IsMacOS) {
+        "  Instalá pwsh: https://docs.microsoft.com/powershell/scripting/install/installing-powershell"
+    } else {
+        "  winget install Microsoft.PowerShell"
+    }
     Write-Error "╔══════════════════════════════════════════════════════╗"
     Write-Error "║  Requiere PowerShell 7+                              ║"
     Write-Error "║  Versión actual: $($PSVersionTable.PSVersion)                      ║"
     Write-Error "║  Usá sync-all.bat o instalá pwsh:                     ║"
-    Write-Error "║    winget install Microsoft.PowerShell                ║"
+    Write-Error $installHint
     Write-Error "╚══════════════════════════════════════════════════════╝"
     exit 1
 }
@@ -46,8 +54,8 @@ if ($PSVersionTable.PSVersion -lt [Version]"7.6") {
 }
 
 $repoRoot = Split-Path $PSScriptRoot -Parent
-$globalSetup = Join-Path $repoRoot "scripts\global-setup.ps1"
-$syncVmk    = Join-Path $repoRoot "scripts\sync-vmk.ps1"
+$globalSetup = Join-Path $repoRoot "scripts" "global-setup.ps1"
+$syncVmk    = Join-Path $repoRoot "scripts" "sync-vmk.ps1"
 $results = [System.Collections.Generic.List[object]]::new()
 $ok = $true
 

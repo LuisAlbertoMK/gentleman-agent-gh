@@ -24,8 +24,11 @@ param([switch]$Force,[switch]$SkipMCP,[switch]$Json,[switch]$Quiet)
 Set-StrictMode -Version Latest;$ErrorActionPreference='Stop'
 if($Quiet){$Json=$true}
 
+# ── Cross-platform helpers ──────────────────────────────────────────────
+. (Join-Path $PSScriptRoot "lib" "platform.ps1")
+
 $gentlemanRoot = if ($env:GENTLEMAN_AGENT_ROOT) { $env:GENTLEMAN_AGENT_ROOT } else { (Get-Item $PSScriptRoot).Parent.FullName }
-$globalConfig = "$env:USERPROFILE\.config\opencode"
+$globalConfig = Get-GlobalConfigDir
 $results = [System.Collections.Generic.List[object]]::new()
 
 function Add-Result {
@@ -58,37 +61,35 @@ Sync-File (Join-Path $gentlemanRoot "AGENTS.md") (Join-Path $globalConfig "AGENT
 # ── 2. Sync shared prompts ─────────────────────────────────────────────
 $sharedPrompts = @("_core-behavior.md","_analyze-only-protocol.md")
 foreach($p in $sharedPrompts){
-    $src = Join-Path $gentlemanRoot "prompts\shared\$p"
-    $dst = Join-Path $globalConfig "prompts\shared\$p"
+    $src = Join-Path $gentlemanRoot "prompts" "shared" $p
+    $dst = Join-Path $globalConfig "prompts" "shared" $p
     Sync-File $src $dst "prompts/shared/$p"
 }
 
 # ── 3. Sync shared scripts ─────────────────────────────────────────────
 $sharedScripts = @(
     # Core utilities
-    @{Src="scripts\lib\cache.ps1";Dst="scripts\lib\cache.ps1"},
-    @{Src="scripts\skill-resolver-fast.ps1";Dst="scripts\skill-resolver-fast.ps1"},
-    @{Src="scripts\build-skill-registry.ps1";Dst="scripts\build-skill-registry.ps1"},
-    @{Src="scripts\auto-pattern-detector.ps1";Dst="scripts\auto-pattern-detector.ps1"},
-    @{Src="scripts\learning-stats.ps1";Dst="scripts\learning-stats.ps1"},
+    @{Src=Join-Path "scripts" "lib" "cache.ps1";Dst=Join-Path "scripts" "lib" "cache.ps1"},
+    @{Src=Join-Path "scripts" "skill-resolver-fast.ps1";Dst=Join-Path "scripts" "skill-resolver-fast.ps1"},
+    @{Src=Join-Path "scripts" "build-skill-registry.ps1";Dst=Join-Path "scripts" "build-skill-registry.ps1"},
+    @{Src=Join-Path "scripts" "auto-pattern-detector.ps1";Dst=Join-Path "scripts" "auto-pattern-detector.ps1"},
+    @{Src=Join-Path "scripts" "learning-stats.ps1";Dst=Join-Path "scripts" "learning-stats.ps1"},
     # Compressed scripts (v16 improvements)
-    @{Src="scripts\wisdom-forge.ps1";Dst="scripts\wisdom-forge.ps1"},
-    @{Src="scripts\check-mcp-security.ps1";Dst="scripts\check-mcp-security.ps1"},
-    @{Src="scripts\wisdom-demote.ps1";Dst="scripts\wisdom-demote.ps1"},
-    @{Src="scripts\sync-global-ps5.ps1";Dst="scripts\sync-global-ps5.ps1"},
-    @{Src="scripts\project-cycle.ps1";Dst="scripts\project-cycle.ps1"},
-    @{Src="scripts\sync-global.ps1";Dst="scripts\sync-global.ps1"},
-    @{Src="scripts\wisdom-stats.ps1";Dst="scripts\wisdom-stats.ps1"},
-    @{Src="scripts\skillspector-gate.ps1";Dst="scripts\skillspector-gate.ps1"},
+    @{Src=Join-Path "scripts" "wisdom-forge.ps1";Dst=Join-Path "scripts" "wisdom-forge.ps1"},
+    @{Src=Join-Path "scripts" "check-mcp-security.ps1";Dst=Join-Path "scripts" "check-mcp-security.ps1"},
+    @{Src=Join-Path "scripts" "wisdom-demote.ps1";Dst=Join-Path "scripts" "wisdom-demote.ps1"},
+    @{Src=Join-Path "scripts" "sync-global-ps5.ps1";Dst=Join-Path "scripts" "sync-global-ps5.ps1"},
+    @{Src=Join-Path "scripts" "project-cycle.ps1";Dst=Join-Path "scripts" "project-cycle.ps1"},
+    @{Src=Join-Path "scripts" "sync-global.ps1";Dst=Join-Path "scripts" "sync-global.ps1"},
+    @{Src=Join-Path "scripts" "wisdom-stats.ps1";Dst=Join-Path "scripts" "wisdom-stats.ps1"},
+    @{Src=Join-Path "scripts" "skillspector-gate.ps1";Dst=Join-Path "scripts" "skillspector-gate.ps1"},
     # New scripts
-    @{Src="scripts\analyze-screenshot.ps1";Dst="scripts\analyze-screenshot.ps1"},
-    @{Src="scripts\bench-compare.ps1";Dst="scripts\bench-compare.ps1"},
-    @{Src="scripts\bench-file-io.ps1";Dst="scripts\bench-file-io.ps1"},
-    @{Src="scripts\bootstrap.ps1";Dst="scripts\bootstrap.ps1"},
-    @{Src="scripts\list-skills.ps1";Dst="scripts\list-skills.ps1"},
-    @{Src="scripts\project-profile.ps1";Dst="scripts\project-profile.ps1"},
-    @{Src="scripts\skill-test-suite.ps1";Dst="scripts\skill-test-suite.ps1"},
-    @{Src="scripts\test-downstream.ps1";Dst="scripts\test-downstream.ps1"}
+    @{Src=Join-Path "scripts" "analyze-screenshot.ps1";Dst=Join-Path "scripts" "analyze-screenshot.ps1"},
+    @{Src=Join-Path "scripts" "bench-compare.ps1";Dst=Join-Path "scripts" "bench-compare.ps1"},
+    @{Src=Join-Path "scripts" "bootstrap.ps1";Dst=Join-Path "scripts" "bootstrap.ps1"},
+    @{Src=Join-Path "scripts" "list-skills.ps1";Dst=Join-Path "scripts" "list-skills.ps1"},
+    @{Src=Join-Path "scripts" "project-profile.ps1";Dst=Join-Path "scripts" "project-profile.ps1"},
+    @{Src=Join-Path "scripts" "test-downstream.ps1";Dst=Join-Path "scripts" "test-downstream.ps1"}
 )
 foreach($s in $sharedScripts){
     $src = Join-Path $gentlemanRoot $s.Src
@@ -171,7 +172,7 @@ if(-not $SkipMCP -and (Test-Path $globalJson)){
 
 # ── 7. Ensure skill junctions ──────────────────────────────────────────
 $globalSkills = Join-Path $globalConfig "skills"
-$canonicalSkills = Join-Path $gentlemanRoot ".agents\skills"
+$canonicalSkills = Join-Path $gentlemanRoot ".agents" "skills"
 if((Test-Path $canonicalSkills) -and (Test-Path $globalSkills)){
     $canonDirs = Get-ChildItem $canonicalSkills -Directory | Where-Object { $_.Name -ne '_shared' }
     $junctionCount = 0
@@ -179,9 +180,9 @@ if((Test-Path $canonicalSkills) -and (Test-Path $globalSkills)){
     foreach($d in $canonDirs){
         $target = Join-Path $globalSkills $d.Name
         if(-not (Test-Path $target)){
-            # Create junction
+            # Create junction/symlink (cross-platform)
             try{
-                New-Item -ItemType Junction -Path $target -Target $d.FullName -Force | Out-Null
+                New-CrossPlatLink -Path $target -Target $d.FullName
                 $junctionCount++
             }catch{
                 Add-Result "Junction:$($d.Name)" "FAIL" $_.Exception.Message
@@ -197,8 +198,8 @@ if((Test-Path $canonicalSkills) -and (Test-Path $globalSkills)){
 }
 
 # ── 8. Generate skill registry if missing ──────────────────────────────
-$registryPath = Join-Path $gentlemanRoot "scripts\skill-registry.json"
-$buildScript = Join-Path $gentlemanRoot "scripts\build-skill-registry.ps1"
+$registryPath = Join-Path $gentlemanRoot "scripts" "skill-registry.json"
+$buildScript = Join-Path $gentlemanRoot "scripts" "build-skill-registry.ps1"
 if(-not (Test-Path $registryPath) -and (Test-Path $buildScript)){
     & $buildScript -Quiet 2>$null
     Add-Result "Skill Registry" "SYNCED" "Generated from SKILL.md frontmatters"
