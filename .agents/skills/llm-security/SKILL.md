@@ -1,52 +1,68 @@
 ---
 name: llm-security
 description: "Trigger: LLM, AI, prompt injection, RAG, OpenAI, Anthropic, Ollama, LangChain, agent, tool use, data exfiltration. Audit LLM integration security."
+triggers: "LLM, AI, prompt injection, RAG, OpenAI, Anthropic, Ollama, LangChain, agent, tool use, data exfiltration, model"
 license: Apache-2.0
 metadata:
   tags: [security, ai]
   author: gentleman-vMK
-  version: "1.2"
-  changelog: "1.2: aggressive compression — 741→~560 tokens · 1.1: Karpathy · 1.0: initial"
+  version: "1.4"
+  changelog: "1.4: compression + breaker fixes retained · 1.3: breaker fixes · 1.0: initial"
 ---
 ## WHEN: Reviewing LLM integrations, AI features, RAG pipelines, or "is this LLM integration secure"
 
-## SCAN DIMENSIONS
+## SCAN DIMENSIONS (by integration type)
 
-**Prompt Injection**: `grep -rn "user.*input\|prompt.*=\|system.*message\|messages\.push" --include="*.{ts,js,py,go}"` → user input in prompts without sanitization, system prompt leakage
-**Data Exfiltration**: `grep -rn "output.*channel\|response.*send\|return.*data" --include="*.{ts,js,py,go}"` → LLM output leaking PII/secrets via response/logging/webhook
-**RAG Pipeline**: `grep -rn "retrieval\|embedding\|vector\|similarity\|chunk" --include="*.{ts,js,py,go}"` → per-user doc access controls, chunk sanitization, index poisoning
-**Tool Use**: `grep -rn "tool.*call\|function.*call\|execute.*command\|run.*tool" --include="*.{ts,js,py,go}"` → privilege escalation, sandboxing, rate limiting on tool calls
-**Model Config**: `grep -rn "temperature\|top_p\|max_tokens\|model" --include="*.{ts,js,py,yaml,yml}"` → version pinning, temperature bounds, token limits (cost/DoS)
+### Chat/Completion
+- `grep -rn "openai\|anthropic\|ollama\|ChatOpenAI\|generateText" --include="*.{ts,js,py,go}"` → entry points
+- `grep -rn "messages\.push\|role.*user" --include="*.{ts,js,py,go}"` → prompt construction (user input sanitized before injection?)
+- `grep -rn "system.*message\|systemPrompt\|system_prompt" --include="*.{ts,js,py,go}"` → leakage in errors/responses?
 
-## VULNERABILITY CHECKLIST
+### RAG Pipeline
+- `grep -rn "retrieval\|embedding\|vector.*search\|similarity\|chunk" --include="*.{ts,js,py,go}"` → per-user access controls?
+- `grep -rn "pinecone\|weaviate\|chroma\|qdrant\|pgvector" --include="*.{ts,js,py,go}"` → namespace/collection isolation?
+
+### Tool Use / Agents
+- `grep -rn "tool.*call\|function.*call\|tools.*=" --include="*.{ts,js,py,go}"` → privilege boundaries?
+- `grep -rn "execute.*command\|invoke.*tool" --include="*.{ts,js,py,go}"` → sandboxing, rate limiting?
+
+### Output Handling
+- `grep -rn "innerHTML\|dangerouslySetInnerHTML" --include="*.{ts,js,jsx,tsx,vue}"` → XSS via LLM output
+- `grep -rn "console\.log.*prompt\|logger.*prompt" --include="*.{ts,js,py,go}"` → PII in logs
+
+### Config
+- `grep -rn "temperature\|max_tokens\|model.*=" --include="*.{ts,js,py,yaml,yml}"` → bounds, pinning
+
+## CHECKLIST
 
 | Check | Sev | Pattern |
 |-------|-----|---------|
-| User input in system prompt | CRIT | User text concatenated into system msg without delimiters |
-| No output sanitization | HIGH | LLM response sent directly to client |
-| RAG: no per-user filtering | HIGH | Vector search returns all docs regardless of permissions |
-| Tool: no privilege boundary | HIGH | LLM can call admin tools from user context |
-| System prompt leaked | HIGH | Full prompt in error/response payload |
-| No token budget | MED | Unbounded `max_tokens` = cost DoS |
-| Model not pinned | MED | `gpt-4` instead of `gpt-4o-2024-08-06` = drift |
-| No rate limiting | MED | Unlimited LLM calls = cost exhaustion |
+| User input in system prompt | CRIT | Concatenated without delimiters |
+| Output via innerHTML | HIGH | LLM response rendered unsanitized |
+| RAG: no per-user filter | HIGH | Vector search returns all docs |
+| Tool: no privilege boundary | HIGH | LLM calls admin tools from user ctx |
+| System prompt leaked | HIGH | Full prompt in error/response |
+| PII in LLM logs | HIGH | Prompt/response logged with user data |
+| No token budget | MED | Unbounded max_tokens = cost DoS |
+| Model not pinned | MED | Behavioral drift |
+| No rate limiting | MED | Cost exhaustion |
+| Multi-tenancy leak | MED | Shared vector DB without namespace |
 
-## OUTPUT FORMAT
-
+## OUTPUT
 ```
 ## LLM Security: {scope}
 ### Summary
-- Prompt Injection: {N} | Data Exfil: {N} | RAG: {N} | Tool Use: {N} | Config: {N}
-### Issues (CRITICAL/HIGH/MEDIUM/LOW)
+- Chat: {N} | RAG: {N} | Tools: {N} | Output: {N} | Config: {N}
+### Issues
 # CRITICAL: {type} in {file:line}
 - Pattern: `{found}` → Fix: `{fix}`
 ```
 
 ## RULES
-1. Prompt injection FIRST — LLM equivalent of SQL injection. 2. RAG access controls per-user. 3. Tool privilege boundaries. 4. Set max_tokens + temperature bounds. 5. End: "Remaining risk: NONE/LOW/MED/HIGH (why)"
+1. Prompt injection FIRST. 2. RAG per-user. 3. Tool privilege boundaries. 4. Output sanitization. 5. End: "Remaining risk: NONE/LOW/MED/HIGH (why)"
 
 ## Refs
 security-scanner · best-practices · quality-gate
 
 ## Anti-Patterns
-Assume LLM output is safe because "just text" · Skip RAG access control · Ignore token budget · Miss system prompt leakage · Treat all LLM integrations the same (chat≠RAG≠tool-use)
+Assume output safe because "just text" · Skip RAG access control · Ignore token budget · Miss system prompt leakage · Treat all LLM types same (chat≠RAG≠tool-use) · Miss output XSS
