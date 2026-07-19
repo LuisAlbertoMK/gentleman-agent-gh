@@ -266,10 +266,10 @@
       }
     },
     "gentleman-seo": {
-      "description": "SEO specialist - content optimization, keyword analysis, schema markup, GEO strategy (FREE TIER)",
+      "description": "Technical SEO analyst - crawlability, structured data validation, on-page audit, CWV, GEO readiness (FREE TIER)",
       "model": "opencode/nemotron-3-super-free",
       "mode": "primary",
-      "prompt": "You are an SEO and content specialist. Focus on content optimization, keyword analysis, schema markup, and generative engine optimization (GEO). Leverage large context windows (1M tokens) for full-site analysis.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
+      "prompt": "You are a technical SEO analyst. Audit crawlability, indexability, structured data (JSON-LD), on-page elements (title/meta/H1), Core Web Vitals, and GEO readiness. Follow audit order: robots.txt → sitemap → structured data → on-page → CWV → mobile. Severity: Critical (indexable/title/canonical) → High (structured data/alt text) → Medium (OG cards/hreflang). Leverage large context for full-site analysis.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
         "bash": {
           "*": "ask",
@@ -326,10 +326,10 @@
       }
     },
     "gentleman-frontend": {
-      "description": "Frontend specialist - UI/UX, React, Tailwind, Vue, accessibility, design systems (FREE TIER)",
+      "description": "Frontend architecture analyst - component patterns, design system audit, CSS architecture, accessibility compliance (FREE TIER)",
       "model": "opencode/kimi-k2.5-free",
       "mode": "primary",
-      "prompt": "You are a frontend and UI/UX specialist. Focus on converting designs to code (React, Tailwind, Vue), improving accessibility (WCAG 2.2 AA), and creating consistent design systems. Leverage long context to read entire component libraries.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
+      "prompt": "You are a frontend architecture analyst. Audit component structure, design system consistency, CSS architecture, and UI patterns. Prioritize: accessibility (WCAG 2.2 AA/EAA 2025) → responsive integrity → animation budget → token cascade (PRIM→SEM→COMP). Flag anti-patterns: fixed widths, grid-auto-flow:dense on interactive, transition:all, missing reduced-motion, HSL tokens, prop drilling >3L.\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
         "bash": {
           "*": "ask",

@@ -9,9 +9,9 @@ Total: 22 agents
 | gentleman-quick | Fast executor - quick edits, localized changes, simple tasks | inline (3 lines) |
 | gentleman-codex | Code generation specialist - general coding, tool calling, scripts | inline (3 lines) |
 | gentleman-security | Security specialist - vulnerability analysis, secure code review, attack pattern detection (FREE TIER) | inline (3 lines) |
-| gentleman-seo | SEO specialist - content optimization, keyword analysis, schema markup, GEO strategy (FREE TIER) | inline (3 lines) |
+| gentleman-seo | Technical SEO analyst - crawlability, structured data validation, on-page audit, CWV, GEO readiness (FREE TIER) | inline (3 lines) |
 | gentleman-infra | Infrastructure specialist - IaC, Kubernetes, Terraform, CI/CD pipelines, cloud architecture (FREE TIER) | inline (3 lines) |
-| gentleman-frontend | Frontend specialist - UI/UX, React, Tailwind, Vue, accessibility, design systems (FREE TIER) | inline (3 lines) |
+| gentleman-frontend | Frontend architecture analyst - component patterns, design system audit, CSS architecture, accessibility compliance (FREE TIER) | inline (3 lines) |
 | gentleman-performance | Performance specialist - code optimization, query tuning, load testing, bottleneck analysis (FREE TIER) | inline (3 lines) |
 | gentleman-datascience | Data science specialist - Python (Pandas, Polars), SQL, data visualization, statistical analysis (FREE TIER) | inline (3 lines) |
 | gentleman-docs | Documentation specialist - technical writing, API docs, READMEs, ADRs, clean structured output (FREE TIER) | inline (3 lines) |
@@ -47,8 +47,8 @@ Total: 22 agents
 - **gentleman-security**: Security specialist - vulnerability analysis, secure code review, attack pattern detection (FREE TIER)
 
 ### UI/UX/Design (2)
-- **gentleman-seo**: SEO specialist - content optimization, keyword analysis, schema markup, GEO strategy (FREE TIER)
-- **gentleman-frontend**: Frontend specialist - UI/UX, React, Tailwind, Vue, accessibility, design systems (FREE TIER)
+- **gentleman-seo**: Technical SEO analyst - crawlability, structured data validation, on-page audit, CWV, GEO readiness (FREE TIER)
+- **gentleman-frontend**: Frontend architecture analyst - component patterns, design system audit, CSS architecture, accessibility compliance (FREE TIER)
 
 ### General Purpose (9)
 - **gentleman-vMK**: Senior Architect mentor - helpful first, challenging when it matters
@@ -67,3 +67,4 @@ Total: 22 agents
 - All `gentleman-*` agents except vMK have granular bash deny rules (17 commands)
 - gentleman-vMK inherits global permissions (orchestrator role)
 - All agents have write/edit deny for .env, credentials, secrets, opencode.json, AGENTS.md
+- gentleman-frontend and gentleman-seo prompts improved in v3 (2026-07-18)

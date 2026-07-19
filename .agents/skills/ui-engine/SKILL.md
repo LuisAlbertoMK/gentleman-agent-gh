@@ -1,13 +1,13 @@
 ---
 name: ui-engine
-description: "UI system — Grid/Flexbox/@layer/:has(), container queries, compositor-only animation, OKLCH tokens"
-triggers: "ui, layout, responsive, animation, design tokens, css, grid, flexbox, container query, dark mode, component layout, page layout"
+description: "UI system — Grid/Flexbox/@layer/:has(), container queries, compositor-only animation, OKLCH tokens, component patterns"
+triggers: "ui, layout, responsive, animation, design tokens, css, grid, flexbox, container query, dark mode, component layout, page layout, component patterns, hooks, compound components, state management"
 license: MIT
 metadata:
   tags: [frontend, ui, css, architecture]
   author: gentleman-vMK
-  version: "7.1"
-  changelog: "7.1: Breaker fixes — subgrid clarification, container naming, flex:1 distinction, max nest defined, budget clarified. 7.0: Added decision tree, workflow, examples"
+  version: "8.0"
+  changelog: "8.0: Added §5 Component Patterns (compound, hooks, state management, RSC). 7.1: Breaker fixes"
 ---
 # UI Engine
 
@@ -66,14 +66,32 @@ Fluid type: use `vw` for page-level, `cqi` only inside containers with `containe
 120ms hover/focus | 200ms dropdown | 300ms modal | MAX 500ms per animation. Per-element budget: <200ms total per element.
 ❌Decorative·❌Layoutanim·❌will-change·❌>500ms·❌transition:all
 
+## §5 Component Patterns
+**Evolution**: HOC→Render Props→Hooks→Headless. Use hooks (dominant), render props only for DnD/animation libs.
+```jsx
+// Compound: shared state via Context
+<Tab.Group><Tab.List><Tab>...</Tab.List><Tab.Panels>...</Tab.Panels></Tab.Group>
+
+// Custom hook: logic sharing
+const useLocalStorage = (key, init) => { const [v,set]=useState(()=>...)... }
+
+// Controlled vs Uncontrolled: default uncontrolled, controlled when parent needs state
+const [open,setOpen] =useState(false) // uncontrolled
+const {open,onClose}=props // controlled
+```
+**State 2026**: URL→Server Component→TanStack Query→useState→Zustand(default)→Redux(rarely)
+**RSC**: Server Components = no useState/useEffect. `'use client'` at leaf nodes only.
+❌PropDrill>3L·❌DerivedStateInUseEffect·❌ContextForHighFreq·❌HOCsInNewCode·❌ReduxAsDefault
+
 ## Workflow
 1. **Identify**: 1D/2D? Component/page? Known layout → skip
 2. **Choose**: Decision tree → pick technique
-3. **Implement**: Use patterns from §1-§4
+3. **Implement**: Use patterns from §1-§5
 4. **Tokens**: Check cascade PRIM→SEM→COMP
 5. **Responsive**: CQ for components (container-type: inline-size), MQ for page
 6. **Animate**: 4 purposes check → compositor-only → per-element budget
-7. **Verify**: `prefers-reduced-motion`, contrast≥4.5:1, CSS nesting depth ≤3
+7. **Components**: Pattern from §5 (hooks > render props > HOCs)
+8. **Verify**: `prefers-reduced-motion`, contrast≥4.5:1, CSS nesting depth ≤3
 
 ## Component Examples
 **Card grid**: `.ga{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}`
@@ -91,4 +109,4 @@ When loading multiple UI skills: **ui-engine** (reference patterns) → **baseli
 - **web-quality-audit** → full audit checklist
 
 ## Anti-Patterns
-Flexbox2D · Grid1D · !important vs @layer · flex:1 w/o min-inline-size:0 · container-type:size w/o block-size · grid-auto-flow:dense interactive · MQ for components · Decorative animation · >500ms duration · transition:all · HSL/RGB tokens · Fixed font-size · cqi outside container
+Flexbox2D · Grid1D · !important vs @layer · flex:1 w/o min-inline-size:0 · container-type:size w/o block-size · grid-auto-flow:dense interactive · MQ for components · Decorative animation · >500ms duration · transition:all · HSL/RGB tokens · Fixed font-size · cqi outside container · Prop drilling >3L · Derived state in useEffect · Context for high-frequency updates · HOCs in new code · Redux as default
