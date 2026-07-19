@@ -1,9 +1,9 @@
 # SKILLS INDEX
 
-> Full trigger table for all 68 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 71 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 4.2 | **Changelog**: 4.2 (+1 new: e2e-testing; count 68→69); 4.1 (+2 new: server-commands, analysis-mode; count 66→68); 4.0 (+8 missing triggers: cancel-ralph, cross-project-forge, cross-project-wisdom, engram-protocol, help, opencode-skill-creator, ralph-loop, sdd-quick; fixed 57→65 discoverable count); 3.9 (+2 new: vision-analyze, workflow-optimizer; count 63→65); 3.8 (+4 new skills: sdd-quick, visual-testing, image-pipeline, pdf-utils); 3.7 (Removed 4 redirect skills: css-layout, design-tokens, responsive-design, ui-animation); 3.6 (Merged into ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills)
+> **Version**: 4.3 | **Changelog**: 4.3 (+3 new: auth-hardening, container-security, llm-security; count 68→71); 4.2 (+1 new: e2e-testing; count 68→69); 4.1 (+2 new: server-commands, analysis-mode; count 66→68); 4.0 (+8 missing triggers: cancel-ralph, cross-project-forge, cross-project-wisdom, engram-protocol, help, opencode-skill-creator, ralph-loop, sdd-quick; fixed 57→65 discoverable count); 3.9 (+2 new: vision-analyze, workflow-optimizer; count 63→65); 3.8 (+4 new skills: sdd-quick, visual-testing, image-pipeline, pdf-utils); 3.7 (Removed 4 redirect skills: css-layout, design-tokens, responsive-design, ui-animation); 3.6 (Merged into ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills)
 
 ## Triggers → Skill
 
@@ -44,6 +44,9 @@
 | Commit, mensaje, commit message, conventional commit | commit-crafter |
 | Mapear, project map, estructura, tech stack, arquitectura | project-mapper |
 | Security, seguridad, vulnerabilidad, auditar | security-scanner |
+| Auth, authentication, authorization, JWT, OAuth, RBAC, CSRF, session, login, password hashing | auth-hardening |
+| Dockerfile, docker-compose, container, image, Kubernetes, k8s, pod, deployment, helm | container-security |
+| LLM, AI, prompt injection, RAG, OpenAI, Anthropic, Ollama, LangChain, agent, tool use, data exfiltration | llm-security |
 | Bitacora, historial, histórico, qué pedí, request log | bitacora |
 | Dreaming, cross-session patterns, memory curation | dreaming |
 | Performance score, mobile perf, desktop perf, rendimiento, app score, lighthouse, benchmark | performance-tracker |
@@ -86,7 +89,7 @@
 - **Memory**: session-resume, dreaming, bitacora
 - **Skills meta**: opencode-skill-creator, skill-registry, skill-improver, skill-graph
 - **Coordination**: delivery-harness, chained-pr, branch-pr, issue-creation, subagent-isolation, command-wrapper, opencode-model-router
-- **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner
+- **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner, auth-hardening, container-security, llm-security
 - **SDD**: sdd (unified pipeline — phases consolidated)
 - **UI/Design**: baseline-ui, accessibility, performance, seo, web-quality-audit, ui-engine
 - **Visual/Testing**: visual-testing, image-pipeline, e2e-testing
@@ -97,7 +100,7 @@
 
 ## Load rule
 1. `read` this file → find trigger match → get skill name
-2. `skill` tool with name (skills.paths now registered in opencode.json — 68 skills globally discoverable)
+2. `skill` tool with name (skills.paths now registered in opencode.json — 71 skills globally discoverable)
 3. If `skill` tool fails → `read skills/{name}/SKILL.md` directly from disk
 4. If skill has assets → `read skills/{name}/references/` or `read skills/{name}/assets/` for templates
 
