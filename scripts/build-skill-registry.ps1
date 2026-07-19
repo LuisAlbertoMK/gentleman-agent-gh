@@ -108,7 +108,22 @@ $registry = @{
     trigger_index = $triggerIndex
 }
 
-$registry | ConvertTo-Json -Depth 5 | Set-Content -Path $OutputFile -Encoding UTF8
+# Compact output: strip tags and dependencies (not used by resolver)
+$compact = @{
+    generated    = $registry.generated
+    trigger_index = $registry.trigger_index
+    skills       = @{}
+}
+foreach ($name in $registry.skills.Keys) {
+    $s = $registry.skills[$name]
+    $compact.skills[$name] = @{
+        name     = [string]$s.name
+        triggers = @($s.triggers)
+        path     = [string]$s.path
+    }
+}
+
+$compact | ConvertTo-Json -Depth 5 | Set-Content -Path $OutputFile -Encoding UTF8
 
 if (-not $Quiet) { Write-Host "✓ Registry built: $($skills.Count) skills, $($triggerIndex.Count) triggers → $OutputFile" -ForegroundColor Green }
 

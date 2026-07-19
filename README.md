@@ -1,5 +1,20 @@
 # Gentleman Agent — OpenCode AI Agent Skills & Scripts
 
+## ¿Qué es esto?
+
+**Gentleman Agent** es un **equipo de desarrollo de software AI** para OpenCode. En lugar de un solo chatbot, tenés 22 agentes especializados que trabajan juntos:
+
+- 🏗️ **Arquitecto Principal** — mentor Senior Architect que resuelve tareas complejas
+- 🔒 **Especialistas** — consultores de seguridad, performance, frontend, etc. (FREE TIER)
+- 🧠 **Memoria persistente** — el agente recuerda entre sesiones
+- ✅ **Verificación automática** — triple check antes de cualquier cambio
+
+**En una línea**: Pedís una tarea → el agente la resuelve con su equipo → verifica que funcione → documenta lo que aprendió.
+
+**Empezá aquí**: [QUICKSTART.md](QUICKSTART.md) (5 pasos, 5 minutos)
+
+---
+
 Suite de **68 skills** (+ `_shared`) + **91 scripts PowerShell** para [OpenCode](https://github.com/sst/opencode). Diseñadas para desarrollo de software con arquitectura limpia, TDD, y verificación multi-capa.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
@@ -67,15 +82,15 @@ El proyecto ejecuta ciclos de mejora continua (CYCLE.md):
 | `!close` | — | — | Session close |
 
 ### Workflow Shortcuts
+
+> **Full shortcut reference**: [SHORTCUTS.md](SHORTCUTS.md)
+
 | Keyword | Action |
 |---------|--------|
-| `!compress` | Karpathy compress skills >2.5KB + score update |
 | `!score` | Score auto-update + docs/operations/project-score.md sync |
-| `!sync` | Upstream check + drift + score update |
 | `!health` | Full diagnostics (git, drift, cross-ref, score, inter) |
-| `!batch` | New batch with auto-increment + bitacora + inter-track++ |
-| `!cycle` | Cycle status summary |
 | `!close` | Session close pipeline (bitacora + inter-track + git status) |
+| `!analisis` | Multi-agent analysis (6 specialists, 8 dimensions) |
 
 ### SDD Pipeline (Spec-Driven Development)
 8 fases completas: `init → propose → spec → design → tasks → apply → verify → archive`
@@ -116,7 +131,7 @@ El proyecto usa dos MCPs para memoria cross-session:
 | **Quality** | quality-gate, auto-metrics, external-auditor, immune-system, triple-verify |
 | **Code Review** | code-review-agent, judgment-day |
 | **Memory** | session-resume, dreaming, bitacora |
-| **Skills Meta** | skill-creator, skill-registry, skill-improver, skill-graph |
+| **Skills Meta** | opencode-skill-creator, skill-registry, skill-improver, skill-graph |
 | **SDD** | sdd (unified pipeline — phases consolidated) |
 | **Engineering** | senior-engineer, refactoring-planner, project-mapper |
 | **Security** | security-scanner |
@@ -230,18 +245,14 @@ gentleman-agent-gh/
 
 ### Shortcuts principales
 
+> **Full reference**: [SHORTCUTS.md](SHORTCUTS.md)
+
 | Shortcut | Acción |
 |----------|--------|
 | `!score` | Score-auto + docs update + cross-ref |
 | `!health` | Git status, drift, cross-ref, score |
 | `!close` | Pipeline de cierre unificado |
-| `!setup` | Setup máquina nueva (.ps1 o .sh según OS) |
-| `!dev` | Manage background dev servers |
-| `!gentleman` | Heredar config en otro proyecto |
 | `!analisis` | Análisis multi-agente profundo |
-| `!batch` | Batch auto-incremental + bitácora |
-| `!cycle` | Inter-track + score + upstream |
-| `!ponytail {lite\|full\|ultra\|off}` | Cambiar intensidad de ceremony |
 
 ---
 

@@ -30,7 +30,16 @@ Set-StrictMode -Version Latest
 # 1. CACHE CHECK
 # ============================================================
 
-$cacheDir  = Join-Path "$PSScriptRoot\.." ".learnings"
+# Resolve repoRoot FIRST — needed by cache path and everything else
+$repoRoot = if ($PSScriptRoot -and (Test-Path "$PSScriptRoot\..")) {
+    "$PSScriptRoot\.."
+} elseif ($env:GENTLEMAN_AGENT_ROOT) {
+    $env:GENTLEMAN_AGENT_ROOT
+} else {
+    $PWD.Path
+}
+
+$cacheDir  = Join-Path $repoRoot ".learnings"
 $cacheFile = Join-Path $cacheDir "score-cache.json"
 
 # ponytail: init before try — ensures vars exist even if cache check throws
@@ -39,9 +48,7 @@ $skillMdFiles = @()
 $skillDirs    = @()
 
 try {
-    $repoRoot = "$PSScriptRoot\.."
-
-    $gitHead = git -C $repoRoot rev-parse HEAD 2>$null
+    $gitHead = try { git -C $repoRoot rev-parse HEAD 2>$null } catch { $null }
 
     # ponytail: consolidated reads — single pass for cache hash + scoring
     $scriptFiles  = @(Get-ChildItem "$repoRoot\scripts\*.ps1" -EA SilentlyContinue)
@@ -75,9 +82,7 @@ try {
 # SETUP: Push-Location preserves caller CWD (AGENTS.md forbids Set-Location)
 # ============================================================
 
-Push-Location "$PSScriptRoot\.."
-
-& "$PSScriptRoot\restore-project-score.ps1" -Quiet 2>&1 | Out-Null
+Push-Location $repoRoot
 
 $math       = [math]
 $dimensions = @{}
@@ -96,25 +101,26 @@ $skillDirCount = $skillDirs.PSWhere({ $_ -ne '_shared' }).Count
 # 2. PARALLEL SUB-SCRIPTS
 # ============================================================
 
-$scriptRoot = $PSScriptRoot
-$jobs       = @()
+# Use repoRoot for script paths (more reliable than PSScriptRoot in pwsh -Command)
+$scriptLibRoot = Join-Path $repoRoot "scripts"
+$jobs          = @()
 
-$jobs += Start-ThreadJob -Name "crossref" -ScriptBlock { & "$using:scriptRoot\cross-ref-check.ps1" -Json -Quiet }
-$jobs += Start-ThreadJob -Name "pssa"    -ScriptBlock { & "$using:scriptRoot\pssa-gate.ps1" -Mode Check -Quiet }
-$jobs += Start-ThreadJob -Name "backlog" -ScriptBlock { & "$using:scriptRoot\check-backlog-integrity.ps1" -Json }
+$jobs += Start-ThreadJob -Name "crossref" -ScriptBlock { & "$using:scriptLibRoot\cross-ref-check.ps1" -Json -Quiet }
+$jobs += Start-ThreadJob -Name "pssa"     -ScriptBlock { & "$using:scriptLibRoot\pssa-gate.ps1" -Mode Check -Quiet }
+$jobs += Start-ThreadJob -Name "backlog"  -ScriptBlock { & "$using:scriptLibRoot\check-backlog-integrity.ps1" -Json }
 
 $jobs | Wait-Job -Timeout 30 | Out-Null
 
-# Receive each job by name (order-safe)
+# Receive each job by name — handle failures gracefully with defaults
 $crossRefOutput = Receive-Job -Name "crossref" -ErrorAction SilentlyContinue
 $pssaOutput     = Receive-Job -Name "pssa" -ErrorAction SilentlyContinue | Out-String
 $backlogRaw     = Receive-Job -Name "backlog" -ErrorAction SilentlyContinue
 
 $jobs | Remove-Job -Force 2>$null
 
-# Parse parallel results
-$crossRefClean = ($crossRefOutput | ConvertFrom-Json -EA SilentlyContinue).allClean -eq $true
-$backlogData   = $backlogRaw | ConvertFrom-Json -EA SilentlyContinue
+# Parse parallel results with safe defaults on failure
+$crossRefClean = try { ($crossRefOutput | ConvertFrom-Json -EA SilentlyContinue).allClean -eq $true } catch { $false }
+$backlogData   = try { $backlogRaw | ConvertFrom-Json -EA SilentlyContinue } catch { $null }
 
 $hasReadme      = Test-Path "README.md"
 $hasProjectJson = Test-Path ".project.json"
@@ -123,17 +129,23 @@ $hasProjectJson = Test-Path ".project.json"
 # 3. DIMENSION SCORING
 # ============================================================
 
-. "$PSScriptRoot\lib\score-dims.ps1"
+. "$repoRoot\scripts\lib\score-dims.ps1"
 
-# Bias calibration warning (auto-metrics correction, not project score)
+# Bias calibration data (persist to .project.json, not just display)
 $biasCalPath = ".learnings/bias-calibration.json"
-if (-not $Json -and -not $Quiet -and (Test-Path $biasCalPath)) {
+$biasAdjusted = $null
+$biasNote = $null
+if (Test-Path $biasCalPath) {
     try {
         $biasCalData = Get-Content $biasCalPath -Raw | ConvertFrom-Json
         if ($biasCalData.samples -ge 2) {
-            Write-Host "⚠️ Active bias offsets (auto-metrics):" -ForegroundColor DarkYellow
-            $biasCalData.offsets.PSObject.Properties | Sort-Object Name | ForEach-Object {
-                Write-Host "  $($_.Name): $($_.Value)" -ForegroundColor DarkYellow
+            $biasAdjusted = $math::Round($finalScore - $biasCalData.avg_offset, 1)
+            $biasNote = "Self-assessment inflation ~$($biasCalData.avg_offset)pt avg across $($biasCalData.samples) samples (bias-calibration.json). Real score estimated at $biasAdjusted/10."
+            if (-not $Json -and -not $Quiet) {
+                Write-Host "⚠️ Active bias offsets (auto-metrics):" -ForegroundColor DarkYellow
+                $biasCalData.offsets.PSObject.Properties | Sort-Object Name | ForEach-Object {
+                    Write-Host "  $($_.Name): $($_.Value)" -ForegroundColor DarkYellow
+                }
             }
         }
     } catch {
@@ -174,6 +186,12 @@ $result = @{
     dimensions_detail = $dimensions
 }
 
+# Persist bias calibration data if available
+if ($null -ne $biasAdjusted) {
+    $result.score.bias_adjusted = $biasAdjusted
+    $result.score.bias_note = $biasNote
+}
+
 foreach ($key in $dimNames.Keys) {
     $result.score.dimensions[$dimNames[$key]] = $dimensions[$key].s
 }
@@ -203,7 +221,7 @@ if (Test-Path ".project.json") {
 }
 
 # ============================================================
-# SAVE TO CACHE
+# SAVE TO CACHE + SYNC .project.json
 # ============================================================
 
 try {
@@ -218,6 +236,31 @@ try {
     $cacheObject | ConvertTo-Json -Depth 5 | Set-Content $cacheFile -Encoding UTF8
 } catch {
     Write-Debug "score-cache save: $($_.Exception.Message)"
+}
+
+# --- Sync .project.json (single source of truth) ---
+try {
+    $pjPath = Join-Path $repoRoot ".project.json"
+    $skipWorktreeRemoved = $false
+
+    # Validation: ensure score is sane before writing (ported from restore-project-score.ps1)
+    $dimCount = @($dimensions.Keys).Count
+    if ($finalScore -lt 0 -or $finalScore -gt 10 -or $dimCount -lt 11) {
+        Write-Debug "score-auto: validation failed — score=$finalScore, dims=$dimCount (expected: 0-10, >=11 dims). Skipping .project.json write."
+    } else {
+        if (Test-Path $pjPath) {
+            & "git" "-C" $repoRoot "update-index", "--no-skip-worktree", ".project.json" 2>$null
+            $skipWorktreeRemoved = $true
+        }
+        $result | ConvertTo-Json -Depth 5 | Set-Content $pjPath -Encoding UTF8
+    }
+} catch {
+    Write-Debug "score-auto: .project.json sync failed ($($_.Exception.Message))"
+} finally {
+    # Always restore skip-worktree if we removed it
+    if ($skipWorktreeRemoved) {
+        try { & "git" "-C" $repoRoot "update-index", "--skip-worktree", ".project.json" 2>$null } catch { }
+    }
 }
 
 Pop-Location

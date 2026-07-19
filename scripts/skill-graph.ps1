@@ -109,7 +109,7 @@ vision-analyze|vision analyze|image analysis|screenshot analysis|visual inspecti
 workflow-optimizer|workflow optimize|process optimize|streamline|reduce steps|automate workflow|specialized|low|||Optimize workflow patterns — faster info access
 '@ -split "`n" | Where-Object { $_.Trim() -ne '' }
 
-$validCategories = @('meta','quality','coordination','code-ops','specialized','testing','web-quality','memory','documents')
+$validCategories = @('meta','quality','coordination','code-ops','specialized','testing','web-quality','memory','documents','compression','performance','research','SDD')
 $validEfforts = @('low','medium','high')
 
 $skillRegistry = foreach ($line in $raw) {
@@ -117,25 +117,37 @@ $skillRegistry = foreach ($line in $raw) {
     $name = $parts[0]
     $len = $parts.Length
 
-    # Find Category and Effort by scanning for known values from the end
-    $catIdx = -1; $effIdx = -1
-    for ($i = $len - 1; $i -ge 1; $i--) {
+    # Description = always last field
+    $descIdx = $len - 1
+
+    # Find Effort by scanning from end for known values (stop at first match)
+    $effIdx = -1
+    for ($i = $descIdx - 1; $i -ge 1; $i--) {
         $v = $parts[$i].Trim().ToLowerInvariant()
-        if ($effIdx -lt 0 -and $v -in $validEfforts) { $effIdx = $i }
-        elseif ($catIdx -lt 0 -and $v -in $validCategories) { $catIdx = $i; break }
+        if ($v -in $validEfforts) { $effIdx = $i; break }
     }
 
-    # Description = last field
-    $descIdx = $len - 1
-    # DependsOn/Related = fields between Effort and Description (skip empty separators)
+    # Find Category by scanning from effort position backwards for known values
+    $catIdx = -1
+    if ($effIdx -gt 0) {
+        for ($i = $effIdx - 1; $i -ge 1; $i--) {
+            $v = $parts[$i].Trim()
+            if ($v -in $validCategories) { $catIdx = $i; break }
+        }
+    }
+
+    # Triggers = fields between Name and Category (positions 1..catIdx-1)
+    $triggers = if ($catIdx -gt 1) { ($parts[1..($catIdx-1)] -join '|') } else { '' }
+
+    # DependsOn = non-empty fields between Effort and Description
+    # NOTE: Related cannot be distinguished from DependsOn in pipe-delimited format
+    # (both can contain pipes). All mid-fields go into DependsOn.
     $midFields = @()
     if ($effIdx -gt 0) {
         for ($i = $effIdx + 1; $i -lt $descIdx; $i++) {
             if ($parts[$i].Trim() -ne '') { $midFields += $parts[$i] }
         }
     }
-    # Triggers = fields between Name and Category
-    $triggers = if ($catIdx -gt 1) { ($parts[1..($catIdx-1)] -join '|') } else { '' }
 
     [PSCustomObject]@{
         Name        = $name
@@ -165,12 +177,8 @@ function New-Graph {
                 $graph.AdjList[$skill.Name].from[$dep] = "depended_by"
             }
         }
-        foreach ($rel in ($skill.Related -split '\|')) {
-            if ($rel -and $graph.AdjList.ContainsKey($rel)) {
-                $graph.AdjList[$rel].to[$skill.Name] = "related"
-                $graph.AdjList[$skill.Name].from[$rel] = "related"
-            }
-        }
+        # NOTE: Related field is always empty in pipe-delimited format
+        # (cannot distinguish deps from related when both contain pipes)
     }
     return $graph
 }

@@ -1,0 +1,17 @@
+# .dockerignore — Exclude files not needed in Docker build
+.git
+.learnings
+node_modules
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Sensitive files — never bake into image layers
+.env
+.env.*
+*.env
+.vscode/
+*.secret
+*.key
+credentials.json

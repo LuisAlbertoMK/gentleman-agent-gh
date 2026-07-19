@@ -53,7 +53,7 @@ gh issue view <N> -R Gentleman-Programming/gentle-ai
 Valid scopes: `tui`, `cli`, `installer`, `catalog`, `system`, `agent`, `e2e`, `ci`, `docs`
 
 ## Refs
-branch-pr · commit-crafter · quality-gate · work-unit-commits · skill-creator
+branch-pr · commit-crafter · quality-gate · work-unit-commits · opencode-skill-creator
 
 ## Anti-Patterns
 Create issue without searching duplicates · Skip template · Work before approved · Use issue for questions · Start PR without Closes #N

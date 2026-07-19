@@ -11,7 +11,7 @@ metadata:
 triggers: "!audit, external audit, blind review, 'second opinion', 'verificá mi auto-score'"
 ---
 ## TRIGGER
-Explicit (!audit), user request, OR **required by close-session gate**. Auto-required when changes touch: security-scanner/, quality-gate/, auto-metrics/, external-auditor/, immune-system/, ANTI-PATTERN-CATALOG.md, ANTI-PATTERN-CHEATSHEET.md, .project.json. Also for HIGH-risk (8+ files, auth/storage/API). Skip trivial tasks (~2000 tok waste).
+Explicit (!audit), user request, OR **required by close-session gate**. Auto-required when changes touch: security-scanner/, quality-gate/, auto-metrics/, external-auditor/, immune-system/, ANTI-PATTERN-CATALOG.md, .project.json. Also for HIGH-risk (8+ files, auth/storage/API). Skip trivial tasks (~2000 tok waste).
 
 ## FLOW
 1. Gather `git diff` + scores | 2. Delegate subagent with blind prompt | 3. Timeout/unparseable → retry once, abort 2nd | 4. Regex `-\s*(Correctness|Tokens|ErrPrev|Skill|Speed|Breadth):\s*(\d+)`. <4 dims → unparseable | 5. Gap = `abs(self - audit)` | 6. Double-save guard | 7. All gaps ≤1.5 → PASSED · 1 dim >1.5 (self higher) → immune-system · 2+ dims >1.5 → full stop · under-scored → update bias · mixed → immune on over-scored only | 8. Log: bitacora + `mem_save(type="audit")` | 9. Bias calibration per dim, rolling 3, avg stored

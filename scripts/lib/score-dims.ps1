@@ -15,6 +15,13 @@
 if (-not $PSScriptRoot) { $scriptRoot = $PWD.Path } else { $scriptRoot = $PSScriptRoot }
 # Use $scriptRoot for any relative paths
 
+# --- Null guards: gracefully handle empty file arrays ---
+if (-not $scriptFiles)  { $scriptFiles = @() }
+if (-not $skillMdFiles) { $skillMdFiles = @() }
+if (-not $skillDirs)    { $skillDirs = @() }
+$hasScripts  = $scriptFiles.Count -gt 0
+$hasSkills   = $skillMdFiles.Count -gt 0
+
 # --- PA: Project Artifacts ---
 
 $paScore = 10
@@ -37,23 +44,30 @@ $hasWeakCrypto = $false
 $hasSecrets    = $false
 
 # Check for weak crypto patterns in scripts
-$weakCryptoMatches = @(
-    Select-String -Path $scriptFiles.FullName -Pattern "MD5|SHA1\b"
-).PSWhere({
-    $_.Line -notmatch "SHA1ToSHA256|SHA256|#deprecat|#legacy|SHA1SHA256|Select-String.*MD5"
-})
+$hasWeakCrypto = $false
+if ($hasScripts) {
+    $weakCryptoMatches = @(
+        Select-String -Path $scriptFiles.FullName -Pattern "MD5|SHA1\b"
+    ) | Where-Object {
+        $_.Line -notmatch "SHA1ToSHA256|SHA256|#deprecat|#legacy|SHA1SHA256|Select-String.*MD5"
+    }
 
-if ($weakCryptoMatches) {
-    $hasWeakCrypto = $true
-    $secScore -= 2
+    if ($weakCryptoMatches) {
+        $hasWeakCrypto = $true
+        $secScore -= 2
+    }
 }
 
 # Check for hardcoded secrets across scripts, skills, workflows, config
-$secretPaths = $scriptFiles.FullName +
-               $skillMdFiles.FullName +
-               @(".\.github\workflows\*.yml", ".\opencode.json")
+$secretPaths = @()
+if ($hasScripts)  { $secretPaths += $scriptFiles.FullName }
+if ($hasSkills)   { $secretPaths += $skillMdFiles.FullName }
+$secretPaths += @(".\.github\workflows\*.yml", ".\opencode.json")
 
-$secretMatches = @(Select-String -Path $secretPaths -Pattern "(?i)(api[_-]?key|secret|password|token|credential)\s*[=:]\s*['""][^'""]{8,}")
+$secretMatches = @()
+if ($secretPaths.Count -gt 0) {
+    $secretMatches = @(Select-String -Path $secretPaths -Pattern "(?i)(api[_-]?key|secret|password|token|credential)\s*[=:]\s*['""][^'""]{8,}" -EA SilentlyContinue)
+}
 
 if ($secretMatches) {
     $hasSecrets = $true
@@ -86,7 +100,7 @@ $deadJunctions = 0
 
 # Orphan skills (files in .\skills not matching .\.agents\skills\ dirs)
 $skillFilesInWorkspace = Get-ChildItem ".\skills" -File -EA SilentlyContinue
-$orphanSkills = $skillFilesInWorkspace.PSWhere({ $_.Name -notin $skillDirs }).Count
+$orphanSkills = @($skillFilesInWorkspace | Where-Object { $_.Name -notin $skillDirs }).Count
 
 if ($orphanSkills -gt 5) {
     $dcScore -= 2
@@ -96,22 +110,25 @@ if ($orphanSkills -gt 5) {
 
 # Dead junctions (symlinks pointing to missing targets)
 $junctionDirs   = Get-ChildItem ".\skills" -Directory -EA SilentlyContinue
-$deadJunctions  = $junctionDirs.PSWhere({ $_.Target -and -not (Test-Path $_.Target) }).Count
+$deadJunctions  = @($junctionDirs | Where-Object { $_.Target -and -not (Test-Path $_.Target) }).Count
 
 if ($deadJunctions -gt 0) {
     $dcScore -= 1
 }
 
 # Commented-out code patterns in scripts (exclude this file)
-$commentedPatterns = @(
-    Select-String -Path $scriptFiles.FullName -Pattern (
-        '^\s*#\s*function\s+\w+|^\s*#\s*if\s*\(|^\s*#\s*foreach\s*\(|' +
-        '^\s*#\s*for\s*\(|^\s*#\s*while\s*\(|^\s*#\s*switch\s*\(|' +
-        '^\s*#\s*try\s*\{|^\s*#\s*catch\s*\{'
-    )
-).PSWhere({ $_.Filename -ne "score-auto.ps1" })
+$commentedLines = 0
+if ($hasScripts) {
+    $commentedPatterns = @(
+        Select-String -Path $scriptFiles.FullName -Pattern (
+            '^\s*#\s*function\s+\w+|^\s*#\s*if\s*\(|^\s*#\s*foreach\s*\(|' +
+            '^\s*#\s*for\s*\(|^\s*#\s*while\s*\(|^\s*#\s*switch\s*\(|' +
+            '^\s*#\s*try\s*\{|^\s*#\s*catch\s*\{'
+        ) -EA SilentlyContinue
+    ) | Where-Object { $_.Filename -ne "score-auto.ps1" }
 
-$commentedLines = $commentedPatterns.Count
+    $commentedLines = @($commentedPatterns).Count
+}
 
 if ($commentedLines -gt 10) {
     $dcScore -= 1
@@ -127,24 +144,28 @@ Add-Dimension "DC" ($math::Max(0, $math::Min(10, $dcScore))) @{
 
 $totalScripts = $scriptFiles.Count
 
-$scriptStats = $scriptFiles | ForEach-Object -Parallel {
-    $content = [IO.File]::ReadAllText($_.FullName)
-    [PSCustomObject]@{
-        h = [bool]($content -match '<#')
-        p = [bool]($content -match 'param\(')
-        s = [bool]($content -match 'Set-StrictMode')
-        t = [bool]($content -match 'try\s*\{')
-    }
-} -ThrottleLimit 7
+if ($hasScripts) {
+    $scriptStats = $scriptFiles | ForEach-Object -Parallel {
+        $content = [IO.File]::ReadAllText($_.FullName)
+        [PSCustomObject]@{
+            h = [bool]($content -match '<#')
+            p = [bool]($content -match 'param\(')
+            s = [bool]($content -match 'Set-StrictMode')
+            t = [bool]($content -match 'try\s*\{')
+        }
+    } -ThrottleLimit 7
 
-$scriptsWithHelp       = @($scriptStats | Where-Object { $_.h }).Count
-$scriptsWithParams     = @($scriptStats | Where-Object { $_.p }).Count
-$scriptsWithStrictMode = @($scriptStats | Where-Object { $_.s }).Count
-$scriptsWithTryCatch   = @($scriptStats | Where-Object { $_.t }).Count
+    $scriptsWithHelp       = @($scriptStats | Where-Object { $_.h }).Count
+    $scriptsWithParams     = @($scriptStats | Where-Object { $_.p }).Count
+    $scriptsWithStrictMode = @($scriptStats | Where-Object { $_.s }).Count
+    $scriptsWithTryCatch   = @($scriptStats | Where-Object { $_.t }).Count
+} else {
+    $scriptsWithHelp = 0; $scriptsWithParams = 0; $scriptsWithStrictMode = 0; $scriptsWithTryCatch = 0
+}
 
-$helpRatio       = $math::Round($scriptsWithHelp / $totalScripts, 2)
-$paramRatio      = $math::Round($scriptsWithParams / $totalScripts, 2)
-$strictModeRatio = $math::Round($scriptsWithStrictMode / $totalScripts, 2)
+$helpRatio       = if ($totalScripts -gt 0) { $math::Round($scriptsWithHelp / $totalScripts, 2) } else { 0 }
+$paramRatio      = if ($totalScripts -gt 0) { $math::Round($scriptsWithParams / $totalScripts, 2) } else { 0 }
+$strictModeRatio = if ($totalScripts -gt 0) { $math::Round($scriptsWithStrictMode / $totalScripts, 2) } else { 0 }
 
 $ccScore = $math::Round(
     ($helpRatio + $paramRatio + $strictModeRatio) / 3 * 10,
@@ -160,9 +181,9 @@ Add-Dimension "CC" $ccScore @{
 
 # --- BP: Best Practices ---
 
-$bpScore = $math::Round(($scriptsWithParams / $totalScripts) * 10, 1)
+$bpScore = if ($totalScripts -gt 0) { $math::Round(($scriptsWithParams / $totalScripts) * 10, 1) } else { 0 }
 
-$tryCatchRatio = $scriptsWithTryCatch / $totalScripts
+$tryCatchRatio = if ($totalScripts -gt 0) { $scriptsWithTryCatch / $totalScripts } else { 0 }
 if ($tryCatchRatio -ge 0.8) {
     $bpScore = $math::Min(10, $bpScore + 1)
 } elseif ($tryCatchRatio -le 0.3) {
@@ -176,8 +197,10 @@ Add-Dimension "BP" $bpScore @{
 
 # --- Or: Orthography / corruption detection ---
 
-$corruptedFiles = @(
-    $skillMdFiles | ForEach-Object -Parallel {
+$corruptedFiles = 0
+if ($hasSkills) {
+    $corruptedFiles = @(
+        $skillMdFiles | ForEach-Object -Parallel {
         $file = $_
         try {
             $bytes = [System.IO.File]::ReadAllBytes($file.FullName)
@@ -197,7 +220,8 @@ $corruptedFiles = @(
             $false
         }
     } -ThrottleLimit 4 | Where-Object { $_ }
-).Count
+    ).Count
+}
 
 if ($corruptedFiles -gt 10) {
     $orScore = 4
@@ -266,11 +290,15 @@ Add-Dimension "Me" $meScore @{
 
 # --- SP: Script Performance ---
 
-$avgScriptSizeKB = $math::Round(
-    ($scriptFiles | Measure-Object -Average Length).Average / 1KB,
-    1
-)
-$hugeScriptCount = $scriptFiles.PSWhere({ $_.Length -gt 51200 }).Count
+$avgScriptSizeKB = 0
+$hugeScriptCount = 0
+if ($hasScripts) {
+    $avgScriptSizeKB = $math::Round(
+        ($scriptFiles | Measure-Object -Average Length).Average / 1KB,
+        1
+    )
+    $hugeScriptCount = @($scriptFiles | Where-Object { $_.Length -gt 51200 }).Count
+}
 
 $spScore = 10
 if ($totalScripts -lt 15 -or $totalScripts -gt 60) {
@@ -294,21 +322,32 @@ Add-Dimension "SP" ($math::Max(0, $math::Min(10, $spScore))) @{
 
 # --- SE: Skill Effectiveness ---
 
-$skillsNonShared = $skillMdFiles.PSWhere({ $_.Directory.Name -ne '_shared' })
-$totalSkills     = $skillsNonShared.Count
-$over3KBSkills   = $skillsNonShared.PSWhere({ $_.Length -gt 3072 }).Count
-$over5KBSkills   = $skillsNonShared.PSWhere({ $_.Length -gt 5120 }).Count
-$totalSkillBytes = ($skillsNonShared | Measure-Object -Sum Length).Sum
-$avgSkillSizeKB  = $math::Round($totalSkillBytes / $totalSkills / 1KB, 1)
+$skillsNonShared = @()
+$totalSkills     = 0
+$over3KBSkills   = 0
+$over5KBSkills   = 0
+$totalSkillBytes = 0
+$avgSkillSizeKB  = 0
+
+if ($hasSkills) {
+    $skillsNonShared = @($skillMdFiles | Where-Object { $_.Directory.Name -ne '_shared' })
+    $totalSkills     = $skillsNonShared.Count
+    if ($totalSkills -gt 0) {
+        $over3KBSkills   = @($skillsNonShared | Where-Object { $_.Length -gt 3072 }).Count
+        $over5KBSkills   = @($skillsNonShared | Where-Object { $_.Length -gt 5120 }).Count
+        $totalSkillBytes = ($skillsNonShared | Measure-Object -Sum Length).Sum
+        $avgSkillSizeKB  = $math::Round($totalSkillBytes / $totalSkills / 1KB, 1)
+    }
+}
 
 # Extend overweight check to commands/ + prompts/ (H-019)
 $cmdFiles    = Get-ChildItem "commands\*.md" -EA SilentlyContinue
 $promptFiles = Get-ChildItem "prompts" -Recurse -File -EA SilentlyContinue
 
-$cmdOver3KB  = $cmdFiles.PSWhere({ $_.Length -gt 3072 }).Count
-$cmdOver5KB  = $cmdFiles.PSWhere({ $_.Length -gt 5120 }).Count
-$prOver3KB   = $promptFiles.PSWhere({ $_.Length -gt 3072 }).Count
-$prOver5KB   = $promptFiles.PSWhere({ $_.Length -gt 5120 }).Count
+$cmdOver3KB  = @($cmdFiles | Where-Object { $_.Length -gt 3072 }).Count
+$cmdOver5KB  = @($cmdFiles | Where-Object { $_.Length -gt 5120 }).Count
+$prOver3KB   = @($promptFiles | Where-Object { $_.Length -gt 3072 }).Count
+$prOver5KB   = @($promptFiles | Where-Object { $_.Length -gt 5120 }).Count
 
 $overweightPenalty = 0
 if ($cmdOver5KB -gt 0 -or $prOver5KB -gt 0) {
@@ -390,11 +429,14 @@ Add-Dimension "BI2" $backlogScore @{
 
 # Compute new sub-dimension values
 # Tool Hygiene: % scripts with Quiet/Json switches
-$quietSwitchCount = @($scriptFiles | ForEach-Object -Parallel {
-    $content = [IO.File]::ReadAllText($_.FullName)
-    if ($content -match '\[switch\]\$Quiet|\[switch\]\$Json') { $true } else { $false }
-} | Where-Object { $_ }).Count
-$toolHygieneScore = $math::Round($quietSwitchCount / $totalScripts * 10, 1)
+$quietSwitchCount = 0
+if ($hasScripts) {
+    $quietSwitchCount = @($scriptFiles | ForEach-Object -Parallel {
+        $content = [IO.File]::ReadAllText($_.FullName)
+        if ($content -match '\[switch\]\$Quiet|\[switch\]\$Json') { $true } else { $false }
+    } | Where-Object { $_ }).Count
+}
+$toolHygieneScore = if ($totalScripts -gt 0) { $math::Round($quietSwitchCount / $totalScripts * 10, 1) } else { 0 }
 
 # Delegation Rate: subagent mentions in BITACORA (last 30 lines)
 $delegationScore = 0
@@ -466,15 +508,19 @@ $subScores += $(if ($dcEvidence.dead_junctions -le 0) { 10 } else { 7 })
 $subScores += $(if ($dcEvidence.commented_out -le 10) { 10 } else { 7 })
 
 # Clean Code sub-dimensions
-$ccEvidence = $dimensions["CC"].e
-$subScores += $math::Round($ccEvidence.with_help / $totalScripts * 10, 1)
-$subScores += $math::Round($ccEvidence.with_params / $totalScripts * 10, 1)
-$subScores += $math::Round($ccEvidence.with_strictmode / $totalScripts * 10, 1)
+if ($dimensions.ContainsKey("CC") -and $dimensions["CC"].e -and $totalScripts -gt 0) {
+    $ccEvidence = $dimensions["CC"].e
+    $subScores += $math::Round($ccEvidence.with_help / $totalScripts * 10, 1)
+    $subScores += $math::Round($ccEvidence.with_params / $totalScripts * 10, 1)
+    $subScores += $math::Round($ccEvidence.with_strictmode / $totalScripts * 10, 1)
+}
 
 # Best Practices sub-dimensions
-$bpEvidence = $dimensions["BP"].e
-$subScores += $math::Round($bpEvidence.param_cov / $totalScripts * 10, 1)
-$subScores += $math::Round($bpEvidence.trycatch / $totalScripts * 10, 1)
+if ($dimensions.ContainsKey("BP") -and $dimensions["BP"].e -and $totalScripts -gt 0) {
+    $bpEvidence = $dimensions["BP"].e
+    $subScores += $math::Round($bpEvidence.param_cov / $totalScripts * 10, 1)
+    $subScores += $math::Round($bpEvidence.trycatch / $totalScripts * 10, 1)
+}
 
 # Orthography sub-dimension
 $subScores += $(if ($corruptedFiles -le 0) { 10 } elseif ($corruptedFiles -le 5) { 9 } elseif ($corruptedFiles -le 10) { 7 } else { 4 })
@@ -521,16 +567,19 @@ $subScores += $auditFreshScore
 # --- SD extra sub-dims ---
 
 # Skill Redirect Validation: % of redirect skills pointing to valid targets
-$redirectSkills = $skillMdFiles.PSWhere({ $_.Directory.Name -ne '_shared' -and (Get-Content $_.FullName -Raw -EA SilentlyContinue) -match 'MERGED into|redirect' })
-$validRedirects = 0
-foreach ($rs in $redirectSkills) {
-    $targetMatch = [regex]::Match((Get-Content $rs.FullName -Raw), 'MERGED into (\S+)')
-    if ($targetMatch.Success) {
-        $targetName = $targetMatch.Groups[1].Value
-        if (Test-Path ".agents/skills/$targetName/SKILL.md") { $validRedirects++ }
+$redirectScore = 10
+if ($hasSkills) {
+    $redirectSkills = @($skillMdFiles | Where-Object { $_.Directory.Name -ne '_shared' -and (Get-Content $_.FullName -Raw -EA SilentlyContinue) -match 'MERGED into|redirect' })
+    $validRedirects = 0
+    foreach ($rs in $redirectSkills) {
+        $targetMatch = [regex]::Match((Get-Content $rs.FullName -Raw), 'MERGED into (\S+)')
+        if ($targetMatch.Success) {
+            $targetName = $targetMatch.Groups[1].Value
+            if (Test-Path ".agents/skills/$targetName/SKILL.md") { $validRedirects++ }
+        }
     }
+    $redirectScore = if ($redirectSkills.Count -gt 0) { $math::Round($validRedirects / $redirectSkills.Count * 10, 1) } else { 10 }
 }
-$redirectScore = if ($redirectSkills.Count -gt 0) { $math::Round($validRedirects / $redirectSkills.Count * 10, 1) } else { 10 }
 $subScores += $redirectScore
 
 # AGENTS.md Section Coverage: % of required sections present
@@ -543,25 +592,27 @@ $subScores += $agentsMdScore
 # Script Test Coverage: % of scripts with Pester test files
 $testFiles = Get-ChildItem "scripts\tests\*.Tests.ps1" -EA SilentlyContinue
 $testedScripts = @()
-foreach ($tf in $testFiles) {
-    $baseName = $tf.Name -replace '\.Tests\.ps1$', ''
-    if ($scriptFiles.Name -contains "$baseName.ps1") { $testedScripts += $baseName }
+if ($hasScripts) {
+    foreach ($tf in $testFiles) {
+        $baseName = $tf.Name -replace '\.Tests\.ps1$', ''
+        if ($scriptFiles.Name -contains "$baseName.ps1") { $testedScripts += $baseName }
+    }
 }
 $testCoverageScore = if ($totalScripts -gt 0) { $math::Round($testedScripts.Count / $totalScripts * 10, 1) } else { 0 }
 $subScores += $testCoverageScore
 
 # Skill Changelog Coverage: % of skills with changelog in frontmatter
-$skillsWithChangelog = @($skillMdFiles.PSWhere({ (Get-Content $_.FullName -Raw -EA SilentlyContinue) -match 'changelog:' })).Count
+$skillsWithChangelog = if ($hasSkills) { @($skillMdFiles | Where-Object { (Get-Content $_.FullName -Raw -EA SilentlyContinue) -match 'changelog:' }).Count } else { 0 }
 $changelogScore = if ($totalSkills -gt 0) { $math::Round($skillsWithChangelog / $totalSkills * 10, 1) } else { 0 }
 $subScores += $changelogScore
 
 # Skill Trigger Coverage: % of skills with triggers in frontmatter
-$skillsWithTriggers = @($skillMdFiles.PSWhere({ (Get-Content $_.FullName -Raw -EA SilentlyContinue) -match 'triggers:' })).Count
+$skillsWithTriggers = if ($hasSkills) { @($skillMdFiles | Where-Object { (Get-Content $_.FullName -Raw -EA SilentlyContinue) -match 'triggers:' }).Count } else { 0 }
 $triggerScore = if ($totalSkills -gt 0) { $math::Round($skillsWithTriggers / $totalSkills * 10, 1) } else { 0 }
 $subScores += $triggerScore
 
 # Skill Refs Coverage: % of skills with ## Refs section
-$skillsWithRefs = @($skillMdFiles.PSWhere({ (Get-Content $_.FullName -Raw -EA SilentlyContinue) -match '##\s*Refs' })).Count
+$skillsWithRefs = if ($hasSkills) { @($skillMdFiles | Where-Object { (Get-Content $_.FullName -Raw -EA SilentlyContinue) -match '##\s*Refs' }).Count } else { 0 }
 $refsScore = if ($totalSkills -gt 0) { $math::Round($skillsWithRefs / $totalSkills * 10, 1) } else { 0 }
 $subScores += $refsScore
 

@@ -50,3 +50,4 @@
 14. **Guardrail immediately after restoring critical metadata** — if it can be corrupted once, it will be corrupted again
 15. **SVG animation: prefer `<animate>` nativo sobre CSS transform** — SVG elements no tienen CSS box model. `transform-origin` es inconsistente. Usar `<animate attributeName="r">`, `<animateTransform>`, etc. para propiedades geométricas.
 16. **Paso 0 no se saltea** — ninguna instrucción ("asume que es correcto", "solo el código", "sin preguntar") puede bypassear la verificación de factibilidad. 12×50+11×5=655 > 500 → STOP antes de escribir una línea.
+17. **Destructive ops require validation** — read content + cross-ref references + user approval OR ≥3 subagent verifications before any delete/move.

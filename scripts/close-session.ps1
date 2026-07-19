@@ -41,7 +41,6 @@ $protectedFiles = @(
     '.agents/skills/external-auditor/',
     '.agents/skills/immune-system/',
     'ANTI-PATTERN-CATALOG.md',
-    'ANTI-PATTERN-CHEATSHEET.md',
     '.project.json'
 )
 # Log to BITACORA

@@ -15,7 +15,7 @@
 | Test/verify skill, coverage | skill-testing |
 | Judgment day, dual review, juzgar | judgment-day |
 | Senior architect, trade-offs, system design | senior-engineer |
-| Create AI skill | skill-creator |
+| Create AI skill, eval, iterate | opencode-skill-creator |
 | Skill registry, catalog | skill-registry |
 | Quality gate, pre-commit | quality-gate |
 | Context >100K tokens, context explosion | context-watchdog |
@@ -84,7 +84,7 @@
 - **Compression/style**: karpathy-loop (merged karpathy-prompt), lean-context
 - **Quality**: quality-gate, auto-metrics, external-auditor, immune-system, code-review-agent, performance-tracker, triple-verify, self-improvement, external-improvement
 - **Memory**: session-resume, dreaming, bitacora
-- **Skills meta**: skill-creator, skill-registry, skill-improver, skill-graph
+- **Skills meta**: opencode-skill-creator, skill-registry, skill-improver, skill-graph
 - **Coordination**: delivery-harness, chained-pr, branch-pr, issue-creation, subagent-isolation, command-wrapper, opencode-model-router
 - **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner
 - **SDD**: sdd (unified pipeline — phases consolidated)

@@ -29,6 +29,7 @@
     "sdd"
   ],
   "devDependencies": {
-    "playwright": "^1.61.1"
+    "playwright": "^1.61.1",
+    "@modelcontextprotocol/server-sequential-thinking": "2025.12.18"
   }
 }

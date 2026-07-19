@@ -93,4 +93,4 @@ git checkout AGENTS.md
 `docs/cross-project/patterns/*.json` · `docs/cross-project/PLAN.md`
 
 ## Refs
-cross-project-wisdom · skill-creator · skill-registry · skill-graph · dreaming
+cross-project-wisdom · opencode-skill-creator · skill-registry · skill-graph · dreaming

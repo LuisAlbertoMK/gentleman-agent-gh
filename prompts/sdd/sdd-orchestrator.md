@@ -42,7 +42,7 @@ Priority: `agent.sdd-<phase>.model` → `agent.sdd-orchestrator.model` → defau
 ## Sub-Agent Launch
 Resolve skill registry ONCE (session start/first delegation). Cache compact rules. Match by code context + task context. Inject as `## Project Standards (auto-resolved)`.
 
-**Flow**: `mem_search("skill-registry")` → fallback `.atl/skill-registry.md` → cache → match → inject.
+**Flow**: `mem_search("skill-registry")` → cache → match → inject. If no cached registry → `skill-registry` skill load.
 Post-delegation: check `skill_resolution`. Not `injected`? Re-read, re-inject.
 
 ## Sub-Agent Context Protocol

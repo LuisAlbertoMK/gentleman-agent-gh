@@ -76,4 +76,4 @@ Trigger: same bug 2x · unused 5+ · correction 2x · loss >5%
 
 ## Refs
 
-- [karpathy-loop](../karpathy-loop/SKILL.md) · [skill-creator](../skill-creator/SKILL.md) · [skill-testing](../skill-testing/SKILL.md) · [immune-system](../immune-system/SKILL.md) · [drift](../dreaming/SKILL.md)
+- [karpathy-loop](../karpathy-loop/SKILL.md) · [opencode-skill-creator](../opencode-skill-creator/SKILL.md) · [skill-testing](../skill-testing/SKILL.md) · [immune-system](../immune-system/SKILL.md) · [drift](../dreaming/SKILL.md)
