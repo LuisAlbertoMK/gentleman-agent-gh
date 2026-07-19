@@ -6,8 +6,8 @@ license: MIT
 metadata:
   tags: [frontend, ui, design, responsive, layout]
   author: gentleman-vMK (adapted from ibelick/ui-skills)
-  version: "3.1"
-  changelog: "3.1: Breaker fixes — cqi→vw for page-level, content-visibility corrected, React-only disclaimer, letter-spacing exception. 3.0: Added workflow, examples"
+  version: "3.2"
+  changelog: "3.2: dedup animation/tokens → defer to ui-engine for implementation patterns · 3.1: Breaker fixes · 3.0: Added workflow, examples"
 ---
 <!-- karpathy-compressed: 2026-07-10 -->
 # Baseline UI — Anti-slop
@@ -52,27 +52,15 @@ h1 { font-size: clamp(1.5rem, 3vw+0.5rem, 2.5rem); text-wrap: balance; }
 ```
 
 ## Animation
-- **Purpose**: state/feedback/attention/continuity
-- **Props**: `transform`+`opacity` only. Never `width/height/top/left/margin/padding`.
-- **Easing**: `--ease-out: cubic-bezier(0,0,0.2,1)` · `--ease-in: cubic-bezier(0.4,0,1,1)` · `--ease-standard: cubic-bezier(0.4,0,0.2,1)`
-- **Duration**: fast 120ms, base 200ms, slow 300ms. **Never >500ms**. Per-element total <200ms.
-- **Scroll**: CSS Scroll-Driven (`animation-timeline: view()`) 0 INP.
-- **Reduced motion**: `animation/transition-duration: 0.01ms !important` on `*` at `prefers-reduced-motion: reduce`.
-- CSS transitions, WAAPI, View Transitions, `@starting-style`.
-
-### Before/After
-```css
-/* ❌ Before: animating layout properties */
-.card { transition: width 0.3s ease; }
-.card:hover { width: 320px; }
-
-/* ✅ After: compositor-only */
-.card { transition: transform 0.2s var(--ease-out); }
-.card:hover { transform: scale(1.02); }
-```
+Audit rules — for implementation patterns, load **ui-engine**.
+- **Props**: `transform`+`opacity` only. ❌ `width/height/top/left/margin/padding`
+- **Duration**: fast 120ms, base 200ms, slow 300ms. ❌ >500ms. Per-element total <200ms
+- **Reduced motion**: `animation/transition-duration: 0.01ms !important` on `*` at `prefers-reduced-motion: reduce`
+- ❌ `transition:all` · ❌ layout property animation · ✅ Scroll-Driven CSS for 0 INP
 
 ## Tokens
-OKLCH `oklch(55% 0.18 255)` · 8pt 8/16/24/32/48/64 (4px ok) · 3-tier Primitive→Semantic→Component · `light-dark()` · **4.5:1 contrast** all text all themes.
+Audit rules — for implementation patterns, load **ui-engine**.
+- ❌ HSL/RGB tokens → ✅ OKLCH · 8pt scale · 3-tier Primitive→Semantic→Component · `light-dark()` · **4.5:1 contrast** all text all themes
 
 ## Design + Interaction
 No gradients/multicolor · No glow primary · Empty state: 1 primary action · Accent color: 1 per view.
