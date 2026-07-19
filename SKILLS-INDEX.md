@@ -1,9 +1,9 @@
 # SKILLS INDEX
 
-> Full trigger table for all 71 skills. Read on-demand when AGENTS.md compact table doesn't match.
+> Full trigger table for all 79 skills. Read on-demand when AGENTS.md compact table doesn't match.
 > Located at project root.
 >
-> **Version**: 4.3 | **Changelog**: 4.3 (+3 new: auth-hardening, container-security, llm-security; count 68→71); 4.2 (+1 new: e2e-testing; count 68→69); 4.1 (+2 new: server-commands, analysis-mode; count 66→68); 4.0 (+8 missing triggers: cancel-ralph, cross-project-forge, cross-project-wisdom, engram-protocol, help, opencode-skill-creator, ralph-loop, sdd-quick; fixed 57→65 discoverable count); 3.9 (+2 new: vision-analyze, workflow-optimizer; count 63→65); 3.8 (+4 new skills: sdd-quick, visual-testing, image-pipeline, pdf-utils); 3.7 (Removed 4 redirect skills: css-layout, design-tokens, responsive-design, ui-animation); 3.6 (Merged into ui-engine); 3.5 (+4 UI/UX skills; Karpathy compression 8 skills)
+> **Version**: 4.4 | **Changelog**: 4.4 (+8 new: deep-debugging, quick-executor, code-generation, infra-audit, perf-profiling, data-quality, docs-audit, plan-execution; count 71→79); 4.3 (+3 new: auth-hardening, container-security, llm-security; count 68→71); 4.2 (+1 new: e2e-testing; count 68→69); 4.1 (+2 new: server-commands, analysis-mode; count 66→68); 4.0 (+8 missing triggers; fixed 57→65); 3.9 (+2 new: vision-analyze, workflow-optimizer; count 63→65); 3.8 (+4 new: sdd-quick, visual-testing, image-pipeline, pdf-utils)
 
 ## Triggers → Skill
 
@@ -82,6 +82,14 @@
 | Server, ng serve, npm run dev, dotnet run, dev server, background process, long-lived, !dev | server-commands |
 | !analisis, analysis mode, multi-agent analysis, smart analysis, 8 dimensions, perspective validation | analysis-mode |
 | test, e2e, playwright, browser testing, interactive testing, form testing, click test, navigate test | e2e-testing |
+| deep debug, root cause, hypothesis, multi-file bug, ambiguous failure, debug, RCA | deep-debugging |
+| quick edit, single file, atomic edit, fast fix, one-line fix, small change, quick fix | quick-executor |
+| new file, new function, code generation, script, boilerplate, scaffold, create code, write code | code-generation |
+| infrastructure audit, IaC, Terraform, Kubernetes, CI/CD, Docker, cloud, deployment, Helm, Ansible | infra-audit |
+| performance profiling, slow queries, N+1, memory leak, CPU hotspot, profiling, query optimization | perf-profiling |
+| data audit, data pipeline audit, schema validation, data governance, ETL audit, data quality check | data-quality |
+| documentation audit, README audit, API docs, onboarding docs, Diátaxis, docs completeness, docs review | docs-audit |
+| execute plan, implement plan, step-by-step execution, task execution, plan completion, run plan | plan-execution |
 
 ## Quick groups
 - **Compression/style**: karpathy-loop (merged karpathy-prompt), lean-context
@@ -89,7 +97,10 @@
 - **Memory**: session-resume, dreaming, bitacora
 - **Skills meta**: opencode-skill-creator, skill-registry, skill-improver, skill-graph
 - **Coordination**: delivery-harness, chained-pr, branch-pr, issue-creation, subagent-isolation, command-wrapper, opencode-model-router
-- **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner, auth-hardening, container-security, llm-security
+- **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner, auth-hardening, container-security, llm-security, code-generation
+- **Engineering**: deep-debugging, quick-executor, plan-execution
+- **Infra/Perf**: infra-audit, perf-profiling
+- **Data/Docs**: data-quality, docs-audit
 - **SDD**: sdd (unified pipeline — phases consolidated)
 - **UI/Design**: baseline-ui, accessibility, performance, seo, web-quality-audit, ui-engine
 - **Visual/Testing**: visual-testing, image-pipeline, e2e-testing
@@ -100,7 +111,7 @@
 
 ## Load rule
 1. `read` this file → find trigger match → get skill name
-2. `skill` tool with name (skills.paths now registered in opencode.json — 71 skills globally discoverable)
+2. `skill` tool with name (skills.paths now registered in opencode.json — 79 skills globally discoverable)
 3. If `skill` tool fails → `read skills/{name}/SKILL.md` directly from disk
 4. If skill has assets → `read skills/{name}/references/` or `read skills/{name}/assets/` for templates
 

@@ -1,13 +1,13 @@
 # Specialized Agents — Manual Review
 
-Total: 22 agents
+Total: 22 agents, 8 GP skills
 
 | Agent | Role | Prompt Source |
 |-------|------|---------------|
-| gentleman-vMK | Senior Architect mentor - helpful first, challenging when it matters | inline (1 lines) |
-| gentleman-deep | Deep reasoning specialist - architecture, complex debugging, multi-file refactors | inline + _core-behavior.md |
-| gentleman-quick | Fast executor - quick edits, localized changes, simple tasks | inline + _core-behavior.md |
-| gentleman-codex | Code generation specialist - general coding, tool calling, scripts | inline + _core-behavior.md |
+| gentleman-vMK | Orchestrator - decomposes tasks, delegates to right agent, synthesizes results | prompts/gentleman-vMK.md + _core-behavior-gp.md |
+| gentleman-deep | Deep reasoning - hypothesis-driven debugging, root cause analysis, multi-file refactors | prompts/gentleman-deep.md + _core-behavior-gp.md |
+| gentleman-quick | Fast executor - single-file atomic edits with immediate verification, scope-guarded | prompts/gentleman-quick.md + _core-behavior-gp.md |
+| gentleman-codex | Code generation - convention mirroring, defensive coding, new files/scripts/boilerplate | prompts/gentleman-codex.md + _core-behavior-gp.md |
 | gentleman-security | Security specialist - STRIDE threat model, CVSS scoring, OWASP Top 10, injection/XSS/auth analysis (FREE TIER) | prompts/gentleman-security.md + _analyze-only-protocol.md |
 | gentleman-seo | Technical SEO analyst - three-pillar audit (Technical/On-Page/Content), E-E-A-T, GEO readiness, schema validation (FREE TIER) | prompts/gentleman-seo.md + _analyze-only-protocol.md |
 | gentleman-infra | Infrastructure specialist - container security, K8s reliability, IaC quality, CI/CD security, dependency graphs (FREE TIER) | prompts/gentleman-infra.md + _analyze-only-protocol.md |
@@ -53,21 +53,32 @@ Total: 22 agents
 - **gentleman-seo**: Technical SEO analyst - crawlability, structured data validation, on-page audit, CWV, GEO readiness (FREE TIER)
 - **gentleman-frontend**: Frontend architecture analyst - component patterns, design system audit, CSS architecture, accessibility compliance (FREE TIER)
 
-### General Purpose (9)
-- **gentleman-vMK**: Senior Architect mentor - helpful first, challenging when it matters
-- **gentleman-deep**: Deep reasoning specialist - architecture, complex debugging, multi-file refactors
-- **gentleman-quick**: Fast executor - quick edits, localized changes, simple tasks
-- **gentleman-codex**: Code generation specialist - general coding, tool calling, scripts
+### General Purpose (9 agents + 8 skills)
+**Agents:**
+- **gentleman-vMK**: Orchestrator - decomposes tasks, delegates to right agent, synthesizes results
+- **gentleman-deep**: Deep reasoning - hypothesis-driven debugging, root cause analysis, multi-file refactors
+- **gentleman-quick**: Fast executor - single-file atomic edits with immediate verification
+- **gentleman-codex**: Code generation - convention mirroring, defensive coding, new files/scripts
 - **gentleman-infra**: Infrastructure specialist - IaC, Kubernetes, Terraform, CI/CD pipelines, cloud architecture (FREE TIER)
 - **gentleman-performance**: Performance specialist - code optimization, query tuning, load testing, bottleneck analysis (FREE TIER)
 - **gentleman-datascience**: Data science specialist - Python (Pandas, Polars), SQL, data visualization, statistical analysis (FREE TIER)
 - **gentleman-docs**: Documentation specialist - technical writing, API docs, READMEs, ADRs, clean structured output (FREE TIER)
 - **gentleman-implementer**: Plan executor specialist — implements plans from specialized agents, no deviations (FREE TIER)
 
+**Skills (reusable across agents):**
+- **deep-debugging**: Hypothesis-driven debugging — 7-step methodology with tool escalation (grep→runtime→debugger→minimal repro)
+- **quick-executor**: Single-file atomic edits — risk heuristic, 10+ language verification, scope-guarded
+- **code-generation**: Convention-mirroring code gen — quality floor (flags anti-patterns), file selection heuristic, edge cases by domain
+- **infra-audit**: Infrastructure audit — progressive scan (Terraform/Docker/K8s/Helm/Ansible/CF), multi-CI, risk scoring rubric
+- **perf-profiling**: Performance profiling — measurement-first (pprof/cProfile/DevTools), N+1/network/concurrency/memory
+- **data-quality**: Data quality audit — schema→ingestion→transform→output, dbt/YAML, data profiling guidance
+- **docs-audit**: Documentation audit — Diátaxis decision tree, accuracy before completeness, link validation, standard files
+- **plan-execution**: Plan execution — git isolation, auto-rollback, language-aware verification gates, failure limits
+
 ## Notes
 - All `gentleman-*` agents (except vMK) now use file-based prompts (`prompts/gentleman-{role}.md`)
 - All `gentleman-*` specialist agents (security/seo/infra/frontend/performance/datascience/docs) use `{file:prompts/shared/_analyze-only-protocol.md}` for shared analyze-only behavior, cross-agent handoff format, output budget, and graceful degradation
-- gentleman-vMK, gentleman-deep, gentleman-quick, gentleman-codex use `{file:prompts/shared/_core-behavior.md}` for core behavior rules
+- gentleman-vMK, gentleman-deep, gentleman-quick, gentleman-codex use `{file:prompts/shared/_core-behavior-gp.md}` (GP-specific: tool constraints, return format, no unachievable orchestration rules)
 - gentleman-implementer uses `{file:prompts/gentleman-implementer.md}` + `{file:prompts/shared/_core-behavior.md}`
 - All `sdd-*` agents use file-based prompts (`prompts/sdd/*.md`) that redirect to SKILL.md
 - All `gentleman-*` agents except vMK have granular bash deny rules (17 commands)
@@ -77,3 +88,4 @@ Total: 22 agents
 - gentleman-frontend and gentleman-seo prompts improved in v3 (2026-07-18)
 - gentleman-security prompt expanded v3: 7 phases (OWASP mapping, supply chain, container/API, LLM risks), security-scanner v1.2 with supply chain + API security patterns (2026-07-18)
 - New security skills: auth-hardening (JWT/OAuth/RBAC/CSRF), container-security (Dockerfile/K8s), llm-security (prompt injection/RAG/tool privilege) — fills OWASP #1+#7 gap and modern threat surfaces (2026-07-18)
+- 8 new General Purpose skills: deep-debugging, quick-executor, code-generation, infra-audit, perf-profiling, data-quality, docs-audit, plan-execution — extracts GP agent expertise into reusable skills with !breaker verification (2026-07-18)
