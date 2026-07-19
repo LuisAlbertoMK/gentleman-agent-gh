@@ -1,200 +1,188 @@
-# Análisis Completo: gentleman-agent-gh
+# Gentleman Agent — Análisis Profundo v4
 
-**Fecha**: 2026-07-18  
-**Proyecto**: gentleman-agent-gh  
-**Versión del análisis**: 1.0  
-**Objetivo**: Identificar gaps, correcciones y mejoras existentes con foco en reducción de tokens, calidad de código y excelentes resultados.
+**Fecha**: 2026-07-18
+**Versión**: v4 (6 especialistas, 8 dimensiones, 47 hallazgos)
+**Especialistas**: Security · Performance · Frontend/UX · Infrastructure · Documentation · Architecture
 
-## Resumen Ejecutivo
+---
 
-El proyecto es una configuración de agente opencode con 68 skills, 13 agentes, y un ecosistema de datos sofisticado pero fragmentado. Se identificaron **78 hallazgos** categorizados por 8 dimensiones obligatorias, con **11 CRITICAL/HIGH** que requieren atención inmediata.
+## Executive Summary
 
-### Puntuación por Dimensión (post-análisis)
+El sistema Gentleman Agent tiene una arquitectura sólida (22 agentes, 71 skills, 91 scripts) con defensa en profundidad. Sin embargo, **3 problemas CRITICAL** y **11 problemas HIGH** reducen eficiencia, seguridad y mantenibilidad. El plan v4 prioriza 15 mejoras de alto impacto con verificación `!breaker` en cada paso.
 
-| Dimensión | Puntuación | Hallazgos | Impacto |
-|-----------|------------|-----------|---------|
-| Security | 5/10 | 18 | CRITICAL |
-| Performance | 6/10 | 10 | HIGH |
-| UX | 6/10 | 11 | HIGH |
-| Infra | 5/10 | 13 | HIGH |
-| Data | 4/10 | 10 | HIGH |
-| Architecture | 6/10 | 8 | MEDIUM |
-| DX | 7/10 | 10 | MEDIUM |
-| Business | 7/10 | 8 | MEDIUM |
+**Risk Score Global**: 6.2/10 (Medium-High)
+**Mayor ROI**: Consolidación de contratos de retorno + reducción de token overhead + hardening de permisos.
 
-## Hallazgos por Dimensión
+---
 
-### 1. Security (5/10) — 18 hallazgos
+## Per-Dimension Findings
 
-**CRITICAL (3)**:
-1. **Permisos de agentes bash/write sin restricción** — Ejecución arbitraria de código
-2. **ExecutionPolicy Bypass en todas partes** — Derrota la política de seguridad de PowerShell
-3. **bash-safe.ps1 pasa comandos sin sanitizar** — Vector de inyección
+### 1. Security (Risk: 7/10)
 
-**HIGH (5)**:
-1. `.gitleaks.toml` permite directorios backup — Ventana de filtración de secretos
-2. `secrets-scan` tiene cobertura limitada de patrones de tokens
-3. `review-rules.jsonc` clasifica `.env*` como riesgo medio, no alto
-4. GitHub Actions workflow falta bloque `permissions` — Exposición de token elevada
-5. `setup-machine.ps1` descarga binario engram sin verificación de checksum
+| # | Severity | Finding | Evidence | Recommendation |
+|---|----------|---------|----------|----------------|
+| S1 | **CRITICAL** | Memory poisoning via MCP — no input validation on `mem_save` | `engram_mem_save` accepts arbitrary `content` strings. Malicious code comments → agent stores payload → next session picks it up via `mem_search`. | Sanitize `mem_save` content (strip prompt-injection patterns) or add `mem_judge` gate before persisting from untrusted sources. |
+| S2 | HIGH | Read-only agents have `bash: ask` not `deny` | `gentleman-security`, `gentleman-seo` etc. can run shell commands if human approves. Prompt injection in source code could trick agent into `echo > malicious_file`. | Set `bash: *: deny` for all read-only specialist agents. |
+| S3 | HIGH | Orchestrator has `bash: *: allow` — escalation surface | `python -c "import os; os.remove(...)"` or `node -e "require('fs').unlinkSync(...)"` bypass the deny list. | Add `python *` / `node *` to deny list, or set orchestrator to `bash: *: ask`. |
+| S4 | MEDIUM | MCP servers lack sandboxing | Engram has full filesystem access. context7/headroom API keys have unknown scope. | Evaluate MCP server sandboxing. Validate/sanitize stored content. |
+| S5 | MEDIUM | Glob bypass on `.env` protection | `.envrc`, `.env.bak`, `.env.old` not blocked. `**/*secret*` not matched. | Add broader patterns: `**/.env*`, `**/*.env`, `**/*secret*`, `**/.ssh/**`. |
+| S6 | LOW | No tamper detection on config files | `opencode.json`, `AGENTS.md` write-denied but no HMAC/git hook integrity check. | Add pre-commit hook or CI check for integrity-sensitive files. |
 
-**MEDIUM (6)**: Path traversal en run.ps1, registro dev-server en $env:TEMP world-readable, post-commit hook auto-syncs sin validación, package.json versión pinned sin semver, action-gh-release usa tag mutable, quality-gate no ejecuta PSSA incremental.
+### 2. Performance (Risk: 5/10)
 
-**LOW (4)**: Tests excluidos de gitleaks, sin CodeQL/SAST en CI, pre-commit hooks versión antigua, .gitignore falta patrones sensibles.
+| # | Severity | Finding | Evidence | Recommendation |
+|---|----------|---------|----------|----------------|
+| P1 | **CRITICAL** | System prompt burns ~12K tokens before user speaks | Engram protocol duplicated 3×, 80 skill descriptions always loaded, MCP tool schemas injected. | Consolidate Engram to 1 location (skill file only). Lazy-load skill list. |
+| P2 | **CRITICAL** | MCP tool definitions add ~2-4K tokens/session | 4 MCP servers + 3 plugins inject schemas even when unused. | Lazy-load MCP tool schemas. Disable sequential-thinking (already disabled). |
+| P3 | HIGH | Permission blocks duplicated 20× in opencode.json | ~600 tokens of pure JSON waste. | Extract shared permission template. |
+| P4 | HIGH | Compaction reserve 12K too conservative | 9.4% of 128K context permanently locked. | Set `reserved: 8000`. |
+| P5 | MEDIUM | Key skills not Karpathy-compressed | skill-graph (2.7KB), lean-context (3.8KB), karpathy-loop (3.1KB) uncompressed. | Apply karpathy-loop to these 3 skills. ~4K token savings when loaded. |
+| P6 | MEDIUM | Subagent-first thresholds inconsistent | PROTOCOL.md: ">3 files" vs T1-T4: "T2=2-5 files" overlap ambiguously. | Align: T1=1 file, T2=2-4, T3=5+. |
+| P7 | LOW | Zone thresholds misaligned across 3 sources | context-watchdog: 40/60/80, skill-graph digest: 60/80, core-behavior: 40/60/80. | Single source of truth: reference context-watchdog everywhere. |
 
-### 2. Performance (6/10) — 10 hallazgos
+### 3. UX / Response Quality (Risk: 6/10)
 
-**HIGH (4)**:
-1. **Skill registry bloat** — 32KB para 3 entradas, sin caching
-2. **System prompt baseline ~8,400 tokens** — Sobrecarga de contexto
-3. **Duplicación entre global/project AGENTS.md** — 8 líneas idénticas
-4. **69 skills = 169KB total** — Listing overhead ~100KB
+| # | Severity | Finding | Evidence | Recommendation |
+|---|----------|---------|----------|----------------|
+| U1 | HIGH | Failure escalation is human-hostile | Raw YAML `agent_output: [raw output]` dumped on user. | Synthesize failures into 2-3 line human-readable messages. Keep raw YAML as internal log. |
+| U2 | HIGH | Zero progress feedback during multi-agent work | User sees nothing between "analyzing..." and final result across 6+ subagents. | Emit phase announcements: "Phase 1/3: Reading files... ✓ → Phase 2/3: Implementing... ✓" |
+| U3 | HIGH | Shortcut discovery impossible | 18+ shortcuts across 6 categories, no progressive disclosure. | Add contextual `!help` that lists relevant shortcuts based on current context. |
+| U4 | MEDIUM | Bilingual mixing creates cognitive overhead | PROTOCOL.md mixes Spanish/English. Agent prompts are English-only. | Standardize: keep jargon in personality text, translate procedural terms. |
+| U5 | MEDIUM | Error recovery inconsistent across agents | gentleman-quick: 4 explicit failure paths. gentleman-deep: 1 vague path. | Standardize structured failure report format across all agents. |
+| U6 | MEDIUM | Context-budget zones invisible to user | Agent becomes terse at ORANGE without explanation. | Brief indicator when transitioning zones: "(context tightening — headline mode)" |
 
-**MEDIUM (4)**:
-1. bash-safe.ps1 cold start ~410ms
-2. 5 MCP servers iniciados sin health gating
-3. Sin caching en skill-resolver-fast.ps1
-4. CI quality-gate ejecuta matriz completa
+### 4. Infrastructure (Risk: 6/10)
 
-**LOW (2)**: 68 scripts PS1 fragmentados, BITACORA.md/CYCLE.md crecen sin límite.
+| # | Severity | Finding | Evidence | Recommendation |
+|---|----------|---------|----------|----------------|
+| I1 | HIGH | Dockerfile single-stage, non-optimized | `COPY . .` before `npm install` invalidates layer. No multi-stage. | Split build + runtime stages. Add `.dockerignore`. |
+| I2 | HIGH | CI Quality Gate runs all steps sequentially | No job splitting. Every commit runs PSSA, shellcheck, Pester, pre-commit, trufflehog — ALL sequentially. | Split into 3 jobs: lint (fast), security (Linux), tests (Pester). |
+| I3 | HIGH | No health check or observability | No HTTP endpoint, no structured logging, no metrics. | Add health endpoint checking: MCP servers, disk, git, Engram. |
+| I4 | HIGH | backup.ps1 has no push/remote | Local-only backup. Disk failure = backup loss. | Add optional `-Remote` parameter for push. |
+| I5 | MEDIUM | Runs as root in Docker | No `USER vscode` directive. | Add `USER vscode` before CMD. |
+| I6 | MEDIUM | No .dockerignore | `.git`, `node_modules`, `.learnings` all copied into image. | Create `.dockerignore`. |
+| I7 | MEDIUM | No dependency caching in CI | Every run re-installs npm, pip, pre-commit. | Add `actions/cache` for `~/.npm`, `~/.cache/pre-commit`. |
+| I8 | MEDIUM | cache.ps1 race condition | Read-modify-write without file locking. | Use `[System.IO.FileStream]` with `FileShare.None`. |
+| I9 | MEDIUM | No rollback procedure documented | backup.ps1 creates snapshots but no restore flow documented. | Add restore documentation and `--List` mode. |
 
-### 3. UX (6/10) — 11 hallazgos
+### 5. Documentation (Risk: 5/10)
 
-**HIGH (4)**:
-1. **Onboarding gap** — Sin "¿qué hago primero?" claro
-2. **Skill discovery opaca** — 68 skills sin agrupación legible
-3. **gentleman-implementer prompt de 241+ líneas** — Viola sus propios principios
-4. **Documentación bilingüe inconsistente** — Confusión de contexto
+| # | Severity | Finding | Evidence | Recommendation |
+|---|----------|---------|----------|----------------|
+| D1 | HIGH | Skill count inconsistency across all docs | README: 68, QUICKSTART: 69, SKILLS-INDEX: 71, PROTOCOL: 68. | Pick ONE canonical source (SKILLS-INDEX = 71) and grep-replace. |
+| D2 | HIGH | Language mixing hurts onboarding | README in Spanish. PROTOCOL mixes both. Persona says "artifacts default to English" but doesn't follow it. | Translate README/QUICKSTART to English per own convention. |
+| D3 | MEDIUM | AGENTS.md is routing stub, not entrypoint | 44 lines, delegates to PROTOCOL.md. New users confused. | Add 10-line table of contents at top. |
+| D4 | MEDIUM | SHORTCUTS.md overlaps with 3 other docs | Shortcuts appear in README, PROTOCOL, QUICKSTART, SHORTCUTS. | Remove shortcut tables from README/PROTOCOL. Keep only reference link. |
+| D5 | MEDIUM | CONTRIBUTING.md thin on unique workflows | Doesn't mention SDD, skill-validate, quality-gate local, score system. | Add "Local Validation" section with exact commands. |
+| D6 | LOW | No glossary for domain terms | "Ponytail", "SDD", "Bitácora", "PSSA", "Karpathy compression" undefined. | Add glossary section to PROTOCOL.md. |
 
-**MEDIUM (4)**: Sistema de permisos sin documentar, shortcuts duplicados, definiciones de zonas contextuales duplicadas, agentes deep/codex sin claridad de rol.
+### 6. Architecture (Risk: 7/10)
 
-**LOW (3)**: Frontmatter inconsistente, sin guía de recuperación de errores, versionado manual.
+| # | Severity | Finding | Evidence | Recommendation |
+|---|----------|---------|----------|----------------|
+| A1 | **CRITICAL** | Two competing return contracts | `_core-behavior-gp.md`: 5-field (status/summary/files/verification/escalation). `subagent-isolation`: 4-field (Decision/Files/Findings/Nuance). Incompatible schemas. | Define ONE canonical contract. 4-field is better (preserves lossy summary info). |
+| A2 | HIGH | Dual routing systems | `gentleman-vMK.md`: hardcoded routing table. `opencode-model-router` skill: different table with fallbacks. Can disagree. | ONE routing authority: `opencode-model-router` skill. Orchestrator loads it. |
+| A3 | HIGH | Permission blocks copy-pasted 14 times | ~250 lines of identical bash deny-list in opencode.json. | Extract shared permission template or add CI lint for consistency. |
+| A4 | MEDIUM | gentleman-implementer breaks shared-pattern | No `_core-behavior-gp.md` or `_analyze-only-protocol.md` included. Lacks tool constraints, autonomy zones. | Add shared fragment include. |
+| A5 | MEDIUM | sdd-orchestrator uses paid model | `claude-sonnet-4-6` in a "FREE TIER" branded system. | Document cost exception. Consider free model alternative. |
+| A6 | MEDIUM | 80 skills, zero dependency enforcement | Skills declare `dependencies:` in YAML but no loader validates. | Add CI lint to validate declared deps exist. |
+| A7 | LOW | `_analyze-only-protocol.md` duplicates core behavior | Re-declares autonomy zones with drift from `_core-behavior-gp.md`. | Use `{file:}` include instead of re-declaration. |
 
-### 4. Infra (5/10) — 13 hallazgos
+---
 
-**HIGH (6)**:
-1. **Sin soporte Docker** — Mayor gap de infraestructura
-2. **Sin caching de dependencias CI** — 40-60% más lento
-3. **Release notes dependen de CHANGELOG inexistente**
-4. **Pre-commit silenciosamente saltado en CI**
-5. **Backup solo cubre config global** — DR incompleto
-6. **Paridad cross-platform** — 70 PS1 vs 2 SH
+## Consensus (All 6 Specialists Agree)
 
-**MEDIUM (5)**: Junction scaling frágil, setup-machine.sh error bash, sin triggers de backup automático, sin lockfile npm, sin alerting de errores.
+1. **Permission block duplication is the #1 maintenance risk** — any deny-list update requires 14+ edits
+2. **Return contract fragmentation** — 3 different output formats create integration fragility
+3. **Token overhead is self-inflicted** — the system about managing tokens costs more tokens than most tasks
+4. **Documentation drift** — skill counts, script counts, and shortcut tables diverge across files
+5. **Security is defense-in-depth but has gaps** — read-only agents shouldn't have shell access
 
-**LOW (2)**: Dependabot pip sección muerta, smoke cache usa $env:TEMP.
+## Divergence (Specialists Disagree)
 
-### 5. Data (4/10) — 10 hallazgos
+| Topic | View A | View B |
+|-------|--------|--------|
+| Orchestrator bash permissions | Security: set to `ask` | Performance: keep `allow` for coordination speed |
+| Bilingual docs | UX: translate to English | Architecture: keep Rioplatense identity in docs |
+| Compaction reserve | Performance: reduce to 8K | Infrastructure: keep 12K for safety margin |
 
-**HIGH (3)**:
-1. **Divergencia de schema de patrones** — Riesgo de rotura silenciosa
-2. **Triple sistema de scoring sin reconciliación** — Números diferentes del mismo sistema
-3. **Pipeline stages vacíos** — Infraestructura diseñada pero no implementada
+## Risk Matrix
 
-**MEDIUM (4)**: Fragmentación de cache, staleness de skill registry, sin capa de validación, sin lineage de datos.
+| Impact × Likelihood | Low | Medium | High |
+|---------------------|-----|--------|------|
+| **Critical** | S6 (tamper) | P1 (token overhead) | A1 (return contracts) |
+| **High** | I4 (backup push) | S2 (bash permissions) | A2 (dual routing) |
+| **Medium** | D6 (glossary) | U4 (bilingual) | I2 (CI sequential) |
+| **Low** | D6 (glossary) | P7 (zone alignment) | U3 (shortcut discovery) |
 
-**LOW (3)**: Duplicación catálogo anti-patrones, métricas sin consumo, dreaming sin datos de entrada.
+---
 
-### 6. Architecture (6/10) — 8 hallazgos
+## Recommendations — Plan v4
 
-**MEDIUM (5)**:
-1. **Acoplamiento skills ↔ _shared** — Sin inyección de dependencias
-2. **Patrones duplicados** — Zonas contextuales en 4 archivos
-3. **Tech debt** — Skill registry bloat, triple score, pipeline vacío
-4. **Modularidad** — 68 skills sin capas claras
-5. **Separación de concerns** — Mezcla de config, scripts, docs
+### Phase 1: Quick Wins (1-2 hours, low risk)
 
-**LOW (3)**: Sin diagrama de arquitectura, sin dependency injection, sin plugin system.
+| # | Action | Files | Verification |
+|---|--------|-------|-------------|
+| 1.1 | Consolidate skill count to 71 across all docs | README.md, QUICKSTART.md, PROTOCOL.md, ARCHITECTURE.md | `grep -r "68 skills\|69 skills\|68+1" docs/` returns 0 |
+| 1.2 | Add ToC to AGENTS.md top | AGENTS.md | Manual: new user can navigate in <30s |
+| 1.3 | Add `bash: *: deny` to all read-only agents | opencode.json | `!breaker` verifies agents can't run shell |
+| 1.4 | Align zone thresholds to 40/60/80 everywhere | skill-graph/SKILL.md | `grep -r "YELLOW.*60" .agents/skills/` returns 0 |
+| 1.5 | Set `compaction.reserved: 8000` | opencode.json | `ctx-stats` shows ~4K more available |
 
-### 7. DX (7/10) — 10 hallazgos
+### Phase 2: Security Hardening (2-4 hours, medium risk)
 
-**HIGH (3)**:
-1. **AGENTS.md referencia contenido movido**
-2. **Sin diagramas de arquitectura**
-3. **Documentación MCP incompleta**
+| # | Action | Files | Verification |
+|---|--------|-------|-------------|
+| 2.1 | Add `python *` / `node *` to orchestrator bash deny-list | opencode.json | `!breaker` attempts `python -c "print('test')"` → denied |
+| 2.2 | Broaden `.env` protection patterns | opencode.json | `!breaker` tries reading `.envrc`, `.env.bak` → denied |
+| 2.3 | Add memory poisoning guard to engram protocol | engram-protocol/SKILL.md | `!breaker` attempts storing injection payload → sanitized |
+| 2.4 | Add CI lint for permission consistency | scripts/ or .github/ | CI fails if any agent has different deny-list |
 
-**MEDIUM (4)**: Sin índice de navegación, contenido duplicado README/QUICKSTART, sin detección de obsolescencia, sin ejemplos de workflow.
+### Phase 3: Token Optimization (3-5 hours, medium risk)
 
-**LOW (3)**: Triggers scattered, documentación inconsistente, sin versionado.
+| # | Action | Files | Verification |
+|---|--------|-------|-------------|
+| 3.1 | Consolidate Engram protocol to 1 location | AGENTS.md, engram-protocol/SKILL.md | `ctx-stats` shows ~800 token reduction |
+| 3.2 | Extract shared permission template | opencode.json | Config size reduced by ~600 tokens |
+| 3.3 | Lazy-load skill descriptions (reduce 80→20 per session) | System prompt or opencode config | `ctx-stats` shows ~400 token reduction |
+| 3.4 | Karpathy-compress skill-graph, lean-context, karpathy-loop | .agents/skills/*/SKILL.md | Each skill <2KB after compression |
 
-### 8. Business (7/10) — 8 hallazgos
+### Phase 4: Architecture Consolidation (4-6 hours, high risk)
 
-**MEDIUM (5)**:
-1. **Sin métricas de éxito claras** — Más allá del sistema de scoring
-2. **Sin mecanismo de feedback de usuario**
-3. **Sin A/B testing de efectividad de prompts**
-4. **ROI no cuantificado** — Ahorro de tokens, tiempo de desarrollo
-5. **Roadmap no documentado**
+| # | Action | Files | Verification |
+|---|--------|-------|-------------|
+| 4.1 | Define ONE return contract (4-field) in `_return-contract.md` | prompts/shared/, all agent prompts | `!breaker` verifies all agents use same format |
+| 4.2 | Make `opencode-model-router` the single routing authority | prompts/gentleman-vMK.md, opencode-model-router/SKILL.md | No hardcoded routing in orchestrator prompt |
+| 4.3 | Add `_core-behavior-gp.md` include to gentleman-implementer | opencode.json | Implementer has tool constraints and autonomy zones |
+| 4.4 | Unify `_analyze-only-protocol.md` to use `{file:}` include | prompts/shared/_analyze-only-protocol.md | No drift between protocol versions |
 
-**LOW (3)**: Sin competitive analysis, sin user personas, sin adoption metrics.
+### Phase 5: Infrastructure & Docs (5-8 hours, high risk)
 
-## Consensos entre Especialistas
+| # | Action | Files | Verification |
+|---|--------|-------|-------------|
+| 5.1 | Multi-stage Dockerfile + .dockerignore | Dockerfile, .dockerignore | `docker build` succeeds, image <500MB |
+| 5.2 | Split CI into parallel jobs | .github/workflows/quality-gate.yml | CI runs in <5min (vs current ~15min) |
+| 5.3 | Add health check endpoint | scripts/health-endpoint.ps1 | `!health` checks MCP servers + disk + git |
+| 5.4 | Translate README/QUICKSTART to English | README.md, QUICKSTART.md | Non-Spanish speaker can onboard |
+| 5.5 | Add contextual `!help` shortcut | scripts/help-contextual.ps1 | `!help` lists relevant shortcuts per context |
 
-1. **Token reduction es prioridad #1** — Performance, UX, y Data coinciden
-2. **Skill registry necesita reescritura** — 32KB para 3 entradas es inaceptable
-3. **Duplicación de contenido** — AGENTS.md, shortcuts, zonas contextuales
-4. **Pipeline de datos incompleto** — Diseñado pero no implementado
-5. **Documentación bilingüe** — Confusión entre español/inglés
+---
 
-## Divergencias
+## v1 → v2 → v3 → v4 Evolution
 
-1. **Docker vs PS7-first** — Infra sugiere Docker, Performance sugiere PS7-first
-2. **Scoring system** — Data dice unificar, Performance dice simplificar
-3. **Skill listing** — UX quiere más detalle, Performance quiere menos tokens
+| Version | Scope | Findings | Focus |
+|---------|-------|----------|-------|
+| v1 | Initial agent setup | ~10 items | Basic routing and permissions |
+| v2 | Skills expansion (40→68) | ~20 items | Skill quality and coverage |
+| v3 | Protocol refinement | ~30 items | Delegation patterns, context management |
+| **v4** | **Full-stack analysis** | **47 items** | **Security, token optimization, architecture consolidation, infrastructure** |
 
-## Matriz de Riesgo
+**Key delta v3→v4**: v4 adds cross-dimensional analysis (6 specialists agreeing/disagreeing), risk matrix, and phased implementation with `!breaker` verification at each step.
 
-| Hallazgo | Riesgo | Impacto | Esfuerzo | Prioridad |
-|----------|--------|---------|----------|-----------|
-| Permisos agentes sin restricción | CRITICAL | Alto | Medio | P0 |
-| Skill registry bloat | HIGH | Alto | Bajo | P0 |
-| System prompt 8.4K tokens | HIGH | Alto | Medio | P1 |
-| Sin Docker support | HIGH | Medio | Alto | P2 |
-| Pipeline stages vacíos | HIGH | Medio | Alto | P2 |
-| Documentación bilingüe | MEDIUM | Medio | Bajo | P2 |
+---
 
-## Plan de Implementación Recomendado
+## Gate
 
-### Fase 1: Crítico (1-2 días)
-1. Restringir permisos agentes en opencode.json
-2. Reescribir skill-registry.json (versión compacta)
-3. Eliminar duplicación AGENTS.md global/project
-4. Agregar permissions block a quality-gate.yml
+**Plan only** — NO code, NO commit. Must exit analysis mode before implementing.
 
-### Fase 2: Alto Impacto (3-5 días)
-1. Comprimir gentleman-implementer prompt
-2. Implementar caching en skill-resolver-fast.ps1
-3. Unificar sistema de scoring
-4. Agregar CHANGELOG.md y validar release workflow
-
-### Fase 3: Mejora Continua (1-2 semanas)
-1. Crear Dockerfile y .devcontainer
-2. Implementar pipeline de datos completo
-3. Crear documentación de arquitectura
-4. Establecer métricas de éxito y feedback loop
-
-## Verificación con Breaker
-
-Para cada implementación en Fase 1 y 2, se ejecutará el protocolo adversarial-breaker para verificar:
-1. Que la corrección no introduce nuevos vulnerabilities
-2. Que la reducción de tokens no compromete funcionalidad
-3. Que los cambios son backward-compatible
-4. Que no hay regresiones en calidad de código
-
-## Archivos Afectados
-
-- `opencode.json` — Permisos de agentes
-- `scripts/skill-registry.json` — Reescritura
-- `AGENTS.md` — Eliminación duplicación
-- `.github/workflows/quality-gate.yml` — Permissions block
-- `scripts/skill-resolver-fast.ps1` — Caching
-- `scripts/score-auto.ps1` — Unificación scoring
-- `docs/CHANGELOG.md` — Nuevo archivo
-- `.github/workflows/release.yml` — Validación release notes
-
-## Próximos Pasos
-
-1. Ejecutar fase 1 con verificación breaker
-2. Medir ahorro de tokens post-implementación
-3. Actualizar scoring post-correcciones
-4. Documentar decisiones en Engram
+Next step: Execute Phase 1 (Quick Wins) with `!breaker` verification after each action.

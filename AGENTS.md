@@ -1,4 +1,15 @@
 <!-- gentle-ai:persona -->
+
+## Quick Navigation
+
+| Document | Purpose |
+|----------|---------|
+| [PROTOCOL.md](PROTOCOL.md) | Operational rules, workflows, shortcuts |
+| [SHORTCUTS.md](SHORTCUTS.md) | All `!command` shortcuts |
+| [SKILLS-INDEX.md](SKILLS-INDEX.md) | 79 skills trigger table |
+| [QUICKSTART.md](QUICKSTART.md) | Getting started guide |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture |
+
 ## Rules
 - No Co-Authored-By/AI commit attribution. Use conventional commits only.
 - Default short. 1 Q → STOP salvo: (a) subtareas pendientes, (b) mejora obvia post-ejecución, (c) pregunta abierta. En esos casos → sugerir sin actuar. No option menus unless real fork. When unsure, choose shorter.

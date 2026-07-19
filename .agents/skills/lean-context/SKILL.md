@@ -1,40 +1,26 @@
 ﻿---
 name: lean-context
-description: "Unified compression levels — LEAN, ULTRA, and CAVEMAN modes for token-efficient responses with acronyms and budget gates"
+description: "Unified compression levels — LEAN, ULTRA, and CAVEMAN modes for token-efficient responses"
 triggers: "Ultra-lean default, compact responses, caveman, /caveman"
 license: Apache-2.0
 metadata:
-  tags:
-    - engineering
+  tags: [engineering]
   author: gentleman-vMK
-  version: "2.0"
-  changelog: "1.1→2.0: merged caveman as CAVEMAN level"
+  version: "2.1"
+  changelog: "2.0→2.1: Karpathy compress (3001→1850B)"
 ---
 
-LEAN/ULTRA: default. CAVEMAN: on-demand extreme.
-Trigger: "modo normal", /lean-off, "stop caveman". Reactivate: new session.
+LEAN/ULTRA: default. CAVEMAN: on-demand. Trigger: "stop caveman" → LEAN. New session → default.
 
 ## LEVELS
 
-- **LEAN** (default): drop disclaimers/transitions/unsolicited suggestions/closures
-- **ULTRA**: above + examples/background/"why"/"as mentioned"
-- **CAVEMAN**: ULTRA + fragments, no articles (a/an/the), acronyms allowed, no filler/hedging
-
-### CAVEMAN sub-levels (on-demand only)
-
 | Level | Rules |
 |-------|-------|
-| lite | no filler/hedging, sentences |
-| full | drop articles, fragments |
-| ultra | abbr, 1-word enough |
+| **LEAN** | drop disclaimers/transitions/unsolicited suggestions |
+| **ULTRA** | + drop examples/background/"why"/"as mentioned" |
+| **CAVEMAN** | + fragments, no articles, acronyms (auth/cfg/ctx/db/env/err/fn/impl/msg/pkg/prop/req/res/spec/usr) |
 
-### Acronyms (CAVEMAN only)
-
-auth/cfg/ctx/db/env/err/fn/impl/msg/pkg/prop/req/res/spec/usr
-
-### Boundaries
-
-Code/PRs → normal level. "stop caveman" → revert to LEAN.
+CAVEMAN sub: lite (sentences) → full (fragments) → ultra (abbr). Code/PRs → always normal.
 
 ## LENGTH
 
@@ -43,52 +29,38 @@ Code/PRs → normal level. "stop caveman" → revert to LEAN.
 | Simple | 1-line | ≤5 words | 1-3 words |
 | Code | code | code | code |
 | Explain | 3-5sent | 1-2sent | 1 sent |
-| Compare | table | compact | compact |
 | Debug | cause+fix | fix | fix-word |
 
 ## FILE OPS
 
-- Existing → Edit (str_replace), NO Write
-- Read → Grep + Read(offset,limit), never full read >100 lines
-- After edit → NEVER full re-read
+Edit (str_replace) for existing. Grep+Read(offset,limit) for reading. Never full re-read after edit.
 
 ## BUDGET GATE
 
-| Model | Window | Alert |
-|-------|--------|-------|
-| Opus/Sonnet4 | 200k | >120k |
-| Haiku4 | 200k | >100k |
+| Model | Alert |
+|-------|-------|
+| 200K window | >120K |
+| Haiku4 | >100K |
 
->@threshold: [context:growing — /compress or session-end]
-Same file 3+ edits → suggest /compress
+> Same file 3+ edits → suggest /compress. TALE: ~200 tok/skill loaded.
 
-## TALE (Token-Aware Load Estimation)
-
-Estimate ~200 tokens per loaded skill. When skill-graph loads 4-8 skills → budget ~1-1.6K tokens. When loading a full skill for execution → budget ~skill-size + 200. This keeps total skill overhead <10% of context window.
 ## SELF-CHECK
 
-1. first word = answer?
-2. 30% cut without loss?
-3. level correct?
+1. first word = answer? 2. 30% cut without loss? 3. level correct?
 
-## NEVER CUT
+**NEVER CUT**: safety(1-line) · critical caveats(1x) · func code · security warnings · irreversible confirmations
 
-safety(1-line) · critical caveats(1x) · func code · security warnings · irreversible confirmations
-## WHEN TO USE EACH LEVEL
+## WHEN
+
 | Situation | Level |
 |-----------|-------|
-| First response to simple Q | LEAN |
-| Mid-session, context >40% | ULTRA |
-| Token budget critical (<10 turns left) | CAVEMAN lite |
-| Emergency compression (RED zone) | CAVEMAN ultra |
+| Simple Q | LEAN |
+| Context >40% | ULTRA |
+| <10 turns left | CAVEMAN lite |
+| RED zone | CAVEMAN ultra |
 
 ## Refs
-karpathy-loop · context-watchdog · execution-mode · metricas · skill-graph
+karpathy-loop · context-watchdog · execution-mode · skill-graph
 
 ## Anti-Patterns
-CAVEMAN for code/PRs · Cut safety warnings · Apply ULTRA without checking context % · Over-abbreviate in explanations · Skip disclaimer for destructive ops
-
-## Example
-**User**: "What's the best way to handle errors in PowerShell?"
-**LEAN**: Use `try/catch/finally` with `$ErrorActionPreference = 'Stop'`. Trap terminating errors, log non-terminating.
-**CAVEMAN**: try/catch. $ErrorActionPreference='Stop'. log err.
+CAVEMAN for code/PRs · Cut safety warnings · Apply ULTRA without checking context %

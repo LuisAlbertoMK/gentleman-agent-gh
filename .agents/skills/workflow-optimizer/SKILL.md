@@ -34,7 +34,7 @@ triggers: [optimize-workflow, faster-access, token-optimization, workflow-patter
 ```
 L1 (every 8 msgs/15 calls): Full summary, -60-70% tokens
 L2 (every 20 msgs/>3 L1): 1-2 line decisions + engram ID, -40-50%
-L3 (YELLOW>60%): 1-liner/topic + ref, -80-90%
+L3 (ORANGE>60%): 1-liner/topic + ref, -80-90%
 ```
 
 ### 4. Parallel Information Gathering

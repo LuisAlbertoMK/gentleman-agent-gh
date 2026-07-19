@@ -6,7 +6,7 @@
 
 ## System Overview
 
-Gentleman Agent is a **multi-agent AI development team** for OpenCode. It provides 22 specialized agents, 68 skills, and 91+ PowerShell scripts that work together to deliver verified, high-quality code changes.
+Gentleman Agent is a **multi-agent AI development team** for OpenCode. It provides 22 specialized agents, 79 skills, and 91+ PowerShell scripts that work together to deliver verified, high-quality code changes.
 
 ### Core Principles
 
@@ -44,7 +44,7 @@ Gentleman Agent is a **multi-agent AI development team** for OpenCode. It provid
     ▼                    ▼                    ▼
 ┌─────────┐      ┌─────────────┐      ┌───────────┐
 │ Skills   │      │   Scripts   │      │  Memory   │
-│ (68 +    │      │  (91+ PS1)  │      │  (Engram) │
+│ (79 +    │      │  (91+ PS1)  │      │  (Engram) │
 │  _shared)│      │             │      │           │
 └────┬─────┘      └──────┬──────┘      └─────┬─────┘
      │                   │                   │
@@ -73,7 +73,7 @@ Gentleman Agent is a **multi-agent AI development team** for OpenCode. It provid
 
 ### 2. Skill Layer (`.agents/skills/`)
 
-68 skills + `_shared` references. Organized by domain:
+79 skills + `_shared` references. Organized by domain:
 
 | Domain | Skills | Examples |
 |--------|--------|----------|
@@ -273,7 +273,7 @@ Fix applied
 
 ```
 gentleman-agent-gh/
-├── .agents/skills/          # 68 skills + _shared
+├── .agents/skills/          # 79 skills + _shared
 ├── .github/workflows/       # CI/CD (quality-gate, release)
 ├── docs/
 │   ├── ARCHITECTURE.md      # This file

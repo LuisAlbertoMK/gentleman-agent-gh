@@ -1,26 +1,26 @@
 # Quick Start — Gentleman Agent
 
-**5 pasos para empezar a usar el agente en 5 minutos.**
+**5 steps to start using the agent in 5 minutes.**
 
 ---
 
-## ¿Qué es esto?
+## What is this?
 
-Gentleman Agent es un **equipo de desarrollo de software AI** con 22 agentes especializados. En lugar de un solo chatbot, tenés:
+Gentleman Agent is an **AI software development team** with 22 specialized agents. Instead of a single chatbot, you get:
 
-- 🏗️ **Arquitecto Principal** (`gentleman-vMK`) — tu mentor Senior Architect
-- 🔒 **Especialistas** (seguridad, performance, frontend, etc.) — consultores FREE TIER
-- 🧠 **Memoria persistente** (Engram) — el agente recuerda entre sesiones
-- ✅ **Verificación automática** — triple check antes de cualquier cambio
+- 🏗️ **Lead Architect** (`gentleman-vMK`) — your Senior Architect mentor
+- 🔒 **Specialists** (security, performance, frontend, etc.) — FREE TIER consultants
+- 🧠 **Persistent memory** (Engram) — the agent remembers across sessions
+- ✅ **Auto-verification** — triple check before any change
 
-**En resumen**: Pedís una tarea, el agente la resuelve con su equipo, verifica que funcione, y documenta lo que aprendió.
+**In summary**: You ask for a task, the agent resolves it with its team, verifies it works, and documents what it learned.
 
 ---
 
-## Paso 1: Instalar
+## Step 1: Install
 
 ```bash
-# Clonar
+# Clone
 git clone https://github.com/LuisAlbertoMK/gentleman-agent-gh.git
 cd gentleman-agent-gh
 
@@ -31,111 +31,111 @@ cd gentleman-agent-gh
 ./scripts/setup-machine.sh
 ```
 
-**Tiempo**: ~2 minutos
+**Time**: ~2 minutes
 
 ---
 
-## Paso 2: Abrir OpenCode
+## Step 2: Open OpenCode
 
 ```bash
-# En la carpeta del proyecto
+# In the project folder
 opencode
 ```
 
-El agente `gentleman-vMK` se carga automáticamente como default.
+The `gentleman-vMK` agent loads automatically as default.
 
-**Tiempo**: ~10 segundos
-
----
-
-## Paso 3: Pedir tu primera tarea
-
-Escribí algo como:
-
-```
-Analizá mi proyecto y decime qué puedo mejorar
-```
-
-o
-
-```
-Revisá este archivo y sugerí optimizaciones
-```
-
-o
-
-```
-Creá un tests para esta función
-```
-
-**El agente automáticamente**:
-1. Detecta tu stack技术
-2. Carga las skills relevantes
-3. Delega a especialistas si es necesario
-4. Verifica los cambios
-5. Documenta en bitácora
-
-**Tiempo**: Variable según la tarea
+**Time**: ~10 seconds
 
 ---
 
-## Paso 4: Usar shortcuts útiles
+## Step 3: Ask for your first task
 
-| Shortcut | Cuándo usarlo |
-|----------|---------------|
-| `!score` | Después de cambios para ver el score |
-| `!health` | Si algo falla o querés diagnosticar |
-| `!close` | Al terminar la sesión |
-| `!analisis` | Para un análisis profundo multi-agente |
+Write something like:
 
-**Ejemplo**:
+```
+Analyze my project and tell me what I can improve
+```
+
+or
+
+```
+Review this file and suggest optimizations
+```
+
+or
+
+```
+Create a test for this function
+```
+
+**The agent automatically**:
+1. Detects your tech stack
+2. Loads relevant skills
+3. Delegates to specialists if needed
+4. Verifies the changes
+5. Documents in bitacora
+
+**Time**: Variable depending on the task
+
+---
+
+## Step 4: Use useful shortcuts
+
+| Shortcut | When to use |
+|----------|-------------|
+| `!score` | After changes to see the score |
+| `!health` | If something fails or you want to diagnose |
+| `!close` | When finishing the session |
+| `!analisis` | For deep multi-agent analysis |
+
+**Example**:
 ```
 !score
 ```
 
 ---
 
-## Paso 5: Cerrar sesión
+## Step 5: Close session
 
 ```
 !close
 ```
 
-Esto ejecuta automáticamente:
-- Guarda en bitácora
-- Actualiza inter-track
-- Sync con config global
-- Muestra estado de git
+This automatically:
+- Saves to bitacora
+- Updates inter-track
+- Syncs with global config
+- Shows git status
 
 ---
 
-## Próximos pasos
+## Next steps
 
-1. **Leé [AGENTS.md](AGENTS.md)** para entender el protocolo completo
-2. **Explorá las skills** en `.agents/skills/` (69 disponibles)
-3. **Probá `!analisis`** para un análisis multi-agente de tu proyecto
-4. **Revisá [CYCLE.md](CYCLE.md)** para ver el ciclo de mejora actual
+1. **Read [AGENTS.md](AGENTS.md)** to understand the full protocol
+2. **Explore skills** in `.agents/skills/` (79 available)
+3. **Try `!analisis`** for multi-agent analysis of your project
+4. **Check [CYCLE.md](CYCLE.md)** to see the current improvement cycle
 
 ---
 
-## Tips para usuarios nuevos
+## Tips for new users
 
-- **No necesitás acordarte de todo** — el agente sabe cuándo aplicar cada skill
-- **Empezá simple** — pedí tareas pequeñas primero
-- **Usá `!health`** si algo falla — te da un diagnóstico completo
-- **El agente aprende** — usa Engram para recordar entre sesiones
+- **You don't need to remember everything** — the agent knows when to apply each skill
+- **Start simple** — ask for small tasks first
+- **Use `!health`** if something fails — it gives you a complete diagnostic
+- **The agent learns** — uses Engram to remember across sessions
 
 ---
 
 ## Troubleshooting
 
-| Problema | Solución |
-|----------|----------|
-| Agente no responde | `!health` para diagnosticar |
-| Skill no se carga | Verificá `.agents/skills/` existe |
-| Score bajo | `!score` para recalcular |
-| Git errors | `git status` para ver el estado |
+| Problem | Solution |
+|---------|----------|
+| Agent not responding | `!health` to diagnose |
+| Skill not loading | Check `.agents/skills/` exists |
+| Low score | `!score` to recalculate |
+| Git errors | `git status` to see the state |
 
 ---
 
-*Última actualización: 2026-07-18*
+*Last updated: 2026-07-18*

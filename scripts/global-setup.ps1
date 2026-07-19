@@ -56,9 +56,32 @@ function Sync-File {
 if(-not $Quiet){Write-Output "`n═══ GLOBAL SETUP — opencode ═══`n"}
 Sync-File (Join-Path $gentlemanRoot "AGENTS.md") (Join-Path $globalConfig "AGENTS.md") "AGENTS.md"
 
-# 2. Sync shared prompts
-foreach($p in @("_core-behavior.md","_analyze-only-protocol.md")){
-    Sync-File (Join-Path $gentlemanRoot "prompts" "shared" $p) (Join-Path $globalConfig "prompts" "shared" $p) "prompts/shared/$p"
+# 2. Sync ALL shared prompts (auto-discover from canonical)
+$sharedPromptsSrc = Join-Path $gentlemanRoot "prompts" "shared"
+if (Test-Path $sharedPromptsSrc) {
+    Get-ChildItem $sharedPromptsSrc -Filter "*.md" -Attributes !ReparsePoint | ForEach-Object {
+        $safeName = Split-Path -Leaf $_.Name
+        Sync-File $_.FullName (Join-Path $globalConfig "prompts" "shared" $safeName) "prompts/shared/$safeName"
+    }
+}
+
+# 2b. Sync SDD prompts (auto-discover from canonical)
+$sharedSddSrc = Join-Path $gentlemanRoot "prompts" "sdd"
+if (Test-Path $sharedSddSrc) {
+    Get-ChildItem $sharedSddSrc -Filter "*.md" -Attributes !ReparsePoint | ForEach-Object {
+        $safeName = Split-Path -Leaf $_.Name
+        $destDir = Join-Path $globalConfig "prompts" "sdd"
+        Sync-File $_.FullName (Join-Path $destDir $safeName) "prompts/sdd/$safeName"
+    }
+}
+
+# 2c. Sync root prompts (gentleman-*.md, _*.md — auto-discover, allowlisted)
+$rootPromptsSrc = Join-Path $gentlemanRoot "prompts"
+if (Test-Path $rootPromptsSrc) {
+    Get-ChildItem $rootPromptsSrc -Include "gentleman-*.md","_*.md" -File -Attributes !ReparsePoint | ForEach-Object {
+        $safeName = Split-Path -Leaf $_.Name
+        Sync-File $_.FullName (Join-Path $globalConfig "prompts" $safeName) "prompts/$safeName"
+    }
 }
 
 # 3. Sync shared scripts
@@ -121,7 +144,7 @@ if(-not $SkipMCP -and (Test-Path $globalJson)){
     if(-not ($config.mcp.PSObject.Properties['context7'])){
         $config.mcp | Add-Member -Name "context7" -Value @{type="local";command=$c7Cmd;enabled=$true} -MemberType NoteProperty -Force
         $mcpChanged = $true; Add-Result "MCP:context7" "SYNCED" "Added context7 MCP server"
-    }elseif(($config.mcp.context7.command -join ' ') -ne ($c7Cmd -join ' ')){
+    }elseif($config.mcp.context7.PSObject.Properties['command'] -and ($config.mcp.context7.command -join ' ') -ne ($c7Cmd -join ' ')){
         $config.mcp.context7.command = $c7Cmd; $mcpChanged = $true; Add-Result "MCP:context7" "SYNCED" "Updated context7 command"
     }else{Add-Result "MCP:context7" "OK" "Already configured"}
     if($mcpChanged){$config | ConvertTo-Json -Depth 10 | Set-Content $globalJson -Encoding UTF8}

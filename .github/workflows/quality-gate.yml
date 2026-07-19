@@ -9,8 +9,12 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: qg-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  quality-gate:
+  lint:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
@@ -18,28 +22,25 @@ jobs:
     defaults:
       run:
         shell: pwsh
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Linux/macOS setup test — verify install.sh runs cleanly
+      - name: Linux/macOS setup test
         if: runner.os == 'Linux'
         run: ./scripts/install.sh --yes --skip-env-var --skip-shortcuts
 
-      - name: Cross-platform — shellcheck bash scripts (Linux)
+      - name: Shellcheck bash scripts (Linux)
         if: runner.os == 'Linux'
         run: |
           if command -v shellcheck &>/dev/null; then
             shellcheck scripts/*.sh
           else
-            # fallback: bash -n syntax check
             for f in scripts/*.sh; do
               bash -n "$f" && echo "OK: $f" || exit 1
             done
           fi
 
-      - name: Cross-platform — PS7 syntax check .ps1 on Linux
-        if: runner.os == 'Linux'
+      - name: PS7 syntax check .ps1
         run: |
           $fail = 0
           Get-ChildItem -Recurse -Filter *.ps1 | Where-Object {
@@ -57,36 +58,16 @@ jobs:
           }
           if ($fail) { exit 1 }
 
-      - name: Cross-ref validation — skills, index, references
-        run: ./scripts/cross-ref-check.ps1
-
-      - name: Skill drift check — canonical vs global config
-        if: runner.os == 'Windows'
-        run: ./scripts/check-skill-drift.ps1
-
-      - name: PS7 version gate — verify all scripts require 7.6
+      - name: PS7 version gate
         run: |
           $bad = Get-ChildItem -Recurse -Filter *.ps1 | Where-Object { $_.FullName -notmatch 'experiments|node_modules|metricas\\assets' } | Where-Object {
             $c = (Get-Content $_ -Head 3) -join "`n"; $c -notmatch '#requires -Version 7'
           }
-          # ps5-detect.ps1 intentionally targets PS5.1 — skip it
           $bad = $bad | Where-Object { $_.Name -ne 'ps5-detect.ps1' }
           if ($bad) { $bad | ForEach-Object { Write-Output "::warning title=Missing PS7::$($_.Name)" }; exit 1 }
           else { Write-Output "OK: All .ps1 scripts require PS7+" }
 
-      - name: Pester unit tests — core script logic
-        run: |
-          $results = Invoke-Pester -Path './scripts/tests/*.Tests.ps1' -PassThru
-          if ($results.FailedCount -gt 0) {
-            Write-Error "Pester: $($results.FailedCount) test(s) failed"
-            exit 1
-          }
-          Write-Output "OK: $($results.PassedCount)/$($results.TotalCount) tests passed"
-
-      - name: Benchmark report — system health snapshot
-        run: ./scripts/benchmark.ps1 -Snapshot
-
-      - name: Overweight skill check — warn if any skill >3KB
+      - name: Overweight skill check
         run: |
           $overweight = Get-ChildItem .agents/skills -Directory | Where-Object { $_.Name -ne '_shared' } | ForEach-Object {
             $md = Join-Path $_.FullName 'SKILL.md'
@@ -102,14 +83,40 @@ jobs:
             Write-Output "OK: All skills ≤3KB"
           }
 
-      - name: pre-commit — all hooks (local + remote)
+      - name: Permission consistency
+        run: |
+          $config = Get-Content 'opencode.json' -Raw | ConvertFrom-Json
+          $readOnlyAgents = @('gentleman-security', 'gentleman-seo', 'gentleman-infra', 'gentleman-frontend', 'gentleman-performance', 'gentleman-datascience', 'gentleman-docs')
+          $fail = 0
+          foreach ($agent in $readOnlyAgents) {
+            $a = $config.agent.$agent
+            if (-not $a) { Write-Warning "Agent not found: $agent"; $fail++; continue }
+            $bashDeny = $a.permission.bash.'*'
+            if ($bashDeny -ne 'deny') {
+              Write-Error "FAIL: $agent has bash.* = $bashDeny (expected deny)"
+              $fail++
+            }
+          }
+          $orchBash = $config.agent.'gentleman-vMK'.permission.bash
+          if ($orchBash.'python *' -ne 'deny') { Write-Error "FAIL: orchestrator missing python deny"; $fail++ }
+          if ($orchBash.'node *' -ne 'deny') { Write-Error "FAIL: orchestrator missing node deny"; $fail++ }
+          if ($fail) { exit 1 }
+          Write-Output "OK: All permission consistency checks passed"
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cross-ref validation
+        run: ./scripts/cross-ref-check.ps1
+
+      - name: pre-commit — all hooks
         run: |
           if (Get-Command pre-commit -ErrorAction SilentlyContinue) {
             pre-commit run --all-files --show-diff-on-failure
-          } elseif (Get-Command py -ErrorAction SilentlyContinue) {
-            py -m pre_commit run --all-files --show-diff-on-failure
           } else {
-            Write-Warning "pre-commit not available — SKIP (non-blocking)"
+            pip install pre-commit && pre-commit run --all-files --show-diff-on-failure
           }
 
       - name: trufflehog — deep secrets scan
@@ -120,25 +127,41 @@ jobs:
           head: HEAD
           extra_args: --only-verified --fail --exclude-globs '.learnings/*,.backup-*/**'
 
-      - name: Windows smoke test — verify key scripts exit clean
-        if: runner.os == 'Windows'
+      - name: SkillSpector — install
+        run: pip install git+https://github.com/NVIDIA/SkillSpector.git --quiet || echo "SkillSpector install failed"
+
+      - name: SkillSpector security gate
+        continue-on-error: false
+        run: ./scripts/skillspector-gate.ps1 -Strict -FailOnRisk 50
+
+  tests:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Skill drift check
+        run: ./scripts/check-skill-drift.ps1
+
+      - name: Pester unit tests
+        run: |
+          $results = Invoke-Pester -Path './scripts/tests/*.Tests.ps1' -PassThru
+          if ($results.FailedCount -gt 0) {
+            Write-Error "Pester: $($results.FailedCount) test(s) failed"
+            exit 1
+          }
+          Write-Output "OK: $($results.PassedCount)/$($results.TotalCount) tests passed"
+
+      - name: Benchmark report
+        run: ./scripts/benchmark.ps1 -Snapshot
+
+      - name: Windows smoke test
         run: |
           ./scripts/verify.ps1 -Quiet
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: SkillSpector — install (Linux only)
-        if: runner.os == 'Linux'
-        run: pip install git+https://github.com/NVIDIA/SkillSpector.git --quiet || echo "SkillSpector install failed — gate will fail in strict mode"
-
-      - name: SkillSpector security gate — static analysis (blocking on failures)
-        if: runner.os == 'Linux'
-        continue-on-error: false
-        run: ./scripts/skillspector-gate.ps1 -Strict -FailOnRisk 50
-
-      - name: SkillSpector security gate — skip (not available on Windows)
-        if: runner.os == 'Windows'
-        run: Write-Output "⚪ SkillSpector not available on Windows — skipping"
-
-      - name: Error snapshot — persist CI quality gate results
+      - name: Error snapshot
         if: always()
         run: ./scripts/capture-errors.ps1 -Snapshot

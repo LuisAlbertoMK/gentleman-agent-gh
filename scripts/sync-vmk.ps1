@@ -63,13 +63,15 @@ function Sync-Config {
     if ($canonicalPerm -ne $targetPerm) { $changes += "permission" }
   }
   # skills paths (from canonical, adjust for target)
-  $canonicalSkills = $canonical.skills | ConvertTo-Json -Depth 5 -Compress
-  $targetSkills = $target.skills | ConvertTo-Json -Depth 5 -Compress
-  if ($canonicalSkills -ne $targetSkills) { $changes += "skills" }
+  if ($canonical.PSObject.Properties['skills']) {
+    $canonicalSkills = $canonical.skills | ConvertTo-Json -Depth 5 -Compress
+    $targetSkills = if ($target.PSObject.Properties['skills']) { $target.skills | ConvertTo-Json -Depth 5 -Compress } else { "null" }
+    if ($canonicalSkills -ne $targetSkills) { $changes += "skills" }
+  }
   # plugin list (from canonical — replace, don't merge)
-  if ($canonical.plugin) {
+  if ($canonical.PSObject.Properties['plugin']) {
     $canonicalPlugin = $canonical.plugin | ConvertTo-Json -Compress
-    $targetPlugin = if ($target.plugin) { $target.plugin | ConvertTo-Json -Compress } else { "[]" }
+    $targetPlugin = if ($target.PSObject.Properties['plugin']) { $target.plugin | ConvertTo-Json -Compress } else { "null" }
     if ($canonicalPlugin -ne $targetPlugin) { $changes += "plugin" }
   }
 
@@ -83,16 +85,19 @@ function Sync-Config {
     return
   }
 
-  # Apply changes
+  # Apply changes (use Add-Member for properties that may not exist yet)
   if ($changes -contains "agent")      { $target.agent = $canonical.agent }
   if ($changes -contains "permission") { $target.permission = $canonical.permission }
-  if ($changes -contains "skills")     { $target.skills = $canonical.skills }
-  if ($changes -contains "plugin")     { $target.plugin = $canonical.plugin }
-
-  # Preserve MCP if needed
-  if ($PreserveMCP -and $null -ne $target.mcpServers) {
-    # MCP stays as-is
+  if ($changes -contains "skills")     {
+    if ($target.PSObject.Properties['skills']) { $target.skills = $canonical.skills }
+    else { $target | Add-Member -Name "skills" -Value $canonical.skills -MemberType NoteProperty }
   }
+  if ($changes -contains "plugin")     {
+    if ($target.PSObject.Properties['plugin']) { $target.plugin = $canonical.plugin }
+    else { $target | Add-Member -Name "plugin" -Value $canonical.plugin -MemberType NoteProperty }
+  }
+
+  # MCP is NOT synced by design — managed separately by global-setup.ps1
 
   $target | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $TargetPath -Encoding UTF8
   $results.Add(@{target=$Label; status="SYNCED"; detail="Updated: $($changes -join ', ')"})
@@ -101,9 +106,13 @@ function Sync-Config {
 # ── Execute ──────────────────────────────────────────────────────────────
 if ($Target -eq "global") {
   Sync-Config -TargetPath $globalPath -Label "global" -PreserveMCP $false
-  $agentsMdDest = Join-Path $globalConfig "AGENTS.md"
-  Copy-Item -LiteralPath (Join-Path $gentlemanRoot "AGENTS.md") $agentsMdDest -Force -ErrorAction SilentlyContinue
-  $results.Add(@{target="global-agents-md"; status="SYNCED"; detail="AGENTS.md copied"})
+  if (-not $DryRun) {
+    $agentsMdDest = Join-Path $globalConfig "AGENTS.md"
+    Copy-Item -LiteralPath (Join-Path $gentlemanRoot "AGENTS.md") $agentsMdDest -Force -ErrorAction SilentlyContinue
+    $results.Add(@{target="global-agents-md"; status="SYNCED"; detail="AGENTS.md copied"})
+  } else {
+    $results.Add(@{target="global-agents-md"; status="DRY-RUN"; detail="Would copy AGENTS.md"})
+  }
 }
 
 # ── Output ──────────────────────────────────────────────────────────────

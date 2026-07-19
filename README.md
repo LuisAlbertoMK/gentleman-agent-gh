@@ -1,37 +1,37 @@
 # Gentleman Agent — OpenCode AI Agent Skills & Scripts
 
-## ¿Qué es esto?
+## What is this?
 
-**Gentleman Agent** es un **equipo de desarrollo de software AI** para OpenCode. En lugar de un solo chatbot, tenés 22 agentes especializados que trabajan juntos:
+**Gentleman Agent** is an **AI software development team** for OpenCode. Instead of a single chatbot, you get 22 specialized agents working together:
 
-- 🏗️ **Arquitecto Principal** — mentor Senior Architect que resuelve tareas complejas
-- 🔒 **Especialistas** — consultores de seguridad, performance, frontend, etc. (FREE TIER)
-- 🧠 **Memoria persistente** — el agente recuerda entre sesiones
-- ✅ **Verificación automática** — triple check antes de cualquier cambio
+- 🏗️ **Lead Architect** — Senior Architect mentor solving complex tasks
+- 🔒 **Specialists** — Security, performance, frontend, etc. consultants (FREE TIER)
+- 🧠 **Persistent memory** — the agent remembers across sessions
+- ✅ **Auto-verification** — triple check before any change
 
-**En una línea**: Pedís una tarea → el agente la resuelve con su equipo → verifica que funcione → documenta lo que aprendió.
+**In one line**: You ask for a task → the agent resolves it with its team → verifies it works → documents what it learned.
 
-**Empezá aquí**: [QUICKSTART.md](QUICKSTART.md) (5 pasos, 5 minutos)
+**Start here**: [QUICKSTART.md](QUICKSTART.md) (5 steps, 5 minutes)
 
 ---
 
-Suite de **68 skills** (+ `_shared`) + **91 scripts PowerShell** para [OpenCode](https://github.com/sst/opencode). Diseñadas para desarrollo de software con arquitectura limpia, TDD, y verificación multi-capa.
+Suite of **79 skills** (+ `_shared`) + **91 PowerShell scripts** for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
-> **Score**: 7.3/10 (bias-adjusted, 13 dimensiones)
-> **Skills**: 68 (+ `_shared` = 69 SKILL.md)
-> **Cycle**: 26 completado (Skill Merge & DCP Stale Detection)
+> **Score**: 7.3/10 (bias-adjusted, 13 dimensions)
+> **Skills**: 79 (+ `_shared`)
+> **Cycle**: 26 completed (Skill Merge & DCP Stale Detection)
 
 ---
 
-## Características
+## Features
 
 ### Multi-Agent Architecture
-22 agentes en total: orquestador principal (`gentleman-vMK`) + 12 especialistas + 9 SDD pipeline agents:
+22 agents total: main orchestrator (`gentleman-vMK`) + 12 specialists + 9 SDD pipeline agents:
 
 | Agent | Model | Specialty |
 |-------|-------|-----------|
-| `gentleman-vMK` | default | Senior Architect mentor — orquestador principal |
+| `gentleman-vMK` | default | Senior Architect mentor — main orchestrator |
 | `gentleman-deep` | nemotron-3-ultra-free | Architecture, design, complex code |
 | `gentleman-codex` | deepseek-v4-flash-free | Code generation, boilerplate |
 | `gentleman-quick` | mimo-v2.5-free | Fast tasks, review, simple edits |
@@ -46,34 +46,34 @@ Suite de **68 skills** (+ `_shared`) + **91 scripts PowerShell** para [OpenCode]
 | `sdd-orchestrator` | claude-sonnet-4-6 | SDD pipeline orchestration |
 
 #### SDD Pipeline Agents (subagents)
-9 agentes que ejecutan las fases del pipeline SDD. **Heradan el modelo del orchestrator** (`claude-sonnet-4-6`, pago) a menos que tengan `model` explícito en `opencode.json`. Todos tienen permisos completos (`bash: allow, edit: allow, write: allow`).
+9 agents executing SDD pipeline phases. **Inherit orchestrator model** (`claude-sonnet-4-6`, paid) unless they have explicit `model` in `opencode.json`. All have full permissions (`bash: allow, edit: allow, write: allow`).
 
 | Agent | Phase | Model | Description |
 |-------|-------|-------|-------------|
-| `sdd-init` | Init | hereda orchestrator | Bootstrap SDD context and project configuration |
-| `sdd-explore` | Explore | hereda orchestrator | Investigate codebase and think through ideas |
-| `sdd-propose` | Propose | hereda orchestrator | Create change proposals from explorations |
-| `sdd-spec` | Spec | hereda orchestrator | Write detailed specifications from proposals |
-| `sdd-design` | Design | hereda orchestrator | Create technical design from proposals |
-| `sdd-tasks` | Tasks | hereda orchestrator | Break down specs and designs into implementation tasks |
-| `sdd-apply` | Apply | hereda orchestrator | Implement code changes from task definitions |
-| `sdd-verify` | Verify | hereda orchestrator | Validate implementation against specs |
-| `sdd-archive` | Archive | hereda orchestrator | Archive completed change artifacts |
+| `sdd-init` | Init | inherits orchestrator | Bootstrap SDD context and project configuration |
+| `sdd-explore` | Explore | inherits orchestrator | Investigate codebase and think through ideas |
+| `sdd-propose` | Propose | inherits orchestrator | Create change proposals from explorations |
+| `sdd-spec` | Spec | inherits orchestrator | Write detailed specifications from proposals |
+| `sdd-design` | Design | inherits orchestrator | Create technical design from proposals |
+| `sdd-tasks` | Tasks | inherits orchestrator | Break down specs and designs into implementation tasks |
+| `sdd-apply` | Apply | inherits orchestrator | Implement code changes from task definitions |
+| `sdd-verify` | Verify | inherits orchestrator | Validate implementation against specs |
+| `sdd-archive` | Archive | inherits orchestrator | Archive completed change artifacts |
 
 > **Cost**: `sdd-orchestrator` + 9 sub-agents = 10 agents using `claude-sonnet-4-6`. This is intentional — SDD pipeline is high-risk and benefits from a capable model. To reduce cost, add `"model": "opencode/nemotron-3-ultra-free"` to individual SDD agents in `opencode.json`.
 
 ### Self-Improvement Cycle
-El proyecto ejecuta ciclos de mejora continua (CYCLE.md):
+The project runs continuous improvement cycles (CYCLE.md):
 
-- **Backlog priorizado** por Impacto/Riesgo
-- **Métrica inter(30)**: mínimo 30 interacciones significativas por ciclo
-- **Triple verificación** (E1/E2/E3) por dificultad
-- **Score auto-actualizado** tras cada cambio significativo
-- **Bias calibration** contra external auditor subagent
+- **Prioritized backlog** by Impact/Risk
+- **inter(30) metric**: minimum 30 meaningful interactions per cycle
+- **Triple verification** (E1/E2/E3) by difficulty
+- **Auto-updated score** after each significant change
+- **Bias calibration** via external auditor subagent
 
 ### Verification Pipeline
 
-| Modo | Verify | Gate | Commit |
+| Mode | Verify | Gate | Commit |
 |------|--------|------|--------|
 | `!ship` | Triple verify | Quality gate + PSSA | ✅ auto |
 | `!check` | Verify profiles | Quality gate | ❌ |
@@ -93,15 +93,15 @@ El proyecto ejecuta ciclos de mejora continua (CYCLE.md):
 | `!analisis` | Multi-agent analysis (6 specialists, 8 dimensions) |
 
 ### SDD Pipeline (Spec-Driven Development)
-8 fases completas: `init → propose → spec → design → tasks → apply → verify → archive`
+8 complete phases: `init → propose → spec → design → tasks → apply → verify → archive`
 
 ---
 
-## Instalación
+## Installation
 
 ### Windows (PowerShell 7+)
 ```powershell
-# Clonar e instalar
+# Clone and install
 git clone https://github.com/LuisAlbertoMK/gentleman-agent-gh.git
 cd gentleman-agent-gh
 .\scripts\install.ps1
@@ -109,24 +109,24 @@ cd gentleman-agent-gh
 
 ### Linux/macOS
 ```bash
-# Clonar e instalar
+# Clone and install
 git clone https://github.com/LuisAlbertoMK/gentleman-agent-gh.git
 cd gentleman-agent-gh
 ./scripts/install.sh
 ```
 
-### MCP Setup (recomendado)
-El proyecto usa dos MCPs para memoria cross-session:
+### MCP Setup (recommended)
+The project uses two MCPs for cross-session memory:
 
-- **[Engram](https://engram.mentat.ai)**: Memoria persistente. Instalar con `opencode mcp add engram`
-- **Context7**: Documentación actualizada de librerías. Instalar con `opencode mcp add context7`
+- **[Engram](https://engram.mentat.ai)**: Persistent memory. Install with `opencode mcp add engram`
+- **Context7**: Updated library documentation. Install with `opencode mcp add context7`
 
 ---
 
-## Skills Incluidas
+## Included Skills
 
-| Categoría | Skills |
-|-----------|--------|
+| Category | Skills |
+|----------|--------|
 | **Compression** | karpathy-loop, lean-context |
 | **Quality** | quality-gate, auto-metrics, external-auditor, immune-system, triple-verify |
 | **Code Review** | code-review-agent, judgment-day |
@@ -134,8 +134,8 @@ El proyecto usa dos MCPs para memoria cross-session:
 | **Skills Meta** | opencode-skill-creator, skill-registry, skill-improver, skill-graph |
 | **SDD** | sdd (unified pipeline — phases consolidated) |
 | **Engineering** | senior-engineer, refactoring-planner, project-mapper |
-| **Security** | security-scanner |
-| **UI/Web** | baseline-ui, accessibility, performance, seo, web-quality-audit, best-practices |
+| **Security** | security-scanner, auth-hardening, container-security, llm-security |
+| **UI/Web** | baseline-ui, accessibility, performance, seo, web-quality-audit, best-practices, ui-engine |
 | **PR/Workflow** | commit-crafter, work-unit-commits, branch-pr, chained-pr |
 | **Orchestration** | delivery-harness, subagent-isolation, command-wrapper, opencode-model-router |
 | **Decisions** | cognitive-doc-design |
@@ -143,58 +143,59 @@ El proyecto usa dos MCPs para memoria cross-session:
 | **Research** | research, prompt-engineering |
 | **Self-Improvement** | self-improvement (merged self-reflection) |
 | **DevOps** | ci-cd |
-| **Testing** | skill-testing |
+| **Testing** | skill-testing, e2e-testing, visual-testing |
 | **Others** | recovery-protocol, context-watchdog, performance-tracker, metricas, issue-creation, development-mode, execution-mode |
 
-**Total: 68 skills + `_shared`** — todas con SKILL.md, frontmatter YAML, versionado, cambio previo y licencia Apache-2.0.
+**Total: 79 skills + `_shared`** — all with SKILL.md, YAML frontmatter, versioning, changelog, and Apache-2.0 license.
 
 ---
 
-## Scripts (49 en scripts/)
+## Scripts (91+ in scripts/)
 
-| Script | Propósito |
-|--------|-----------|
-| `score-auto.ps1` | Auto-scoring del proyecto en 13 dimensiones + 32 sub-dims |
-| `skill-graph.ps1` | Resolución BFS de skills (carga sparse, −85-92%) |
-| `verify.ps1` | Triple verificación E1/E2/E3 |
-| `pssa-gate.ps1` | PSScriptAnalyzer con auto-fix de BOM |
-| `inter-track.ps1` | Tracking de interacciones por ciclo |
-| `cross-ref-check.ps1` | Consistencia skills ↔ SKILLS-INDEX |
-| `check-skill-drift.ps1` | Detección de drift entre canonical y global |
-| `check-backlog-integrity.ps1` | Verificación de backlog vs realidad |
-| `check-upstream.ps1` | Monitoreo de repos externos |
-| `batch.ps1` | Batch auto-incremental con bitácora |
-| `close-session.ps1` | Pipeline unificado de cierre de sesión |
-| `restore-project-score.ps1` | Restaura .project.json si vMK lo sobrescribe |
-| `run.ps1` | Universal runner desde junction global |
-| `ensure-tools.ps1` | Verifica rg/sg/gh en PATH |
-| `token-count.ps1` | Cuenta tokens aproximados |
-| `session-miner.ps1` | Minería cross-session para patrones |
-| `run-dreaming.ps1` | Disparador de dreaming auto |
-| `skill-validate.ps1` | Validación multi-trial de skills |
-| `smoke/smoke-all.ps1` | Tests de humo para claims de automatización |
-| `benchmark.ps1` | Benchmarking de skills y scripts |
-| `trend.ps1` | Análisis de tendencias de scoring |
-| `install.ps1` / `install.sh` | Instalador multi-plataforma (Windows/Linux/macOS) |
+| Script | Purpose |
+|--------|---------|
+| `score-auto.ps1` | Auto-scoring in 13 dimensions + 32 sub-dims |
+| `skill-graph.ps1` | BFS skill resolution (sparse loading, −85-92%) |
+| `verify.ps1` | Triple verification E1/E2/E3 |
+| `pssa-gate.ps1` | PSScriptAnalyzer with BOM auto-fix |
+| `inter-track.ps1` | Interaction tracking per cycle |
+| `cross-ref-check.ps1` | Skills ↔ SKILLS-INDEX consistency |
+| `check-skill-drift.ps1` | Drift detection between canonical and global |
+| `check-backlog-integrity.ps1` | Backlog vs reality verification |
+| `check-upstream.ps1` | External repo monitoring |
+| `batch.ps1` | Auto-incremental batch with bitacora |
+| `close-session.ps1` | Unified session close pipeline |
+| `restore-project-score.ps1` | Restores .project.json if vMK overwrites it |
+| `run.ps1` | Universal runner from global junction |
+| `ensure-tools.ps1` | Verifies rg/sg/gh in PATH |
+| `token-count.ps1` | Approximate token counting |
+| `session-miner.ps1` | Cross-session pattern mining |
+| `run-dreaming.ps1` | Auto-dreaming trigger |
+| `skill-validate.ps1` | Multi-trial skill validation |
+| `smoke/smoke-all.ps1` | Smoke tests for automation claims |
+| `benchmark.ps1` | Skills and scripts benchmarking |
+| `trend.ps1` | Scoring trend analysis |
+| `health-check-system.ps1` | System health check (MCP, disk, git, permissions) |
+| `install.ps1` / `install.sh` | Multi-platform installer (Windows/Linux/macOS) |
 
 ---
 
-## Arquitectura
+## Architecture
 
 ```
 gentleman-agent-gh/
-├── .agents/skills/          # 68 skills + _shared (canonical, git-tracked)
+├── .agents/skills/          # 79 skills + _shared (canonical, git-tracked)
 │   ├── quality-gate/
 │   ├── code-review-agent/
 │   └── .../
 ├── skills/                  # Junctions workspace (git-ignored)
-├── scripts/                 # 69 PowerShell scripts (91 including subdirs)
+├── scripts/                 # 91+ PowerShell scripts
 │   └── smoke/               # Smoke tests
 ├── docs/                    # Documentation
 │   ├── metricas/            # Session metrics
 │   ├── ciclos/              # Self-improvement cycle reports
 │   ├── audits/              # External audit reports
-│   ├── errors/               # Error analysis reports
+│   ├── errors/              # Error analysis reports
 │   ├── architecture/        # Architecture decisions & analysis
 │   ├── operations/          # Quality standard, runbooks
 │   ├── CHANGELOG.md         # Release history
@@ -205,62 +206,60 @@ gentleman-agent-gh/
 ├── AGENTS.md                # Full agent protocol (~350 lines)
 ├── CYCLE.md                 # Self-improvement cycle manifest
 ├── ANTI-PATTERN-CATALOG.md  # 23 immunized patterns
-├── SKILLS-INDEX.md           # Skill registry with triggers
+├── SKILLS-INDEX.md          # Skill registry with triggers
 └── review-rules.jsonc       # Zone-based verification policy
 ```
 
 ---
 
-## Convenciones
+## Conventions
 
 - **Commits**: Conventional Commits (`fix(scripts):`, `feat(cycle7):`, `docs(readme):`, etc.)
 - **TDD**: Test-first, code-after
-- **Memoria**: Engram persistent memory con protocolo MCP
-- **Verificación**: Triple verify (E1/E2/E3) antes de `!ship`
-- **Anti-patrones**: Catálogo con 23 patrones inmunizados
-- **Auto-metrics**: Post-task auto-evaluación en 7 dimensiones con bias calibration
-
----
+- **Memory**: Engram persistent memory with MCP protocol
+- **Verification**: Triple verify (E1/E2/E3) before `!ship`
+- **Anti-patterns**: Catalog with 23 immunized patterns
+- **Auto-metrics**: Post-task self-evaluation in 7 dimensions with bias calibration
 
 ---
 
 ## Quick Reference
 
-### Flujo típico
+### Typical flow
 
 ```
-1. gentleman-vmk               ← abrir agente
-2. "haz X"                     ← pedir tarea
-3. el agente resuelve solo     ← cambios triviales = sin ceremony
-4. !score                      ← opcional: medir resultado
-5. !close                      ← cerrar sesión
+1. gentleman-vmk               ← open agent
+2. "do X"                      ← ask for task
+3. agent resolves alone        ← trivial changes = no ceremony
+4. !score                      ← optional: measure result
+5. !close                      ← close session
 ```
 
 ### Tips
 
-- **Ponytail `lite`** = default. Solo chequea si algo es necesario antes de codear.
-- **Ponytail `full`** = para cambios complejos. Activa más gates de calidad.
-- **No necesitas** acordarte de todo — el agente sabe cuándo aplicar cada cosa.
-- **Dudas**: `!health` para diagnóstico, `!manifest` para ver el ciclo actual.
+- **Ponytail `lite`** = default. Only checks if something is necessary before coding.
+- **Ponytail `full`** = for complex changes. Activates more quality gates.
+- **You don't need** to remember everything — the agent knows when to apply each thing.
+- **Questions**: `!health` for diagnostics, `!manifest` to see current cycle.
 
-### Shortcuts principales
+### Main shortcuts
 
 > **Full reference**: [SHORTCUTS.md](SHORTCUTS.md)
 
-| Shortcut | Acción |
+| Shortcut | Action |
 |----------|--------|
 | `!score` | Score-auto + docs update + cross-ref |
 | `!health` | Git status, drift, cross-ref, score |
-| `!close` | Pipeline de cierre unificado |
-| `!analisis` | Análisis multi-agente profundo |
+| `!close` | Unified close pipeline |
+| `!analisis` | Deep multi-agent analysis |
 
 ---
 
-## Basado en
+## Based on
 
-- Método Karpathy (prompts mínimos, compresión recursiva)
+- Karpathy Method (minimal prompts, recursive compression)
 - SPEAR Framework (prompt engineering)
-- Competencias Staff+ Engineer (2026)
+- Staff+ Engineer Competencies (2026)
 - SkillsBench Benchmark
 - Engram Persistent Memory (Go + SQLite + FTS5)
 - Hermes Agent (SkillForge + Curator + SkillInjector)
