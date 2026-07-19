@@ -8,7 +8,7 @@ Total: 22 agents
 | gentleman-deep | Deep reasoning specialist - architecture, complex debugging, multi-file refactors | inline (3 lines) |
 | gentleman-quick | Fast executor - quick edits, localized changes, simple tasks | inline (3 lines) |
 | gentleman-codex | Code generation specialist - general coding, tool calling, scripts | inline (3 lines) |
-| gentleman-security | Security specialist - vulnerability analysis, secure code review, attack pattern detection (FREE TIER) | inline (3 lines) |
+| gentleman-security | Security specialist - OWASP Top 10, supply chain integrity, LLM-specific risks, container/API security, attack pattern detection (FREE TIER) | prompts/gentleman-security.md |
 | gentleman-seo | Technical SEO analyst - crawlability, structured data validation, on-page audit, CWV, GEO readiness (FREE TIER) | inline (3 lines) |
 | gentleman-infra | Infrastructure specialist - IaC, Kubernetes, Terraform, CI/CD pipelines, cloud architecture (FREE TIER) | inline (3 lines) |
 | gentleman-frontend | Frontend architecture analyst - component patterns, design system audit, CSS architecture, accessibility compliance (FREE TIER) | inline (3 lines) |
@@ -44,7 +44,7 @@ Total: 22 agents
 - **sdd-verify**: Validate implementation against specs
 
 ### Security/Quality (1)
-- **gentleman-security**: Security specialist - vulnerability analysis, secure code review, attack pattern detection (FREE TIER)
+- **gentleman-security**: Security specialist - OWASP Top 10, supply chain integrity, LLM-specific risks, container/API security, attack pattern detection (FREE TIER)
 
 ### UI/UX/Design (2)
 - **gentleman-seo**: Technical SEO analyst - crawlability, structured data validation, on-page audit, CWV, GEO readiness (FREE TIER)
@@ -62,9 +62,14 @@ Total: 22 agents
 - **gentleman-implementer**: Plan executor specialist — implements plans from specialized agents, no deviations (FREE TIER)
 
 ## Notes
-- All `gentleman-*` agents (except vMK) have 3-line inline prompts
-- All `sdd-*` agents use file-based prompts (prompts/sdd/*.md)
+- All `gentleman-*` agents (except vMK) now use file-based prompts (`prompts/gentleman-{role}.md`)
+- All `gentleman-*` specialist agents (security/seo/infra/frontend/performance/datascience/docs) use `{file:prompts/shared/_analyze-only-protocol.md}` for shared analyze-only behavior, cross-agent handoff format, output budget, and graceful degradation
+- gentleman-vMK, gentleman-deep, gentleman-quick, gentleman-codex use `{file:prompts/shared/_core-behavior.md}` for core behavior rules
+- gentleman-implementer uses `{file:prompts/gentleman-implementer.md}` + `{file:prompts/shared/_core-behavior.md}`
+- All `sdd-*` agents use file-based prompts (`prompts/sdd/*.md`) that redirect to SKILL.md
 - All `gentleman-*` agents except vMK have granular bash deny rules (17 commands)
 - gentleman-vMK inherits global permissions (orchestrator role)
 - All agents have write/edit deny for .env, credentials, secrets, opencode.json, AGENTS.md
+- Specialist prompts v3 (Jul 2026): 500-1200 tokens each, model-appropriate, with domain-specific scan protocols, grep patterns, severity tables, and output schemas
 - gentleman-frontend and gentleman-seo prompts improved in v3 (2026-07-18)
+- gentleman-security prompt expanded v3: 7 phases (OWASP mapping, supply chain, container/API, LLM risks), security-scanner v1.2 with supply chain + API security patterns (2026-07-18)
