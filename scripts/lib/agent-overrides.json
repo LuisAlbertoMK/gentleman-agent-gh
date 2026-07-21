@@ -1,0 +1,48 @@
+{
+  "sdd-apply": {
+    "hidden": true
+  },
+  "sdd-archive": {
+    "hidden": true
+  },
+  "sdd-design": {
+    "hidden": true
+  },
+  "sdd-explore": {
+    "hidden": true
+  },
+  "sdd-init": {
+    "hidden": true
+  },
+  "sdd-orchestrator": {
+    "extraPermKeys": {
+      "delegate": "allow",
+      "delegation_list": "allow",
+      "delegation_read": "allow",
+      "task": {
+        "*": "deny",
+        "sdd-apply": "allow",
+        "sdd-archive": "allow",
+        "sdd-design": "allow",
+        "sdd-explore": "allow",
+        "sdd-init": "allow",
+        "sdd-propose": "allow",
+        "sdd-spec": "allow",
+        "sdd-tasks": "allow",
+        "sdd-verify": "allow"
+      }
+    }
+  },
+  "sdd-propose": {
+    "hidden": true
+  },
+  "sdd-spec": {
+    "hidden": true
+  },
+  "sdd-tasks": {
+    "hidden": true
+  },
+  "sdd-verify": {
+    "hidden": true
+  }
+}

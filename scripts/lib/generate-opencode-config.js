@@ -1,0 +1,214 @@
+#!/usr/bin/env node
+/**
+ * generate-opencode-config.js
+ *
+ * Generates opencode.json from:
+ *   - opencode-base.json (agent definitions WITHOUT permission blocks)
+ *   - permission-templates.json (3 shared permission patterns)
+ *   - agent-overrides.json (agent-specific extra properties: hidden, custom perms)
+ *
+ * Usage:
+ *   node scripts/lib/generate-opencode-config.js           # write opencode.json
+ *   node scripts/lib/generate-opencode-config.js --validate # compare only, exit 1 on diff
+ *
+ * WHY: The original opencode.json had ~1,710 duplicated lines (73% of file)
+ * because the same permission block was copied across 22 agents. This generator
+ * maintains a single source of truth in permission-templates.json.
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+const ROOT = path.resolve(__dirname, '../..');
+const BASE_PATH = path.join(__dirname, 'opencode-base.json');
+const TEMPLATES_PATH = path.join(__dirname, 'permission-templates.json');
+const OVERRIDES_PATH = path.join(__dirname, 'agent-overrides.json');
+const OUTPUT_PATH = path.join(ROOT, 'opencode.json');
+
+const VALIDATE = process.argv.includes('--validate');
+
+// --- Agent-to-template mapping ---
+const TEMPLATE_MAP = {
+  // Orchestrator — full bash allow + extra language denials
+  'gentleman-vMK': 'orchestrator',
+
+  // Read-only specialists — bash deny, no write/edit
+  'gentleman-security': 'readonly',
+  'gentleman-seo': 'readonly',
+  'gentleman-infra': 'readonly',
+  'gentleman-frontend': 'readonly',
+  'gentleman-performance': 'readonly',
+  'gentleman-datascience': 'readonly',
+  'gentleman-docs': 'readonly',
+
+  // All remaining: 'readwrite' (default)
+};
+
+// --- Permission key order (must match original file) ---
+// Standard: bash→edit→read→write
+// sdd-orchestrator: bash→delegate→delegation_list→delegation_read→edit→read→write→task
+const STANDARD_PERM_ORDER = ['bash', 'edit', 'read', 'write'];
+const SDD_ORCH_PERM_ORDER = ['bash', 'delegate', 'delegation_list', 'delegation_read', 'edit', 'read', 'write', 'task'];
+
+// --- Load inputs ---
+console.log('[1/5] Loading base config, templates, and overrides...');
+const base = JSON.parse(fs.readFileSync(BASE_PATH, 'utf8'));
+const templates = JSON.parse(fs.readFileSync(TEMPLATES_PATH, 'utf8'));
+
+let overrides = {};
+try {
+  overrides = JSON.parse(fs.readFileSync(OVERRIDES_PATH, 'utf8'));
+} catch (e) {
+  console.log('  No agent-overrides.json found, using empty overrides');
+}
+
+// --- Deep clone and sort keys in permission objects ---
+function sortPermKeys(perm, agentName) {
+  // Use agent-specific key order if available, otherwise standard
+  const keyOrder = agentName === 'sdd-orchestrator' ? SDD_ORCH_PERM_ORDER : STANDARD_PERM_ORDER;
+  const sorted = {};
+  for (const key of keyOrder) {
+    if (perm[key] !== undefined) sorted[key] = perm[key];
+  }
+  // Add any extra keys not in the predefined order
+  for (const key of Object.keys(perm)) {
+    if (!keyOrder.includes(key)) sorted[key] = perm[key];
+  }
+  return sorted;
+}
+
+// --- Merge permissions ---
+console.log('[2/5] Merging permission templates into agent definitions...');
+
+const stats = { orchestrator: 0, readwrite: 0, readonly: 0, total: 0 };
+
+const orderedAgents = {};
+for (const [agentName, agentDef] of Object.entries(base.agent)) {
+  const templateName = TEMPLATE_MAP[agentName] || 'readwrite';
+  const template = templates[templateName];
+
+  if (!template) {
+    console.error(`ERROR: Template "${templateName}" not found for agent "${agentName}"`);
+    process.exit(1);
+  }
+
+  // Start with template permission (deep clone)
+  const permission = JSON.parse(JSON.stringify(template));
+
+  // Apply agent-specific overrides (hidden, custom perm keys, etc.)
+  const agentOverrides = overrides[agentName] || {};
+  if (agentOverrides.hidden !== undefined) {
+    agentDef.hidden = agentOverrides.hidden;
+  }
+  if (agentOverrides.extraPermKeys) {
+    Object.assign(permission, agentOverrides.extraPermKeys);
+  }
+
+  // Sort permission keys to match original ordering
+  const sortedPerm = sortPermKeys(permission, agentName);
+
+  // Rebuild agent with correct key order
+  // sdd-orchestrator: description, model, mode, permission, prompt (permission BEFORE prompt)
+  // SDD agents: description, hidden, mode, prompt, permission
+  // Others: description, [model], mode, prompt, permission, [tools]
+  const rebuilt = {};
+  let keyOrder;
+  if (agentName === 'sdd-orchestrator') {
+    keyOrder = ['description', 'model', 'mode', 'permission', 'prompt'];
+  } else {
+    keyOrder = ['description', 'model', 'hidden', 'mode', 'prompt', 'permission', 'tools'];
+  }
+
+  for (const key of keyOrder) {
+    if (key === 'permission') {
+      rebuilt.permission = sortedPerm;
+    } else if (key === 'hidden' && agentDef.hidden !== undefined) {
+      rebuilt.hidden = agentDef.hidden;
+    } else if (agentDef[key] !== undefined) {
+      rebuilt[key] = agentDef[key];
+    }
+  }
+
+  orderedAgents[agentName] = rebuilt;
+  stats[templateName]++;
+  stats.total++;
+}
+
+base.agent = orderedAgents;
+
+console.log(`  Orchestrator: ${stats.orchestrator} agent(s)`);
+console.log(`  Read/Write:   ${stats.readwrite} agent(s)`);
+console.log(`  Read-Only:    ${stats.readonly} agent(s)`);
+
+// --- Serialize ---
+console.log('[3/5] Serializing output...');
+const output = JSON.stringify(base, null, 2);
+
+// --- Validate or write ---
+if (VALIDATE) {
+  console.log('[4/5] Validating against existing opencode.json...');
+
+  let existing = fs.readFileSync(OUTPUT_PATH, 'utf8');
+  // Strip BOM if present
+  if (existing.charCodeAt(0) === 0xFEFF) existing = existing.slice(1);
+  // Normalize line endings
+  existing = existing.replace(/\r\n/g, '\n');
+
+  const normalized = output.replace(/\r\n/g, '\n');
+
+  if (existing === normalized) {
+    console.log('  VALID — generated output matches existing opencode.json');
+    process.exit(0);
+  } else {
+    console.log('  MISMATCH — generated output differs from existing opencode.json');
+
+    const existingLines = existing.split('\n').length;
+    const generatedLines = normalized.split('\n').length;
+    console.log(`  Existing:  ${existingLines} lines`);
+    console.log(`  Generated: ${generatedLines} lines`);
+
+    // Find ALL differences
+    const existingArr = existing.split('\n');
+    const generatedArr = normalized.split('\n');
+    const diffs = [];
+    for (let i = 0; i < Math.max(existingArr.length, generatedArr.length); i++) {
+      if (existingArr[i] !== generatedArr[i]) {
+        diffs.push({
+          line: i + 1,
+          existing: existingArr[i] || '(EOF)',
+          generated: generatedArr[i] || '(EOF)',
+        });
+        if (diffs.length >= 10) {
+          diffs.push({ line: '...', existing: `(${existingArr.length - i - 1} more)`, generated: '' });
+          break;
+        }
+      }
+    }
+
+    for (const d of diffs) {
+      console.log(`  Line ${d.line}:`);
+      console.log(`    Existing:  ${JSON.stringify(d.existing)}`);
+      console.log(`    Generated: ${JSON.stringify(d.generated)}`);
+    }
+
+    process.exit(1);
+  }
+} else {
+  console.log(`[4/5] Writing to ${OUTPUT_PATH}...`);
+
+  // Write with BOM to match original file
+  const BOM = '\uFEFF';
+  fs.writeFileSync(OUTPUT_PATH, BOM + output, 'utf8');
+
+  console.log('[5/5] Verifying output...');
+  const written = fs.readFileSync(OUTPUT_PATH, 'utf8').replace(/^\uFEFF/, '');
+  if (written === output) {
+    const lineCount = output.split('\n').length;
+    console.log(`  Written: ${lineCount} lines — verified OK`);
+  } else {
+    console.error('  ERROR: Written file does not match generated output!');
+    process.exit(1);
+  }
+
+  console.log('  Done!');
+}
