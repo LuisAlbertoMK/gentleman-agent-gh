@@ -55,6 +55,15 @@ repos:
         language: system
         pass_filenames: false
 
+      - id: pester-gate
+        name: Pester tests
+        entry: pwsh -NoProfile -Command "Invoke-Pester -Path './scripts/tests' -Output Detailed"
+        language: system
+        types: [file]
+        files: \.ps1$
+        pass_filenames: false
+        timeout: 120
+
       - id: opencode-config-sync
         name: opencode.json sync check
         entry: node scripts/lib/generate-opencode-config.js --validate

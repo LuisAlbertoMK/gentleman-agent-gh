@@ -18,6 +18,12 @@
       "git branch -D *": "ask",
       "git stash drop *": "ask",
       "gh pr merge *": "ask",
+      "docker *": "deny",
+      "docker-compose *": "deny",
+      "docker compose *": "deny",
+      "ssh *": "deny",
+      "wsl *": "deny",
+      "npx *": "deny",
       "rm *": "deny",
       "rm -rf *": "deny",
       "curl *": "deny",
@@ -53,7 +59,25 @@
       "net use *": "deny",
       "net session *": "deny",
       "cmd.exe *": "deny",
-      "icm *": "deny"
+      "icm *": "deny",
+      "python *": "deny",
+      "python3 *": "deny",
+      "node *": "deny",
+      "ruby *": "deny",
+      "perl *": "deny",
+      "php *": "deny",
+      "powershell -enc *": "deny",
+      "powershell -File *": "deny",
+      "powershell.exe -c *": "deny",
+      "powershell.exe -command *": "deny",
+      "powershell.exe -enc *": "deny",
+      "powershell.exe -File *": "deny",
+      "pwsh *": "deny",
+      "pwsh.exe *": "deny",
+      "certutil *": "deny",
+      "bitsadmin *": "deny",
+      "saps *": "deny",
+      "start *": "deny"
     },
     "read": {
       "*": "allow",
@@ -196,6 +220,17 @@
       "environment": {
         "HEADROOM_PROXY_URL": "{env:HEADROOM_PROXY_URL}"
       }
+    },
+    "chrome-devtools-mcp": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "chrome-devtools-mcp@1.6.0",
+        "--no-usage-statistics"
+      ],
+      "enabled": false,
+      "timeout": 30000
     }
   },
   "$schema": "https://opencode.ai/config.json",
@@ -213,6 +248,12 @@
           "ruby *": "deny",
           "perl *": "deny",
           "php *": "deny",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -330,6 +371,12 @@
       "permission": {
         "bash": {
           "*": "ask",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -448,6 +495,12 @@
       "permission": {
         "bash": {
           "*": "ask",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -562,6 +615,12 @@
       "permission": {
         "bash": {
           "*": "ask",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -676,6 +735,12 @@
       "permission": {
         "bash": {
           "*": "deny",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -733,6 +798,12 @@
       "permission": {
         "bash": {
           "*": "deny",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -790,6 +861,12 @@
       "permission": {
         "bash": {
           "*": "deny",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -847,6 +924,12 @@
       "permission": {
         "bash": {
           "*": "deny",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -904,6 +987,12 @@
       "permission": {
         "bash": {
           "*": "deny",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -961,6 +1050,12 @@
       "permission": {
         "bash": {
           "*": "deny",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -1018,6 +1113,12 @@
       "permission": {
         "bash": {
           "*": "deny",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -1075,6 +1176,12 @@
       "permission": {
         "bash": {
           "*": "ask",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -1189,6 +1296,12 @@
       "permission": {
         "bash": {
           "*": "ask",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -1303,6 +1416,12 @@
       "permission": {
         "bash": {
           "*": "ask",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -1417,6 +1536,12 @@
       "permission": {
         "bash": {
           "*": "ask",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -1531,6 +1656,12 @@
       "permission": {
         "bash": {
           "*": "ask",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -1645,6 +1776,12 @@
       "permission": {
         "bash": {
           "*": "ask",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -1758,6 +1895,12 @@
       "permission": {
         "bash": {
           "*": "ask",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -1888,6 +2031,12 @@
       "permission": {
         "bash": {
           "*": "ask",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -2002,6 +2151,12 @@
       "permission": {
         "bash": {
           "*": "ask",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -2116,6 +2271,12 @@
       "permission": {
         "bash": {
           "*": "ask",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",
@@ -2230,6 +2391,12 @@
       "permission": {
         "bash": {
           "*": "ask",
+          "docker *": "deny",
+          "docker-compose *": "deny",
+          "docker compose *": "deny",
+          "ssh *": "deny",
+          "wsl *": "deny",
+          "npx *": "deny",
           "rm *": "deny",
           "rm -rf *": "deny",
           "curl *": "deny",

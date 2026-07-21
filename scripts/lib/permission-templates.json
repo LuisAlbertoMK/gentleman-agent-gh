@@ -10,6 +10,12 @@
       "ruby *": "deny",
       "perl *": "deny",
       "php *": "deny",
+      "docker *": "deny",
+      "docker-compose *": "deny",
+      "docker compose *": "deny",
+      "ssh *": "deny",
+      "wsl *": "deny",
+      "npx *": "deny",
       "rm *": "deny",
       "rm -rf *": "deny",
       "curl *": "deny",
@@ -117,6 +123,12 @@
   "readwrite": {
     "bash": {
       "*": "ask",
+      "docker *": "deny",
+      "docker-compose *": "deny",
+      "docker compose *": "deny",
+      "ssh *": "deny",
+      "wsl *": "deny",
+      "npx *": "deny",
       "rm *": "deny",
       "rm -rf *": "deny",
       "curl *": "deny",
@@ -225,6 +237,12 @@
   "readonly": {
     "bash": {
       "*": "deny",
+      "docker *": "deny",
+      "docker-compose *": "deny",
+      "docker compose *": "deny",
+      "ssh *": "deny",
+      "wsl *": "deny",
+      "npx *": "deny",
       "rm *": "deny",
       "rm -rf *": "deny",
       "curl *": "deny",

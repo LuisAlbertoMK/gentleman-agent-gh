@@ -40,6 +40,16 @@ jobs:
             done
           fi
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'package.json'
+
+      - name: opencode.json config validation
+        run: node scripts/lib/generate-opencode-config.js --validate
+
       - name: PS7 syntax check .ps1
         run: |
           $fail = 0
@@ -107,6 +117,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          cache: 'pip'
 
       - name: Cross-ref validation
         run: ./scripts/cross-ref-check.ps1

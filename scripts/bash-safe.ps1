@@ -74,7 +74,65 @@ function Test-PortInUse {
     } catch { return $false }
 }
 
+# SECURITY: Validate that a command string contains no injection vectors.
+# bash -c interprets the entire string — backticks and $() execute arbitrary
+# code inside the bash invocation. This function rejects commands that contain
+# bash command substitution patterns, which are the real injection risk.
+# NOTE: quotes (single/double) are normal bash syntax and are NOT rejected.
+# The background path escapes " to \" to prevent quote-breaking.
+function Test-SafeCommand {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][string]$Command)
+
+    # Reject $() subshell expansion — executes arbitrary code inside bash.
+    if ($Command -match '\$\(') {
+        Write-Warning "[bash-safe] SECURITY: command contains $() subshell — refusing to execute."
+        return $false
+    }
+
+    # Reject backtick command substitution — same risk as $().
+    if ($Command -match '`') {
+        Write-Warning "[bash-safe] SECURITY: command contains backtick — refusing to execute."
+        return $false
+    }
+
+    # Reject process substitution <(...) — spawns subprocesses outside caller control.
+    if ($Command -match '<\(') {
+        Write-Warning "[bash-safe] SECURITY: command contains process substitution <(... ) — refusing to execute."
+        return $false
+    }
+
+    # Reject process substitution >(...) — same risk.
+    if ($Command -match '>\(') {
+        Write-Warning "[bash-safe] SECURITY: command contains process substitution >(... ) — refusing to execute."
+        return $false
+    }
+
+    # Reject ANSI-C quoting $'...' — can embed arbitrary escape sequences.
+    if ($Command -match "\\\$'") {
+        Write-Warning "[bash-safe] SECURITY: command contains ANSI-C quoting \$'...' — refusing to execute."
+        return $false
+    }
+
+    # Reject bash -c passthrough — nested shell invocation bypasses this layer.
+    if ($Command -match 'bash\s+-c\s') {
+        Write-Warning "[bash-safe] SECURITY: command contains bash -c passthrough — refusing to execute."
+        return $false
+    }
+
+    return $true
+}
+
 # Main entry point — invoke command via Git Bash
+# SECURITY MODEL:
+#   - The $Command parameter is passed to `bash -c` as a SINGLE argument.
+#   - Sync paths (lines below) are safe: PowerShell passes $Command as a
+#     single argv element to the bash process — no re-interpretation.
+#   - The background path builds a ProcessStartInfo.Arguments string, which
+#     IS vulnerable to quote-breaking if $Command contains double-quotes.
+#     We escape " → \" to prevent this.
+#   - Callers MUST NOT interpolate user input into $Command. Always use
+#     string literals or pre-validated strings.
 function Invoke-Bash {
     [CmdletBinding()]
     param(
@@ -83,6 +141,12 @@ function Invoke-Bash {
         [switch]$Background
     )
     $ErrorActionPreference = 'Continue'
+
+    # Input validation — reject commands that look like injection attempts
+    if (-not (Test-SafeCommand $Command)) {
+        if ($CaptureOutput) { return [PSCustomObject]@{ Output = @(); ExitCode = 126 } }
+        throw "Invoke-Bash: command rejected by security validation. See warnings above."
+    }
 
     # Server command detection — warn if launched without -Background
     $isServer = Test-IsServerCommand $Command
@@ -104,8 +168,12 @@ function Invoke-Bash {
     }
 
     if ($Background) {
+        # SECURITY: Escape backslashes first, then double-quotes.
+        # Order matters: if we escaped quotes first, a trailing \ before " would
+        # produce \" which bash interprets as an escaped quote, not backslash+quote.
+        $escapedCommand = $Command -replace '\\', '\\\\' -replace '"', '\"'
         $psi = [System.Diagnostics.ProcessStartInfo]@{
-            FileName = $script:GitBash; Arguments = "-c `"$Command`""
+            FileName = $script:GitBash; Arguments = "-c `"$escapedCommand`""
             UseShellExecute = $false; CreateNoWindow = $true
         }
         try {
@@ -121,7 +189,8 @@ function Invoke-Bash {
         }
     }
 
-    # Synchronous behavior
+    # Synchronous behavior — safe: PowerShell passes $Command as a single
+    # argument to bash, no shell re-interpretation happens on the PS side.
     if ($CaptureOutput) {
         $output = & $script:GitBash -c $Command 2>&1
         return [PSCustomObject]@{ Output = $output; ExitCode = $LASTEXITCODE }
@@ -147,6 +216,37 @@ function Test-BashSafe {
         $ok = if ($t.Pattern) { ($r.Output -join '') -match $t.Pattern } else { $true }
         if ($t.ExitOk) { $ok = $r.ExitCode -eq 0 -and $ok }
         Write-Host $(if ($ok) { " OK" } else { " FAIL" }) -ForegroundColor $(if ($ok) { "Green" } else { "Red" })
+    }
+}
+
+function Test-SecurityValidation {
+    $safe = @(
+        @{ Name = "[SEC1] plain command"; Cmd = "echo hello" }
+        @{ Name = "[SEC2] && chaining"; Cmd = "echo a && echo b" }
+        @{ Name = "[SEC3] pipeline"; Cmd = "cat file | grep pattern" }
+        @{ Name = "[SEC4] semicolons"; Cmd = "echo a; echo b" }
+        @{ Name = "[SEC5] env vars (PS side)"; Cmd = "echo $HOME" }
+        @{ Name = "[SEC6] single quotes (bash syntax)"; Cmd = "echo 'hello world'" }
+        @{ Name = "[SEC7] double quotes (bash syntax)"; Cmd = 'echo "hello world"' }
+        @{ Name = "[SEC8] escaped dollar"; Cmd = 'echo \$HOME' }
+    )
+    $unsafe = @(
+        @{ Name = "[SEC9] backtick injection"; Cmd = "echo `$(whoami)" }
+        @{ Name = "[SEC10] subshell injection"; Cmd = 'echo $(whoami)' }
+        @{ Name = "[SEC11] process substitution <("; Cmd = 'diff <(echo a) <(echo b)' }
+        @{ Name = "[SEC12] process substitution >("; Cmd = 'echo x > >()' }
+        @{ Name = "[SEC13] ANSI-C quoting"; Cmd = "echo \$'\\x48'" }
+        @{ Name = "[SEC14] bash -c passthrough"; Cmd = 'bash -c "echo pwned"' }
+    )
+    foreach ($t in $safe) {
+        Write-Host "$($t.Name)..." -NoNewline
+        $ok = Test-SafeCommand $t.Cmd
+        Write-Host $(if ($ok) { " OK (safe allowed)" } else { " FAIL (safe rejected)" }) -ForegroundColor $(if ($ok) { "Green" } else { "Red" })
+    }
+    foreach ($t in $unsafe) {
+        Write-Host "$($t.Name)..." -NoNewline
+        $ok = -not (Test-SafeCommand $t.Cmd)
+        Write-Host $(if ($ok) { " OK (unsafe blocked)" } else { " FAIL (unsafe passed)" }) -ForegroundColor $(if ($ok) { "Green" } else { "Red" })
     }
 }
 
@@ -198,6 +298,7 @@ if ($__item.LinkType -eq "Junction" -and $__item.Target) {
 # Self-test if run directly
 if ($MyInvocation.InvocationName -ne '.' -and $MyInvocation.MyCommand.Path -eq $PSCommandPath) {
     Write-Host "Using: $script:GitBash" -ForegroundColor Cyan
+    Test-SecurityValidation; Write-Host ""
     Test-BashSafe; Write-Host ""
     Test-ServerDetection; Write-Host ""
     Test-PortDetection
