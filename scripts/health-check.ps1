@@ -1,4 +1,4 @@
-﻿#requires -Version 7.6
+﻿#requires -Version 7
 <#
 .SYNOPSIS
   Unified pre-session health check for gentleman-vMK and opencode-ai ecosystem.

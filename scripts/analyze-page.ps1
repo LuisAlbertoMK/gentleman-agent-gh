@@ -1,4 +1,4 @@
-#requires -Version 7.6
+#requires -Version 7
 <#
 .SYNOPSIS
     Quick wrapper for analyze-page.js — capture and analyze web pages.

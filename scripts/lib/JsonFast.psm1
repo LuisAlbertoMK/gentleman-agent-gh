@@ -1,4 +1,4 @@
-#requires -Version 7.6
+#requires -Version 7
 <# .SYNOPSIS System.Text.Json helper — fast JSON, bypasses cmdlet overhead #>
 if(-not('System.Text.Json.JsonSerializer' -as [type])){Add-Type -AssemblyName System.Text.Json}
 function ConvertTo-JsonFast{

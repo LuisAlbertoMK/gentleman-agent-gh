@@ -1,4 +1,4 @@
-#requires -Version 7.6
+#requires -Version 7
 <#
 .SYNOPSIS
     LAZY detection: check current code for cross-project pattern matches.

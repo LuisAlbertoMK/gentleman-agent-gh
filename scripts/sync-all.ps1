@@ -1,4 +1,4 @@
-#requires -Version 7.6
+#requires -Version 7
 <#
 .SYNOPSIS
   Run global-setup + sync-vmk in sequence — full global sync in one shot.

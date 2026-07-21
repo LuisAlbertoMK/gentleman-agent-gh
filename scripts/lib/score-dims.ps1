@@ -1,4 +1,4 @@
-#requires -Version 7.6
+#requires -Version 7
 
 <#
 .SYNOPSIS
@@ -304,11 +304,11 @@ $spScore = 10
 if ($totalScripts -lt 15 -or $totalScripts -gt 60) {
     $spScore -= 1
 }
-# Note: condition order matters — >15 checked first, >20 uses elseif
-if ($avgScriptSizeKB -gt 15) {
-    $spScore -= 1
-} elseif ($avgScriptSizeKB -gt 20) {
+# Note: condition order matters — >20 checked first, then >15
+if ($avgScriptSizeKB -gt 20) {
     $spScore -= 2
+} elseif ($avgScriptSizeKB -gt 15) {
+    $spScore -= 1
 }
 if ($hugeScriptCount -gt 0) {
     $spScore -= 2
@@ -631,3 +631,30 @@ if ($depthScore -is [double]) {
 Add-Dimension "SD" $depthScore @{
     subd = $subScores.Count
 } "Depth: $($subScores.Count) sub-dims: $depthScore/10"
+
+# --- SG: Staleness Gate (SSoT freshness) ---
+$sgScore = 10
+$sgDaysOld = 0
+$sgLastUpdated = "unknown"
+$pjStalenessPath = ".project.json"
+if (Test-Path $pjStalenessPath) {
+    try {
+        $pjData = Get-Content $pjStalenessPath -Raw | ConvertFrom-Json
+        $sgLastUpdated = $pjData.score.last_updated
+        if ($sgLastUpdated) {
+            $lastUpdated = [datetime]::Parse($sgLastUpdated, $null, [System.Globalization.DateTimeStyles]::None)
+            $sgDaysOld = [int]((Get-Date) - $lastUpdated).TotalDays
+            if ($sgDaysOld -gt 7) { $sgScore = 0 }
+            elseif ($sgDaysOld -gt 3) { $sgScore = 5 }
+        } else {
+            $sgScore = 5  # No last_updated field
+        }
+    } catch {
+        $sgScore = 5  # Can't parse = uncertain freshness
+    }
+}
+
+Add-Dimension "SG" $sgScore @{
+    days_old = $sgDaysOld
+    last_updated = $sgLastUpdated
+} "SSoT age: ${sgDaysOld}d"

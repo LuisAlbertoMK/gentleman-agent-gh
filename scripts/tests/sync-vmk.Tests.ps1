@@ -1,4 +1,4 @@
-#requires -Version 7.6
+#requires -Version 7
 <#
 .SYNOPSIS
     Pester tests for sync-vmk.ps1 — Sync-Config function.

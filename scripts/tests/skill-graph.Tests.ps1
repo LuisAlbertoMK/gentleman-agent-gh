@@ -1,4 +1,4 @@
-#requires -Version 7.6
+#requires -Version 7
 <#
 .SYNOPSIS
   Pester tests for skill-graph.ps1 core logic.
@@ -14,78 +14,47 @@ param([switch]$Quiet)
 Set-StrictMode -Version Latest
 
 BeforeAll {
-    # --- Extract functions only (skip top-level Register-Skill calls) ---
+    # --- Extract functions only (skip top-level initialization) ---
     $raw = Get-Content (Join-Path (Split-Path $PSScriptRoot -Parent) 'skill-graph.ps1') -Raw
 
-    # Extract function blocks — skill-graph.ps1 uses C#-style signatures:
-    #   function Register-Skill(\n    $Name,\n    ...\n)\n{ ... }
-    $functionNames = @('Register-Skill', 'New-Graph', 'Resolve-Skill', 'Get-AgentRecommendation')
-    foreach ($fn in $functionNames) {
-        # Match: function NAME followed by ( or { (may have params on separate lines)
-        if ($raw -match "(?s)(function\s+$fn\s*[\(\{].+?\n\})") {
-            . ([ScriptBlock]::Create($Matches[1]))
-        }
-    }
-
-    # Initialize our own registry in the test scope
+    # Register-Skill no longer exists in the script (replaced by pipe-delimited
+    # data parsing). Recreate as a test helper for populating the registry.
     $script:skillRegistry = @()
-
-    # Also load agent recommendations array (needed by Get-AgentRecommendation)
-    if ($raw -match '(?s)(\$agentRecommendations\s*=\s*@\(.+?\n\))') {
-        . ([ScriptBlock]::Create($Matches[1]))
-    }
-
-    # Helper: rebuild the skillLookup hashtable from current registry
-    # (Resolve-Skill uses this at line 262 to look up skill objects by name)
-    function Update-SkillLookup {
-        $script:skillLookup = @{}
-        foreach ($skill in $script:skillRegistry) {
-            $script:skillLookup[$skill.Name] = $skill
+    function Register-Skill {
+        param([string]$Name, [string]$Triggers, [string]$Category, [string]$Effort,
+              [string]$DependsOn, [string]$Related, [string]$Description)
+        $script:skillRegistry += [PSCustomObject]@{
+            Name = $Name; Triggers = $Triggers; Category = $Category; Effort = $Effort
+            DependsOn = $DependsOn; Related = $Related; Description = $Description
         }
     }
-}
 
-# ============================================================
-Describe 'Register-Skill' {
-    BeforeEach {
-        $script:skillRegistry = @()
+    # Extract functions — replace bare $skillRegistry/$externalPatterns with $script: for Pester scope
+    foreach ($fn in @('New-Graph', 'Resolve-Skill', 'Get-AgentRecommendation')) {
+        $fnStart = $raw.IndexOf("function $fn")
+        if ($fnStart -ge 0) {
+            $bracePos = $raw.IndexOf('{', $fnStart)
+            $depth = 0; $endIdx = $bracePos
+            for ($i = $bracePos; $i -lt $raw.Length; $i++) {
+                if ($raw[$i] -eq '{') { $depth++ }
+                elseif ($raw[$i] -eq '}') { $depth--; if ($depth -eq 0) { $endIdx = $i; break } }
+            }
+            $fnText = $raw.Substring($fnStart, $endIdx - $fnStart + 1)
+            $fnText = $fnText -replace '(?<!\$script:)\$skillRegistry\b', '$script:skillRegistry'
+            $fnText = $fnText -replace '(?<!\$script:)\$externalPatterns\b', '$script:externalPatterns'
+            $fnText = $fnText -replace '(?<!\$script:)\$agentRecommendations\b', '$script:agentRecommendations'
+            . ([ScriptBlock]::Create($fnText))
+        }
     }
 
-    It 'adds a skill with all fields' {
-        Register-Skill 'test-skill' 'trigger1|trigger2' 'test' 'low' 'dep1' 'rel1' 'Test skill'
-
-        $script:skillRegistry.Count | Should -Be 1
-        $script:skillRegistry[0].Name | Should -Be 'test-skill'
-        $script:skillRegistry[0].Category | Should -Be 'test'
-        $script:skillRegistry[0].Effort | Should -Be 'low'
-        $script:skillRegistry[0].Description | Should -Be 'Test skill'
+    # Extract agentRecommendations data
+    if ($raw -match '(?s)(\$agentRecommendations\s*=\s*@\(.+?\n\))') {
+        $dataText = $Matches[1] -replace '\$agentRecommendations', '$script:agentRecommendations'
+        . ([ScriptBlock]::Create($dataText))
     }
 
-    It 'splits triggers by pipe' {
-        Register-Skill 'split-test' 'a|b|c' 'test' 'low' '' '' 'Split test'
-
-        $script:skillRegistry[0].Triggers.Count | Should -Be 3
-        $script:skillRegistry[0].Triggers[0] | Should -Be 'a'
-        $script:skillRegistry[0].Triggers[1] | Should -Be 'b'
-        $script:skillRegistry[0].Triggers[2] | Should -Be 'c'
-    }
-
-    It 'splits dependencies by pipe' {
-        Register-Skill 'dep-test' 'trigger' 'test' 'low' 'dep1|dep2' '' 'Dep test'
-
-        $script:skillRegistry[0].DependsOn.Count | Should -Be 2
-        $script:skillRegistry[0].DependsOn[0] | Should -Be 'dep1'
-        $script:skillRegistry[0].DependsOn[1] | Should -Be 'dep2'
-    }
-
-    It 'accumulates multiple skills' {
-        Register-Skill 'skill1' 'trigger1' 'test' 'low' '' '' 'First'
-        Register-Skill 'skill2' 'trigger2' 'test' 'low' '' '' 'Second'
-
-        $script:skillRegistry.Count | Should -Be 2
-        $script:skillRegistry[0].Name | Should -Be 'skill1'
-        $script:skillRegistry[1].Name | Should -Be 'skill2'
-    }
+    # Initialize external patterns (used by Resolve-Skill)
+    $script:externalPatterns = @()
 }
 
 # ============================================================
@@ -141,7 +110,6 @@ Describe 'Resolve-Skill' {
         Register-Skill 'seo' 'SEO|search engine|meta tags|structured data|sitemap' 'web-quality' 'medium' '' '' 'SEO optimization'
         Register-Skill 'accessibility' 'accessibility|a11y|WCAG|screen reader|keyboard nav' 'web-quality' 'medium' '' '' 'Web accessibility'
         Register-Skill 'research' 'research|investigar|technical investigation|learn|compare solutions' 'research' 'medium' '' '' 'Structured research'
-        Update-SkillLookup
     }
 
     It 'returns empty for no-match task' {
@@ -239,7 +207,6 @@ Describe 'Skill Graph Integration' {
         Register-Skill 'A' 'trigger_a' 'test' 'low' 'B' '' 'A depends on B'
         Register-Skill 'B' 'trigger_b' 'test' 'low' '' '' 'B standalone'
         Register-Skill 'C' 'trigger_c' 'test' 'low' 'A' '' 'C depends on A'
-        Update-SkillLookup
     }
 
     It 'resolves dependency chain A -> B via BFS' {

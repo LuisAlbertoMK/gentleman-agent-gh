@@ -1,4 +1,4 @@
-#requires -Version 7.6
+#requires -Version 7
 <#
 .SYNOPSIS
     Pester tests for check-mcp-security.ps1 core logic.
@@ -13,8 +13,29 @@ param([switch]$Quiet)
 Set-StrictMode -Version Latest
 
 BeforeAll {
-    # Dot-source the script to get functions + data. Script runs main logic (harmless).
-    . (Join-Path (Split-Path $PSScriptRoot -Parent) 'check-mcp-security.ps1')
+    # Dot-sourcing the full script crashes on remote servers (context7 has no 'command'
+    # property → PropertyNotFoundException under StrictMode). Extract functions + data only.
+    $raw = Get-Content (Join-Path (Split-Path $PSScriptRoot -Parent) 'check-mcp-security.ps1') -Raw
+
+    # Extract data arrays
+    if ($raw -match '(?s)(\$archivedServers\s*=\s*@\([^)]+\))') {
+        . ([ScriptBlock]::Create($Matches[1]))
+    }
+    if ($raw -match '(?s)(\$trustedVendors\s*=\s*@\([^)]+\))') {
+        . ([ScriptBlock]::Create($Matches[1]))
+    }
+    if ($raw -match '(?s)(\$knownToolCounts\s*=\s*@\{[^}]+\})') {
+        . ([ScriptBlock]::Create($Matches[1]))
+    }
+
+    # Extract functions via line-based regex (avoids running main logic).
+    # Uses (?ms) so ^ matches line starts — function closing braces are at column 0.
+    foreach ($fn in @('Test-ArchivedServer', 'Test-TrustedSource', 'Test-HardcodedToken',
+                      'Get-ServerIdentifier', 'Get-EstimatedToolCount')) {
+        if ($raw -match "(?ms)(function\s+$fn\s*\{.*?^\})") {
+            . ([ScriptBlock]::Create($Matches[1]))
+        }
+    }
 }
 
 # ============================================================

@@ -1,4 +1,4 @@
-﻿#requires -Version 7.6
+﻿#requires -Version 7
 <#
 .SYNOPSIS
   2-way config drift detection between gentleman-agent-gh (canonical)

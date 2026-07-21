@@ -1,4 +1,4 @@
-#requires -Version 7.6
+#requires -Version 7
 <#
 .SYNOPSIS
     Data pipeline orchestrator — connects scoring, metrics, and learning systems.

@@ -1,4 +1,4 @@
-﻿#requires -Version 7.6
+﻿#requires -Version 7
 <#
 .SYNOPSIS
     Learning statistics — pattern occurrences and trends over time.

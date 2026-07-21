@@ -8,7 +8,7 @@
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
 [ -z "$REPO_ROOT" ] && REPO_ROOT="."
 # Escape for PowerShell -Command blocks (single quotes, backticks, dollar signs)
-REPO_ROOT_ESC=$(echo "$REPO_ROOT" | sed "s/'/''/g" | sed 's/`/``/g' | sed 's/\$/`$/g')
+REPO_ROOT_ESC=$(echo "$REPO_ROOT" | sed "s/'/''/g" | sed 's/`/``/g' | sed 's/\$/`$/g' | sed 's/"/""/g' | sed 's/&/`&/g' | sed 's/!/`!/g' | sed 's/(/`(/g' | sed 's/)/`)/g')
 
 # Detect PowerShell 7 (cross-platform)
 if command -v pwsh >/dev/null 2>&1; then
@@ -59,7 +59,7 @@ if [ -n "$STAGED_PS1" ]; then
   if [ -z "$MISSING" ]; then
     green "  OK"
   else
-    red "  BLOCKING: scripts missing #requires -Version 7.6:"
+    red "  BLOCKING: scripts missing #requires -Version 7:"
     echo "$MISSING" | while read -r line; do echo "    $line"; done
     PS7_BLOCK="yes"
   fi
@@ -132,7 +132,7 @@ echo "[6/10] .project.json integrity..."
 STAGED_PROJECT_JSON=$(git diff --cached --name-only --diff-filter=ACM | grep '\.project\.json$')
 if [ -n "$STAGED_PROJECT_JSON" ]; then
   POWERSHELL_OUT=$($PWSH -NoProfile -ExecutionPolicy Bypass -Command "
-    \$json = Get-Content '$REPO_ROOT/.project.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+    \$json = Get-Content '$REPO_ROOT_ESC/.project.json' -Raw -Encoding UTF8 | ConvertFrom-Json
     \$dims = \$json.score.dimensions.PSObject.Properties.Name.Count
     \$current = \$json.score.current
     if (\$dims -ne 13) { Write-Output \"FAIL: Expected 13 dimensions, found \$dims\" }
@@ -157,7 +157,7 @@ STAGED_RULES=$(git diff --cached --name-only --diff-filter=ACM | grep 'review-ru
 if [ -n "$STAGED_RULES" ]; then
   RULES_VALID=$($PWSH -NoProfile -ExecutionPolicy Bypass -Command "
     try {
-      \$json = Get-Content '$REPO_ROOT/review-rules.jsonc' -Raw -Encoding UTF8
+      \$json = Get-Content '$REPO_ROOT_ESC/review-rules.jsonc' -Raw -Encoding UTF8
       \$parsed = \$json -replace '(?m)^\s*//.*$','' -replace '(?m)\s*//[^\"\n]*$','' -replace '(?s)/\*.*?\*/','' | ConvertFrom-Json
       \$zones = \$parsed.zones.PSObject.Properties.Name
       \$ctx = \$parsed.context_zones.PSObject.Properties.Name

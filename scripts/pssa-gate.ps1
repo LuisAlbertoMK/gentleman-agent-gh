@@ -1,4 +1,4 @@
-#requires -Version 7.6
+#requires -Version 7
 #Requires -Module @{ModuleName='PSScriptAnalyzer'; ModuleVersion='1.20.0'}
 <#
 .SYNOPSIS Self-Healing PSSA Gate.

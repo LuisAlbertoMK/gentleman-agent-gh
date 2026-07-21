@@ -1,4 +1,4 @@
-#requires -Version 7.6
+#requires -Version 7
 <#
 .SYNOPSIS
     Rollback a forged skill — remove directory, demote pattern back to active.

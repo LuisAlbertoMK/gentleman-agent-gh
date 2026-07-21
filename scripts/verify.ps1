@@ -1,4 +1,4 @@
-#requires -Version 7.6
+#requires -Version 7
 <#
 .SYNOPSIS
     Unified verify profiles E1/E2/E3 -- runnable checks for triple-verify gates.

@@ -17,12 +17,25 @@ param(
 $results = @()
 
 # 1. Disk space
-$disk = Get-PSDrive -Name / | Select-Object -First 1
-$freeGB = [math]::Round($disk.Free / 1GB, 2)
+try {
+    $disk = if ($IsWindows) {
+        Get-PSDrive -Name ($env:SystemDrive[0]) | Select-Object -First 1
+    } elseif ($IsLinux) {
+        Get-PSDrive -Name / | Select-Object -First 1
+    } else {
+        Get-PSDrive | Where-Object { $_.Used -gt 0 } | Sort-Object Free -Descending | Select-Object -First 1
+    }
+    $freeGB = [math]::Round($disk.Free / 1GB, 2)
+} catch {
+    $disk = $null
+    $freeGB = -1
+}
+$diskStatus = if ($freeGB -gt 1) { "OK" } elseif ($freeGB -gt 0.5) { "WARN" } elseif ($freeGB -ge 0) { "FAIL" } else { "FAIL" }
+$diskDetail = if ($freeGB -ge 0) { "${freeGB}GB free" } else { "detection failed" }
 $results += @{
     Check = "Disk Space"
-    Status = if ($freeGB -gt 1) { "OK" } elseif ($freeGB -gt 0.5) { "WARN" } else { "FAIL" }
-    Detail = "${freeGB}GB free"
+    Status = $diskStatus
+    Detail = $diskDetail
 }
 
 # 2. Git status

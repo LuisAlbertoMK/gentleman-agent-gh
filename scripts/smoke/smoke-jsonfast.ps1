@@ -1,4 +1,4 @@
-#requires -Version 7.6
+#requires -Version 7
 <#
 .SYNOPSIS
   Smoke test: validates JsonFast.psm1 loads, handles all types, matches ConvertTo-Json output.

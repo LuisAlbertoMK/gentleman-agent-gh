@@ -1,4 +1,4 @@
-﻿#requires -Version 7.6
+﻿#requires -Version 7
 <#
 .SYNOPSIS
   Pull-from-Upstream Workflow — detect, classify, and selectively apply upstream changes.

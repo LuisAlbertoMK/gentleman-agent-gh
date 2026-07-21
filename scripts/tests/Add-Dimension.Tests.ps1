@@ -1,4 +1,4 @@
-#requires -Version 7.6
+#requires -Version 7
 <#
 .SYNOPSIS
   Pester 6 tests for Add-Dimension from score-auto.ps1
