@@ -566,13 +566,26 @@ $subScores += $auditFreshScore
 
 # --- SD extra sub-dims ---
 
+# --- Single-read cache for SKILL.md content (avoid N+1 reads) ---
+$skillContentCache = @{}
+if ($hasSkills) {
+    foreach ($skillMd in $skillMdFiles) {
+        $cacheKey = $skillMd.FullName
+        try {
+            $skillContentCache[$cacheKey] = Get-Content $cacheKey -Raw -EA SilentlyContinue
+        } catch {
+            $skillContentCache[$cacheKey] = ""
+        }
+    }
+}
+
 # Skill Redirect Validation: % of redirect skills pointing to valid targets
 $redirectScore = 10
 if ($hasSkills) {
-    $redirectSkills = @($skillMdFiles | Where-Object { $_.Directory.Name -ne '_shared' -and (Get-Content $_.FullName -Raw -EA SilentlyContinue) -match 'MERGED into|redirect' })
+    $redirectSkills = @($skillMdFiles | Where-Object { $_.Directory.Name -ne '_shared' -and $skillContentCache[$_.FullName] -match 'MERGED into|redirect' })
     $validRedirects = 0
     foreach ($rs in $redirectSkills) {
-        $targetMatch = [regex]::Match((Get-Content $rs.FullName -Raw), 'MERGED into (\S+)')
+        $targetMatch = [regex]::Match($skillContentCache[$rs.FullName], 'MERGED into (\S+)')
         if ($targetMatch.Success) {
             $targetName = $targetMatch.Groups[1].Value
             if (Test-Path ".agents/skills/$targetName/SKILL.md") { $validRedirects++ }
@@ -602,17 +615,17 @@ $testCoverageScore = if ($totalScripts -gt 0) { $math::Round($testedScripts.Coun
 $subScores += $testCoverageScore
 
 # Skill Changelog Coverage: % of skills with changelog in frontmatter
-$skillsWithChangelog = if ($hasSkills) { @($skillMdFiles | Where-Object { (Get-Content $_.FullName -Raw -EA SilentlyContinue) -match 'changelog:' }).Count } else { 0 }
+$skillsWithChangelog = if ($hasSkills) { @($skillMdFiles | Where-Object { $skillContentCache[$_.FullName] -match 'changelog:' }).Count } else { 0 }
 $changelogScore = if ($totalSkills -gt 0) { $math::Round($skillsWithChangelog / $totalSkills * 10, 1) } else { 0 }
 $subScores += $changelogScore
 
 # Skill Trigger Coverage: % of skills with triggers in frontmatter
-$skillsWithTriggers = if ($hasSkills) { @($skillMdFiles | Where-Object { (Get-Content $_.FullName -Raw -EA SilentlyContinue) -match 'triggers:' }).Count } else { 0 }
+$skillsWithTriggers = if ($hasSkills) { @($skillMdFiles | Where-Object { $skillContentCache[$_.FullName] -match 'triggers:' }).Count } else { 0 }
 $triggerScore = if ($totalSkills -gt 0) { $math::Round($skillsWithTriggers / $totalSkills * 10, 1) } else { 0 }
 $subScores += $triggerScore
 
 # Skill Refs Coverage: % of skills with ## Refs section
-$skillsWithRefs = if ($hasSkills) { @($skillMdFiles | Where-Object { (Get-Content $_.FullName -Raw -EA SilentlyContinue) -match '##\s*Refs' }).Count } else { 0 }
+$skillsWithRefs = if ($hasSkills) { @($skillMdFiles | Where-Object { $skillContentCache[$_.FullName] -match '##\s*Refs' }).Count } else { 0 }
 $refsScore = if ($totalSkills -gt 0) { $math::Round($skillsWithRefs / $totalSkills * 10, 1) } else { 0 }
 $subScores += $refsScore
 

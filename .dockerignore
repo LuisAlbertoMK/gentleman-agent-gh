@@ -1,20 +1,44 @@
-# .dockerignore — Exclude files from Docker build context
+# Version control
 .git
 .gitignore
-.gitattributes
-.github
-.githooks
-.gitleaks.toml
-.learnings
+
+# Dependencies (rebuilt in container)
 node_modules
-*.backup-*
-experiments/
-docs/
-scripts/tests/
-scripts/metricas/
+package-lock.json
+
+# Learnings and session data
+.learnings
+
+# Tests and test artifacts
+scripts/tests
+*.Tests.ps1
+*.test.js
+*.test.jsx
+
+# Documentation (not needed in runtime)
+docs
 *.md
 !README.md
+
+# CI/CD and config
+.github
 .pre-commit-config.yaml
-.markdownlint.yaml
-.yamllint.yaml
-LICENSE
+.gitleaks.toml
+.editorconfig
+
+# IDE
+.vscode
+.idea
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Dev containers
+.devcontainer
+
+# Examples
+examples
+
+# Metric snapshots
+docs/metricas/snapshots
