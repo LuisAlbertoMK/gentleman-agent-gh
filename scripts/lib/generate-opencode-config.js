@@ -28,6 +28,7 @@ const OUTPUT_PATH = path.join(ROOT, 'opencode.json');
 const VALIDATE = process.argv.includes('--validate');
 
 // --- Agent-to-template mapping ---
+// ALL agents must be listed here. Unmapped agents are REJECTED (fail-closed).
 const TEMPLATE_MAP = {
   // Orchestrator — full bash allow + extra language denials
   'gentleman-vMK': 'orchestrator',
@@ -41,7 +42,21 @@ const TEMPLATE_MAP = {
   'gentleman-datascience': 'readonly',
   'gentleman-docs': 'readonly',
 
-  // All remaining: 'readwrite' (default)
+  // Read/write agents — bash ask, full edit/write with deny rules
+  'gentleman-deep': 'readwrite',
+  'gentleman-quick': 'readwrite',
+  'gentleman-codex': 'readwrite',
+  'gentleman-implementer': 'readwrite',
+  'sdd-apply': 'readwrite',
+  'sdd-archive': 'readwrite',
+  'sdd-design': 'readwrite',
+  'sdd-explore': 'readwrite',
+  'sdd-init': 'readwrite',
+  'sdd-orchestrator': 'readwrite',
+  'sdd-propose': 'readwrite',
+  'sdd-spec': 'readwrite',
+  'sdd-tasks': 'readwrite',
+  'sdd-verify': 'readwrite',
 };
 
 // --- Permission key order (must match original file) ---
@@ -84,7 +99,11 @@ const stats = { orchestrator: 0, readwrite: 0, readonly: 0, total: 0 };
 
 const orderedAgents = {};
 for (const [agentName, agentDef] of Object.entries(base.agent)) {
-  const templateName = TEMPLATE_MAP[agentName] || 'readwrite';
+  const templateName = TEMPLATE_MAP[agentName];
+  if (!templateName) {
+    console.error(`ERROR: Agent "${agentName}" has no template mapping. Add it to TEMPLATE_MAP.`);
+    process.exit(1);
+  }
   const template = templates[templateName];
 
   if (!template) {
@@ -101,6 +120,13 @@ for (const [agentName, agentDef] of Object.entries(base.agent)) {
     agentDef.hidden = agentOverrides.hidden;
   }
   if (agentOverrides.extraPermKeys) {
+    // Guard against clobbering template permissions
+    const templateKeys = ['bash', 'edit', 'read', 'write'];
+    const collisions = templateKeys.filter(k => k in agentOverrides.extraPermKeys);
+    if (collisions.length > 0) {
+      console.error(`ERROR: extraPermKeys for "${agentName}" collides with template keys: ${collisions.join(', ')}`);
+      process.exit(1);
+    }
     Object.assign(permission, agentOverrides.extraPermKeys);
   }
 
