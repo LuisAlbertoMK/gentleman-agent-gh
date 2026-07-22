@@ -33,7 +33,7 @@ if($Json){return($data | ConvertTo-Json)}
 if(-not $Quiet){Write-Host "  Catalog: $(@($catalog).Count) entries`n  Patterns: $(@($patternKeys).Count) keys`n  Errors: $(@($errors).Count) entries`n  Repeated: $(@($repeated).Count) patterns`n  Status: $($data.Status)"};return}
 if($Mode-eq'scan'){$uncataloged=@($repeated | Where-Object {-not $_.Cataloged})
 # ponytail: cross-project wisdom cross-check
-$wisdomPatterns=@();$wisdomDir=Join-Path $rr 'docs' 'cross-project' 'patterns'
+$wisdomPatterns=@();$wisdomDir=Join-Path (Join-Path (Join-Path $rr 'docs') 'cross-project') 'patterns'
 if(Test-Path $wisdomDir){$wisdomFiles=Get-ChildItem $wisdomDir -Filter '*.json' -ErrorAction SilentlyContinue
 foreach($wf in $wisdomFiles){try{$wp=Get-Content $wf.FullName -Raw|ConvertFrom-Json
 $wpPattern=$wp.rule.summary

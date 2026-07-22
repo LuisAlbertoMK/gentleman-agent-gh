@@ -28,7 +28,7 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $learningsDir = Join-Path $repoRoot '.learnings'
 $learningsFile = Join-Path $learningsDir 'LEARNINGS.md'
-$errorsDir = Join-Path $repoRoot 'docs' 'metricas' 'errors'
+$errorsDir = Join-Path (Join-Path (Join-Path $repoRoot 'docs') 'metricas') 'errors'
 $catalogFile = Join-Path $repoRoot 'ANTI-PATTERN-CATALOG.md'
 $timestamp = Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ'
 

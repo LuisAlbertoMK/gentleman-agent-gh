@@ -39,8 +39,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$patternsDir = Join-Path (Join-Path $repoRoot "docs") "cross-project" "patterns"
-$backlogDir = Join-Path (Join-Path $repoRoot "docs") "cross-project" "backlog"
+$patternsDir = Join-Path (Join-Path (Join-Path $repoRoot "docs") "cross-project") "patterns"
+$backlogDir = Join-Path (Join-Path (Join-Path $repoRoot "docs") "cross-project") "backlog"
 
 # Ensure patterns dir exists
 if (-not (Test-Path $patternsDir)) {

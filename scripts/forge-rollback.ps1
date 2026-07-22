@@ -28,7 +28,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$patternsDir = Join-Path (Join-Path $repoRoot "docs") "cross-project" "patterns"
+$patternsDir = Join-Path (Join-Path (Join-Path $repoRoot "docs") "cross-project") "patterns"
 $skillsDir = Join-Path (Join-Path $repoRoot ".agents") "skills"
 
 $actions = @()
