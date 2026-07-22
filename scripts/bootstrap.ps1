@@ -12,18 +12,27 @@
     Override install directory (default: platform-specific)
 .PARAMETER Update
     Update existing installation instead of fresh clone
+.PARAMETER DryRun
+    Preview destructive actions without executing them
+.PARAMETER Force
+    Skip confirmation prompts for destructive operations
 .EXAMPLE
     .\scripts\bootstrap.ps1
 .EXAMPLE
     .\scripts\bootstrap.ps1 -Update
+.EXAMPLE
+    .\scripts\bootstrap.ps1 -DryRun
 .NOTES
     Auto-detects package managers: scoop/choco (Windows), apt/brew (Linux/macOS).
 #>
+[CmdletBinding(SupportsShouldProcessing)]
 param(
     [string]$RepoUrl = "https://github.com/Gentleman-Programming/gentleman-agent-gh.git",
     [string]$Branch = "master",
     [string]$InstallDir = $(if ($IsLinux -or $IsMacOS) { Join-Path $HOME ".local" "gentleman-agent" } else { Join-Path $env:LOCALAPPDATA "gentleman-agent" }),
-    [switch]$Update
+    [switch]$Update,
+    [switch]$DryRun,
+    [switch]$Force
 )
 
 Set-StrictMode -Version Latest
@@ -66,7 +75,19 @@ if (Test-Path "$InstallDir\.git") {
         & git -C "$InstallDir" pull --ff-only origin $Branch 2>$null
         if (-not $?) {
             warn "Pull failed, re-cloning..."
-            Remove-Item -Recurse -Force "$InstallDir" -ErrorAction SilentlyContinue
+            if (-not $Force) {
+                $confirm = Read-Host "About to delete $InstallDir. Continue? (y/N)"
+                if ($confirm -ne 'y') { Write-Output "Aborted."; exit 1 }
+            }
+            try {
+                if ($DryRun) {
+                    Write-Output "[DryRun] Would delete: $InstallDir"
+                } else {
+                    Remove-Item -Recurse -Force "$InstallDir" -ErrorAction Stop
+                }
+            } catch {
+                err "Failed to remove $InstallDir : $_"
+            }
             & git clone --depth 1 --branch $Branch $RepoUrl $InstallDir 2>$null
             if (-not $?) { err "Clone failed: $RepoUrl" }
         }

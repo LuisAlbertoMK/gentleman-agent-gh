@@ -12,10 +12,14 @@
     Migrate ALL .json files from backlog/ to patterns/ with auto-ID.
 .PARAMETER Category
     Override category for migrated patterns (domain/subdomain).
+.PARAMETER DryRun
+    Preview actions without modifying any files.
+.PARAMETER Force
+    Skip confirmation prompts during migration.
 .PARAMETER Quiet
     Output JSON only (machine-readable).
 .EXAMPLE
-    .\scripts\wisdom-store.ps1 -PatternFile "docs/cross-project/backlog/my-pattern.json"
+    .\scripts\wisdom-store.ps1 -PatternFile "docs/cross-project/backlog/my-pattern.json" -DryRun
 .EXAMPLE
     .\scripts\wisdom-store.ps1 -MigrateBacklog
 .EXAMPLE
@@ -23,10 +27,13 @@
         .\scripts\wisdom-store.ps1 -PatternFile $_.FullName
     }
 #>
+[CmdletBinding(SupportsShouldProcess)]
 param(
     [string]$PatternFile = "",
     [switch]$MigrateBacklog,
     [string]$Category = "",
+    [switch]$DryRun,
+    [switch]$Force,
     [switch]$Quiet
 )
 Set-StrictMode -Version Latest
@@ -125,7 +132,11 @@ if ($MigrateBacklog) {
             }
             $result = Save-Pattern $pattern
             # Remove from backlog
-            Remove-Item $file.FullName -Force
+            if ($DryRun) {
+                Write-Output "[DryRun] Would delete: $($file.FullName)"
+            } else {
+                Remove-Item $file.FullName -Force
+            }
             $rAction = if ($result -and $result.ContainsKey('Action')) { $result.Action } else { "unknown" }
             $rId = if ($result -and $result.ContainsKey('Id')) { $result.Id } else { "" }
             $rPath = if ($result -and $result.ContainsKey('Path')) { $result.Path } else { "" }

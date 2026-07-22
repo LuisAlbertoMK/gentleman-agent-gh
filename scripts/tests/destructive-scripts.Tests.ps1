@@ -35,7 +35,9 @@ Describe "Destructive Script Safety — <_.Name>" -ForEach (
         It "should have WhatIf/Confirm, Force, or DryRun support" {
             $hasShouldProcess = $scriptContent -match 'SupportsShouldProcessing'
             $hasWhatIf = $scriptContent -match '\$WhatIfPreference|\-WhatIf'
-            $hasForce = $scriptContent -match '\-Force|\$Force|switch.*Force'
+            $hasForceParam = $scriptContent -match 'param\s*\([^)]*\[switch\]\s*\$Force[^)]*\)'
+            $hasForceVar = $scriptContent -match '\$Force\b'
+            $hasForce = $hasForceParam -or $hasForceVar
             $hasDryRun = $scriptContent -match 'DryRun|dry.run'
 
             ($hasShouldProcess -or $hasWhatIf -or $hasForce -or $hasDryRun) |
@@ -55,7 +57,11 @@ Describe "Destructive Script Safety — <_.Name>" -ForEach (
         }
 
         It "should have a -Force parameter for explicit override" {
-            $scriptContent | Should -Match '\-Force|\$Force|switch\s+.*Force'
+            $scriptContent | Should -Match 'param\s*\([^)]*\$Force[^)]*\)'
+        }
+
+        It "should have -Force as a script parameter (not just cmdlet flag)" {
+            $scriptContent | Should -Match 'param\s*\([^)]*\$Force[^)]*\)'
         }
 
         It "should gate destructive Remove-Item behind a condition" {
@@ -137,7 +143,8 @@ Describe "Destructive Script Cross-Checks" {
         $scriptsUnsafeRemove = @()
         foreach ($s in $scriptsUsingRemoveItem) {
             $c = Get-Content $s.FullName -Raw -ErrorAction SilentlyContinue
-            if ($c -notmatch 'SupportsShouldProcessing|\-Force|DryRun|WhatIf|\-Confirm') {
+            $hasForceParam = $c -match 'param\s*\([^)]*\$Force[^)]*\)'
+            if ($c -notmatch 'SupportsShouldProcessing|DryRun|WhatIf|\-Confirm' -and -not $hasForceParam) {
                 $scriptsUnsafeRemove += $s
             }
         }
@@ -145,7 +152,8 @@ Describe "Destructive Script Cross-Checks" {
         $scriptsUnsafePush = @()
         foreach ($s in $scriptsUsingGitPush) {
             $c = Get-Content $s.FullName -Raw -ErrorAction SilentlyContinue
-            if ($c -notmatch 'SupportsShouldProcessing|\-Force|DryRun|WhatIf|\-Confirm') {
+            $hasForceParam = $c -match 'param\s*\([^)]*\$Force[^)]*\)'
+            if ($c -notmatch 'SupportsShouldProcessing|DryRun|WhatIf|\-Confirm' -and -not $hasForceParam) {
                 $scriptsUnsafePush += $s
             }
         }

@@ -16,10 +16,13 @@
     .\scripts\forge-rollback.ps1 -SkillName "cross-project-ux-a11y-hero-btn-contrast"
     .\scripts\forge-rollback.ps1 -PatternId "ux/a11y/hero-btn-contrast"
 #>
+[CmdletBinding(SupportsShouldProcessing)]
 param(
     [string]$SkillName = "",
     [string]$PatternId = "",
-    [switch]$Quiet
+    [switch]$Quiet,
+    [switch]$DryRun,
+    [switch]$Force
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -62,10 +65,25 @@ if ($PatternId) {
 # ─── Remove skill directory ─────────────────────────────────────
 $skillRemoved = $false
 if ($resolvedSkillDir -and (Test-Path $resolvedSkillDir)) {
-    Remove-Item -Recurse -Force $resolvedSkillDir
-    $actions += "Removed skill directory: $resolvedSkillDir"
-    $skillRemoved = $true
-    if (-not $Quiet) { Write-Host "  [✓] Removed: $resolvedSkillDir" }
+    if (-not $Force -and -not $DryRun) {
+        $confirm = Read-Host "About to delete skill directory: $resolvedSkillDir. Continue? (y/N)"
+        if ($confirm -ne 'y') { Write-Output "Aborted."; exit 1 }
+    }
+    if ($DryRun) {
+        Write-Output "[DryRun] Would delete: $resolvedSkillDir"
+        $actions += "[DryRun] Would remove skill directory: $resolvedSkillDir"
+        $skillRemoved = $true
+    } else {
+        try {
+            Remove-Item -Recurse -Force $resolvedSkillDir
+            $actions += "Removed skill directory: $resolvedSkillDir"
+            $skillRemoved = $true
+            if (-not $Quiet) { Write-Host "  [✓] Removed: $resolvedSkillDir" }
+        } catch {
+            Write-Error "Failed to remove skill directory: $($_.Exception.Message)"
+            exit 1
+        }
+    }
 } elseif ($SkillName -and -not $resolvedSkillDir) {
     Write-Error "Cannot resolve skill directory for: $SkillName"; exit 1
 }
