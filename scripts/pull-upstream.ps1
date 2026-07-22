@@ -16,7 +16,7 @@
 .PARAMETER Remote
   Remote name (default: upstream).
 .NOTES
-  Excludes: install.ps1, install.sh, README.md, .env.example (local customizations).
+  Excludes: setup-install.ps1, install.sh, README.md, .env.example (local customizations).
 #>
 [CmdletBinding()]
 param(
@@ -33,7 +33,7 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 # ponytail: files we customize locally — upstream must NOT overwrite
-$excludeList = @('install.ps1', 'install.sh', 'README.md', '.env.example')
+$excludeList = @('setup-install.ps1', 'install.sh', 'README.md', '.env.example')
 
 # Mapping: upstream path → local path (with path translation)
 $pathMappings = @(

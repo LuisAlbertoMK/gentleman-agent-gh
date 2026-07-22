@@ -104,7 +104,7 @@ The project runs continuous improvement cycles (CYCLE.md):
 # Clone and install
 git clone https://github.com/LuisAlbertoMK/gentleman-agent-gh.git
 cd gentleman-agent-gh
-.\scripts\install.ps1
+.\scripts\setup-install.ps1
 ```
 
 ### Linux/macOS
@@ -176,7 +176,7 @@ The project uses two MCPs for cross-session memory:
 | `benchmark.ps1` | Skills and scripts benchmarking |
 | `trend.ps1` | Scoring trend analysis |
 | `health-check-system.ps1` | System health check (MCP, disk, git, permissions) |
-| `install.ps1` / `install.sh` | Multi-platform installer (Windows/Linux/macOS) |
+| `setup-install.ps1` / `install.sh` | Multi-platform installer (Windows/Linux/macOS) |
 
 ---
 

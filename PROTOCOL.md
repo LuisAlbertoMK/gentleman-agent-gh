@@ -60,7 +60,7 @@ Default `lite`. Set via `!ponytail [lite|full|ultra|off]`. Persists in `~/.confi
 | `!manifest` | Read CYCLE.md, report cycle + score |
 | `!5fases`/`!extimprove` | Load `external-improvement` — 5-phase |
 | `!analisis` | Smart multi-agent analysis → consolidated plan |
-| `!setup` | `scripts/setup-machine.ps1` (Win) / `.sh` (Linux/macOS) |
+| `!setup` | `scripts/setup-install.ps1` (Win) / `install.sh` (Linux/macOS) |
 | `!dev` | `scripts/dev-server.ps1` — manage dev servers |
 | `!gentleman` | `scripts/use-gentleman.ps1` — gentleman-ize project |
 | `!wisdom` | Load cross-project patterns — `cross-project-wisdom` |

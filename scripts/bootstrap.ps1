@@ -3,7 +3,7 @@
 .SYNOPSIS
     Gentleman Agent — bootstrap entry point (cross-platform).
 .DESCRIPTION
-    Clones the repo and runs install.ps1. Supports Windows, Linux, and macOS.
+    Clones the repo and runs setup-install.ps1. Supports Windows, Linux, and macOS.
 .PARAMETER RepoUrl
     Override repository URL (default: https://github.com/Gentleman-Programming/gentleman-agent-gh.git)
 .PARAMETER Branch
@@ -102,8 +102,8 @@ if (Test-Path "$InstallDir\.git") {
 
 # ── Run installer ────────────────────────────────────────────────
 Set-Location $InstallDir
-info "Running install.ps1..."
-& "$InstallDir\scripts\install.ps1"
+info "Running setup-install.ps1..."
+& "$InstallDir\scripts\setup-install.ps1"
 
 # ── Next steps ────────────────────────────────────────────────────
 Write-Host ""

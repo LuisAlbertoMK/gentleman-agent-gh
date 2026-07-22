@@ -25,10 +25,10 @@ git clone https://github.com/LuisAlbertoMK/gentleman-agent-gh.git
 cd gentleman-agent-gh
 
 # Windows
-.\scripts\setup-machine.ps1
+.\scripts\setup-install.ps1
 
 # Linux/macOS
-./scripts/setup-machine.sh
+./scripts/install.sh
 ```
 
 **Time**: ~2 minutes

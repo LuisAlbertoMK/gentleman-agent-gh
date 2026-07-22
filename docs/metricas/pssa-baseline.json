@@ -26,7 +26,7 @@
     },
     {
       "count": 5,
-      "file": "install.ps1"
+      "file": "setup-install.ps1"
     },
     {
       "count": 54,

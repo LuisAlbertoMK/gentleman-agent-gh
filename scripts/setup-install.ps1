@@ -9,9 +9,9 @@
     - Links skills into OpenCode global config
     - Optionally installs gentle-ai CLI dependency
 .EXAMPLE
-    .\scripts\install.ps1                 # interactive
-    .\scripts\install.ps1 -InstallGentleAI  # auto-install dep
-    .\scripts\install.ps1 -Yes             # non-interactive
+    .\scripts\setup-install.ps1                 # interactive
+    .\scripts\setup-install.ps1 -InstallGentleAI  # auto-install dep
+    .\scripts\setup-install.ps1 -Yes             # non-interactive
 #>
 param(
     [switch]$Quiet,

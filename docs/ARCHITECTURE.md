@@ -100,7 +100,7 @@ Gentleman Agent is a **multi-agent AI development team** for OpenCode. It provid
 | Skills | 8 | `skill-graph`, `skill-resolver-fast`, `skill-validate`, `check-skill-drift` |
 | Sync | 5 | `sync-all`, `sync-vmk`, `pull-upstream`, `backup`, `restore` |
 | Learning | 6 | `wisdom-store`, `wisdom-loader`, `wisdom-forge`, `run-dreaming` |
-| Setup | 3 | `setup-machine.ps1/.sh`, `install.ps1/.sh`, `global-setup` |
+| Setup | 3 | `setup-machine.ps1/.sh`, `setup-install.ps1`/`install.sh`, `global-setup` |
 | Analysis | 5 | `pipeline-analyze`, `project-profile`, `trend`, `token-count` |
 
 ### 4. Memory Layer (Engram)
