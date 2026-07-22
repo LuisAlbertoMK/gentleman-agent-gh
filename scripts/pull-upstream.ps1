@@ -114,8 +114,8 @@ try {
     # Candidates for MOD: in both
     $commonItems = @($uniqueUpstream | Where-Object { $_ -in $uniqueLocal })
 
-    # Filter exclusions
-    $newItems = $newItems | Where-Object { $_ -notin $excludeList }
+    # Filter exclusions — compare by leaf name (path-qualified items vs bare filenames)
+    $newItems = $newItems | Where-Object { (Split-Path $_ -Leaf) -notin $excludeList }
     if ($categoryLabel -eq 'Root files') {
       $newItems = $newItems | Where-Object { $_ -notmatch '\.md$|LICENSE' }
     }
@@ -161,7 +161,7 @@ try {
           $modifiedItems += $_
         }
       }
-      $modifiedItems = $modifiedItems | Where-Object { $_ -notin $excludeList }
+      $modifiedItems = $modifiedItems | Where-Object { (Split-Path $_ -Leaf) -notin $excludeList }
     }
 
     # --- Output per category ---
