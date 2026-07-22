@@ -57,11 +57,11 @@ Describe "Destructive Script Safety — <_.Name>" -ForEach (
         }
 
         It "should have a -Force parameter for explicit override" {
-            $scriptContent | Should -Match 'param\s*\([^)]*\$Force[^)]*\)'
+            $scriptContent | Should -Match 'param\s*\([\s\S]*?\$Force[\s\S]*?\)'
         }
 
         It "should have -Force as a script parameter (not just cmdlet flag)" {
-            $scriptContent | Should -Match 'param\s*\([^)]*\$Force[^)]*\)'
+            $scriptContent | Should -Match 'param\s*\([\s\S]*?\$Force[\s\S]*?\)'
         }
 
         It "should gate destructive Remove-Item behind a condition" {
@@ -143,7 +143,7 @@ Describe "Destructive Script Cross-Checks" {
         $scriptsUnsafeRemove = @()
         foreach ($s in $scriptsUsingRemoveItem) {
             $c = Get-Content $s.FullName -Raw -ErrorAction SilentlyContinue
-            $hasForceParam = $c -match 'param\s*\([^)]*\$Force[^)]*\)'
+            $hasForceParam = $c -match 'param\s*\([\s\S]*?\$Force[\s\S]*?\)'
             if ($c -notmatch 'SupportsShouldProcessing|DryRun|WhatIf|\-Confirm' -and -not $hasForceParam) {
                 $scriptsUnsafeRemove += $s
             }
@@ -152,7 +152,7 @@ Describe "Destructive Script Cross-Checks" {
         $scriptsUnsafePush = @()
         foreach ($s in $scriptsUsingGitPush) {
             $c = Get-Content $s.FullName -Raw -ErrorAction SilentlyContinue
-            $hasForceParam = $c -match 'param\s*\([^)]*\$Force[^)]*\)'
+            $hasForceParam = $c -match 'param\s*\([\s\S]*?\$Force[\s\S]*?\)'
             if ($c -notmatch 'SupportsShouldProcessing|DryRun|WhatIf|\-Confirm' -and -not $hasForceParam) {
                 $scriptsUnsafePush += $s
             }

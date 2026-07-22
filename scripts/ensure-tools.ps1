@@ -12,7 +12,9 @@
 $ErrorActionPreference = 'Stop'
 
 param(
-  [switch]$Quiet
+  [switch]$Quiet,
+  [switch]$DryRun,
+  [switch]$Force
 )
 
 Set-StrictMode -Version Latest

@@ -29,7 +29,9 @@ param(
     [switch]$SkipEnvVar,
     [switch]$SkipShortcuts,
     [switch]$SkipMcp,
-    [switch]$SkipVision
+    [switch]$SkipVision,
+    [switch]$DryRun,
+    [switch]$Force
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"

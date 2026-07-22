@@ -17,7 +17,7 @@
     .\scripts\wisdom-demote.ps1 -All
     .\scripts\wisdom-demote.ps1 -DemoteOnly -DryRun
 #>
-param([switch]$All,[switch]$DemoteOnly,[switch]$RemoveOnly,[switch]$ArchiveOnly,[switch]$DryRun,[switch]$Quiet)
+param([switch]$All,[switch]$DemoteOnly,[switch]$RemoveOnly,[switch]$ArchiveOnly,[switch]$DryRun,[switch]$Force,[switch]$Quiet)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 

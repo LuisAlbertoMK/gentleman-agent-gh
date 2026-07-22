@@ -26,7 +26,9 @@
 param(
   [switch]$AutoRepair,      # Auto-fix broken junctions
   [switch]$Json,            # JSON output for agent consumption
-  [switch]$Quiet            # Exit code only, minimal output
+  [switch]$Quiet,           # Exit code only, minimal output
+  [switch]$DryRun,
+  [switch]$Force
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -95,7 +97,11 @@ function Repair-Junction {
   if (Test-Path $Path) {
     $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
     if ($item -and $item.LinkType -in @('Junction', 'SymbolicLink')) {
-      Remove-Item -LiteralPath $Path -Force -Recurse -ErrorAction SilentlyContinue
+      try {
+        Remove-Item -LiteralPath $Path -Force -Recurse -ErrorAction Stop
+      } catch {
+        Write-Warning "[repair] failed to remove $($Path): $($_.Exception.Message)"
+      }
     } elseif ($item -and $item.LinkType) {
       Write-Warning "[repair] skipping $($Path): existing LinkType $($item.LinkType) is not Junction"
       if (-not $Quiet) { Write-Output "[skipped] $Label (not a junction)" }

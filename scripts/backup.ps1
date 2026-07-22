@@ -12,7 +12,7 @@ Backup even if no changes detected.
 #>
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-param([switch]$Quiet,[string]$Message="",[switch]$Force)
+param([switch]$Quiet,[string]$Message="",[switch]$Force,[switch]$DryRun)
 . (Join-Path $PSScriptRoot "lib" "platform.ps1")
 $cfg=Join-Path (Get-GlobalConfigDir)
 if(-not(Test-Path $cfg)){Write-Host "[err] $cfg not found" -ForegroundColor Red;exit 1}

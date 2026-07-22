@@ -27,7 +27,9 @@ param(
     [string]$Goal = "",
     [string]$Description = "Session close",
     [switch]$Quiet,
-    [switch]$CompactPrompt
+    [switch]$CompactPrompt,
+    [switch]$DryRun,
+    [switch]$Force
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
