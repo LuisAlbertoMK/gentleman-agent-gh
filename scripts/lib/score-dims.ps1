@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 5.1
 
 <#
 .SYNOPSIS
@@ -145,7 +145,7 @@ Add-Dimension "DC" ($math::Max(0, $math::Min(10, $dcScore))) @{
 $totalScripts = $scriptFiles.Count
 
 if ($hasScripts) {
-    $scriptStats = $scriptFiles | ForEach-Object -Parallel {
+    $scriptStats = $scriptFiles | ForEach-Object {
         $content = [IO.File]::ReadAllText($_.FullName)
         [PSCustomObject]@{
             h = [bool]($content -match '<#')
@@ -200,7 +200,7 @@ Add-Dimension "BP" $bpScore @{
 $corruptedFiles = 0
 if ($hasSkills) {
     $corruptedFiles = @(
-        $skillMdFiles | ForEach-Object -Parallel {
+        $skillMdFiles | ForEach-Object {
         $file = $_
         try {
             $bytes = [System.IO.File]::ReadAllBytes($file.FullName)
@@ -431,7 +431,7 @@ Add-Dimension "BI2" $backlogScore @{
 # Tool Hygiene: % scripts with Quiet/Json switches
 $quietSwitchCount = 0
 if ($hasScripts) {
-    $quietSwitchCount = @($scriptFiles | ForEach-Object -Parallel {
+    $quietSwitchCount = @($scriptFiles | ForEach-Object {
         $content = [IO.File]::ReadAllText($_.FullName)
         if ($content -match '\[switch\]\$Quiet|\[switch\]\$Json') { $true } else { $false }
     } | Where-Object { $_ }).Count

@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
   Pester 6 tests for cross-ref-check.ps1 output contract and regex patterns

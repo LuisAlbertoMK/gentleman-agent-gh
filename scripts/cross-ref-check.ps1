@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
   Validate internal refs (skills, SKILLS-INDEX, junctions, shared, README models).

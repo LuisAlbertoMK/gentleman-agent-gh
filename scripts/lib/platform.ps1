@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Cross-platform helpers for PowerShell 7 scripts — Windows, Linux, macOS.
@@ -17,9 +17,9 @@ function Get-GlobalConfigDir {
         Linux/macOS: $HOME/.config/opencode
     #>
     if ($IsLinux -or $IsMacOS) {
-        return Join-Path $HOME ".config" "opencode"
+        return Join-Path (Join-Path $HOME ".config") "opencode"
     }
-    return Join-Path $env:USERPROFILE ".config" "opencode"
+    return Join-Path (Join-Path $env:USERPROFILE ".config") "opencode"
 }
 
 function New-CrossPlatLink {

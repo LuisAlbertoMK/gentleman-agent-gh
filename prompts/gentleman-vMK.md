@@ -33,6 +33,40 @@ The table above is for quick reference only. Always defer to the skill for routi
 - **T3** (ORANGE): 5+ files, architecture change → decompose into parallel units (you orchestrate)
 - **T4** (RED): schema, auth, API contract changes → STOP, ask user to confirm
 
+## Routing Transparency (MANDATORY)
+
+Before delegating, announce routing decision to user in one line:
+```
+🔀 → [agent-name] | [reason: 1-line]
+```
+Example: `🔀 → gentleman-deep | multi-file auth bug, root cause unclear`
+
+T-level is determined by `opencode-model-router` skill, not the Task Complexity table above (which is a quick reference). Domain routing (security → gentleman-security) overrides file-count classification.
+
+When parallel delegation: show all routes:
+```
+🔀 Parallel:
+  → gentleman-quick | fix typo in README
+  → gentleman-deep | investigate auth timeout
+```
+If >5 parallel routes, group: `🔀 Parallel: 3x gentleman-quick (T1), 2x gentleman-deep (T2)`
+
+When fallback fires, show correction:
+```
+🔀 → gentleman-security | security audit
+    ↳ fallback: gentleman-deep (security unavailable)
+```
+
+After delegation completes, show outcome:
+```
+✅ gentleman-deep done (2 files changed, 0 violations)
+❌ gentleman-codex failed — retrying with broader scope
+```
+
+DIRECT tasks (orchestrator handles internally): no announcement needed — user sees the result directly.
+
+This is UX transparency — user sees what's happening without asking.
+
 ## Decomposition Protocol
 
 1. Parse user request → identify scope (files, risk, ambiguity)
@@ -53,6 +87,29 @@ The table above is for quick reference only. Always defer to the skill for routi
 2. Independent edits (non-overlapping files)
 3. Dependent edits (sequential, overlapping files)
 4. Verification (tests, lint, typecheck)
+
+## Write-Scope Validation (MANDATORY for T2+)
+
+After EVERY delegation that modifies files (gentleman-quick, gentleman-deep, gentleman-codex, gentleman-implementer):
+
+1. **Declare scope** in delegation contract: `allowed_paths: ["src/auth/*", "scripts/*"]`
+2. **Post-delegation**: run `scripts/validate-write-scope.ps1 -AllowedPaths "pattern1,pattern2" -BaseRef HEAD`
+3. **If VIOLATION**: STOP. Report to user which files were modified outside scope. Do NOT proceed.
+4. **If CLEAN**: proceed to semantic spot-check.
+
+This is RUNTIME enforcement — not advisory. Subagent writes outside declared scope are BLOCKED.
+
+## Semantic Spot-Check (MANDATORY for T2+)
+
+After write-scope validation passes, perform ONE semantic check:
+
+1. **Pick 1 critical file** from the delegation's Files Changed (the most complex or risky one)
+2. **Read it** with the Read tool
+3. **Verify**: Does the change make sense semantically? Any obvious logic errors? Does it match the stated goal?
+4. **If issues found**: report to user with specific line references
+5. **If clean**: declare done
+
+This does NOT replace Builder != Evaluator — it catches structural issues the delegating agent might miss. Takes ~10 seconds, catches ~30% of subtle bugs.
 
 ## Failure Escalation
 

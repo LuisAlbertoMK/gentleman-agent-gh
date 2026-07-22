@@ -1,15 +1,15 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Benchmark comparativo: backup pre-sprint3 vs gentleman-agent-gh (actual)
 #>
 param(
-  [string]$BDir = (Join-Path $HOME ".config" "opencode" ".bak" "pre-sprint3-apply-20260607-005330"),
+  [string]$BDir = (Join-Path (Join-Path $HOME ".config") "opencode" ".bak" "pre-sprint3-apply-20260607-005330"),
   [string]$RDir = "$PSScriptRoot\.."
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-. (Join-Path $PSScriptRoot "lib" "platform.ps1")
+. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 $RDir = (Resolve-Path $RDir).Path
 try {
 function Get-Line { param($P) try { if (test-path $P) { (Get-Content $P -EA Stop | Measure-Object -Line).Lines } else { 0 } } catch { Write-Warning "GL $($P): $_"; 0 } }

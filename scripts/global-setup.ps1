@@ -23,7 +23,7 @@ Set-StrictMode -Version Latest;$ErrorActionPreference='Stop'
 if($Quiet){$Json=$true}
 
 # Cross-platform helpers
-. (Join-Path $PSScriptRoot "lib" "platform.ps1")
+. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 
 $gentlemanRoot = if ($env:GENTLEMAN_AGENT_ROOT) { $env:GENTLEMAN_AGENT_ROOT } else { (Get-Item $PSScriptRoot).Parent.FullName }
 $globalConfig = Get-GlobalConfigDir
@@ -57,20 +57,20 @@ if(-not $Quiet){Write-Output "`n═══ GLOBAL SETUP — opencode ═══`n"
 Sync-File (Join-Path $gentlemanRoot "AGENTS.md") (Join-Path $globalConfig "AGENTS.md") "AGENTS.md"
 
 # 2. Sync ALL shared prompts (auto-discover from canonical)
-$sharedPromptsSrc = Join-Path $gentlemanRoot "prompts" "shared"
+$sharedPromptsSrc = Join-Path (Join-Path $gentlemanRoot "prompts") "shared"
 if (Test-Path $sharedPromptsSrc) {
     Get-ChildItem $sharedPromptsSrc -Filter "*.md" -Attributes !ReparsePoint | ForEach-Object {
         $safeName = Split-Path -Leaf $_.Name
-        Sync-File $_.FullName (Join-Path $globalConfig "prompts" "shared" $safeName) "prompts/shared/$safeName"
+        Sync-File $_.FullName (Join-Path (Join-Path (Join-Path $globalConfig "prompts") "shared") $safeName) "prompts/shared/$safeName"
     }
 }
 
 # 2b. Sync SDD prompts (auto-discover from canonical)
-$sharedSddSrc = Join-Path $gentlemanRoot "prompts" "sdd"
+$sharedSddSrc = Join-Path (Join-Path $gentlemanRoot "prompts") "sdd"
 if (Test-Path $sharedSddSrc) {
     Get-ChildItem $sharedSddSrc -Filter "*.md" -Attributes !ReparsePoint | ForEach-Object {
         $safeName = Split-Path -Leaf $_.Name
-        $destDir = Join-Path $globalConfig "prompts" "sdd"
+        $destDir = Join-Path (Join-Path $globalConfig "prompts") "sdd"
         Sync-File $_.FullName (Join-Path $destDir $safeName) "prompts/sdd/$safeName"
     }
 }
@@ -80,13 +80,13 @@ $rootPromptsSrc = Join-Path $gentlemanRoot "prompts"
 if (Test-Path $rootPromptsSrc) {
     Get-ChildItem $rootPromptsSrc -Include "gentleman-*.md","_*.md" -File -Attributes !ReparsePoint | ForEach-Object {
         $safeName = Split-Path -Leaf $_.Name
-        Sync-File $_.FullName (Join-Path $globalConfig "prompts" $safeName) "prompts/$safeName"
+        Sync-File $_.FullName (Join-Path (Join-Path $globalConfig "prompts") $safeName) "prompts/$safeName"
     }
 }
 
 # 3. Sync shared scripts
 $sharedScripts = @(
-    @{Src=Join-Path "scripts" "lib" "cache.ps1";Dst=Join-Path "scripts" "lib" "cache.ps1"},
+    @{Src=Join-Path (Join-Path "scripts" "lib") "cache.ps1";Dst=Join-Path (Join-Path "scripts" "lib") "cache.ps1"},
     @{Src=Join-Path "scripts" "skill-resolver-fast.ps1";Dst=Join-Path "scripts" "skill-resolver-fast.ps1"},
     @{Src=Join-Path "scripts" "build-skill-registry.ps1";Dst=Join-Path "scripts" "build-skill-registry.ps1"},
     @{Src=Join-Path "scripts" "auto-pattern-detector.ps1";Dst=Join-Path "scripts" "auto-pattern-detector.ps1"},
@@ -152,7 +152,7 @@ if(-not $SkipMCP -and (Test-Path $globalJson)){
 
 # 6. Ensure skill junctions
 $globalSkills = Join-Path $globalConfig "skills"
-$canonicalSkills = Join-Path $gentlemanRoot ".agents" "skills"
+$canonicalSkills = Join-Path (Join-Path $gentlemanRoot ".agents") "skills"
 if((Test-Path $canonicalSkills) -and (Test-Path $globalSkills)){
     $canonDirs = Get-ChildItem $canonicalSkills -Directory | Where-Object { $_.Name -ne '_shared' }
     $junctionCount = 0; $skipCount = 0
@@ -166,8 +166,8 @@ if((Test-Path $canonicalSkills) -and (Test-Path $globalSkills)){
 }else{Add-Result "Skill Junctions" "SKIP" "Skills directories not found"}
 
 # 7. Generate skill registry if missing
-$registryPath = Join-Path $gentlemanRoot "scripts" "skill-registry.json"
-$buildScript = Join-Path $gentlemanRoot "scripts" "build-skill-registry.ps1"
+$registryPath = Join-Path (Join-Path $gentlemanRoot "scripts") "skill-registry.json"
+$buildScript = Join-Path (Join-Path $gentlemanRoot "scripts") "build-skill-registry.ps1"
 if(-not (Test-Path $registryPath) -and (Test-Path $buildScript)){& $buildScript -Quiet 2>$null; Add-Result "Skill Registry" "SYNCED" "Generated from SKILL.md frontmatters"}
 else{Add-Result "Skill Registry" "OK" "Already exists"}
 

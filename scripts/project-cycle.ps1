@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
   !pcycle orchestrator — run external project improvement cycle.

@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Gentleman Agent — bootstrap entry point (cross-platform).
@@ -29,7 +29,7 @@
 param(
     [string]$RepoUrl = "https://github.com/Gentleman-Programming/gentleman-agent-gh.git",
     [string]$Branch = "master",
-    [string]$InstallDir = $(if ($IsLinux -or $IsMacOS) { Join-Path $HOME ".local" "gentleman-agent" } else { Join-Path $env:LOCALAPPDATA "gentleman-agent" }),
+    [string]$InstallDir = $(if ($IsLinux -or $IsMacOS) { Join-Path (Join-Path $HOME ".local") "gentleman-agent" } else { Join-Path $env:LOCALAPPDATA "gentleman-agent" }),
     [switch]$Update,
     [switch]$DryRun,
     [switch]$Force

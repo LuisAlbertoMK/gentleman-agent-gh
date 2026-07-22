@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
   Sync canonical config from gentleman-agent-gh to opencode-global.
@@ -25,7 +25,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 # ── Cross-platform helpers ──────────────────────────────────────────────
-. (Join-Path $PSScriptRoot "lib" "platform.ps1")
+. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 
 $gentlemanRoot = if ($env:GENTLEMAN_AGENT_ROOT) { $env:GENTLEMAN_AGENT_ROOT } else { (Get-Item $PSScriptRoot).Parent.FullName }
 

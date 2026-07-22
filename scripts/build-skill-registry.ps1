@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Build skill registry — generates skill-registry.json from SKILL.md frontmatter. Idempotent.

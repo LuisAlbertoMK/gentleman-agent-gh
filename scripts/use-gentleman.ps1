@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Gentleman-ize any project — one command to inherit MCPs, agents, skills, and SDD pipeline.
@@ -47,7 +47,7 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
-. (Join-Path $PSScriptRoot "lib" "platform.ps1")
+. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 
 # ── Load GENTLEMAN_AGENT_ROOT from User env if not in session ────────
 if (-not $env:GENTLEMAN_AGENT_ROOT) {

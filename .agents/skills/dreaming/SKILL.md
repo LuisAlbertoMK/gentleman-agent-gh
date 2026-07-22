@@ -6,8 +6,8 @@ license: Apache-2.0
 metadata:
   tags: [engineering]
   author: gentleman-vMK
-  version: "1.5"
-  changelog: "1.5: karpathy compress. 1.4: added auto-pattern-detector + learning-stats."
+  version: "1.6"
+  changelog: "1.6: auto-dream trigger on session close / 10th error. 1.5: karpathy compress. 1.4: added auto-pattern-detector + learning-stats."
 ---
 ## TRIGGER
 Only on explicit request (`!dream`) or user asking. Recommended weekly or after milestone.
@@ -54,6 +54,15 @@ When `auto-pattern-detector.ps1` returns `PATTERNS_FOUND`:
 1. Each proposal → immune-system (detect→diagnose→document→immunize)
 2. Same error 3+ times → mandatory catalog + AGENTS.md rule
 3. Cross-ref with `learning-stats.ps1` before promotion
+
+## Auto-Dream Trigger
+At session close (via `!close`), count new memories since last dream:
+1. `mem_search(type="error|bugfix|decision|discovery", limit=10)` — filter results timestamped after the last dream timestamp.
+2. If **>5 new memories**: auto-execute the dreaming protocol (Quick scan mode).
+3. If **≤5 new memories**: skip — no overhead.
+4. After auto-dream, record the timestamp via `mem_save(type="config", topic_key="dreaming/last-auto-dream", content="Last auto-dream: {timestamp}")`.
+
+This ensures cross-session patterns are extracted when memory volume signals enough new signal to harvest, without wasting cycles on low-activity sessions.
 
 ## Refs
 immune-system · cross-project-wisdom · auto-metrics · session-resume · bitacora

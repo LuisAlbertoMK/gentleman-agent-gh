@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Skill dependency graph - sparse loading resolver
@@ -191,7 +191,7 @@ function Resolve-Skill {
     $Tokens = $TaskText.ToLowerInvariant() -split '\s+|[-_/.,!?;:()]' |
         Where-Object { $_.Length -gt 2 } | Select-Object -Unique
     $SkillScores = @{}
-    $MatchResults = $skillRegistry | ForEach-Object -Parallel {
+    $MatchResults = $skillRegistry | ForEach-Object {
         $matchCount = 0
         $tokens = $using:Tokens
         foreach ($token in $tokens) {
@@ -260,7 +260,7 @@ $agentRecommendations = @(
 
 function Get-AgentRecommendation {
     param([string]$TaskText)
-    $results = $agentRecommendations | ForEach-Object -Parallel {
+    $results = $agentRecommendations | ForEach-Object {
         if ($using:TaskText -match $_.P) { $_.S }
     } -ThrottleLimit ([Math]::Max(2, [int]([Environment]::ProcessorCount / 2)))
     $recommended = @($results | Where-Object { $_ } | Select-Object -Unique)

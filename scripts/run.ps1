@@ -1,9 +1,9 @@
 ﻿#!/usr/bin/env pwsh
-#requires -Version 7
+#requires -Version 5.1
 Set-StrictMode -Version Latest
 param([switch]$Quiet,[string[]]$Args)
 $ErrorActionPreference = 'Continue'
-. (Join-Path $PSScriptRoot "lib" "platform.ps1")
+. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 <#
 .SYNOPSIS
     Universal runner — discover GENTLEMAN_AGENT_ROOT and invoke a repo script.

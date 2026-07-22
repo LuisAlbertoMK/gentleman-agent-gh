@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
   Detect project tech stack and output structured profile for !pcycle orchestration.

@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
   Pester 6 tests for pure scoring math from score-dims.ps1 (sourced by score-auto.ps1)

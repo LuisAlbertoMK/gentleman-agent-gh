@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 5.1
 #Requires -Module @{ModuleName='PSScriptAnalyzer'; ModuleVersion='1.20.0'}
 <#
 .SYNOPSIS Self-Healing PSSA Gate.
@@ -59,7 +59,7 @@ $af=@($results | Where-Object {$_.RuleName -in $fr});$td=@($results | Where-Obje
 $ev=@($manual | Where-Object {$sp=$_.ScriptPath.Replace('\','/');$sk=$false;foreach($d in $xd){if($sp-match"/$d/"){$sk=$true;break}};$sk})
 $manual=@($manual | Where-Object {$sp=$_.ScriptPath.Replace('\','/');$sk=$false;foreach($d in $xd){if($sp-match"/$d/"){$sk=$true;break}};-not$sk})
 
-$kx=@('bash-safe.ps1','pssa-gate.ps1');$av=[IO.Directory]::EnumerateFiles($target, '*.ps1', [IO.SearchOption]::AllDirectories) | ForEach-Object -Parallel {$rp=$_.Replace($using:target,'').TrimStart('\');$sk=$false;foreach($ex in $using:kx){if($rp-match[regex]::Escape($ex)){$sk=$true}};foreach($d in $using:xd){if($rp-match"^$d[\\/]"){$sk=$true}};if($sk){return}
+$kx=@('bash-safe.ps1','pssa-gate.ps1');$av=[IO.Directory]::EnumerateFiles($target, '*.ps1', [IO.SearchOption]::AllDirectories) | ForEach-Object {$rp=$_.Replace($using:target,'').TrimStart('\');$sk=$false;foreach($ex in $using:kx){if($rp-match[regex]::Escape($ex)){$sk=$true}};foreach($d in $using:xd){if($rp-match"^$d[\\/]"){$sk=$true}};if($sk){return}
 try{$ln=[IO.File]::ReadAllText($_)}catch{return};$ln=$ln -split '\r?\n'
 $results=@();for($i=0;$i-lt$ln.Count;$i++){$t=$ln[$i].Trim();if($t-eq''-or$t.StartsWith('#')){continue};if($t-match'(^|[^""])&&([^""]|$)'){$results+=[PSCustomObject]@{ScriptName=$rp;Line=$i+1;Text=$t}}};$results} -ThrottleLimit 4
 $av=@($av|Where-Object{$_})

@@ -1,7 +1,7 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#.SYNOPSIS Benchmark system — score skill fitness, system health, track trends.#>param([switch]$Snapshot,[switch]$Gate,[switch]$Json)
 $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
-. (Join-Path $PSScriptRoot "lib" "platform.ps1")
+. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 $r=Convert-Path "$PSScriptRoot\.."
 $cd="$r\.agents\skills";$am="$r\AGENTS.md";$sd="$r\scripts";$sn="$r\docs\metricas\snapshots"
 $sk=@(Get-ChildItem $cd -Directory).PSWhere({$_.Name -ne '_shared'}).PSForEach({$m="$($_.FullName)\SKILL.md";if(!(test-path $m)){return};$c=Get-Content $m -Raw;@{Name=$_.Name;Bytes=$c.Length;Lines=($c-split"`n").Count;F=$c-match"^---";W=$c-match"(?m)^## When to Use";R=$c-match"(?m)^## (Rules|Critical Rules)"}})

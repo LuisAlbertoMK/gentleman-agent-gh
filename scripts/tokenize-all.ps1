@@ -1,11 +1,11 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
   Tokenize every SKILL.md in the repo (parallel python subprocess)
 .DESCRIPTION
   Escanea todos los skills y calcula tokens usando tiktoken (si instalado)
   o heurística chars/3.5 como fallback. Output opcional a CSV.
-  Usa ForEach-Object -Parallel para tokenizar skills concurrentemente.
+  Usa ForEach-Object para tokenizar skills concurrentemente.
 .PARAMETER Path
   Directorio de skills (default: .agents/skills/).
 .PARAMETER OutCsv
@@ -27,7 +27,7 @@ Set-StrictMode -Version Latest
 if (-not (Test-Path $Path)) { Write-Error "[tokenize] Skills dir not found: $Path"; exit 1 }
 
 $skills = Get-ChildItem $Path -Directory
-$rows = $skills | ForEach-Object -Parallel {
+$rows = $skills | ForEach-Object {
     $md = Join-Path $_.FullName "SKILL.md"
     if (-not (Test-Path $md)) { return }
     $content = Get-Content $md -Raw

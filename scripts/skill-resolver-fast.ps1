@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Fast skill resolver — matches tasks to skills from pre-built registry JSON via keyword scoring.

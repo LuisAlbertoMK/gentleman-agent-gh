@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 
 <#
 .SYNOPSIS
@@ -15,7 +15,7 @@ Show what would be restored without applying.
 Set-StrictMode -Version Latest
 param([switch]$Quiet,[string]$Revision="",[switch]$List,[switch]$DryRun,[switch]$Force)
 $ErrorActionPreference='Stop'
-. (Join-Path $PSScriptRoot "lib" "platform.ps1")
+. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 $cfg=Join-Path (Get-GlobalConfigDir)
 if(-not(Test-Path "$cfg\.git")){Write-Host "[err] No backup repo" -ForegroundColor Red;exit 1}
 Push-Location $cfg;try{

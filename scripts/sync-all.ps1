@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
   Run global-setup + sync-vmk in sequence — full global sync in one shot.
@@ -21,7 +21,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 # ── Cross-platform helpers ──────────────────────────────────────────────
-. (Join-Path $PSScriptRoot "lib" "platform.ps1")
+. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 
 # ── PowerShell version check — graceful redirect ──────────────
 if ($PSVersionTable.PSVersion.Major -lt 7) {
@@ -54,8 +54,8 @@ if ($PSVersionTable.PSVersion -lt [Version]"7.6") {
 }
 
 $repoRoot = Split-Path $PSScriptRoot -Parent
-$globalSetup = Join-Path $repoRoot "scripts" "global-setup.ps1"
-$syncVmk    = Join-Path $repoRoot "scripts" "sync-vmk.ps1"
+$globalSetup = Join-Path (Join-Path $repoRoot "scripts") "global-setup.ps1"
+$syncVmk    = Join-Path (Join-Path $repoRoot "scripts") "sync-vmk.ps1"
 $results = [System.Collections.Generic.List[object]]::new()
 $ok = $true
 

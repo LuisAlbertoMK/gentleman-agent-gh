@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Load and rank cross-project patterns matching current task context.
@@ -34,7 +34,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$patternsDir = Join-Path $repoRoot "docs" "cross-project" "patterns"
+$patternsDir = Join-Path (Join-Path $repoRoot "docs") "cross-project" "patterns"
 
 if (-not (Test-Path $patternsDir)) {
     $result = [PSCustomObject]@{ Status = "NO_STORE"; Patterns = @(); Count = 0 }

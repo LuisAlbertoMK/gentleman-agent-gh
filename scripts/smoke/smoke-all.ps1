@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 5.1
 
 <#
 .SYNOPSIS
@@ -16,8 +16,8 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 # Cross-platform config dir
-$globalConfig = if ($IsLinux -or $IsMacOS) { Join-Path $HOME ".config" "opencode" } else { Join-Path $env:USERPROFILE ".config" "opencode" }
-. (Join-Path $globalConfig "scripts" "bash-safe.ps1")
+$globalConfig = if ($IsLinux -or $IsMacOS) { Join-Path (Join-Path $HOME ".config") "opencode" } else { Join-Path (Join-Path $env:USERPROFILE ".config") "opencode" }
+. (Join-Path (Join-Path $globalConfig "scripts") "bash-safe.ps1")
 
 $RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $script:passed = 0
@@ -82,7 +82,7 @@ if ($cached -and $cached.hash -eq $currentHash) {
     }
 } else {
     # ── Parallel execution ────────────────────────────────────────────────
-    $parallelResults = $smokeScripts | ForEach-Object -Parallel -ThrottleLimit 4 {
+    $parallelResults = $smokeScripts | ForEach-Object -ThrottleLimit 4 {
         $path = Join-Path $using:smokeDir $_.file
         if (-not (Test-Path $path)) {
             @{ name = $_.name; passed = $false; detail = "script not found: $($_.file)" }

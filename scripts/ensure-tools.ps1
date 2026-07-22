@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
   Verifica y expone herramientas esenciales en PATH
@@ -84,8 +84,7 @@ foreach ($key in $tools.Keys) {
 
       # V2: basic function (rg only — native binary)
       if ($key -eq 'rg') {
-        $testFile = Join-Path $env:TEMP "ensure-tools-test.txt"
-        "hello world" | Set-Content $testFile -Encoding utf8 -ErrorAction Stop
+        $testFile = Join-Path (Join-Path $env:TEMP "ensure-tools-test.txt") "hello world" | Set-Content $testFile -Encoding utf8 -ErrorAction Stop
         $null = & $fullPath "hello" $testFile 2>$null
         if ($LASTEXITCODE -eq 0) {
           Write-VerboseOutput "       search: OK"

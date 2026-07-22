@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
   Check skill drift between canonical (.agents/skills/) and global config (~/.config/opencode/skills/). Optionally sync agent definitions.
@@ -8,12 +8,12 @@ param([switch]$Thorough,[switch]$AutoFix,[switch]$SyncAgents,[switch]$Json,[swit
 if($Quiet){$Json=$true}
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
-. (Join-Path $PSScriptRoot "lib" "platform.ps1")
+. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 
 # ── Adaptive polling cache ─────────────────────────────────────────────
 # ponytail: unified cache
 $cacheScript=Join-Path $PSScriptRoot "lib/cache.ps1"
-$cacheTtl=[int]($env:SKILL_DRIFT_CACHE_TTL ?? 300)  # seconds, configurable via env var (default 5min, was 30s)
+if ($env:SKILL_DRIFT_CACHE_TTL) { $cacheTtl=[int]$env:SKILL_DRIFT_CACHE_TTL } else { $cacheTtl=300 }  # seconds, configurable via env var (default 5min, was 30s)
 $skipCache=$Thorough -or $AutoFix -or $SyncAgents
 if(-not $skipCache){
   $cached=& $cacheScript -Action get -Key "skill-drift" -TtlSeconds $cacheTtl

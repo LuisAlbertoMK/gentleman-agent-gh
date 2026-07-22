@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Sync gentleman-agent-gh to global OpenCode config — skills, scripts, MCPs, agents, AGENTS.md, permissions.
@@ -11,7 +11,7 @@
 #>
 param([switch]$DryRun,[switch]$Force,[switch]$NoAgentSync,[switch]$Json,[switch]$NoAgentsMd)
 $ErrorActionPreference = "Stop"; Set-StrictMode -Version Latest
-. (Join-Path $PSScriptRoot "lib" "platform.ps1")
+. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 
 $srcSkills = Resolve-Path "$PSScriptRoot\..\.agents\skills" -EA Stop
 $dstSkills = Join-Path (Get-GlobalConfigDir) "skills"

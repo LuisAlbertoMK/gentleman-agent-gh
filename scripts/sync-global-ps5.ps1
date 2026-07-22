@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Sync gentleman-agent-gh to global OpenCode config — PS 5.1 compatible.
@@ -8,7 +8,7 @@
 #>
 param([switch]$DryRun)
 $ErrorActionPreference = "Stop"
-. (Join-Path $PSScriptRoot "lib" "platform.ps1")
+. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 $repoRoot = Resolve-Path "$PSScriptRoot\.." -ErrorAction Stop
 $srcSkills = Join-Path $repoRoot ".agents\skills"
 $srcScripts = Join-Path $repoRoot "scripts"

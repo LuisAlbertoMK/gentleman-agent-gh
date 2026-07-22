@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
   Downstream validation of CYCLE-3 skills: delivery-harness, chained-pr, subagent-isolation.

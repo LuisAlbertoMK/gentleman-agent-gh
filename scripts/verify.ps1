@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Unified verify profiles E1/E2/E3 -- runnable checks for triple-verify gates.
@@ -10,7 +10,7 @@ param(
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
-. (Join-Path $PSScriptRoot "lib" "platform.ps1")
+. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 $r=@{profile=$ProfileName;checks=@();passed=0;failed=0;errors=@()}
 if($Quiet){$Json=$true}
 function Add-Check{

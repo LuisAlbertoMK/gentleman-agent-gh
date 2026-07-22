@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Health check for Gentleman Agent system.
@@ -140,6 +140,34 @@ try {
         Check = "Permissions"
         Status = "FAIL"
         Detail = "Could not parse opencode.json"
+    }
+}
+
+# 8. MCP server health (via mcp-resilience library)
+try {
+    $mcpLib = Join-Path (Join-Path $PSScriptRoot "lib") "mcp-resilience.ps1"
+    if (Test-Path $mcpLib) {
+        . $mcpLib
+        $mcpReport = Get-McpHealthReport
+        foreach ($mcp in $mcpReport) {
+            $results += @{
+                Check = "MCP: $($mcp.Server)"
+                Status = $mcp.Status
+                Detail = "$($mcp.Detail) | Circuit: $($mcp.CircuitState)"
+            }
+        }
+    } else {
+        $results += @{
+            Check = "MCP Servers"
+            Status = "WARN"
+            Detail = "mcp-resilience.ps1 not found - skipping MCP checks"
+        }
+    }
+} catch {
+    $results += @{
+        Check = "MCP Servers"
+        Status = "FAIL"
+        Detail = "MCP health check error: $($_.Exception.Message)"
     }
 }
 

@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Gentleman Agent — One-shot machine setup for portability
@@ -35,7 +35,7 @@ param(
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
-. (Join-Path $PSScriptRoot "lib" "platform.ps1")
+. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 
 # Helpers
 function info  { Write-Host "==> " -ForegroundColor Cyan -NoNewline; Write-Host "$args" }
@@ -234,7 +234,7 @@ if (-not $SkipVision) {
             if ($?) { ok "Ollama installed via scoop" } else { warn "Ollama scoop install failed — download from https://ollama.com/download" }
         } else { warn "scoop not found — install Ollama manually from https://ollama.com/download" }
     } else { skip "Ollama already installed" }
-    $ollamaExe = if ($ollamaCmd) { $ollamaCmd.Source } else { Join-Path $HOME "scoop" "apps" "ollama" "current" "ollama.exe" }
+    $ollamaExe = if ($ollamaCmd) { $ollamaCmd.Source } else { Join-Path (Join-Path $HOME "scoop") "apps" "ollama" "current" "ollama.exe" }
     if (Test-Path $ollamaExe) {
         $models = & $ollamaExe list 2>$null
         if ($models -notmatch "moondream") {

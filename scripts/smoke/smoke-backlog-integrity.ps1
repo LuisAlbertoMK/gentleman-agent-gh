@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 5.1
 
 <#
 .SYNOPSIS
@@ -9,8 +9,8 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 # Cross-platform config dir
-$globalConfig = if ($IsLinux -or $IsMacOS) { Join-Path $HOME ".config" "opencode" } else { Join-Path $env:USERPROFILE ".config" "opencode" }
-. (Join-Path $globalConfig "scripts" "bash-safe.ps1")
+$globalConfig = if ($IsLinux -or $IsMacOS) { Join-Path (Join-Path $HOME ".config") "opencode" } else { Join-Path (Join-Path $env:USERPROFILE ".config") "opencode" }
+. (Join-Path (Join-Path $globalConfig "scripts") "bash-safe.ps1")
 
 $RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $Script = Join-Path $RepoRoot 'scripts\check-backlog-integrity.ps1'

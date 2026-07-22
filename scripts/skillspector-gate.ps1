@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     SkillSpector security gate for agent skills. Scans .agents/skills/

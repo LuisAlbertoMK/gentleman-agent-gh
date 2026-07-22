@@ -46,20 +46,20 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [2/10] PS7 requirement check on changed .ps1 files ---
-echo "[2/10] PS7 #requires (staged .ps1)..."
+# --- [2/10] PS5.1+ requirement check on changed .ps1 files ---
+echo "[2/10] #requires Version check (staged .ps1)..."
 STAGED_PS1=$(git diff --cached --name-only --diff-filter=ACM | grep '\.ps1$')
 PS7_BLOCK=""
 if [ -n "$STAGED_PS1" ]; then
   MISSING=$(for f in $STAGED_PS1; do
     FULL="$REPO_ROOT/$f"
     [ ! -f "$FULL" ] && continue
-    head -3 "$FULL" | grep -q '#requires -Version 7' || echo "$f"
+    head -3 "$FULL" | grep -qE '#requires -Version (5\.1|7)' || echo "$f"
   done)
   if [ -z "$MISSING" ]; then
     green "  OK"
   else
-    red "  BLOCKING: scripts missing #requires -Version 7:"
+    red "  BLOCKING: scripts missing #requires -Version 5.1 or 7:"
     echo "$MISSING" | while read -r line; do echo "    $line"; done
     PS7_BLOCK="yes"
   fi

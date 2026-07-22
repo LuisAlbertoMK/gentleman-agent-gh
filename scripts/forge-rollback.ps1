@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Rollback a forged skill — remove directory, demote pattern back to active.
@@ -28,8 +28,8 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$patternsDir = Join-Path $repoRoot "docs" "cross-project" "patterns"
-$skillsDir = Join-Path $repoRoot ".agents" "skills"
+$patternsDir = Join-Path (Join-Path $repoRoot "docs") "cross-project" "patterns"
+$skillsDir = Join-Path (Join-Path $repoRoot ".agents") "skills"
 
 $actions = @()
 

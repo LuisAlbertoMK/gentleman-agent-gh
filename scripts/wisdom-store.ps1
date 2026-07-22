@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Save or migrate a cross-project pattern to the Pattern Store + Engram.
@@ -39,8 +39,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$patternsDir = Join-Path $repoRoot "docs" "cross-project" "patterns"
-$backlogDir = Join-Path $repoRoot "docs" "cross-project" "backlog"
+$patternsDir = Join-Path (Join-Path $repoRoot "docs") "cross-project" "patterns"
+$backlogDir = Join-Path (Join-Path $repoRoot "docs") "cross-project" "backlog"
 
 # Ensure patterns dir exists
 if (-not (Test-Path $patternsDir)) {

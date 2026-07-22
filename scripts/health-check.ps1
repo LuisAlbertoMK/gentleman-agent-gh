@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
   Unified pre-session health check for gentleman-vMK and opencode-ai ecosystem.
@@ -32,7 +32,7 @@ param(
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-. (Join-Path $PSScriptRoot "lib" "platform.ps1")
+. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 
 # ── Cache check (1h TTL — junctions rarely change) ─────────────────────
 # ponytail: unified cache
@@ -136,14 +136,14 @@ $checks.Add($check1)
 if ($check1.status -eq "FAIL") { $exitCode = 2 }
 
 # ── Check 2: vmk prompts junction ───────────────────────────────────────
-$check2 = Test-Junction -Path (Join-Path (Get-GlobalConfigDir) "prompts" "sdd") `
+$check2 = Test-Junction -Path (Join-Path (Join-Path (Get-GlobalConfigDir) "prompts") "sdd") `
   -ExpectedTarget "$gentlemanRoot/prompts/sdd" `
   -Label "vmk-prompts-junction"
 if ($check2.status -eq "FAIL" -and $AutoRepair) {
-  Repair-Junction -Path (Join-Path (Get-GlobalConfigDir) "prompts" "sdd") `
+  Repair-Junction -Path (Join-Path (Join-Path (Get-GlobalConfigDir) "prompts") "sdd") `
     -Target "$gentlemanRoot/prompts/sdd" `
     -Label "vmk-prompts"
-  $check2 = Test-Junction -Path (Join-Path (Get-GlobalConfigDir) "prompts" "sdd") `
+  $check2 = Test-Junction -Path (Join-Path (Join-Path (Get-GlobalConfigDir) "prompts") "sdd") `
     -ExpectedTarget "$gentlemanRoot/prompts/sdd" `
     -Label "vmk-prompts-junction"
 }

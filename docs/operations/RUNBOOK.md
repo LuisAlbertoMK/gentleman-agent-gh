@@ -1,0 +1,44 @@
+# Infrastructure Runbook
+
+Quick-reference troubleshooting for gentleman-agent-gh operations.
+
+## MCP Server Issues
+
+| Symptom | Diagnosis | Fix | Prevention |
+|---------|-----------|-----|------------|
+| MCP tool returns timeout | Server overloaded or network issue | Check circuit breaker state in `.learnings/mcp-circuit-state.json`. If OPEN, wait 60s for HALF_OPEN. If persistent, run `scripts/health-check-system.ps1` | Use retry/backoff via `scripts/lib/mcp-resilience.ps1` |
+| MCP tool returns "connection refused" | Server not running or wrong config | Verify `opencode.json` mcp section. For local servers: check command exists (`Get-Command <cmd>`). For remote: check URL and port | Enable health probes in session start |
+| Circuit breaker stuck OPEN | Repeated failures locked the circuit | Dot-source `scripts/lib/mcp-resilience.ps1`, then: `Reset-McpCircuit -Server "server-name"`. If file `.learnings/mcp-circuit-state.json` doesn't exist, circuit is effectively CLOSED (no failures recorded) | Monitor failure count; investigate root cause before resetting |
+| MCP returns unexpected data | Schema mismatch or version drift | Check MCP server version. Re-index with `codebase-memory-mcp_index_repository` if knowledge graph stale | Pin MCP server versions in opencode.json |
+
+## Context Window Issues
+
+| Symptom | Diagnosis | Fix | Prevention |
+|---------|-----------|-----|------------|
+| Responses become incoherent | Context window >80% full (RED zone) | Trigger manual compaction: `/compact`. Or call `mem_session_summary` + start fresh context | Monitor with context-watchdog skill; compress at YELLOW (40%) |
+| Agent forgets earlier instructions | Compaction happened, context lost | Call `engram_mem_context` to recover session history. Check `mem_search` for prior decisions | Always call `mem_session_summary` before compaction |
+| Token count spikes unexpectedly | Large tool output entered context | Use `ctx_execute` for data processing (sandbox keeps bytes out of conversation). Use `ctx_batch_execute` for multi-command batches | Follow Think-in-Code: process in sandbox, surface only answers |
+
+## Agent Delegation Failures
+
+| Symptom | Diagnosis | Fix | Prevention |
+|---------|-----------|-----|------------|
+| Subagent returns empty/wrong output | Agent hit context limit or misunderstood scope | Check agent's `_return-contract.md` output. Retry with narrower scope | Use `subagent-isolation` skill; keep delegation contracts precise |
+| Write-scope violation detected | Subagent wrote outside declared allowed_paths | Report to user. Use `git checkout -- <file>` to revert violations | Declare precise allowed_paths in delegation contract |
+| Agent fails 2x consecutively | Root cause unclear or task too complex | STOP delegation. Report to user in natural language. Consider: (a) broader search, (b) different agent, (c) manual intervention | Follow Failure Escalation protocol in orchestrator prompt |
+
+## Memory System Issues
+
+| Symptom | Diagnosis | Fix | Prevention |
+|---------|-----------|-----|------------|
+| mem_save returns conflict | New memory contradicts existing | See engram-protocol skill: Memory Contradiction Detection section | Use topic_key consistently; search before save |
+| Memory search returns stale results | Source file changed after indexing | Re-index: `codebase-memory-mcp_index_repository` | Check content hash in search results for staleness |
+| Session summary missing | Session ended without close protocol | Manually create summary from git log + context | Always call `mem_session_summary` before session end |
+
+## PowerShell Issues
+
+| Symptom | Diagnosis | Fix | Prevention |
+|---------|-----------|-----|------------|
+| Script fails with parse error | Unicode chars (em-dash, arrows) in PS file | Replace with ASCII: `--` instead of `—`, `->` instead of `→` | Use only ASCII in .ps1 files |
+| `#requires -Version 7` blocks execution | Running on PowerShell 5.1 | Nearly all scripts require PS7. Install PS7 or use `scripts/sync-global-ps5.ps1` for PS5.1-compatible wrappers. Only `mcp-resilience.ps1` and `validate-write-scope.ps1` are PS5.1-compatible | Target PS7; use PS5.1 wrappers for critical scripts only |
+| DateTime round-trip fails through JSON | Culture-dependent serialization | Use `Get-IsoTimestamp` / `ConvertFrom-IsoTimestamp` helpers from `scripts/lib/mcp-resilience.ps1` | Never pass raw DateTime through ConvertTo-Json/ConvertFrom-Json |
