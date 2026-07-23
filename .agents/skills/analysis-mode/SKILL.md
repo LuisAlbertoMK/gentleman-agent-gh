@@ -1,13 +1,13 @@
----
+﻿---
 name: analysis-mode
-description: "Trigger: !analisis, !analysis, multi-agent analysis. Read-only 3-phase pipeline: analyze → validate → synthesize."
+description: "Trigger: !analisis, !analysis, multi-agent analysis. Read-only 4-phase pipeline: analyze → validate → synthesize → persist."
 triggers: "!analisis, !analysis, analysis mode, multi-agent analysis, smart analysis"
 license: Apache-2.0
 metadata:
   tags: [analysis, architecture]
   author: gentleman-vMK
-  version: "4.4"
-  changelog: "4.4: breaker fixes — scope guard with counting, blocked actions list, failure handling, consensus math"
+  version: "4.5"
+  changelog: "4.5: Phase 4 PERSIST — auto-save findings to Engram, compare with previous analyses, trend delta"
   dependencies: [project-mapper]
 ---
 
@@ -44,7 +44,41 @@ Structured output: `| Finding | Consensus | Risk | Files | Recommendation |`
 
 If findings >30 → consolidate top-15 by risk, remainder to appendix.
 
+## PHASE 4: PERSIST
+**Purpose**: Save findings to Engram and compare with prior analyses of the same project.
+
+### 4a. Compare with previous analyses
+1. Extract `<project>` from the output filename (e.g., `gentleman-agent-gh` from `2025-07-22-gentleman-agent-gh-analisis.md`).
+2. Call `mem_search` with:
+   - query: `"analysis:<project>"`
+   - topic_key: `"analysis/<project>"`
+3. If previous analysis found:
+   - Extract key findings from the prior observation's `content.Key Findings`.
+   - Build a **delta summary**: improvements (resolved findings), regressions (worsened), new findings, stale findings (no longer present).
+   - Insert a `## Trend vs Previous Analysis` section after the synthesis table with this delta.
+4. If no previous analysis found → note `No previous analysis for <project> — this is the baseline.`
+
+### 4b. Save findings to Engram
+Call `mem_save` with:
+- **title**: `analysis:<project>:<YYYY-MM-DD>`
+- **type**: `architecture`
+- **topic_key**: `analysis/<project>` (upserts — updates same topic over time)
+- **content** (structured):
+  ```
+  **What**: Analyzed <project> on <YYYY-MM-DD> — <one-line summary of scope>.
+  **Why**: Triggered by <user trigger / git diff / manual request>.
+  **Where**: <list top files/dirs in scope, max 8>.
+  **Key Findings**: <top 5 findings ordered by risk — each as bullet with severity tag>.
+  **Learned**: <surprises, non-obvious discoveries, or "None significant" if clean>.
+  ```
+- **scope**: `project`
+
+### 4c. Enrich the report file
+Append two sections to `docs/mejoras/YYYY-MM-DD-<project>-analisis.md`:
+1. `## Engram Persistence` — state the observation ID saved, topic_key used, and timestamp.
+2. `## Trend Analysis` — include the delta summary from 4a (or "First analysis — no prior baseline" if none found).
+
 ## OUTPUT
-`docs/mejoras/YYYY-MM-DD-<project>-analisis.md` — Summary, Findings (8 dims), Synthesis table, Risk Matrix, Recommendations.
+`docs/mejoras/YYYY-MM-DD-<project>-analisis.md` — Summary, Findings (8 dims), Synthesis table, Risk Matrix, Recommendations, Engram Persistence, Trend Analysis.
 
 **Gate**: Plan only — NO code, NO commit. Exit analysis mode before implementing.
