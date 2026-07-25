@@ -42,3 +42,16 @@ examples
 
 # Metric snapshots
 docs/metricas/snapshots
+
+# Secrets and credentials — prevent leaks into image layers
+.env*
+*.pem
+*.key
+*.p12
+secrets/
+
+# Logs
+*.log
+
+# Analysis reports
+docs/mejoras/

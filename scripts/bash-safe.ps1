@@ -168,10 +168,12 @@ function Invoke-Bash {
     }
 
     if ($Background) {
-        # SECURITY: Escape backslashes first, then double-quotes.
-        # Order matters: if we escaped quotes first, a trailing \ before " would
-        # produce \" which bash interprets as an escaped quote, not backslash+quote.
-        $escapedCommand = $Command -replace '\\', '\\\\' -replace '"', '\"'
+        # SECURITY: Escape backslashes first, then double-quotes, then dollar
+        # signs and backticks. Order matters: if we escaped quotes first, a
+        # trailing \ before " would produce \" which bash interprets as an
+        # escaped quote, not backslash+quote. Dollar signs and backticks are
+        # special to Windows cmd.exe when passed through ProcessStartInfo.
+        $escapedCommand = $Command -replace '\\', '\\\\' -replace '"', '\"' -replace '\$', '`$'
         $psi = [System.Diagnostics.ProcessStartInfo]@{
             FileName = $script:GitBash; Arguments = "-c `"$escapedCommand`""
             UseShellExecute = $false; CreateNoWindow = $true

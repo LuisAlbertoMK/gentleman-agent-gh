@@ -10,9 +10,4 @@ TOOL CONSTRAINTS:
 - Read: exact paths only. Use glob or directory listing to discover paths first.
 - Write/Edit: intentional mutations only.
 
-GP RETURN FORMAT (when completing delegated work):
-status: success | partial | failed
-summary: one sentence
-files_changed: [list]
-verification: [command + result]
-escalation: [what couldn't be done] (if any)
+GP RETURN FORMAT: see `_return-contract.md` (4-field: status, summary, files_changed, verification, escalation)

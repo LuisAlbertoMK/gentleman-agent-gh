@@ -8,6 +8,8 @@
 
 Gentleman Agent is an **AI software development team** with 22 specialized agents. Instead of a single chatbot, you get:
 
+Each agent loads from 1-5 of 92 specialized skills as needed.
+
 - 🏗️ **Lead Architect** (`gentleman-vMK`) — your Senior Architect mentor
 - 🔒 **Specialists** (security, performance, frontend, etc.) — FREE TIER consultants
 - 🧠 **Persistent memory** (Engram) — the agent remembers across sessions
@@ -87,6 +89,7 @@ Create a test for this function
 | `!health` | If something fails or you want to diagnose |
 | `!close` | When finishing the session |
 | `!analisis` | For deep multi-agent analysis |
+| `!ejecutar` | Execute analysis findings with parallel subagents (after `!analisis`) |
 
 **Example**:
 ```
@@ -112,7 +115,7 @@ This automatically:
 ## Next steps
 
 1. **Read [AGENTS.md](AGENTS.md)** to understand the full protocol
-2. **Explore skills** in `.agents/skills/` (79 available)
+2. **Explore skills** in `.agents/skills/` (92 available)
 3. **Try `!analisis`** for multi-agent analysis of your project
 4. **Check [CYCLE.md](CYCLE.md)** to see the current improvement cycle
 

@@ -16,6 +16,7 @@
 | `!sync` | Upstream check + drift + score update | Keep in sync |
 | `!compress` | Karpathy compress skills >2.5KB | Skill optimization |
 | `!analisis` | Multi-agent analysis (6 specialists, 8 dimensions) | Deep analysis |
+| `!ejecutar` | Execute analysis findings with parallel subagents | After `!analisis` completes |
 
 ## Ponytail Mode
 
@@ -67,6 +68,7 @@
 
 # Quick analysis:
 !analisis           ← deep multi-agent analysis
+!ejecutar           ← execute findings in parallel (after !analisis)
 
 # Emergency:
 !health             ← diagnose issues

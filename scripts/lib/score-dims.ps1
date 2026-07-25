@@ -22,6 +22,19 @@ if (-not $skillDirs)    { $skillDirs = @() }
 $hasScripts  = $scriptFiles.Count -gt 0
 $hasSkills   = $skillMdFiles.Count -gt 0
 
+# --- Single-read cache for SKILL.md content (avoid N+1 reads) ---
+$skillContentCache = @{}
+if ($hasSkills) {
+    foreach ($skillMd in $skillMdFiles) {
+        $cacheKey = $skillMd.FullName
+        try {
+            $skillContentCache[$cacheKey] = Get-Content $cacheKey -Raw -EA SilentlyContinue
+        } catch {
+            $skillContentCache[$cacheKey] = ""
+        }
+    }
+}
+
 # --- PA: Project Artifacts ---
 
 $paScore = 10
@@ -61,12 +74,21 @@ if ($hasScripts) {
 # Check for hardcoded secrets across scripts, skills, workflows, config
 $secretPaths = @()
 if ($hasScripts)  { $secretPaths += $scriptFiles.FullName }
-if ($hasSkills)   { $secretPaths += $skillMdFiles.FullName }
 $secretPaths += @(".\.github\workflows\*.yml", ".\opencode.json")
 
 $secretMatches = @()
 if ($secretPaths.Count -gt 0) {
     $secretMatches = @(Select-String -Path $secretPaths -Pattern "(?i)(api[_-]?key|secret|password|token|credential)\s*[=:]\s*['""][^'""]{8,}" -EA SilentlyContinue)
+}
+
+# Skill files: regex against cached content (avoid re-reads)
+if ($hasSkills) {
+    $secretPattern = [regex]::new("(?i)(api[_-]?key|secret|password|token|credential)\s*[=:]\s*['""][^'""]{8,}")
+    foreach ($cachedContent in $skillContentCache.Values) {
+        if ($cachedContent -and $secretPattern.IsMatch($cachedContent)) {
+            $secretMatches += [PSCustomObject]@{ Line = $cachedContent }
+        }
+    }
 }
 
 if ($secretMatches) {
@@ -565,19 +587,6 @@ $subScores += $crossRefFreshScore
 $subScores += $auditFreshScore
 
 # --- SD extra sub-dims ---
-
-# --- Single-read cache for SKILL.md content (avoid N+1 reads) ---
-$skillContentCache = @{}
-if ($hasSkills) {
-    foreach ($skillMd in $skillMdFiles) {
-        $cacheKey = $skillMd.FullName
-        try {
-            $skillContentCache[$cacheKey] = Get-Content $cacheKey -Raw -EA SilentlyContinue
-        } catch {
-            $skillContentCache[$cacheKey] = ""
-        }
-    }
-}
 
 # Skill Redirect Validation: % of redirect skills pointing to valid targets
 $redirectScore = 10

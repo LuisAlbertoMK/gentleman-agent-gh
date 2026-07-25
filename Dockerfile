@@ -60,7 +60,7 @@ COPY --from=builder /usr/local/share/powershell/Modules /usr/local/share/powersh
 
 # Copy Python packages from builder
 COPY --from=builder /usr/lib/python3/dist-packages /usr/lib/python3/dist-packages
-COPY --from=builder /usr/local/lib/python3.11/dist-packages /usr/local/lib/python3.11/dist-packages
+COPY --from=builder /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
 
 # Copy pre-commit from builder
 COPY --from=builder /usr/local/bin/pre-commit /usr/local/bin/pre-commit

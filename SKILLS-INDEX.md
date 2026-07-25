@@ -1,127 +1,56 @@
-# SKILLS INDEX
+# SKILLS INDEX (Compact)
 
-> Full trigger table for all 79 skills. Read on-demand when AGENTS.md compact table doesn't match.
-> Located at project root.
+> Top-20 daily-use skills. Full table: 93 skills — use `skill` tool or read this file for complete list.
 >
-> **Version**: 4.4 | **Changelog**: 4.4 (+8 new: deep-debugging, quick-executor, code-generation, infra-audit, perf-profiling, data-quality, docs-audit, plan-execution; count 71→79); 4.3 (+3 new: auth-hardening, container-security, llm-security; count 68→71); 4.2 (+1 new: e2e-testing; count 68→69); 4.1 (+2 new: server-commands, analysis-mode; count 66→68); 4.0 (+8 missing triggers; fixed 57→65); 3.9 (+2 new: vision-analyze, workflow-optimizer; count 63→65); 3.8 (+4 new: sdd-quick, visual-testing, image-pipeline, pdf-utils)
+> **Version**: 5.0 | **Changelog**: 5.0 (compact top-20 table for token reduction); 4.7 (+1 new: adversarial-breaker; count 92→93); 4.6 (count corrected 80→92 per filesystem audit)
 
-## Triggers → Skill
+## Top 20 Daily-Use Skills
 
 | Trigger keywords | Skill |
 |------------------|-------|
-| Karpathy, less tokens, context compression, optimize prompt, measure tokens | karpathy-loop |
-| Improve prompt, security, ReAct, multi-agent | prompt-engineering |
-| Compact, less tokens, /caveman, ultra-lean | lean-context |
-| Test/verify skill, coverage | skill-testing |
-| Judgment day, dual review, juzgar | judgment-day |
-| Senior architect, trade-offs, system design | senior-engineer |
-| Create AI skill, eval, iterate | opencode-skill-creator |
-| Skill registry, catalog | skill-registry |
-| Quality gate, pre-commit | quality-gate |
-| Context >100K tokens, context explosion | context-watchdog |
-| Recovery, "no es eso", frustration | recovery-protocol |
-| Resume, "dónde lo dejamos", "continuá", git state gate | session-resume |
-| SDD pipeline, unified pipeline, orchestrate SDD phases | sdd |
-| Execution mode, resource-adaptive zones, quick/thorough/draft | execution-mode |
-| Subagent isolation, context boundaries | subagent-isolation |
-| Delivery harness, orchestrate, multi-agent, delegate work | delivery-harness |
-| Chained PR, stacked PR, sequential branches, PR chain | chained-pr |
-| Command wrapper, error handling, output parsing | command-wrapper |
-| Branch PR, branch naming, PR creation, open PR, create pull request | branch-pr |
-| Cognitive doc design, doc design, documentation patterns, reduce cognitive load, progressive disclosure | cognitive-doc-design |
-| Comment writer, PR feedback, review comment, GitHub comment, write feedback | comment-writer |
-| Issue creation, create issue, GitHub issue, bug report, feature request | issue-creation |
-| Skill refresher, drift detection, auto-heal | skill-improver (merged) |
-| Skill improvement, audit skills, refactor skills | skill-improver |
-| CI/CD pipeline, GitHub Actions, quality gate | ci-cd |
-| Work-unit commits, commit organization | work-unit-commits |
-| Immune System, anti-pattern, permanent immunity | immune-system |
-| Auto-score, metrics, post-task evaluation | auto-metrics |
-| External audit, blind review, second opinion, verificá mi auto-score, contralor externo | external-auditor |
-| Metricas, before/after, % improvement, tokenization, delta | metricas |
-| Code review, CR, revisar código, criticar | code-review-agent |
-| Refactor, refactoring, reestructurar, migrate | refactoring-planner |
-| Commit, mensaje, commit message, conventional commit | commit-crafter |
-| Mapear, project map, estructura, tech stack, arquitectura | project-mapper |
-| Security, seguridad, vulnerabilidad, auditar | security-scanner |
-| Auth, authentication, authorization, JWT, OAuth, RBAC, CSRF, session, login, password hashing | auth-hardening |
-| Dockerfile, docker-compose, container, image, Kubernetes, k8s, pod, deployment, helm | container-security |
-| LLM, AI, prompt injection, RAG, OpenAI, Anthropic, Ollama, LangChain, agent, tool use, data exfiltration | llm-security |
-| Bitacora, historial, histórico, qué pedí, request log | bitacora |
-| Dreaming, cross-session patterns, memory curation | dreaming |
-| Performance score, mobile perf, desktop perf, rendimiento, app score, lighthouse, benchmark | performance-tracker |
-| Accessibility, a11y, WCAG, screen reader, keyboard nav, make accessible | accessibility |
-| Web performance, speed up, reduce load time, page speed, performance audit | performance |
-| SEO, search engine, meta tags, structured data, sitemap, search optimization | seo |
-| Core Web Vitals, LCP, INP, CLS, layout shift, page experience | performance (merged) |
-| Best practices, security audit, modernize code, code quality review | best-practices |
-| Web quality audit, lighthouse audit, review web quality, check page quality | web-quality-audit |
-| UI cleanup, polish interface, fix layout, ui slop, generic ui, design review | baseline-ui |
-| Performance mode, dev mode, modo desarrollo, resource priority, high performance | development-mode |
-| Gap analysis, system audit, identificar gaps, evaluar software | gap-analysis |
-| Sparse loading, skill resolution, relevant skills, which skill, resolver skill, minimo skills | skill-graph |
-| Research, technical investigation, investigar, learn tech, compare solutions, evaluate options | research |
-| Triple verify, triangulate, 3 enfoques, verificación profunda, !ship, !listo, !fast, !draft | triple-verify |
-| Self-improvement, improvement cycle, auto-mejora, ciclo de mejora, comienza ciclo | self-improvement |
-| External improvement, 5-phase cycle, external project, analyze project, improve external, cliente, proyecto externo | external-improvement |
-| Model router, routing, qué modelo, delegate or direct, qué hacer con esta tarea, trial risk, security gate | opencode-model-router |
-| UI, layout, responsive, animation, design tokens, css, grid, flexbox, container query, dark mode, easing, scroll animation, flexbox, grid, subgrid, cascade layers, @layer, has selector, css nesting, intrinsic sizing, logical properties, oklch, spacing, 8pt, fluid typography, clamp, theme, style dictionary, container query, subgrid, fluid grid, auto-fit, auto-fill, style query, cqi, cqw, breakpoints, mobile-first, page scaffold, animation, transition, motion, micro-interaction, easing, scroll animation, view transition, WAAPI, keyframe, scroll-driven, compositor, motion budget, animate, 60fps | ui-engine |
-| screenshot, visual diff, visual bug, regression test, VRT, UI broken, text overflow, layout shift, responsive test | visual-testing |
-| compress image, optimize image, resize image, convert webp, convert avif, describe image, image too heavy, slow images, image bug, visual bug description | image-pipeline |
-| PDF, extract PDF, parse PDF, merge PDF, generate PDF, PDF table, PDF invoice, read PDF, PDF to text, PDF to markdown | pdf-utils |
-| Vision analyze, image analysis, screenshot analysis, visual inspection, describe screenshot | vision-analyze |
-| Workflow optimize, process optimize, streamline, reduce steps, automate workflow | workflow-optimizer |
-| Cancel ralph, stop loop, cancel loop, ralph stop, end loop | cancel-ralph |
-| Forge, promote pattern, auto-skill, forjar, convertir patrón, skill desde patrón | cross-project-forge |
-| Patterns, wisdom, lesson learned, cross-project, retrospectiva, experiencia previa, !wisdom | cross-project-wisdom |
-| Remember, recall, engram, mem_save, mem_search, session close, memory | engram-protocol |
-| Help, ralph help, commands, available commands, what can you do, /help | help |
-| Create skill, edit skill, opencode skill, skill eval, evaluate prompt, benchmark skill | opencode-skill-creator |
-| Ralph, ralph loop, auto-continue, iterative loop, /ralph-loop, continuous task | ralph-loop |
-| SDD quick, fast path, quick SDD, low risk SDD, simple change SDD | sdd-quick |
-| Server, ng serve, npm run dev, dotnet run, dev server, background process, long-lived, !dev | server-commands |
-| !analisis, analysis mode, multi-agent analysis, smart analysis, 8 dimensions, perspective validation | analysis-mode |
-| test, e2e, playwright, browser testing, interactive testing, form testing, click test, navigate test | e2e-testing |
-| deep debug, root cause, hypothesis, multi-file bug, ambiguous failure, debug, RCA | deep-debugging |
-| quick edit, single file, atomic edit, fast fix, one-line fix, small change, quick fix | quick-executor |
-| new file, new function, code generation, script, boilerplate, scaffold, create code, write code | code-generation |
-| infrastructure audit, IaC, Terraform, Kubernetes, CI/CD, Docker, cloud, deployment, Helm, Ansible | infra-audit |
-| performance profiling, slow queries, N+1, memory leak, CPU hotspot, profiling, query optimization | perf-profiling |
-| data audit, data pipeline audit, schema validation, data governance, ETL audit, data quality check | data-quality |
-| documentation audit, README audit, API docs, onboarding docs, Diátaxis, docs completeness, docs review | docs-audit |
-| execute plan, implement plan, step-by-step execution, task execution, plan completion, run plan | plan-execution |
+| deep debug, root cause, hypothesis, RCA | deep-debugging |
+| security, audit, vulnerability | security-scanner |
+| quality gate, pre-commit | quality-gate |
+| commit, conventional commit | commit-crafter |
+| create issue, bug report, feature request | issue-creation |
+| branch PR, create PR, open pull request | branch-pr |
+| code review, CR | code-review-agent |
+| quick edit, single file, fast fix | quick-executor |
+| new file, new function, script, scaffold | code-generation |
+| execute analysis, implement analysis | analysis-executor |
+| analysis mode, multi-agent analysis | analysis-mode |
+| delivery harness, orchestrate, multi-agent | delivery-harness |
+| execute plan, step-by-step, task execution | plan-execution |
+| SDD quick, fast path, low risk | sdd-quick |
+| SDD apply, implement SDD tasks | sdd-apply |
+| skill creator, create skill, evaluate | opencode-skill-creator |
+| triple verify, !ship, !fast, !draft | triple-verify |
+| session resume, continue, git state gate | session-resume |
+| engram, memory, recall, mem_save | engram-protocol |
+| Karpathy, less tokens, measure tokens | karpathy-loop |
 
-## Quick groups
-- **Compression/style**: karpathy-loop (merged karpathy-prompt), lean-context
-- **Quality**: quality-gate, auto-metrics, external-auditor, immune-system, code-review-agent, performance-tracker, triple-verify, self-improvement, external-improvement
-- **Memory**: session-resume, dreaming, bitacora
-- **Skills meta**: opencode-skill-creator, skill-registry, skill-improver, skill-graph
-- **Coordination**: delivery-harness, chained-pr, branch-pr, issue-creation, subagent-isolation, command-wrapper, opencode-model-router
-- **Code ops**: commit-crafter, refactoring-planner, project-mapper, security-scanner, auth-hardening, container-security, llm-security, code-generation
-- **Engineering**: deep-debugging, quick-executor, plan-execution
-- **Infra/Perf**: infra-audit, perf-profiling
-- **Data/Docs**: data-quality, docs-audit
-- **SDD**: sdd (unified pipeline — phases consolidated)
-- **UI/Design**: baseline-ui, accessibility, performance, seo, web-quality-audit, ui-engine
-- **Visual/Testing**: visual-testing, image-pipeline, e2e-testing
-- **Documents**: pdf-utils
-- **Communication**: comment-writer, cognitive-doc-design
-- **Specialized**: metricas, context-watchdog, recovery-protocol, vision-analyze, workflow-optimizer
-- **Internal**: _shared (not invokable)
+## Quick Groups
 
-## Load rule
-1. `read` this file → find trigger match → get skill name
-2. `skill` tool with name (skills.paths now registered in opencode.json — 79 skills globally discoverable)
-3. If `skill` tool fails → `read skills/{name}/SKILL.md` directly from disk
-4. If skill has assets → `read skills/{name}/references/` or `read skills/{name}/assets/` for templates
+| Group | Skills |
+|-------|--------|
+| Quality | quality-gate, code-review-agent, triple-verify, auto-metrics, external-auditor, immune-system |
+| Code | commit-crafter, code-generation, quick-executor, refactoring-planner |
+| Security | security-scanner, auth-hardening, container-security, llm-security |
+| SDD | sdd (unified pipeline), sdd-quick, sdd-apply |
+| Coordination | delivery-harness, branch-pr, issue-creation, command-wrapper |
+| Analysis | analysis-mode, analysis-executor, deep-debugging |
+| Memory | session-resume, engram-protocol, dreaming, bitacora |
+| Skills meta | opencode-skill-creator, skill-registry, skill-graph |
+| Engineering | plan-execution, infra-audit, perf-profiling |
+| UI/Docs | baseline-ui, ui-engine, accessibility, seo, docs-audit |
+| Testing | visual-testing, e2e-testing, image-pipeline, pdf-utils |
+| Communication | comment-writer, cognitive-doc-design |
+| Specialized | karpathy-loop, context-watchdog, recovery-protocol, metricas, workflow-optimizer |
 
-**Skill validation**: use `scripts/skill-validate.ps1` for 3-trial benchmark on any skill change
+## Load Rule
 
-**Utility scripts**:
-- `scripts/ensure-tools.ps1` — verify rg/sg/gh are in PATH
-- `scripts/token-count.ps1` — count ~tokens in files (4 chars/token)
-- `scripts/skill-graph.ps1` — sparse loading resolver: find relevant skills + deps for any task
-- `scripts/pull-upstream.ps1` — sync new/modified skills & scripts from upstream (gentleman-vMK) via git merge. 3 modes: `Check` (drift report), `Apply-New` (safe auto-merge), `Apply-File` (checkout individual file)
+1. `skill` tool with name (skills.paths registered in opencode.json — 93 skills globally discoverable)
+2. Fallback: `read skills/{name}/SKILL.md` directly from disk
+3. Assets: `read skills/{name}/references/` or `skills/{name}/assets/` for templates
 
-**Web-quality skills** mirror: `.agents/skills/{name}/` ←→ `skills/{name}/` (synced via junction)
-
+**Validation**: `scripts/skill-validate.ps1` | **Scripts**: ensure-tools, token-count, skill-graph, pull-upstream

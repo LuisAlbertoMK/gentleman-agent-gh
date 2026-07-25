@@ -29,12 +29,7 @@ Climb the Ponytail Ladder BEFORE any response:
 
 ### Ponytail Mode
 
-Default `lite`. Set via `!ponytail [lite|full|ultra|off]`. Persists in `~/.config/ponytail/config.json`.
-
-- `lite` (default): rungs 0-3 — ceremony only for necessity checks
-- `full`: rungs 0-8 + security — full gate for complex/risky tasks
-- `ultra`: rungs 0-8 + aggressive debt review — for refactoring sessions
-- `off`: bypass all gates — debugging only
+Default `lite`. See [SHORTCUTS.md](SHORTCUTS.md#ponytail-mode) for modes (`lite`/`full`/`ultra`/`off`).
 
 **SIMPLE** (chat/Q&A/theory) → respond direct. **MEDIUM** (1-file refactor) → decompose→parallel→merge. **COMPLEX** (multi-file, risky, arch) → full gate: 0) Factibilidad 1) skill-graph→Router 2) Load skill 3) ANTI-PATTERN-CATALOG 4) Engram 5) Load skill: triple-verify 6) Execute with checkpoint mid-task: verify alignment → continue or replan/abort.
 
@@ -46,25 +41,9 @@ Default `lite`. Set via `!ponytail [lite|full|ultra|off]`. Persists in `~/.confi
 
 | Shortcut | Action |
 |----------|--------|
-| `!compress` | Karpathy compression >2.5KB + score |
-| `!score` | `score-auto.ps1 -Json` + docs update |
-| `!sync` | `pull-upstream.ps1 -Mode Check` → sync-vmk + check-skill-drift → score |
-| `!sync-all` | `sync-all.ps1` — full global sync |
 | `!health` | health-check + check-config-drift + git status |
-| `!batch` | `batch.ps1` — batch auto-incremental |
-| `!cycle` | `inter-track.ps1 -Show` + score + upstream |
 | `!close` | `close-session.ps1` — unified close |
-| `!pdebt` | `ponytail-audit.ps1` — scan `ponytail:` |
-| `!paudit` | `ponytail-audit.ps1 -Audit` — detect over-engineering |
-| `!ponytail` | Set intensity: `!ponytail [lite|full|ultra|off]` |
-| `!manifest` | Read CYCLE.md, report cycle + score |
-| `!5fases`/`!extimprove` | Load `external-improvement` — 5-phase |
-| `!analisis` | Smart multi-agent analysis → consolidated plan |
-| `!setup` | `scripts/setup-install.ps1` (Win) / `install.sh` (Linux/macOS) |
-| `!dev` | `scripts/dev-server.ps1` — manage dev servers |
-| `!gentleman` | `scripts/use-gentleman.ps1` — gentleman-ize project |
-| `!wisdom` | Load cross-project patterns — `cross-project-wisdom` |
-| `!breaker` | Load `adversarial-breaker` — orchestrator invokes when fixer claims done |
+| `!ponytail` | Set intensity: `!ponytail [lite\|full\|ultra\|off]` |
 
 ## Analysis Mode (trigger: `!analisis`)
 
@@ -74,33 +53,21 @@ Default `lite`. Set via `!ponytail [lite|full|ultra|off]`. Persists in `~/.confi
 
 **RULE**: Main context = synthesis/decisions ONLY. Never read raw data >3 files.
 
-| Task Type | Action | Savings |
-|-----------|--------|---------|
-| Read >3 files | Delegate `explore` | 2-5K |
-| Multi-file grep | Delegate `explore` | 3-8K |
-| Codebase analysis | Delegate `explore` | 5-15K |
-| Research + synthesis | Delegate `general` | 4-10K |
+| Task Type | Delegate To | Savings |
+|-----------|-------------|---------|
+| Read/grep/analyze >3 files | `explore` | 2-15K |
+| Research + synthesis | `general` | 4-10K |
 
-**Pattern**: 
-1. Delegate explore → get summary
-2. Main context: synthesize, decide, instruct
-3. Delegate implementation if >3 files
+**Pattern**: Delegate explore → get summary → synthesize/decide → delegate implementation if >3 files.
 
-**NEVER delegate**: 
-- Single file edits
-- Git operations
-- Script execution
-- Final verification
-
-**Anti-pattern**: Reading 10+ files manually = context pollution. If you're scrolling, you should be delegating.
+**NEVER delegate**: Single file edits, git ops, script execution, final verification.
 
 ### Delegation Rules
 
-- **Threshold**: Delegate when >3 files or exploratory task
-- **Max concurrent**: 6 subagents
-- **Max depth**: 1 (no nested delegation)
-- **Min steps**: Do NOT delegate tasks <3 steps (overhead > savings)
-- **Pattern**: Partition independent work → parallel subagents → merge results → verify
+> Full protocol in `delivery-harness` skill. Core rules:
+
+- Delegate when >3 files or exploratory task. Max 6 concurrent. Depth 1 (no nesting). Min 3 steps (overhead > savings below that).
+- Partition independent work → parallel subagents → merge → verify.
 
 ## Learning Loop
 

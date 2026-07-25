@@ -1,0 +1,284 @@
+{
+  "project": "gentleman-agent-gh",
+  "analysis_source": "2026-07-24-gentleman-agent-gh-analisis.md",
+  "created_at": "2026-07-24T18:00:00Z",
+  "updated_at": "2026-07-25T01:04:04.622Z",
+  "current_phase": 4,
+  "findings": {
+    "#1": {
+      "title": "SSoT scores compite",
+      "severity": "CRITICAL",
+      "phase": 1,
+      "status": "done",
+      "files": [
+        ".project.json",
+        ".learnings/score-cache.json"
+      ],
+      "agent": "gentleman-deep",
+      "started_at": null,
+      "completed_at": "2026-07-25T00:17:28.737Z",
+      "changes": [
+        ".project.json",
+        ".learnings/score-cache.json"
+      ],
+      "verification": "All 7 divergent dims reconciled, cache matches .project.json",
+      "error": null
+    },
+    "#2": {
+      "title": "Skill count triple desalineado",
+      "severity": "CRITICAL",
+      "phase": 1,
+      "status": "done",
+      "files": [
+        ".project.json",
+        "SKILLS-INDEX.md",
+        "QUICKSTART.md"
+      ],
+      "agent": "gentleman-deep",
+      "depends_on": [
+        "#1"
+      ],
+      "started_at": null,
+      "completed_at": "2026-07-25T00:20:33.842Z",
+      "changes": [
+        ".project.json",
+        "SKILLS-INDEX.md",
+        "QUICKSTART.md"
+      ],
+      "verification": "All 3 files unified to 92 invokable skills",
+      "error": null
+    },
+    "#3": {
+      "title": "Skill tool roto",
+      "severity": "CRITICAL",
+      "phase": 1,
+      "status": "skipped",
+      "files": [],
+      "agent": "platform",
+      "note": "Platform issue — fallback Read already implemented",
+      "started_at": null,
+      "completed_at": null,
+      "changes": [],
+      "verification": null,
+      "error": null
+    },
+    "#6": {
+      "title": ".dockerignore no excluye secrets",
+      "severity": "HIGH",
+      "phase": 1,
+      "status": "done",
+      "files": [
+        ".dockerignore"
+      ],
+      "agent": "gentleman-quick",
+      "started_at": null,
+      "completed_at": "2026-07-25T00:17:28.739Z",
+      "changes": [
+        ".dockerignore"
+      ],
+      "verification": "+13 exclusion patterns, secrets covered",
+      "error": null
+    },
+    "#7": {
+      "title": "Dockerfile Python 3.11 hardcoded",
+      "severity": "HIGH",
+      "phase": 1,
+      "status": "done",
+      "files": [
+        "Dockerfile"
+      ],
+      "agent": "gentleman-quick",
+      "depends_on": [
+        "#6"
+      ],
+      "started_at": null,
+      "completed_at": "2026-07-25T00:20:33.844Z",
+      "changes": [
+        "Dockerfile"
+      ],
+      "verification": "Python 3.11 → 3.10, matches Ubuntu 22.04 default",
+      "error": null
+    },
+    "#9": {
+      "title": "Orchestrator bash fail-open",
+      "severity": "MEDIUM",
+      "phase": 2,
+      "status": "done",
+      "files": [
+        "opencode.json"
+      ],
+      "agent": "gentleman-deep",
+      "started_at": null,
+      "completed_at": "2026-07-25T00:26:37.420Z",
+      "changes": [
+        "opencode.json"
+      ],
+      "verification": "Orchestrator bash \"*\" changed from allow to ask",
+      "error": null
+    },
+    "#10": {
+      "title": "Select-String re-reads SKILL.md",
+      "severity": "MEDIUM",
+      "phase": 2,
+      "status": "done",
+      "files": [
+        "scripts/lib/score-dims.ps1"
+      ],
+      "agent": "gentleman-quick",
+      "started_at": null,
+      "completed_at": "2026-07-25T00:26:37.422Z",
+      "changes": [
+        "scripts/lib/score-dims.ps1"
+      ],
+      "verification": "Select-String now uses cache, ~80 redundant reads eliminated",
+      "error": null
+    },
+    "#13": {
+      "title": "bash-safe $ escaping incompleto",
+      "severity": "MEDIUM",
+      "phase": 2,
+      "status": "done",
+      "files": [
+        "scripts/bash-safe.ps1"
+      ],
+      "agent": "gentleman-quick",
+      "started_at": null,
+      "completed_at": "2026-07-25T00:26:37.422Z",
+      "changes": [
+        "scripts/bash-safe.ps1"
+      ],
+      "verification": "Added $ escaping to ProcessStartInfo.Arguments",
+      "error": null
+    },
+    "#4": {
+      "title": "adversarial-breaker sin entrada en SKILLS-INDEX",
+      "severity": "HIGH",
+      "phase": 2,
+      "status": "done",
+      "files": [
+        "SKILLS-INDEX.md"
+      ],
+      "agent": "gentleman-quick",
+      "started_at": null,
+      "completed_at": "2026-07-25T00:26:37.422Z",
+      "changes": [
+        "SKILLS-INDEX.md"
+      ],
+      "verification": "adversarial-breaker row added with correct triggers",
+      "error": null
+    },
+    "#14": {
+      "title": "56 skills > 2.5KB",
+      "severity": "MEDIUM",
+      "phase": 3,
+      "status": "pending",
+      "files": [
+        "skills/*"
+      ],
+      "agent": "karpathy-loop",
+      "note": "Run !compress separately",
+      "started_at": null,
+      "completed_at": null,
+      "changes": [],
+      "verification": null,
+      "error": null
+    },
+    "#5": {
+      "title": "README tabla skills 30% stale",
+      "severity": "HIGH",
+      "phase": 3,
+      "status": "done",
+      "files": [
+        "README.md"
+      ],
+      "agent": "gentleman-quick",
+      "started_at": null,
+      "completed_at": "2026-07-25T01:04:04.620Z",
+      "changes": [
+        "README.md"
+      ],
+      "verification": "Skills table replaced with link to SKILLS-INDEX",
+      "error": null
+    },
+    "#8": {
+      "title": "!ejecutar invisible en onboarding",
+      "severity": "HIGH",
+      "phase": 3,
+      "status": "done",
+      "files": [
+        "QUICKSTART.md"
+      ],
+      "agent": "gentleman-quick",
+      "started_at": null,
+      "completed_at": "2026-07-25T01:04:04.622Z",
+      "changes": [
+        "QUICKSTART.md"
+      ],
+      "verification": "!ejecutar row added to shortcuts table",
+      "error": null
+    },
+    "#11": {
+      "title": "Session-miner source files vacíos",
+      "severity": "MEDIUM",
+      "phase": 3,
+      "status": "done",
+      "files": [
+        ".learnings/LEARNINGS.md",
+        ".learnings/ERRORS.md"
+      ],
+      "agent": "gentleman-quick",
+      "started_at": null,
+      "completed_at": "2026-07-25T01:04:04.622Z",
+      "changes": [
+        ".learnings/LEARNINGS.md",
+        ".learnings/ERRORS.md"
+      ],
+      "verification": "Template headers added, existing examples preserved",
+      "error": null
+    },
+    "#12": {
+      "title": "22 agents vs 80 skills confusión",
+      "severity": "MEDIUM",
+      "phase": 3,
+      "status": "done",
+      "files": [
+        "QUICKSTART.md"
+      ],
+      "agent": "gentleman-quick",
+      "depends_on": [
+        "#8"
+      ],
+      "started_at": null,
+      "completed_at": "2026-07-25T01:04:04.622Z",
+      "changes": [
+        "QUICKSTART.md"
+      ],
+      "verification": "Agent→skill relationship clarified",
+      "error": null
+    },
+    "#15": {
+      "title": "SHORTCUTS date stale",
+      "severity": "LOW",
+      "phase": 4,
+      "status": "skipped",
+      "files": [
+        "SHORTCUTS.md"
+      ],
+      "agent": "skip",
+      "note": "LOW severity — deferred",
+      "started_at": null,
+      "completed_at": null,
+      "changes": [],
+      "verification": null,
+      "error": null
+    }
+  },
+  "summary": {
+    "total": 15,
+    "done": 12,
+    "failed": 0,
+    "in_progress": 0,
+    "pending": 0,
+    "skipped": 3
+  }
+}

@@ -6,167 +6,75 @@ license: Apache-2.0
 metadata:
   tags: [engineering, verification, adversarial]
   author: gentleman-vMK
-  version: "2.0"
-  changelog: "2.0: Reworked after 4-agent analysis — fixed pipeline integration, output contracts, zone filter, failure paths"
+  version: "2.1"
+  changelog: "2.1: Karpathy-loop compression — 50% size reduction, no functionality lost"
   dependencies: [subagent-isolation]
   config_refs: review-rules.jsonc
 ---
 
 # Adversarial Breaker
 
-Protocol for the **orchestrator** (main agent) to run an independent adversarial check after a fix. Builder ≠ Evaluator, enforced.
+Orchestrator runs independent adversarial check after fix. Builder ≠ Evaluator.
 
 ## When to Invoke
 
-Invoke this protocol when:
-- A fixer subagent claims a fix is complete
-- The change is ROJA-zone (always) or AMARILLA-zone touching auth/storage/API
-- The change is NOT pure config/whitespace/lock-file (no attack surface = skip)
-
-Do NOT invoke for:
-- VERDE-zone changes
-- Non-code diffs (Markdown, YAML, JSON config without logic)
-- Fixes that only add comments or documentation
+Invoke: fixer claims complete + ROJA-zone (always) or AMARILLA touching auth/storage/API + not pure config/whitespace/lock-file.
+Skip: VERDE-zone, non-code diffs, comments-only, docs-only.
 
 ## Protocol
 
-The orchestrator executes these steps. The breaker is a subagent launched at Step 3.
+| Step | Action | Output |
+|------|--------|--------|
+| 1 | Gather artifacts: `diff`, `changed_files`, `fixer_claims`, `test_results`, `zone`, `pipeline_mode` | Bundle |
+| 2 | Zone check from `review-rules.jsonc`. AMARILLA touching auth/storage/API → escalate ROJA | Zone |
+| 3 | Launch breaker — inject `references/breaker-briefing.md` + artifact bundle | Breaker output |
+| 4 | Parse output — validate 4-field format. <3 attempts → FAIL, re-run | Parsed |
+| 5 | Verdict → see below | APPROVED/FIX/BLOCK/ESCALATE |
+| 6 | Round 2 if FIX → see below | Updated verdict |
+| 7 | Record to Engram: `title: "breaker:{target}:R{round}"` `type: discovery` `topic_key: "breaker/{target}"` | Memory |
 
-| Step | Orchestrator Action | Output |
-|------|-------------------|--------|
-| 1 | **Gather artifacts** from fixer output — see Artifact Bundle below | Bundle |
-| 2 | **Zone check** — resolve zone from `review-rules.jsonc` (source of truth). If AMARILLA by pattern but diff touches auth/storage/API paths → escalate to ROJA for breaker purposes | Zone |
-| 3 | **Launch breaker** — read `references/breaker-briefing.md`, inject as delegation prompt context alongside artifact bundle | Breaker output |
-| 4 | **Parse breaker output** — validate format (4-field required). If <3 attack attempts declared → FAIL, re-run | Parsed results |
-| 5 | **Synthesize verdict** — see Verdicts below | APPROVED/FIX/BLOCK/ESCALATE |
-| 6 | **Round 2** (if FIX) — see Round 2 Protocol | Updated verdict |
-| 7 | **Record** — save to Engram per Recording Schema | Memory |
+## Breaker Output & Verdicts
 
-## Artifact Bundle
+**Breaker format**: Attack Attempts (numbered), Attack Vector (Input validation, Injection, Concurrency, Error handling, Logic), Result (PASS/FAIL per attempt), Edge Cases Found.
 
-The orchestrator assembles this from the fixer's output + `git diff`:
+**Summary**: `AB-{target} | Round:{N}/2 | Attacks:{n} | SAFE/BROKEN | VERDICT: {verdict}`
 
-```yaml
-diff: string              # git diff of changed files (working tree)
-changed_files: string[]   # file paths from fixer's "Files Changed"
-fixer_claims: string      # fixer's "Key Findings" + "Nuance" fields
-test_results: string      # quality-gate output + any test results (if available, else "N/A")
-zone: enum                # roja | amarilla | verde (from review-rules.jsonc)
-pipeline_mode: enum       # ship | fast | check | manual
-```
+| Output | Verdict | Action |
+|--------|---------|--------|
+| All PASS | APPROVED | → triple-verify |
+| 1-2 minor | FIX | → fixer (R1) / accept tech debt (R2) |
+| Critical | BLOCK | → human |
+| Partial coverage | FIX | Re-run, scope mandate |
+| <3 attempts / malformed | FAIL | Re-run (stricter briefing / format) |
+| Timeout / R2 breaks | ESCALATE | → human with full chain |
 
-Pass this bundle to the breaker alongside the briefing template content.
+## Round 2 & Escalation
 
-## Breaker Output Contract
+**Round 2**: New `git diff` after fixer changes. Pass BOTH diffs — breaker checks R1 resolved + new issues. Re-inject briefing with `## Round 2 — Focus on whether these specific issues were fixed: {R1 findings}`. Max 2 rounds.
 
-The breaker produces a **detailed** 4-field output:
+**Escalation** (BLOCK/ESCALATE): Target, Rounds, Pipeline, Chain Evidence (R1/R2 attempts→verdict), Blocker, Recommendation (revert/redesign/manual review/merge first).
 
-```
-## Attack Attempts
-[Numbered list of every attack tried]
+**Recording**: Engram — What, Why (pipeline + zone), Where, Attempts (count + vectors), Verdict, Learned.
 
-## Attack Vector
-[Categories: Input validation, Injection, Concurrency, Error handling, Logic]
-
-## Result (per test)
-[Numbered list matching Attack Attempts — PASS or FAIL with evidence]
-
-## Edge Cases Found
-[Unexpected behaviors, regressions, or confirmed failures]
-```
-
-The orchestrator then synthesizes the **summary line**:
-
-```
-AB-{target} | Round:{N}/2 | Attacks:{n} | SAFE/BROKEN | VERDICT: APPROVED/FIX/BLOCK/ESCALATE
-```
-
-These are TWO DIFFERENT formats. Breaker produces detailed. Orchestrator produces summary. Do not confuse them.
-
-## Verdicts
-
-| Breaker Output | Verdict | Orchestrator Action |
-|----------------|---------|-------------------|
-| All attacks PASS | APPROVED | Proceed to triple-verify |
-| 1-2 minor issues, Round 1 | FIX | Send findings back to fixer |
-| 1-2 minor issues, Round 2 | APPROVED | Accept — document as tech debt |
-| Critical break (security/crash/data loss) | BLOCK | Escalate to human |
-| Partial coverage (3 of 5 files) | FIX | Re-run with scope mandate |
-| <3 attack attempts | FAIL | Re-run with stricter briefing |
-| Breaker subagent timeout | ESCALATE | Partial results → human |
-| Breaker returns malformed output | FAIL | Re-run with format emphasis |
-| Round 2 breaks | ESCALATE | Full chain evidence → human |
-
-## Round 2 Protocol
-
-When verdict is FIX and fixer applies corrections:
-
-1. **New diff**: Orchestrator runs `git diff` again (working tree reflects fixer's round-2 changes)
-2. **Delta context**: Pass BOTH diffs to breaker — original + new. Breaker focuses on whether round-1 findings are resolved AND whether new changes introduce new issues
-3. **Briefing injection**: Read `references/breaker-briefing.md` AGAIN (fresh injection). Add header: `## Round 2 — Focus on whether these specific issues were fixed: {round-1 findings}`
-4. **Max rounds**: 2 total. If round 2 breaks → ESCALATE with full chain evidence.
-
-## Escalation Template
-
-When verdict is BLOCK or ESCALATE, produce this for the human:
-
-```
-## ESCALATION
-Target: {file path}
-Rounds: {N}/2
-Pipeline: {!ship/!fast/manual}
-
-### Chain Evidence
-Round 1: {breaker attempts summary} → {verdict}
-Round 2: {breaker attempts summary} → {verdict} (if applicable)
-
-### Blocker
-{Specific finding that caused BLOCK/ESCALATE}
-
-### Recommendation
-{revert / redesign / manual review needed / merge required first}
-```
-
-## Recording Schema
-
-Save to Engram after each run:
-
-```yaml
-title: "breaker:{target}:R{round}"
-type: discovery
-topic_key: "breaker/{target}"
-content: |
-  **What**: Adversarial verification of {target} — {SAFE/BROKEN}
-  **Why**: {pipeline_mode} pipeline, zone {zone}
-  **Where**: {changed_files}
-  **Attempts**: {attack count} across {vectors}
-  **Verdict**: {APPROVED/FIX/BLOCK/ESCALATE}
-  **Learned**: {any edge cases or gotchas found, omit if none}
-```
-
-## Integration
+## Integration & Anti-Patterns
 
 | Skill | Relation |
 |-------|----------|
-| quality-gate | Runs BEFORE breaker — gate is entry |
-| triple-verify | Runs AFTER breaker — breaker is pre-verify |
-| judgment-day | Independent — JD=4R evaluation, breaker=offensive testing |
-| subagent-isolation | Breaker follows isolation rules — independent (not blind), fresh context, artifact bundle (not 4-field contract) |
-| external-auditor | On BLOCK, orchestrator may invoke for independent confirmation |
-| immune-system | Repeated pattern breaks → permanent fix |
-
-## Anti-Patterns
+| quality-gate | BEFORE breaker — gate is entry |
+| triple-verify | AFTER breaker — pre-verify |
+| judgment-day | Independent — JD=4R, breaker=offensive |
+| subagent-isolation | Fresh context, artifact bundle |
+| external-auditor | On BLOCK → confirmation |
+| immune-system | Repeated breaks → permanent fix |
 
 | Anti-Pattern | Fix |
 |---|---|
-| Breaker trusts fixer claims | Verify independently from artifacts |
-| "Looks clean" no attempts | Enforce declare-methodology rule |
-| 3+ rounds | Cap 2 → escalate to human |
-| Breaker before quality-gate | quality-gate ALWAYS first |
-| Breaker does 4R review | Offensive, not evaluative |
-| Breaker only tests happy path | Must test adversarial inputs |
-| Orchestrator accepts output without format validation | Parse 4-field, reject if malformed |
-| Breaker ignores non-code files | Skip breaker for non-code diffs |
+| Breaker trusts fixer | Verify from artifacts |
+| No attempts declared | Enforce methodology |
+| 3+ rounds | Cap 2 → escalate |
+| Before quality-gate | quality-gate first |
+| 4R review | Offensive, not evaluative |
+| Happy path only | Test adversarial inputs |
+| Non-code diffs | Skip breaker |
 
-## Refs
 - [breaker-briefing](references/breaker-briefing.md) · [attack-surface](references/attack-surface.md) · [subagent-isolation](../subagent-isolation/SKILL.md) · [quality-gate](../quality-gate/SKILL.md) · [triple-verify](../triple-verify/SKILL.md) · [judgment-day](../judgment-day/SKILL.md)

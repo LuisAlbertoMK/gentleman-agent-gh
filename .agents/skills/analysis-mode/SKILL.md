@@ -6,12 +6,17 @@ license: Apache-2.0
 metadata:
   tags: [analysis, architecture]
   author: gentleman-vMK
-  version: "4.5"
-  changelog: "4.5: Phase 4 PERSIST — auto-save findings to Engram, compare with previous analyses, trend delta"
+  version: "4.6"
+  changelog: "4.6: Resilient skill loading (Read fallback), external project support"
   dependencies: [project-mapper]
 ---
 
 `!analisis` or `!analysis` as first token.
+
+**SKILL LOADING (RESILIENT)**: If `skill` tool fails ("Skills no disponibles"), load instructions directly:
+1. Try `skill(name="analysis-mode")` first
+2. If fails → `Read` this file: `.agents/skills/analysis-mode/SKILL.md` (project) or `C:\Users\MK\.config\opencode\skills\analysis-mode\SKILL.md` (global)
+3. For external projects: copy this skill to `<project>/.agents/skills/analysis-mode/`
 
 **SCOPE GUARD** (MANDATORY): Run `git diff --name-only HEAD~1 2>$null | Measure-Object -Line` (or equivalent). If <10 files changed → HALT, load `code-review-agent` instead. Do NOT continue.
 
@@ -82,3 +87,5 @@ Append two sections to `docs/mejoras/YYYY-MM-DD-<project>-analisis.md`:
 `docs/mejoras/YYYY-MM-DD-<project>-analisis.md` — Summary, Findings (8 dims), Synthesis table, Risk Matrix, Recommendations, Engram Persistence, Trend Analysis.
 
 **Gate**: Plan only — NO code, NO commit. Exit analysis mode before implementing.
+
+**Next step**: Run `!ejecutar` to fast-track implementation with parallel subagents + state persistence.

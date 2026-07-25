@@ -125,28 +125,9 @@ The project uses two MCPs for cross-session memory:
 
 ## Included Skills
 
-| Category | Skills |
-|----------|--------|
-| **Compression** | karpathy-loop, lean-context |
-| **Quality** | quality-gate, auto-metrics, external-auditor, immune-system, triple-verify |
-| **Code Review** | code-review-agent, judgment-day |
-| **Memory** | session-resume, dreaming, bitacora |
-| **Skills Meta** | opencode-skill-creator, skill-registry, skill-improver, skill-graph |
-| **SDD** | sdd (unified pipeline — phases consolidated) |
-| **Engineering** | senior-engineer, refactoring-planner, project-mapper |
-| **Security** | security-scanner, auth-hardening, container-security, llm-security |
-| **UI/Web** | baseline-ui, accessibility, performance, seo, web-quality-audit, best-practices, ui-engine |
-| **PR/Workflow** | commit-crafter, work-unit-commits, branch-pr, chained-pr |
-| **Orchestration** | delivery-harness, subagent-isolation, command-wrapper, opencode-model-router |
-| **Decisions** | cognitive-doc-design |
-| **Docs** | bitacora, comment-writer |
-| **Research** | research, prompt-engineering |
-| **Self-Improvement** | self-improvement (merged self-reflection) |
-| **DevOps** | ci-cd |
-| **Testing** | skill-testing, e2e-testing, visual-testing |
-| **Others** | recovery-protocol, context-watchdog, performance-tracker, metricas, issue-creation, development-mode, execution-mode |
-
-**Total: 79 skills + `_shared`** — all with SKILL.md, YAML frontmatter, versioning, changelog, and Apache-2.0 license.
+| Scope | Count | Reference |
+|-------|-------|-----------|
+| Skills | 93 specialized skills for analysis, security, testing, docs, and more | See [SKILLS-INDEX.md](SKILLS-INDEX.md) for full trigger table |
 
 ---
 
