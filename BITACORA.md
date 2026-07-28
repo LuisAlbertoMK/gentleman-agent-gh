@@ -1,4 +1,5 @@
-﻿2026-07-28 - Fixed session-miner populate mode and regex anchoring
+﻿2026-07-28 - Simplified opencode.json permissions (21/22 agents, -720 tok), trimmed SPECIALIZED-AGENTS.md (-1,943 tok), analysis-mode auto-trigger optimization, verified with breaker
+2026-07-28 - Fixed session-miner populate mode and regex anchoring
 2026-07-28 - Test
 2026-07-28 - Fixed session-miner populate mode and regex anchoring
 2026-07-28 - Fixed session-miner populate mode and regex anchoring
@@ -110,6 +111,7 @@
 2026-07-05 - Purge opencode-vmk references: 22 edits across 11 files (setup-machine, install, AGENTS.md, README, doc-sync, bridge-mcp-server, research docs). All opencode-vmk fork references removed, only opencode-ai upstream retained.
 2026-07-05 - Batch cleanup: dead scripts, fork shortcuts, stale config, doc sync (14 files, 1111 lines deleted)
 2026-07-05 - Agent optimization analysis saved to docs/optimizaciones/agent-optimization-analysis.md (pending Cycle 20)
+
 
 
 

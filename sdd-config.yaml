@@ -1,0 +1,5 @@
+project_name: gentleman-agent-gh
+strict_tdd: true
+test_runner: pester
+test_command: pwsh -NoProfile -Command "Import-Module Pester; Invoke-Pester ./scripts/tests/"
+test_pattern: "scripts/tests/*.Tests.ps1"

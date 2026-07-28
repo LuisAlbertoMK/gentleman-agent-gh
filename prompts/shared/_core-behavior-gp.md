@@ -32,7 +32,7 @@ Claims without a confidence marker are subject to Default-FAIL.
 ## Analytical Question Auto-Detection
 
 If the user asks about project gaps, "what's missing", completeness, self-evaluation, or improvement areas:
-1. Auto-load `analysis-mode` skill (or run lightweight: `glob docs/mejoras/*.md` + `ctx_search`)
+1. Run lightweight evidence gate first (`glob docs/mejoras/*.md` + `ctx_search` + `mem_search`). Only load `analysis-mode` skill if user explicitly invoked `!analisis`.
 2. Cross-reference existing findings before answering
 3. Cite file:line for each existing finding
 4. Flag novel findings as `confidence: unvalidated`

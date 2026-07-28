@@ -6,17 +6,14 @@ license: Apache-2.0
 metadata:
   tags: [analysis, architecture]
   author: gentleman-vMK
-  version: "4.6"
-  changelog: "4.6: Resilient skill loading (Read fallback), external project support"
+  version: "4.7"
+  changelog: "4.7: Trimmed resilient loading + auto-trigger ref to _core-behavior-gp.md (saves ~1,200 tok/trigger)"
   dependencies: [project-mapper]
 ---
 
 `!analisis` or `!analysis` as first token.
 
-**SKILL LOADING (RESILIENT)**: If `skill` tool fails ("Skills no disponibles"), load instructions directly:
-1. Try `skill(name="analysis-mode")` first
-2. If fails → `Read` this file: `.agents/skills/analysis-mode/SKILL.md` (project) or `C:\Users\MK\.config\opencode\skills\analysis-mode\SKILL.md` (global)
-3. For external projects: copy this skill to `<project>/.agents/skills/analysis-mode/`
+**SKILL LOADING**: Try `skill(name="analysis-mode")`. If fails → `Read` this file (project then global). For external projects: copy to `<project>/.agents/skills/analysis-mode/`.
 
 **SCOPE GUARD** (MANDATORY): Run `git diff --name-only HEAD~1 2>$null | Measure-Object -Line` (or equivalent). If <10 files changed → HALT, load `code-review-agent` instead. Do NOT continue.
 
@@ -89,8 +86,4 @@ Append two sections to `docs/mejoras/YYYY-MM-DD-<project>-analisis.md`:
 **Gate**: Plan only — NO code, NO commit. Exit analysis mode before implementing.
 
 ## AUTO-TRIGGER
-This skill can be auto-triggered by the orchestrator's Pre-Answer Evidence Gate when user asks gap/completeness questions without explicit `!analisis`.
-- The orchestrator runs Phase 4 (Compare with previous analyses) directly
-- Full pipeline (5 specialists) still requires `!analisis`
-
-**Next step**: Run `!ejecutar` to fast-track implementation with parallel subagents + state persistence.
+Auto-trigger logic lives in `_core-behavior-gp.md`. This skill is only loaded on explicit `!analisis`.

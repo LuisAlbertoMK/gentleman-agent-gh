@@ -74,7 +74,7 @@ pnpm-debug.log*
 .npm/
 
 # ============================================
-# Build artifacts (defensive — not used yet)
+# Build artifacts (defensive �?" not used yet)
 # ============================================
 dist/
 build/
@@ -82,9 +82,13 @@ out/
 .next/
 .cache/
 coverage/
+coverage.xml
 .parcel-cache/
 .turbo/
 *.tsbuildinfo
+
+# Generated reports
+docs/health-report.html
 
 # ============================================
 # Engram runtime data (if symlinked here)

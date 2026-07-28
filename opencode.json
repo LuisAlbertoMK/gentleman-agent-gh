@@ -257,16 +257,7 @@
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-vMK.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
-        "bash": {
-          "*": "ask"
-        },
-        "edit": {
-          "*": "allow"
-        },
-        "read": "allow",
-        "write": {
-          "*": "allow"
-        }
+        "bash": { "*": "ask" }
       },
       "tools": {
         "codebase-memory*": true,
@@ -279,16 +270,7 @@
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
-        "bash": {
-          "*": "ask"
-        },
-        "edit": {
-          "*": "allow"
-        },
-        "read": "allow",
-        "write": {
-          "*": "allow"
-        }
+        "bash": { "*": "ask" }
       },
       "tools": {
         "codebase-memory*": true,
@@ -301,16 +283,7 @@
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
-        "bash": {
-          "*": "ask"
-        },
-        "edit": {
-          "*": "allow"
-        },
-        "read": "allow",
-        "write": {
-          "*": "allow"
-        }
+        "bash": { "*": "ask" }
       }
     },
     "gentleman-codex": {
@@ -319,16 +292,7 @@
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
-        "bash": {
-          "*": "ask"
-        },
-        "edit": {
-          "*": "allow"
-        },
-        "read": "allow",
-        "write": {
-          "*": "allow"
-        }
+        "bash": { "*": "ask" }
       }
     },
     "gentleman-security": {
@@ -337,11 +301,8 @@
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-security.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
-        "bash": {
-          "*": "deny"
-        },
+        "bash": { "*": "deny" },
         "edit": "deny",
-        "read": "allow",
         "write": "deny"
       }
     },
@@ -351,11 +312,8 @@
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-seo.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
-        "bash": {
-          "*": "deny"
-        },
+        "bash": { "*": "deny" },
         "edit": "deny",
-        "read": "allow",
         "write": "deny"
       }
     },
@@ -365,11 +323,8 @@
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-infra.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
-        "bash": {
-          "*": "deny"
-        },
+        "bash": { "*": "deny" },
         "edit": "deny",
-        "read": "allow",
         "write": "deny"
       }
     },
@@ -379,11 +334,8 @@
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-frontend.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
-        "bash": {
-          "*": "deny"
-        },
+        "bash": { "*": "deny" },
         "edit": "deny",
-        "read": "allow",
         "write": "deny"
       }
     },
@@ -393,11 +345,8 @@
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-performance.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
-        "bash": {
-          "*": "deny"
-        },
+        "bash": { "*": "deny" },
         "edit": "deny",
-        "read": "allow",
         "write": "deny"
       }
     },
@@ -407,11 +356,8 @@
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-datascience.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
-        "bash": {
-          "*": "deny"
-        },
+        "bash": { "*": "deny" },
         "edit": "deny",
-        "read": "allow",
         "write": "deny"
       }
     },
@@ -421,11 +367,8 @@
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-docs.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
-        "bash": {
-          "*": "deny"
-        },
+        "bash": { "*": "deny" },
         "edit": "deny",
-        "read": "allow",
         "write": "deny"
       }
     },
@@ -435,16 +378,7 @@
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
-        "bash": {
-          "*": "ask"
-        },
-        "edit": {
-          "*": "allow"
-        },
-        "read": "allow",
-        "write": {
-          "*": "allow"
-        }
+        "bash": { "*": "ask" }
       }
     },
     "sdd-apply": {
@@ -453,16 +387,7 @@
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-apply.md}",
       "permission": {
-        "bash": {
-          "*": "ask"
-        },
-        "edit": {
-          "*": "allow"
-        },
-        "read": "allow",
-        "write": {
-          "*": "allow"
-        }
+        "bash": { "*": "ask" }
       }
     },
     "sdd-archive": {
@@ -471,16 +396,7 @@
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-archive.md}",
       "permission": {
-        "bash": {
-          "*": "ask"
-        },
-        "edit": {
-          "*": "allow"
-        },
-        "read": "allow",
-        "write": {
-          "*": "allow"
-        }
+        "bash": { "*": "ask" }
       }
     },
     "sdd-design": {
@@ -489,16 +405,7 @@
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-design.md}",
       "permission": {
-        "bash": {
-          "*": "ask"
-        },
-        "edit": {
-          "*": "allow"
-        },
-        "read": "allow",
-        "write": {
-          "*": "allow"
-        }
+        "bash": { "*": "ask" }
       }
     },
     "sdd-explore": {
@@ -507,16 +414,7 @@
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-explore.md}",
       "permission": {
-        "bash": {
-          "*": "ask"
-        },
-        "edit": {
-          "*": "allow"
-        },
-        "read": "allow",
-        "write": {
-          "*": "allow"
-        }
+        "bash": { "*": "ask" }
       }
     },
     "sdd-init": {
@@ -525,16 +423,7 @@
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-init.md}",
       "permission": {
-        "bash": {
-          "*": "ask"
-        },
-        "edit": {
-          "*": "allow"
-        },
-        "read": "allow",
-        "write": {
-          "*": "allow"
-        }
+        "bash": { "*": "ask" }
       }
     },
     "sdd-orchestrator": {
@@ -576,16 +465,7 @@
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-propose.md}",
       "permission": {
-        "bash": {
-          "*": "ask"
-        },
-        "edit": {
-          "*": "allow"
-        },
-        "read": "allow",
-        "write": {
-          "*": "allow"
-        }
+        "bash": { "*": "ask" }
       }
     },
     "sdd-spec": {
@@ -594,16 +474,7 @@
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-spec.md}",
       "permission": {
-        "bash": {
-          "*": "ask"
-        },
-        "edit": {
-          "*": "allow"
-        },
-        "read": "allow",
-        "write": {
-          "*": "allow"
-        }
+        "bash": { "*": "ask" }
       }
     },
     "sdd-tasks": {
@@ -612,16 +483,7 @@
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-tasks.md}",
       "permission": {
-        "bash": {
-          "*": "ask"
-        },
-        "edit": {
-          "*": "allow"
-        },
-        "read": "allow",
-        "write": {
-          "*": "allow"
-        }
+        "bash": { "*": "ask" }
       }
     },
     "sdd-verify": {
@@ -630,16 +492,7 @@
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-verify.md}",
       "permission": {
-        "bash": {
-          "*": "ask"
-        },
-        "edit": {
-          "*": "allow"
-        },
-        "read": "allow",
-        "write": {
-          "*": "allow"
-        }
+        "bash": { "*": "ask" }
       }
     }
   },

@@ -8,6 +8,7 @@
 .PARAMETER PassThru Return Pester run results object (default: exit code only)
 .PARAMETER Path     One or more test file paths (default: scripts/tests/*.Tests.ps1)
 .PARAMETER NoParallel  Disable parallel file execution (Pester 6 only)
+.PARAMETER CodeCoverage Collect code coverage metrics (Pester 5/6 only; < 50% → exit 10)
 .EXAMPLE
   .\scripts\run-tests.ps1                      # run all, exit 0/1
   .\scripts\run-tests.ps1 -PassThru            # get results object
@@ -17,7 +18,8 @@ param(
     [switch]$Quiet,
     [switch]$PassThru,
     [string[]]$Path,
-    [switch]$NoParallel
+    [switch]$NoParallel,
+    [switch]$CodeCoverage
 )
 
 Set-StrictMode -Version Latest
@@ -78,9 +80,24 @@ if ($pester.Version.Major -ge 5) {
         }
     }
 
+    if ($CodeCoverage) {
+        $coverageFiles = Get-ChildItem -Path "$PSScriptRoot/*.ps1" -Recurse | Select-Object -ExpandProperty FullName
+        if ($coverageFiles) {
+            $cfg.CodeCoverage = @{
+                Enabled = $true
+                Path    = $coverageFiles
+            }
+        } elseif (-not $Quiet) {
+            Write-Warning "No .ps1 files found for code coverage in $PSScriptRoot"
+        }
+    }
+
     $result = Invoke-Pester -Configuration $cfg
 } else {
     # Pester 3/4 fallback
+    if ($CodeCoverage -and -not $Quiet) {
+        Write-Warning "-CodeCoverage requires Pester 5+; skipping coverage"
+    }
     $result = $Path | ForEach-Object {
         Invoke-Pester -Script $_ -PassThru
     } | Select-Object -Last 1
@@ -95,6 +112,26 @@ $skipped = $result.SkippedCount
 if (-not $Quiet) {
     Write-Host "`n=== Results ===" -ForegroundColor Cyan
     Write-Host "Total: $total | Passed: $passed | Failed: $failed | Skipped: $skipped" -ForegroundColor $(if ($failed -gt 0) { 'Red' } else { 'Green' })
+}
+
+# --- code coverage ---
+if ($CodeCoverage -and $result.CodeCoverage) {
+    $cc = $result.CodeCoverage
+    $totalCmds  = $cc.CommandsAnalyzedCount
+    $executed   = $cc.CommandsExecutedCount
+    $pct        = if ($totalCmds -gt 0) { [math]::Round(($executed / $totalCmds) * 100, 1) } else { 100.0 }
+    $threshold  = 50
+
+    if (-not $Quiet) {
+        Write-Host "`n=== Code Coverage ===" -ForegroundColor Cyan
+        Write-Host "Commands: $totalCmds | Executed: $executed | Coverage: $pct%" -ForegroundColor $(if ($pct -ge $threshold) { 'Green' } else { 'Red' })
+    }
+
+    if ($pct -lt $threshold) {
+        if (-not $Quiet) { Write-Host "Coverage below $threshold% threshold — failing" -ForegroundColor Red }
+        if ($PassThru) { return $result }
+        exit 10
+    }
 }
 
 if ($PassThru) { return $result }
