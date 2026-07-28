@@ -1,32 +1,32 @@
 ﻿#requires -Version 5.1
 <# .SYNOPSIS Mine session histories for error patterns and propose corrections #>
-param([ValidateSet('scan','apply','check','populate')][string]$Mode='scan',[switch]$Json,[switch]$Quiet,[int]$Threshold=2,[string[]]$PatternKeys,[string[]]$ErrorEntries)
+param([ValidateSet('scan','apply','check','populate')][string]$Mode='scan',[switch]$Json,[switch]$Quiet,[int]$Threshold=2,[string[]]$PatternKeys,[string[]]$ErrorEntries,[string]$Root='')
 if($Quiet){$Json=$true}
 Set-StrictMode -Version Latest;$ErrorActionPreference='Stop'
-$rr=Split-Path -Parent $PSScriptRoot
+if($Root){$rr=$Root}else{$rr=Split-Path -Parent $PSScriptRoot}
 $cp=Join-Path $rr 'ANTI-PATTERN-CATALOG.md';$ld=Join-Path $rr '.learnings'
 $ep=Join-Path $ld 'ERRORS.md';$lp=Join-Path $ld 'LEARNINGS.md'
 $ro='Multiline';try{
-function rc{if(-not(Test-Path $cp)){return @()}
-try{$c=Get-Content $cp -Raw}catch{Write-Debug "sm: cannot read catalog ($($_.Exception.Message))";return @()}
+function rc{if(-not(Test-Path $cp)){return ,@()}
+try{$c=Get-Content $cp -Raw}catch{Write-Debug "sm: cannot read catalog ($($_.Exception.Message))";return ,@()}
 $p=@();$rows=[regex]::Matches($c,'^\|\s*\d+\s*\|.*?\|.*?\|.*?\|.*?\|.*?\|.*?\|',$ro)
 foreach($r in $rows){$parts=$r.Value -split '\|' | ForEach-Object {$_.Trim()}
 if($parts.Count-ge8){$id=0;if($parts[1]){[int]::TryParse($parts[1],[ref]$id) | Out-Null}
 $p+=[PSCustomObject]@{Id=$id;Date=$parts[2];Pattern=$parts[3];Symptom=$parts[4];RootCause=$parts[5];Fix=$parts[6];Prevention=$parts[7]}}}
-return $p}
-function rl{if(-not(Test-Path $lp)){return @()}
-try{$c=Get-Content $lp -Raw}catch{Write-Debug "sm: cannot read learnings ($($_.Exception.Message))";return @()}
+return ,$p}
+function rl{if(-not(Test-Path $lp)){return ,@()}
+try{$c=Get-Content $lp -Raw}catch{Write-Debug "sm: cannot read learnings ($($_.Exception.Message))";return ,@()}
 $k=@();$m=[regex]::Matches($c,'^[\s]*Pattern-Key:\s*([^\n\r]+)',$ro)
-foreach($x in $m){$k+=$x.Groups[1].Value.Trim()};return $k}
-function re{if(-not(Test-Path $ep)){return @()}
-try{$c=Get-Content $ep -Raw}catch{Write-Debug "sm: cannot read errors ($($_.Exception.Message))";return @()}
+foreach($x in $m){$k+=$x.Groups[1].Value.Trim()};return ,$k}
+function re{if(-not(Test-Path $ep)){return ,@()}
+try{$c=Get-Content $ep -Raw}catch{Write-Debug "sm: cannot read errors ($($_.Exception.Message))";return ,@()}
 $e=@();$entries=[regex]::Matches($c,'^##\s+\[\w+-\d+-\d+\]\s+(.+?)$',$ro)
-foreach($entry in $entries){$e+=$entry.Groups[1].Value.Trim()};return $e}
+foreach($entry in $entries){$e+=$entry.Groups[1].Value.Trim()};return ,$e}
 function frp{param([array]$cp,[array]$pk,[int]$mn)
 $kc=@{};foreach($k in $pk){if($kc.ContainsKey($k)){$kc[$k]++}else{$kc[$k]=1}}
 $r=@();foreach($e in $kc.GetEnumerator()){if($e.Value-ge$mn){$cat=$false
 foreach($c in $cp){if($c.Pattern -cmatch [regex]::Escape($e.Name)){$cat=$true;break}}
-$r+=[PSCustomObject]@{PatternKey=$e.Name;Count=$e.Value;Cataloged=$cat}}};return $r}
+$r+=[PSCustomObject]@{PatternKey=$e.Name;Count=$e.Value;Cataloged=$cat}}};return ,$r}
 # --- Populate mode: inject session data into learnings/errors files ---
 if($Mode-eq'populate'){
     $today=(Get-Date -Format 'yyyy-MM-dd')
