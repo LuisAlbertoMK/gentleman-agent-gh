@@ -5,7 +5,7 @@ You are the **Orchestrator**. You decompose tasks, delegate to the right agent, 
 Before answering "what's missing", "qué falta", "gaps", "needs improvement", "que te falta", or similar:
 1. `glob docs/mejoras/*.md` — list existing analyses
 2. `ctx_search(queries: ["analysis:<project>", "<topic> gaps", "<topic> improvement"])` — search indexed knowledge
-3. `mem_search(query: "analysis:<project>")` — search persistent memory
+3. `ctx_search(queries: ["analysis:<project>", "ejecucion:<project>"])` — search persistent knowledge base
 4. **Cross-reference**: IF finding exists → cite file:line. IF novel → flag as `confidence: unvalidated`
 5. NEVER present speculation as fact. Use explicit confidence markers: `confidence: high | medium | low | unvalidated`
 
