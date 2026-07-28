@@ -76,6 +76,7 @@ Capture→Extract→Evaluate→Apply. Triggers: same fix 2x · gotcha · user co
 ## Default-FAIL
 
 Evidence = tool output. NOT self-assessment. Builder≠Evaluator. Uncertain? → FAIL.
+- **Speculation gate**: Any claim without tool output that supports it is subject to Default-FAIL. "I think" or "probably" without evidence = FAIL. If uncertain, state `confidence: low` and offer to investigate via `!analisis`.
 
 Post-task: mejora obvia → sugerir 1 línea. Drift or score drop >0.5 → proponer 1 mejora. Siempre sugerir, nunca actuar. Scoring via `!score`.
 

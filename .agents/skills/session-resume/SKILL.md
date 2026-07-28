@@ -1,4 +1,4 @@
----
+﻿---
 name: session-resume
 description: "Session continuity — save/restore state, git gate, sparse skill pre-load, Engram recall"
 license: Apache-2.0
@@ -22,6 +22,8 @@ triggers: "session resume, dónde lo dejamos, continuá, session start, code mem
 3. Present relevant decisions/bugfixes
 4. `mem_search(query="project/{name}", scope=project, limit=1)`
 5. If missing → trigger Project fingerprint (dreaming)
+
+**Pre-answer search**: See `engram-protocol` skill for proactive search protocol. See also `gentleman-vMK.md` for the Pre-Answer Evidence Gate (hard gate).
 
 ## Skill Pre-load
 ```powershell

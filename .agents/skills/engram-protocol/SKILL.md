@@ -1,4 +1,4 @@
----
+﻿---
 name: engram-protocol
 description: "Persistent memory protocol — save, search, dreaming, session lifecycle via Engram MCP"
 triggers: "remember, recall, engram, mem_save, mem_search, session close, dreaming, memory, token budget, compression, L1 L2 L3, capture pipeline, project score, bias calibration"
@@ -29,6 +29,7 @@ Every turn before next response:
 ## Memory Search
 "remember"/"recall" → `mem_context` → `mem_search` → `mem_get_observation`. Proactive: known-area work · unfamiliar topic · first msg refs project.
 **Task injection**: Before non-trivial task → extract keywords, `mem_search(query, type="bugfix|pattern|decision", limit=3)`, inject top 3.
+**Authority**: This is the authoritative skill for proactive search. The `workflow-optimizer` and `session-resume` skills reference this section.
 
 ## Dreaming
 `mem_search(type="error|bugfix")`. Same error 2x→catalog. 3x→AGENTS.md rule. Auto: `session-miner.ps1 -Mode scan -Json` every 5th error.

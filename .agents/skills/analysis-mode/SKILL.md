@@ -1,4 +1,4 @@
-﻿---
+---
 name: analysis-mode
 description: "Trigger: !analisis, !analysis, multi-agent analysis. Read-only 4-phase pipeline: analyze → validate → synthesize → persist."
 triggers: "!analisis, !analysis, analysis mode, multi-agent analysis, smart analysis"
@@ -87,5 +87,10 @@ Append two sections to `docs/mejoras/YYYY-MM-DD-<project>-analisis.md`:
 `docs/mejoras/YYYY-MM-DD-<project>-analisis.md` — Summary, Findings (8 dims), Synthesis table, Risk Matrix, Recommendations, Engram Persistence, Trend Analysis.
 
 **Gate**: Plan only — NO code, NO commit. Exit analysis mode before implementing.
+
+## AUTO-TRIGGER
+This skill can be auto-triggered by the orchestrator's Pre-Answer Evidence Gate when user asks gap/completeness questions without explicit `!analisis`.
+- The orchestrator runs Phase 4 (Compare with previous analyses) directly
+- Full pipeline (5 specialists) still requires `!analisis`
 
 **Next step**: Run `!ejecutar` to fast-track implementation with parallel subagents + state persistence.

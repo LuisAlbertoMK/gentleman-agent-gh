@@ -1,4 +1,4 @@
----
+﻿---
 name: workflow-optimizer
 description: "Optimize workflow patterns — faster info access, reduced token waste, smarter caching, auto-learning triggers."
 triggers: [optimize-workflow, faster-access, token-optimization, workflow-pattern, information-access, fluidez]
@@ -93,6 +93,9 @@ IF repeat_workflow_3x → create skill
 - User mentions feature → mem_search(query="<feature>")
 - User mentions error → mem_search(type="bugfix", query="<error>")
 ```
+
+
+**Proactive search**: See `engram-protocol` skill for the authoritative proactive search protocol.
 
 ## Metrics to Track
 - Token usage per task (reduce by 20% target)
