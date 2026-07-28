@@ -1,6 +1,6 @@
 ﻿#requires -Version 5.1
 <# .SYNOPSIS Mine session histories for error patterns and propose corrections #>
-param([ValidateSet('scan','apply','check')][string]$Mode='scan',[switch]$Json,[switch]$Quiet,[int]$Threshold=2)
+param([ValidateSet('scan','apply','check','populate')][string]$Mode='scan',[switch]$Json,[switch]$Quiet,[int]$Threshold=2,[string[]]$PatternKeys,[string[]]$ErrorEntries)
 if($Quiet){$Json=$true}
 Set-StrictMode -Version Latest;$ErrorActionPreference='Stop'
 $rr=Split-Path -Parent $PSScriptRoot
@@ -16,17 +16,55 @@ $p+=[PSCustomObject]@{Id=$id;Date=$parts[2];Pattern=$parts[3];Symptom=$parts[4];
 return $p}
 function rl{if(-not(Test-Path $lp)){return @()}
 try{$c=Get-Content $lp -Raw}catch{Write-Debug "sm: cannot read learnings ($($_.Exception.Message))";return @()}
-$k=@();$m=[regex]::Matches($c,'Pattern-Key:\s*([^\n\r]+)',$ro)
+$k=@();$m=[regex]::Matches($c,'^[\s]*Pattern-Key:\s*([^\n\r]+)',$ro)
 foreach($x in $m){$k+=$x.Groups[1].Value.Trim()};return $k}
 function re{if(-not(Test-Path $ep)){return @()}
 try{$c=Get-Content $ep -Raw}catch{Write-Debug "sm: cannot read errors ($($_.Exception.Message))";return @()}
-$e=@();$entries=[regex]::Matches($c,'##\s+\[\w+-\d+-\d+\]\s+(.+?)$',$ro)
+$e=@();$entries=[regex]::Matches($c,'^##\s+\[\w+-\d+-\d+\]\s+(.+?)$',$ro)
 foreach($entry in $entries){$e+=$entry.Groups[1].Value.Trim()};return $e}
 function frp{param([array]$cp,[array]$pk,[int]$mn)
 $kc=@{};foreach($k in $pk){if($kc.ContainsKey($k)){$kc[$k]++}else{$kc[$k]=1}}
 $r=@();foreach($e in $kc.GetEnumerator()){if($e.Value-ge$mn){$cat=$false
 foreach($c in $cp){if($c.Pattern -cmatch [regex]::Escape($e.Name)){$cat=$true;break}}
 $r+=[PSCustomObject]@{PatternKey=$e.Name;Count=$e.Value;Cataloged=$cat}}};return $r}
+# --- Populate mode: inject session data into learnings/errors files ---
+if($Mode-eq'populate'){
+    $today=(Get-Date -Format 'yyyy-MM-dd')
+    # Populate LEARNINGS.md with pattern keys
+    if($PatternKeys -and $PatternKeys.Count-gt0){
+        $existingKeys=@();if(Test-Path $lp){$ec=Get-Content $lp -Raw;$existingKeys=@([regex]::Matches($ec,'^[\s]*Pattern-Key:\s*([^\n\r]+)','Multiline')|ForEach-Object{$_.Groups[1].Value.Trim()})}
+        $newLines=@();$todayKeys=@()
+        foreach($pk in $PatternKeys){
+            $key=$pk -replace '\s+','-' -replace '[^a-zA-Z0-9\-]','' -replace '-+','-' -replace '^-|-$',''
+            if($key -and $key.Length-gt2 -and $existingKeys -notcontains $key -and $todayKeys -notcontains $key){
+                $todayKeys+=$key;$newLines+="# $today`nPattern-Key: $key"
+            }
+        }
+        if($newLines.Count-gt0){
+            $nl="`r`n"+($newLines -join "`r`n")+"`r`n"
+            Add-Content -Path $lp -Value $nl -Encoding UTF8
+            if(-not $Json){Write-Host "  ⛏️  Populated $($newLines.Count) new pattern key(s) to LEARNINGS.md"}
+        } elseif(-not $Json){Write-Host "  ⛏️  No new pattern keys to add (all exist or invalid)"}
+    }
+    # Populate ERRORS.md with error entries
+    if($ErrorEntries -and $ErrorEntries.Count-gt0){
+        $existingErrors=@();if(Test-Path $ep){$ec=Get-Content $ep -Raw;$existingErrors=@([regex]::Matches($ec,'^##\s+\[\w+-\d+-\d+\]\s+(.+?)$','Multiline')|ForEach-Object{$_.Groups[1].Value.Trim()})}
+        $newErrors=@()
+        foreach($ee in $ErrorEntries){
+            $clean=$ee.Trim()
+            if($clean -and $existingErrors -notcontains $clean){
+                $newErrors+="## [$today] $clean"
+            }
+        }
+        if($newErrors.Count-gt0){
+            $nl="`r`n"+($newErrors -join "`r`n")+"`r`n"
+            Add-Content -Path $ep -Value $nl -Encoding UTF8
+            if(-not $Json){Write-Host "  ⛏️  Populated $($newErrors.Count) new error entry(ies) to ERRORS.md"}
+        } elseif(-not $Json){Write-Host "  ⛏️  No new error entries to add (all exist or invalid)"}
+    }
+    # Fall through as check so caller gets repeated-pattern analysis
+    $Mode='check'
+}
 $catalog=rc;$patternKeys=rl;$errors=re;$repeated=frp -cp $catalog -pk $patternKeys -mn $Threshold
 if($Mode-eq'check'){$data=[PSCustomObject]@{CatalogEntries=@($catalog).Count;PatternKeys=@($patternKeys).Count;ErrorEntries=@($errors).Count;RepeatedPatterns=@($repeated).Count;Mode='check';Status=if(@($repeated).Count-gt0){'PATTERNS_FOUND'}else{'CLEAN'}}
 if($Json){return($data | ConvertTo-Json)}

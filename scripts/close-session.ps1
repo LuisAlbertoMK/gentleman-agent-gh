@@ -29,7 +29,9 @@ param(
     [switch]$Quiet,
     [switch]$CompactPrompt,
     [switch]$DryRun,
-    [switch]$Force
+    [switch]$Force,
+    [string[]]$Discoveries,
+    [string[]]$Errors
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -52,7 +54,7 @@ if (Test-Path -LiteralPath $bitacoraPath) {
     Set-Content -LiteralPath $bitacoraPath -Value "$entry`r`n$existingContent" -Encoding UTF8
 }
 # Git status
-$gitStatus = git status --short 2>&1
+$savedEap = $ErrorActionPreference; $ErrorActionPreference = "Continue"; $gitStatus = git status --short 2>$null; $ErrorActionPreference = $savedEap
 $hasChanges = @($gitStatus | Where-Object { $_ -match '\S' }).Count -gt 0
 try {
     $branch = git rev-parse --abbrev-ref HEAD 2>$null
@@ -104,14 +106,30 @@ $result = [PSCustomObject]@{
     auditGatePassed   = $auditGatePassed
     bloatWarning      = $bloatWarning
 }
-# --- Session miner: scan for repeated error patterns ---
+# --- Session miner: populate from discoveries then scan for patterns ---
 $minerOutput = $null
 try {
-    $minerResult = & "$PSScriptRoot\session-miner.ps1" -Mode check -Json 2>$null
+    $hasSessionData = ($Discoveries -and $Discoveries.Count -gt 0) -or ($Errors -and $Errors.Count -gt 0)
+    if ($hasSessionData) {
+        if ($Discoveries) { Write-Debug "close-session: passing $($Discoveries.Count) discovery(ies) to session-miner" }
+        if ($Errors) { Write-Debug "close-session: passing $($Errors.Count) error(s) to session-miner" }
+        $minerMode = "populate"
+    } else {
+        $minerMode = "check"
+    }
+    $minerParams = @{ Mode = $minerMode; Json = $true }
+    if ($Discoveries) { $minerParams.PatternKeys = $Discoveries }
+    if ($Errors) { $minerParams.ErrorEntries = $Errors }
+    $minerResult = & "$PSScriptRoot\session-miner.ps1" @minerParams 2>$null
     if ($minerResult) {
         $minerData = $minerResult | ConvertFrom-Json -ErrorAction SilentlyContinue
         if ($minerData -and $minerData.RepeatedPatterns -gt 0) {
             $minerOutput = "$($minerData.RepeatedPatterns) repeated pattern(s) detected — run dreaming to review"
+        }
+        if ($hasSessionData -and $minerData -and -not $Quiet) {
+            $dc = if ($Discoveries) { $Discoveries.Count } else { 0 }
+            $ec = if ($Errors) { $Errors.Count } else { 0 }
+            Write-Host "  ⛏️  Session-miner: $($dc+$ec) entries ingested, $($minerData.RepeatedPatterns) repeated patterns found" -ForegroundColor DarkYellow
         }
     }
 } catch {
