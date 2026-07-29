@@ -207,8 +207,8 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [9/10] JD review check (ROJA zone files) ---
-echo "[9/10] JD review check (ROJA zone)..."
+# --- [9/12] JD review check (ROJA zone files) ---
+echo "[9/12] JD review check (ROJA zone)..."
 STAGED_ROJA=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^(src/|test/|scripts/|migrations/|ci/|\.github/)' | head -10)
 if [ -n "$STAGED_ROJA" ]; then
   yellow "  WARN — ROJA zone files staged without JD dual review:"
@@ -220,8 +220,8 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [10/10] Secrets scan on staged diff ---
-echo "[10/10] Secrets scan..."
+# --- [10/12] Secrets scan on staged diff ---
+echo "[10/12] Secrets scan..."
 STAGED_SECRETS=$(git diff --cached --diff-filter=ACM -- ':!.githooks' ':!*.tests.ps1' ':!scripts/check-mcp-security.ps1' ':!.agents/skills/*/references/*' ':!.gitleaks.toml' ':!docs/mejoras/*' 2>/dev/null | $PWSH -NoProfile -ExecutionPolicy Bypass -Command "
   \$input | Select-String -Pattern '^\+[^\+]' | ForEach-Object { \$_.Line.Substring(1) } | Select-String -Pattern '(ghp_|gho_|github_pat_|AKIA|ctx7sk_|-----BEGIN\s+(RSA|EC|DSA|PRIVATE)\s+KEY|GH_TOKEN\s*=|GITHUB_TOKEN\s*=|password\s*=|api[_-]?key\s*=|secret\s*=|token\s*=)' 2>\$null | ForEach-Object {
     \$line = \$_.Line.Trim()
@@ -239,8 +239,42 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
-# --- [11/11] Pester tests on staged test files ---
-echo "[11/11] Pester tests..."
+# --- [11/12] Taste invariant: SKILL.md frontmatter completeness ---
+echo "[11/12] Taste invariant: SKILL.md frontmatter..."
+STAGED_SKILLS=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.agents/skills/[^/]+/SKILL\.md$')
+if [ -n "$STAGED_SKILLS" ]; then
+  FRONTMATTER_FAIL=0
+  while IFS= read -r skillfile; do
+    name_val=$(sed -n '/^---$/,/^---$/p' "$skillfile" | grep -E '^name:\s+' | head -1)
+    desc_val=$(sed -n '/^---$/,/^---$/p' "$skillfile" | grep -E '^description:\s+' | head -1)
+    trig_val=$(sed -n '/^---$/,/^---$/p' "$skillfile" | grep -E '^triggers:\s+' | head -1)
+    if [ -z "$name_val" ]; then
+      red "  BLOCKING: $skillfile — missing 'name:' in frontmatter"
+      FRONTMATTER_FAIL=1
+    fi
+    if [ -z "$desc_val" ]; then
+      red "  BLOCKING: $skillfile — missing 'description:' in frontmatter"
+      FRONTMATTER_FAIL=1
+    fi
+    if [ -z "$trig_val" ]; then
+      red "  BLOCKING: $skillfile — missing 'triggers:' in frontmatter"
+      FRONTMATTER_FAIL=1
+    fi
+  done <<< "$STAGED_SKILLS"
+  if [ $FRONTMATTER_FAIL -eq 0 ]; then
+    green "  OK"
+    CHECKS_PASSED=$((CHECKS_PASSED + 1))
+  else
+    echo "  Fix frontmatter issues above and stage again."
+    CHECKS_FAILED=$((CHECKS_FAILED + 1))
+  fi
+else
+  green "  OK (no SKILL.md changes)"
+  CHECKS_PASSED=$((CHECKS_PASSED + 1))
+fi
+
+# --- [12/12] Pester tests on staged test files ---
+echo "[12/12] Pester tests..."
 STAGED_TESTS=$(git diff --cached --name-only --diff-filter=ACM | grep -Ei '\.Tests\.ps1$')
 if [ -n "$STAGED_TESTS" ]; then
   TEST_PATHS=$(echo "$STAGED_TESTS" | while read -r f; do

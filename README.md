@@ -18,7 +18,7 @@
 Suite of **79 skills** (+ `_shared`) + **91 PowerShell scripts** for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
-> **Score**: 9.1/10 (13 dimensions)
+> **Score**: 6.2/10 (12 dimensions) — 4 dims at 0.0: Cycle Activity, Best Practices, Clean Code, backlog integrity. Tracking in .project.json.
 > **Skills**: 79 (+ `_shared`)
 > **Cycle**: 27 completed (Audit Cleanup & Enrichment)
 
@@ -27,7 +27,7 @@ Suite of **79 skills** (+ `_shared`) + **91 PowerShell scripts** for [OpenCode](
 ## Features
 
 ### Multi-Agent Architecture
-27 agents total: main orchestrator (`gentleman-vMK`) + 12 specialists + 9 SDD pipeline agents + 5 auto-mode variants:
+28 agents total: main orchestrator (`gentleman-vMK`) + 13 specialists + 9 SDD pipeline agents + 5 auto-mode variants:
 
 | Agent | Model | Specialty |
 |-------|-------|-----------|
@@ -43,6 +43,7 @@ Suite of **79 skills** (+ `_shared`) + **91 PowerShell scripts** for [OpenCode](
 | `gentleman-datascience` | mimo-v2.5-free | Pandas, SQL, stats (FREE TIER) |
 | `gentleman-docs` | big-pickle | Technical writing, docs (FREE TIER) |
 | `gentleman-implementer` | deepseek-v4-flash-free | Plan executor (FREE TIER) |
+| `gentleman-reviewer` | claude-sonnet-4-6 | Code review — 4R (Risk/Readability/Reliability/Resilience) |
 | `sdd-orchestrator` | claude-sonnet-4-6 | SDD pipeline orchestration |
 | `gentleman-deep-auto` | nemotron-3-ultra-free | — AUTO mode (same model, `*: allow`) |
 | `gentleman-quick-auto` | mimo-v2.5-free | — AUTO mode (same model, `*: allow`) |

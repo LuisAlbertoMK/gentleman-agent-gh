@@ -53,5 +53,27 @@ secrets/
 # Logs
 *.log
 
+# Data (extracted from scripts, rebuilt in CI)
+data/
+
+# opnecode runtime config
+.opencode/
+
+# Mode state
+.gentleman-mode
+
+# Git hooks (local dev only)
+.githooks/
+.gitattributes
+
+# Root-level docs (not needed at runtime)
+PROTOCOL.md
+QUICKSTART.md
+SHORTCUTS.md
+SKILLS-INDEX.md
+CYCLE.md
+ANTI-PATTERN-CATALOG.md
+BITACORA.md
+
 # Analysis reports
 docs/mejoras/

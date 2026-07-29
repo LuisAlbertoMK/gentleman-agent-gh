@@ -96,7 +96,28 @@ process {
     }
 
     # --- 3. Injection patterns ---
-    $injectionPatterns = @("ignore previous", "forget instructions", "system prompt", "new instructions")
+    $injectionPatterns = @("ignore previous", "forget instructions", "system prompt", "new instructions", "ignore all", "override", "new rule", "disregard", "you are now", "ignore everything", "forget previous", "system message", "ignore instructions", "forget all", "you are not", "disregard previous")
+    # Homoglyph check: unicode chars that visually resemble ASCII (injection bypass defense)
+    $homoglyphChars = @{
+        [char]0x0430 = 'a'; # Cyrillic а → Latin a
+        [char]0x0435 = 'e'; # Cyrillic е → Latin e
+        [char]0x043E = 'o'; # Cyrillic о → Latin o
+        [char]0x0441 = 'c'; # Cyrillic с → Latin c
+        [char]0x0440 = 'p'; # Cyrillic р → Latin p
+        [char]0x0445 = 'x'; # Cyrillic х → Latin x
+        [char]0x0456 = 'i'; # Cyrillic і → Latin i
+        [char]0x043A = 'k'; # Cyrillic к → Latin k
+        [char]0x043C = 'm'; # Cyrillic м → Latin m
+        [char]0x0432 = 'v'; # Cyrillic в → Latin v
+        [char]0x043D = 'h'; # Cyrillic н → Latin h
+        [char]0x0442 = 't'; # Cyrillic т → Latin t
+    }
+    foreach ($kv in $homoglyphChars.GetEnumerator()) {
+        if ($contentStr -match [regex]::Escape($kv.Key)) {
+            $errors += "Homoglyph detected: '$($kv.Key)' (looks like '$($kv.Value)') — injection bypass attempt"
+            if (-not $Quiet) { Write-ErrorMsg "Homoglyph character U+$('{0:X4}' -f [int]$kv.Key) (looks like '$($kv.Value)') — possible injection bypass" }
+        }
+    }
     # Strategy A: normalize whitespace + check raw (catches single-field, multi-space, tab variants)
     $normalized = $contentStr -replace '\s+', ' '
     # Strategy B: join field values (catches split-across-fields: "ignore" in What + "previous" in Why)

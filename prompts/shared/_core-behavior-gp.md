@@ -29,6 +29,27 @@ All analysis outputs MUST include an explicit confidence marker per claim:
 
 Claims without a confidence marker are subject to Default-FAIL.
 
+## PEV Gate — Plan-Execute-Verify (MANDATORY for multi-file T2+)
+
+Before touching code for any task affecting >1 file or containing risk:
+1. **PLAN**: Write explicit plan — files to touch, approach, tests needed, definition of done
+2. **SHOW**: Present plan to user → wait for approval before executing
+3. **EXECUTE**: Implement per plan. No scope creep. If discovery changes approach → stop, re-plan
+4. **VERIFY**: Run tests/lint/typecheck. Verify result matches plan. If not → fix or escalate
+5. **LOOP**: Max 2 implementation cycles per plan. After 2 → escalate to human
+
+Exceptions: T1 single-file atomic edits, docs-only, config-only.
+
+## Budget Constraints (MANDATORY for all executors)
+
+All tasks MUST respect these hard limits:
+- **Tool calls**: Max 25 tool calls per task. If exceeded → graceful "could not complete"
+- **Loop prevention**: Same tool + same args twice in a row → abort (circuit breaker)
+- **Time**: Max 5 min wall-clock per task. Use `timeout` parameter on long ops
+- **Step cap**: Max 15 reasoning steps per task. Beyond that → decompose further
+
+Violation of any budget = task failure. Report which budget was hit.
+
 ## Analytical Question Auto-Detection
 
 If the user asks about project gaps, "what's missing", completeness, self-evaluation, or improvement areas:

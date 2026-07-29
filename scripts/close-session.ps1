@@ -48,11 +48,17 @@ $protectedFiles = @(
     'ANTI-PATTERN-CATALOG.md',
     '.project.json'
 )
-# Log to BITACORA
+# Log to BITACORA (with dedup guard)
 $entry = "$(Get-Date -Format 'yyyy-MM-dd') - $Description"
 if (Test-Path -LiteralPath $bitacoraPath) {
-    $existingContent = Get-Content -LiteralPath $bitacoraPath -Raw
-    Set-Content -LiteralPath $bitacoraPath -Value "$entry`r`n$existingContent" -Encoding UTF8
+    $existingLines = Get-Content -LiteralPath $bitacoraPath
+    # Guard: skip if exact entry exists as first line (consecutive duplicate prevention)
+    $firstLine = $existingLines | Select-Object -First 1
+    $isDup = ($firstLine -and $firstLine.Trim() -eq $entry.Trim())
+    if (-not $isDup) {
+        $existingContent = $existingLines -join "`r`n"
+        Set-Content -LiteralPath $bitacoraPath -Value "$entry`r`n$existingContent" -Encoding UTF8
+    }
 }
 # Git status
 $savedEap = $ErrorActionPreference; $ErrorActionPreference = "Continue"; $gitStatus = git status --short 2>$null; $ErrorActionPreference = $savedEap
