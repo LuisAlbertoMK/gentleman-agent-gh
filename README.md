@@ -44,8 +44,13 @@ Suite of **79 skills** (+ `_shared`) + **91 PowerShell scripts** for [OpenCode](
 | `gentleman-docs` | big-pickle | Technical writing, docs (FREE TIER) |
 | `gentleman-implementer` | deepseek-v4-flash-free | Plan executor (FREE TIER) |
 | `sdd-orchestrator` | claude-sonnet-4-6 | SDD pipeline orchestration |
+| `gentleman-deep-auto` | nemotron-3-ultra-free | — AUTO mode (same model, `*: allow`) |
+| `gentleman-quick-auto` | mimo-v2.5-free | — AUTO mode (same model, `*: allow`) |
+| `gentleman-codex-auto` | deepseek-v4-flash-free | — AUTO mode (same model, `*: allow`) |
+| `gentleman-implementer-auto` | deepseek-v4-flash-free | — AUTO mode (same model, `*: allow`) |
+| `gentleman-vMK-auto` | default | — AUTO mode (orchestrator, `*: allow`) |
 
-> **Auto-mode variants**: Each orchestrator agent (`gentleman-vMK`, `gentleman-deep`, `gentleman-quick`, `gentleman-codex`, `gentleman-implementer`) has a `-auto` variant (e.g. `gentleman-vMK-auto`) with `*: allow` permissions. Activated automatically when `.gentleman-mode` is `auto`. See [PROTOCOL.md](PROTOCOL.md) for mode behavior.
+> **Auto-mode**: Activated when `.gentleman-mode` is `auto`. See [PROTOCOL.md](PROTOCOL.md) for mode behavior. Read-only specialists have no `-auto` variant.
 
 #### SDD Pipeline Agents (subagents)
 9 agents executing SDD pipeline phases. **Inherit orchestrator model** (`claude-sonnet-4-6`, paid) unless they have explicit `model` in `opencode.json`. All have full permissions (`bash: allow, edit: allow, write: allow`).

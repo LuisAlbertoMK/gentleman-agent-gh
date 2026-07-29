@@ -32,7 +32,7 @@
 
 | Group | Skills |
 |-------|--------|
-| Quality | quality-gate, code-review-agent, triple-verify, auto-metrics, external-auditor, immune-system |
+| Quality | quality-gate, code-review-agent, triple-verify, auto-metrics, external-auditor, immune-system, testing-strategy |
 | Code | commit-crafter, code-generation, quick-executor, refactoring-planner |
 | Security | security-scanner, auth-hardening, container-security, llm-security |
 | SDD | sdd (unified pipeline), sdd-quick, sdd-apply |
@@ -42,7 +42,7 @@
 | Skills meta | opencode-skill-creator, skill-registry, skill-graph |
 | Engineering | plan-execution, infra-audit, perf-profiling |
 | UI/Docs | baseline-ui, ui-engine, accessibility, seo, docs-audit |
-| Testing | visual-testing, e2e-testing, image-pipeline, pdf-utils |
+| Testing | visual-testing, e2e-testing, api-testing, image-pipeline, pdf-utils |
 | Communication | comment-writer, cognitive-doc-design |
 | Specialized | karpathy-loop, context-watchdog, recovery-protocol, metricas, workflow-optimizer |
 
