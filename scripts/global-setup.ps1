@@ -78,7 +78,7 @@ if (Test-Path $sharedSddSrc) {
 # 2c. Sync root prompts (gentleman-*.md, _*.md — auto-discover, allowlisted)
 $rootPromptsSrc = Join-Path $gentlemanRoot "prompts"
 if (Test-Path $rootPromptsSrc) {
-    Get-ChildItem $rootPromptsSrc -Include "gentleman-*.md","_*.md" -File -Attributes !ReparsePoint | ForEach-Object {
+    Get-ChildItem "$rootPromptsSrc\*" -Include "gentleman-*.md","_*.md" -File -Attributes !ReparsePoint | ForEach-Object {
         $safeName = Split-Path -Leaf $_.Name
         Sync-File $_.FullName (Join-Path (Join-Path $globalConfig "prompts") $safeName) "prompts/$safeName"
     }
