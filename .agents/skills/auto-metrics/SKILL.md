@@ -1,12 +1,6 @@
-﻿---
+---
 name: auto-metrics
 description: "Self-evaluation scoring. Trigger via !score or !metrics — not automatic."
-license: Apache-2.0
-metadata:
-  tags: [engineering]
-  author: gentleman-vMK
-  version: "3.3"
-  changelog: "3.3: opt-in only (no auto post-task). Risk-adaptive: only scores on !score/!metrics"
 triggers: "!score, !metrics, explicit score/metric request, session end via !close"
 ---
 ## TRIGGER

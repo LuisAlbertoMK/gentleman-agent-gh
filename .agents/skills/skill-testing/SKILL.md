@@ -2,13 +2,6 @@
 name: skill-testing
 description: "Test and verify skill quality — syntax, coverage, integration, and token budget assessment before production use"
 triggers: "Test/verify skill, coverage"
-license: Apache-2.0
-metadata:
-  tags:
-    - engineering
-  author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.1: initial tracked version"
 ---
 
 Trigger: After creating/modifying skill, before production use.

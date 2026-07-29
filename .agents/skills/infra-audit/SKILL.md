@@ -2,12 +2,6 @@
 name: infra-audit
 description: "Trigger: infrastructure audit, IaC, Terraform, Kubernetes, CI/CD, Docker, cloud, deployment, Helm, Ansible. Audit infrastructure reliability and security."
 triggers: "infrastructure audit, IaC, Terraform, Kubernetes, CI/CD, Docker, cloud, deployment, Helm, Ansible, terraform, k8s"
-license: Apache-2.0
-metadata:
-  tags: [infrastructure, security]
-  author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.1: progressive scan, .yaml/.yml unified, Helm/Ansible/CF, multi-CI, NetworkPolicy, risk rubric"
 ---
 ## WHEN: Reviewing infrastructure (Terraform, Docker, K8s, CI/CD, Helm, Ansible, CloudFormation). Progressive scan: audit what's present, report what's missing.
 

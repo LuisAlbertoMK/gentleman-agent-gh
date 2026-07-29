@@ -2,13 +2,6 @@
 name: sdd-quick
 description: "3-phase fast SDD for LOW-risk changes — Propose→Apply→Verify. Skips Init/Explore/Design/Spec/Tasks/Archive. Use when change is 1-3 files, known codebase, no schema/auth/API changes."
 triggers: "SDD quick, fast path, quick SDD, low risk SDD, simple change SDD"
-license: MIT
-metadata:
-  tags: [engineering, fast-path]
-  author: gentleman-vMK
-  version: "1.0"
-  changelog: "1.0: initial — 3-phase fast path for LOW-risk changes"
-  dependencies: [sdd, execution-mode]
 ---
 
 # SDD Quick — 3-Phase Fast Path

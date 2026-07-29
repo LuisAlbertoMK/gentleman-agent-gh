@@ -1,13 +1,7 @@
-﻿---
+---
 name: baseline-ui
 description: "Anti-slop UI — layout, typography, responsive, animation, tokens. Use for cleanup or polish."
 triggers: "ui cleanup, polish interface, fix layout, ui slop, generic ui, design review, responsive, container query, flexbox, grid, ui audit"
-license: MIT
-metadata:
-  tags: [frontend, ui, design, responsive, layout]
-  author: gentleman-vMK (adapted from ibelick/ui-skills)
-  version: "3.2"
-  changelog: "3.2: dedup animation/tokens → defer to ui-engine for implementation patterns · 3.1: Breaker fixes · 3.0: Added workflow, examples"
 ---
 <!-- karpathy-compressed: 2026-07-10 -->
 # Baseline UI — Anti-slop

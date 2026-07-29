@@ -2,13 +2,6 @@
 name: commit-crafter
 description: Craft conventional commit messages from diff analysis.
 triggers: "commit, mensaje, commit message, conventional commit, git commit, craft commit"
-license: Apache-2.0
-metadata:
-  tags:
-    - engineering
-  author: gentleman-vMK
-  version: "1.2"
-  changelog: "1.2: initial tracked version"
 ---
 <!-- karpathy-compressed: 2026-07-09 -->
 ## Type Detection

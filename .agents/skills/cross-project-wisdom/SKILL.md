@@ -1,12 +1,6 @@
 ---
 name: cross-project-wisdom
 description: "Load patterns from prior projects relevant to the current task — advisory knowledge transfer across repos. Trigger: patterns, wisdom, lesson learned, in another project I, last time this happened, cross-project, retrospectiva, experiencia previa, !wisdom"
-license: Apache-2.0
-metadata:
-  tags: [engineering, meta]
-  author: gentleman-vMK
-  version: "1.0"
-  changelog: "1.0: F1 Pattern Store — 3 seed patterns, rung 0b integration"
 triggers: "patterns, wisdom, lesson learned, in another project I, last time this, cross-project, retrospectiva, experiencia previa, !wisdom, pattern guard"
 ---
 

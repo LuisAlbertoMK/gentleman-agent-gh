@@ -1,13 +1,7 @@
-﻿---
+---
 name: metricas
 description: "On-demand before/after comparison with delta and % improvement — git diff or bookmark mode, tokenization, multi-language auto-detect"
 triggers: "Metricas, before/after, % improvement, tokenization, delta"
-license: Apache-2.0
-metadata:
-  tags: [engineering]
-  author: gentleman-vMK
-  version: "1.4"
-  changelog: "1.4: karpathy compress"
 ---
 Before/after comparison w/ %. Trigger: "metricas", "métricas", "comparar", "mejora", "delta", "token", "tokenizar".
 ## Flow: Capture baseline → Apply change → Capture after → Display: **Before | After | Δ | Δ%** (green↑ red↓)

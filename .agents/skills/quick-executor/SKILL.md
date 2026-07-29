@@ -2,12 +2,6 @@
 name: quick-executor
 description: "Trigger: quick edit, single file, atomic edit, fast fix, one-line fix. Single-file low-risk changes."
 triggers: "quick edit, single file, atomic edit, fast fix, one-line fix, small change, quick fix"
-license: Apache-2.0
-metadata:
-  tags: [engineering, execution]
-  author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.1: removed Never-create-files rule, added risk heuristic, more languages, standalone context"
 ---
 ## WHEN: 1 file, clear before/after, low risk. SCOPE GUARD: >1 file → STOP, report to orchestrator or delegate to plan-execution.
 

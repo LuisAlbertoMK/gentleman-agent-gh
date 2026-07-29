@@ -1,39 +1,4 @@
-2026-07-29 - Branch test
-2026-07-29 - Non-quiet test
-2026-07-29 - Compact
-2026-07-29 - Dry run
-2026-07-29 - Added RBAC support
-2026-07-29 - Test
-2026-07-29 - Gate check
-2026-07-29 - Protected check
-2026-07-29 - Int test
-2026-07-29 - Branch test
-2026-07-29 - Non-quiet test
-2026-07-29 - Compact
-2026-07-29 - Dry run
-2026-07-29 - Added RBAC support
-2026-07-29 - Test
-2026-07-29 - Gate check
-2026-07-29 - Protected check
-2026-07-29 - Int test
-2026-07-29 - Branch test
-2026-07-29 - Non-quiet test
-2026-07-29 - Compact
-2026-07-29 - Dry run
-2026-07-29 - Added RBAC support
-2026-07-29 - Test
-2026-07-29 - Gate check
-2026-07-29 - Protected check
-2026-07-29 - Int test
-2026-07-29 - Branch test
-2026-07-29 - Non-quiet test
-2026-07-29 - Compact
-2026-07-29 - Dry run
-2026-07-29 - Added RBAC support
-2026-07-29 - Test
-2026-07-29 - Gate check
-2026-07-29 - Protected check
-2026-07-29 - Int test
+2026-07-29 - Session close
 2026-07-29 - Branch test
 2026-07-29 - Non-quiet test
 2026-07-29 - Compact
@@ -44,15 +9,6 @@
 2026-07-29 - Protected check
 2026-07-29 - Int test
 2026-07-29 - Post-save validation, injection guard adversarial testing, 14 skills enriched, permission mode infra, close-session gate
-2026-07-29 - Branch test
-2026-07-29 - Non-quiet test
-2026-07-29 - Compact
-2026-07-29 - Dry run
-2026-07-29 - Added RBAC support
-2026-07-29 - Test
-2026-07-29 - Gate check
-2026-07-29 - Protected check
-2026-07-29 - Int test
 2026-07-29 - Changes test
 2026-07-28 - Created .gentleman-mode, switch-mode.ps1, analysis docs for 3 permission modes
 2026-07-28 - Simplified opencode.json permissions (21/22 agents, -720 tok), trimmed SPECIALIZED-AGENTS.md (-1,943 tok), analysis-mode auto-trigger optimization, verified with breaker

@@ -2,13 +2,6 @@
 name: bitacora
 description: "Historical log of user requests per session — auto-append to BITACORA.md, search, date filtering"
 triggers: "Bitacora, historial, histórico, qué pedí, request log"
-license: Apache-2.0
-metadata:
-  tags:
-    - content
-  author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.1: enriched with concrete search examples, engram integration flow, edge cases"
 ---
 
 Historical log of user requests per session. Auto-append on session end.

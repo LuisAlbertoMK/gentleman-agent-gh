@@ -2,15 +2,6 @@
 name: quality-gate
 description: "Pre-commit gate — TDD + Pester tests pass, secrets scan, conventional commit, PSSA gate"
 triggers: "Quality gate, pre-commit, PSSA gate"
-license: Apache-2.0
-metadata:
-  tags: [engineering]
-  author: gentleman-vMK
-  version: "4.0"
-  changelog: "4.0: graceful degradation — skip missing scripts instead of failing. Portable to any project."
-  dependencies: [security-scanner]
-  env:
-    GENTLEMAN_AGENT_ROOT: "Repo root — all script paths are relative to this"
 ---
 ## Trigger: Before ANY `git commit`/`push`/`gh pr create` — ALL gates MUST pass
 ## PORTABLE MODE: Steps 4, 5, 6 depend on repo-specific scripts/skills. If not found → `[SKIP]` with warning, continue. Never fail because a script is missing.

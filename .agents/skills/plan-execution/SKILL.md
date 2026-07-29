@@ -2,12 +2,6 @@
 name: plan-execution
 description: "Trigger: execute plan, implement plan, step-by-step execution, task execution, plan completion. Execute implementation plans with rollback."
 triggers: "execute plan, implement plan, step-by-step execution, task execution, plan completion, run plan, do plan"
-license: Apache-2.0
-metadata:
-  tags: [engineering, execution]
-  author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.1: added isolation/rollback, language detection, timeout guards, failure counter fix"
 ---
 ## WHEN: Executing a multi-step plan (from agent, spec, or task list). NOT for 1-file edits (→ quick-executor) or single-concept changes.
 

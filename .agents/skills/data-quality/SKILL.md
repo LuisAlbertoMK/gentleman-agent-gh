@@ -2,12 +2,6 @@
 name: data-quality
 description: "Trigger: data audit, data pipeline audit, schema validation, data governance, ETL audit. Audit data layer quality and reliability."
 triggers: "data audit, data pipeline audit, schema validation, data governance, ETL audit, data quality check, data review"
-license: Apache-2.0
-metadata:
-  tags: [data, quality]
-  author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.1: fixed triggers, added measurement tooling, clarified audit order, dbt/YAML coverage"
 ---
 ## WHEN: Reviewing data pipelines, schemas, ETL processes, analytics. If no data layer → report and stop.
 

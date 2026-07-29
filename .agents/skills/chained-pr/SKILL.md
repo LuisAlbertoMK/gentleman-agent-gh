@@ -2,11 +2,6 @@
 name: chained-pr
 description: "Split oversized changes into chained PRs that protect review focus."
 triggers: "chained PR, stacked PR, sequential branches, PR chain, stacked branches, PR stack, oversized PR, 400 lines, review slices"
-license: Apache-2.0
-metadata:
-  author: gentleman-programming
-  version: "1.0"
-  changelog: "1.0: initial tracked version"
 ---
 
 ## Activation Contract

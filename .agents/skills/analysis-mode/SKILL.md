@@ -2,13 +2,6 @@
 name: analysis-mode
 description: "Trigger: !analisis, !analysis, multi-agent analysis. Read-only 4-phase pipeline: analyze → validate → synthesize → persist."
 triggers: "!analisis, !analysis, analysis mode, multi-agent analysis, smart analysis"
-license: Apache-2.0
-metadata:
-  tags: [analysis, architecture]
-  author: gentleman-vMK
-  version: "4.7"
-  changelog: "4.7: Trimmed resilient loading + auto-trigger ref to _core-behavior-gp.md (saves ~1,200 tok/trigger)"
-  dependencies: [project-mapper]
 ---
 
 `!analisis` or `!analysis` as first token.

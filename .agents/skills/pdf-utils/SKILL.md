@@ -2,15 +2,6 @@
 name: pdf-utils
 description: "PDF processing — extract text, parse tables, generate reports"
 triggers: "PDF, extract PDF, parse PDF, merge PDF, generate PDF, PDF table, PDF invoice, read PDF, PDF to text, PDF to markdown"
-license: Apache-2.0
-metadata:
-  tags: [documents, processing, data]
-  author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.1: Karpathy compression (<2.5KB)"
-  dependencies: [command-wrapper]
-  env:
-    GENTLEMAN_AGENT_ROOT: "Repo root"
 ---
 
 ## Tools

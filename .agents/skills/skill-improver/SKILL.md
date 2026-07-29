@@ -2,12 +2,6 @@
 name: skill-improver
 description: "Audit and improve skills — preserve author intent, fix frontmatter, convert tutorial prose to actionable rules, track usage"
 triggers: "Skill improvement, audit skills, refactor skills, skill refresher, drift detection, auto-heal"
-license: Apache-2.0
-metadata:
-  tags: [engineering]
-  author: gentleman-vMK
-  version: "2.3"
-  changelog: "2.2->2.3: Karpathy re-compress to ≤2.5KB"
 ---
 <!-- karpathy-compressed: 2026-07-10 -->
 

@@ -2,14 +2,6 @@
 name: judgment-day
 description: "Dual adversarial review orchestrator — 2 profile-scoped code-review-agent instances, verdict synthesis"
 triggers: "Judgment day, JD, dual review, juzgar, adversarial review"
-license: Apache-2.0
-metadata:
-  tags: [engineering, review, orchestrator]
-  author: gentleman-vMK
-  version: "3.2"
-  changelog: "3.1->3.2: Karpathy compression — merged redundancies, trimmed prose"
-  config_refs: review-rules.jsonc
-  dependencies: [code-review-agent]
 ---
 <!-- karpathy-compressed: 2026-07-10 -->
 

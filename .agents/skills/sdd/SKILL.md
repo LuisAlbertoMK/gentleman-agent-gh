@@ -2,12 +2,6 @@
 name: sdd
 description: "Unified SDD pipeline — 9 phases from init through archive. Use sdd-quick for LOW-risk 3-phase fast path."
 triggers: "SDD pipeline, SDD phase, spec-driven development"
-license: MIT
-metadata:
-  tags: [engineering]
-  author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.1: added sdd-quick fast path reference"
 ---
 
 # SDD Pipeline

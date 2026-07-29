@@ -2,12 +2,6 @@
 name: context-watchdog
 description: "Monitor context window — Recursive Summary Compression (L1/L2/L3), YELLOW/RED zones, hallucination detection"
 triggers: "Context explosion, compress, compression schedule, session break"
-license: Apache-2.0
-metadata:
-  tags: [engineering]
-  author: gentleman-vMK
-  version: "3.2"
-  changelog: "3.2: Karpathy re-compressed (3.81→2.4KB) · 3.1: prior"
 ---
 <!-- karpathy-compressed: 2026-07-10 -->
 # Context Watchdog

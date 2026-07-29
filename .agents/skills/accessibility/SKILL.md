@@ -1,13 +1,7 @@
-﻿---
+---
 name: accessibility
 description: "WCAG 2.2 + EAA 2025 — audit and improve web accessibility."
 triggers: "a11y, accessibility, WCAG, screen reader, keyboard navigation, EAA, European Accessibility Act, contrast, focus, touch target"
-license: MIT
-metadata:
-  tags: [accessibility]
-  author: web-quality-skills + gentleman-vMK
-  version: "2.0"
-  changelog: "2.0: EAA 2025, touch 44×44px, focus 2px, theme-switch contrast, Karpathy compressed (5.5→3.0KB)"
 ---
 <!-- karpathy-compressed: 2026-07-09 -->
 ## POUR — Perceivable | Operable | Understandable | Robust

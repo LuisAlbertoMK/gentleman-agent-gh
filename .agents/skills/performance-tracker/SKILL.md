@@ -2,12 +2,6 @@
 name: performance-tracker
 description: "Score and track app performance — 6 dims, continuous scoring, trend analysis"
 triggers: "performance score, mobile perf, desktop perf, rendimiento, app score, lighthouse, benchmark"
-license: Apache-2.0
-metadata:
-  tags: [engineering]
-  author: gentleman-vMK
-  version: "1.3"
-  changelog: "1.3: karpathy compress"
 ---
 ## Scope
 App PERFORMANCE (not agent — use `auto-metrics`). Mobile (Android/iOS), Desktop (Win/Mac/Linux), Web.

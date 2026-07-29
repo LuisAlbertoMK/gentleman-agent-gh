@@ -2,13 +2,6 @@
 name: subagent-isolation
 description: "Maintain clean context boundaries between delegated agents — prevent hallucination cascades, cross-contamination, and enforce error isolation"
 triggers: "Subagent isolation, context boundaries"
-license: Apache-2.0
-metadata:
-  tags:
-    - engineering
-  author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.0->1.1 (Karpathy compress: 3026->1680B)"
 ---
 
 ## Isolation Rules

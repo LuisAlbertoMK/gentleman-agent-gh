@@ -2,12 +2,6 @@
 name: senior-engineer
 description: "Apply senior engineering competencies — system design, trade-off analysis, delegation, mentoring, and tech debt strategy"
 triggers: "Senior architect, trade-offs, system design"
-license: Apache-2.0
-metadata:
-  tags: [engineering]
-  author: gentleman-vMK
-  version: "1.3"
-  changelog: "1.3: initial tracked version"
 ---
 <!-- karpathy-compressed: 2026-07-10 -->
 

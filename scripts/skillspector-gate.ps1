@@ -141,7 +141,7 @@ if ($dockerOk) {
 # --- Neither available ---
 if(-not $Quiet) {
   Write-Host "⚪ SkillSpector not installed — skipping"
-  Write-Host "   CLI: pip install git+https://github.com/NVIDIA/SkillSpector.git"
+  Write-Host "   CLI: pip install git+https://github.com/NVIDIA/SkillSpector.git@v2.5.0"
   Write-Host "   Docker: docker build -t skillspector . (from repo clone)"
 }
 if ($Strict) {

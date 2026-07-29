@@ -2,12 +2,6 @@
 name: web-quality-audit
 description: "Comprehensive web audit: performance, a11y, SEO, responsive, animation, design tokens."
 triggers: "audit, review web quality, lighthouse, page quality, optimize website, design audit, ui audit, web audit, site review"
-license: MIT
-metadata:
-  tags: [engineering]
-  author: web-quality-skills + gentleman-vMK
-  version: "3.1"
-  changelog: "3.1: Breaker fixes — removed '200+' claim, fixed CI/CD cross-platform, added prerequisites, expanded best practices. 3.0: Added workflow, CI/CD, output format"
 ---
 ## Prerequisites
 Target site must be **running and accessible** before audit. For local dev, start server first. For production, ensure URL is publicly accessible (no auth/CAPTCHA/WAF blocking).

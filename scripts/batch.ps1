@@ -60,7 +60,14 @@ $today = Get-Date -Format "yyyy-MM-dd"
 
 try {
     $entry = "$today - Batch $($nextBatch): $Description"
-    $existingContent = Get-Content -LiteralPath $bitacoraPath -Raw
+    $existingLines = Get-Content -LiteralPath $bitacoraPath
+    # Dedup guard: skip if entry already exists
+    $isDup = ($existingLines | Where-Object { $_.Trim() -eq $entry.Trim() } | Select-Object -First 1) -ne $null
+    if ($isDup) {
+        Write-Warning "Batch entry already exists, skipping: $entry"
+        return
+    }
+    $existingContent = $existingLines -join "`r`n"
     $newContent = "$entry`r`n$existingContent"
     Set-Content -LiteralPath $bitacoraPath -Value $newContent -Encoding UTF8
 

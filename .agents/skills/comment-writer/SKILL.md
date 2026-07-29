@@ -2,11 +2,6 @@
 name: comment-writer
 description: "Write warm, direct collaboration comments. Trigger: PR feedback, issue replies, reviews, Slack messages, or GitHub comments."
 triggers: "comments, PR feedback, review comment, GitHub comment, write feedback"
-license: Apache-2.0
-metadata:
-  author: gentleman-programming
-  version: "1.0"
-  changelog: "1.0: initial tracked version"
 ---
 
 ## When to Use

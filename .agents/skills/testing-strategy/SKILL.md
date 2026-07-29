@@ -2,13 +2,6 @@
 name: testing-strategy
 description: "Test strategy & planning — pyramid analysis, coverage gaps, risk-based prioritization, test debt assessment, ROI-driven test investment."
 triggers: "testing strategy, test plan, test coverage, test pyramid, test debt, test gap, test priority, test audit, quality strategy, what to test, how to test"
-license: Apache-2.0
-metadata:
-  tags: [testing, quality, strategy, planning]
-  author: gentleman-vMK
-  version: "1.0"
-  changelog: "1.0: initial — pyramid analysis, coverage gaps, test debt, risk-based prioritization"
-  dependencies: [quality-gate, code-review-agent]
 ---
 
 # Testing Strategy

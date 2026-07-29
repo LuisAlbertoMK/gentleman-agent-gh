@@ -2,12 +2,6 @@
 name: recovery-protocol
 description: "Stop-diagnose-correct-learn protocol — handle agent errors and frustration systematically"
 triggers: "Recovery, 'no es eso', frustration, error correction"
-license: Apache-2.0
-metadata:
-  tags: [engineering]
-  author: gentleman-vMK
-  version: "1.2"
-  changelog: "1.2: karpathy compress"
 ---
 Trigger: "ya te dije", "no es eso", "no funciona", "otra vez", "wrong", "not what I asked", repeated correction 2x.
 ## Protocol

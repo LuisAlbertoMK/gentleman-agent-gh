@@ -2,12 +2,6 @@
 name: code-generation
 description: "Trigger: new file, new function, code generation, script, boilerplate, scaffold. Write code matching codebase patterns."
 triggers: "new file, new function, code generation, script, boilerplate, scaffold, create code, write code"
-license: Apache-2.0
-metadata:
-  tags: [engineering, code-gen]
-  author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.1: added quality floor, file selection heuristic, disambiguation with quick-executor"
 ---
 ## WHEN: New files, new functions, scripts, boilerplate. NOT for debugging (→ deep-debugging) or single-line fixes on existing files (→ quick-executor).
 

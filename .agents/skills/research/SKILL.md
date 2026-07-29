@@ -2,13 +2,6 @@
 name: research
 description: "Structured research workflow for technical investigations — define scope, gather evidence, synthesize findings, document decisions"
 triggers: "Research task, technical investigation, investigar, research, learn new tech, compare solutions, evaluate options"
-license: Apache-2.0
-metadata:
-  tags:
-    - engineering
-  author: gentleman-vMK
-  version: "1.0"
-  changelog: "1.0: initial tracked version"
 ---
 
 Structured research: scope, gather, synthesize, decide.

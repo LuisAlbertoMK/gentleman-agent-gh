@@ -2,12 +2,6 @@
 name: security-scanner
 description: "Pre-commit security scan — detect secrets, injection patterns, dependency vulnerabilities, supply chain risks, and dangerous API usage"
 triggers: "Security, seguridad, vulnerabilidad, auditar, safe check, harden"
-license: Apache-2.0
-metadata:
-  tags: [security]
-  author: gentleman-vMK
-  version: "1.3"
-  changelog: "1.3: dedup LLM section → ref llm-security · 1.2: added supply chain, API security · 1.1: initial tracked version"
 ---
 ## WHEN: Before committing sensitive code, deploying, or user asks "is this secure"
 ## SCAN DIMENSIONS

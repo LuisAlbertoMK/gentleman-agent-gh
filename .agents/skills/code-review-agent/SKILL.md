@@ -2,12 +2,6 @@
 name: code-review-agent
 description: "4R code review — Risk/Readability/Reliability/Resilience with evidence gates and actionable fixes"
 triggers: "Code review, CR, revisar código, criticar"
-license: Apache-2.0
-metadata:
-  tags: [engineering, review]
-  author: gentleman-vMK
-  version: "2.3"
-  changelog: "2.3: enriched with full 4R output example, adaptive profile flow, BLOCKER evidence chain"
 ---
 
 4R framework: each R scored independently, synthesized into verdict with fixes.

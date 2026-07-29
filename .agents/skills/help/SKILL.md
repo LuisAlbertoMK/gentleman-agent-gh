@@ -2,11 +2,6 @@
 name: help
 description: Explain Ralph Loop plugin and available commands
 triggers: "help, ralph help, commands, available commands, what can you do, /help"
-license: MIT
-metadata:
-  author: gentleman-vMK
-  version: "1.0"
-  changelog: "1.0: initial tracked version"
 ---
 
 # Ralph Loop Help

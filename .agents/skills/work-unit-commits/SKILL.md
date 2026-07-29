@@ -2,11 +2,6 @@
 name: work-unit-commits
 description: "Plan commits as reviewable work units."
 triggers: "work unit, commit splitting, commit organization, reviewable commits, split commit, stacked PR, chained PR commits"
-license: Apache-2.0
-metadata:
-  author: gentleman-programming
-  version: "1.0"
-  changelog: "1.0: initial tracked version"
 ---
 
 ## When

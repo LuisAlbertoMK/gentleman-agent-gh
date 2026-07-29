@@ -2,12 +2,6 @@
 name: ui-engine
 description: "UI system — Grid/Flexbox/@layer/:has(), container queries, compositor-only animation, OKLCH tokens, component patterns"
 triggers: "ui, layout, responsive, animation, design tokens, css, grid, flexbox, container query, dark mode, component layout, page layout, component patterns, hooks, compound components, state management"
-license: MIT
-metadata:
-  tags: [frontend, ui, css, architecture]
-  author: gentleman-vMK
-  version: "8.0"
-  changelog: "8.0: Added §5 Component Patterns. 7.1: Breaker fixes"
 ---
 # UI Engine
 

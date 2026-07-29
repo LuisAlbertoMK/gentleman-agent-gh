@@ -1,13 +1,7 @@
-﻿---
+---
 name: engram-protocol
 description: "Persistent memory protocol — save, search, dreaming, session lifecycle via Engram MCP"
 triggers: "remember, recall, engram, mem_save, mem_search, session close, dreaming, memory, token budget, compression, L1 L2 L3, capture pipeline, project score, bias calibration"
-license: MIT
-metadata:
-  tags: [memory, persistence, engram, protocol]
-  author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.1: Compressed 5.2→3KB. 1.0: Extracted from AGENTS.md"
 ---
 
 # Engram Persistent Memory — Protocol

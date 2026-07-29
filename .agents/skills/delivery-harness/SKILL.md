@@ -2,15 +2,6 @@
 name: delivery-harness
 description: "Orchestrate multi-agent work — break goals into work units, delegate with isolation, collect results, handle failures"
 triggers: "Coordinate, orchestrate, multi-agent, delegate work"
-license: Apache-2.0
-metadata:
-  tags:
-    - engineering
-    - coordination
-  author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.1: declared dependency on subagent-isolation"
-  dependencies: [subagent-isolation]
 ---
 
 Trigger: Multi-step tasks, parallel subagent work, complex deliverables.

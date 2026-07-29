@@ -2,11 +2,6 @@
 name: ralph-loop
 description: Start Ralph Loop - auto-continues until task completion
 triggers: "ralph, ralph loop, auto-continue, iterative loop, /ralph-loop, continuous task, autonomous loop"
-license: MIT
-metadata:
-  author: gentleman-vMK
-  version: "1.0"
-  changelog: "1.0: initial tracked version"
 ---
 
 # Ralph Loop

@@ -2,15 +2,6 @@
 name: visual-testing
 description: "Visual verification — screenshots, visual regression, UI bug detection"
 triggers: "screenshot, visual diff, visual bug, regression test, VRT, UI broken, text overflow, layout shift, responsive test, visual regression"
-license: Apache-2.0
-metadata:
-  tags: [testing, ui, visual]
-  author: gentleman-vMK
-  version: "2.1"
-  changelog: "2.1: Breaker fixes — removed Peek-MCP reference, fixed flaky test advice, added config scaffold, dynamic content strategy. 2.0: Added baseline management, thresholds"
-  dependencies: [command-wrapper]
-  env:
-    GENTLEMAN_AGENT_ROOT: "Repo root"
 ---
 
 ## Tools

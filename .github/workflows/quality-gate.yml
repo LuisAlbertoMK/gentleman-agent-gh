@@ -144,7 +144,7 @@ jobs:
           extra_args: --only-verified --fail --exclude-globs '.learnings/*,.backup-*/**'
 
       - name: SkillSpector — install
-        run: pip install git+https://github.com/NVIDIA/SkillSpector.git --quiet || echo "SkillSpector install failed"
+        run: pip install git+https://github.com/NVIDIA/SkillSpector.git@v2.5.0 --quiet || echo "SkillSpector install failed"
 
       - name: SkillSpector security gate
         continue-on-error: false

@@ -2,12 +2,6 @@
 name: container-security
 description: "Trigger: Dockerfile, docker-compose, container, image, Kubernetes, k8s, pod, deployment, helm. Audit container security and orchestration hardening."
 triggers: "Dockerfile, docker-compose, container, image, Kubernetes, k8s, pod, deployment, helm, docker, orchestration"
-license: Apache-2.0
-metadata:
-  tags: [security, infrastructure]
-  author: gentleman-vMK
-  version: "1.2"
-  changelog: "1.2: compression + breaker fixes retained · 1.1: breaker fixes · 1.0: initial"
 ---
 ## WHEN: Reviewing Dockerfiles, docker-compose, K8s manifests, Helm charts, or "is this container secure"
 

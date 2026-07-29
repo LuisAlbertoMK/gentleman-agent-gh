@@ -2,12 +2,6 @@
 name: gap-analysis
 description: "Complete gap analysis — 8-dim quality framework, project intake, priority scoring"
 triggers: "Gap analysis, system audit, identificar gaps, project intake"
-license: Apache-2.0
-metadata:
-  tags: [engineering]
-  author: gentleman-vMK
-  version: "2.3"
-  changelog: "2.3: further karpathy compress for budget"
 ---
 ## Intake: Classify Tech (Frontend|Backend|DB|Mobile|Desktop|Infra|Full-stack) | Biz (SaaS|ERP|E-com|CMS|API|Web|Desktop|Mobile). Verify: ROADMAP.md | git log | PRD/requirements/spec | README | tests/__tests__/spec | CI/CD config | monitoring
 ## 8 Dims (1-10): 9-10=Leading | 7-8=Minor | 5-6=Needs attention | 3-4=Systemic | 1-2=Rebuild

@@ -2,13 +2,6 @@
 name: triple-verify
 description: "Triple verification — 3 enfoques, thresholds por zona, modos !ship/!fast/!draft"
 triggers: "Triple verify, triangulate, 3 enfoques, !ship, !listo, !fast, !draft"
-license: Apache-2.0
-metadata:
-  tags: [engineering, quality]
-  author: gentleman-vMK
-  version: "1.2"
-  changelog: "1.2: karpathy compress"
-  dependencies: [quality-gate, code-review-agent, commit-crafter]
 ---
 ## Zones
 Zones, thresholds, verify depth defined in `review-rules.jsonc`.

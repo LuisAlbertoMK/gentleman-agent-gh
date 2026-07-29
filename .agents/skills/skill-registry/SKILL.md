@@ -2,13 +2,6 @@
 name: skill-registry
 description: "Build and maintain skill registry — scan skill directories, deduplicate across sources, compact rules, and persist to engram"
 triggers: "Skill registry, catalog"
-license: MIT
-metadata:
-  tags:
-    - engineering
-  author: gentleman-vMK
-  version: "1.0"
-  changelog: "1.0: initial tracked version"
 ---
 
 Trigger: "update skills", after install/remove skills.

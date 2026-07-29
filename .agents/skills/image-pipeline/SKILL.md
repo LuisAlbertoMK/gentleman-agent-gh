@@ -2,15 +2,6 @@
 name: image-pipeline
 description: "Image optimization — compress, convert WebP/AVIF, resize, describe"
 triggers: "compress image, optimize image, resize image, convert webp, convert avif, describe image, image too heavy, slow images, image bug"
-license: Apache-2.0
-metadata:
-  tags: [performance, images, optimization]
-  author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.1: Karpathy compression (<2.5KB)"
-  dependencies: [command-wrapper, performance]
-  env:
-    GENTLEMAN_AGENT_ROOT: "Repo root"
 ---
 
 ## Tools

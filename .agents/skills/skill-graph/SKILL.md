@@ -2,12 +2,6 @@
 name: skill-graph
 description: "Sparse loading — resolve only relevant skills + dependencies, digest per context budget"
 triggers: "sparse loading, skill resolution, relevant skills, which skill, skill-graph"
-license: Apache-2.0
-metadata:
-  tags: [engineering]
-  author: gentleman-vMK
-  version: "2.1"
-  changelog: "2.0→2.1: Karpathy compress (2525→1680B)"
 ---
 ## RESOLVE
 ```powershell

@@ -2,15 +2,6 @@
 name: development-mode
 description: "System resource prioritization — RAM/CPU/GPU/file I/O optimization. NOT task execution mode (see execution-mode)."
 triggers: "modo desarrollo, dev mode, development mode, performance mode, resource priority"
-license: Apache-2.0
-metadata:
-  tags: [tools]
-  author: gentleman-vMK
-  version: "1.3"
-  changelog: "1.3: parametrized script paths via GENTLEMAN_AGENT_ROOT"
-  dependencies: []
-  env:
-    GENTLEMAN_AGENT_ROOT: "Repo root — all script paths are relative to this"
 ---
 ## Complementary: opencode-skillful (-30-50%) · opencode-dcp (-50-70%) · context-mode (-98%) · opencode-lazy-loader
 ## Activate (on user approval)

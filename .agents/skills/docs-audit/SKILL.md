@@ -2,12 +2,6 @@
 name: docs-audit
 description: "Trigger: documentation audit, README audit, API docs, onboarding docs, Diátaxis, docs completeness. Audit documentation quality and accuracy."
 triggers: "documentation audit, README audit, API docs, onboarding docs, Diátaxis, docs completeness, docs review, doc audit"
-license: Apache-2.0
-metadata:
-  tags: [documentation, quality]
-  author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.1: accuracy before completeness, link checking, Diátaxis operationalized, CHANGELOG/CONTRIBUTING/LICENSE"
 ---
 ## WHEN: Reviewing documentation quality, README files, API docs, onboarding. If no docs → report and stop.
 

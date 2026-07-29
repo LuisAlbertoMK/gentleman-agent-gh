@@ -2,12 +2,6 @@
 name: seo
 description: "Search engine visibility & ranking — technical SEO, on-page, structured data, E-E-A-T, AI Overviews"
 triggers: "seo, search engine, meta tags, structured data, sitemap, search optimization, ranking, schema, robots.txt, meta description, EEAT, E-E-A-T, AI Overview, SGE, AI Mode, generative search, AEO, GEO, INP, Google Core Update, GA4, topical authority, content cluster"
-license: MIT
-metadata:
-  tags: [growth]
-  author: web-quality-skills + gentleman-vMK
-  version: "3.1"
-  changelog: "3.1: Compressed ~50% (Karpathy), all content preserved. 3.0: AI Overviews/SGE/AI Mode, E-E-A-T, INP, ProfilePage schema, llms.txt corrected per Google 2026 guide."
 ---
 
 **WHEN**: SEO audit, meta/review, structured data, sitemap/robots.txt, ranking, Core Update response, AI Overviews, E-E-A-T, content clusters, CWV/INP.  

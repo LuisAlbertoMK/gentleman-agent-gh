@@ -191,7 +191,7 @@
   },
   "compaction": {
     "prune": true,
-    "reserved": 8000
+    "reserved": 4000
   },
   "tools": {
     "codebase-memory*": false,
@@ -361,8 +361,7 @@
           "telnet *": "deny",
           "Test-NetConnection *": "deny",
           "wget *": "deny",
-          "wsl *": "deny"
-        }
+          "wsl *": "deny"}
       },
       "tools": {
         "codebase-memory*": true,
@@ -458,8 +457,7 @@
           "telnet *": "deny",
           "Test-NetConnection *": "deny",
           "wget *": "deny",
-          "wsl *": "deny"
-        }
+          "wsl *": "deny"}
       }
     },
     "gentleman-codex": {
@@ -554,8 +552,7 @@
           "telnet *": "deny",
           "Test-NetConnection *": "deny",
           "wget *": "deny",
-          "wsl *": "deny"
-        }
+          "wsl *": "deny"}
       },
       "tools": {
         "codebase-memory*": true
@@ -744,8 +741,7 @@
           "telnet *": "deny",
           "Test-NetConnection *": "deny",
           "wget *": "deny",
-          "wsl *": "deny"
-        }
+          "wsl *": "deny"}
       },
       "tools": {
         "codebase-memory*": true
@@ -963,8 +959,7 @@
           "telnet *": "deny",
           "Test-NetConnection *": "deny",
           "wget *": "deny",
-          "wsl *": "deny"
-        }
+          "wsl *": "deny"}
       },
       "mode": "primary"
     },
@@ -990,6 +985,11 @@
     "context-mode",
     "opencode-ralph-loop",
     "opencode-lazy-loader",
-    "opencode-personality"
-  ]
+    "opencode-personality",
+    "token-optimizer-opencode"
+  ],
+  "tool_output": {
+    "max_bytes": 4096,
+    "max_lines": 100
+  }
 }

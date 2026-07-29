@@ -2,13 +2,6 @@
 name: immune-system
 description: "Permanent immunity against repeated errors — detect, diagnose, document to anti-pattern catalog, immunize in AGENTS.md rules"
 triggers: "Immune System, anti-pattern, permanent immunity"
-license: Apache-2.0
-metadata:
-  tags:
-    - engineering
-  author: gentleman-vMK
-  version: "1.2"
-  changelog: "1.1->1.2 (Karpathy compress: 2755->1700B)"
 ---
 
 ## Protocol — Every failure = asset. Once documented -> permanent immunity.

@@ -2,12 +2,6 @@
 name: auth-hardening
 description: "Trigger: auth, authentication, authorization, JWT, OAuth, RBAC, CSRF, session, login, password hashing. Audit and harden authentication and authorization."
 triggers: "auth, authentication, authorization, JWT, OAuth, RBAC, CSRF, session, login, password hashing, token, cookie"
-license: Apache-2.0
-metadata:
-  tags: [security]
-  author: gentleman-vMK
-  version: "1.4"
-  changelog: "1.4: compression + breaker fixes retained · 1.3: breaker fixes · 1.0: initial"
 ---
 ## WHEN: Reviewing auth flows, login/signup, token handling, RBAC, or "is this auth secure"
 

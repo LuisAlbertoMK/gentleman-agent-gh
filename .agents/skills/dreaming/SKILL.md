@@ -2,12 +2,6 @@
 name: dreaming
 description: "Cross-session pattern extraction via Engram. Run via !dream — not automatic."
 triggers: "!dream, dreaming, patrones, memory review, session end, !close, pattern extraction"
-license: Apache-2.0
-metadata:
-  tags: [engineering]
-  author: gentleman-vMK
-  version: "1.6"
-  changelog: "1.6: auto-dream trigger on session close / 10th error. 1.5: karpathy compress. 1.4: added auto-pattern-detector + learning-stats."
 ---
 ## TRIGGER
 Only on explicit request (`!dream`) or user asking. Recommended weekly or after milestone.

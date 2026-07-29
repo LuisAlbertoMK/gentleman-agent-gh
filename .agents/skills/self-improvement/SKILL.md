@@ -2,13 +2,6 @@
 name: self-improvement
 description: "Continuous improvement cycle — macro (cycle) + micro (per-task). Merge of self-reflection. inter(30) minimum. SkillOpt-style gated validation."
 triggers: "Self-improvement, improvement cycle, auto-mejora, ciclo de mejora, comienza ciclo, self-reflection, Hermes, reflexioná"
-license: Apache-2.0
-metadata:
-  tags: [system, improvement, cicd, skillopt, learning]
-  author: gentleman-vMK
-  version: "2.0"
-  changelog: "2.0: merged self-reflection (per-task loop), expanded triggers"
-  dependencies: [triple-verify, quality-gate, bitacora, engram-protocol, commit-crafter]
 ---
 ## MACRO (cycle-level) — "comienza ciclo de auto-mejora"
 1st: READ CYCLE.md. Then: Pre-Flight → Diagnose → SkillOpt Gate (per fix) → Verify → Learn → Propagate → Epoch Review.

@@ -2,14 +2,6 @@
 name: adversarial-breaker
 description: "Adversarial verification protocol — orchestrator loads this skill to run fixer→breaker chain. Breaker is an independent offensive agent."
 triggers: "adversarial, breaker, !breaker, verify fix, romper, verificar fix, try to break, offensive verification"
-license: Apache-2.0
-metadata:
-  tags: [engineering, verification, adversarial]
-  author: gentleman-vMK
-  version: "3.3"
-  changelog: "3.3: Token-save skip — <10 line config-only diffs skip breaker. Pre-regression check — stash+test before launch catches broken builds. Versionable surface — `.agents/attack-surface.{project}.md` override. Test case generation — FAIL attacks produce reproducible test cases via Engram"
-  dependencies: [subagent-isolation, engram-protocol]
-  config_refs: review-rules.jsonc
 ---
 
 # Adversarial Breaker

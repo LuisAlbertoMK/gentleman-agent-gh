@@ -1,13 +1,7 @@
-﻿---
+---
 name: performance
 description: "Web performance — CWV/INP, compositor animation, scroll-driven, content-visibility."
 triggers: "performance, speed up, load time, slow loading, page speed, performance audit, INP, animation performance, scroll performance, compositor"
-license: MIT
-metadata:
-  tags: [performance]
-  author: web-quality-skills + gentleman-vMK
-  version: "2.4"
-  changelog: "2.4: Karpathy re-compressed (3.06→2.4KB) · 2.3: prior"
 ---
 <!-- karpathy-compressed: 2026-07-10 -->
 

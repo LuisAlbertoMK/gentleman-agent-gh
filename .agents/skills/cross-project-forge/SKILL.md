@@ -1,12 +1,6 @@
 ---
 name: cross-project-forge
 description: "Manual pipeline to promote a recurring pattern to an auto-generated skill — triggered when a pattern hits its severity threshold."
-license: Apache-2.0
-metadata:
-  tags: [engineering, meta]
-  author: gentleman-vMK
-  version: "1.0"
-  changelog: "1.0: F2 — manual forge pipeline, quality gates documented"
 triggers: "forge, promote pattern, auto-skill, forjar, convertir patrón, skill desde patrón, cross-project-forge"
 ---
 

@@ -2,13 +2,6 @@
 name: server-commands
 description: "Run long-lived server processes safely — dev-server.ps1, port detection, background management"
 triggers: "server, ng serve, npm run dev, dotnet run, python -m http.server, dev server, background process, long-lived, !dev"
-license: Apache-2.0
-metadata:
-  tags: [devops, workflow]
-  author: gentleman-vMK
-  version: "1.0"
-  changelog: "1.0: extracted from AGENTS.md"
-  dependencies: [bash-safe]
 ---
 
 Commands like `ng serve`, `npm run dev`, `dotnet run`, `python -m http.server`

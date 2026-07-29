@@ -1,13 +1,7 @@
-﻿---
+---
 name: lean-context
 description: "Unified compression levels — LEAN, ULTRA, and CAVEMAN modes for token-efficient responses"
 triggers: "Ultra-lean default, compact responses, caveman, /caveman"
-license: Apache-2.0
-metadata:
-  tags: [engineering]
-  author: gentleman-vMK
-  version: "2.1"
-  changelog: "2.0→2.1: Karpathy compress (3001→1850B)"
 ---
 
 LEAN/ULTRA: default. CAVEMAN: on-demand. Trigger: "stop caveman" → LEAN. New session → default.

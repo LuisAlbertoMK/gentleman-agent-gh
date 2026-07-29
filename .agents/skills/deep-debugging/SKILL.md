@@ -2,12 +2,6 @@
 name: deep-debugging
 description: "Trigger: deep debug, root cause, hypothesis, multi-file bug, ambiguous failure. Hypothesis-driven debugging methodology."
 triggers: "deep debug, root cause, hypothesis, multi-file bug, ambiguous failure, debug, RCA"
-license: Apache-2.0
-metadata:
-  tags: [engineering, debugging]
-  author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.1: removed architecture/refactor triggers, added tool escalation, runtime testing, context checkpoint"
 ---
 ## WHEN: Multi-file bugs, ambiguous failures. NOT for 1-file edits (→ quick-executor), architecture decisions (→ senior-engineer), or refactors (→ refactoring-planner).
 

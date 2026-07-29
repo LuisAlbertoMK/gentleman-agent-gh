@@ -2,13 +2,6 @@
 name: api-testing
 description: "API endpoint testing — REST + GraphQL contract validation, schema assertion, collection testing, response validation, auth flows, mock integration."
 triggers: "api testing, API test, REST test, GraphQL test, endpoint test, contract test, schema validation, response validation, auth test, API mock, collection test, Postman, Bruno, insomnia, OpenAPI validation"
-license: Apache-2.0
-metadata:
-  tags: [testing, api, quality, backend]
-  author: gentleman-vMK
-  version: "1.0"
-  changelog: "1.0: initial — REST + GraphQL, schema validation, auth flow testing"
-  dependencies: [e2e-testing, quality-gate]
 ---
 
 # API Testing

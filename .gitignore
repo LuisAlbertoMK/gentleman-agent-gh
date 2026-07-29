@@ -128,3 +128,6 @@ credentials.json
 scripts/skill-registry.json.backup-session-*/
 scripts/skill-registry.json
 .backup-session-20260705-150321/
+
+# Archived stale documentation
+.archive/

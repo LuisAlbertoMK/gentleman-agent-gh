@@ -2,11 +2,6 @@
 name: opencode-skill-creator
 description: "Create, test, evaluate, and iterate OpenCode skills with mandatory intake interview."
 triggers: "create skill, edit skill, opencode skill, skill eval, evaluate prompt, benchmark skill, iterate skill, skill testing, skill creation"
-license: MIT
-metadata:
-  author: gentleman-vMK
-  version: "1.0"
-  changelog: "1.0: initial tracked version"
 ---
 <!-- karpathy-compressed: 2026-07-09 -->
 Loop: Decide → Draft → Test prompts → Run (with-skill & baseline) → Review → Iterate → Install.

@@ -2,12 +2,6 @@
 name: perf-profiling
 description: "Trigger: performance profiling, slow queries, N+1, memory leak, CPU hotspot, profiling, query optimization. Performance audit with measurement."
 triggers: "performance profiling, slow queries, N+1, memory leak, CPU hotspot, profiling, query optimization"
-license: Apache-2.0
-metadata:
-  tags: [performance, engineering]
-  author: gentleman-vMK
-  version: "1.1"
-  changelog: "1.1: added measurement tools, network/concurrency dimensions, modern ORM patterns"
 ---
 ## WHEN: Performance profiling, slow queries, memory leaks, CPU bottlenecks. If no performance issue → report and stop.
 

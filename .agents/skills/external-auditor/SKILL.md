@@ -1,13 +1,6 @@
 ---
 name: external-auditor
 description: "Blind second-opinion audit via subagent. Run with !audit — not automatic."
-license: Apache-2.0
-metadata:
-  tags: [engineering, quality]
-  author: gentleman-vMK
-  version: "1.3"
-  changelog: "1.3: merged bias-calibration into Bias Calibration section"
-  dependencies: [auto-metrics]
 triggers: "!audit, external audit, blind review, 'second opinion', 'verificá mi auto-score'"
 ---
 ## TRIGGER

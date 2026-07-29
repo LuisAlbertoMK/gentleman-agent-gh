@@ -2,13 +2,6 @@
 name: best-practices
 description: Apply modern web development best practices for security, compatibility, and code quality.
 triggers: "best practices, security audit, modernize code, code quality, check vulnerabilities"
-license: MIT
-metadata:
-  tags:
-    - engineering
-  author: web-quality-skills
-  version: "1.2"
-  changelog: "1.2: initial tracked version"
 ---
 # Best practices — modern web dev standards
 ## Security

@@ -2,11 +2,6 @@
 name: issue-creation
 description: "Create Gentle AI issues with issue-first checks."
 triggers: "create issue, GitHub issue, bug report, feature request, open issue, issue creation, report bug"
-license: Apache-2.0
-metadata:
-  author: gentleman-programming
-  version: "1.0"
-  changelog: "1.0: initial tracked version"
 ---
 
 ## When to Use

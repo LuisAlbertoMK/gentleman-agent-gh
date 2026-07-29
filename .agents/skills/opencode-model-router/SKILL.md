@@ -2,12 +2,6 @@
 name: opencode-model-router
 description: "Route tasks by model strength — specialized agents for analysis, implementer for execution"
 triggers: "model router, routing, delegate or direct, model decision, specialized agent, implementer"
-license: Apache-2.0
-metadata:
-  tags: [engineering, routing, orchestration, multi-model]
-  author: gentleman-vMK
-  version: "3.0"
-  changelog: "3.0: initial tracked version"
 ---
 
 ## ⚠️ SECURITY GATE (always first)

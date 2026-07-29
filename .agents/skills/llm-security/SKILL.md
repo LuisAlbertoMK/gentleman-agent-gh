@@ -2,12 +2,6 @@
 name: llm-security
 description: "Trigger: LLM, AI, prompt injection, RAG, OpenAI, Anthropic, Ollama, LangChain, agent, tool use, data exfiltration. Audit LLM integration security."
 triggers: "LLM, AI, prompt injection, RAG, OpenAI, Anthropic, Ollama, LangChain, agent, tool use, data exfiltration, model"
-license: Apache-2.0
-metadata:
-  tags: [security, ai]
-  author: gentleman-vMK
-  version: "1.4"
-  changelog: "1.4: compression + breaker fixes retained · 1.3: breaker fixes · 1.0: initial"
 ---
 ## WHEN: Reviewing LLM integrations, AI features, RAG pipelines, or "is this LLM integration secure"
 

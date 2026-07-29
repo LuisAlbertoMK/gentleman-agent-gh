@@ -2,13 +2,6 @@
 name: external-improvement
 description: "5-phase improvement cycle for external projects — 3+ subagents per phase."
 triggers: "improve external project, mejora proyecto, proyecto externo, 5-phase cycle, ciclo 5 fases, analizá este proyecto, corré el ciclo, revisame el proyecto, !5fases, !extimprove, aplicá las 5 fases"
-license: Apache-2.0
-metadata:
-  tags: [improvement, external, analysis]
-  author: gentleman-vMK
-  version: "1.0"
-  changelog: "1.0: initial tracked version"
-  standalone: true
 ---
 
 ## 5-Phase Cycle

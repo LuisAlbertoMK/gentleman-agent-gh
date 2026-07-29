@@ -1,12 +1,6 @@
-﻿---
+---
 name: session-resume
 description: "Session continuity — save/restore state, git gate, sparse skill pre-load, Engram recall"
-license: Apache-2.0
-metadata:
-  tags: [engineering]
-  author: gentleman-vMK
-  version: "2.2"
-  changelog: "2.2: merged code-memory (Save State section + triggers)"
 triggers: "session resume, dónde lo dejamos, continuá, session start, code memory, memory, recordar, acordate, multi-session, donde quedamos, handoff"
 ---
 ## Gate

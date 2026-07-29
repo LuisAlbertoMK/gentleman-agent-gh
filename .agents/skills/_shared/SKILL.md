@@ -1,14 +1,7 @@
 ---
 name: _shared
 description: >
-  Internal shared references for SDD skills. Not an invokable skill.
 triggers: "none; shared library only"
-license: MIT
-metadata:
-  tags:
-    - engineering
-  author: gentleman-programming
-  version: "1.0"
 ---
 
 ## Purpose
