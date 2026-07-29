@@ -27,7 +27,7 @@ Suite of **79 skills** (+ `_shared`) + **91 PowerShell scripts** for [OpenCode](
 ## Features
 
 ### Multi-Agent Architecture
-22 agents total: main orchestrator (`gentleman-vMK`) + 12 specialists + 9 SDD pipeline agents:
+27 agents total: main orchestrator (`gentleman-vMK`) + 12 specialists + 9 SDD pipeline agents + 5 auto-mode variants:
 
 | Agent | Model | Specialty |
 |-------|-------|-----------|
@@ -44,6 +44,8 @@ Suite of **79 skills** (+ `_shared`) + **91 PowerShell scripts** for [OpenCode](
 | `gentleman-docs` | big-pickle | Technical writing, docs (FREE TIER) |
 | `gentleman-implementer` | deepseek-v4-flash-free | Plan executor (FREE TIER) |
 | `sdd-orchestrator` | claude-sonnet-4-6 | SDD pipeline orchestration |
+
+> **Auto-mode variants**: Each orchestrator agent (`gentleman-vMK`, `gentleman-deep`, `gentleman-quick`, `gentleman-codex`, `gentleman-implementer`) has a `-auto` variant (e.g. `gentleman-vMK-auto`) with `*: allow` permissions. Activated automatically when `.gentleman-mode` is `auto`. See [PROTOCOL.md](PROTOCOL.md) for mode behavior.
 
 #### SDD Pipeline Agents (subagents)
 9 agents executing SDD pipeline phases. **Inherit orchestrator model** (`claude-sonnet-4-6`, paid) unless they have explicit `model` in `opencode.json`. All have full permissions (`bash: allow, edit: allow, write: allow`).

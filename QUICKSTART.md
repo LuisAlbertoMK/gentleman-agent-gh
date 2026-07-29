@@ -6,7 +6,7 @@
 
 ## What is this?
 
-Gentleman Agent is an **AI software development team** with 22 specialized agents. Instead of a single chatbot, you get:
+Gentleman Agent is an **AI software development team** with 27 specialized agents (22 base + 5 auto-mode variants). Instead of a single chatbot, you get:
 
 Each agent loads from 1-5 of 92 specialized skills as needed.
 
