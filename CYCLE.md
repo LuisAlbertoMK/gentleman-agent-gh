@@ -10,6 +10,17 @@
 
 **Previous**: Cycle 27 — Deep audit, fix, and refactor del repo. **Result**: SUCCESS (10/10 backlog, score 9.1/10 → 6.2/10 post-close).
 
+### Backlog
+
+| # | Item | Impact | Risk | IR | Est | Status | Done Criteria |
+|---|------|--------|------|----|-----|--------|---------------|
+| 1 | Fix multiline pipeline bug in score-dims.ps1 (CC/BP dims) | High | Low | 3 | 30m | ✅ Done | `!score` reports CC>9, BP>9 |
+| 2 | Integration tests for score-auto.ps1 | Medium | Low | 2 | 1h | ✅ Done | `ScoreIntegration.Tests.ps1` with 11+ tests all pass |
+| 3 | Fix pre-commit hook numbering consistency | Low | Low | 1 | 15m | ✅ Done | Hook prints [1/12]–[12/12] |
+| 4 | Fix e2e pipeline tests (hook + execution state) | Medium | Low | 2 | 15m | ✅ Done | `e2e_pipeline.Tests.ps1` 24/24 pass |
+| 5 | Skill compression (>3KB skills) | Medium | Medium | 1 | 3h | 🔴 Pending | 0 skills >3KB, avg <2.0KB |
+| 6 | Compress/merge non-junction skills | Low | Medium | 0.5 | 2h | 🔴 Pending | 0 non-junction skills |
+
 ## Pilares
 1. **Script Performance** — reduce avg script size from 6.4KB to <5KB. Compress scripts >8KB. (✅ Cycle 8)
 2. **Score expansion** — implement sub-dimension taxonomy to break the 10.0 ceiling on key metrics. (✅ Cycle 8)

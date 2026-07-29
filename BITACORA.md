@@ -7,6 +7,42 @@
 2026-07-29 - Gate check
 2026-07-29 - Protected check
 2026-07-29 - Int test
+2026-07-29 - Branch test
+2026-07-29 - Non-quiet test
+2026-07-29 - Compact
+2026-07-29 - Dry run
+2026-07-29 - Added RBAC support
+2026-07-29 - Test
+2026-07-29 - Gate check
+2026-07-29 - Protected check
+2026-07-29 - Int test
+2026-07-29 - Branch test
+2026-07-29 - Non-quiet test
+2026-07-29 - Compact
+2026-07-29 - Dry run
+2026-07-29 - Added RBAC support
+2026-07-29 - Test
+2026-07-29 - Gate check
+2026-07-29 - Protected check
+2026-07-29 - Int test
+2026-07-29 - Branch test
+2026-07-29 - Non-quiet test
+2026-07-29 - Compact
+2026-07-29 - Dry run
+2026-07-29 - Added RBAC support
+2026-07-29 - Test
+2026-07-29 - Gate check
+2026-07-29 - Protected check
+2026-07-29 - Int test
+2026-07-29 - Branch test
+2026-07-29 - Non-quiet test
+2026-07-29 - Compact
+2026-07-29 - Dry run
+2026-07-29 - Added RBAC support
+2026-07-29 - Test
+2026-07-29 - Gate check
+2026-07-29 - Protected check
+2026-07-29 - Int test
 2026-07-29 - Post-save validation, injection guard adversarial testing, 14 skills enriched, permission mode infra, close-session gate
 2026-07-29 - Branch test
 2026-07-29 - Non-quiet test

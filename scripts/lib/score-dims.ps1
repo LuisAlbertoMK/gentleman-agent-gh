@@ -167,15 +167,18 @@ Add-Dimension "DC" ($math::Max(0, $math::Min(10, $dcScore))) @{
 $totalScripts = $scriptFiles.Count
 
 if ($hasScripts) {
-    $scriptStats = $scriptFiles | ForEach-Object {
-        $content = [IO.File]::ReadAllText($_.FullName)
-        [PSCustomObject]@{
+    # FOREACH (not ForEach-Object) avoids multiline pipeline parsing bug
+    # where pwsh misparses { ... } -ThrottleLimit and throws positional param error
+    $scriptStats = @()
+    foreach ($sf in $scriptFiles) {
+        $content = [IO.File]::ReadAllText($sf.FullName)
+        $scriptStats += [PSCustomObject]@{
             h = [bool]($content -match '<#')
             p = [bool]($content -match 'param\(')
             s = [bool]($content -match 'Set-StrictMode')
             t = [bool]($content -match 'try\s*\{')
         }
-    } -ThrottleLimit 7
+    }
 
     $scriptsWithHelp       = @($scriptStats | Where-Object { $_.h }).Count
     $scriptsWithParams     = @($scriptStats | Where-Object { $_.p }).Count
@@ -221,28 +224,25 @@ Add-Dimension "BP" $bpScore @{
 
 $corruptedFiles = 0
 if ($hasSkills) {
-    $corruptedFiles = @(
-        $skillMdFiles | ForEach-Object {
-        $file = $_
+    # FOREACH (not ForEach-Object) — avoids multiline pipeline parsing bug
+    foreach ($file in $skillMdFiles) {
         try {
             $bytes = [System.IO.File]::ReadAllBytes($file.FullName)
+            $isCorrupted = $false
             for ($i = 0; $i -lt $bytes.Length - 3; $i++) {
                 # Check for double-encoded UTF-8 (mojibake) patterns
                 if ($bytes[$i] -eq 0xC3 -and $bytes[$i + 1] -eq 0x83 -and $bytes[$i + 2] -ge 0x80) {
-                    $true; return
+                    $isCorrupted = $true; break
                 }
                 if ($bytes[$i] -eq 0xC3 -and $bytes[$i + 1] -eq 0xA2 -and
                     $i + 2 -lt $bytes.Length -and $bytes[$i + 2] -eq 0xE2 -and
                     ($bytes[$i + 3] -eq 0x80 -or $bytes[$i + 3] -eq 0x82)) {
-                    $true; return
+                    $isCorrupted = $true; break
                 }
             }
-            return $false
-        } catch {
-            $false
-        }
-    } -ThrottleLimit 4 | Where-Object { $_ }
-    ).Count
+            if ($isCorrupted) { $corruptedFiles++ }
+        } catch { }
+    }
 }
 
 if ($corruptedFiles -gt 10) {

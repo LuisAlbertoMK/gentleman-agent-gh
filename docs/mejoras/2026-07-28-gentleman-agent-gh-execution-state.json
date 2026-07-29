@@ -1,0 +1,56 @@
+{
+  "analysis": "2026-07-28-gentleman-agent-gh-analysis.md",
+  "summary": {
+    "done": 7,
+    "total": 7,
+    "failed": 0
+  },
+  "findings": [
+    {
+      "id": 1,
+      "finding": "validate-write-scope.ps1 sin tests",
+      "status": "done",
+      "files": ["scripts/tests/validate-write-scope.Tests.ps1"]
+    },
+    {
+      "id": 2,
+      "finding": "close-session.ps1 audit gate sin tests",
+      "status": "done",
+      "files": ["scripts/tests/close-session.Tests.ps1"]
+    },
+    {
+      "id": 3,
+      "finding": "destructive-scripts.Tests.ps1 engañoso",
+      "status": "done",
+      "files": ["scripts/tests/destructive-scripts.Tests.ps1"]
+    },
+    {
+      "id": 4,
+      "finding": "strict_tdd: true en 0 proyectos",
+      "status": "done",
+      "files": ["sdd-config.yaml"]
+    },
+    {
+      "id": 5,
+      "finding": "Pre-commit hook no ejecuta tests",
+      "status": "done",
+      "files": [".githooks/pre-commit"]
+    },
+    {
+      "id": 7,
+      "finding": "Cero -CodeCoverage en runner de tests",
+      "status": "done",
+      "files": ["scripts/run-tests.ps1"]
+    },
+    {
+      "id": 8,
+      "finding": "restore.ps1 y forge-rollback.ps1 destructivos sin tests",
+      "status": "done",
+      "files": [
+        "scripts/tests/restore.Tests.ps1",
+        "scripts/tests/forge-rollback.Tests.ps1"
+      ]
+    }
+  ],
+  "last_updated": "2026-07-29"
+}

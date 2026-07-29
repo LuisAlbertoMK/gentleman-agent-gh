@@ -117,10 +117,10 @@ Describe 'E2E: Security Gates' {
 # ============================================================
 Describe 'E2E: Pre-commit Hook' {
 
-    It 'hook has [11/11] Pester step' {
+    It 'hook has [12/12] Pester step' {
         $hookPath = Join-Path $script:ProjectRoot ".githooks/pre-commit"
         $hookPath | Should -Exist
-        Get-Content $hookPath -Raw | Should -Match '\[11/11\] Pester tests on staged'
+        Get-Content $hookPath -Raw | Should -Match '\[12/12\] Pester tests'
     }
 
     It 'hook Pester step uses Invoke-Pester and blocks on failure' {
@@ -130,10 +130,10 @@ Describe 'E2E: Pre-commit Hook' {
         $content | Should -Match 'no test files staged'
     }
 
-    It 'hook preserves all 10 original steps' {
+    It 'hook preserves all 12 steps' {
         $content = Get-Content (Join-Path $script:ProjectRoot ".githooks/pre-commit") -Raw
-        for ($i = 1; $i -le 10; $i++) {
-            $content | Should -Match "\[$i/10\]"
+        for ($i = 1; $i -le 12; $i++) {
+            $content | Should -Match "\[$i/12\]"
         }
     }
 }
