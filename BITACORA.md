@@ -1,3 +1,4 @@
+2026-07-29 - Token/context reduction: P0-P3 complete. frontmatter strip, deny-rules SSoT, dedup, archive ciclos + stale docs
 2026-07-29 - Session close
 2026-07-29 - Branch test
 2026-07-29 - Non-quiet test
