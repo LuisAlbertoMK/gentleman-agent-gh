@@ -6,9 +6,9 @@
 
 ## Objective
 
-**Cycle 27** (CLOSED): Deep audit, fix, and refactor del repo — syntax analysis, gap detection, cleanup, and applying verified fixes. **Result**: SUCCESS (10/10 backlog, score 9.1/10).
+**Cycle 28** (ACTIVE): Security hardening + quality recovery — implement findings from global analysis (2026-07-29). Restore 4 score dims at 0.0. Compress skills >3KB. **Target**: 6.2→7.5/10.
 
-**Next**: TBD — awaiting new cycle direction.
+**Previous**: Cycle 27 — Deep audit, fix, and refactor del repo. **Result**: SUCCESS (10/10 backlog, score 9.1/10 → 6.2/10 post-close).
 
 ## Pilares
 1. **Script Performance** — reduce avg script size from 6.4KB to <5KB. Compress scripts >8KB. (✅ Cycle 8)

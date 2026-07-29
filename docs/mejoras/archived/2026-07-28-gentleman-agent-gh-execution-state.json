@@ -1,0 +1,94 @@
+{
+  "project": "gentleman-agent-gh",
+  "analysis_source": "2026-07-28-gentleman-agent-gh-analysis.md",
+  "created_at": "2026-07-28T15:30:00Z",
+  "updated_at": "2026-07-28T16:15:00Z",
+  "current_phase": 4,
+  "findings": {
+    "#1": {
+      "title": "Tests para validate-write-scope.ps1 (regex security gate)",
+      "severity": "CRITICAL",
+      "phase": 1,
+      "status": "done",
+      "files": ["scripts/tests/validate-write-scope.Tests.ps1"],
+      "agent": "gentleman-deep",
+      "changes": ["scripts/tests/validate-write-scope.Tests.ps1"],
+      "verification": "26/26 Pester tests passed",
+      "error": null
+    },
+    "#2": {
+      "title": "Tests conductuales para close-session.ps1 (audit gate)",
+      "severity": "CRITICAL",
+      "phase": 1,
+      "status": "done",
+      "files": ["scripts/tests/close-session.Tests.ps1"],
+      "agent": "gentleman-deep",
+      "changes": ["scripts/tests/close-session.Tests.ps1"],
+      "verification": "43/43 Pester tests passed",
+      "error": null
+    },
+    "#3": {
+      "title": "Tests conductuales para restore.ps1 + forge-rollback.ps1",
+      "severity": "CRITICAL",
+      "phase": 1,
+      "status": "done",
+      "files": ["scripts/tests/restore.Tests.ps1", "scripts/tests/forge-rollback.Tests.ps1"],
+      "agent": "gentleman-deep",
+      "changes": ["scripts/tests/restore.Tests.ps1", "scripts/tests/forge-rollback.Tests.ps1"],
+      "verification": "7/7 restore + 11/11 forge-rollback Pester tests passed",
+      "error": null
+    },
+    "#4": {
+      "title": "Activar strict_tdd: true en proyecto raíz",
+      "severity": "HIGH",
+      "phase": 2,
+      "status": "done",
+      "files": ["sdd-config.yaml"],
+      "agent": "gentleman-quick",
+      "changes": ["sdd-config.yaml"],
+      "verification": "strict_tdd: true configured, persists across sessions",
+      "error": null
+    },
+    "#5": {
+      "title": "Agregar Invoke-Pester a .githooks/pre-commit",
+      "severity": "HIGH",
+      "phase": 2,
+      "status": "done",
+      "files": [".githooks/pre-commit"],
+      "agent": "gentleman-deep",
+      "changes": [".githooks/pre-commit"],
+      "verification": "[11/11] Pester step added — runs on staged .Tests.ps1 files, blocks on failure",
+      "error": null
+    },
+    "#6": {
+      "title": "Agregar -CodeCoverage a scripts/run-tests.ps1",
+      "severity": "MEDIUM",
+      "phase": 3,
+      "status": "done",
+      "files": ["scripts/run-tests.ps1"],
+      "agent": "gentleman-quick",
+      "changes": ["scripts/run-tests.ps1"],
+      "verification": "-CodeCoverage switch added, coverage summary output, <50% → exit 10",
+      "error": null
+    },
+    "#7": {
+      "title": "Migrar tests críticos a Mock/InModuleScope",
+      "severity": "MEDIUM",
+      "phase": 3,
+      "status": "done",
+      "files": ["scripts/tests/validate-write-scope.Tests.ps1"],
+      "agent": "gentleman-quick",
+      "changes": ["scripts/tests/validate-write-scope.Tests.ps1"],
+      "verification": "26/26 tests preserved, regex extraction removed, inline functions with Test- prefix",
+      "error": null
+    }
+  },
+  "summary": {
+    "total": 7,
+    "done": 7,
+    "failed": 0,
+    "in_progress": 0,
+    "pending": 0,
+    "skipped": 0
+  }
+}

@@ -262,6 +262,14 @@ function Test-SecurityValidation {
         @{ Name = "[SEC6] single quotes (bash syntax)"; Cmd = "echo 'hello world'" }
         @{ Name = "[SEC7] double quotes (bash syntax)"; Cmd = 'echo "hello world"' }
         @{ Name = "[SEC8] escaped dollar"; Cmd = 'echo \$HOME' }
+        @{ Name = "[SEC15] docker exec (subcommand, safe)"; Cmd = 'docker exec -it bash' }
+        @{ Name = "[SEC16] kubectl exec (subcommand, safe)"; Cmd = 'kubectl exec pod -- ls' }
+        @{ Name = "[SEC17] find . (dot arg, safe)"; Cmd = 'find . -name "*.txt"' }
+        @{ Name = "[SEC18] git config alias (word, safe)"; Cmd = 'git config alias.st status' }
+        @{ Name = "[SEC19] eval as text (safe)"; Cmd = 'echo "setup: eval v1.0"' }
+        @{ Name = "[SEC20] source as text (safe)"; Cmd = 'echo "source file loaded"' }
+        @{ Name = "[SEC21] ls . (dot arg, safe)"; Cmd = 'ls .' }
+        @{ Name = "[SEC22] source inside git (text, safe)"; Cmd = 'git -C . log --oneline' }
     )
     $unsafe = @(
         @{ Name = "[SEC9] backtick injection"; Cmd = "echo `$(whoami)" }
@@ -270,6 +278,16 @@ function Test-SecurityValidation {
         @{ Name = "[SEC12] process substitution >("; Cmd = 'echo x > >()' }
         @{ Name = "[SEC13] ANSI-C quoting"; Cmd = "echo \$'\\x48'" }
         @{ Name = "[SEC14] bash -c passthrough"; Cmd = 'bash -c "echo pwned"' }
+        @{ Name = "[SEC23] eval standalone"; Cmd = 'eval ls' }
+        @{ Name = "[SEC24] eval after pipe"; Cmd = 'echo x | eval ls' }
+        @{ Name = "[SEC25] exec standalone"; Cmd = 'exec ls -la' }
+        @{ Name = "[SEC26] source standalone"; Cmd = 'source /etc/profile' }
+        @{ Name = "[SEC27] alias definition"; Cmd = 'alias ll="ls -la"' }
+        @{ Name = "[SEC28] declare -f dump"; Cmd = 'declare -f myfunc' }
+        @{ Name = "[SEC29] typeset -f dump"; Cmd = 'typeset -f myfunc' }
+        @{ Name = "[SEC30] eval after semicolon"; Cmd = 'echo a; eval whoami' }
+        @{ Name = "[SEC31] source after AND"; Cmd = 'echo a && source secrets.sh' }
+        @{ Name = "[SEC32] exec after OR"; Cmd = 'false || exec /bin/sh' }
     )
     foreach ($t in $safe) {
         Write-Host "$($t.Name)..." -NoNewline
