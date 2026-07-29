@@ -120,6 +120,37 @@ function Test-SafeCommand {
         return $false
     }
 
+    # Reject eval — arbitrary code execution. Block as standalone command or via control operators.
+    if ($Command -match '(^|;|&&|\|\||\|)\s*eval(\s|$)') {
+        Write-Warning "[bash-safe] SECURITY: command contains eval — refusing to execute."
+        return $false
+    }
+
+    # Reject exec as standalone command (not subcommand like `docker exec` or `kubectl exec`).
+    if ($Command -match '(^|;|&&|\|\||\|)\s*exec(\s|$)') {
+        Write-Warning "[bash-safe] SECURITY: command contains exec — refusing to execute."
+        return $false
+    }
+
+    # Reject source — loads arbitrary script into current shell.
+    # NOTE: `. ` not blocked — too many false positives (find ., git -C ., ls .).
+    if ($Command -match '(^|;|&&|\|\||\|)\s*source(\s|$)') {
+        Write-Warning "[bash-safe] SECURITY: command contains source — refusing to execute."
+        return $false
+    }
+
+    # Reject alias — can override builtins.
+    if ($Command -match '(^|;|&&|\|\||\|)\s*alias(\s|$)') {
+        Write-Warning "[bash-safe] SECURITY: command contains alias — refusing to execute."
+        return $false
+    }
+
+    # Reject declare/typeset -f — can dump function source.
+    if ($Command -match '(declare|typeset)\s+(-f|-F)') {
+        Write-Warning "[bash-safe] SECURITY: command contains declare/typeset -f — refusing to execute."
+        return $false
+    }
+
     return $true
 }
 

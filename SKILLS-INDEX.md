@@ -17,7 +17,6 @@
 | code review, CR | code-review-agent |
 | quick edit, single file, fast fix | quick-executor |
 | new file, new function, script, scaffold | code-generation |
-| execute analysis, implement analysis | analysis-executor |
 | analysis mode, multi-agent analysis | analysis-mode |
 | delivery harness, orchestrate, multi-agent | delivery-harness |
 | execute plan, step-by-step, task execution | plan-execution |
@@ -38,7 +37,7 @@
 | Security | security-scanner, auth-hardening, container-security, llm-security |
 | SDD | sdd (unified pipeline), sdd-quick, sdd-apply |
 | Coordination | delivery-harness, branch-pr, issue-creation, command-wrapper |
-| Analysis | analysis-mode, analysis-executor, deep-debugging |
+| Analysis | analysis-mode, deep-debugging |
 | Memory | session-resume, engram-protocol, dreaming, bitacora |
 | Skills meta | opencode-skill-creator, skill-registry, skill-graph |
 | Engineering | plan-execution, infra-audit, perf-profiling |

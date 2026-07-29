@@ -154,8 +154,8 @@ LOOP:
 ## Archived Cycles
 
 - Cycles 6-17: `docs/ciclos/cycle-archive-6-17.md`
-- Cycles 18-26: `docs/ciclos/cycle-archive-18-26.md`
-- Cycle 27: `docs/ciclos/cycle27-20260716.md`
+- Cycles 18-26: `docs/ciclos/cycle-archive-6-17.md` (appended)
+- Cycle 27: cycle artifacts pending archive
 
 Only the current cycle is maintained in this file for active reference.
 
