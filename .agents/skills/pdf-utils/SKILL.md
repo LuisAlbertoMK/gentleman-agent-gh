@@ -39,6 +39,34 @@ py -m mineru input.pdf -o output_dir -m pipeline
 # Output: Markdown with tables, 86-95% accuracy
 ```
 
+## Validation
+After extraction, validate output before using it:
+- Text: check `d.text.length > 50 && !/\^L|\x00/.test(d.text)` (garbage guard)
+- Tables: verify row count matches expected items
+- Scanned: spot-check 3 random pages for OCR quality
+
+## Batch Processing (>10 files)
+```powershell
+foreach ($file in Get-ChildItem invoices/*.pdf) {
+  try {
+    node -e "const p=require('pdf-parse'),f=require('fs');
+p(f.readFileSync('$file')).then(d=>f.writeFileSync('$file.txt',d.text))" -ErrorAction Stop
+  } catch {
+    "$file failed: $_" | Out-File -Append batch-errors.log
+  }
+}
+```
+
+## Error Handling
+| Problem | Symptom | Fix |
+|---------|---------|-----|
+| Corrupted PDF | pdf-parse hangs/throws | Try pdf2json first, then MinerU as last resort |
+| Encrypted PDF | "Permission denied" | `qpdf --password=... --decrypt` then retry |
+| Scanned w/o OCR | Empty text | Skip pdf-parse → MinerU directly |
+| Huge PDF (>200p) | OOM | Process in 50-page chunks |
+
+**Fallback chain**: pdf-parse → pdf2json → MinerU → `[skip]` with log entry
+
 ## Decision Tree
 ```
 Simple text? → pdf-parse (fastest)

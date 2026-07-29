@@ -30,6 +30,45 @@ Option table (Pros/Cons 2 max each, Cost) + Recommendation with confidence 1-5
 ### 4. Decide
 Clear winner -> mem_save decision | Unclear -> define next evidence | Dead end -> document why + what NOT to pursue
 
+## Example: Library Evaluation
+Search pattern combining both tools:
+```
+websearch("zustand vs jotai vs valtio 2026 benchmark" numResults=8)
+→ webfetch(URL of top comparison)
+→ websearch("zustand migration from redux experience" numResults=5)
+→ webfetch(URL of migration guide)
+```
+
+| Criteria | Zustand | Jotai | Valtio |
+|----------|---------|-------|--------|
+| Bundle | 2.5 KB | 4.2 KB | 3.1 KB |
+| API style | Single store | Atomic atoms | Proxy-based |
+| Learning curve | Low | Medium | Medium |
+| React 19 compat | ✅ | ✅ | ⚠️ pending |
+| **Pick if** | Simple state | Fine-grained | Mutable style |
+
+## Dead Ends
+Document rejected paths to prevent future re-evaluation:
+```
+**Not pursuing**: {option}
+**Why**: {licensing | perf below threshold | unmaintained since Y}
+**Evidence**: {link/benchmark}
+**Re-evaluate if**: {trigger condition}
+```
+Save via: `mem_save(title="Research: {topic} — rejected {option}" type="discovery")`
+
+## Post-Research mem_save
+```
+title: "Research: {topic} — recommendation"
+type: "decision"
+content: |
+  **What**: Selected {winner} over {alternatives}
+  **Why**: {top 2 reasons}
+  **Where**: {implementation files}
+  **Rejected**: {option} because {fatal flaw}
+  **Confidence**: {1-5}
+```
+
 ## Depth Levels
 | Level | Sources | Time |
 |-------|---------|------|

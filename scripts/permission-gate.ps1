@@ -32,7 +32,9 @@ param(
     [string]$Command = "",
     [ValidateSet('manual','semi','auto')][string]$Mode = "",
     [switch]$ListModes,
-    [switch]$Json
+    [switch]$Json,
+    [switch]$Force,
+    [switch]$DryRun
 )
 
 # --- Resolve paths ---
@@ -154,33 +156,38 @@ if ($ListModes) {
     return
 }
 
-$verdict = Classify-Command -cmd $Command -mode $Mode
+try {
+    $verdict = Classify-Command -cmd $Command -mode $Mode
 
-if ($Json) {
-    @{
-        command = $Command
-        mode    = $Mode
-        verdict = $verdict
-        rule    = switch ($verdict) {
-            'deny'  { 'Built-in security restriction' }
-            'allow' { "Allowed in $Mode mode" }
-            'ask'   { "Requires confirmation in $Mode mode" }
-            'help'  { 'No command provided' }
+    if ($Json) {
+        @{
+            command = $Command
+            mode    = $Mode
+            verdict = $verdict
+            rule    = switch ($verdict) {
+                'deny'  { 'Built-in security restriction' }
+                'allow' { "Allowed in $Mode mode" }
+                'ask'   { "Requires confirmation in $Mode mode" }
+                'help'  { 'No command provided' }
+            }
+        } | ConvertTo-Json
+    } else {
+        $icon = switch ($verdict) {
+            'allow' { '✅' }
+            'ask'   { '⏸️' }
+            'deny'  { '❌' }
+            'help'  { 'ℹ️' }
         }
-    } | ConvertTo-Json
-} else {
-    $icon = switch ($verdict) {
-        'allow' { '✅' }
-        'ask'   { '⏸️' }
-        'deny'  { '❌' }
-        'help'  { 'ℹ️' }
+        $modeLabel = $Mode.ToUpper().PadRight(8)
+        Write-Host "$icon [$modeLabel] $Command" -NoNewline
+        switch ($verdict) {
+            'allow' { Write-Host " → ALLOW" -ForegroundColor Green }
+            'ask'   { Write-Host " → ASK"  -ForegroundColor Yellow }
+            'deny'  { Write-Host " → DENY" -ForegroundColor Red }
+            'help'  { Write-Host "Usage: permission-gate.ps1 -Command '<cmd>' [-Mode manual|semi|auto]" }
+        }
     }
-    $modeLabel = $Mode.ToUpper().PadRight(8)
-    Write-Host "$icon [$modeLabel] $Command" -NoNewline
-    switch ($verdict) {
-        'allow' { Write-Host " → ALLOW" -ForegroundColor Green }
-        'ask'   { Write-Host " → ASK"  -ForegroundColor Yellow }
-        'deny'  { Write-Host " → DENY" -ForegroundColor Red }
-        'help'  { Write-Host "Usage: permission-gate.ps1 -Command '<cmd>' [-Mode manual|semi|auto]" }
-    }
+} catch {
+    Write-Error "Permission gate error: $_"
+    exit 1
 }

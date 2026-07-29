@@ -50,7 +50,7 @@ if ($BaseRef -match '\s') {
 # Run git diff with error checking
 $gitOutput = $null
 try {
-    $gitOutput = & git diff --name-only -- $BaseRef 2>&1
+    $gitOutput = & git diff --name-only $BaseRef 2>&1
     $exitCode = $LASTEXITCODE
 } catch {
     $exitCode = 1

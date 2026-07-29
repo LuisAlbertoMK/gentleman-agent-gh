@@ -42,6 +42,42 @@ All phases share: `{file:sdd/references/sdd-phase-common.md}`
 Individual wrapper skills (`sdd-init`, `sdd-explore`, etc.) each load their phase from this shared structure.
 Common protocol migrated from `_shared/sdd-phase-common.md`.
 
+## Choosing Your Path
+
+| Factor | Fast (sdd-quick) | Full (9-phase) |
+|--------|-----------------|----------------|
+| Files changed | 1-3 | 4+ |
+| Schema change | No | Yes |
+| Auth/API change | No | Yes |
+| New dependency | No | Yes |
+| Risk level | LOW | MED/HIGH |
+| Known codebase | Yes | No |
+
+**Gate check**: If ANY answer is "No" below → full pipeline.
+```
+Known codebase? ← Schema unchanged? ← No new deps? ← LOW risk? ← <4 files?
+```
+When unsure: start full, skip phases after `[Explore]` if scope confirms fast path.
+
+## Orchestrator Routing
+```
+phase=init    → sdd-init
+phase=explore → sdd-explore
+phase=propose → sdd-propose
+Fast path?    → switch to sdd-quick after Propose
+```
+Each phase writes to `sdd/registry/{change-id}/{phase}.md`.
+
+## Delivery-Harness Integration
+| SDD Phase | Harness Unit |
+|-----------|-------------|
+| Explore + Design | Work Unit 1 (analysis) |
+| Tasks | Work Unit 2 (task split) |
+| Apply | Work Unit 3-N (parallel impl) |
+| Verify | Gate → archive |
+
+Use `delivery-harness` when SDD task list exceeds 5 apply steps.
+
 ## Refs
 execution-mode · quality-gate · triple-verify · delivery-harness · project-mapper
 

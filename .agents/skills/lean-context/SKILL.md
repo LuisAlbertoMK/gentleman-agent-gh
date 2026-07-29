@@ -50,6 +50,23 @@ Edit (str_replace) for existing. Grep+Read(offset,limit) for reading. Never full
 
 **NEVER CUT**: safety(1-line) · critical caveats(1x) · func code · security warnings · irreversible confirmations
 
+## LIVE EXAMPLE
+| Request | LEAN | ULTRA | CAVEMAN |
+|---------|------|-------|---------|
+| "Explain JWT" | "Server signs payload → client sends in Authorization header → verify with secret" | "Sign→header→verify" | "srv sign→auth hdr→vrfy" |
+| "Fix auth.go bug" | "Line 42: missing `return` after failed validation" | "L42: missing return" | "L42: no ret" |
+| "What's context %?" | "112k/200k (56%) — YELLOW zone" | "112k/200k 56% YLW" | "112k 56% YLW" |
+
+## ESCALATION
+Context crosses 40% mid-conversation? Move LEAN→ULTRA immediately.
+Crosses 80%? → CAVEMAN lite. Under 10 turns remaining? → CAVEMAN full.
+**Never escalate mid-code-block** — finish the thought first, then switch on next turn.
+
+## NEVER CUT EXAMPLES
+- Safety: "This command will DELETE ALL DATA in production — are you sure?"
+- Caveat: "Works on Node ≥18; fails silently on 16"
+- Confirmation: "Proceed? (y/N)" — always show before destructive ops
+
 ## WHEN
 
 | Situation | Level |

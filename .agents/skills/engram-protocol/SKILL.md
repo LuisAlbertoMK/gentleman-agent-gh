@@ -21,10 +21,12 @@ metadata:
 
 ## Capture Pipeline
 Every turn before next response:
-1. Tool fail → `mem_save(type="bugfix", title="Auto: {error}")`
-2. Correction → `mem_save(type="learning", title="Correction: {topic}")` + immune-system
-3. Decision → `mem_save(type="decision", title="...")`
-4. Discovery → `mem_save(type="discovery", title="...")`
+1. Tool fail → `mem_save(priority=high, type="bugfix", title="Auto: {error}")`
+2. Correction → `mem_save(priority=normal, type="learning", title="Correction: {topic}")` + immune-system
+3. Decision → `mem_save(priority=high, type="decision", title="...")`
+4. Discovery → `mem_save(priority=low, type="discovery", title="...")`
+**Batching**: normal→every 3t, low→session-end via `topic_key="batch/{session-topic}"`. high→immediate.
+**Validate**: if `scripts/engram-validate.ps1` exists → run after `mem_save`.
 
 ## Memory Search
 "remember"/"recall" → `mem_context` → `mem_search` → `mem_get_observation`. Proactive: known-area work · unfamiliar topic · first msg refs project.
@@ -58,7 +60,8 @@ Saving with `topic_key` (not auto-captures):
 First request: find `.project.json`. Exists → report. >7d stale → fresh metrics + `mem_save(topic_key=project/score)`.
 
 ## Session Close
-`!close` → `mem_session_summary` (Goal/Discoveries/Accomplished/Next/Files). `!score`/`!dream`. Mandatory unless pure chat.
+`!close` → `mem_session_summary` (Goal/Discoveries/Accomplished/Next/Files). Flush low batch.
+Gate: `close-session.ps1` verifies `mem_session_summary` called. `!score`/`!dream`. Mandatory unless pure chat.
 
 ## After Compaction
 1) `mem_session_summary` 2) `mem_context` 3) Continue.

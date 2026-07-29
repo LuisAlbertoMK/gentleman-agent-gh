@@ -193,15 +193,14 @@ function Resolve-Skill {
     $SkillScores = @{}
     $MatchResults = $skillRegistry | ForEach-Object {
         $matchCount = 0
-        $tokens = $using:Tokens
-        foreach ($token in $tokens) {
+        foreach ($token in $Tokens) {
             $pattern = [regex]::Escape($token)
             foreach ($trigger in ($_.Triggers -split '\|')) {
                 if ($trigger.ToLowerInvariant() -match $pattern) { $matchCount++; break }
             }
         }
         if ($matchCount -gt 0) { [PSCustomObject]@{Name = $_.Name; MatchCount = $matchCount} }
-    } -ThrottleLimit ([Math]::Max(2, [int]([Environment]::ProcessorCount / 2)))
+    }
     foreach ($match in $MatchResults) { if ($match) { $SkillScores[$match.Name] = $match.MatchCount } }
     if ($externalPatterns.Count -gt 0) {
         foreach ($pattern in $externalPatterns) {
@@ -261,8 +260,8 @@ $agentRecommendations = @(
 function Get-AgentRecommendation {
     param([string]$TaskText)
     $results = $agentRecommendations | ForEach-Object {
-        if ($using:TaskText -match $_.P) { $_.S }
-    } -ThrottleLimit ([Math]::Max(2, [int]([Environment]::ProcessorCount / 2)))
+        if ($TaskText -match $_.P) { $_.S }
+    }
     $recommended = @($results | Where-Object { $_ } | Select-Object -Unique)
     if ($recommended.Count -eq 0) {
         $resolved = @(Resolve-Skill $TaskText 1)

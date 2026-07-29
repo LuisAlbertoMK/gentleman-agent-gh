@@ -82,17 +82,17 @@ Describe 'Skill Name Regex Filter' {
         $refs | Should -Not -Contain '123bad'
     }
     It 'filters out names with spaces or special characters' {
-        $refs = Get-SkillRefs 'good-name | has space | has@special'
-        $refs.Count | Should -Be 1
+        $refs = @(Get-SkillRefs 'good-name | has space | has@special')
+        @($refs).Count | Should -Be 1
         $refs | Should -Contain 'good-name'
     }
     It 'returns empty for header with no valid names' {
-        $refs = Get-SkillRefs 'UPPER | 123 | spaced name'
-        $refs.Count | Should -Be 0
+        $refs = @(Get-SkillRefs 'UPPER | 123 | spaced name')
+        @($refs).Count | Should -Be 0
     }
     It 'handles single skill reference' {
-        $refs = Get-SkillRefs 'single-skill'
-        $refs.Count | Should -Be 1
+        $refs = @(Get-SkillRefs 'single-skill')
+        @($refs).Count | Should -Be 1
         $refs | Should -Contain 'single-skill'
     }
 }
@@ -101,15 +101,15 @@ Describe 'Cross-Ref Parsing Patterns' {
     It 'extracts cross-ref names from header line' {
         $header = "Cross-Refs: skill-a | skill-b, skill_c"
         if ($header -match 'Cross-Refs:\s*(.+)') {
-            $refs = Get-SkillRefs $Matches[1]
-            $refs.Count | Should -Be 3
+            $refs = @(Get-SkillRefs $Matches[1])
+            @($refs).Count | Should -Be 3
         }
     }
     It 'extracts anti-pattern names from header line' {
         $header = "Anti-Patterns: immune-system | dreaming"
         if ($header -match 'Anti-Patterns:\s*(.+)') {
-            $refs = Get-SkillRefs $Matches[1]
-            $refs.Count | Should -Be 2
+            $refs = @(Get-SkillRefs $Matches[1])
+            @($refs).Count | Should -Be 2
             $refs | Should -Contain 'immune-system'
             $refs | Should -Contain 'dreaming'
         }
@@ -117,9 +117,9 @@ Describe 'Cross-Ref Parsing Patterns' {
     It 'extracts config_refs file paths (no name filter)' {
         $header = "config_refs: .opencode/skills/foo/SKILL.md | AGENTS.md"
         if ($header -match 'config_refs:\s*(.+)') {
-            $refs = ($Matches[1] -split '\s*[\|,]\s*' |
-                ForEach-Object { $_.Trim() }).Where({ $_ -ne '' })
-            $refs.Count | Should -Be 2
+            $refs = @(($Matches[1] -split '\s*[\|,]\s*' |
+                ForEach-Object { $_.Trim() }).Where({ $_ -ne '' }))
+            @($refs).Count | Should -Be 2
             $refs | Should -Contain '.opencode/skills/foo/SKILL.md'
             $refs | Should -Contain 'AGENTS.md'
         }
@@ -127,8 +127,8 @@ Describe 'Cross-Ref Parsing Patterns' {
     It 'returns nothing for empty Cross-Refs value' {
         $header = "Cross-Refs: "
         if ($header -match 'Cross-Refs:\s*(.+)') {
-            $refs = Get-SkillRefs $Matches[1]
-            $refs.Count | Should -Be 0
+            $refs = @(Get-SkillRefs $Matches[1])
+            @($refs).Count | Should -Be 0
         }
     }
 }

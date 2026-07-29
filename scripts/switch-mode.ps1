@@ -29,7 +29,9 @@
 param(
     [ValidateSet('manual','semi','auto')][string]$Mode,
     [switch]$Status,
-    [switch]$Help
+    [switch]$Help,
+    [switch]$Force,
+    [switch]$DryRun
 )
 
 # --- Resolve .gentleman-mode path ---
@@ -147,7 +149,12 @@ if ($Mode -eq $current) {
 }
 
 # Write the new mode
-$Mode | Set-Content -LiteralPath $modeFile -NoNewline -Encoding ASCII
+try {
+    $Mode | Set-Content -LiteralPath $modeFile -NoNewline -Encoding ASCII -ErrorAction Stop
+} catch {
+    Write-Error "Failed to write mode file: $_"
+    exit 1
+}
 $c = $colors[$Mode]
 
 Write-Host "`n$($c.icon)  Switched to $Mode mode." -ForegroundColor $c.fg

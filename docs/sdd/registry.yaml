@@ -1,0 +1,88 @@
+# =============================================================================
+# SDD Change Registry — persistent, git-tracked log of all SDD-tracked changes
+# =============================================================================
+# Auto-managed by SDD Archive phase + manual entries during Apply.
+# DO NOT delete keys — mark as rolled_back if reverted.
+#
+# Change ID format: YYYY-MM-DD-{short-descriptive-slug}
+# Status: in_progress | exploring | proposing | designing | specing |
+#         applying | verifying | archived | rolled_back
+# =============================================================================
+
+schema_version: "1.0"
+project: gentleman-agent-gh
+
+changes:
+
+  "2026-07-29-auth-hardening":
+    title: "Authorization Hardening — test coverage for critical scripts"
+    status: archived
+    domains: ["auth", "testing", "scripts"]
+    files:
+      - "scripts/validate-write-scope.ps1"
+      - "scripts/forge-rollback.ps1"
+      - "scripts/tests/close-session.Integration.Tests.ps1"
+      - "scripts/tests/forge-rollback.Integration.Tests.ps1"
+      - "scripts/tests/validate-write-scope.Integration.Tests.ps1"
+    created: "2026-07-29"
+    archived: "2026-07-29"
+    description: >
+      Fixed git diff -- bug and SupportsShouldProcessing typo.
+      Created 21 integration tests across 3 critical security scripts.
+      All 292 tests pass (271 unit + 21 integration).
+
+  "2026-07-29-sdd-standardization":
+    title: "SDD Standardization — registry, hybrid persistence, docs"
+    status: archived
+    domains: ["meta", "sdd", "documentation"]
+    files:
+      - "docs/sdd/registry.yaml"
+      - "docs/sdd/README.md"
+      - "sdd-config.yaml"
+    created: "2026-07-29"
+    archived: "2026-07-29"
+    description: >
+      Created SDD change registry (docs/sdd/registry.yaml) for persistent,
+      git-tracked log of all SDD changes. Added docs/sdd/README.md with
+      pipeline documentation. Extended sdd-config.yaml to hybrid mode
+      with explicit registry/specs/archive paths. Created docs/sdd/permissions.md
+      documenting the full permission model (mode system, delegation rules,
+      write-scope enforcement, agent boundaries).       Established convention:
+      hybrid persistence (Engram + filesystem) for all SDD artifacts.
+
+  "2026-07-29-mode-gate":
+    title: "Mode Gate — automated routing enforcement"
+    status: archived
+    domains: ["auth", "scripts", "routing"]
+    files:
+      - "scripts/mode-gate.ps1"
+      - "scripts/tests/mode-gate.Integration.Tests.ps1"
+      - "docs/sdd/permissions.md"
+    created: "2026-07-29"
+    archived: "2026-07-29"
+    description: >
+      Created mode-gate.ps1 — pre-delegation validation that enforces agent
+      suffix matches .gentleman-mode (auto→-auto, manual→no suffix, semi→-semi).
+      9 integration tests covering auto/manual/explicit-Mode/edge cases.
+      Updated permissions.md with Mode Gate Protocol section.
+      Converts mode routing from convention to runtime-checkable gate.
+
+  "2026-07-29-gdpr-compliance":
+    title: "GDPR/Compliance — data inventory, erasure, export"
+    status: archived
+    domains: ["compliance", "documentation"]
+    files:
+      - "docs/compliance/README.md"
+      - "docs/compliance/data-inventory.md"
+      - "docs/compliance/erasure.md"
+      - "docs/compliance/export.md"
+    created: "2026-07-29"
+    archived: "2026-07-29"
+    description: >
+      Documented full data inventory (8 stores: Engram, BITACORA, Git,
+      project score, mejoras, config, SDD registry, MCP logs). Created
+      Right to Erasure guide (full + selective deletion). Created Data
+      Portability export guide (full + selective export). Established
+      compliance documentation structure (docs/compliance/). Mapped
+      GDPR principles to existing controls (data minimisation, storage
+      limitation, accountability via audit gate, integrity via write-scope).

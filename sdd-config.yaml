@@ -3,3 +3,8 @@ strict_tdd: true
 test_runner: pester
 test_command: pwsh -NoProfile -Command "Import-Module Pester; Invoke-Pester ./scripts/tests/"
 test_pattern: "scripts/tests/*.Tests.ps1"
+artifact_store:
+  mode: hybrid
+  registry: "docs/sdd/registry.yaml"
+  specs: "docs/sdd/specs/"
+  archive: "docs/sdd/archive/"

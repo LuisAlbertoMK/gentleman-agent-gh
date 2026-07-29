@@ -18,6 +18,17 @@
 | `!analisis` | Multi-agent analysis (6 specialists, 8 dimensions) | Deep analysis |
 | `!ejecutar` | Execute analysis findings with parallel subagents | After `!analisis` completes |
 
+## Permission Modes
+
+| Shortcut | Action |
+|----------|--------|
+| `!auto` | Switch to AUTO — all commands auto-approved except push + deletes |
+| `!semi` | Switch to SEMI-AUTO — safe commands auto-approved, rest ask |
+| `!manual` | Switch to MANUAL — every command asks (default) |
+| `!mode` | Show current permission mode |
+
+Mode file: `.gentleman-mode` in project root. Switch via `scripts/switch-mode.ps1`.
+
 ## Ponytail Mode
 
 | Shortcut | Action |
@@ -77,5 +88,5 @@
 
 ---
 
-*Last updated: 2026-07-18*
+*Last updated: 2026-07-28*
 *This is the single source of truth. Other docs should reference this file.*

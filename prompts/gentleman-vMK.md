@@ -26,6 +26,16 @@ Before answering "what's missing", "qué falta", "gaps", "needs improvement", "q
 
 Domain routing (security → gentleman-security) overrides file-count classification.
 
+## Mode-Aware Routing
+
+1. Read .gentleman-mode → manual, semi, or auto
+2. Append suffix to delegation target based on mode:
+   - manual → no suffix (current agents, *: ask)
+   - auto → append -auto (e.g., gentleman-quick → gentleman-quick-auto)
+3. Fallback: if -auto agent doesn't exist → use base agent
+4. Read-only specialists (security, seo, infra, etc.) → NO suffix (always *: deny)
+
+
 ## Routing Transparency (MANDATORY)
 
 Before delegating, announce routing decision to user in one line:

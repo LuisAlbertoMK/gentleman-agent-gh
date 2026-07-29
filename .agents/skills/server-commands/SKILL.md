@@ -44,6 +44,34 @@ Manual check: `Get-NetTCPConnection -LocalPort <port>` or `Test-PortInUse 4200`
 .\scripts\dev-server.ps1 -Action Kill -Name "myapp"
 ```
 
+## Port Conflict Resolution
+```powershell
+# Port 4200 in use? Find the owner
+$processId = (Get-NetTCPConnection -LocalPort 4200 -ErrorAction SilentlyContinue).OwningProcess
+if ($processId) {
+  $process = Get-Process -Id $processId
+  Write-Warning "Port 4200 in use by $($process.ProcessName) PID $processId"
+  # Option A: kill the blocker
+  # Stop-Process -Id $processId -Force
+  # Option B: next available port
+  # .\scripts\dev-server.ps1 -Action Start -Name "myapp" -Command "npx ng serve" -Arguments "--port 4201"
+}
+```
+
+## Multiple Simultaneous Servers
+```powershell
+# Frontend + Backend side by side
+.\scripts\dev-server.ps1 -Action Start -Name "frontend" -Command "npm run dev" -Arguments "--port 5173"
+.\scripts\dev-server.ps1 -Action Start -Name "backend" -Command "dotnet run" -Arguments "--urls http://localhost:5000"
+
+# Check both
+.\scripts\dev-server.ps1 -Action Status -Name "frontend"
+.\scripts\dev-server.ps1 -Action Status -Name "backend"
+
+# Kill both
+.\scripts\dev-server.ps1 -Action Kill -Name "frontend","backend"
+```
+
 **Wrong** (will hang the agent):
 ```powershell
 npx ng serve  # ❌ Server never exits, blocks session

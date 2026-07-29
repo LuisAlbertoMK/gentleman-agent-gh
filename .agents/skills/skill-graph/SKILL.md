@@ -17,6 +17,41 @@ Match keywords→triggers (fuzzy, min 3 chars). Expand BFS 1-hop deps. Output: m
 
 Ex: `"security audit"` → security-scanner + best-practices. `"implement feature"` → sdd-tasks + sdd-design + sdd-spec.
 
+## Output Format
+### JSON (default)
+```json
+{ "matched": ["security-scanner", "best-practices"],
+  "deps": ["lean-context"],
+  "skill_count": 2, "dep_count": 1,
+  "expand_chain": ["security-scanner", "best-practices"] }
+```
+### CSV (`-Format Csv`)
+```
+matched,dep_count,expand_chain
+security-scanner;best-practices,1,security-scanner>best-practices
+```
+Use JSON for programmatic consumption; CSV for human review or spreadsheets.
+
+## BFS Expansion Example
+`-Expand 2` resolves 2 hops deep:
+```
+hop 0: "performance"        → perf-profiling
+hop 1: perf-profiling       → [command-wrapper, lean-context]
+hop 2: command-wrapper      → [bash-safe]
+```
+`-Expand 1` (default) stops at direct deps only. Expand >3 is rarely needed.
+
+## Troubleshooting
+| Symptom | Likely Cause | Fix |
+|---------|-------------|------|
+| "No skills matched" | Task too vague | Use 2-3 specific terms: "security audit JWT" not "check stuff" |
+| Empty deps | No `dependencies` field | Check skill metadata frontmatter |
+| Wrong match | Trigger overlap | Narrow task: "python async" vs "python django" disambiguates |
+| Same item in loop | Circular dep | Report to skill-registry; BFS capped at 10 unique |
+| Empty task (`-Task ""`) | No input | Defaults to `"task"` scan — rarely useful; always pass a real task |
+
+**Empty task edge case**: `-Task ""` matches on empty string — returns everything. Always provide a concrete task.
+
 ## DIGEST
 | Context | Strategy | Target |
 |---------|----------|--------|

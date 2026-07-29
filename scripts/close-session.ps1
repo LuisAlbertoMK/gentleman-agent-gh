@@ -30,6 +30,7 @@ param(
     [switch]$CompactPrompt,
     [switch]$DryRun,
     [switch]$Force,
+    [switch]$SkipSummaryGate,
     [string[]]$Discoveries,
     [string[]]$Errors
 )
@@ -89,6 +90,16 @@ if (Test-Path -LiteralPath $agentsPath) {
         $bloatWarning = "AGENTS.md is $([math]::Round($agentsBytes/1KB,1))KB — approaching 15KB threshold."
     }
 }
+# --- Session summary gate ---
+$summaryLockPath = Join-Path -Path $repoRoot -ChildPath ".opencode\session-summary.lock"
+$summaryGatePassed = $true
+if (-not (Test-Path -LiteralPath $summaryLockPath) -and -not $SkipSummaryGate) {
+    $summaryGatePassed = $false
+    if (-not $Quiet) {
+        Write-Host "⚠️  SESSION SUMMARY NOT CONFIRMED: call mem_session_summary before !close" -ForegroundColor Yellow
+        Write-Host ""
+    }
+}
 # --- External auditor gate ---
 $auditGatePassed = $true
 if ($needsAudit) {
@@ -104,7 +115,12 @@ $result = [PSCustomObject]@{
     needsAudit        = $needsAudit
     protectedTouched  = $touchedProtected
     auditGatePassed   = $auditGatePassed
+    summaryGatePassed = $summaryGatePassed
     bloatWarning      = $bloatWarning
+}
+# Force override for summary gate
+if (-not $summaryGatePassed -and $Force) {
+    $summaryGatePassed = $true
 }
 # --- Session miner: populate from discoveries then scan for patterns ---
 $minerOutput = $null
@@ -170,6 +186,12 @@ if ($Quiet) {
         Write-Host "⚠️  $bloatWarning" -ForegroundColor Yellow
         Write-Host ""
     }
+    if ($summaryGatePassed) {
+        Write-Host "✅ Session summary confirmed" -ForegroundColor Green
+    } else {
+        Write-Host "⚠️  Run mem_session_summary before closing" -ForegroundColor Yellow
+    }
+    Write-Host ""
     if ($minerOutput) {
         Write-Host "⛏️  $minerOutput" -ForegroundColor DarkYellow
         Write-Host "    Run '!dream' to review repeated patterns." -ForegroundColor DarkYellow

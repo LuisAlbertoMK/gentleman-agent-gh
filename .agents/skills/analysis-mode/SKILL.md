@@ -19,6 +19,8 @@ metadata:
 
 **ANALYSIS-ONLY GATE**: Forbidden: `ctx_execute`, `Write`, `Edit`, `Bash` (except `git status/diff/log`), `skill` (except `project-mapper`). Allowed: `Read`, `Grep`, `Glob`, `webfetch`, `websearch`, `project-mapper`. Output to `docs/mejoras/**` only. Any forbidden attempt → log as `BLOCKED: [tool] [reason]`, continue analysis.
 
+**CONCISO**: Toda salida de este skill debe ser concisa — sin introducciones, sin resúmenes extensos, directo al punto.
+
 ## PHASE 1: ANALYZE
 0. `project-mapper` → detect stack + public site? → include SEO specialist if yes.
 1. Scope: ONLY affected subsystems from mapper output (not entire project).

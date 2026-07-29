@@ -16,7 +16,7 @@
     .\scripts\forge-rollback.ps1 -SkillName "cross-project-ux-a11y-hero-btn-contrast"
     .\scripts\forge-rollback.ps1 -PatternId "ux/a11y/hero-btn-contrast"
 #>
-[CmdletBinding(SupportsShouldProcessing)]
+[CmdletBinding(SupportsShouldProcess)]
 param(
     [string]$SkillName = "",
     [string]$PatternId = "",
