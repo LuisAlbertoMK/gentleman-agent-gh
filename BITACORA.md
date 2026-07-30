@@ -132,3 +132,4 @@
 2026-07-05 - Batch cleanup: dead scripts, fork shortcuts, stale config, doc sync (14 files, 1111 lines deleted)
 2026-07-05 - Agent optimization analysis saved to docs/optimizaciones/agent-optimization-analysis.md (pending Cycle 20)
 
+| 2026-07-30 | orchestrated analysis | Context optimization + agent engineering deep analysis. Fixed: limit.input, orchestrator models, SDD models, cross-project sync pipeline (sync-vmk + use-gentleman), task permissions parity for vMK-auto/semi. 3 commits. | ✅ completed |
