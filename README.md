@@ -27,7 +27,7 @@ Suite of **79 skills** (+ `_shared`) + **91 PowerShell scripts** for [OpenCode](
 ## Features
 
 ### Multi-Agent Architecture
-28 agents total: main orchestrator (`gentleman-vMK`) + 13 specialists + 9 SDD pipeline agents + 5 auto-mode variants:
+33 agents total: main orchestrator (`gentleman-vMK`) + 13 specialists + 9 SDD pipeline agents + 5 auto-mode + 5 semi-mode variants:
 
 | Agent | Model | Specialty |
 |-------|-------|-----------|
@@ -50,8 +50,13 @@ Suite of **79 skills** (+ `_shared`) + **91 PowerShell scripts** for [OpenCode](
 | `gentleman-codex-auto` | deepseek-v4-flash-free | — AUTO mode (same model, `*: allow`) |
 | `gentleman-implementer-auto` | deepseek-v4-flash-free | — AUTO mode (same model, `*: allow`) |
 | `gentleman-vMK-auto` | default | — AUTO mode (orchestrator, `*: allow`) |
+| `gentleman-deep-semi` | nemotron-3-ultra-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
+| `gentleman-quick-semi` | mimo-v2.5-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
+| `gentleman-codex-semi` | deepseek-v4-flash-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
+| `gentleman-implementer-semi` | deepseek-v4-flash-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
+| `gentleman-vMK-semi` | default | — SEMI mode (orchestrator, `"*": ask` + safe commands allow) |
 
-> **Auto-mode**: Activated when `.gentleman-mode` is `auto`. See [PROTOCOL.md](PROTOCOL.md) for mode behavior. Read-only specialists have no `-auto` variant.
+> **Auto/Semi modes**: Activated when `.gentleman-mode` is `auto` or `semi`. See [PROTOCOL.md](PROTOCOL.md) for mode behavior. Read-only specialists have no `-auto` or `-semi` variant.
 
 #### SDD Pipeline Agents (subagents)
 9 agents executing SDD pipeline phases. **Inherit orchestrator model** (`claude-sonnet-4-6`, paid) unless they have explicit `model` in `opencode.json`. All have full permissions (`bash: allow, edit: allow, write: allow`).

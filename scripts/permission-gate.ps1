@@ -91,7 +91,7 @@ $semiAllowPatterns = @(
     '^which\s', '^Get-Command', '^Get-Help', '^Get-Alias',
     # Build/test
     '^npm test', '^pytest\s', '^go test', '^Invoke-Pester',
-    '^dotnet test', '^cargo test',
+    '^dotnet test', '^cargo test', '^pip\s', '^npm run',
     # Git read-only (no args)
     '^git stash list$', '^git status$', '^git diff$', '^git log$'
 )

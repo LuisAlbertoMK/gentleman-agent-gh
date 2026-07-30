@@ -257,6 +257,48 @@ try {
     if (-not $Quiet) { Write-Host " WARN (parse: $($_.Exception.Message))" }
 }
 
+# --- [10/9] semi-agents.json vs permission-gate.ps1 allowlist ---
+if (-not $Quiet) { Write-Host "[10/9] semi allowlist sync..." -N }
+try {
+    $semiPath = Join-Path $RepoRoot "scripts\opencode-config\semi-agents.json"
+    $gatePath = Join-Path $RepoRoot "scripts\permission-gate.ps1"
+    
+    if ((Test-Path $semiPath) -and (Test-Path $gatePath)) {
+        $semiContent = Get-Content $semiPath -Raw -Encoding UTF8
+        $gateContent = Get-Content $gatePath -Raw -Encoding UTF8
+
+        # Extract semi-agent allow commands (the "xxx *": "allow" patterns)
+        $semiAllow = [regex]::Matches($semiContent, '"(\w+(?:-\w+)*) \*":\s*"allow"') | ForEach-Object { $_.Groups[1].Value }
+        # Extract gate patterns: capture command name after '^ (word chars, dots, hyphens)
+        $gatePatterns = [regex]::Matches($gateContent, "'\^([a-zA-Z][a-zA-Z0-9._-]+)") | ForEach-Object { $_.Groups[1].Value }
+
+        # Normalize: add test runners that use spaces in the name
+        $gateCommands = @($gatePatterns | Where-Object { $_ -ne '' } | ForEach-Object { $_.ToLower() } | Sort-Object)
+        $semiCommands = @($semiAllow | ForEach-Object { $_.ToLower() } | Sort-Object)
+
+        # Check: every semi allow should exist in gate patterns (or be a superset)
+        $missingInGate = @()
+        $checked = @{}  # deduplicate
+        foreach ($cmd in $semiCommands) {
+            if ($checked.ContainsKey($cmd)) { continue }
+            $checked[$cmd] = $true
+            if ($cmd -notin $gateCommands -and $cmd -notmatch '^(Get-|Test-Path)') {
+                $hasMatch = $gateCommands | Where-Object { $cmd -match "^$_" }
+                if (-not $hasMatch) { $missingInGate += $cmd }
+            }
+        }
+
+        if ($missingInGate.Count -eq 0) {
+            if (-not $Quiet) { Write-Host " OK ($($semiCommands.Count) semi allows, $($gateCommands.Count) gate patterns)" }
+        } else {
+            $warnings += "semi-agents.json allows missing from permission-gate.ps1: $($missingInGate -join ', ')"
+            if (-not $Quiet) { Write-Host " WARN ($($missingInGate.Count) mismatches)" }
+        }
+    }
+} catch {
+    if (-not $Quiet) { Write-Host " WARN (check: $($_.Exception.Message))" }
+}
+
 # --- Output ---
 $result = @{
     timestamp        = (Get-Date -Format "o")
