@@ -1,8 +1,8 @@
 # SKILLS INDEX (Compact)
 
-> Top-20 daily-use skills. Full table: 93 skills — use `skill` tool or read this file for complete list.
+> Top-20 daily-use skills. Full table: all 81 skills — use `skill` tool or read this file for complete list.
 >
-> **Version**: 5.0 | **Changelog**: 5.0 (compact top-20 table for token reduction); 4.7 (+1 new: adversarial-breaker; count 92→93); 4.6 (count corrected 80→92 per filesystem audit)
+> **Version**: 5.1 | **Changelog**: 5.1 (sync count 93→81 per filesystem audit); 5.0 (compact top-20 table for token reduction); 4.7 (+1 new: adversarial-breaker; count 92→93); 4.6 (count corrected 80→92 per filesystem audit)
 
 ## Top 20 Daily-Use Skills
 

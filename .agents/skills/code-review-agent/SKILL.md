@@ -3,87 +3,34 @@ name: code-review-agent
 description: "4R code review — Risk/Readability/Reliability/Resilience with evidence gates and actionable fixes"
 triggers: "Code review, CR, revisar código, criticar"
 ---
+4R: each R scored independently→verdict+fixes.
 
-4R framework: each R scored independently, synthesized into verdict with fixes.
+## When: User asks CR·pre-commit complex·pre-merge high-impact PRs
 
-## When
-User asks CR · pre-commit complex · pre-merge high-impact PRs
+## 4R
+R Risk(error/edge/nil/rollback/monitor)30%|Readability(naming/structure/load/patterns)20%|Reliability(retry/timeout/consistency/data/error-prop)25%|Resilience(fault-isolation/backpressure/circuit-breaker/degradation/recovery)25%
 
-## The 4R Framework
-| R | Focus | Weight |
-|---|-------|--------|
-| Risk | Error handling, edge cases, validation, nil safety, rollback, monitoring | 30% |
-| Readability | Naming, structure, cognitive load, complexity, project patterns | 20% |
-| Reliability | Retry/backoff, timeouts, state consistency, data integrity, error propagation | 25% |
-| Resilience | Fault isolation, backpressure, circuit breaker, graceful degradation, recovery | 25% |
+## Workflow: `read diff→score 4R→verdict→fixes→evidence`. Sweet spot 200-400L.
+✅all R≥7 | 🔶any 4-6 | ❌any <4
 
-## Workflow
-`read diff → score 4R → verdict → fixes → evidence`. Sweet spot: 200-400L.
-
-## Verdicts
-- ✅ all R≥7
-- 🔶 any R 4-6
-- ❌ any R<4 or design flaw
-
-## Output (compact)
+## Output
 ```
-## CR: {summary}
-### 4R | Risk:X | Readability:X | Reliability:X | Resilience:X | Score: X.X/10 | Verdict: ✅/🔶/❌
-### Fixes: line-ref + what + why (1. file.go:42 — handle nil before range)
+## CR:{summary} ### 4R|Risk:X|Read:X|Rel:X|Res:X|Score:X.X|Verdict:✅/🔶/❌
+### Fixes:1.file.go:42—handle nil before range
 ```
+Example: `## CR:API auth middleware—nil check+no rate limit ### 4R|Risk:3|Read:7|Rel:5|Res:4|Score:4.8|Verdict:❌ BLOCKER ### Fixes 1.src/middleware/auth.go:42—err not checked. Fix:if err!=nil{return...,fmt.Errorf(...)}. Evidence:err swallowed,nil user proceeds. 2.src/middleware/ratelimit.go:12—hardcoded 1000r/s. Fix:env var,default 100,sliding window. ### Model:claude-4-opus-20260514`
 
-### Full output example
-```
-## CR: API auth middleware — missing nil check + no rate limit
-### 4R | Risk:3 | Readability:7 | Reliability:5 | Resilience:4 | Score: 4.8/10 | Verdict: ❌ BLOCKER
-### Fixes
-1. src/middleware/auth.go:42 — `user, err := db.FindUser(id)` — err not checked → Risk BLOCKER
-   - Fix: `if err != nil { return nil, fmt.Errorf("find user: %w", err) }`
-   - Evidence: err is silently swallowed; if db is down, handler proceeds with nil user
-2. src/middleware/auth.go:67 — `db.Query("SELECT ...")` — no timeout on DB call → Reliability
-   - Fix: add context.WithTimeout 5s to all queries
-3. src/middleware/ratelimit.go:12 — rate limit hardcoded to 1000 req/s → Resilience
-   - Fix: make configurable via env var, default 100, add sliding window
-4. src/middleware/auth.go:88 — `log.Printf("auth failed: %v", err)` — logs sensitive data → Risk
-   - Fix: sanitize error before logging
-### Model: claude-4-opus-20260514
-```
-
-## Adaptive Profile Flow
-```
-1. mem_search("review-profile/{project}") — load past CR patterns for this project
-   - Found: "previous review flagged missing context deadlines in this team"
-   - → Adjust: be explicit about context propagation patterns
-2. Run 4R review with adjusted lens
-3. mem_save(title: "CR profile — {project} #{N}", type: pattern, topic_key: "review-profile/{project}")
-   - Content: what was flagged, what was accepted, team response patterns
-   - → Next review loads this profile automatically
-```
+## Adaptive Profile
+1.`mem_search("review-profile/{project}")`→load past patterns→adjust lens 2.Run 4R 3.`mem_save(title:"CR profile—{project}#{N}",type:pattern,topic_key:"review-profile/{project}")`
 
 ## Rules
-1. Score BEFORE fixing (no anchoring). Score<5 → WHY with checklist item.
-2. Clean → "Approved. No issues."
-3. Evidence for Reliability+Risk (run tests/examine error paths).
-4. ≥1 fix per R<6. Any R<4 = **BLOCKER**.
-5. **Model visibility**: declare model + version in every review.
-6. **Adaptive profile**: `mem_search("review-profile/{project}")` before, `mem_save(...)` after.
-7. **Scope detection**: diff <50L → surface-read (fast track). diff >400L → flag as "large CR, suggest splitting into 2+ reviews for full depth"
-8. **Evidence chain for BLOCKER**: (a) locate exact line, (b) trace the vulnerability path, (c) reference language/runtime behavior, (d) propose concrete fix. Every BLOCKER must have all 4 links.
+1.Score BEFORE fixing. <5→WHY+checklist 2.Clean→"Approved.No issues." 3.Evidence for Rel+Risk 4.≥1 fix per R<6. Any R<4=**BLOCKER** 5.Model+version in every review 6.Adaptive profile 7.diff<50L→surface-read. >400L→"suggest splitting" 8.BLOCKER chain:(a)exact line (b)trace vuln (c)ref lang/runtime (d)concrete fix
 
-## BLOCKER evidence chain example
-```
-BLOCKER: src/handler/order.go:88 — `rows, _ := db.Query(...)`
-  Evidence chain:
-  1. Line 85: `func GetOrders() ([]Order, error)` — returns error
-  2. Line 88: error discarded with `_` → callers get zero Orders
-  3. Line 92: caller treats empty `[]Order{}` as "no data" not "db error"
-  4. Line 95: UI shows empty state instead of error toast
-  Impact: silent data loss when Postgres is unreachable.
-  Fix: `rows, err := db.Query(...)` + propagate error up
-```
+### BLOCKER evidence
+`src/handler/order.go:88—rows,_:=db.Query(...)` 1.L85 returns error 2.L88 discarded→zero Orders 3.L92 treats empty="no data" 4.L95 UI empty→error toast. Impact:silent data loss. Fix:rows,err:=db.Query(...)+propagate
 
 ## Anti-patterns
-Vague "looks good" · Only praise no critique · Skipping one R · Repeated findings every session · BLOCKER without evidence chain · Ignoring project conventions from adaptive profile · Reviewing >400L diffs as single unit
+Vague"looks good"·Only praise·Skip one R·Repeated findings·BLOCKER no chain·Ignore profile·>400L as single unit
 
 ## Refs
-judgment-day · senior-engineer · skill-improver · quality-gate · triple-verify · engram-protocol
+judgment-day·senior-engineer·skill-improver·quality-gate·triple-verify·engram-protocol

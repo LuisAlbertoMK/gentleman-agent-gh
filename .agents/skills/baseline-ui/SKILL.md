@@ -3,71 +3,44 @@ name: baseline-ui
 description: "Anti-slop UI — layout, typography, responsive, animation, tokens. Use for cleanup or polish."
 triggers: "ui cleanup, polish interface, fix layout, ui slop, generic ui, design review, responsive, container query, flexbox, grid, ui audit"
 ---
-<!-- karpathy-compressed: 2026-07-10 -->
-# Baseline UI — Anti-slop
-
-**Stack**: Existing CSS/Tailwind · `cn()` (clsx+tailwind-merge) React · No new approach unless project uses
-**Scope**: Audit & cleanup patterns. For implementation reference, load **ui-engine** after this skill.
+**Stack**: Existing CSS/Tailwind·`cn()`(clsx+tailwind-merge) React·No new approach unless project uses
+**Scope**: Audit&cleanup. For implementation→load **ui-engine** after.
 
 ## Workflow
-1. **Scan**: Read target files → identify violations (❌ rules below)
-2. **Classify**: Layout? Typography? Animation? Tokens? Interaction?
-3. **Fix**: Apply patterns from sections below
-4. **Verify**: Check contrast, responsive, motion preferences
-5. **Chain**: accessibility (focus/A11y) → performance (animation budget)
+1.Scan targets→violations(❌) 2.Classify 3.Fix 4.Verify:contrast/responsive/motion 5.Chain:a11y→perf
 
-## Layout + Responsive
-`h-dvh` not `h-screen` · `safe-area-inset` · Fixed z-index · `size-*` over `w-*`+`h-*`.
-- **Components**: container queries (`container-type: inline-size`) · **Page**: media queries only
-- `container-type: size` ❌ without `block-size` · `grid-auto-flow: dense` ❌ interactive
-- Cards: `repeat(auto-fit, minmax(280px, 1fr))` · Fluid: `cqi` (ONLY inside containers) · Named containers · Subgrid · `aspect-ratio`
-- **Tree**: 1D→Flexbox · 2D→Grid · Child inherits parent tracks→Subgrid · Parent→:has() · Unknown→`auto-fit, minmax()` · Adapt→CQ
-
-### Before/After
+## Layout
+`h-dvh`not`h-screen`·`safe-area-inset`·`size-*`over`w-*`+`h-*`·Components:CQ(`container-type:inline-size`)·Page:MQ
+❌`container-type:size`w/o`block-size`·❌`grid-auto-flow:dense`interactive
+Cards:`repeat(auto-fit,minmax(280px,1fr))`·Fluid:`cqi`(ONLY containers)·Subgrid·`aspect-ratio`
+Tree:1D→Flex|2D→Grid|Child→Subgrid|Parent→:has()|Unknown→auto-fit,minmax()
 ```css
-/* ❌ Before: fixed width, no responsive */
-.card { width: 300px; height: 200px; }
-
-/* ✅ After: fluid grid, container query */
-.card { container-type: inline-size; }
-.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+/* ❌ */.card{width:300px;height:200px}
+/* ✅ */.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}
+.card{container-type:inline-size}
 ```
 
 ## Typography
-`text-balance` headings · `text-pretty` body · `tabular-nums` data · Fluid: page-level use `vw` (e.g. `clamp(1rem, 1.5vw+0.5rem, 1.5rem)`), containers use `cqi` · CQ components · No `letter-spacing` except uppercase labels/small-caps/tracking adjustments.
-
-### Before/After
+`text-balance`headings·`text-pretty`body·`tabular-nums`data·Fluid:page→`clamp(1rem,1.5vw+0.5rem,1.5rem)`, containers→`cqi`. No`letter-spacing`except labels
 ```css
-/* ❌ Before: fixed font size */
-h1 { font-size: 2rem; }
-
-/* ✅ After: fluid, balanced */
-h1 { font-size: clamp(1.5rem, 3vw+0.5rem, 2.5rem); text-wrap: balance; }
+/* ❌ */h1{font-size:2rem} /* ✅ */h1{font-size:clamp(1.5rem,3vw+0.5rem,2.5rem);text-wrap:balance}
 ```
 
-## Animation
-Audit rules — for implementation patterns, load **ui-engine**.
-- **Props**: `transform`+`opacity` only. ❌ `width/height/top/left/margin/padding`
-- **Duration**: fast 120ms, base 200ms, slow 300ms. ❌ >500ms. Per-element total <200ms
-- **Reduced motion**: `animation/transition-duration: 0.01ms !important` on `*` at `prefers-reduced-motion: reduce`
-- ❌ `transition:all` · ❌ layout property animation · ✅ Scroll-Driven CSS for 0 INP
+## Animation(audit only—see ui-engine)
+Props:`transform`+`opacity`✅. ❌`width/height/top/left/margin/padding`. Duration:120/200/300ms. ❌>500ms. <200ms/element.
+Reduced:`animation/transition-duration:0.01ms!important`on`*`at`prefers-reduced-motion:reduce`
+❌`transition:all`·✅Scroll-Driven CSS
 
 ## Tokens
-Audit rules — for implementation patterns, load **ui-engine**.
-- ❌ HSL/RGB tokens → ✅ OKLCH · 8pt scale · 3-tier Primitive→Semantic→Component · `light-dark()` · **4.5:1 contrast** all text all themes
+❌HSL/RGB→✅OKLCH·8pt·3-tier(Prim→Sem→Comp)·`light-dark()`·≥4.5:1 all text all themes
 
-## Design + Interaction
-No gradients/multicolor · No glow primary · Empty state: 1 primary action · Accent color: 1 per view.
-Errors next to action · Accessible keyboard/focus · `aria-label` icons · No blocking paste.
+## Design
+No gradients/multicolor·No glow·Empty:1primary·Accent:1/view·Errors next to action·Keyboard/focus·`aria-label`icons·No blocking paste
 
-## Review
-`/baseline-ui <file>` → Violation → Why → Fix
+## Review: `/baseline-ui <file>`→Violation→Why→Fix
 
-## Cross-References
-- **ui-engine** → implementation patterns, decision tree, CSS reference (load FIRST)
-- **accessibility** → focus management, contrast, ARIA, EAA compliance
-- **performance** → animation budget, content-visibility, compositor
-- **web-quality-audit** → full audit checklist, CI/CD integration
+## Refs
+**ui-engine**(implementation)**accessibility**(focus/ARIA/EAA)**performance**(budget/CV)**web-quality-audit**(full audit)
 
 ## Anti-Patterns
-Fixed width · h-screen · grid-auto-flow:dense interactive · Fixed font-size · transition:all · >500ms animation · Missing reduced-motion · HSL/RGB tokens · No contrast check · cqi outside container · letter-spacing on body text
+Fixed width·h-screen·grid-auto-flow:dense interactive·Fixed font-size·transition:all·>500ms·No reduced-motion·HSL/RGB·No contrast·cqi outside container·letter-spacing body

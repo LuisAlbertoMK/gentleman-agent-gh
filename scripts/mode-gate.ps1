@@ -128,7 +128,8 @@ $result = [PSCustomObject]@{
 }
 
 if ($Json) {
-    return ($result | ConvertTo-Json)
+    Write-Output ($result | ConvertTo-Json)
+    if (-not $modeOk) { exit 1 } else { exit 0 }
 }
 
 # --- Human-readable output ---

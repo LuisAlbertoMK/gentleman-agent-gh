@@ -1,3 +1,13 @@
+2026-07-30 - Branch test
+2026-07-30 - Non-quiet test
+2026-07-30 - Compact
+2026-07-30 - Dry run
+2026-07-30 - Added RBAC support
+2026-07-30 - Test
+2026-07-30 - Gate check
+2026-07-30 - Protected check
+2026-07-30 - Int test
+2026-07-30 - 3-phase refactor done, 22 files changed
 2026-07-29 - Token/context reduction: P0-P3 complete. frontmatter strip, deny-rules SSoT, dedup, archive ciclos + stale docs
 2026-07-29 - Session close
 2026-07-29 - Branch test

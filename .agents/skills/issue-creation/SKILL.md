@@ -3,100 +3,48 @@ name: issue-creation
 description: "Create Gentle AI issues with issue-first checks."
 triggers: "create issue, GitHub issue, bug report, feature request, open issue, issue creation, report bug"
 ---
+**Use**: Bug in `gga`·Feature/enhancement·Gentleman-Programming/gentle-ai·Triaging
 
-## When to Use
-- Report a bug in `gga`
-- Request feature/enhancement
-- Open issue on Gentleman-Programming/gentle-ai
-- Triaging or approving issues
-
-## Critical Rules
-1. **Blank issues DISABLED** — MUST use `.github/ISSUE_TEMPLATE/bug_report.yml` or `feature_request.yml`.
-2. **`status:needs-review` auto-applied** — do NOT add manually.
-3. **`status:approved` REQUIRED** before ANY PR.
-4. **Questions → [GitHub Discussions](https://github.com/Gentleman-Programming/gentle-ai/discussions)**, not issues.
-5. **No `Co-Authored-By`** trailers.
-
-## Decision Tree
-```
-Bug?                  → Bug Report template
-New feature?          → Feature Request template
-Question?             → Discussions (not issues)
-Duplicate?            → Link existing, close
-```
+## Rules
+1.Blank issues❌—MUST use `.github/ISSUE_TEMPLATE/bug_report.yml` or `feature_request.yml`
+2.`status:needs-review` auto—do NOT add manually
+3.`status:approved` REQUIRED before ANY PR
+4.Questions→[Discussions](https://github.com/Gentleman-Programming/gentle-ai/discussions)
+5.No `Co-Authored-By`
 
 ## Workflow
-```
-1. Search existing issues for duplicates
-2. Choose template (Bug Report or Feature Request)
-3. Fill ALL required fields
-4. Submit → gets status:needs-review (auto)
-5. Wait for status:approved
-6. Only after approved → PR with Closes #<N>
-```
+1.Search dupes 2.Choose template 3.Fill required 4.Submit→`status:needs-review`(auto) 5.Wait `status:approved` 6.PR with `Closes #<N>`
 
-## Issue Templates
+## Bug Report
+Template:`.github/ISSUE_TEMPLATE/bug_report.yml` Labels:`bug`,`status:needs-review`
+Areas:CLI·TUI·Installation·Agent Detection·System Detection·Catalog/Steps·Docs·Other
+Required:Pre-flight+Bug Desc+Steps+Expected vs Actual+gga version+OS+Agent/Client
+Optional:Logs+Context
 
-### Bug Report
-Template: `.github/ISSUE_TEMPLATE/bug_report.yml` | Labels: `bug`, `status:needs-review`
-Areas: `CLI` · `TUI` · `Installation` · `Agent Detection` · `System Detection` · `Catalog/Steps` · `Documentation` · `Other`
+## Feature Request
+Template:`.github/ISSUE_TEMPLATE/feature_request.yml` Labels:`enhancement`,`status:needs-review`
+Required:Pre-flight+Area+Problem+Proposed Solution. Optional:Alternatives+Context
 
-| Field | Required | Notes |
-|-------|----------|-------|
-| Pre-flight Checks | ✓ | No duplicate + understands approval |
-| Bug Description | ✓ | Clear description |
-| Steps to Reproduce | ✓ | Numbered steps |
-| Expected vs Actual | ✓ | What should happen vs what happened |
-| gga version | ✓ | Version string |
-| Operating System | ✓ | OS name/version |
-| Agent / Client | ✓ | AI agent used |
-| Relevant Logs | — | Auto-formatted code block |
-| Additional Context | — | Screenshots, workarounds |
+## Labels
+Bug→`bug`+`needs-review`|Feature→`enhancement`+`needs-review`
+Status:`needs-review`→`approved`→`in-progress`→`blocked`/`wont-fix`
+Issue type:`bug`/`enhancement`. PR type:`type:bug`/`feature`/`docs`/`refactor`/`chore`/`breaking-change`
+Priority:`critical`/`high`/`medium`/`low`
 
-### Feature Request
-Template: `.github/ISSUE_TEMPLATE/feature_request.yml` | Labels: `enhancement`, `status:needs-review`
-
-| Field | Required | Notes |
-|-------|----------|-------|
-| Pre-flight Checks | ✓ | No duplicate + understands approval |
-| Affected Area | ✓ | Dropdown |
-| Problem Statement | ✓ | Pain point this solves |
-| Proposed Solution | ✓ | User-facing behavior |
-| Alternatives Considered | — | Other approaches |
-| Additional Context | — | Mockups, references |
-
-## Label System
-
-| Template | Auto Labels |
-|----------|-------------|
-| Bug Report | `bug`, `status:needs-review` |
-| Feature Request | `enhancement`, `status:needs-review` |
-
-**Status flow**: `needs-review` → `approved` → `in-progress` → `blocked`|`wont-fix`
-**Type** (issues): `bug`|`enhancement` · (PRs): `type:bug`|`type:feature`|`type:docs`|`type:refactor`|`type:chore`|`type:breaking-change`
-**Priority**: `critical`|`high`|`medium`|`low`
-
-## Maintainer Workflow
-```
-1. Issue arrives → status:needs-review
-2. Valid & clear? → add status:approved
-3. Not clear? → comment, request info
-4. Invalid/duplicate? → close with reason
-5. Contributor opens PR linking the issue
-```
+## Maintainer
+1.Issue→`needs-review` 2.Valid→`approved` 3.Unclear→comment 4.Invalid→close with reason 5.Contributor→PR linking issue
 
 ## Commands
 ```bash
 gh issue list -R Gentleman-Programming/gentle-ai --state all -s "keywords"
-gh issue create -R Gentleman-Programming/gentle-ai --template bug_report.yml -t "fix(<scope>): <desc>"
-gh issue create -R Gentleman-Programming/gentle-ai --template feature_request.yml -t "feat(<scope>): <desc>"
+gh issue create -R Gentleman-Programming/gentle-ai --template bug_report.yml -t "fix(<scope>):<desc>"
+gh issue create -R Gentleman-Programming/gentle-ai --template feature_request.yml -t "feat(<scope>):<desc>"
 gh issue view <N> -R Gentleman-Programming/gentle-ai
 ```
-
-Valid scopes: `tui`, `cli`, `installer`, `catalog`, `system`, `agent`, `e2e`, `ci`, `docs`
+Scopes:`tui`|`cli`|`installer`|`catalog`|`system`|`agent`|`e2e`|`ci`|`docs`
 
 ## Refs
-branch-pr · commit-crafter · quality-gate · work-unit-commits · opencode-skill-creator
+branch-pr·commit-crafter·quality-gate·work-unit-commits·opencode-skill-creator
 
 ## Anti-Patterns
-Create issue without searching duplicates · Skip template · Work before approved · Use issue for questions · Start PR without Closes #N
+No dupe search·Skip template·Work before approved·Issue for questions·PR without Closes#
