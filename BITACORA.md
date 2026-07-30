@@ -1,3 +1,4 @@
+2026-07-30 - Session: limit key fix, default_agent global, sync ops
 2026-07-30 - Removed invalid limit key from opencode.json, synced global config, committed fix
 2026-07-30 - Branch test
 2026-07-30 - Non-quiet test
