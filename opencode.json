@@ -303,125 +303,65 @@
           "git rebase *": "ask",
           "git reset *": "ask",
           "git stash drop *": "ask",
-          
           "Add-MpPreference *": "deny",
-          
           "bitsadmin *": "deny",
-          
           "certutil *": "deny",
-          
           "cmd /c *": "deny",
-          
           "cmd.exe *": "deny",
-          
           "curl *": "deny",
-          
           "docker *": "deny",
-          
           "docker compose *": "deny",
-          
           "docker-compose *": "deny",
-          
           "icacls *": "deny",
-          
           "icm *": "deny",
-          
           "iex *": "deny",
-          
           "Invoke-Command *": "deny",
-          
           "Invoke-Expression *": "deny",
-          
           "Invoke-RestMethod *": "deny",
-          
           "Invoke-WebRequest *": "deny",
-          
           "irm *": "deny",
-          
           "iwr *": "deny",
-          
           "nc *": "deny",
-          
           "ncat *": "deny",
-          
           "net localgroup *": "deny",
-          
           "net session *": "deny",
-          
           "net share *": "deny",
-          
           "net use *": "deny",
-          
           "net user *": "deny",
-          
           "New-Service *": "deny",
-          
           "node *": "deny",
-          
           "npx *": "deny",
-          
           "perl *": "deny",
-          
           "php *": "deny",
-          
           "powershell -c *": "deny",
-          
           "powershell -command *": "deny",
-          
           "powershell -enc *": "deny",
-          
           "powershell -File *": "deny",
-          
           "powershell.exe -c *": "deny",
-          
           "powershell.exe -command *": "deny",
-          
           "powershell.exe -enc *": "deny",
-          
           "powershell.exe -File *": "deny",
-          
           "pwsh *": "deny",
-          
           "pwsh.exe *": "deny",
-          
           "python *": "deny",
-          
           "python3 *": "deny",
-          
           "reg *": "deny",
-          
           "Register-ScheduledTask *": "deny",
-          
           "Remove-Item *": "deny",
-          
           "rm -rf *": "deny",
-          
           "rm *": "deny",
-          
           "ruby *": "deny",
-          
           "saps *": "deny",
-          
           "sc *": "deny",
-          
           "schtasks *": "deny",
-          
           "Set-MpPreference *": "deny",
-          
           "ssh *": "deny",
-          
           "start *": "deny",
-          
           "Start-BitsTransfer *": "deny",
-          
           "Start-Process *": "deny",
-          
           "telnet *": "deny",
-          
           "Test-NetConnection *": "deny",
-          
           "wget *": "deny",
-          
           "wsl *": "deny"
         }
       },
@@ -460,125 +400,65 @@
           "git rebase *": "ask",
           "git reset *": "ask",
           "git stash drop *": "ask",
-          
           "Add-MpPreference *": "deny",
-          
           "bitsadmin *": "deny",
-          
           "certutil *": "deny",
-          
           "cmd /c *": "deny",
-          
           "cmd.exe *": "deny",
-          
           "curl *": "deny",
-          
           "docker *": "deny",
-          
           "docker compose *": "deny",
-          
           "docker-compose *": "deny",
-          
           "icacls *": "deny",
-          
           "icm *": "deny",
-          
           "iex *": "deny",
-          
           "Invoke-Command *": "deny",
-          
           "Invoke-Expression *": "deny",
-          
           "Invoke-RestMethod *": "deny",
-          
           "Invoke-WebRequest *": "deny",
-          
           "irm *": "deny",
-          
           "iwr *": "deny",
-          
           "nc *": "deny",
-          
           "ncat *": "deny",
-          
           "net localgroup *": "deny",
-          
           "net session *": "deny",
-          
           "net share *": "deny",
-          
           "net use *": "deny",
-          
           "net user *": "deny",
-          
           "New-Service *": "deny",
-          
           "node *": "deny",
-          
           "npx *": "deny",
-          
           "perl *": "deny",
-          
           "php *": "deny",
-          
           "powershell -c *": "deny",
-          
           "powershell -command *": "deny",
-          
           "powershell -enc *": "deny",
-          
           "powershell -File *": "deny",
-          
           "powershell.exe -c *": "deny",
-          
           "powershell.exe -command *": "deny",
-          
           "powershell.exe -enc *": "deny",
-          
           "powershell.exe -File *": "deny",
-          
           "pwsh *": "deny",
-          
           "pwsh.exe *": "deny",
-          
           "python *": "deny",
-          
           "python3 *": "deny",
-          
           "reg *": "deny",
-          
           "Register-ScheduledTask *": "deny",
-          
           "Remove-Item *": "deny",
-          
           "rm -rf *": "deny",
-          
           "rm *": "deny",
-          
           "ruby *": "deny",
-          
           "saps *": "deny",
-          
           "sc *": "deny",
-          
           "schtasks *": "deny",
-          
           "Set-MpPreference *": "deny",
-          
           "ssh *": "deny",
-          
           "start *": "deny",
-          
           "Start-BitsTransfer *": "deny",
-          
           "Start-Process *": "deny",
-          
           "telnet *": "deny",
-          
           "Test-NetConnection *": "deny",
-          
           "wget *": "deny",
-          
           "wsl *": "deny"
         }
       }
@@ -616,125 +496,65 @@
           "git rebase *": "ask",
           "git reset *": "ask",
           "git stash drop *": "ask",
-          
           "Add-MpPreference *": "deny",
-          
           "bitsadmin *": "deny",
-          
           "certutil *": "deny",
-          
           "cmd /c *": "deny",
-          
           "cmd.exe *": "deny",
-          
           "curl *": "deny",
-          
           "docker *": "deny",
-          
           "docker compose *": "deny",
-          
           "docker-compose *": "deny",
-          
           "icacls *": "deny",
-          
           "icm *": "deny",
-          
           "iex *": "deny",
-          
           "Invoke-Command *": "deny",
-          
           "Invoke-Expression *": "deny",
-          
           "Invoke-RestMethod *": "deny",
-          
           "Invoke-WebRequest *": "deny",
-          
           "irm *": "deny",
-          
           "iwr *": "deny",
-          
           "nc *": "deny",
-          
           "ncat *": "deny",
-          
           "net localgroup *": "deny",
-          
           "net session *": "deny",
-          
           "net share *": "deny",
-          
           "net use *": "deny",
-          
           "net user *": "deny",
-          
           "New-Service *": "deny",
-          
           "node *": "deny",
-          
           "npx *": "deny",
-          
           "perl *": "deny",
-          
           "php *": "deny",
-          
           "powershell -c *": "deny",
-          
           "powershell -command *": "deny",
-          
           "powershell -enc *": "deny",
-          
           "powershell -File *": "deny",
-          
           "powershell.exe -c *": "deny",
-          
           "powershell.exe -command *": "deny",
-          
           "powershell.exe -enc *": "deny",
-          
           "powershell.exe -File *": "deny",
-          
           "pwsh *": "deny",
-          
           "pwsh.exe *": "deny",
-          
           "python *": "deny",
-          
           "python3 *": "deny",
-          
           "reg *": "deny",
-          
           "Register-ScheduledTask *": "deny",
-          
           "Remove-Item *": "deny",
-          
           "rm -rf *": "deny",
-          
           "rm *": "deny",
-          
           "ruby *": "deny",
-          
           "saps *": "deny",
-          
           "sc *": "deny",
-          
           "schtasks *": "deny",
-          
           "Set-MpPreference *": "deny",
-          
           "ssh *": "deny",
-          
           "start *": "deny",
-          
           "Start-BitsTransfer *": "deny",
-          
           "Start-Process *": "deny",
-          
           "telnet *": "deny",
-          
           "Test-NetConnection *": "deny",
-          
           "wget *": "deny",
-          
           "wsl *": "deny"
         }
       },
@@ -866,125 +686,65 @@
           "git rebase *": "ask",
           "git reset *": "ask",
           "git stash drop *": "ask",
-          
           "Add-MpPreference *": "deny",
-          
           "bitsadmin *": "deny",
-          
           "certutil *": "deny",
-          
           "cmd /c *": "deny",
-          
           "cmd.exe *": "deny",
-          
           "curl *": "deny",
-          
           "docker *": "deny",
-          
           "docker compose *": "deny",
-          
           "docker-compose *": "deny",
-          
           "icacls *": "deny",
-          
           "icm *": "deny",
-          
           "iex *": "deny",
-          
           "Invoke-Command *": "deny",
-          
           "Invoke-Expression *": "deny",
-          
           "Invoke-RestMethod *": "deny",
-          
           "Invoke-WebRequest *": "deny",
-          
           "irm *": "deny",
-          
           "iwr *": "deny",
-          
           "nc *": "deny",
-          
           "ncat *": "deny",
-          
           "net localgroup *": "deny",
-          
           "net session *": "deny",
-          
           "net share *": "deny",
-          
           "net use *": "deny",
-          
           "net user *": "deny",
-          
           "New-Service *": "deny",
-          
           "node *": "deny",
-          
           "npx *": "deny",
-          
           "perl *": "deny",
-          
           "php *": "deny",
-          
           "powershell -c *": "deny",
-          
           "powershell -command *": "deny",
-          
           "powershell -enc *": "deny",
-          
           "powershell -File *": "deny",
-          
           "powershell.exe -c *": "deny",
-          
           "powershell.exe -command *": "deny",
-          
           "powershell.exe -enc *": "deny",
-          
           "powershell.exe -File *": "deny",
-          
           "pwsh *": "deny",
-          
           "pwsh.exe *": "deny",
-          
           "python *": "deny",
-          
           "python3 *": "deny",
-          
           "reg *": "deny",
-          
           "Register-ScheduledTask *": "deny",
-          
           "Remove-Item *": "deny",
-          
           "rm -rf *": "deny",
-          
           "rm *": "deny",
-          
           "ruby *": "deny",
-          
           "saps *": "deny",
-          
           "sc *": "deny",
-          
           "schtasks *": "deny",
-          
           "Set-MpPreference *": "deny",
-          
           "ssh *": "deny",
-          
           "start *": "deny",
-          
           "Start-BitsTransfer *": "deny",
-          
           "Start-Process *": "deny",
-          
           "telnet *": "deny",
-          
           "Test-NetConnection *": "deny",
-          
           "wget *": "deny",
-          
           "wsl *": "deny"
         }
       },
@@ -1013,7 +773,8 @@
         "bash": {
           "*": "ask"
         }
-      }
+      },
+      "model": "opencode/deepseek-v4-flash-free"
     },
     "sdd-design": {
       "description": "Create technical design from proposals",
@@ -1024,7 +785,8 @@
         "bash": {
           "*": "ask"
         }
-      }
+      },
+      "model": "opencode/nemotron-3-ultra-free"
     },
     "sdd-explore": {
       "description": "Investigate codebase and think through ideas",
@@ -1047,7 +809,8 @@
         "bash": {
           "*": "ask"
         }
-      }
+      },
+      "model": "opencode/deepseek-v4-flash-free"
     },
     "sdd-orchestrator": {
       "description": "SDD Orchestrator - coordinates sub-agents, never does work inline",
@@ -1132,7 +895,7 @@
     },
     "gentleman-vMK-auto": {
       "description": "Orchestrator â€” AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode/mimo-v2.5-free",
+      "model": "opencode/big-pickle",
       "tools": {
         "engram*": true,
         "codebase-memory*": true
@@ -1152,131 +915,70 @@
           "git rebase *": "ask",
           "git reset *": "ask",
           "git stash drop *": "ask",
-          
           "Add-MpPreference *": "deny",
-          
           "bitsadmin *": "deny",
-          
           "certutil *": "deny",
-          
           "cmd /c *": "deny",
-          
           "cmd.exe *": "deny",
-          
           "curl *": "deny",
-          
           "docker *": "deny",
-          
           "docker compose *": "deny",
-          
           "docker-compose *": "deny",
-          
           "icacls *": "deny",
-          
           "icm *": "deny",
-          
           "iex *": "deny",
-          
           "Invoke-Command *": "deny",
-          
           "Invoke-Expression *": "deny",
-          
           "Invoke-RestMethod *": "deny",
-          
           "Invoke-WebRequest *": "deny",
-          
           "irm *": "deny",
-          
           "iwr *": "deny",
-          
           "nc *": "deny",
-          
           "ncat *": "deny",
-          
           "net localgroup *": "deny",
-          
           "net session *": "deny",
-          
           "net share *": "deny",
-          
           "net use *": "deny",
-          
           "net user *": "deny",
-          
           "New-Service *": "deny",
-          
           "node *": "deny",
-          
           "npx *": "deny",
-          
           "perl *": "deny",
-          
           "php *": "deny",
-          
           "powershell -c *": "deny",
-          
           "powershell -command *": "deny",
-          
           "powershell -enc *": "deny",
-          
           "powershell -File *": "deny",
-          
           "powershell.exe -c *": "deny",
-          
           "powershell.exe -command *": "deny",
-          
           "powershell.exe -enc *": "deny",
-          
           "powershell.exe -File *": "deny",
-          
           "pwsh *": "deny",
-          
           "pwsh.exe *": "deny",
-          
           "python *": "deny",
-          
           "python3 *": "deny",
-          
           "reg *": "deny",
-          
           "Register-ScheduledTask *": "deny",
-          
           "Remove-Item *": "deny",
-          
           "rm -rf *": "deny",
-          
           "rm *": "deny",
-          
           "ruby *": "deny",
-          
           "saps *": "deny",
-          
           "sc *": "deny",
-          
           "schtasks *": "deny",
-          
           "Set-MpPreference *": "deny",
-          
           "ssh *": "deny",
-          
           "start *": "deny",
-          
           "Start-BitsTransfer *": "deny",
-          
           "Start-Process *": "deny",
-          
           "telnet *": "deny",
-          
           "Test-NetConnection *": "deny",
-          
           "wget *": "deny",
-          
           "wsl *": "deny"
         }
       },
       "mode": "primary"
     },
-    
     "gentleman-deep-semi": {
       "description": "Deep reasoning â€” SEMI mode (safe commands auto, writes/commits ask)",
       "model": "opencode/nemotron-3-ultra-free",
@@ -1709,7 +1411,7 @@
     },
     "gentleman-vMK-semi": {
       "description": "Orchestrator â€” SEMI mode (safe commands auto, writes/commits ask)",
-      "model": "opencode/deepseek-v4-flash-free",
+      "model": "opencode/big-pickle",
       "tools": {
         "engram*": true,
         "codebase-memory*": true
@@ -1844,5 +1546,8 @@
   "tool_output": {
     "max_bytes": 4096,
     "max_lines": 100
+  },
+  "limit": {
+    "input": 80000
   }
 }
