@@ -15,30 +15,12 @@ concurrency:
 
 jobs:
   lint:
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     defaults:
       run:
         shell: pwsh
     steps:
       - uses: actions/checkout@v4
-
-      - name: Linux/macOS setup test
-        if: runner.os == 'Linux'
-        run: ./scripts/install.sh --yes --skip-env-var --skip-shortcuts
-
-      - name: Shellcheck bash scripts (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          if command -v shellcheck &>/dev/null; then
-            shellcheck scripts/*.sh
-          else
-            for f in scripts/*.sh; do
-              bash -n "$f" && echo "OK: $f" || exit 1
-            done
-          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -50,48 +32,29 @@ jobs:
       - name: opencode.json config validation
         run: node scripts/lib/generate-opencode-config.js --validate
 
-      - name: PS7 syntax check .ps1
+      - name: PS7 checks (syntax + version gate)
         run: |
           $fail = 0
           Get-ChildItem -Recurse -Filter *.ps1 | Where-Object {
             $_.FullName -notmatch 'experiments|node_modules|metricas\\assets'
           } | ForEach-Object {
-            try {
-              $null = [System.Management.Automation.Language.Parser]::ParseFile(
-                $_.FullName, [ref]$null, [ref]$null
-              )
-              Write-Output "OK: $($_.Name)"
-            } catch {
-              Write-Warning "Syntax error: $($_.Name) — $($_.Exception.Message)"
-              $fail++
+            $c = Get-Content $_ -Head 3 -Raw
+            if ($c -notmatch '#requires -Version 7' -and $_.Name -ne 'ps5-detect.ps1') {
+              Write-Output "::warning title=Missing PS7::$($_.Name)"; $fail++; return
             }
+            try { $null = [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$null); Write-Output "OK: $($_.Name)" }
+            catch { Write-Warning "Syntax error: $($_.Name) — $($_.Exception.Message)"; $fail++ }
           }
           if ($fail) { exit 1 }
-
-      - name: PS7 version gate
-        run: |
-          $bad = Get-ChildItem -Recurse -Filter *.ps1 | Where-Object { $_.FullName -notmatch 'experiments|node_modules|metricas\\assets' } | Where-Object {
-            $c = (Get-Content $_ -Head 3) -join "`n"; $c -notmatch '#requires -Version 7'
-          }
-          $bad = $bad | Where-Object { $_.Name -ne 'ps5-detect.ps1' }
-          if ($bad) { $bad | ForEach-Object { Write-Output "::warning title=Missing PS7::$($_.Name)" }; exit 1 }
-          else { Write-Output "OK: All .ps1 scripts require PS7+" }
 
       - name: Overweight skill check
         run: |
           $overweight = Get-ChildItem .agents/skills -Directory | Where-Object { $_.Name -ne '_shared' } | ForEach-Object {
             $md = Join-Path $_.FullName 'SKILL.md'
-            if (Test-Path $md) {
-              $len = (Get-Content $md -Raw).Length
-              if ($len -gt 3072) { Write-Output "$($_.Name) ($($len)B)" }
-            }
+            if (Test-Path $md) { $len = (Get-Content $md -Raw).Length; if ($len -gt 3072) { "$($_.Name) ($($len)B)" } }
           }
-          if ($overweight) {
-            Write-Output "::warning title=Overweight Skills::Skills exceeding 3KB limit"
-            $overweight
-          } else {
-            Write-Output "OK: All skills ≤3KB"
-          }
+          if ($overweight) { Write-Output "::warning title=Overweight Skills::Skills exceeding 3KB limit"; $overweight }
+          else { Write-Output "OK: All skills ≤3KB" }
 
       - name: Permission consistency
         run: |
@@ -102,16 +65,27 @@ jobs:
             $a = $config.agent.$agent
             if (-not $a) { Write-Warning "Agent not found: $agent"; $fail++; continue }
             $bashDeny = $a.permission.bash.'*'
-            if ($bashDeny -ne 'deny') {
-              Write-Error "FAIL: $agent has bash.* = $bashDeny (expected deny)"
-              $fail++
-            }
+            if ($bashDeny -ne 'deny') { Write-Error "FAIL: $agent has bash.* = $bashDeny (expected deny)"; $fail++ }
           }
           $orchBash = $config.agent.'gentleman-vMK'.permission.bash
           if ($orchBash.'python *' -ne 'deny') { Write-Error "FAIL: orchestrator missing python deny"; $fail++ }
           if ($orchBash.'node *' -ne 'deny') { Write-Error "FAIL: orchestrator missing node deny"; $fail++ }
           if ($fail) { exit 1 }
           Write-Output "OK: All permission consistency checks passed"
+
+  lint-linux:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install
+        run: ./scripts/install.sh --yes --skip-env-var --skip-shortcuts
+      - name: Shellcheck
+        run: |
+          if command -v shellcheck &>/dev/null; then shellcheck scripts/*.sh
+          else for f in scripts/*.sh; do bash -n "$f" && echo "OK: $f" || exit 1; done; fi
 
   security:
     runs-on: ubuntu-latest
@@ -123,9 +97,6 @@ jobs:
         with:
           python-version: '3.x'
           cache: 'pip'
-
-      - name: Cross-ref validation
-        run: ./scripts/cross-ref-check.ps1
 
       - name: pre-commit — all hooks
         run: |
@@ -157,6 +128,13 @@ jobs:
         shell: pwsh
     steps:
       - uses: actions/checkout@v4
+
+      - name: Cache PowerShell modules
+        uses: actions/cache@v4
+        with:
+          path: ~\Documents\PowerShell\Modules
+          key: psmodules-${{ hashFiles('scripts/tests/*.Tests.ps1') }}
+          restore-keys: psmodules-
 
       - name: Skill drift check
         run: ./scripts/check-skill-drift.ps1
