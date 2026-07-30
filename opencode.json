@@ -1,4 +1,4 @@
-﻿{
+{
   "skills": {
     "paths": [
       ".agents/skills/*"
@@ -10,7 +10,7 @@
       "git commit *": "ask",
       "git push": "ask",
       "git push *": "ask",
-      "git push --force *": "ask",
+      "git push --force *": "deny",
       "git push --delete *": "ask",
       "git rebase *": "ask",
       "git reset *": "ask",
@@ -393,7 +393,7 @@
           "git merge *": "ask",
           "git push": "ask",
           "git push --delete *": "ask",
-          "git push --force *": "ask",
+          "git push --force *": "deny",
           "git push *": "ask",
           "git rebase *": "ask",
           "git reset *": "ask",
@@ -488,7 +488,7 @@
           "git merge *": "ask",
           "git push": "ask",
           "git push --delete *": "ask",
-          "git push --force *": "ask",
+          "git push --force *": "deny",
           "git push *": "ask",
           "git rebase *": "ask",
           "git reset *": "ask",
@@ -677,7 +677,7 @@
           "git merge *": "ask",
           "git push": "ask",
           "git push --delete *": "ask",
-          "git push --force *": "ask",
+          "git push --force *": "deny",
           "git push *": "ask",
           "git rebase *": "ask",
           "git reset *": "ask",
@@ -895,7 +895,7 @@
           "git merge *": "ask",
           "git push": "ask",
           "git push --delete *": "ask",
-          "git push --force *": "ask",
+          "git push --force *": "deny",
           "git push *": "ask",
           "git rebase *": "ask",
           "git reset *": "ask",
