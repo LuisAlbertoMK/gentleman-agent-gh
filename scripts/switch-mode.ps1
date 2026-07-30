@@ -81,47 +81,14 @@ function Show-Banner {
 # --- Show summary of what each mode allows ---
 function Show-ModeDetail {
     param([string]$targetMode)
-
-    $details = @{
-        manual = @"
-MANUAL MODE — Maximum safety
-  Git:              All operations ask (status, diff, commit, push)
-  File read:        Allowed but each command asks
-  File write/edit:  Allowed but each command asks
-  Scripts:          Each execution asks
-  Network:          Denied (curl, ssh, docker, etc.)
-  Destructive:      Denied (rm, Remove-Item, etc.)
-  Interpreters:     Denied (python, node, ruby, etc.)
-
-  Best for: Exploration, learning, untrusted code
-"@
-        semi = @"
-SEMI-AUTO MODE — Balanced
-  ✅ Git read:      status, log, diff, show, branch — auto
-  ✅ File read:     ls, pwd, cat, grep, Test-Path — auto
-  ✅ Build/test:    npm test, pytest, go test, Invoke-Pester — auto
-  ⏸️ Git write:     commit, add, push — ask
-  ⏸️ File create:   mkdir, New-Item — ask (unless whitelisted)
-  ❌ Network:       Denied (curl, ssh, docker)
-  ❌ Destructive:   Denied (rm, Remove-Item)
-  ❌ Interpreters:  Denied (python, node)
-
-  Best for: Daily development with guardrails
-"@
-        auto = @"
-AUTO MODE — Maximum speed
-  ✅ Git:           Everything auto except push (ask) and push --force (deny)
-  ✅ File ops:      Read, write, edit — auto
-  ✅ Scripts:       Execute — auto (except interpreters)
-  ✅ Commit:        Auto (no ask)
-  ⏸️ Git push:      Ask (unless --force, which is denied)
-  ❌ Destructive:   Denied (rm, Remove-Item, curl, ssh, docker, python, node)
-
-  Best for: Focused implementation, trusted environment
-"@
+    $N = [Environment]::NewLine
+    $text = switch ($targetMode) {
+        manual { "MANUAL MODE --- Maximum safety${N}  Git:              All operations ask${N}  File read:        Allowed but each command asks${N}  File write/edit:  Allowed but each command asks${N}  Scripts:          Each execution asks${N}  Network:          Denied (curl, ssh, docker, etc.)${N}  Destructive:      Denied (rm, Remove-Item, etc.)${N}  Interpreters:     Denied (python, node, ruby, etc.)${N}${N}  Best for: Exploration, learning, untrusted code" }
+        semi   { "SEMI-AUTO MODE --- Balanced${N}  [OK] Git read:      status, log, diff, show, branch --- auto${N}  [OK] File read:     ls, pwd, cat, grep, Test-Path --- auto${N}  [OK] Build/test:    npm test, pytest, go test, Invoke-Pester --- auto${N}  [..] Git write:     commit, add, push --- ask${N}  [..] File create:   mkdir, New-Item --- ask${N}  [NO] Network:       Denied (curl, ssh, docker)${N}  [NO] Destructive:   Denied (rm, Remove-Item)${N}  [NO] Interpreters:  Denied (python, node)${N}${N}  Best for: Daily development with guardrails" }
+        auto   { "AUTO MODE --- Maximum speed${N}  [OK] Git:           Everything auto except push${N}  [OK] File ops:      Read, write, edit --- auto${N}  [OK] Scripts:       Execute --- auto${N}  [OK] Commit:        Auto (no ask)${N}  [..] Git push:      Ask (unless --force, which is denied)${N}  [NO] Destructive:   Denied (rm, Remove-Item, curl, ssh, docker, python, node)${N}${N}  Best for: Focused implementation, trusted environment" }
     }
-
-    Write-Host "`n$($details[$targetMode])" -ForegroundColor White
+    $text = $text -replace '\[OK\]', '✅' -replace '\[..\]', '⏸️ ' -replace '\[NO\]', '❌'
+    Write-Host "${N}${text}" -ForegroundColor White
 }
 
 # ===== MAIN =====

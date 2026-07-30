@@ -262,7 +262,7 @@ if (-not $Quiet) { Write-Host "[10/9] semi allowlist sync..." -N }
 try {
     $semiPath = Join-Path $RepoRoot "scripts\opencode-config\semi-agents.json"
     $gatePath = Join-Path $RepoRoot "scripts\permission-gate.ps1"
-    
+
     if ((Test-Path $semiPath) -and (Test-Path $gatePath)) {
         $semiContent = Get-Content $semiPath -Raw -Encoding UTF8
         $gateContent = Get-Content $gatePath -Raw -Encoding UTF8

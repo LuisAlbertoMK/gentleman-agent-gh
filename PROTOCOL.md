@@ -4,6 +4,22 @@
 
 ---
 
+## Agent Permission Modes
+
+Three modes control how commands are approved:
+
+| Mode | File `.gentleman-mode` | Behavior | Routing Suffix |
+|------|----------------------|----------|---------------|
+| **manual** | `manual` | Every command ASKs for approval | No suffix (`gentleman-quick`) |
+| **semi** | `semi` | Safe commands auto-approve (git status/diff/log, npm test, ls, grep, etc.), writes/commits ASK, destructive DENY | `-semi` (`gentleman-quick-semi`) |
+| **auto** | `auto` | All commands auto-approve except pushes + deletes + destructive DENY | `-auto` (`gentleman-quick-auto`) |
+
+**Switch mode**: `!manual` / `!semi` / `!auto` in OpenCode, or `scripts/switch-mode.ps1 -Mode semi`.
+
+**Mode Gate**: `scripts/mode-gate.ps1` validates agent suffix matches mode before delegation.
+
+**Audit trail**: In auto/semi mode, significant actions are logged to `.gentleman/audit.log`. View with `scripts/audit-log.ps1 session`.
+
 ## Pre-Flight Gate — Lazy Senior Dev Mode
 
 Climb the Ponytail Ladder BEFORE any response:
