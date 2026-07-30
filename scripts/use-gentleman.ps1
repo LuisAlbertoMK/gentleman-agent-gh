@@ -166,6 +166,17 @@ if ($cfg.permission) {
     $projectCfg['permission'] = $mergedPerms
 }
 
+# Inherit runtime config sections — project wins on conflict
+@('limit', 'compaction', 'tool_output', 'experimental', 'tools', 'plugin') | ForEach-Object {
+    $section = $_
+    if ($cfg.PSObject.Properties[$section]) {
+        if (-not $projectCfg.ContainsKey($section)) {
+            $projectCfg[$section] = $cfg.$section
+        }
+        # if project already has it, keep project's version
+    }
+}
+
 $projectCfg | ConvertTo-Json -Depth 10 | Set-Content $projectCfgFile -Encoding UTF8 -Force
 Out-Message "  Created $projectCfgFile" -color Green
 Out-Message "    default_agent: $DefaultAgent" -color DarkGray

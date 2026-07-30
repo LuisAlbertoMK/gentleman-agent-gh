@@ -74,6 +74,36 @@ function Sync-Config {
     $targetPlugin = if ($target.PSObject.Properties['plugin']) { $target.plugin | ConvertTo-Json -Compress } else { "null" }
     if ($canonicalPlugin -ne $targetPlugin) { $changes += "plugin" }
   }
+  # limit (context window threshold — new in v2)
+  if ($canonical.PSObject.Properties['limit']) {
+    $canonicalLimit = $canonical.limit | ConvertTo-Json -Compress
+    $targetLimit   = if ($target.PSObject.Properties['limit'])   { $target.limit   | ConvertTo-Json -Compress } else { "null" }
+    if ($canonicalLimit -ne $targetLimit) { $changes += "limit" }
+  }
+  # compaction (prune + reserved)
+  if ($canonical.PSObject.Properties['compaction']) {
+    $canonicalComp = $canonical.compaction | ConvertTo-Json -Compress
+    $targetComp    = if ($target.PSObject.Properties['compaction']) { $target.compaction | ConvertTo-Json -Compress } else { "null" }
+    if ($canonicalComp -ne $targetComp) { $changes += "compaction" }
+  }
+  # tool_output (max_lines / max_bytes)
+  if ($canonical.PSObject.Properties['tool_output']) {
+    $canonicalTout = $canonical.tool_output | ConvertTo-Json -Compress
+    $targetTout    = if ($target.PSObject.Properties['tool_output']) { $target.tool_output | ConvertTo-Json -Compress } else { "null" }
+    if ($canonicalTout -ne $targetTout) { $changes += "tool_output" }
+  }
+  # experimental (feature flags)
+  if ($canonical.PSObject.Properties['experimental']) {
+    $canonicalExp = $canonical.experimental | ConvertTo-Json -Compress
+    $targetExp    = if ($target.PSObject.Properties['experimental']) { $target.experimental | ConvertTo-Json -Compress } else { "null" }
+    if ($canonicalExp -ne $targetExp) { $changes += "experimental" }
+  }
+  # tools (engram*, codebase-memory* allow/deny)
+  if ($canonical.PSObject.Properties['tools']) {
+    $canonicalTools = $canonical.tools | ConvertTo-Json -Compress
+    $targetTools    = if ($target.PSObject.Properties['tools']) { $target.tools | ConvertTo-Json -Compress } else { "null" }
+    if ($canonicalTools -ne $targetTools) { $changes += "tools" }
+  }
 
   if ($changes.Count -eq 0) {
     $results.Add(@{target=$Label; status="OK"; detail="No changes needed"})
@@ -95,6 +125,26 @@ function Sync-Config {
   if ($changes -contains "plugin")     {
     if ($target.PSObject.Properties['plugin']) { $target.plugin = $canonical.plugin }
     else { $target | Add-Member -Name "plugin" -Value $canonical.plugin -MemberType NoteProperty }
+  }
+  if ($changes -contains "limit") {
+    if ($target.PSObject.Properties['limit']) { $target.limit = $canonical.limit }
+    else { $target | Add-Member -Name "limit" -Value $canonical.limit -MemberType NoteProperty }
+  }
+  if ($changes -contains "compaction") {
+    if ($target.PSObject.Properties['compaction']) { $target.compaction = $canonical.compaction }
+    else { $target | Add-Member -Name "compaction" -Value $canonical.compaction -MemberType NoteProperty }
+  }
+  if ($changes -contains "tool_output") {
+    if ($target.PSObject.Properties['tool_output']) { $target.tool_output = $canonical.tool_output }
+    else { $target | Add-Member -Name "tool_output" -Value $canonical.tool_output -MemberType NoteProperty }
+  }
+  if ($changes -contains "experimental") {
+    if ($target.PSObject.Properties['experimental']) { $target.experimental = $canonical.experimental }
+    else { $target | Add-Member -Name "experimental" -Value $canonical.experimental -MemberType NoteProperty }
+  }
+  if ($changes -contains "tools") {
+    if ($target.PSObject.Properties['tools']) { $target.tools = $canonical.tools }
+    else { $target | Add-Member -Name "tools" -Value $canonical.tools -MemberType NoteProperty }
   }
 
   # MCP is NOT synced by design — managed separately by global-setup.ps1
