@@ -31,8 +31,9 @@ Domain routing (security → gentleman-security) overrides file-count classifica
 1. Read .gentleman-mode → manual, semi, or auto
 2. Append suffix to delegation target based on mode:
    - manual → no suffix (current agents, *: ask)
+   - semi → append -semi (e.g., gentleman-quick → gentleman-quick-semi)
    - auto → append -auto (e.g., gentleman-quick → gentleman-quick-auto)
-3. Fallback: if -auto agent doesn't exist → use base agent
+3. Fallback: if -semi/-auto agent doesn't exist → use base agent
 4. Read-only specialists (security, seo, infra, etc.) → NO suffix (always *: deny)
 
 

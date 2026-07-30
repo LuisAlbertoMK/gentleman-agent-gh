@@ -1,11 +1,14 @@
 #requires -Version 5.1
 <#
 .SYNOPSIS
-  Expand $import markers in opencode.json — resolves shared deny rules inline.
+  Expand $import markers in opencode.json — resolves shared deny rules inline
+  and injects -semi agents from semi-agents.json.
 .DESCRIPTION
   Reads opencode.json, finds all "$import" keys in permission.bash blocks,
   reads the referenced JSON files, merges their properties into the parent,
   and writes the expanded result back to opencode.json.
+  Also checks if -semi agents exist and injects them from semi-agents.json
+  if they are missing.
   Safe to run repeatedly — already-expanded files are left unchanged.
 .EXAMPLE
   .\scripts\opencode-config\expand-config.ps1
@@ -28,15 +31,14 @@ if (-not (Test-Path -LiteralPath $configPath)) {
 $content = Get-Content -LiteralPath $configPath -Raw
 $modified = $false
 
-# Pattern: match "$import": "..." with leading whitespace capture
+# --- Expand $import markers ---
 $importPattern = [regex]::new('(?m)^(\s+)"\$import":\s*"([^"]+)"')
 
 $match = $importPattern.Match($content)
 while ($match.Success) {
-    $importPath = $match.Groups[2].Value   # the path
-    $indent = $match.Groups[1].Value       # leading whitespace
+    $importPath = $match.Groups[2].Value
+    $indent = $match.Groups[1].Value
 
-    # Resolve relative to repo root
     $absPath = if ([System.IO.Path]::IsPathRooted($importPath)) {
         $importPath
     } else {
@@ -49,7 +51,6 @@ while ($match.Success) {
         continue
     }
 
-    # Read the imported JSON
     $imported = Get-Content -LiteralPath $absPath -Raw | ConvertFrom-Json
     if (-not $imported) {
         Write-Warning "Empty or invalid import: $importPath"
@@ -57,11 +58,9 @@ while ($match.Success) {
         continue
     }
 
-    # Count rules
     $props = @($imported.PSObject.Properties)
     $ruleCount = $props.Count
 
-    # Build replacement: each rule on its own line with proper indent + comma
     $ruleLines = @()
     for ($i = 0; $i -lt $ruleCount; $i++) {
         $prop = $props[$i]
@@ -70,33 +69,113 @@ while ($match.Success) {
     }
     $replacement = $ruleLines -join "`r`n"
 
-    # Replace the "$import": "..." line with expanded rules
     $content = $content.Remove($match.Index, $match.Length).Insert($match.Index, $replacement)
 
     $modified = $true
     if (-not $Quiet) {
-        Write-Host "  expanded: $importPath → $ruleCount rules" -ForegroundColor Green
+        Write-Host "  expanded: $importPath -> $ruleCount rules" -ForegroundColor Green
     }
 
-    # Re-scan from beginning (positions shifted after replacement)
     $match = $importPattern.Match($content)
+}
+
+# --- Inject -semi agents (if not already present) ---
+$semiConfigPath = Join-Path $repoRoot "scripts\opencode-config\semi-agents.json"
+$semiMarker = '"gentleman-vMK-semi"'
+
+if (Test-Path -LiteralPath $semiConfigPath) {
+    if ($content -notmatch [regex]::Escape($semiMarker)) {
+        $semiRaw = Get-Content -LiteralPath $semiConfigPath -Raw
+
+        # Find insertion point: at the line of "gentleman-reviewer"
+        $afterPattern = [regex]::new('(?m)^    "gentleman-reviewer"')
+        $afterMatch = $afterPattern.Match($content)
+
+        if ($afterMatch.Success) {
+            # Strip outer { } from semi-agents.json
+            $innerSemi = $semiRaw -replace '(?s)^\s*\{\s*\r?\n', '' -replace '(?s)\r?\n\s*\}\s*$', ''
+            # Re-indent from 2-space to 4-space (agents object indent level)
+            $reindented = $innerSemi -replace '(?m)^(\s+)', '  $1'
+            # Ensure last entry has trailing comma (it will be mid-object)
+            $reindented = $reindented.TrimEnd() -replace '\}\s*$', '},'
+
+            # Insert after the 4-space indent to avoid doubling it
+            # $afterMatch.Index points to first space of indent
+            $insertPoint = $afterMatch.Index + 4
+            $insertion = "`r`n${reindented}`r`n    "
+            $content = $content.Substring(0, $insertPoint) + $insertion + $content.Substring($insertPoint)
+            $modified = $true
+
+            if (-not $Quiet) {
+                Write-Host "  injected: 5 -semi agents -> will expand imports below" -ForegroundColor Green
+            }
+
+            # Re-run expand loop for the newly injected $import markers
+            $match = $importPattern.Match($content)
+            while ($match.Success) {
+                $importPath = $match.Groups[2].Value
+                $indent = $match.Groups[1].Value
+
+                $absPath = if ([System.IO.Path]::IsPathRooted($importPath)) {
+                    $importPath
+                } else {
+                    Join-Path $repoRoot $importPath
+                }
+
+                if (-not (Test-Path -LiteralPath $absPath)) {
+                    Write-Warning "Import not found: $importPath (resolved: $absPath)"
+                    $match = $match.NextMatch()
+                    continue
+                }
+
+                $imported = Get-Content -LiteralPath $absPath -Raw | ConvertFrom-Json
+                if (-not $imported) {
+                    $match = $match.NextMatch()
+                    continue
+                }
+
+                $props = @($imported.PSObject.Properties)
+                $ruleCount = $props.Count
+                $ruleLines = @()
+                for ($i = 0; $i -lt $ruleCount; $i++) {
+                    $prop = $props[$i]
+                    $comma = if ($i -lt $ruleCount - 1) { "," } else { "" }
+                    $ruleLines += "$indent`"$($prop.Name)`": `"$($prop.Value)`"$comma"
+                }
+                $replacement = $ruleLines -join "`r`n"
+
+                $content = $content.Remove($match.Index, $match.Length).Insert($match.Index, $replacement)
+                $modified = $true
+                if (-not $Quiet) {
+                    Write-Host "  expanded: $importPath -> $ruleCount rules (semi agent)" -ForegroundColor Green
+                }
+                $match = $importPattern.Match($content)
+            }
+        } else {
+            Write-Warning "Could not find insertion point for -semi agents"
+        }
+    } else {
+        if (-not $Quiet) {
+            Write-Host "`u{2139} -semi agents already present" -ForegroundColor Yellow
+        }
+    }
 }
 
 if ($modified) {
     # Validate JSON before writing
     try {
-        $null = $content | ConvertFrom-Json -Depth 10
+        $null = $content | ConvertFrom-Json
     } catch {
-        Write-Error "Generated JSON is invalid — not writing. Error: $_"
+        Write-Error "Generated JSON is invalid -- not writing. Error: $_"
         exit 1
     }
 
     Set-Content -LiteralPath $configPath -Value $content -Encoding UTF8 -NoNewline
     if (-not $Quiet) {
-        Write-Host "`n✅ opencode.json expanded and validated" -ForegroundColor Green
+        Write-Host "`n`u{2705} opencode.json expanded and validated" -ForegroundColor Green
     }
 } else {
     if (-not $Quiet) {
-        Write-Host "ℹ️ No imports found — opencode.json already expanded" -ForegroundColor Yellow
+        Write-Host "`u{2139} No imports found - opencode.json already expanded" -ForegroundColor Yellow
     }
 }
