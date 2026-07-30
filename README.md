@@ -2,7 +2,7 @@
 
 ## What is this?
 
-**Gentleman Agent** is an **AI software development team** for OpenCode. Instead of a single chatbot, you get 22 specialized agents working together:
+**Gentleman Agent** is an **AI software development team** for OpenCode. Instead of a single chatbot, you get 24 specialized agents working together:
 
 - 🏗️ **Lead Architect** — Senior Architect mentor solving complex tasks
 - 🔒 **Specialists** — Security, performance, frontend, etc. consultants (FREE TIER)
@@ -15,12 +15,12 @@
 
 ---
 
-Suite of **79 skills** (+ `_shared`) + **91 PowerShell scripts** for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
+Suite of **79 skills** (+ `_shared`) + **123 PowerShell scripts** for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
-> **Score**: 6.2/10 (12 dimensions) — 4 dims at 0.0: Cycle Activity, Best Practices, Clean Code, backlog integrity. Tracking in .project.json.
+> **Score**: 9.1/10 (13 dimensions) — tracking in .project.json.
 > **Skills**: 79 (+ `_shared`)
-> **Cycle**: 27 completed (Audit Cleanup & Enrichment)
+> **Cycle**: 28 active (Security Hardening + Quality Recovery)
 
 ---
 
@@ -140,11 +140,11 @@ The project uses two MCPs for cross-session memory:
 
 | Scope | Count | Reference |
 |-------|-------|-----------|
-| Skills | 93 specialized skills for analysis, security, testing, docs, and more | See [SKILLS-INDEX.md](SKILLS-INDEX.md) for full trigger table |
+| Skills | 79 specialized skills for analysis, security, testing, docs, and more | See [SKILLS-INDEX.md](SKILLS-INDEX.md) for full trigger table |
 
 ---
 
-## Scripts (91+ in scripts/)
+## Scripts (123 in scripts/)
 
 | Script | Purpose |
 |--------|---------|
@@ -183,7 +183,7 @@ gentleman-agent-gh/
 │   ├── code-review-agent/
 │   └── .../
 ├── skills/                  # Junctions workspace (git-ignored)
-├── scripts/                 # 91+ PowerShell scripts
+├── scripts/                 # 123 PowerShell scripts
 │   └── smoke/               # Smoke tests
 ├── docs/                    # Documentation
 │   ├── metricas/            # Session metrics

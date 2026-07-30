@@ -1,3 +1,4 @@
+2026-07-30 - Removed invalid limit key from opencode.json, synced global config, committed fix
 2026-07-30 - Branch test
 2026-07-30 - Non-quiet test
 2026-07-30 - Compact
