@@ -301,6 +301,28 @@ else
   CHECKS_PASSED=$((CHECKS_PASSED + 1))
 fi
 
+# --- [13/13] Config expansion check (H5) ---
+echo "[13/13] Config expansion check..."
+STAGED_CONFIG=$(git diff --cached --name-only --diff-filter=ACM | grep -E 'scripts/opencode-config/' | head -5)
+if [ -n "$STAGED_CONFIG" ]; then
+  # Check staged opencode.json for unresolved $import markers
+  IMPORT_MARKERS=$(git show :opencode.json 2>/dev/null | grep '\$import' | head -5)
+  if [ -n "$IMPORT_MARKERS" ]; then
+    yellow "  CONFIG EXPANSION NEEDED:"
+    echo "    Config sources changed but opencode.json has unresolved \$import markers."
+    echo "    Run: .\scripts\opencode-config\expand-config.ps1"
+    echo "    Then: git add opencode.json"
+    echo "    Staged source files: $(echo "$STAGED_CONFIG" | tr '\n' ' ')"
+    CHECKS_FAILED=$((CHECKS_FAILED + 1))
+  else
+    green "  OK"
+    CHECKS_PASSED=$((CHECKS_PASSED + 1))
+  fi
+else
+  green "  OK (no config source changes)"
+  CHECKS_PASSED=$((CHECKS_PASSED + 1))
+fi
+
 # --- Summary ---
 echo ""
 TOTAL=$((CHECKS_PASSED + CHECKS_FAILED))
