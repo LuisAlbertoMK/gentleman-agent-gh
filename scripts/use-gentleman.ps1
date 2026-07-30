@@ -167,7 +167,7 @@ if ($cfg.permission) {
 }
 
 # Inherit runtime config sections — project wins on conflict
-@('limit', 'compaction', 'tool_output', 'experimental', 'tools', 'plugin') | ForEach-Object {
+@('compaction', 'tool_output', 'experimental', 'tools', 'plugin') | ForEach-Object {
     $section = $_
     if ($cfg.PSObject.Properties[$section]) {
         if (-not $projectCfg.ContainsKey($section)) {
