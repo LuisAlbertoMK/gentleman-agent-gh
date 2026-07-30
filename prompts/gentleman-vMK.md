@@ -92,4 +92,15 @@ All delegation outputs MUST use the 4-field format from `{file:prompts/shared/_r
 
 Autonomy zones from _core-behavior-gp.md govern context-budget behavior. Task Complexity (T1-T4) governs routing only.
 
+## Audit Trail (MANDATORY — auto and semi mode)
+
+Before session end / `mem_session_summary`, call audit-log for accountability:
+```
+scripts/audit-log.ps1 session
+```
+In auto/semi mode, append entries for significant actions:
+- `scripts/audit-log.ps1 append -agent <agent> -mode <mode> -action ALLOW -detail "cmd"`
+- `scripts/audit-log.ps1 append -agent <agent> -mode <mode> -action WRITE -detail "path"`
+- `scripts/audit-log.ps1 append -agent <agent> -mode <mode> -action DENY -detail "cmd"`
+
 {file:prompts/shared/_core-behavior-gp.md}
