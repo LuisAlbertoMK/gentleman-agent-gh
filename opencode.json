@@ -975,6 +975,9 @@
           "Test-NetConnection *": "deny",
           "wget *": "deny",
           "wsl *": "deny"
+        },
+        "task": {
+          "gentleman-reviewer": "allow"
         }
       },
       "mode": "primary"
@@ -1514,6 +1517,9 @@
           "Test-NetConnection *": "deny",
           "wget *": "deny",
           "wsl *": "deny"
+        },
+        "task": {
+          "gentleman-reviewer": "allow"
         }
       },
       "mode": "primary"
