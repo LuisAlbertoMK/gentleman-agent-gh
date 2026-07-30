@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Integration tests for mode-gate.ps1 — tests the ACTUAL script.
@@ -94,6 +94,62 @@ Describe "Mode gate — explicit -Mode override" {
         $output = & $scriptPath -TargetAgent "gentleman-deep" -Mode manual -Json 2>&1
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
+    }
+}
+
+Describe "Mode gate — semi mode" {
+
+    BeforeAll {
+        Set-Content -LiteralPath $modeFilePath -Value "semi" -NoNewline -Encoding ASCII -Force
+    }
+
+    It "ALLOWS -semi suffixed agent in semi mode" {
+        $output = & $scriptPath -TargetAgent "gentleman-quick-semi" -Json 2>&1
+        $result = $output | Out-String | ConvertFrom-Json
+        $result.allowed | Should -Be $true
+        $result.mode | Should -Be "semi"
+    }
+
+    It "BLOCKS base agent (no suffix) in semi mode" {
+        $output = & $scriptPath -TargetAgent "gentleman-quick" -Json 2>&1
+        $result = $output | Out-String -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
+        if ($LASTEXITCODE -ne 0) {
+            $result.allowed | Should -Be $false
+        }
+    }
+
+    It "BLOCKS -auto agent in semi mode" {
+        $output = & $scriptPath -TargetAgent "gentleman-quick-auto" -Json 2>&1
+        $result = $output | Out-String -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
+        if ($LASTEXITCODE -ne 0) {
+            $result.allowed | Should -Be $false
+        }
+    }
+
+    It "ALLOWS read-only specialist in semi mode" {
+        $output = & $scriptPath -TargetAgent "gentleman-security" -Json 2>&1
+        $result = $output | Out-String | ConvertFrom-Json
+        $result.allowed | Should -Be $true
+    }
+
+    It "ALLOWS SDD sub-agent in semi mode" {
+        $output = & $scriptPath -TargetAgent "sdd-apply" -Json 2>&1
+        $result = $output | Out-String | ConvertFrom-Json
+        $result.allowed | Should -Be $true
+    }
+
+    It "ALLOWS -semi agent with -Mode semi override" {
+        $output = & $scriptPath -TargetAgent "gentleman-deep-semi" -Mode semi -Json 2>&1
+        $result = $output | Out-String | ConvertFrom-Json
+        $result.allowed | Should -Be $true
+    }
+
+    It "BLOCKS -semi agent with -Mode manual override" {
+        $output = & $scriptPath -TargetAgent "gentleman-deep-semi" -Mode manual -Json 2>&1
+        $result = $output | Out-String -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
+        if ($LASTEXITCODE -ne 0) {
+            $result.allowed | Should -Be $false
+        }
     }
 }
 

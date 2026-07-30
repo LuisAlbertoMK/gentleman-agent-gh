@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Mode Gate — pre-delegation validation. Verifies agent suffix matches current mode.
@@ -65,7 +65,12 @@ $expectedSuffix = $suffixMap[$Mode]
 $readOnlySpecialists = @(
     'gentleman-security',
     'gentleman-seo',
-    'gentleman-infra'
+    'gentleman-infra',
+    'gentleman-frontend',
+    'gentleman-performance',
+    'gentleman-datascience',
+    'gentleman-docs',
+    'gentleman-reviewer'
 )
 $isReadOnly = $TargetAgent -in $readOnlySpecialists
 

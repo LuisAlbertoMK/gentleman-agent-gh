@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
@@ -91,7 +91,8 @@ $semiAllowPatterns = @(
     '^which\s', '^Get-Command', '^Get-Help', '^Get-Alias',
     # Build/test
     '^npm test', '^pytest\s', '^go test', '^Invoke-Pester',
-    '^dotnet test', '^cargo test', '^pip\s', '^npm run',
+    '^dotnet test', '^cargo test', '^npm run', '^npm ci',
+    '^pip (freeze|list|show|install --user)(\s|$)',
     # Git read-only (no args)
     '^git stash list$', '^git status$', '^git diff$', '^git log$'
 )
@@ -161,6 +162,7 @@ try {
 
     if ($Json) {
         @{
+            action  = 'permission-gate'
             command = $Command
             mode    = $Mode
             verdict = $verdict

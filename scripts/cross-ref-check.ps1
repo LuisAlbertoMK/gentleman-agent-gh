@@ -267,8 +267,13 @@ try {
         $semiContent = Get-Content $semiPath -Raw -Encoding UTF8
         $gateContent = Get-Content $gatePath -Raw -Encoding UTF8
 
-        # Extract semi-agent allow commands (the "xxx *": "allow" patterns)
-        $semiAllow = [regex]::Matches($semiContent, '"(\w+(?:-\w+)*) \*":\s*"allow"') | ForEach-Object { $_.Groups[1].Value }
+        # Extract semi-agent allow commands:
+        #   "xxx *": "allow"  — capture "xxx" (single or multi-word before " *")
+        #   "exact": "allow"  — capture exact command (no asterisk, e.g. "git stash list")
+        $semiAllow = @(
+            [regex]::Matches($semiContent, '"((?:\w+[ -]?)+) \*":\s*"allow"') | ForEach-Object { $_.Groups[1].Value }
+            [regex]::Matches($semiContent, '"((?:\w+[ -]?)+)":\s*"allow"')   | ForEach-Object { $_.Groups[1].Value }
+        )
         # Extract gate patterns: capture command name after '^ (word chars, dots, hyphens)
         $gatePatterns = [regex]::Matches($gateContent, "'\^([a-zA-Z][a-zA-Z0-9._-]+)") | ForEach-Object { $_.Groups[1].Value }
 
@@ -288,8 +293,9 @@ try {
             }
         }
 
+        $dedupedSemi = $checked.Keys.Count
         if ($missingInGate.Count -eq 0) {
-            if (-not $Quiet) { Write-Host " OK ($($semiCommands.Count) semi allows, $($gateCommands.Count) gate patterns)" }
+            if (-not $Quiet) { Write-Host " OK ($dedupedSemi unique semi allows across $($semiCommands.Count) entries, $($gateCommands.Count) gate patterns)" }
         } else {
             $warnings += "semi-agents.json allows missing from permission-gate.ps1: $($missingInGate -join ', ')"
             if (-not $Quiet) { Write-Host " WARN ($($missingInGate.Count) mismatches)" }
