@@ -28,6 +28,14 @@ $archivedDir = Join-Path (Join-Path (Join-Path $repoRoot "docs") "cross-project"
 $runAll = $All -or (-not $DemoteOnly -and -not $RemoveOnly -and -not $ArchiveOnly)
 $changes = @()
 
+# Pre-build pattern index for O(1) lookups (avoids N+1 full scans)
+$patternIndex = @{}
+if (Test-Path $patternsDir) {
+    foreach ($pf in @(Get-ChildItem $patternsDir -Filter "*.json")) {
+        try { $pp = Get-Content $pf.FullName -Raw | ConvertFrom-Json; if ($pp.id) { $patternIndex[$pp.id] = $pf.FullName } } catch { }
+    }
+}
+
 # 1. Demote stale patterns (90d no hits)
 if ($runAll -or $DemoteOnly) {
     if (-not (Test-Path $patternsDir)) { if (-not $Quiet) { Write-Host "[SKIP] No patterns directory" } }
@@ -35,7 +43,8 @@ if ($runAll -or $DemoteOnly) {
         $now = Get-Date
         foreach ($file in @(Get-ChildItem $patternsDir -Filter "*.json")) {
             try { $p = Get-Content $file.FullName -Raw | ConvertFrom-Json } catch { continue }
-            if (($p.status ? $p.status : "active") -ne "active") { continue }
+            $status = if ($p.status) { $p.status } else { "active" }
+            if ($status -ne "active") { continue }
             $updatedStr = if ($p.updated) { $p.updated } else { $p.created }
             if (-not $updatedStr) { continue }
             $updatedDate = try { [DateTime]::ParseExact($updatedStr, "yyyy-MM-dd", $null) } catch { continue }
@@ -64,7 +73,14 @@ if ($runAll -or $RemoveOnly) {
         else {
             Remove-Item -Recurse -Force $skillDir.FullName
             $changes += @{Action="REMOVED";Target=$skillDir.Name;Reason="Not resolved in $days days (>=14)";SourcePattern=$src}
-            if ($src) { $found=@(Get-ChildItem $patternsDir -Filter "*.json"|Where-Object{try{(Get-Content $_.FullName -Raw|ConvertFrom-Json).id -eq $src}catch{$false}}); if($found.Length-gt 0){$sp=Get-Content $found[0].FullName -Raw|ConvertFrom-Json;$sp|Add-Member -NotePropertyName "status" -NotePropertyValue "active" -Force;$sp|Add-Member -NotePropertyName "skill_ref" -NotePropertyValue $null -Force;$sp|Add-Member -NotePropertyName "updated" -NotePropertyValue (Get-Date -Format "yyyy-MM-dd") -Force;$sp|ConvertTo-Json -Depth 6|Set-Content $found[0].FullName -Encoding UTF8;$changes+=@{Action="DEMOTED";Target=$src;Reason="Rollback: forged skill removed (unused)"}} }
+            if ($src -and $patternIndex.ContainsKey($src)) {
+                $sp = Get-Content $patternIndex[$src] -Raw | ConvertFrom-Json
+                $sp | Add-Member -NotePropertyName "status" -NotePropertyValue "active" -Force
+                $sp | Add-Member -NotePropertyName "skill_ref" -NotePropertyValue $null -Force
+                $sp | Add-Member -NotePropertyName "updated" -NotePropertyValue (Get-Date -Format "yyyy-MM-dd") -Force
+                $sp | ConvertTo-Json -Depth 6 | Set-Content $patternIndex[$src] -Encoding UTF8
+                $changes += @{Action="DEMOTED";Target=$src;Reason="Rollback: forged skill removed (unused)"}
+            }
             if (-not $Quiet) { Write-Host "  [X] Removed: $($skillDir.Name) (unused $days days)" }
         }
     }
@@ -78,7 +94,8 @@ if ($runAll -or $ArchiveOnly) {
     $pFiles = if (Test-Path $patternsDir) { @(Get-ChildItem $patternsDir -Filter "*.json") } else { @() }
     foreach ($file in $pFiles) {
         try { $p = Get-Content $file.FullName -Raw | ConvertFrom-Json } catch { continue }
-        if (($p.status ? $p.status : "active") -ne "deprecated") { continue }
+        $status = if ($p.status) { $p.status } else { "active" }
+        if ($status -ne "deprecated") { continue }
         $depStr = if ($p.deprecated_at) { $p.deprecated_at } else { $p.updated }
         if (-not $depStr) { continue }
         $depDate = try { [DateTime]::ParseExact($depStr, "yyyy-MM-dd", $null) } catch { continue }

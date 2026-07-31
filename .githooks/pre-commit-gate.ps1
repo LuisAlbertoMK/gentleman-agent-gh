@@ -120,11 +120,21 @@ if ($stagedRoja) {
     Warn "ROJA zone files staged without JD dual review:`n$($rojaPreview -join "`n")`n  Use '!ship' or 'judgment-day'"
 } else { Pass }
 
-# [10/13] Secrets scan
+# [10/13] Secrets scan — parse diff to get real filenames (not "InputStream")
 Write-Host "[10/13] Secrets scan..."
-$diffContent = git diff --cached --diff-filter=ACM -- ':!.githooks' ':!*.tests.ps1' ':!scripts/check-mcp-security.ps1' ':!.agents/skills/*/references/*' ':!.gitleaks.toml' ':!docs/mejoras/*'
-$secrets = $diffContent | Select-String -Pattern '^\+[^\+]' | ForEach-Object { $_.Line.Substring(1) } |
-    Select-String -Pattern '(ghp_|gho_|github_pat_|AKIA|ctx7sk_|-----BEGIN\s+(RSA|EC|DSA|PRIVATE)\s+KEY|GH_TOKEN\s*=|GITHUB_TOKEN\s*=|password\s*=|api[_-]?key\s*=|secret\s*=|token\s*=)'
+$diffLines = git diff --cached --diff-filter=ACM -- ':!.githooks' ':!*.tests.ps1' ':!scripts/check-mcp-security.ps1' ':!.agents/skills/*/references/*' ':!.gitleaks.toml' ':!docs/mejoras/*'
+$secrets = @(); $currentFile = ""; $lineInFile = 0
+foreach ($dl in $diffLines) {
+    if ($dl -match '^\+\+\+ b/(.+)$') { $currentFile = $Matches[1]; continue }
+    if ($dl -match '^@@ -\d+,\d+ \+(\d+),\d+ @@') { $lineInFile = [int]$Matches[1] - 1; continue }
+    if ($dl -match '^\+([^\+].*)$') {
+        $lineInFile++
+        $text = $Matches[1]
+        if ($text -match '(ghp_|gho_|github_pat_|AKIA|ctx7sk_|-----BEGIN\s+(RSA|EC|DSA|PRIVATE)\s+KEY|GH_TOKEN\s*=|GITHUB_TOKEN\s*=|password\s*=|api[_-]?key\s*=|secret\s*=|token\s*=)') {
+            $secrets += [PSCustomObject]@{ Filename = $currentFile; LineNumber = $lineInFile; Line = $text }
+        }
+    }
+}
 if ($secrets) {
     $secrets | ForEach-Object {
         $line = $_.Line.Trim()
@@ -142,7 +152,7 @@ if ($stagedSkillMds) {
         $fullPath = Join-Path $RepoRoot $sf
         if (-not (Test-Path $fullPath)) { continue }
         $content = Get-Content $fullPath -Raw
-        $fm = if ($content -match '^---\s*(.*?)---') { $Matches[1] } else { '' }
+        $fm = if ($content -match '(?s)^---\s*(.*?)---') { $Matches[1] } else { '' }
         if ($fm -notmatch 'name:\s+') { Write-Host "  $([char]0x1b)[31m  BLOCKING: $sf — missing 'name:'$([char]0x1b)[0m"; $fmFail=$true }
         if ($fm -notmatch 'description:\s+') { Write-Host "  $([char]0x1b)[31m  BLOCKING: $sf — missing 'description:'$([char]0x1b)[0m"; $fmFail=$true }
         if ($fm -notmatch 'triggers:\s+') { Write-Host "  $([char]0x1b)[31m  BLOCKING: $sf — missing 'triggers:'$([char]0x1b)[0m"; $fmFail=$true }
