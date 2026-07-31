@@ -24,7 +24,7 @@ function Sync-DirectoryFiles { param([string]$SrcDir,[string]$DstDir,[switch]$Is
             $dst = Join-Path $DstDir $f.Name
             $needsCopy = -not (Test-Path $dst)
             if (-not $needsCopy) { try { $needsCopy = (Get-FileHash $f.FullName).Hash -ne (Get-FileHash $dst -EA SilentlyContinue).Hash } catch { $needsCopy = $true } }
-            if ($needsCopy) { if (-not $IsDryRun) { Copy-Item -LiteralPath $f.FullName -Destination $dst -Force }; $Count.Value++ }
+            if ($needsCopy) { if (-not $IsDryRun) { Copy-Item -LiteralPath $f.FullName -Destination $dst -Force; $Count.Value++ } }
         }
     }
 }
@@ -33,7 +33,7 @@ function Sync-SingleFile { param([string]$Src,[string]$Dst,[string]$Name,[switch
     if (-not (Test-Path $Src -PathType Leaf)) { return }
     $needsCopy = -not (Test-Path $Dst)
     if (-not $needsCopy) { try { $needsCopy = (Get-FileHash -Path $Src).Hash -ne (Get-FileHash -Path $Dst -EA SilentlyContinue).Hash } catch { $needsCopy = $true } }
-    if ($needsCopy) { if (-not $IsDryRun) { Copy-Item -LiteralPath $Src -Destination $Dst -Force }; $Count.Value++ }
+    if ($needsCopy) { if (-not $IsDryRun) { Copy-Item -LiteralPath $Src -Destination $Dst -Force; $Count.Value++ } }
 }
 
 Write-Host "`n=== sync-global-ps5: Gentleman Agent ===" -ForegroundColor Cyan
@@ -58,7 +58,7 @@ foreach ($script in Get-ChildItem -Path $srcScripts -File) {
     $scriptsTotal++; $dst = Join-Path $dstScripts $script.Name
     $needsCopy = -not (Test-Path $dst)
     if (-not $needsCopy) { try { $needsCopy = (Get-FileHash -Path $script.FullName).Hash -ne (Get-FileHash -Path $dst -EA SilentlyContinue).Hash } catch { $needsCopy = $true } }
-    if ($needsCopy) { if ($DryRun) { Write-Host "  [dry-run] $($script.Name)" -Fore Yellow } else { Copy-Item -LiteralPath $script.FullName -Destination $dst -Force; Write-Host "  [copied] $($script.Name)" -Fore Green }; $scriptsCopied++ }
+    if ($needsCopy) { if ($DryRun) { Write-Host "  [dry-run] $($script.Name)" -Fore Yellow } else { Copy-Item -LiteralPath $script.FullName -Destination $dst -Force; Write-Host "  [copied] $($script.Name)" -Fore Green; $scriptsCopied++ } }
 }
 Write-Host "  Scripts: $scriptsCopied/$scriptsTotal" -Fore Green
 
