@@ -20,7 +20,7 @@ Complete gap analysis — 8-dim quality framework, project int
 ## Workflow: Intake->Classify->Depth->Map->Score->Auto checks->Root causes->Prioritize->Recommend
 **Priority = (10-Score)×Impact×Urgency** | Impact: 1.0/0.7/0.4/0.1 | Urgency: 2.0/1.0/0.5
 ## Templates: ERP (Func50%/Sec35%) · Ecom (UX40%/Sec30%/Perf30%) · Web (UX40%/Tech30%/Sec25%) · API (Sec40%/Tech35%/Ops25%) · Desktop (UX40%/Func30%/Ops30%) · Mobile (UX45%/Perf35%/Res20%)
-## Cross-Ref: project-mapper · security-scanner · code-review-agent · senior-engineer · performance-tracker
+## Cross-Ref: project-mapper · security-scanner · code-review-agent · performance-tracker
 ## Anti-Patterns: Skip intake · Ignore velocity · Skip responsive · Infra afterthought · Score w/o evidence
 
 ## Example: Scoring a Web App
@@ -38,4 +38,4 @@ Output: prioritized list with scores, evidence, and recommended fixes.
 See [assets/](assets/) for per-project-type intake templates: api, desktop, ecom, erp, mobile, saas, web.
 
 ## Refs
-project-mapper · security-scanner · code-review-agent · senior-engineer · performance-tracker
+project-mapper · security-scanner · code-review-agent · performance-tracker

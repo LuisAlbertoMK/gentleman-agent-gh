@@ -52,7 +52,7 @@ Flag gaps: if only one type exists, others are likely missing.
 ```
 
 ## Refs
-code-generation · quality-gate · cognitive-doc-design
+code-generation · quality-gate
 
 ## Anti-Patterns
 Completeness before accuracy · Skip link validation · No Diátaxis analysis · Ignore standard files · cat README (use grep)

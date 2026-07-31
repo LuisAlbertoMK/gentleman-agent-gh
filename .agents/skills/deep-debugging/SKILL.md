@@ -4,7 +4,7 @@ description: "Trigger: deep debug, root cause, hypothesis, multi-file bug, ambig
 triggers: "deep debug, root cause, hypothesis, multi-file bug, ambiguous failure, debug, RCA"
 ---
 ## When to Use
-Multi-file bugs, ambiguous failures. NOT for 1-file edits (→ quick-executor), architecture decisions (→ senior-engineer), or refactors (→ refactoring-planner).
+Multi-file bugs, ambiguous failures. NOT for 1-file edits (→ quick-executor), architecture decisions (→ sdd), or refactors (→ refactoring-planner).
 
 ## METHODOLOGY: Hypothesis-Driven Debugging
 
@@ -50,7 +50,7 @@ After 4+ hypothesis rounds: summarize findings, save progress, compress context 
 1. Max 5 hypotheses before narrowing. Max 3 cycles total. 2. Unclear after 3 cycles → STOP, ask human. 3. Never refactor during bug fix. 4. Verify with evidence, not assumptions.
 
 ## Refs
-senior-engineer · refactoring-planner · code-review-agent
+refactoring-planner · code-review-agent
 
 ## Anti-Patterns
 Skip OBSERVE step · Refactor during fix · >3 cycles without diagnosis · Assume without grep evidence · Skip tool escalation

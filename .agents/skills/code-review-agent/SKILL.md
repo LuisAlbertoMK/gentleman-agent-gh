@@ -34,4 +34,4 @@ Example: `## CR:API auth middleware—nil check+no rate limit ### 4R|Risk:3|Read
 Vague"looks good"·Only praise·Skip one R·Repeated findings·BLOCKER no chain·Ignore profile·>400L as single unit
 
 ## Refs
-judgment-day·senior-engineer·skill-improver·quality-gate·triple-verify·engram-protocol
+judgment-day·skill-improver·quality-gate·triple-verify·engram-protocol

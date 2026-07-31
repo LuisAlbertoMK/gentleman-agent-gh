@@ -48,7 +48,7 @@ Route tasks by model strength — specialized agents for analy
 - **Fallback**: Big Pickle (docs, SEO, general)
 
 ## Refs
-execution-mode · delivery-harness · subagent-isolation · skill-graph · senior-engineer
+execution-mode · delivery-harness · subagent-isolation · skill-graph
 
 ## Anti-Patterns
 Route sensitive data to subagent · Delegate when context >150K · Skip fallback chain · Route to paid model when free covers it · Forget security gate

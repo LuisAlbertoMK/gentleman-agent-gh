@@ -59,7 +59,7 @@ Tokens <50 + works · 3 iterations no improvement · Fits in 1 line
 **NEVER**: sacrifice correctness for tokens, or leave edge cases uncovered.
 
 ## Refs
-lean-context · skill-improver · prompt-engineering · metricas · code-review-agent
+lean-context · skill-improver · metricas · code-review-agent
 
 ## Anti-Patterns
 Over-optimize before measuring · Cut context before identity · Sacrifice correctness · Stop at T1 when T2 possible · Apply T3 to underspecified prompts · Score subjectively without criteria

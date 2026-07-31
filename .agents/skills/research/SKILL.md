@@ -81,4 +81,4 @@ mem_save(title="Research: TOPIC" type="discovery")
 ```
 
 ## Refs
-cross-project-wisdom · prompt-engineering · senior-engineer · execution-mode · skill-graph
+cross-project-wisdom · execution-mode · skill-graph
