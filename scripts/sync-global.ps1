@@ -50,7 +50,7 @@ Write-Step "Global config" {
 if(-not $NoAgentSync){Write-Step "Agent sync" {
     if(-not(Test-Path $globalCfg)){throw "Global config not found -- run step 3 first"}
     try{$proj=Get-Content $projectCfg -Raw|ConvertFrom-Json;$glob=Get-Content $globalCfg -Raw|ConvertFrom-Json}catch{throw "Parse error: $_"}
-    $agentNames=@("gentleman-vMK","gentleman-deep","gentleman-codex","gentleman-quick")
+    $agentNames=@($proj.agent.PSObject.Properties.Name | Where-Object { $_ -like 'gentleman-*' })
     if($glob.PSObject.Properties.Match('agent').Count-eq 0){$glob|Add-Member -Name agent -Value @{} -MemberType NoteProperty -Force}
     if($proj.PSObject.Properties.Match('agent').Count-eq 0){Write-Warning "  No project agents";$report.steps["agent_sync"]=@{added=0;note="no project agents"}}
     else{$added=0;$updated=0; foreach($n in $agentNames){$sp=$proj.agent.PSObject.Properties[$n]; if($null-eq$sp){continue};$gh=$glob.agent.PSObject.Properties.Match($n).Count-gt 0;$glob.agent|Add-Member -Name $n -Value $sp.Value -MemberType NoteProperty -Force;if($gh){$updated++}else{$added++}}

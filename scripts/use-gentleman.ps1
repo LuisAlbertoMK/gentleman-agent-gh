@@ -183,6 +183,17 @@ Out-Message "  Created $projectCfgFile" -color Green
 Out-Message "    default_agent: $DefaultAgent" -color DarkGray
 Out-Message "    MCPs inherited from global: $(if($mergedMcp){'project own'}else{'yes'})" -color DarkGray
 
+# ── 2b. Propagate permission mode to target project ─────────────────
+$modeSrc = Join-Path $repoRoot ".gentleman-mode"
+$modeDst = Join-Path $TargetDir ".gentleman-mode"
+if (Test-Path $modeSrc -PathType Leaf) {
+    Copy-Item -LiteralPath $modeSrc -Destination $modeDst -Force
+    $inheritedMode = (Get-Content -LiteralPath $modeDst -Raw).Trim()
+    Out-Message "  .gentleman-mode: '$inheritedMode' (inherited from gentleman repo)" -color DarkGray
+} else {
+    Out-Message "  [warn] No .gentleman-mode in repo — target project defaults to 'manual'" -color Yellow
+}
+
 # ── 3. Verify end-to-end ─────────────────────────────────────────────
 $verifyOk = $true
 try {

@@ -46,15 +46,21 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+# Cross-platform helpers (Get-GlobalConfigDir)
+. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
+
 $repoRoot = Split-Path -Path $PSScriptRoot -Parent
+$cwdModeFile = Join-Path -Path (Get-Location) '.gentleman-mode'
 $modeFile = if ($ModeFilePath) { $ModeFilePath } else { Join-Path -Path $repoRoot '.gentleman-mode' }
 
 # --- Resolve current mode ---
 if (-not $Mode) {
-    if (-not (Test-Path -LiteralPath $modeFile)) {
-        $Mode = 'manual'  # default fallback
-    } else {
+    if (-not $ModeFilePath -and (Test-Path -LiteralPath $cwdModeFile)) {
+        $Mode = (Get-Content -LiteralPath $cwdModeFile -Raw).Trim()
+    } elseif (Test-Path -LiteralPath $modeFile) {
         $Mode = (Get-Content -LiteralPath $modeFile -Raw).Trim()
+    } else {
+        $Mode = 'manual'  # default fallback
     }
 }
 
@@ -109,8 +115,43 @@ $alwaysAllowed = @(
 )
 $isAlwaysAllowed = $TargetAgent -in $alwaysAllowed
 
+# --- Fallback: does the suffixed agent exist in any resolvable config? ---
+# In external projects the -auto/-semi variants may not be defined (pre-sync).
+# If the suffixed agent does NOT exist anywhere, allow the base agent instead
+# of dead-blocking the delegation.
+function Test-SuffixedAgentExists {
+    param([string]$AgentName)
+    $candidates = @(
+        (Join-Path (Get-Location) 'opencode.json'),
+        (Join-Path (Get-Location) 'opencode.jsonc'),
+        (Join-Path (Get-GlobalConfigDir) 'opencode.json'),
+        (Join-Path (Get-GlobalConfigDir) 'opencode.jsonc')
+    ) | Where-Object { Test-Path -LiteralPath $_ }
+    foreach ($cfg in $candidates) {
+        try {
+            $parsed = Get-Content -LiteralPath $cfg -Raw -Encoding UTF8 | ConvertFrom-Json
+            $agentSection = $parsed.PSObject.Properties['agent']
+            if ($null -ne $agentSection) {
+                $prop = $agentSection.Value.PSObject.Properties[$AgentName]
+                if ($null -ne $prop) { return $true }
+            }
+        } catch { continue }
+    }
+    return $false
+}
+
 if ($isAlwaysAllowed) {
     $modeOk = $true
+}
+
+# --- Fallback resolution (auto/semi): suffixed agent missing → allow base ---
+$fallbackUsed = $false
+if (-not $modeOk -and $Mode -ne 'manual' -and -not $isReadOnly -and -not $hasSuffix) {
+    $suffixedAgent = "$TargetAgent$expectedSuffix"
+    if (-not (Test-SuffixedAgentExists -AgentName $suffixedAgent)) {
+        $modeOk = $true
+        $fallbackUsed = $true
+    }
 }
 
 # --- Build result ---
@@ -123,6 +164,7 @@ $result = [PSCustomObject]@{
     reason          = if ($modeOk) {
         if ($isAlwaysAllowed) { "Always-allowed agent: $TargetAgent" }
         elseif ($isReadOnly) { "Read-only specialist: $TargetAgent" }
+        elseif ($fallbackUsed) { "FALLBACK: '$TargetAgent$expectedSuffix' not defined in configs — allowed base agent '$TargetAgent'" }
         elseif ($Mode -eq 'manual') { "Manual mode — no suffix required" }
         else { "Mode '$Mode' — suffix '$expectedSuffix' matches" }
     } else {
