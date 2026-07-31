@@ -24,6 +24,7 @@ BeforeAll {
         if (& $Check) { skip "$Name already installed"; return $false }
         try {
             info "Installing $Name..."
+            $script:LASTEXITCODE = 0
             $null = & $Install
             if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw "exit code $LASTEXITCODE" }
             ok "$Name installed"

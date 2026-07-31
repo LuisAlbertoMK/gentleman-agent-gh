@@ -13,6 +13,7 @@
 param(
     [switch]$Json
 )
+Set-StrictMode -Version Latest
 
 $results = @()
 
@@ -175,8 +176,8 @@ try {
 if ($Json) {
     $results | ConvertTo-Json -Depth 3
 } else {
-    $failCount = ($results | Where-Object { $_.Status -eq "FAIL" }).Count
-    $warnCount = ($results | Where-Object { $_.Status -eq "WARN" }).Count
+    $failCount = @($results | Where-Object { $_.Status -eq "FAIL" }).Count
+    $warnCount = @($results | Where-Object { $_.Status -eq "WARN" }).Count
 
     Write-Output "`n=== Gentleman Agent Health Check ===`n"
     foreach ($r in $results) {

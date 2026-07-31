@@ -6,6 +6,7 @@ Set-StrictMode -Version Latest;$ErrorActionPreference='Stop'
 if($Root){$rr=$Root}else{$rr=Split-Path -Parent $PSScriptRoot}
 $cp=Join-Path $rr 'ANTI-PATTERN-CATALOG.md';$ld=Join-Path $rr '.learnings'
 $ep=Join-Path $ld 'ERRORS.md';$lp=Join-Path $ld 'LEARNINGS.md'
+$cachedLearnings=$null;$cachedErrors=$null
 $ro='Multiline';try{
 function rc{if(-not(Test-Path $cp)){return ,@()}
 try{$c=Get-Content $cp -Raw}catch{Write-Debug "sm: cannot read catalog ($($_.Exception.Message))";return ,@()}
@@ -65,6 +66,8 @@ if($Mode-eq'populate'){
         } elseif(-not $Json){Write-Host "  ⛏️  No new error entries to add (all exist or invalid)"}
     }
     # Fall through as check so caller gets repeated-pattern analysis
+    # Invalidate cache so the check re-reads post-populate files from disk
+    $cachedLearnings=$null;$cachedErrors=$null
     $Mode='check'
 }
 $catalog=rc;$patternKeys=rl $cachedLearnings;$errors=re $cachedErrors;$repeated=frp -cp $catalog -pk $patternKeys -mn $Threshold

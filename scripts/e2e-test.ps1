@@ -52,6 +52,7 @@ param(
     
     [switch]$Headed
 )
+Set-StrictMode -Version Latest
 
 $ErrorActionPreference = 'Stop'
 

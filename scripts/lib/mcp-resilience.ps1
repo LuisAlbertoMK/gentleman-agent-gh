@@ -193,7 +193,8 @@ function Test-McpServer {
             }
         }
         elseif ($Server.type -eq "local" -and $Server.command) {
-            $cmd = $Server.command[0]
+            # ConvertFrom-Json unwraps single-element arrays to a string; @() normalizes
+            $cmd = @($Server.command)[0]
             $found = Get-Command $cmd -ErrorAction SilentlyContinue
             $sw.Stop()
             if ($found) {
@@ -400,9 +401,9 @@ function Get-McpHealthReport {
         $serverConfig = @{
             type = if ($serverValue.type) { $serverValue.type } else { "unknown" }
             enabled = $serverValue.enabled
-            url = $serverValue.url
-            command = $serverValue.command
-            timeout = $serverValue.timeout
+            url = if ($serverValue.PSObject.Properties['url']) { $serverValue.url } else { $null }
+            command = if ($serverValue.PSObject.Properties['command']) { $serverValue.command } else { $null }
+            timeout = if ($serverValue.PSObject.Properties['timeout']) { $serverValue.timeout } else { $null }
         }
 
         $probe = Test-McpServer -Server $serverConfig -ServerName $serverName

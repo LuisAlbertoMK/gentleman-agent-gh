@@ -71,7 +71,7 @@ Describe 'engram-validate.ps1 — Domain fields' {
     }
 
     It 'accepts recovery-protocol fields' {
-        $content = "**What**: mistake | **Correct**: use $filter | **Root cause**: wrong operator | **Prevention**: test edge cases"
+        $content = "**What**: mistake | **Correct**: use -Filter | **Root cause**: wrong operator | **Prevention**: test edge cases"
         $result = & $scriptPath -Content $content -DomainFields @("Correct","Root cause","Prevention")
         $result.valid | Should -Be $true
         $result.fields | Should -Contain "Correct"

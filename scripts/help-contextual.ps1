@@ -14,6 +14,7 @@ param(
     [ValidateSet("debugging", "after-change", "start", "general")]
     [string]$Context = "general"
 )
+Set-StrictMode -Version Latest
 
 # Detect context if not provided
 if ($Context -eq "general") {

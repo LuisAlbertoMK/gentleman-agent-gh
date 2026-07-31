@@ -50,7 +50,7 @@ Describe "Destructive Script Safety — <_.Name>" -ForEach (
                 $scriptContent -match '\[switch\]\s*\$(Force|DryRun|WhatIf|Confirm)'
 
             if (-not $hasShouldProcess) {
-                Write-Warning "INFO: $($scriptName) lacks SupportsShouldProcessing (advanced function binding)"
+                Write-Warning "INFO: $($_.Name) lacks SupportsShouldProcessing (advanced function binding)"
             }
             ($hasShouldProcess -or $hasForceOrDryRun) |
                 Should -BeTrue -Because "scripts need SupportsShouldProcessing or explicit -Force/-DryRun/-WhatIf params"
@@ -65,9 +65,9 @@ Describe "Destructive Script Safety — <_.Name>" -ForEach (
         }
 
         It "should gate destructive Remove-Item behind a condition" {
-            $lines = $scriptContent -split "`n"
-            $removeLines = $lines | Where-Object { $_ -match 'Remove-Item' }
-            $ifLines = $lines | Where-Object { $_ -match '^\s*(if|switch|\$Force|\$WhatIf|\$DryRun)' }
+            $lines = @($scriptContent -split "`n")
+            $removeLines = @($lines | Where-Object { $_ -match 'Remove-Item' })
+            $ifLines = @($lines | Where-Object { $_ -match '^\s*(if|switch|\$Force|\$WhatIf|\$DryRun)' })
 
             if ($removeLines.Count -gt 0) {
                 $ifLines.Count | Should -BeGreaterThan 0 -Because "Remove-Item calls should be gated by a condition"
@@ -102,7 +102,7 @@ Describe "Destructive Script Safety — <_.Name>" -ForEach (
                 }
             }
             if ($destructiveSilentLines.Count -gt 0) {
-                Write-Warning "INFO: $($scriptName) has silent error suppression on destructive ops: $($destructiveSilentLines -join '; ')"
+                Write-Warning "INFO: $($_.Name) has silent error suppression on destructive ops: $($destructiveSilentLines -join '; ')"
             }
             $destructiveSilentLines.Count | Should -Be 0 -Because "destructive Remove-Item should not silently suppress errors"
         }

@@ -1,6 +1,4 @@
 #requires -Version 5.1
-Set-StrictMode -Version Latest
-$ErrorActionPreference = 'Stop'
 <#
 .SYNOPSIS
     Validates that subagent writes stayed within declared scope.
@@ -24,6 +22,8 @@ param(
     [string]$BaseRef = "HEAD",
     [switch]$Json
 )
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 $violations = @()
 $clean = @()
@@ -84,7 +84,7 @@ if ($changedFiles.Count -eq 0) {
 }
 
 # Parse and validate patterns
-$patterns = $AllowedPaths -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' }
+$patterns = @($AllowedPaths -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' })
 
 if ($patterns.Count -eq 0) {
     $msg = "No valid patterns after parsing AllowedPaths"

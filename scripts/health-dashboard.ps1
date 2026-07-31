@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Generates a visual HTML health report from health-check-system.ps1.
@@ -17,6 +17,7 @@ param(
     [string]$OutputPath = "docs\health-report.html",
     [switch]$OpenInBrowser
 )
+Set-StrictMode -Version Latest
 
 $ErrorActionPreference = 'Stop'
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
@@ -62,7 +63,7 @@ foreach ($c in $checks) {
         "FAIL" { $icon = "&#x274C;"; $rowClass = "fail" }
     }
     $escapedName = [System.Net.WebUtility]::HtmlEncode($c.Check)
-    $escapedDetail = [System.Net.WebUtility]::HtmlEncode($c.Detail)
+    $escapedDetail = [System.Net.WebUtility]::HtmlEncode(($c.Detail | Out-String).Trim())
     $tableRows += "      <tr class=`"$rowClass`"><td class=`"icon`">$icon</td><td>$escapedName</td><td>$escapedDetail</td><td>$($c.Status)</td></tr>`n"
 }
 
