@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Shared mem_save content validation logic for Engram.
@@ -41,9 +41,12 @@ function Test-EngramContent {
     $script:engramQuiet = [bool]$Quiet
 
     $contentStr = ""
-    $titleStr = $Title
     $typeStr = $Type
     $topicStr = $TopicKey
+    # $Title / $DomainFields are public contract (forwarded by scripts/engram-validate.ps1);
+    # intentionally unused inside the function body — kept for the caller-facing signature.
+    [void]$Title
+    [void]$DomainFields
 
     if ($Content -is [string]) {
         $contentStr = $Content
@@ -128,9 +131,6 @@ function Test-EngramContent {
     $canonical = @("What")
     if ($Strict) { $canonical = @("What", "Why", "Where", "Learned") }
 
-    # Add domain-specific fields if provided
-    $validFields = $canonical + @($DomainFields | Where-Object { $_ -and $_ -ne "" })
-
     foreach ($req in $canonical) {
         if ($foundFields -notcontains $req) {
             if ($req -eq "What") {
@@ -161,7 +161,7 @@ function Test-EngramContent {
     if ($Fix -and $foundFields -notcontains "What") {
         $contentStr = "**What**: Auto-detected`n$contentStr"
         $foundFields = @($fieldRegex.Matches($contentStr) | ForEach-Object { $_.Groups[1].Value.Trim() })
-        if (-not $script:engramQuiet) { Write-Host "  🔧 Auto-fixed: prepended **What**: Auto-detected" -ForegroundColor DarkYellow }
+        if (-not $script:engramQuiet) { "  🔧 Auto-fixed: prepended **What**: Auto-detected" | Out-Host }
     }
 
     # --- 7. Output ---
@@ -174,11 +174,11 @@ function Test-EngramContent {
 
     if (-not $script:engramQuiet) {
         if ($errors.Count -eq 0 -and $warnings.Count -eq 0) {
-            Write-Host "  ✅ Engram content valid" -ForegroundColor Green
+            "  ✅ Engram content valid" | Out-Host
         } elseif ($errors.Count -eq 0) {
-            Write-Host "  ⚠️  Engram content valid with $($warnings.Count) warning(s)" -ForegroundColor Yellow
+            "  ⚠️  Engram content valid with $($warnings.Count) warning(s)" | Out-Host
         } else {
-            Write-Host "  ❌ Engram content invalid: $($errors.Count) error(s)" -ForegroundColor Red
+            "  ❌ Engram content invalid: $($errors.Count) error(s)" | Out-Host
         }
 
         $result = [PSCustomObject]@{
