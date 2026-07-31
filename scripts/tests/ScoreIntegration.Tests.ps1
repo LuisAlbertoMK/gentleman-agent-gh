@@ -17,6 +17,11 @@ param([switch]$Quiet)
 Set-StrictMode -Version Latest
 
 BeforeAll {
+    # Test mode: prevents score-auto.ps1 from launching the ~33s pssa-gate
+    # ThreadJob; the pssa output feeds Sec scoring as empty string (no-op).
+    $script:oldPesterTest = $env:PESTER_TEST
+    $env:PESTER_TEST = '1'
+
     $script:ProjectRoot = git rev-parse --show-toplevel 2>$null
     if (-not $script:ProjectRoot) { throw "Not in a git repo" }
     $script:ScoreScript = Join-Path $script:ProjectRoot "scripts/score-auto.ps1"
@@ -33,6 +38,14 @@ BeforeAll {
     $script:ScoreJson     = & $script:ScoreScript -Json -Quiet 2>$null
     $script:ScoreExitCode = $LASTEXITCODE
     $script:ScoreObj      = $script:ScoreJson | ConvertFrom-Json
+}
+
+AfterAll {
+    if ($null -eq $script:oldPesterTest) {
+        Remove-Item Env:PESTER_TEST -ErrorAction SilentlyContinue
+    } else {
+        $env:PESTER_TEST = $script:oldPesterTest
+    }
 }
 
 # ============================================================

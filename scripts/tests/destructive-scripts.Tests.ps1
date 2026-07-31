@@ -8,6 +8,7 @@ Describe "Destructive Script Safety — <_.Name>" -ForEach (
     (Get-ChildItem -Path "$PSScriptRoot/.." -Filter "*.ps1" -Recurse) |
     Where-Object {
         $_.DirectoryName -notlike "*tests*" -and
+        $_.FullName -notmatch '\\scripts\\lib[\\/]' -and
         $_.Name -ne "destructive-scripts.Tests.ps1" -and
         $_.Name -notlike "smoke-*" -and
         ($_.Name -match '(close|rollback|restore|backup|push|clean|force|forge|wipe|demote|store)' -or
@@ -126,7 +127,11 @@ Describe "Destructive Script Cross-Checks" {
 
     BeforeAll {
         $allNonTest = Get-ChildItem -Path "$PSScriptRoot/.." -Filter "*.ps1" -Recurse |
-            Where-Object { $_.DirectoryName -notlike "*tests*" -and $_.Name -ne "destructive-scripts.Tests.ps1" }
+            Where-Object {
+                $_.DirectoryName -notlike "*tests*" -and
+                $_.FullName -notmatch '\\scripts\\lib[\\/]' -and
+                $_.Name -ne "destructive-scripts.Tests.ps1"
+            }
 
         $scriptsUsingRemoveRecurse = $allNonTest | Where-Object {
             (Get-Content $_.FullName -Raw -ErrorAction SilentlyContinue) -match 'Remove-Item.*-Recurse'

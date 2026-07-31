@@ -42,110 +42,51 @@ param(
 )
 Set-StrictMode -Version Latest
 
+# --- Dot-source shared classification logic (single source of truth) ---
+. (Join-Path (Join-Path $PSScriptRoot "lib") "permission-gate-lib.ps1")
+
 # --- Resolve paths ---
-$repoRoot   = Split-Path -Path $PSScriptRoot -Parent
-$modeFile   = if ($ModeFilePath) { $ModeFilePath } else { Join-Path -Path $repoRoot '.gentleman-mode' }
+$repoRoot = Split-Path -Path $PSScriptRoot -Parent
 
-# --- Read current mode ---
-if (-not $Mode) {
-    $Mode = if (Test-Path -LiteralPath $modeFile) {
-        (Get-Content -LiteralPath $modeFile -Raw).Trim()
-    } else { 'manual' }
-}
+# --- Resolve current mode (-Mode override wins; else read mode file) ---
+$Mode = Get-ConfiguredMode -Mode $Mode -ModeFilePath $ModeFilePath -RepoRoot $repoRoot
 
-# ===== COMMAND CLASSIFICATION RULES =====
-
-# These patterns are checked in order: deny → allow → ask (default)
-
-$denyPatterns = @(
-    # Network — always blocked
-    '^curl\s', '^wget\s', '^Invoke-WebRequest', '^Invoke-RestMethod',
-    '^irm\s', '^iwr\s', '^iex\s', '^Start-BitsTransfer',
-    '^ssh\s', '^docker\s', '^docker-compose\s', '^docker compose',
-    '^telnet\s', '^ncat\s', '^nc\s', '^Test-NetConnection',
-    # Destructive filesystem
-    '^rm\s', '^rm -rf', '^Remove-Item',
-    # Interpreters
-    '^python\s', '^python3\s', '^node\s', '^ruby\s', '^perl\s', '^php\s', '^npx\s',
-    # System/admin — always blocked
-    '^certutil\s', '^bitsadmin\s', '^schtasks\s', '^reg\s', '^sc\s', '^icacls\s',
-    '^cmd /c', '^cmd\.exe', '^powershell\s-c\s', '^powershell\s-command\s',
-    '^powershell\s-enc\s', '^powershell\s-File\s', '^powershell\.exe',
-    '^pwsh\s', '^pwsh\.exe',
-    '^Start-Process', '^Invoke-Command', '^Register-ScheduledTask', '^New-Service',
-    '^net user', '^net localgroup', '^net share', '^net use', '^net session',
-    '^Add-MpPreference', '^Set-MpPreference',
-    '^saps\s', '^start\s',
-    # Push --force is always denied
-    '^git push --force', '^git push -f'
-)
-
-# Semi-auto allowlist (safe commands that run without asking in semi mode)
-$semiAllowPatterns = @(
-    # Git read-only
-    '^git status', '^git log', '^git diff', '^git show', '^git branch',
-    '^git stash list', '^git stash show',
-    # Filesystem read-only
-    '^ls$', '^ls\s', '^dir$', '^dir\s', '^Get-ChildItem', '^Test-Path',
-    '^pwd$', '^Get-Location', '^cat\s', '^Get-Content', '^type\s',
-    # Output
-    '^echo\s', '^Write-Output',
-    # Search
-    '^grep\s', '^rg\s', '^Select-String', '^findstr\s',
-    # Query
-    '^which\s', '^Get-Command', '^Get-Help', '^Get-Alias',
-    # Build/test
-    '^npm test', '^pytest\s', '^go test', '^Invoke-Pester',
-    '^dotnet test', '^cargo test', '^npm run', '^npm ci',
-    '^pip (freeze|list|show|install --user)(\s|$)',
-    # Git read-only (no args)
-    '^git stash list$', '^git status$', '^git diff$', '^git log$'
-)
-
-# Auto-mode: everything allowed EXCEPT pushes + denies + asks
-$autoAskPatterns = @(
-    '^git push$', '^git push\s', # git push ASKS (not denied) in auto mode
-    '^git push --delete'
-)
-
-# ===== CLASSIFY =====
-function Get-CommandClass {
-    param([string]$cmd, [string]$mode)
-
-    if (-not $cmd) { return 'help' }
-
-    # 1. Check deny patterns (all modes)
-    foreach ($p in $denyPatterns) {
-        if ($cmd -match $p) { return 'deny' }
-    }
-
-    # 2. Mode-specific checks
-    switch ($mode) {
-        'manual' {
-            # Everything asks unless allowed by explicit patterns
-            # (deny patterns already checked above)
-            return 'ask'
-        }
-        'semi' {
-            # Check allowlist first
-            foreach ($p in $semiAllowPatterns) {
-                if ($cmd -match $p) { return 'allow' }
-            }
-            # Not in allowlist → ask
-            return 'ask'
-        }
-        'auto' {
-            # Check auto-mode ask patterns (push etc.)
-            foreach ($p in $autoAskPatterns) {
-                if ($cmd -match $p) { return 'ask' }
-            }
-            # Everything else → allow
-            return 'allow'
-        }
-    }
-
-    return 'ask' # safe default
-}
+# =====================================================================
+# CROSS-REFERENCE MIRROR — DO NOT EDIT THE PATTERNS HERE.
+# Runtime source of truth: scripts/lib/permission-gate-lib.ps1
+# scripts/cross-ref-check.ps1 [10/9] TEXT-SCANS this file for the single-quoted
+# caret-anchored pattern literals below to keep semi-agents.json in sync with
+# the gate. When you
+# edit the arrays in the lib, mirror them here (verbatim) so the scan output
+# stays unchanged. Each line is a comment; nothing here executes.
+#   deny:  '^curl\s', '^wget\s', '^Invoke-WebRequest', '^Invoke-RestMethod',
+#          '^irm\s', '^iwr\s', '^iex\s', '^Start-BitsTransfer',
+#          '^ssh\s', '^docker\s', '^docker-compose\s', '^docker compose',
+#          '^telnet\s', '^ncat\s', '^nc\s', '^Test-NetConnection',
+#          '^rm\s', '^rm -rf', '^Remove-Item',
+#          '^python\s', '^python3\s', '^node\s', '^ruby\s', '^perl\s', '^php\s', '^npx\s',
+#          '^certutil\s', '^bitsadmin\s', '^schtasks\s', '^reg\s', '^sc\s', '^icacls\s',
+#          '^cmd /c', '^cmd\.exe', '^powershell\s-c\s', '^powershell\s-command\s',
+#          '^powershell\s-enc\s', '^powershell\s-File\s', '^powershell\.exe',
+#          '^pwsh\s', '^pwsh\.exe',
+#          '^Start-Process', '^Invoke-Command', '^Register-ScheduledTask', '^New-Service',
+#          '^net user', '^net localgroup', '^net share', '^net use', '^net session',
+#          '^Add-MpPreference', '^Set-MpPreference',
+#          '^saps\s', '^start\s',
+#          '^git push --force', '^git push -f'
+#   semi:  '^git status', '^git log', '^git diff', '^git show', '^git branch',
+#          '^git stash list', '^git stash show',
+#          '^ls$', '^ls\s', '^dir$', '^dir\s', '^Get-ChildItem', '^Test-Path',
+#          '^pwd$', '^Get-Location', '^cat\s', '^Get-Content', '^type\s',
+#          '^echo\s', '^Write-Output',
+#          '^grep\s', '^rg\s', '^Select-String', '^findstr\s',
+#          '^which\s', '^Get-Command', '^Get-Help', '^Get-Alias',
+#          '^npm test', '^pytest\s', '^go test', '^Invoke-Pester',
+#          '^dotnet test', '^cargo test', '^npm run', '^npm ci',
+#          '^pip (freeze|list|show|install --user)(\s|$)',
+#          '^git stash list$', '^git status$', '^git diff$', '^git log$'
+#   auto:  '^git push$', '^git push\s', '^git push --delete'
+# =====================================================================
 
 # ===== OUTPUT =====
 if ($ListModes) {

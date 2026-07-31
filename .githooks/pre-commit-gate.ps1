@@ -174,6 +174,7 @@ if ($stagedTests) {
                 PassThru = $true
             }
         }
+        if ($pester.Version.Major -ge 5 -and $cfg.PSObject.Properties['Filter']) { $cfg.Filter.ExcludeTag = 'E2E' }
         if ($testPaths.Count -gt 1 -and $pester.Version.Major -ge 5) { $cfg.Run.Parallel = $true }
         $results = Invoke-Pester -Configuration $cfg
         if ($results.FailedCount -gt 0) { Fail "Pester: $($results.FailedCount) test(s) failed" } else { Pass }

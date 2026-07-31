@@ -8,12 +8,14 @@
 
 | Componente | Tiempo Medido | Notas |
 |------------|---------------|-------|
-| run-tests.ps1 | 14.4s | Tests Pester |
+| run-tests.ps1 (parallel) | 38.5s | Tests Pester — baseline 2026-07-31, suite 26 files/472 Its (was 14.4s on 07-11; 150.3s parallel pre-opt on 07-31) |
 | pssa-gate.ps1 | 28.5s | PSScriptAnalyzer - escanea TODO el repo |
 | cross-ref-check.ps1 | 0.7s | Checks de integridad |
 | score-auto.ps1 | 32.4s | Incluye PSSA como sub-job |
 | Start-Job overhead | 1388ms/job | vs 84ms con ThreadJob |
 | **TOTAL !ship** | **~46s** | Target: ~1-2s |
+
+**Nota:** La optimizacion de run-tests.ps1 vive en la rama `experiment/tests-perf` (commit c0f0b459); detalle en `docs/mejoras/2026-07-31-gentleman-agent-gh-tests-perf.md`.
 
 ## Mejoras Planeadas
 

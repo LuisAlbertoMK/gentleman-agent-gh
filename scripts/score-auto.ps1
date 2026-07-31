@@ -113,7 +113,13 @@ $scriptLibRoot = Join-Path $repoRoot "scripts"
 $jobs          = @()
 
 $jobs += Start-ThreadJob -Name "crossref" -ScriptBlock { & "$using:scriptLibRoot\cross-ref-check.ps1" -Json -Quiet }
-$jobs += Start-ThreadJob -Name "pssa"     -ScriptBlock { & "$using:scriptLibRoot\pssa-gate.ps1" -Mode Check -Quiet }
+if ($env:PESTER_TEST -eq '1') {
+  # Test mode: skip the ~33s PSSA cold scan (pssa-gate.ps1 -Mode Check).
+  # Keeps integration tests fast; normal invocations still run the gate.
+  Write-Warning "PESTER_TEST=1 — skipping pssa-gate job (test mode)"
+} else {
+  $jobs += Start-ThreadJob -Name "pssa" -ScriptBlock { & "$using:scriptLibRoot\pssa-gate.ps1" -Mode Check -Quiet }
+}
 $jobs += Start-ThreadJob -Name "backlog"  -ScriptBlock { & "$using:scriptLibRoot\check-backlog-integrity.ps1" -Json }
 
 $jobs | Wait-Job -Timeout 30 | Out-Null

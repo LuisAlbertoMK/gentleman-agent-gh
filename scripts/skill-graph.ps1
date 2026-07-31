@@ -191,6 +191,7 @@ $agentRecommendations = @(
 function Get-AgentRecommendation {
     param([string]$TaskText)
     $seen = @{}; $recommended = @()
+    $skillLookup = @{}; foreach ($skill in $skillRegistry) { $skillLookup[$skill.Name] = $skill }
     foreach ($rec in $agentRecommendations) {
         if ($TaskText -match $rec.P) {
             foreach ($s in $rec.S) {
@@ -220,8 +221,6 @@ if ($PatternsFile -and (Test-Path $PatternsFile)) {
 # ============================================================================
 # Output
 # ============================================================================
-$skillLookup = @{}; foreach ($skill in $skillRegistry) { $skillLookup[$skill.Name] = $skill }
-
 if ($ListAll) {
     $grouped = $skillRegistry | Group-Object Category
     if ($Format -eq "Json") {

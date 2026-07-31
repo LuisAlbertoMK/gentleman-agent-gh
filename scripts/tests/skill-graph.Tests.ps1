@@ -172,6 +172,11 @@ Describe 'Get-AgentRecommendation' {
     BeforeEach {
         $script:skillRegistry = @()
         Register-Skill 'quality-gate' 'quality gate|pre-commit|validate commit' 'quality' 'medium' '' '' 'Pre-commit quality gate'
+        Register-Skill 'code-review-agent' 'code review|4r review|risk audit' 'quality' 'medium' '' '' '4R code review'
+        Register-Skill 'security-scanner' 'secret scan|injection|vulnerability' 'quality' 'high' '' '' 'Pre-commit security scan'
+        Register-Skill 'triple-verify' 'triple verify|triangulate|verificacion profunda' 'quality' 'high' '' '' 'Triple verification'
+        Register-Skill 'recovery-protocol' 'stop diagnose|frustration|error recovery' 'coordination' 'low' '' '' 'Recovery protocol'
+        Register-Skill 'immune-system' 'immunity|anti-pattern|repeated error' 'meta' 'medium' '' '' 'Immune system'
         Register-Skill 'seo' 'SEO|search engine|meta tags|structured data|sitemap' 'web-quality' 'medium' '' '' 'SEO optimization'
         Register-Skill 'research' 'research|investigar|technical investigation|learn|compare solutions' 'research' 'medium' '' '' 'Structured research'
     }

@@ -1,10 +1,12 @@
 ﻿#requires -Version 5.1
 <#
 .SYNOPSIS
-    Tests for permission-gate.ps1 — command classification per mode.
+    Tests for permission-gate classification — command classification per mode.
 .DESCRIPTION
     Verifies that commands are correctly classified as allow/ask/deny
     in manual, semi, and auto modes.
+    Runs IN-PROCESS: dot-sources scripts/lib/permission-gate-lib.ps1 once in
+    BeforeAll and calls Get-CommandClass directly (no per-It script spawn).
 
     Run: Invoke-Pester .\scripts\tests\permission-gate.Tests.ps1
     Run quiet: Invoke-Pester .\scripts\tests\permission-gate.Tests.ps1 -- -Quiet
@@ -12,23 +14,24 @@
 param([switch]$Quiet)
 
 BeforeAll {
-    $scriptsRoot = Resolve-Path "$PSScriptRoot/.."
-    $scriptPath = "$scriptsRoot/permission-gate.ps1"
-    $realModeFile = "$scriptsRoot/../.gentleman-mode"
-    $modeFilePath = Join-Path ([System.IO.Path]::GetTempPath()) ("gentleman-mode-test-{0}.txt" -f ([guid]::NewGuid().ToString("N")))
-    $realMode = if (Test-Path -LiteralPath $realModeFile) { (Get-Content -LiteralPath $realModeFile -Raw).Trim() } else { 'manual' }
-    Set-Content -LiteralPath $modeFilePath -Value $realMode -NoNewline -Encoding ASCII -Force
+    . (Join-Path (Split-Path $PSScriptRoot -Parent) 'lib\permission-gate-lib.ps1')
 
     function Invoke-Gate {
         param([string]$Command, [string]$Mode)
-        $output = & $scriptPath -Command $Command -Mode $Mode -ModeFilePath $modeFilePath -Json 2>&1
-        $output | Out-String | ConvertFrom-Json
-    }
-}
-
-AfterAll {
-    if (Test-Path -LiteralPath $modeFilePath) {
-        Remove-Item -LiteralPath $modeFilePath -Force
+        $verdict = Get-CommandClass -cmd $Command -mode $Mode
+        $rule = switch ($verdict) {
+            'deny'  { 'Built-in security restriction' }
+            'allow' { "Allowed in $Mode mode" }
+            'ask'   { "Requires confirmation in $Mode mode" }
+            'help'  { 'No command provided' }
+        }
+        [PSCustomObject]@{
+            action  = 'permission-gate'
+            command = $Command
+            mode    = $Mode
+            verdict = $verdict
+            rule    = $rule
+        }
     }
 }
 
