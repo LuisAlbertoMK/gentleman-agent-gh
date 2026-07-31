@@ -45,7 +45,7 @@ function Test-ShouldSkipLine {
     return ($null -eq $Line) -or (-not $Line.StartsWith('|')) -or $Line.StartsWith('| Timestamp')
 }
 
-function Get-ErrorPatterns {
+function Get-ErrorPattern {
     param([string]$Path)
     $errorCounts = @{}
     if (Test-Path $Path) {
@@ -78,7 +78,7 @@ function Get-ErrorPatterns {
     return $errorCounts
 }
 
-function Get-LearningPatterns {
+function Get-LearningPattern {
     param([string]$Path)
     $learningCounts = @{}
     if (Test-Path $Path) {
@@ -106,7 +106,7 @@ function Get-LearningPatterns {
     return $learningCounts
 }
 
-function Get-RepeatedPatterns {
+function Get-RepeatedPattern {
     param($Counts, [int]$Threshold = 2)
     $result = @()
     foreach ($key in $Counts.Keys) {
@@ -128,8 +128,8 @@ $learningCounts = @{}; $workflowPatterns = @(); $feedPatterns = @(); $errorCount
 if ($Mode -in 'quick','full','report') {
     if(-not $Quiet){Write-Host '[1/3] Scanning error patterns...'}
 
-    $errorCounts = Get-ErrorPatterns -Path $errorFile
-    $repeated = Get-RepeatedPatterns -Counts $errorCounts -Threshold 2
+    $errorCounts = Get-ErrorPattern -Path $errorFile
+    $repeated = Get-RepeatedPattern -Counts $errorCounts -Threshold 2
 
     if ($repeated.Count -gt 0) {
         $msg = "$($repeated.Count) repeated error pattern(s) found"
@@ -149,8 +149,8 @@ if ($Mode -in 'quick','full','report') {
 if ($Mode -in 'full','report') {
     if(-not $Quiet){Write-Host '[2/3] Scanning learning patterns...'}
 
-    $learningCounts = Get-LearningPatterns -Path $logFile
-    $workflowPatterns = Get-RepeatedPatterns -Counts $learningCounts -Threshold 3
+    $learningCounts = Get-LearningPattern -Path $logFile
+    $workflowPatterns = Get-RepeatedPattern -Counts $learningCounts -Threshold 3
 
     $workflowCount = $workflowPatterns.Count
     if ($workflowCount -gt 0) {
@@ -189,10 +189,10 @@ if ($Mode -in 'full','report') {
 if ($Mode -eq 'feed') {
     if(-not $Quiet){Write-Host '[FEED] Running scans first...'}
     
-    $errorCounts = Get-ErrorPatterns -Path $errorFile
-    $repeated = Get-RepeatedPatterns -Counts $errorCounts -Threshold 2
-    $learningCounts = Get-LearningPatterns -Path $logFile
-    $workflowPatterns = Get-RepeatedPatterns -Counts $learningCounts -Threshold 3
+    $errorCounts = Get-ErrorPattern -Path $errorFile
+    $repeated = Get-RepeatedPattern -Counts $errorCounts -Threshold 2
+    $learningCounts = Get-LearningPattern -Path $logFile
+    $workflowPatterns = Get-RepeatedPattern -Counts $learningCounts -Threshold 3
     
     if(-not $Quiet){Write-Host '[FEED] Generating skill-graph patterns...'}
     

@@ -90,6 +90,8 @@ $skillRegistry = foreach ($line in (Get-Content $registryCsv | Select-Object -Sk
 # Graph — build adjacency graph from registry
 # ============================================================================
 function New-Graph {
+    [CmdletBinding(SupportsShouldProcess)]
+    param()
     $graph = @{Nodes = @{}; AdjList = @{}}
     foreach ($skill in $skillRegistry) {
         $name = $skill.Name
@@ -106,7 +108,10 @@ function New-Graph {
         # NOTE: Related field is always empty in pipe-delimited format
         # (cannot distinguish deps from related when both contain pipes)
     }
-    return $graph
+    if ($PSCmdlet.ShouldProcess('skill dependency graph', 'Build graph')) {
+        return $graph
+    }
+    return $null
 }
 
 # ============================================================================

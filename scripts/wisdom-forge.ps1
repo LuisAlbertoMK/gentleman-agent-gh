@@ -36,7 +36,7 @@ $thresholds = @{
 }
 
 # --- Helpers ---
-function Load-Pattern {
+function Import-Pattern {
     param([string]$Id, [string]$File)
     if ($Id) {
         $filePath = $patternIndex[$Id]
@@ -69,6 +69,7 @@ function Test-ForgeThreshold {
 }
 
 function New-SkillContent {
+    [CmdletBinding(SupportsShouldProcess)]
     param($Pattern)
     $slug = Get-SkillSlug $Pattern.id
     $description = if ($Pattern.rule -and $Pattern.rule.summary) {
@@ -83,7 +84,7 @@ function New-SkillContent {
     $details = if ($Pattern.rule -and $Pattern.rule.details) { $Pattern.rule.details } else { "" }
     $check = if ($Pattern.rule -and $Pattern.rule.check) { $Pattern.rule.check } else { "" }
     $fix = if ($Pattern.rule -and $Pattern.rule.fix) { $Pattern.rule.fix } else { "" }
-    return @"
+    $skillContent = @"
 ---
 name: $slug
 description: "$description"
@@ -109,6 +110,10 @@ $fix
 ## Source Pattern
 Forged from **$($Pattern.id)**. Updated: $($Pattern.updated). Confidence: $($Pattern.confidence).
 "@
+    if ($PSCmdlet.ShouldProcess("$($Pattern.id)", 'Generate skill content')) {
+        return $skillContent
+    }
+    return $null
 }
 
 $gateResults = @()
@@ -130,7 +135,7 @@ function Get-TriggerCache {
     return $set
 }
 function Test-TriggerUnique { param([string[]]$Triggers); $existing = Get-TriggerCache; foreach ($t in $Triggers) { if ($t.Trim().ToLower() -ne '' -and $existing.ContainsKey($t.Trim().ToLower())) { return $false } }; return $true }
-function Test-NoSecrets { param([string]$Content); foreach ($p in @('-----BEGIN (RSA|OPENSSH|PRIVATE|EC) KEY-----', '(?i)(api[_-]?key|secret|password|token)\s*[:=]\s*[''"][^''"]{8,}')) { if ($Content -match $p) { return $false } }; return $true }
+function Test-NoSecret { param([string]$Content); foreach ($p in @('-----BEGIN (RSA|OPENSSH|PRIVATE|EC) KEY-----', '(?i)(api[_-]?key|secret|password|token)\s*[:=]\s*[''"][^''"]{8,}')) { if ($Content -match $p) { return $false } }; return $true }
 function Test-NoConflict { param([string]$Name); return @(Get-ChildItem $skillsDir -Directory | Where-Object { $_.Name -eq $Name }).Length -eq 0 }
 
 $patternIndex = @{}
@@ -139,7 +144,7 @@ foreach ($f in @(Get-ChildItem $patternsDir -Filter '*.json')) {
 }
 
 # --- Main ---
-$pattern, $filePath = Load-Pattern -Id $PatternId -File $PatternFile
+$pattern, $filePath = Import-Pattern -Id $PatternId -File $PatternFile
 $severity = if ($pattern.severity) { $pattern.severity } else { "MEDIUM" }
 $id = $pattern.id
 $hits = if ($pattern.hits) { [int]$pattern.hits } else { 0 }
@@ -178,7 +183,7 @@ $checks = @(
     @{ N = "has-rules";         C = { $pattern.rule -and ($pattern.rule.check -or $pattern.rule.fix -or $pattern.rule.details) } },
     @{ N = "size-max-2kb";      C = { $skillSize -le 2048 } },
     @{ N = "no-conflict";       C = { Test-NoConflict $slug } },
-    @{ N = "no-secrets";        C = { Test-NoSecrets $skillContent } }
+    @{ N = "no-secrets";        C = { Test-NoSecret $skillContent } }
 )
 foreach ($check in $checks) { $ok = Add-Gate $check.N $check.C; if (-not $ok) { $allPass = $false } }
 

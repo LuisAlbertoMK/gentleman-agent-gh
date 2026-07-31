@@ -57,13 +57,18 @@ if (Test-Path $patternsDir) {
 }
 
 function New-PatternId {
+    [CmdletBinding(SupportsShouldProcess)]
     param([string]$Domain, [string]$Subdomain, [string]$Title)
     $slug = ($Title -replace '[^a-zA-Z0-9\s-]', '' -replace '\s+', '-' -replace '--+', '-').ToLower()
     $slug = $slug.Substring(0, [Math]::Min(40, $slug.Length)) -replace '-+$', ''
-    return "$Domain-$Subdomain-$slug"
+    $patternId = "$Domain-$Subdomain-$slug"
+    if ($PSCmdlet.ShouldProcess($patternId, 'Generate pattern id')) {
+        return $patternId
+    }
+    return $null
 }
 
-function Validate-Pattern {
+function Test-Pattern {
     param([PSCustomObject]$Pattern)
     $errors = @()
     if (-not $Pattern.title) { $errors += "Missing 'title'" }
@@ -138,7 +143,7 @@ if ($MigrateBacklog) {
                     $pattern | Add-Member -NotePropertyName "subdomain" -NotePropertyValue $parts[1] -Force
                 }
             }
-            $errors = @(Validate-Pattern $pattern)
+            $errors = @(Test-Pattern $pattern)
             if ($errors.Length -gt 0) {
                 $results += @{ File = $file.Name; Status = "invalid"; Errors = $errors }
                 if (-not $Quiet) { Write-Warning "Skipping $($file.Name): $($errors -join '; ')" }
@@ -165,7 +170,7 @@ if ($MigrateBacklog) {
     if (-not (Test-Path $PatternFile)) { Write-Error "Pattern file not found: $PatternFile"; exit 1 }
     try {
         $pattern = Get-Content $PatternFile -Raw | ConvertFrom-Json
-        $errors = @(Validate-Pattern $pattern)
+        $errors = @(Test-Pattern $pattern)
         if ($errors.Length -gt 0) { Write-Error "Validation: $($errors -join '; ')"; exit 1 }
         $result = Save-Pattern $pattern
         $results += $result
@@ -180,7 +185,7 @@ if ($MigrateBacklog) {
             exit 1
         }
         $pattern = $inputJson | ConvertFrom-Json
-        $errors = @(Validate-Pattern $pattern)
+        $errors = @(Test-Pattern $pattern)
         if ($errors.Length -gt 0) { Write-Error "Validation: $($errors -join '; ')"; exit 1 }
         $result = Save-Pattern $pattern
         if ($result) { $results += $result }

@@ -36,7 +36,7 @@ function Add-Check {
     $results.Add(@{ check = $Name; status = $Status; detail = $Detail })
 }
 
-function Run-Script {
+function Invoke-Script {
     param([string]$Name, [string]$Path, [string]$ScriptArgs = "")
     if (-not (Test-Path $Path)) {
         Add-Check -Name $Name -Status "SKIP" -Detail "Script not found: $Path"
@@ -64,18 +64,18 @@ function Run-Script {
 }
 
 # ── 1. Health ──────────────────────────────────────────────────────────────
-Run-Script -Name "health-check" -Path (Join-Path $PSScriptRoot "health-check.ps1")
+Invoke-Script -Name "health-check" -Path (Join-Path $PSScriptRoot "health-check.ps1")
 
 # ── 2. Pester tests ───────────────────────────────────────────────────────
 if (-not $NoTests) {
-    Run-Script -Name "pester-tests" -Path (Join-Path $PSScriptRoot "run-tests.ps1") -Args "-Quiet"
+    Invoke-Script -Name "pester-tests" -Path (Join-Path $PSScriptRoot "run-tests.ps1") -Args "-Quiet"
 }
 
 # ── 3. Skill drift ────────────────────────────────────────────────────────
-Run-Script -Name "skill-drift" -Path (Join-Path $PSScriptRoot "check-skill-drift.ps1") -Args "-Json"
+Invoke-Script -Name "skill-drift" -Path (Join-Path $PSScriptRoot "check-skill-drift.ps1") -Args "-Json"
 
 # ── 4. Config drift ───────────────────────────────────────────────────────
-Run-Script -Name "config-drift" -Path (Join-Path $PSScriptRoot "check-config-drift.ps1") -Args "-Json"
+Invoke-Script -Name "config-drift" -Path (Join-Path $PSScriptRoot "check-config-drift.ps1") -Args "-Json"
 
 # ── 5. Git status ─────────────────────────────────────────────────────────
 try {

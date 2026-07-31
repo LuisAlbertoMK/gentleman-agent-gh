@@ -34,7 +34,7 @@ function Add-Check {
     if ($Passed) { $script:results.passed++ } else { $script:results.failed++ }
 }
 
-function Test-CommitExists {
+function Test-CommitExistence {
     param([string]$CommitHash)
     Push-Location $RepoRoot
     try {
@@ -117,7 +117,7 @@ foreach ($item in $items) {
         # Item claims done — verify criteria
         if ($criteria -match 'commit\s+([a-f0-9]{7,})') {
             $commitHash = $Matches[1]
-            if (Test-CommitExists $commitHash) {
+            if (Test-CommitExistence $commitHash) {
                 Add-Check -Item $desc -Passed $true -Detail "Done -- commit $commitHash found"
             } else {
                 Add-Check -Item $desc -Passed $false -Detail "Done claimed but commit $commitHash not found"

@@ -17,7 +17,7 @@ $dstSkills = Join-Path (Get-GlobalConfigDir) "skills"
 $dstScripts = Join-Path (Get-GlobalConfigDir) "scripts"
 $globalCfg = Get-GlobalConfigDir
 
-function Sync-DirectoryFiles { param([string]$SrcDir,[string]$DstDir,[switch]$IsDryRun,[ref]$Count)
+function Sync-DirectoryFile { param([string]$SrcDir,[string]$DstDir,[switch]$IsDryRun,[ref]$Count)
     if (-not (Test-Path $DstDir)) { New-Item -ItemType Directory -Path $DstDir -Force | Out-Null }
     if (Test-Path $SrcDir -PathType Container) {
         foreach ($f in Get-ChildItem -Path $SrcDir -File) {
@@ -73,7 +73,7 @@ Write-Host "  Config: $configCopied/$($configFiles.Count)" -Fore Green
 $syncSections = @(@{Name="Commands";Dir="commands"},@{Name="Prompts";Dir="prompts"},@{Name="Plugins";Dir="plugins"})
 $stepNum = 4; foreach ($sec in $syncSections) {
     Write-Host "`n[$stepNum] $($sec.Name) sync" -ForegroundColor Cyan
-    $count = 0; Sync-DirectoryFiles -SrcDir (Join-Path $repoRoot $sec.Dir) -DstDir (Join-Path $globalCfg $sec.Dir) -IsDryRun:$DryRun -Count ([ref]$count)
+    $count = 0; Sync-DirectoryFile -SrcDir (Join-Path $repoRoot $sec.Dir) -DstDir (Join-Path $globalCfg $sec.Dir) -IsDryRun:$DryRun -Count ([ref]$count)
     Write-Host "  $($sec.Name): $count" -Fore Green; $stepNum++
 }
 

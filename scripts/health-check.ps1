@@ -91,16 +91,19 @@ function Test-Junction {
   return $result
 }
 
-function Repair-Junction {
+function Set-Junction {
+  [CmdletBinding(SupportsShouldProcess)]
   param([string]$Path, [string]$Target, [string]$Label)
   # ponytail: validate LinkType before destructive Remove-Item — avoid nuking real dirs
   if (Test-Path $Path) {
     $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
     if ($item -and $item.LinkType -in @('Junction', 'SymbolicLink')) {
-      try {
-        Remove-Item -LiteralPath $Path -Force -Recurse -ErrorAction Stop
-      } catch {
-        Write-Warning "[repair] failed to remove $($Path): $($_.Exception.Message)"
+      if ($PSCmdlet.ShouldProcess($Path, 'Repair junction')) {
+        try {
+          Remove-Item -LiteralPath $Path -Force -Recurse -ErrorAction Stop
+        } catch {
+          Write-Warning "[repair] failed to remove $($Path): $($_.Exception.Message)"
+        }
       }
     } elseif ($item -and $item.LinkType) {
       Write-Warning "[repair] skipping $($Path): existing LinkType $($item.LinkType) is not Junction"
@@ -114,18 +117,20 @@ function Repair-Junction {
       return
     }
   }
-  $parent = Split-Path $Path -Parent
-  if (-not (Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
-  New-CrossPlatLink -Path $Path -Target $Target
-  if (-not $Quiet) { Write-Output "[repair] $Label → $Target" }
+  if ($PSCmdlet.ShouldProcess($Path, "Create junction to $Target")) {
+    $parent = Split-Path $Path -Parent
+    if (-not (Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
+    New-CrossPlatLink -Path $Path -Target $Target
+    if (-not $Quiet) { Write-Output "[repair] $Label → $Target" }
+  }
 }
 
 # ── Wrapper: Test-Junction → Repair → Re-Test → Collect ──────────────────
-function Check-And-Repair-Junction {
+function Repair-Junction {
   param([string]$Path, [string]$ExpectedTarget, [string]$Target, [string]$Label)
   $check = Test-Junction -Path $Path -ExpectedTarget $ExpectedTarget -Label $Label
   if ($check.status -eq "FAIL" -and $script:AutoRepair) {
-    Repair-Junction -Path $Path -Target $Target -Label $Label
+    Set-Junction -Path $Path -Target $Target -Label $Label
     $check = Test-Junction -Path $Path -ExpectedTarget $ExpectedTarget -Label $Label
   }
   $script:checks.Add($check)
@@ -133,13 +138,13 @@ function Check-And-Repair-Junction {
 }
 
 # ── Check 1: vmk skills junction ────────────────────────────────────────
-Check-And-Repair-Junction -Path (Join-Path (Get-GlobalConfigDir) "skills") `
+Repair-Junction -Path (Join-Path (Get-GlobalConfigDir) "skills") `
   -ExpectedTarget "$gentlemanRoot/.agents/skills" `
   -Target "$gentlemanRoot/.agents/skills" `
   -Label "vmk-skills-junction"
 
 # ── Check 2: vmk prompts junction ───────────────────────────────────────
-Check-And-Repair-Junction -Path (Join-Path (Join-Path (Get-GlobalConfigDir) "prompts") "sdd") `
+Repair-Junction -Path (Join-Path (Join-Path (Get-GlobalConfigDir) "prompts") "sdd") `
   -ExpectedTarget "$gentlemanRoot/prompts/sdd" `
   -Target "$gentlemanRoot/prompts/sdd" `
   -Label "vmk-prompts-junction"

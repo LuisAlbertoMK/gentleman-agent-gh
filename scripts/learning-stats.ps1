@@ -36,7 +36,7 @@ function Get-FileLineCount {
     } catch { return 0 }
 }
 
-function Get-CatalogStats {
+function Get-CatalogStat {
     if (-not (Test-Path $catalogFile)) {
         return [PSCustomObject]@{ Entries = 0; LastUpdated = $null; AgeDays = $null }
     }
@@ -55,7 +55,7 @@ function Get-CatalogStats {
     }
 }
 
-function Get-LearningEntries {
+function Get-LearningEntry {
     $entries = @()
     if (-not (Test-Path $learningsFile)) { return $entries }
     try {
@@ -82,7 +82,7 @@ function Get-LearningEntries {
     return $entries
 }
 
-function Get-ErrorEntries {
+function Get-ErrorEntry {
     $entries = @()
     if (-not (Test-Path $errorsFile)) { return $entries }
     try {
@@ -108,9 +108,9 @@ function Get-ErrorEntries {
 }
 
 # --- Main logic ---
-$learningEntries = Get-LearningEntries
-$errorEntries = Get-ErrorEntries
-$catalogStats = Get-CatalogStats
+$learningEntries = Get-LearningEntry
+$errorEntries = Get-ErrorEntry
+$catalogStats = Get-CatalogStat
 
 # Section frequency
 $sectionCounts = @{}

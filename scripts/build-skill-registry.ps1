@@ -18,7 +18,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-function Parse-Frontmatter {
+function Get-Frontmatter {
     param([string]$Content)
 
     $result = @{
@@ -78,7 +78,7 @@ $skillDirs = Get-ChildItem -Path $SkillsDir -Directory | Where-Object {
 foreach ($dir in $skillDirs) {
     $skillMd = Join-Path $dir.FullName "SKILL.md"
     $content = Get-Content -Path $skillMd -Raw -Encoding UTF8
-    $parsed = Parse-Frontmatter $content
+    $parsed = Get-Frontmatter $content
 
     $name = if ($parsed.name) { $parsed.name } else { $dir.Name }
 

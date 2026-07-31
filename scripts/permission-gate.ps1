@@ -105,7 +105,7 @@ $autoAskPatterns = @(
 )
 
 # ===== CLASSIFY =====
-function Classify-Command {
+function Get-CommandClass {
     param([string]$cmd, [string]$mode)
 
     if (-not $cmd) { return 'help' }
@@ -159,7 +159,7 @@ if ($ListModes) {
 }
 
 try {
-    $verdict = Classify-Command -cmd $Command -mode $Mode
+    $verdict = Get-CommandClass -cmd $Command -mode $Mode
 
     if ($Json) {
         @{

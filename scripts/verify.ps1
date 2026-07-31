@@ -19,7 +19,7 @@ function Add-Check{
     if($P){$script:r.passed++}else{$script:r.failed++}
     if(-not $Quiet){Write-Host ("[{0}] {1} -- {2}" -f $(if($P){'PASS'}else{'FAIL'}),$N,$D) -ForegroundColor $(if($P){'Green'}else{'Red'})}
 }
-function Invoke-E1Checks{
+function Invoke-E1Check{
     $sDir=Join-Path $Root 'scripts'
     $sb_bs = [System.Text.StringBuilder]::new(65536)
     Get-ChildItem "$sDir\*.ps1" | ForEach-Object {
@@ -45,7 +45,7 @@ function Invoke-E1Checks{
     $xs=Join-Path $sDir 'cross-ref-check.ps1'
     if(Test-Path $xs){& $xs;Add-Check 'Cross-Ref Check' ($LASTEXITCODE-eq0) "exit $LASTEXITCODE"}else{Add-Check 'Cross-Ref Check' $true 'not found (skipped)'}
 }
-function Invoke-E2Checks{
+function Invoke-E2Check{
     $ps=Join-Path $Root 'scripts\pssa-gate.ps1'
     if(Test-Path $ps){& $ps -Mode Check -Path $Root;Add-Check 'PSSA Gate' ($LASTEXITCODE-eq0) "exit $LASTEXITCODE"}else{Add-Check 'PSSA Gate' $true 'not found (skipped)'}
     $sb_sf = [System.Text.StringBuilder]::new(65536)
@@ -88,7 +88,7 @@ function Invoke-E2Checks{
         }catch{Add-Check 'review-rules.jsonc' $false "Parse error: $_"}
     }else{Add-Check 'review-rules.jsonc' $true 'Not found (skipped)'}
 }
-function Invoke-E3Checks{
+function Invoke-E3Check{
     $cd=Join-Path $Root '.agents\skills'
     $gd=Join-Path (Get-GlobalConfigDir) "skills"
     $sb_mj = [System.Text.StringBuilder]::new(65536)
@@ -130,10 +130,10 @@ function Invoke-E3Checks{
     }else{Add-Check 'CYCLE.md' $false 'Not found'}
 }
 switch($ProfileName){
-    'E1'{Invoke-E1Checks}
-    'E2'{Invoke-E2Checks}
-    'E3'{Invoke-E3Checks}
-    'All'{Invoke-E1Checks;Invoke-E2Checks;Invoke-E3Checks}
+    'E1'{Invoke-E1Check}
+    'E2'{Invoke-E2Check}
+    'E3'{Invoke-E3Check}
+    'All'{Invoke-E1Check;Invoke-E2Check;Invoke-E3Check}
 }
 $r.allPassed=($r.failed-eq0)
 if($Json){

@@ -88,7 +88,7 @@ function Write-Report {
     }
 }
 
-function Run-Scan {
+function Invoke-Scan {
     param([string]$Runner, [string]$JsonOutput)
     if ([string]::IsNullOrWhiteSpace($JsonOutput)) {
         Write-Warning "${scriptName}: Empty output from $Runner — skipping"
@@ -116,7 +116,7 @@ $sp = Get-Command "skillspector" -ErrorAction SilentlyContinue
 if ($sp) {
     if(-not $Quiet) { Write-Host "🔍 [CLI] Scanning skills with SkillSpector (static only)..." }
     $jsonOutput = & skillspector scan $resolvedPath --no-llm --format json 2>&1 | Out-String
-    Run-Scan -Runner "CLI" -JsonOutput $jsonOutput
+    Invoke-Scan -Runner "CLI" -JsonOutput $jsonOutput
     if ($Strict -and $script:RiskExceeded) { exit 1 }
     exit 0
 }
@@ -133,7 +133,7 @@ if ($dockerOk) {
     $hostPath = (Split-Path $resolvedPath.Path -Parent) -replace '\\', '/'
     $scanTarget = "/scan/$(Split-Path $resolvedPath.Path -Leaf)"
     $jsonOutput = docker run --rm -v "${hostPath}:/scan" $DockerImage scan $scanTarget --no-llm --format json 2>&1 | Out-String
-    Run-Scan -Runner "Docker" -JsonOutput $jsonOutput
+    Invoke-Scan -Runner "Docker" -JsonOutput $jsonOutput
     if ($Strict -and $script:RiskExceeded) { exit 1 }
     exit 0
 }

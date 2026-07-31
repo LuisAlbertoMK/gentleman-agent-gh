@@ -86,6 +86,7 @@ function Get-ServerDir {
 
 # ── Actions ─────────────────────────────────────────────────────────
 function Start-Server {
+    [CmdletBinding(SupportsShouldProcess)]
     param([string]$N, [string]$Cmd, [string]$ArgStr, [string]$Dir)
     if (-not $N) { Write-Error "Name is required"; return }
     if (-not $Cmd) { Write-Error "Command is required"; return }
@@ -107,63 +108,65 @@ function Start-Server {
     $outFile = Join-Path (Get-ServerDir) "$N-out.log"
     $errFile = Join-Path (Get-ServerDir) "$N-err.log"
 
-    # Start process with async output capture
-    $psi = [System.Diagnostics.ProcessStartInfo]@{
-        FileName               = $Cmd
-        Arguments              = $ArgStr
-        RedirectStandardOutput = $true
-        RedirectStandardError  = $true
-        UseShellExecute        = $false
-        WorkingDirectory       = $Dir
-        CreateNoWindow         = $true
-    }
-    try {
-        $p = [System.Diagnostics.Process]::Start($psi)
-    } catch {
-        Write-Error "Failed to start '$Cmd $ArgStr': $_"
-        return
-    }
+    if ($PSCmdlet.ShouldProcess($N, 'Start dev server')) {
+        # Start process with async output capture
+        $psi = [System.Diagnostics.ProcessStartInfo]@{
+            FileName               = $Cmd
+            Arguments              = $ArgStr
+            RedirectStandardOutput = $true
+            RedirectStandardError  = $true
+            UseShellExecute        = $false
+            WorkingDirectory       = $Dir
+            CreateNoWindow         = $true
+        }
+        try {
+            $p = [System.Diagnostics.Process]::Start($psi)
+        } catch {
+            Write-Error "Failed to start '$Cmd $ArgStr': $_"
+            return
+        }
 
-    # Async output → files (avoids deadlock, persists beyond agent session)
-    $outStream = [System.IO.StreamWriter]::new($outFile, $false, [System.Text.UTF8Encoding]::new($false))
-    $errStream = [System.IO.StreamWriter]::new($errFile, $false, [System.Text.UTF8Encoding]::new($false))
-    # Use Register-ObjectEvent: PowerShell .NET events aren't directly callable
-    Register-ObjectEvent -InputObject $p -EventName OutputDataReceived -MessageData $outStream -Action {
-        $d = $Event.SourceEventArgs.Data
-        if ($d) { $Event.MessageData.WriteLine($d); $Event.MessageData.Flush() }
-    }
-    Register-ObjectEvent -InputObject $p -EventName ErrorDataReceived -MessageData $errStream -Action {
-        $d = $Event.SourceEventArgs.Data
-        if ($d) { $Event.MessageData.WriteLine($d); $Event.MessageData.Flush() }
-    }
-    $p.BeginOutputReadLine()
-    $p.BeginErrorReadLine()
+        # Async output → files (avoids deadlock, persists beyond agent session)
+        $outStream = [System.IO.StreamWriter]::new($outFile, $false, [System.Text.UTF8Encoding]::new($false))
+        $errStream = [System.IO.StreamWriter]::new($errFile, $false, [System.Text.UTF8Encoding]::new($false))
+        # Use Register-ObjectEvent: PowerShell .NET events aren't directly callable
+        Register-ObjectEvent -InputObject $p -EventName OutputDataReceived -MessageData $outStream -Action {
+            $d = $Event.SourceEventArgs.Data
+            if ($d) { $Event.MessageData.WriteLine($d); $Event.MessageData.Flush() }
+        }
+        Register-ObjectEvent -InputObject $p -EventName ErrorDataReceived -MessageData $errStream -Action {
+            $d = $Event.SourceEventArgs.Data
+            if ($d) { $Event.MessageData.WriteLine($d); $Event.MessageData.Flush() }
+        }
+        $p.BeginOutputReadLine()
+        $p.BeginErrorReadLine()
 
-    # Register
-    $entry = @{
-        name      = $N
-        pid       = $p.Id
-        cmd       = $Cmd
-        args      = $ArgStr
-        dir       = $Dir
-        started   = (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
-        outFile   = $outFile
-        errFile   = $errFile
-    }
-    $reg[$N] = $entry
-    Save-Registry $reg
+        # Register
+        $entry = @{
+            name      = $N
+            pid       = $p.Id
+            cmd       = $Cmd
+            args      = $ArgStr
+            dir       = $Dir
+            started   = (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+            outFile   = $outFile
+            errFile   = $errFile
+        }
+        $reg[$N] = $entry
+        Save-Registry $reg
 
-    # Wait briefly, capture first output lines
-    Start-Sleep -Milliseconds 1500
-    $initialOut = if (Test-Path $outFile) { Get-Content $outFile -Tail $Tail } else { @() }
+        # Wait briefly, capture first output lines
+        Start-Sleep -Milliseconds 1500
+        $initialOut = if (Test-Path $outFile) { Get-Content $outFile -Tail $Tail } else { @() }
 
-    Write-Host "[dev-server] ✅ Started '$N' (PID $($p.Id))" -ForegroundColor Green
-    Write-Host "[dev-server]   Cmd: $Cmd $ArgStr" -ForegroundColor DarkGray
-    Write-Host "[dev-server]   Dir: $Dir" -ForegroundColor DarkGray
-    Write-Host "[dev-server]   Logs: $outFile" -ForegroundColor DarkGray
-    if ($initialOut) {
-        Write-Host "[dev-server]   Initial output:" -ForegroundColor DarkGray
-        $initialOut | ForEach-Object { Write-Host "     $_" }
+        Write-Host "[dev-server] ✅ Started '$N' (PID $($p.Id))" -ForegroundColor Green
+        Write-Host "[dev-server]   Cmd: $Cmd $ArgStr" -ForegroundColor DarkGray
+        Write-Host "[dev-server]   Dir: $Dir" -ForegroundColor DarkGray
+        Write-Host "[dev-server]   Logs: $outFile" -ForegroundColor DarkGray
+        if ($initialOut) {
+            Write-Host "[dev-server]   Initial output:" -ForegroundColor DarkGray
+            $initialOut | ForEach-Object { Write-Host "     $_" }
+        }
     }
 }
 
@@ -188,7 +191,7 @@ function Get-Status {
     }
 }
 
-function Get-Logs {
+function Get-Log {
     param([string]$N)
     $reg = Get-Registry
     if (-not $reg.ContainsKey($N)) { Write-Warning "Server '$N' not found"; return }
@@ -211,19 +214,22 @@ function Get-Logs {
 }
 
 function Stop-Server {
+    [CmdletBinding(SupportsShouldProcess)]
     param([string]$N)
     $reg = Get-Registry
     if (-not $reg.ContainsKey($N)) { Write-Warning "Server '$N' not found"; return }
     $e = $reg[$N]
     $proc = Get-Process -Id $e.pid -ErrorAction SilentlyContinue
-    if ($proc) {
-        $proc.Kill()
-        Write-Host "[dev-server] 🛑 Killed '$N' (PID $($e.pid))" -ForegroundColor Yellow
-    } else {
-        Write-Host "[dev-server] ⚠️  '$N' was already stopped" -ForegroundColor DarkGray
+    if ($PSCmdlet.ShouldProcess($N, 'Stop dev server')) {
+        if ($proc) {
+            $proc.Kill()
+            Write-Host "[dev-server] 🛑 Killed '$N' (PID $($e.pid))" -ForegroundColor Yellow
+        } else {
+            Write-Host "[dev-server] ⚠️  '$N' was already stopped" -ForegroundColor DarkGray
+        }
+        $reg.Remove($N)
+        Save-Registry $reg
     }
-    $reg.Remove($N)
-    Save-Registry $reg
 }
 
 function Get-List {
@@ -257,7 +263,7 @@ function Invoke-Cleanup {
 switch ($Action) {
     "Start"   { Start-Server -N $Name -Cmd $Command -Args $Arguments -Dir $WorkingDir }
     "Status"  { Get-Status -N $Name }
-    "Logs"    { Get-Logs -N $Name }
+    "Logs"    { Get-Log -N $Name }
     "Kill"    { Stop-Server -N $Name }
     "List"    { Get-List }
     "Cleanup" { Invoke-Cleanup }

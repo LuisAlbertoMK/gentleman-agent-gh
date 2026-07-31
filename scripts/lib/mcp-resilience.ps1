@@ -96,27 +96,30 @@ function Set-McpCircuitState {
     .SYNOPSIS
         Persists circuit breaker state for an MCP server. Thread-safe via mutex.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param([string]$Server, [hashtable]$State)
 
-    $dir = Split-Path $script:CircuitStateFile -Parent
-    if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+    if ($PSCmdlet.ShouldProcess($Server, 'Set MCP circuit state')) {
+        $dir = Split-Path $script:CircuitStateFile -Parent
+        if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
 
-    $acquired = $false
-    try {
-        $script:FileMutex.WaitOne(5000) | Out-Null
-        $acquired = $true
+        $acquired = $false
+        try {
+            $script:FileMutex.WaitOne(5000) | Out-Null
+            $acquired = $true
 
-        $cache = @{}
-        if (Test-Path $script:CircuitStateFile) {
-            try {
-                $raw = Get-Content $script:CircuitStateFile -Raw -Encoding UTF8 | ConvertFrom-Json
-                if ($raw) { $raw.PSObject.Properties | ForEach-Object { $cache[$_.Name] = $_.Value } }
-            } catch { Write-Debug "mcp-resilience: $($_.Exception.Message)" }
+            $cache = @{}
+            if (Test-Path $script:CircuitStateFile) {
+                try {
+                    $raw = Get-Content $script:CircuitStateFile -Raw -Encoding UTF8 | ConvertFrom-Json
+                    if ($raw) { $raw.PSObject.Properties | ForEach-Object { $cache[$_.Name] = $_.Value } }
+                } catch { Write-Debug "mcp-resilience: $($_.Exception.Message)" }
+            }
+            $cache[$Server] = $State
+            $cache | ConvertTo-Json -Depth 10 | Set-Content $script:CircuitStateFile -Encoding UTF8
+        } finally {
+            if ($acquired) { $script:FileMutex.ReleaseMutex() }
         }
-        $cache[$Server] = $State
-        $cache | ConvertTo-Json -Depth 10 | Set-Content $script:CircuitStateFile -Encoding UTF8
-    } finally {
-        if ($acquired) { $script:FileMutex.ReleaseMutex() }
     }
 }
 
@@ -127,13 +130,16 @@ function Reset-McpCircuit {
     .PARAMETER Server
         MCP server name.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param([string]$Server)
-    Set-McpCircuitState -Server $Server -State @{
-        State = "CLOSED"
-        FailureCount = 0
-        LastFailure = $null
-        LastSuccess = (Get-IsoTimestamp)
-        OpenedAt = $null
+    if ($PSCmdlet.ShouldProcess($Server, 'Reset MCP circuit breaker')) {
+        Set-McpCircuitState -Server $Server -State @{
+            State = "CLOSED"
+            FailureCount = 0
+            LastFailure = $null
+            LastSuccess = (Get-IsoTimestamp)
+            OpenedAt = $null
+        }
     }
 }
 

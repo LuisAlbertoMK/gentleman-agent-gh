@@ -26,17 +26,20 @@ function Get-Cache {
 }
 
 function Set-Cache {
+    [CmdletBinding(SupportsShouldProcess)]
     param([string]$Key,[object]$Data)
-    if (-not (Test-Path $cacheDir)) { New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null }
-    $cache = @{}
-    if (Test-Path $cacheFile) {
-        try {
-            $raw = Get-Content $cacheFile -Raw -Encoding UTF8 | ConvertFrom-Json
-            if ($raw) { $raw.PSObject.Properties | ForEach-Object { $cache[$_.Name] = $_.Value } }
-} catch { Write-Debug "cache.set load: $($_.Exception.Message)" }
+    if ($PSCmdlet.ShouldProcess($cacheFile, "Set cache key '$Key'")) {
+        if (-not (Test-Path $cacheDir)) { New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null }
+        $cache = @{}
+        if (Test-Path $cacheFile) {
+            try {
+                $raw = Get-Content $cacheFile -Raw -Encoding UTF8 | ConvertFrom-Json
+                if ($raw) { $raw.PSObject.Properties | ForEach-Object { $cache[$_.Name] = $_.Value } }
+            } catch { Write-Debug "cache.set load: $($_.Exception.Message)" }
+        }
+        $cache[$Key] = @{ timestamp = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ"); data = $Data }
+        $cache | ConvertTo-Json -Depth 5 | Set-Content $cacheFile -Encoding UTF8
     }
-    $cache[$Key] = @{ timestamp = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ"); data = $Data }
-    $cache | ConvertTo-Json -Depth 5 | Set-Content $cacheFile -Encoding UTF8
 }
 
 function Clear-Cache {

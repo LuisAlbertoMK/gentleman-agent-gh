@@ -1,318 +1,6 @@
 {
-  "manualPairs": [
-    {
-      "count": 1,
-      "rule": "PSReviewUnusedParameter",
-      "file": "check-mcp-security.ps1"
-    },
-    {
-      "count": 2,
-      "rule": "PSReviewUnusedParameter",
-      "file": "dev-server.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSReviewUnusedParameter",
-      "file": "global-setup.ps1"
-    },
-    {
-      "count": 2,
-      "rule": "PSReviewUnusedParameter",
-      "file": "health-check.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSReviewUnusedParameter",
-      "file": "intake-debug.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSReviewUnusedParameter",
-      "file": "intake-verify.ps1"
-    },
-    {
-      "count": 3,
-      "rule": "PSReviewUnusedParameter",
-      "file": "inter-track.ps1"
-    },
-    {
-      "count": 2,
-      "rule": "PSReviewUnusedParameter",
-      "file": "mcp-resilience.ps1"
-    },
-    {
-      "count": 2,
-      "rule": "PSReviewUnusedParameter",
-      "file": "permission-gate.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSReviewUnusedParameter",
-      "file": "pipeline-analyze.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSReviewUnusedParameter",
-      "file": "restore-project-score.ps1"
-    },
-    {
-      "count": 2,
-      "rule": "PSReviewUnusedParameter",
-      "file": "setup-install.ps1"
-    },
-    {
-      "count": 3,
-      "rule": "PSReviewUnusedParameter",
-      "file": "setup-machine.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSReviewUnusedParameter",
-      "file": "skill-resolver-fast.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSReviewUnusedParameter",
-      "file": "skillspector-gate.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSReviewUnusedParameter",
-      "file": "sync-global-ps5.ps1"
-    },
-    {
-      "count": 3,
-      "rule": "PSReviewUnusedParameter",
-      "file": "sync-global.ps1"
-    },
-    {
-      "count": 2,
-      "rule": "PSReviewUnusedParameter",
-      "file": "sync-vmk.ps1"
-    },
-    {
-      "count": 10,
-      "rule": "PSReviewUnusedParameter",
-      "file": "trend.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSReviewUnusedParameter",
-      "file": "verify.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSReviewUnusedParameter",
-      "file": "wisdom-demote.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSReviewUnusedParameter",
-      "file": "wisdom-stats.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSReviewUnusedParameter",
-      "file": "wisdom-store.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseApprovedVerbs",
-      "file": "build-skill-registry.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseApprovedVerbs",
-      "file": "check.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseApprovedVerbs",
-      "file": "health-check.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseApprovedVerbs",
-      "file": "JsonFast.psm1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseApprovedVerbs",
-      "file": "permission-gate.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseApprovedVerbs",
-      "file": "skillspector-gate.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseApprovedVerbs",
-      "file": "smoke-all.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseApprovedVerbs",
-      "file": "wisdom-forge.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseApprovedVerbs",
-      "file": "wisdom-store.ps1"
-    },
-    {
-      "count": 2,
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
-      "file": "engram-validate.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
-      "file": "intake-verify.ps1"
-    },
-    {
-      "count": 6,
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
-      "file": "score-auto.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
-      "file": "cache.ps1"
-    },
-    {
-      "count": 2,
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
-      "file": "dev-server.ps1"
-    },
-    {
-      "count": 2,
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
-      "file": "mcp-resilience.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
-      "file": "platform.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
-      "file": "skill-graph.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
-      "file": "wisdom-forge.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
-      "file": "wisdom-store.ps1"
-    },
-    {
-      "count": 4,
-      "rule": "PSUseSingularNouns",
-      "file": "auto-pattern-detector.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseSingularNouns",
-      "file": "check-backlog-integrity.ps1"
-    },
-    {
-      "count": 2,
-      "rule": "PSUseSingularNouns",
-      "file": "cross-ref-check.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseSingularNouns",
-      "file": "dev-server.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseSingularNouns",
-      "file": "global-setup.ps1"
-    },
-    {
-      "count": 3,
-      "rule": "PSUseSingularNouns",
-      "file": "learning-stats.ps1"
-    },
-    {
-      "count": 3,
-      "rule": "PSUseSingularNouns",
-      "file": "run-dreaming.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseSingularNouns",
-      "file": "sync-global-ps5.ps1"
-    },
-    {
-      "count": 3,
-      "rule": "PSUseSingularNouns",
-      "file": "verify.ps1"
-    },
-    {
-      "count": 1,
-      "rule": "PSUseSingularNouns",
-      "file": "wisdom-forge.ps1"
-    }
-  ],
-  "autoFixableCount": 17,
-  "trackedCount": 779,
-  "total": 946,
-  "manualCount": 91,
-  "ampersandCount": 0,
-  "byRule": [
-    {
-      "count": 1,
-      "rule": "PSAvoidAssignmentToAutomaticVariable"
-    },
-    {
-      "count": 5,
-      "rule": "PSAvoidDefaultValueSwitchParameter"
-    },
-    {
-      "count": 18,
-      "rule": "PSAvoidGlobalVars"
-    },
-    {
-      "count": 1,
-      "rule": "PSAvoidUsingEmptyCatchBlock"
-    },
-    {
-      "count": 779,
-      "rule": "PSAvoidUsingWriteHost"
-    },
-    {
-      "count": 60,
-      "rule": "PSReviewUnusedParameter"
-    },
-    {
-      "count": 9,
-      "rule": "PSUseApprovedVerbs"
-    },
-    {
-      "count": 12,
-      "rule": "PSUseBOMForUnicodeEncodedFile"
-    },
-    {
-      "count": 22,
-      "rule": "PSUseDeclaredVarsMoreThanAssignments"
-    },
-    {
-      "count": 15,
-      "rule": "PSUseShouldProcessForStateChangingFunctions"
-    },
-    {
-      "count": 24,
-      "rule": "PSUseSingularNouns"
-    }
-  ],
-  "timestamp": "2026-07-31T10:26:15",
+  "timestamp": "2026-07-31T11:41:08",
+  "total": 908,
   "byFile": [
     {
       "file": "_e2e_pipeline.Tests.ps1",
@@ -340,7 +28,7 @@
     },
     {
       "file": "auto-pattern-detector.ps1",
-      "count": 13
+      "count": 9
     },
     {
       "file": "backup.ps1",
@@ -368,10 +56,6 @@
     },
     {
       "file": "build-skill-registry.ps1",
-      "count": 2
-    },
-    {
-      "file": "cache.ps1",
       "count": 1
     },
     {
@@ -380,7 +64,7 @@
     },
     {
       "file": "check-backlog-integrity.ps1",
-      "count": 8
+      "count": 7
     },
     {
       "file": "check-mcp-security.ps1",
@@ -388,10 +72,6 @@
     },
     {
       "file": "check-mcp-security.Tests.ps1",
-      "count": 1
-    },
-    {
-      "file": "check.ps1",
       "count": 1
     },
     {
@@ -408,7 +88,7 @@
     },
     {
       "file": "cross-ref-check.ps1",
-      "count": 41
+      "count": 39
     },
     {
       "file": "CrossRefPatterns.Tests.ps1",
@@ -424,7 +104,7 @@
     },
     {
       "file": "dev-server.ps1",
-      "count": 27
+      "count": 24
     },
     {
       "file": "e2e-test.ps1",
@@ -464,11 +144,11 @@
     },
     {
       "file": "global-setup.ps1",
-      "count": 2
+      "count": 1
     },
     {
       "file": "health-check.ps1",
-      "count": 3
+      "count": 2
     },
     {
       "file": "health-check.Tests.ps1",
@@ -487,20 +167,16 @@
       "count": 8
     },
     {
-      "file": "JsonFast.psm1",
-      "count": 1
-    },
-    {
       "file": "JunctionLogic.Tests.ps1",
       "count": 1
     },
     {
       "file": "learning-stats.ps1",
-      "count": 13
+      "count": 10
     },
     {
       "file": "mcp-resilience.ps1",
-      "count": 4
+      "count": 2
     },
     {
       "file": "mode-gate.Integration.Tests.ps1",
@@ -516,7 +192,7 @@
     },
     {
       "file": "permission-gate.ps1",
-      "count": 9
+      "count": 8
     },
     {
       "file": "permission-gate.Tests.ps1",
@@ -525,10 +201,6 @@
     {
       "file": "pipeline-analyze.ps1",
       "count": 4
-    },
-    {
-      "file": "platform.ps1",
-      "count": 1
     },
     {
       "file": "ponytail-audit.ps1",
@@ -568,7 +240,7 @@
     },
     {
       "file": "run-dreaming.ps1",
-      "count": 23
+      "count": 20
     },
     {
       "file": "run-improvement-cycle.ps1",
@@ -616,7 +288,7 @@
     },
     {
       "file": "skill-graph.ps1",
-      "count": 14
+      "count": 13
     },
     {
       "file": "skill-graph.Tests.ps1",
@@ -628,11 +300,11 @@
     },
     {
       "file": "skillspector-gate.ps1",
-      "count": 15
+      "count": 14
     },
     {
       "file": "smoke-all.ps1",
-      "count": 7
+      "count": 6
     },
     {
       "file": "smoke-backlog-integrity.ps1",
@@ -684,7 +356,7 @@
     },
     {
       "file": "sync-global-ps5.ps1",
-      "count": 21
+      "count": 20
     },
     {
       "file": "sync-global.ps1",
@@ -728,7 +400,7 @@
     },
     {
       "file": "verify.ps1",
-      "count": 5
+      "count": 2
     },
     {
       "file": "wisdom-demote.ps1",
@@ -736,7 +408,7 @@
     },
     {
       "file": "wisdom-forge.ps1",
-      "count": 16
+      "count": 13
     },
     {
       "file": "wisdom-loader.ps1",
@@ -748,7 +420,185 @@
     },
     {
       "file": "wisdom-store.ps1",
-      "count": 7
+      "count": 5
     }
-  ]
+  ],
+  "manualPairs": [
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "check-mcp-security.ps1",
+      "count": 1
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "dev-server.ps1",
+      "count": 2
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "global-setup.ps1",
+      "count": 1
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "health-check.ps1",
+      "count": 2
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "intake-debug.ps1",
+      "count": 1
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "intake-verify.ps1",
+      "count": 1
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "inter-track.ps1",
+      "count": 3
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "mcp-resilience.ps1",
+      "count": 2
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "permission-gate.ps1",
+      "count": 2
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "pipeline-analyze.ps1",
+      "count": 1
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "restore-project-score.ps1",
+      "count": 1
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "setup-install.ps1",
+      "count": 2
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "setup-machine.ps1",
+      "count": 3
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "skill-resolver-fast.ps1",
+      "count": 1
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "skillspector-gate.ps1",
+      "count": 1
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "sync-global-ps5.ps1",
+      "count": 1
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "sync-global.ps1",
+      "count": 3
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "sync-vmk.ps1",
+      "count": 2
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "trend.ps1",
+      "count": 10
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "verify.ps1",
+      "count": 1
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "wisdom-demote.ps1",
+      "count": 1
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "wisdom-stats.ps1",
+      "count": 1
+    },
+    {
+      "rule": "PSReviewUnusedParameter",
+      "file": "wisdom-store.ps1",
+      "count": 1
+    },
+    {
+      "rule": "PSUseDeclaredVarsMoreThanAssignments",
+      "file": "engram-validate.ps1",
+      "count": 2
+    },
+    {
+      "rule": "PSUseDeclaredVarsMoreThanAssignments",
+      "file": "intake-verify.ps1",
+      "count": 1
+    },
+    {
+      "rule": "PSUseDeclaredVarsMoreThanAssignments",
+      "file": "score-auto.ps1",
+      "count": 6
+    }
+  ],
+  "manualCount": 53,
+  "trackedCount": 779,
+  "autoFixableCount": 17,
+  "byRule": [
+    {
+      "count": 1,
+      "rule": "PSAvoidAssignmentToAutomaticVariable"
+    },
+    {
+      "count": 5,
+      "rule": "PSAvoidDefaultValueSwitchParameter"
+    },
+    {
+      "count": 18,
+      "rule": "PSAvoidGlobalVars"
+    },
+    {
+      "count": 1,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
+    },
+    {
+      "count": 779,
+      "rule": "PSAvoidUsingWriteHost"
+    },
+    {
+      "count": 60,
+      "rule": "PSReviewUnusedParameter"
+    },
+    {
+      "count": 12,
+      "rule": "PSUseBOMForUnicodeEncodedFile"
+    },
+    {
+      "count": 22,
+      "rule": "PSUseDeclaredVarsMoreThanAssignments"
+    },
+    {
+      "count": 6,
+      "rule": "PSUseShouldProcessForStateChangingFunctions"
+    },
+    {
+      "count": 4,
+      "rule": "PSUseSingularNouns"
+    }
+  ],
+  "ampersandCount": 0
 }

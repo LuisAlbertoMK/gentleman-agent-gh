@@ -58,7 +58,7 @@ if(-not $Quiet){Write-Output "`n═══ GLOBAL SETUP — opencode ═══`n"
 Sync-File (Join-Path $gentlemanRoot "AGENTS.md") (Join-Path $globalConfig "AGENTS.md") "AGENTS.md"
 
 # 2. Sync prompts from a source subdir
-function Sync-Prompts {
+function Sync-Prompt {
     param([string]$SourceDir,[string]$DestSubdir,[string]$IncludeFilter="*.md")
     if(-not (Test-Path $SourceDir)){return}
     $destBase = Join-Path (Join-Path $globalConfig "prompts") $DestSubdir
@@ -66,10 +66,10 @@ function Sync-Prompts {
         Sync-File $_.FullName (Join-Path $destBase $_.Name) "prompts/$DestSubdir/$($_.Name)"
     }
 }
-Sync-Prompts (Join-Path (Join-Path $gentlemanRoot "prompts") "shared") "shared"
-Sync-Prompts (Join-Path (Join-Path $gentlemanRoot "prompts") "sdd") "sdd"
-Sync-Prompts (Join-Path $gentlemanRoot "prompts") "" "gentleman-*.md"
-Sync-Prompts (Join-Path $gentlemanRoot "prompts") "" "_*.md"
+Sync-Prompt (Join-Path (Join-Path $gentlemanRoot "prompts") "shared") "shared"
+Sync-Prompt (Join-Path (Join-Path $gentlemanRoot "prompts") "sdd") "sdd"
+Sync-Prompt (Join-Path $gentlemanRoot "prompts") "" "gentleman-*.md"
+Sync-Prompt (Join-Path $gentlemanRoot "prompts") "" "_*.md"
 
 # 3. Sync shared scripts
 $sharedScripts = @(

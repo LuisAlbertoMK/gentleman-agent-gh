@@ -31,11 +31,14 @@ function New-CrossPlatLink {
     .PARAMETER Target
         The existing directory to link to.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param([string]$Path, [string]$Target)
-    if ($IsLinux -or $IsMacOS) {
-        New-Item -ItemType SymbolicLink -Path $Path -Target $Target -Force | Out-Null
-    } else {
-        New-Item -ItemType Junction -Path $Path -Target $Target -Force | Out-Null
+    if ($PSCmdlet.ShouldProcess($Path, 'Create cross-platform link')) {
+        if ($IsLinux -or $IsMacOS) {
+            New-Item -ItemType SymbolicLink -Path $Path -Target $Target -Force | Out-Null
+        } else {
+            New-Item -ItemType Junction -Path $Path -Target $Target -Force | Out-Null
+        }
     }
 }
 

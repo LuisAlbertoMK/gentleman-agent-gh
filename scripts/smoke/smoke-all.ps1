@@ -51,7 +51,7 @@ $smokeScripts = @(
 )
 
 # ── Cache check ────────────────────────────────────────────────────────
-function Compute-SmokeHash {
+function Get-SmokeHash {
     $gitHead = & git rev-parse HEAD 2>$null
     if (-not $gitHead) { $gitHead = "no-git" }
     $content = Get-ChildItem $smokeDir -Filter "*.ps1" | Sort-Object Name | ForEach-Object {
@@ -63,7 +63,7 @@ function Compute-SmokeHash {
     return [Convert]::ToBase64String($hash)
 }
 
-$currentHash = Compute-SmokeHash
+$currentHash = Get-SmokeHash
 $cached = $null
 if (-not $Force -and (Test-Path $CachePath)) {
     try { $cached = Get-Content $CachePath -Raw | ConvertFrom-Json } catch { Write-Debug "Cache read failed: $_" }

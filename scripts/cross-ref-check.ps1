@@ -33,7 +33,7 @@ if (-not (Test-Path $skillsDir)) {
 }
 
 # --- Helper: Get non-shared skill directories ---
-function Get-SkillDirs {
+function Get-SkillDir {
     param([string]$Dir)
     (Get-ChildItem $Dir -Directory).Where({ $_.Name -ne '_shared' })
 }
@@ -47,7 +47,7 @@ function Read-SkillContent {
 }
 
 # --- Helper: Parse comma/pipe separated refs from SKILL.md ---
-function Get-SkillRefs {
+function Get-SkillRef {
     param([string]$Content, [string]$Pattern)
     if ($Content -match $Pattern) {
         return ($Matches[1] -split '\s*[\|,]\s*' |
@@ -70,7 +70,7 @@ if (Test-Path $apcPath) {
 # --- [2/9] SKILL.md presence ---
 if (-not $Quiet) { Write-Host "[2/9] SKILL.md..." -N }
 $missingSkills = [System.Collections.Generic.List[string]]::new()
-$skillDirs = Get-SkillDirs $skillsDir
+$skillDirs = Get-SkillDir $skillsDir
 foreach ($skill in $skillDirs) {
     if (-not (Test-Path (Join-Path $skill.FullName "SKILL.md"))) {
         $missingSkills.Add($skill.Name)
@@ -146,7 +146,7 @@ foreach ($skill in $skillDirs) {
     $skillContentCache[$skill.Name] = $content
 
     # Check Cross-Refs
-    $crossRefs = Get-SkillRefs $content 'Cross-Refs:\s*(.+)'
+    $crossRefs = Get-SkillRef $content 'Cross-Refs:\s*(.+)'
     foreach ($ref in $crossRefs) {
         if ($allSkillNames -notcontains $ref) {
             $brokenRefs.Add("$($skill.Name) cross-refs '$ref' missing")
@@ -154,7 +154,7 @@ foreach ($skill in $skillDirs) {
     }
 
     # Check Anti-Patterns
-    $antiRefs = Get-SkillRefs $content 'Anti-Patterns:\s*(.+)'
+    $antiRefs = Get-SkillRef $content 'Anti-Patterns:\s*(.+)'
     foreach ($ref in $antiRefs) {
         if ($allSkillNames -notcontains $ref) {
             $brokenRefs.Add("$($skill.Name) anti-refs '$ref' missing")
@@ -177,7 +177,7 @@ foreach ($skill in $skillDirs) {
     $content = $skillContentCache[$skill.Name]
     if (-not $content) { continue }
 
-    $configRefs = Get-SkillRefs $content 'config_refs:\s*(.+)'
+    $configRefs = Get-SkillRef $content 'config_refs:\s*(.+)'
     foreach ($ref in $configRefs) {
         $refPath = Join-Path $RepoRoot $ref
         if (-not (Test-Path $refPath)) {

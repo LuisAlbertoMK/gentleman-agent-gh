@@ -32,7 +32,7 @@ $errorsDir = Join-Path (Join-Path (Join-Path $repoRoot 'docs') 'metricas') 'erro
 $catalogFile = Join-Path $repoRoot 'ANTI-PATTERN-CATALOG.md'
 $timestamp = Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ'
 
-function Get-CatalogedPatterns {
+function Get-CatalogedPattern {
     if (-not (Test-Path $catalogFile)) { return @() }
     try {
         $content = Get-Content $catalogFile -Raw -ErrorAction Stop
@@ -51,7 +51,7 @@ function Get-CatalogedPatterns {
     return $patterns
 }
 
-function Get-LearningPatternKeys {
+function Get-LearningPatternKey {
     if (-not (Test-Path $learningsFile)) { return @() }
     try {
         $content = Get-Content $learningsFile -Raw -ErrorAction Stop
@@ -67,7 +67,7 @@ function Get-LearningPatternKeys {
     return $keys
 }
 
-function Get-ErrorEntries {
+function Get-ErrorEntry {
     $entries = @()
     if (-not (Test-Path $errorsDir)) { return $entries }
     $errorFiles = Get-ChildItem -Path $errorsDir -Filter '*.json' -ErrorAction SilentlyContinue
@@ -91,7 +91,7 @@ function Get-ErrorEntries {
     return $entries
 }
 
-function Get-LearningEntries {
+function Get-LearningEntry {
     $entries = @()
     if (-not (Test-Path $learningsFile)) { return $entries }
     try {
@@ -115,9 +115,9 @@ function Get-LearningEntries {
 }
 
 # --- Main logic ---
-$catalogedPatterns = Get-CatalogedPatterns
-$learningKeys = Get-LearningPatternKeys
-$errorEntries = Get-ErrorEntries
+$catalogedPatterns = Get-CatalogedPattern
+$learningKeys = Get-LearningPatternKey
+$errorEntries = Get-ErrorEntry
 
 # Count pattern key occurrences
 $keyCounts = @{}
