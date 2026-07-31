@@ -87,6 +87,20 @@ BAJO     ■■■ (3) — reads redundantes, spawn overhead, coverage opcional
 **Write-scope**: 16/16 archivos de delegación dentro de scope (`.gentleman-mode` y `.project.json` son M pre-sesión, no de la delegación).
 **Pendiente (P2)**: extraer libs para eliminar spawn-por-test (permission-gate 50×, engram-validate 24×…), TestHelpers.ps1 compartido, matar regex-extraction, fix `Get-AgentRecommendation`, actualizar PERFORMANCE-PLAN.md.
 
+### P2 — Ejecutado (mismo día, rama `experiment/tests-perf`, commit 598c8bc8)
+
+| Cambio | Archivos | Resultado |
+|---|---|---|
+| Fix bug producción `Get-AgentRecommendation` (`$skillLookup` null por scope) + fixture incompleto en test | `skill-graph.ps1`, `skill-graph.Tests.ps1` | 18/18 (antes 4 fallos) |
+| Guard `PESTER_TEST` → skip pssa-gate ThreadJob en score-auto | `score-auto.ps1`, `ScoreIntegration.Tests.ps1` | ScoreIntegration 41s → 19-31s (cold residual = score-dims/cross-ref, fuera de scope) |
+| Libs `permission-gate-lib.ps1` + `engram-validate-lib.ps1` — spawn-por-test eliminado (~74 spawns → in-process) | 2 libs nuevas + 2 scripts prod + 2 tests | permission-gate 50/50 (7-15s), engram-validate 24/24 (5.7-10s) |
+| Meta-test `destructive-scripts` excluye `scripts/lib/*` (falsos positivos: pattern arrays como datos) | `destructive-scripts.Tests.ps1` | 184/184, 91 scripts de producción escaneados |
+| Hook excluye `-Tag E2E` (mismo patrón que runner) + PERFORMANCE-PLAN baseline actualizado | `.githooks/pre-commit-gate.ps1`, `PERFORMANCE-PLAN.md` | Hook: 140s → 28s |
+
+**Suite final en rama: exit 0, 656/657 (1 NotRun = E2E), 40-62s wall** (warm ~28s en hook). Baseline original: 150.3s con fallos.
+
+**Pendientes conocidos**: (a) 12 warnings PSSA de estilo en libs nuevas (PSAvoidUsingWriteHost ×4, PSReviewUnusedParameter ×2, PSUseBOM ×3, vars sin uso ×2, process-block ×1) — limpiar antes de merge a main si el gate es estricto; (b) cache de score raramente pega (`score-auto.ps1:66` manifestSkillCount guard) — follow-up de alto valor (~5s warm posible); (c) cross-ref-check.ps1 escanea permission-gate.ps1 por regex — comment mirror en producción, riesgo de drift documentado; (d) TestHelpers.ps1 compartido + matar regex-extraction restantes (7 archivos).
+
 ---
 
 ## Engram Persistence
