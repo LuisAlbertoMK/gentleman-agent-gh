@@ -1,8 +1,8 @@
 # SKILLS INDEX (Compact)
 
-> Top-20 daily-use skills. Full table: all 81 skills — use `skill` tool or read this file for complete list.
+> Top-20 daily-use skills. Full table: all 78 skills — use `skill` tool or read this file for complete list.
 >
-> **Version**: 5.1 | **Changelog**: 5.1 (sync count 93→81 per filesystem audit); 5.0 (compact top-20 table for token reduction); 4.7 (+1 new: adversarial-breaker; count 92→93); 4.6 (count corrected 80→92 per filesystem audit)
+> **Version**: 5.2 | **Changelog**: 5.2 (archived 3 dead: cognitive-doc-design, prompt-engineering, senior-engineer → .archive/skills; count 81→78 per cross-ref-check); 5.1 (sync count 93→81 per filesystem audit); 5.0 (compact top-20 table for token reduction); 4.7 (+1 new: adversarial-breaker; count 92→93); 4.6 (count corrected 80→92 per filesystem audit)
 
 ## Top 20 Daily-Use Skills
 
@@ -43,7 +43,7 @@
 | Engineering | plan-execution, infra-audit, perf-profiling |
 | UI/Docs | baseline-ui, ui-engine, accessibility, seo, docs-audit |
 | Testing | visual-testing, e2e-testing, api-testing, image-pipeline, pdf-utils |
-| Communication | comment-writer, cognitive-doc-design |
+| Communication | comment-writer |
 | Specialized | karpathy-loop, context-watchdog, recovery-protocol, metricas, workflow-optimizer |
 
 ## Load Rule

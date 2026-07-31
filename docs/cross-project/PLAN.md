@@ -50,7 +50,7 @@
      │  PATTERN MINE  │   │   PATTERN GUARD  │   │   SKILL FORGE    │
      │  (descubrir)   │   │   (detectar)     │   │   (automatizar)  │
      ├────────────────┤   ├──────────────────┤   ├──────────────────┤
-     │ session-miner  │   │ project-mapper   │   │ skill-creator    │
+      │ session-miner  │   │ project-mapper   │   │ opencode-skill-creator    │
      │ immune-system  │   │ → clasifica proy │   │ → forge skill    │
      │ dreaming       │   │ → busca patterns │   │ → quality-gate   │
      │ auto-detector  │   │ → reporta match  │   │ → registra       │

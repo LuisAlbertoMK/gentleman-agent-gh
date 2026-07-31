@@ -14,8 +14,8 @@ Budget: cosine decay `max(4, base_budget × cos(π·n/(2·N)))`. Reject 3x→SKI
 Exit: inter≥30 + no dim<9.0→SUCCESS; 7d→STOP; score -0.5→revert.
 ## MICRO (per-task reflection, merged from self-reflection)
 Observe→Reflect→Optimize→Apply after every task (≥3 tools) + session end + error recovery.
-CAPTURE→EXTRACT(≥2 reps?→skill-creator)→EVALUATE(root cause→immune-system)→SCORE(auto-metrics)→IMMUNIZE(<7→anti-pattern).
-Same error 2x→catalog. 3x→AGENTS.md rule. Gotcha→doc skill. Complex workflow→skill-creator.
+CAPTURE→EXTRACT(≥2 reps?→opencode-skill-creator)→EVALUATE(root cause→immune-system)→SCORE(auto-metrics)→IMMUNIZE(<7→anti-pattern).
+Same error 2x→catalog. 3x→AGENTS.md rule. Gotcha→doc skill. Complex workflow→opencode-skill-creator.
 **If changes touch protected files** (security-scanner, quality-gate, auto-metrics, external-auditor, immune-system, ANTI-PATTERN-CATALOG.md, .project.json):
   → RUN `!audit` BEFORE commit. Gate: external-auditor must PASS. This is NOT optional.
 Template: `reflection/{date}` with Outcome/Root cause/Score/What changed.

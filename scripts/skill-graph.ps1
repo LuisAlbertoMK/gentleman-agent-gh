@@ -174,16 +174,16 @@ function Resolve-Skill {
 $agentRecommendations = @(
     @{ P = '(?i)(?:review|audit|check|quality|verify|validate)\s.*(?:code|security|skill|pr)'; S = @('code-review-agent', 'security-scanner', 'quality-gate', 'triple-verify') }
     @{ P = '(?i)(?:fix|bug|error|crash|issue|problem|broken|not\s+working)'; S = @('recovery-protocol', 'immune-system', 'triple-verify') }
-    @{ P = '(?i)(?:design|architecture|plan|propose|proposal)'; S = @('senior-engineer', 'sdd-propose', 'sdd-design') }
+    @{ P = '(?i)(?:design|architecture|plan|propose|proposal)'; S = @('sdd-propose', 'sdd-design') }
     @{ P = '(?i)(?:test|testing|coverage|spec|specification)'; S = @('skill-testing', 'sdd-spec', 'sdd-verify') }
-    @{ P = '(?i)(?:doc|documentation|readme|guide|manual|help)'; S = @('cognitive-doc-design') }
+    @{ P = '(?i)(?:doc|documentation|readme|guide|manual|help)'; S = @('docs-audit') }
     @{ P = '(?i)(?:commit|pr|pull.request|merge|ship|push)'; S = @('commit-crafter', 'quality-gate', 'branch-pr', 'chained-pr') }
     @{ P = '(?i)(?:deploy|ci|cd|pipeline|github.action|release)'; S = @('ci-cd', 'command-wrapper') }
     @{ P = '(?i)(?:refactor|restructur|clean|migrat|extract)'; S = @('refactoring-planner', 'lean-context') }
     @{ P = '(?i)(?:performance|speed|slow|lazy|load\s+time|render|optimize|compress)'; S = @('karpathy-loop', 'performance', 'lean-context') }
     @{ P = '(?i)(?:accessib|a11y|wcad|screen\s+reader)'; S = @('accessibility') }
     @{ P = '(?i)(?:seo|search|meta|sitemap|structured.data)'; S = @('seo') }
-    @{ P = '(?i)(?:research|investigar|compare|evaluate|learn)'; S = @('research', 'prompt-engineering') }
+    @{ P = '(?i)(?:research|investigar|compare|evaluate|learn)'; S = @('research') }
     @{ P = '(?i)(?:mapear|map|project\s+structure|tech\s+stack|audit\s+project)'; S = @('project-mapper', 'gap-analysis') }
 )
 

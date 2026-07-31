@@ -1,13 +1,13 @@
 ---
 name: metricas
-description: "On-demand before/after comparison with delta and % improvement — git diff or bookmark mode, tokenization, multi-language auto-detect"
+description: "On-demand before/after comparison with delta and % improvement — git diff or bookmark mode, tokenization, multi-language auto-detect. NOT self-evaluation — that's auto-metrics (!score/!metrics)."
 triggers: "Metricas, before/after, % improvement, tokenization, delta"
 ---
 
 ## When to Use
 On-demand before/after comparison with delta and % improveme
 
-Before/after comparison w/ %. Trigger: "metricas", "métricas", "comparar", "mejora", "delta", "token", "tokenizar".
+Before/after comparison w/ %. Trigger: "metricas", "métricas", "comparar", "mejora", "delta", "token", "tokenizar". (Nota: "!score"/"!metrics" → auto-metrics, no esta skill.)
 ## Flow: Capture baseline → Apply change → Capture after → Display: **Before | After | Δ | Δ%** (green↑ red↓)
 ## Modes: **Git diff** (HEAD vs main or bookmark) | **Bookmark** (`metricas init` → work → `metricas show`)
 ## Metrics

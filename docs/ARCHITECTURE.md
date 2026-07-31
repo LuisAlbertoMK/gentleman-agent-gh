@@ -84,7 +84,7 @@ Gentleman Agent is a **multi-agent AI development team** for OpenCode. It provid
 | SDD Pipeline | 10 | sdd-init through sdd-archive, sdd-quick |
 | Workflow | 8 | ralph-loop, delivery-harness, session-resume, commit-crafter |
 | Memory | 3 | engram-protocol, dreaming, cross-project-wisdom |
-| Meta | 6 | skill-creator, skill-improver, skill-graph, skill-testing |
+| Meta | 6 | opencode-skill-creator, skill-improver, skill-graph, skill-testing |
 
 **Resolution**: `skill-graph.ps1` (full BFS) or `skill-resolver-fast.ps1` (keyword scoring).
 
