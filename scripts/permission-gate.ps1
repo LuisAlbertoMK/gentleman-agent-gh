@@ -36,6 +36,7 @@ param(
     [switch]$Force,
     [switch]$DryRun
 )
+Set-StrictMode -Version Latest
 
 # --- Resolve paths ---
 $repoRoot   = Split-Path -Path $PSScriptRoot -Parent

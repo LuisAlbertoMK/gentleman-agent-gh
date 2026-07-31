@@ -7,6 +7,7 @@
 .PARAMETER DryRun  Show what would be done without making changes.
 #>
 param([switch]$DryRun)
+Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 $repoRoot = Resolve-Path "$PSScriptRoot\.." -ErrorAction Stop

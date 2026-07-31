@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
   Validate mem_save content before persisting to Engram — schema, injection, field completeness.
@@ -49,6 +49,7 @@ param(
     [switch]$Quiet,
     [switch]$Fix
 )
+Set-StrictMode -Version Latest
 
 begin {
     $script:exitCode = 0

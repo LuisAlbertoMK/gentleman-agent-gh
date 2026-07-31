@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
@@ -33,6 +33,7 @@ param(
     [switch]$Force,
     [switch]$DryRun
 )
+Set-StrictMode -Version Latest
 
 # --- Resolve .gentleman-mode path ---
 $scriptDir = Split-Path -Path $PSScriptRoot -Parent
