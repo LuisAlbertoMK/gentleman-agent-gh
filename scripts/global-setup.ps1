@@ -25,7 +25,7 @@ if($Quiet){$Json=$true}
 # Cross-platform helpers
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 
-$gentlemanRoot = if ($env:GENTLEMAN_AGENT_ROOT) { $env:GENTLEMAN_AGENT_ROOT } else { (Get-Item $PSScriptRoot).Parent.FullName }
+$gentlemanRoot = Get-GentlemanRoot
 $globalConfig = Get-GlobalConfigDir
 $results = [System.Collections.Generic.List[object]]::new()
 

@@ -31,13 +31,8 @@ Set-StrictMode -Version Latest
 # ============================================================
 
 # Resolve repoRoot FIRST — needed by cache path and everything else
-$repoRoot = if ($PSScriptRoot -and (Test-Path "$PSScriptRoot\..")) {
-    "$PSScriptRoot\.."
-} elseif ($env:GENTLEMAN_AGENT_ROOT) {
-    $env:GENTLEMAN_AGENT_ROOT
-} else {
-    $PWD.Path
-}
+. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
+$repoRoot = Get-GentlemanRoot
 
 $cacheDir  = Join-Path $repoRoot ".learnings"
 $cacheFile = Join-Path $cacheDir "score-cache.json"

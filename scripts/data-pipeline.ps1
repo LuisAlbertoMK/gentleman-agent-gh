@@ -33,13 +33,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$repoRoot = if ($PSScriptRoot -and (Test-Path "$PSScriptRoot\..")) {
-    "$PSScriptRoot\.."
-} elseif ($env:GENTLEMAN_AGENT_ROOT) {
-    $env:GENTLEMAN_AGENT_ROOT
-} else {
-    $PWD.Path
-}
+. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
+$repoRoot = Get-GentlemanRoot
 
 Push-Location $repoRoot
 

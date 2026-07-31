@@ -27,7 +27,7 @@ $ErrorActionPreference = 'Stop'
 # ── Cross-platform helpers ──────────────────────────────────────────────
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 
-$gentlemanRoot = if ($env:GENTLEMAN_AGENT_ROOT) { $env:GENTLEMAN_AGENT_ROOT } else { (Get-Item $PSScriptRoot).Parent.FullName }
+$gentlemanRoot = Get-GentlemanRoot
 
 $canonicalPath = (Join-Path $gentlemanRoot "opencode.json")
 $globalConfig  = Get-GlobalConfigDir

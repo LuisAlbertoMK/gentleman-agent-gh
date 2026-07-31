@@ -4,10 +4,26 @@
     Cross-platform helpers for PowerShell 7 scripts — Windows, Linux, macOS.
 .DESCRIPTION
     Dot-sourced by sync-all.ps1, global-setup.ps1, sync-vmk.ps1.
-    Provides: Get-GlobalConfigDir, New-CrossPlatLink, Find-Pwsh.
+    Provides: Get-GentlemanRoot, Get-GlobalConfigDir, New-CrossPlatLink, Find-Pwsh.
 .NOTES
     This file is NOT meant to be invoked directly.
 #>
+
+function Get-GentlemanRoot {
+    <#
+    .SYNOPSIS
+        Returns the canonical gentleman-agent-gh repo root.
+    .DESCRIPTION
+        The script's own repo is ALWAYS canonical when platform.ps1 lives in a
+        repo: repo root is derived from $PSScriptRoot (scripts/lib → root).
+        GENTLEMAN_AGENT_ROOT is only a fallback for shims that are not
+        repo-resident (e.g. ~/.config/opencode/scripts/run.ps1).
+    #>
+    $libDir = $PSScriptRoot                    # scripts/lib
+    $repoRoot = Split-Path (Split-Path $libDir -Parent) -Parent
+    if (Test-Path -LiteralPath (Join-Path $repoRoot 'scripts\lib\platform.ps1')) { return $repoRoot }
+    return $env:GENTLEMAN_AGENT_ROOT           # shim fallback only
+}
 
 function Get-GlobalConfigDir {
     <#

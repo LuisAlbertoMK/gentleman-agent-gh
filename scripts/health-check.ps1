@@ -57,7 +57,7 @@ if (-not $AutoRepair) {
   }
 }
 
-$gentlemanRoot = if ($env:GENTLEMAN_AGENT_ROOT) { $env:GENTLEMAN_AGENT_ROOT } else { (Get-Item $PSScriptRoot).Parent.FullName }
+$gentlemanRoot = Get-GentlemanRoot
 
 $exitCode = 0
 $checks = [System.Collections.Generic.List[object]]::new()
