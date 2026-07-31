@@ -74,4 +74,4 @@ Al completar una mejora:
 
 ## Proximo Paso
 
-Todos los items del plan completados (P0-1..3, P1-1..3, P2-1..3). El cache granular de pssa-gate hace que el post-commit de `!ship` pague solo los archivos cambiados (~5s en vez de ~33s). Opcional futuro: manifest con hash lazy (solo SHA256 cuando len/mtime cambian) para bajar el hit de score-auto de 3.4s a ~1s.
+Todos los items del plan completados (P0-1..3, P1-1..3, P2-1..3). El cache granular de pssa-gate hace que el post-commit de `!ship` pague solo los archivos cambiados (~5s en vez de ~33s). Hash lazy en el manifest (solo SHA256 cuando len/mtime cambian) implementado: warm 4.9s→1.79s, score hit 3.4s→2.5s. Opcional futuro: filtrar node_modules antes del Get-ChildItem recursivo para bajar el warm a <1s.
