@@ -180,7 +180,7 @@ if (Test-Path $repoAgentsMd) {
 function Install-McpServer {
     param([string]$Name, [scriptblock]$Check, [scriptblock]$Install, [string]$ManualHint)
     if (& $Check) { skip "$Name already installed"; return $false }
-    try { info "Installing $Name..."; & $Install; if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw "exit code $LASTEXITCODE" }; ok "$Name installed"; return $true }
+    try { info "Installing $Name..."; $script:LASTEXITCODE = 0; & $Install; if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw "exit code $LASTEXITCODE" }; ok "$Name installed"; return $true }
     catch { warn "$Name install failed — $ManualHint"; return $false }
 }
 

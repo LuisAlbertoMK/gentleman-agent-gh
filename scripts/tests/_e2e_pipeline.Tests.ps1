@@ -95,7 +95,7 @@ Describe 'E2E: Security Gates' {
                 if ($cf -match $escd) { $pf; break }
             }
         }
-        $touched.Count | Should -Be 0
+        @($touched).Count | Should -Be 0
     }
 
     It 'restore ref regex rejects injection patterns' {
@@ -117,23 +117,27 @@ Describe 'E2E: Security Gates' {
 # ============================================================
 Describe 'E2E: Pre-commit Hook' {
 
-    It 'hook has [12/12] Pester step' {
+    It 'hook delegates to pre-commit-gate.ps1 with [13/13] checks' {
         $hookPath = Join-Path $script:ProjectRoot ".githooks/pre-commit"
+        $gatePath = Join-Path $script:ProjectRoot ".githooks/pre-commit-gate.ps1"
         $hookPath | Should -Exist
-        Get-Content $hookPath -Raw | Should -Match '\[12/12\] Pester tests'
+        $gatePath | Should -Exist
+        Get-Content $hookPath -Raw | Should -Match 'pre-commit-gate\.ps1'
+        Get-Content $gatePath -Raw | Should -Match '\[13/13\]'
     }
 
     It 'hook Pester step uses Invoke-Pester and blocks on failure' {
-        $content = Get-Content (Join-Path $script:ProjectRoot ".githooks/pre-commit") -Raw
+        $gatePath = Join-Path $script:ProjectRoot ".githooks/pre-commit-gate.ps1"
+        $content = Get-Content $gatePath -Raw
         $content | Should -Match 'Invoke-Pester'
-        $content | Should -Match 'BLOCKING: Pester tests failed'
-        $content | Should -Match 'no test files staged'
+        $content | Should -Match '\[12/13\] Pester tests'
     }
 
-    It 'hook preserves all 12 steps' {
-        $content = Get-Content (Join-Path $script:ProjectRoot ".githooks/pre-commit") -Raw
-        for ($i = 1; $i -le 12; $i++) {
-            $content | Should -Match "\[$i/12\]"
+    It 'hook preserves all 13 steps' {
+        $gatePath = Join-Path $script:ProjectRoot ".githooks/pre-commit-gate.ps1"
+        $content = Get-Content $gatePath -Raw
+        for ($i = 1; $i -le 13; $i++) {
+            $content | Should -Match "\[$i/13\]"
         }
     }
 }

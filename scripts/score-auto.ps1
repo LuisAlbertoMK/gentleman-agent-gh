@@ -292,3 +292,7 @@ if ($Json) {
     Write-Host $("-" * 32)
     Write-Host " TOTAL$(''.PadLeft(12))$($finalScore.ToString('F1').PadLeft(4))/10" -ForegroundColor White
 }
+
+# Explicit success exit — native calls inside (git update-index) may leave
+# $LASTEXITCODE dirty; the contract is exit 0 on success (score-cache exit 0 parity)
+exit 0

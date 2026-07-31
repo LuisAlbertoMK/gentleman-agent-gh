@@ -49,9 +49,8 @@ param(
     [switch]$Quiet,
     [switch]$Fix
 )
-Set-StrictMode -Version Latest
-
 begin {
+    Set-StrictMode -Version Latest
     $script:exitCode = 0
     function Write-ErrorMsg { param([string]$Msg) $script:exitCode = 2; if (-not $Quiet) { Write-Warning "ERR: $Msg" } }
     function Write-WarnMsg  { param([string]$Msg) if ($script:exitCode -lt 1) { $script:exitCode = 1 }; if (-not $Quiet) { Write-Warning "WARN: $Msg" } }
