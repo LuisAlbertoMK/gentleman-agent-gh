@@ -129,5 +129,8 @@ scripts/skill-registry.json.backup-session-*/
 scripts/skill-registry.json
 .backup-session-20260705-150321/
 
+# Pester test results
+TestResults.xml
+
 # Archived stale documentation
 .archive/

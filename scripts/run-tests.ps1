@@ -8,7 +8,7 @@
 .PARAMETER PassThru Return Pester run results object (default: exit code only)
 .PARAMETER Path     One or more test file paths (default: scripts/tests/*.Tests.ps1)
 .PARAMETER NoParallel  Disable parallel file execution (Pester 6 only)
-.PARAMETER CodeCoverage Collect code coverage metrics (Pester 5/6 only; < 50% → exit 10)
+.PARAMETER CodeCoverage Collect code coverage metrics (Pester 5/6 only; < 50% -> exit 10)
 .EXAMPLE
   .\scripts\run-tests.ps1                      # run all, exit 0/1
   .\scripts\run-tests.ps1 -PassThru            # get results object
@@ -44,8 +44,8 @@ if (-not $Quiet) {
     $Path | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
 }
 
-# --- detect Pester ---
-$pester = Get-Module Pester -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1
+# --- detect Pester (fast path: filter by name to avoid listing all modules) ---
+$pester = Get-Module -ListAvailable -Name Pester | Sort-Object Version -Descending | Select-Object -First 1
 if (-not $pester) {
     Write-Error "Pester module not found. Install: Install-Module Pester -Force -Scope CurrentUser"
     exit 3

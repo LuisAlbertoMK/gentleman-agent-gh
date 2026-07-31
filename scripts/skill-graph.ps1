@@ -38,7 +38,7 @@ $registryCsv = Join-Path (Split-Path $PSScriptRoot -Parent) 'data/skills-registr
 $validCategories = @('meta','quality','coordination','code-ops','specialized','testing','web-quality','memory','documents','compression','performance','research','SDD')
 $validEfforts = @('low','medium','high')
 
-$skillRegistry = foreach ($line in (Get-Content $registryCsv | Select-Object -Skip 1 | Where-Object { $_.Trim() -ne '' })) {
+$skillRegistry = foreach ($line in (Get-Content $registryCsv | Select-Object -Skip 1 | Where-Object { $_.Trim() })) {
     $parts = $line.Split('|')
     $name = $parts[0]
     $len = $parts.Length
@@ -117,17 +117,16 @@ function Resolve-Skill {
     $Tokens = $TaskText.ToLowerInvariant() -split '\s+|[-_/.,!?;:()]' |
         Where-Object { $_.Length -gt 2 } | Select-Object -Unique
     $SkillScores = @{}
-    $MatchResults = $skillRegistry | ForEach-Object {
+    foreach ($skill in $skillRegistry) {
         $matchCount = 0
         foreach ($token in $Tokens) {
             $pattern = [regex]::Escape($token)
-            foreach ($trigger in ($_.Triggers -split '\|')) {
+            foreach ($trigger in ($skill.Triggers -split '\|')) {
                 if ($trigger.ToLowerInvariant() -match $pattern) { $matchCount++; break }
             }
         }
-        if ($matchCount -gt 0) { [PSCustomObject]@{Name = $_.Name; MatchCount = $matchCount} }
+        if ($matchCount -gt 0) { $SkillScores[$skill.Name] = $matchCount }
     }
-    foreach ($match in $MatchResults) { if ($match) { $SkillScores[$match.Name] = $match.MatchCount } }
     if ($externalPatterns.Count -gt 0) {
         foreach ($pattern in $externalPatterns) {
             $patternMatched = $false
@@ -142,7 +141,7 @@ function Resolve-Skill {
             }
         }
     }
-    $MatchedNames = $SkillScores.Keys | Sort-Object { $SkillScores[$_] } -Descending
+    $MatchedNames = $SkillScores.Keys | Sort-Object { [int]$SkillScores[$_] } -Descending
     $Graph = New-Graph
     $Visited = @{}; $Queue = [System.Collections.Queue]::new(); $Depths = @{}
     foreach ($name in $MatchedNames) { $Queue.Enqueue($name); $Depths[$name] = 0; $Visited[$name] = $true }
@@ -185,10 +184,12 @@ $agentRecommendations = @(
 
 function Get-AgentRecommendation {
     param([string]$TaskText)
-    $results = $agentRecommendations | ForEach-Object {
-        if ($TaskText -match $_.P) { $_.S }
+    $seen = @{}; $recommended = @()
+    foreach ($rec in $agentRecommendations) {
+        if ($TaskText -match $rec.P) {
+            foreach ($s in $rec.S) { if (-not $seen[$s]) { $seen[$s] = $true; $recommended += $s } }
+        }
     }
-    $recommended = @($results | Where-Object { $_ } | Select-Object -Unique)
     if ($recommended.Count -eq 0) {
         $resolved = @(Resolve-Skill $TaskText 1)
         $recommended = @($resolved | Where-Object { $_.Depth -eq 0 } | Sort-Object Score -Descending | ForEach-Object { $_.Name })

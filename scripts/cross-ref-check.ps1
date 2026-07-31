@@ -126,7 +126,7 @@ $requiredShared = @{
     'persistence-contract.md' = Test-Path (Join-Path $skillsDir "_shared\persistence-contract.md")
     'engram-convention.md'  = Test-Path (Join-Path $skillsDir "_shared\engram-convention.md")
 }
-$missingShared = @($requiredShared.GetEnumerator().Where({ -not $_.Value }) | ForEach-Object { $_.Key })
+$missingShared = @($requiredShared.GetEnumerator().Where({ -not $_.Value }).ForEach({ $_.Key }))
 if ($missingShared.Count -eq 0) {
     if (-not $Quiet) { Write-Host " OK" }
 } else {
@@ -136,12 +136,14 @@ if ($missingShared.Count -eq 0) {
 
 # --- [6/9] Cross-refs ---
 if (-not $Quiet) { Write-Host "[6/9] cross-refs..." -N }
-$allSkillNames = @($skillDirs | ForEach-Object { $_.Name.ToLower() })
+$allSkillNames = @($skillDirs.ForEach({ $_.Name.ToLower() }))
 $brokenRefs = [System.Collections.Generic.List[string]]::new()
+$skillContentCache = @{}
 
 foreach ($skill in $skillDirs) {
     $content = Read-SkillContent $skill.FullName
     if (-not $content) { continue }
+    $skillContentCache[$skill.Name] = $content
 
     # Check Cross-Refs
     $crossRefs = Get-SkillRefs $content 'Cross-Refs:\s*(.+)'
@@ -172,7 +174,7 @@ if (-not $Quiet) { Write-Host "[7/9] config_refs..." -N }
 $missingConfigRefs = [System.Collections.Generic.List[string]]::new()
 
 foreach ($skill in $skillDirs) {
-    $content = Read-SkillContent $skill.FullName
+    $content = $skillContentCache[$skill.Name]
     if (-not $content) { continue }
 
     $configRefs = Get-SkillRefs $content 'config_refs:\s*(.+)'
@@ -320,14 +322,14 @@ if ($Json) {
 } elseif ($result.allClean) {
     if (-not $Quiet) { Write-Host "OK ALL CHECKS PASSED" -ForegroundColor Green }
     exit 0
-} else {
+} elseif (-not $Quiet) {
     if ($errors.Count -gt 0) {
-        if (-not $Quiet) { Write-Host "ERRORS ($($errors.Count)):" -ForegroundColor Red }
-        $errors | ForEach-Object { if (-not $Quiet) { Write-Host " * $_" -ForegroundColor Red } }
+        Write-Host "ERRORS ($($errors.Count)):" -ForegroundColor Red
+        $errors.ForEach({ Write-Host " * $_" -ForegroundColor Red })
     }
     if ($warnings.Count -gt 0) {
-        if (-not $Quiet) { Write-Host "WARNINGS ($($warnings.Count)):" -ForegroundColor Yellow }
-        $warnings | ForEach-Object { if (-not $Quiet) { Write-Host " * $_" -ForegroundColor Yellow } }
+        Write-Host "WARNINGS ($($warnings.Count)):" -ForegroundColor Yellow
+        $warnings.ForEach({ Write-Host " * $_" -ForegroundColor Yellow })
     }
     if ($errors.Count -gt 0) { exit 1 } else { exit 0 }
 }
