@@ -120,35 +120,29 @@ function Repair-Junction {
   if (-not $Quiet) { Write-Output "[repair] $Label → $Target" }
 }
 
-# ── Check 1: vmk skills junction ────────────────────────────────────────
-$check1 = Test-Junction -Path (Join-Path (Get-GlobalConfigDir) "skills") `
-  -ExpectedTarget "$gentlemanRoot/.agents/skills" `
-  -Label "vmk-skills-junction"
-if ($check1.status -eq "FAIL" -and $AutoRepair) {
-  Repair-Junction -Path (Join-Path (Get-GlobalConfigDir) "skills") `
-    -Target "$gentlemanRoot/.agents/skills" `
-    -Label "vmk-skills"
-  $check1 = Test-Junction -Path (Join-Path (Get-GlobalConfigDir) "skills") `
-    -ExpectedTarget "$gentlemanRoot/.agents/skills" `
-    -Label "vmk-skills-junction"
+# ── Wrapper: Test-Junction → Repair → Re-Test → Collect ──────────────────
+function Check-And-Repair-Junction {
+  param([string]$Path, [string]$ExpectedTarget, [string]$Target, [string]$Label)
+  $check = Test-Junction -Path $Path -ExpectedTarget $ExpectedTarget -Label $Label
+  if ($check.status -eq "FAIL" -and $script:AutoRepair) {
+    Repair-Junction -Path $Path -Target $Target -Label $Label
+    $check = Test-Junction -Path $Path -ExpectedTarget $ExpectedTarget -Label $Label
+  }
+  $script:checks.Add($check)
+  if ($check.status -eq "FAIL") { $script:exitCode = 2 }
 }
-$checks.Add($check1)
-if ($check1.status -eq "FAIL") { $exitCode = 2 }
+
+# ── Check 1: vmk skills junction ────────────────────────────────────────
+Check-And-Repair-Junction -Path (Join-Path (Get-GlobalConfigDir) "skills") `
+  -ExpectedTarget "$gentlemanRoot/.agents/skills" `
+  -Target "$gentlemanRoot/.agents/skills" `
+  -Label "vmk-skills-junction"
 
 # ── Check 2: vmk prompts junction ───────────────────────────────────────
-$check2 = Test-Junction -Path (Join-Path (Join-Path (Get-GlobalConfigDir) "prompts") "sdd") `
+Check-And-Repair-Junction -Path (Join-Path (Join-Path (Get-GlobalConfigDir) "prompts") "sdd") `
   -ExpectedTarget "$gentlemanRoot/prompts/sdd" `
+  -Target "$gentlemanRoot/prompts/sdd" `
   -Label "vmk-prompts-junction"
-if ($check2.status -eq "FAIL" -and $AutoRepair) {
-  Repair-Junction -Path (Join-Path (Join-Path (Get-GlobalConfigDir) "prompts") "sdd") `
-    -Target "$gentlemanRoot/prompts/sdd" `
-    -Label "vmk-prompts"
-  $check2 = Test-Junction -Path (Join-Path (Join-Path (Get-GlobalConfigDir) "prompts") "sdd") `
-    -ExpectedTarget "$gentlemanRoot/prompts/sdd" `
-    -Label "vmk-prompts-junction"
-}
-$checks.Add($check2)
-if ($check2.status -eq "FAIL") { $exitCode = 2 }
 
 # ── Check 3: global skills junction ─────────────────────────────────────
 $globalSkills = Join-Path (Get-GlobalConfigDir) "skills"
@@ -185,12 +179,7 @@ $healthResult = @{
 
 # ── Output ──────────────────────────────────────────────────────────────
 if ($Json) {
-  ConvertTo-Json @{
-    timestamp = (Get-Date -Format "o")
-    version   = "1.0.0"
-    checks    = $checks
-    exitCode  = $exitCode
-  } -Depth 3
+  $healthResult | ConvertTo-Json -Depth 3
 } elseif ($Quiet) {
   $healthResult | ConvertTo-Json -Depth 3
 } else {

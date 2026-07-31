@@ -61,7 +61,8 @@ if (Test-Path -LiteralPath $bitacoraPath) {
 }
 # Git status
 $savedEap = $ErrorActionPreference; $ErrorActionPreference = "Continue"; $gitStatus = git status --short 2>$null; $ErrorActionPreference = $savedEap
-$hasChanges = @($gitStatus | Where-Object { $_ -match '\S' }).Count -gt 0
+$gitStatusLines = @($gitStatus | Where-Object { $_ -match '\S' })
+$hasChanges = $gitStatusLines.Count -gt 0
 try {
     $branch = git rev-parse --abbrev-ref HEAD 2>$null
     if (-not $branch) { $branch = "unknown" }
@@ -115,7 +116,7 @@ $result = [PSCustomObject]@{
     timestamp         = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
     branch            = $branch
     hasChanges        = $hasChanges
-    changeCount       = if ($hasChanges) { @($gitStatus | Where-Object { $_ -match '\S' }).Count } else { 0 }
+    changeCount       = if ($hasChanges) { $gitStatusLines.Count } else { 0 }
     goal              = $Goal
     needsAudit        = $needsAudit
     protectedTouched  = $touchedProtected
@@ -161,7 +162,7 @@ if ($minerOutput) { $result | Add-Member -NotePropertyName "minerWarning" -NoteP
 $showCompact = $CompactPrompt -or ($hasChanges -and -not $PSBoundParameters.ContainsKey('CompactPrompt'))
 if ($showCompact -and -not $Quiet) {
     $diffFiles = if ($hasChanges) {
-        ($gitStatus | Where-Object { $_ -match '\S' } | ForEach-Object { "  - $_" }) -join "`n"
+        ($gitStatusLines | ForEach-Object { "  - $_" }) -join "`n"
     } else { "" }
     $keyDecisions = if ($Goal) { $Goal } else { "None recorded" }
     $nextActions = if ($needsAudit) {

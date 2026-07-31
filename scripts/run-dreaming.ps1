@@ -40,19 +40,17 @@ function Write-Log {
     }
 }
 
-if(-not $Quiet){Write-Host "=== Dreaming Session: $cycleId ==="}
-if(-not $Quiet){Write-Host "Mode: $Mode"}
+function Test-ShouldSkipLine {
+    param([string]$Line)
+    return ($null -eq $Line) -or (-not $Line.StartsWith('|')) -or $Line.StartsWith('| Timestamp')
+}
 
-# ---- Quick scan (error pattern check) ----
-if ($Mode -in 'quick','full','report') {
-    if(-not $Quiet){Write-Host '[1/3] Scanning error patterns...'}
-
+function Get-ErrorPatterns {
+    param([string]$Path)
     $errorCounts = @{}
-    if (Test-Path $errorFile) {
-        foreach ($line in [System.IO.File]::ReadLines($errorFile)) {
-            $startsWithPipe = $line.StartsWith('|')
-            $startsWithPipeTS = $line.StartsWith('| Timestamp')
-            if ($startsWithPipe -and (-not $startsWithPipeTS)) {
+    if (Test-Path $Path) {
+        foreach ($line in [System.IO.File]::ReadLines($Path)) {
+            if (-not (Test-ShouldSkipLine $line)) {
                 $parts = $line.Split('|')
                 if ($parts.Count -ge 4) {
                     $errText = $parts[3].Trim()
@@ -77,39 +75,15 @@ if ($Mode -in 'quick','full','report') {
             }
         }
     }
-
-    $repeated = @()
-    foreach ($key in $errorCounts.Keys) {
-        $entry = $errorCounts[$key]
-        if ($entry.Count -ge 2) {
-            $repeated += $entry
-        }
-    }
-
-    if ($repeated.Count -gt 0) {
-        $msg = "$($repeated.Count) repeated error pattern(s) found"
-        if(-not $Quiet){Write-Host "  WARNING: $($msg):"}
-        foreach ($r in $repeated) {
-            $severity = 'INFO'
-            if ($r.Count -ge 3) { $severity = 'CRITICAL' }
-            elseif ($r.Count -ge 2) { $severity = 'WARNING' }
-            if(-not $Quiet){Write-Host "    [$severity] $($r.Text) appears $($r.Count) times"}
-        }
-    } else {
-        if(-not $Quiet){Write-Host '  No repeated error patterns. Clean.'}
-    }
+    return $errorCounts
 }
 
-# ---- Learning patterns scan ----
-if ($Mode -in 'full','report') {
-    if(-not $Quiet){Write-Host '[2/3] Scanning learning patterns...'}
-
+function Get-LearningPatterns {
+    param([string]$Path)
     $learningCounts = @{}
-    if (Test-Path $logFile) {
-        foreach ($line in [System.IO.File]::ReadLines($logFile)) {
-            $startsWithPipe = $line.StartsWith('|')
-            $startsWithPipeTS = $line.StartsWith('| Timestamp')
-            if ($startsWithPipe -and (-not $startsWithPipeTS)) {
+    if (Test-Path $Path) {
+        foreach ($line in [System.IO.File]::ReadLines($Path)) {
+            if (-not (Test-ShouldSkipLine $line)) {
                 $parts = $line.Split('|')
                 if ($parts.Count -ge 4) {
                     $section = $parts[2].Trim()
@@ -129,14 +103,54 @@ if ($Mode -in 'full','report') {
             }
         }
     }
+    return $learningCounts
+}
 
-    $workflowPatterns = @()
-    foreach ($key in $learningCounts.Keys) {
-        $entry = $learningCounts[$key]
-        if ($entry.Count -ge 3) {
-            $workflowPatterns += $entry
+function Get-RepeatedPatterns {
+    param($Counts, [int]$Threshold = 2)
+    $result = @()
+    foreach ($key in $Counts.Keys) {
+        $entry = $Counts[$key]
+        if ($entry.Count -ge $Threshold) {
+            $result += $entry
         }
     }
+    return $result
+}
+
+if(-not $Quiet){Write-Host "=== Dreaming Session: $cycleId ==="}
+if(-not $Quiet){Write-Host "Mode: $Mode"}
+
+# ---- Pre-initialize all mode-scoped variables (avoid Set-StrictMode crash) ----
+$learningCounts = @{}; $workflowPatterns = @(); $feedPatterns = @(); $errorCounts = @{}; $repeated = @()
+
+# ---- Quick scan (error pattern check) ----
+if ($Mode -in 'quick','full','report') {
+    if(-not $Quiet){Write-Host '[1/3] Scanning error patterns...'}
+
+    $errorCounts = Get-ErrorPatterns -Path $errorFile
+    $repeated = Get-RepeatedPatterns -Counts $errorCounts -Threshold 2
+
+    if ($repeated.Count -gt 0) {
+        $msg = "$($repeated.Count) repeated error pattern(s) found"
+        if(-not $Quiet){Write-Host "  WARNING: $($msg):"}
+        foreach ($r in $repeated) {
+            $severity = 'INFO'
+            if ($r.Count -ge 3) { $severity = 'CRITICAL' }
+            elseif ($r.Count -ge 2) { $severity = 'WARNING' }
+            if(-not $Quiet){Write-Host "    [$severity] $($r.Text) appears $($r.Count) times"}
+        }
+    } else {
+        if(-not $Quiet){Write-Host '  No repeated error patterns. Clean.'}
+    }
+}
+
+# ---- Learning patterns scan ----
+if ($Mode -in 'full','report') {
+    if(-not $Quiet){Write-Host '[2/3] Scanning learning patterns...'}
+
+    $learningCounts = Get-LearningPatterns -Path $logFile
+    $workflowPatterns = Get-RepeatedPatterns -Counts $learningCounts -Threshold 3
 
     $workflowCount = $workflowPatterns.Count
     if ($workflowCount -gt 0) {
@@ -175,80 +189,10 @@ if ($Mode -in 'full','report') {
 if ($Mode -eq 'feed') {
     if(-not $Quiet){Write-Host '[FEED] Running scans first...'}
     
-    # Run scans to populate data
-    $errorCounts = @{}
-    $repeated = @()
-    $learningCounts = @{}
-    $workflowPatterns = @()
-    
-    if (Test-Path $errorFile) {
-        foreach ($line in [System.IO.File]::ReadLines($errorFile)) {
-            $startsWithPipe = $line.StartsWith('|')
-            $startsWithPipeTS = $line.StartsWith('| Timestamp')
-            if ($startsWithPipe -and (-not $startsWithPipeTS)) {
-                $parts = $line.Split('|')
-                if ($parts.Count -ge 4) {
-                    $errText = $parts[3].Trim()
-                    $key = $errText -replace '\[.*?\]',''
-                    $key = $key -replace '\s+',' '
-                    $key = $key -replace '^error[:\s]+',''
-                    $key = $key -replace '^fix[:\s]+',''
-                    if ($key.Length -gt 3) {
-                        if ($errorCounts.ContainsKey($key)) {
-                            $val = $errorCounts[$key]
-                            $val.Count = $val.Count + 1
-                            $val.Lines = $val.Lines + @($line)
-                        } else {
-                            $errorCounts[$key] = @{
-                                Text = $errText
-                                Count = 1
-                                Lines = @($line)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    foreach ($key in $errorCounts.Keys) {
-        $entry = $errorCounts[$key]
-        if ($entry.Count -ge 2) {
-            $repeated += $entry
-        }
-    }
-    
-    if (Test-Path $logFile) {
-        foreach ($line in [System.IO.File]::ReadLines($logFile)) {
-            $startsWithPipe = $line.StartsWith('|')
-            $startsWithPipeTS = $line.StartsWith('| Timestamp')
-            if ($startsWithPipe -and (-not $startsWithPipeTS)) {
-                $parts = $line.Split('|')
-                if ($parts.Count -ge 4) {
-                    $section = $parts[2].Trim()
-                    $msg = $parts[3].Trim()
-                    $key = "$section/$msg"
-                    if ($learningCounts.ContainsKey($key)) {
-                        $val = $learningCounts[$key]
-                        $val.Count = $val.Count + 1
-                    } else {
-                        $learningCounts[$key] = @{
-                            Section = $section
-                            Message = $msg
-                            Count = 1
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    foreach ($key in $learningCounts.Keys) {
-        $entry = $learningCounts[$key]
-        if ($entry.Count -ge 3) {
-            $workflowPatterns += $entry
-        }
-    }
+    $errorCounts = Get-ErrorPatterns -Path $errorFile
+    $repeated = Get-RepeatedPatterns -Counts $errorCounts -Threshold 2
+    $learningCounts = Get-LearningPatterns -Path $logFile
+    $workflowPatterns = Get-RepeatedPatterns -Counts $learningCounts -Threshold 3
     
     if(-not $Quiet){Write-Host '[FEED] Generating skill-graph patterns...'}
     

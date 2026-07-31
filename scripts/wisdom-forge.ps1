@@ -39,17 +39,21 @@ $thresholds = @{
 function Load-Pattern {
     param([string]$Id, [string]$File)
     if ($Id) {
-        $found = @(Get-ChildItem $patternsDir -Filter "*.json" | Where-Object {
-            try { (Get-Content $_.FullName -Raw | ConvertFrom-Json).id -eq $Id } catch { $false }
-        })
-        if ($found.Length -eq 0) { Write-Error "Pattern not found: $Id"; exit 1 }
-        $filePath = $found[0].FullName
+        $filePath = $patternIndex[$Id]
+        if (-not $filePath) { Write-Error "Pattern not found: $Id"; exit 1 }
     } elseif ($File) {
         if (-not (Test-Path $File)) { Write-Error "File not found: $File"; exit 1 }
         $filePath = $File
     } else { Write-Error "Provide -PatternId or -PatternFile"; exit 1 }
     try { $pattern = Get-Content $filePath -Raw | ConvertFrom-Json } catch { Write-Error "Invalid JSON: $_"; exit 1 }
     return $pattern, $filePath
+}
+
+function Get-SkillSlug {
+    param([string]$Id)
+    $slug = ($Id -replace '[/\s]+', '-').ToLower()
+    if ($slug -notlike "cross-project-*") { $slug = "cross-project-$slug" }
+    return $slug -replace '-+$', ''
 }
 
 function Test-ForgeThreshold {
@@ -66,9 +70,7 @@ function Test-ForgeThreshold {
 
 function New-SkillContent {
     param($Pattern)
-    $slug = ($Pattern.id -replace '[/\s]+', '-').ToLower()
-    if ($slug -notlike "cross-project-*") { $slug = "cross-project-$slug" }
-    $slug = $slug -replace '-+$', ''
+    $slug = Get-SkillSlug $Pattern.id
     $description = if ($Pattern.rule -and $Pattern.rule.summary) {
         $desc = $Pattern.rule.summary -replace '[\u201c\u201d]', '"' -replace "'", "'"
         if ($desc.Length -gt 115) { $desc.Substring(0, 112) + "..." } else { $desc }
@@ -117,9 +119,24 @@ function Add-Gate {
 }
 
 function Test-YamlFrontmatter { param([string]$Content); $trimmed = $Content.TrimStart(); return $trimmed.StartsWith("---") -and ($Content -match '(?s)---\s*\n.*?\n---') }
-function Test-TriggerUnique { param([string[]]$Triggers); $existing = @(); foreach ($f in @(Get-ChildItem $skillsDir -Filter "SKILL.md" -Recurse -EA SilentlyContinue)) { try { $c = Get-Content $f.FullName -Raw; if ($c -match '(?s)triggers:\s*"([^"]+)"') { $existing += ($Matches[1] -split ',') | % { $_.Trim().ToLower() } } } catch { continue } }; foreach ($t in $Triggers) { if ($t.Trim().ToLower() -ne "" -and $existing -contains $t.Trim().ToLower()) { return $false } }; return $true }
+$script:triggerCache = $null
+function Get-TriggerCache {
+    if ($script:triggerCache) { return $script:triggerCache }
+    $set = @{}
+    foreach ($f in @(Get-ChildItem $skillsDir -Filter 'SKILL.md' -Recurse -EA SilentlyContinue)) {
+        try { $c = Get-Content $f.FullName -Raw; if ($c -match '(?s)triggers:\s*"([^"]+)"') { ($Matches[1] -split ',') | % { $set[$_.Trim().ToLower()] = $true } } } catch { continue }
+    }
+    $script:triggerCache = $set
+    return $set
+}
+function Test-TriggerUnique { param([string[]]$Triggers); $existing = Get-TriggerCache; foreach ($t in $Triggers) { if ($t.Trim().ToLower() -ne '' -and $existing.ContainsKey($t.Trim().ToLower())) { return $false } }; return $true }
 function Test-NoSecrets { param([string]$Content); foreach ($p in @('-----BEGIN (RSA|OPENSSH|PRIVATE|EC) KEY-----', '(?i)(api[_-]?key|secret|password|token)\s*[:=]\s*[''"][^''"]{8,}')) { if ($Content -match $p) { return $false } }; return $true }
 function Test-NoConflict { param([string]$Name); return @(Get-ChildItem $skillsDir -Directory | Where-Object { $_.Name -eq $Name }).Length -eq 0 }
+
+$patternIndex = @{}
+foreach ($f in @(Get-ChildItem $patternsDir -Filter '*.json')) {
+    try { $p = Get-Content $f.FullName -Raw | ConvertFrom-Json; if ($p.id) { $patternIndex[$p.id] = $f.FullName } } catch { }
+}
 
 # --- Main ---
 $pattern, $filePath = Load-Pattern -Id $PatternId -File $PatternFile
@@ -142,9 +159,7 @@ if (-not $Force) {
     if (-not $Quiet) { Write-Host "[OK] $reason" -ForegroundColor Green }
 }
 
-$slug = ($pattern.id -replace '[/\s]+', '-').ToLower()
-if ($slug -notlike "cross-project-*") { $slug = "cross-project-$slug" }
-$slug = $slug -replace '-+$', ''
+$slug = Get-SkillSlug $pattern.id
 $skillDir = Join-Path $skillsDir $slug
 $skillFile = Join-Path $skillDir "SKILL.md"
 $skillContent = New-SkillContent $pattern
