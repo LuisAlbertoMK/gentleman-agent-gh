@@ -174,9 +174,10 @@ function Resolve-Skill {
 $agentRecommendations = @(
     @{ P = '(?i)(?:review|audit|check|quality|verify|validate)\s.*(?:code|security|skill|pr)'; S = @('code-review-agent', 'security-scanner', 'quality-gate', 'triple-verify') }
     @{ P = '(?i)(?:fix|bug|error|crash|issue|problem|broken|not\s+working)'; S = @('recovery-protocol', 'immune-system', 'triple-verify') }
-    @{ P = '(?i)(?:design|architecture|plan|propose|proposal)'; S = @('sdd-propose', 'sdd-design') }
+    @{ P = '(?i)(?:design|architecture|plan|propose|proposal)'; S = @('sdd') }
     @{ P = '(?i)(?:test|testing|coverage|spec|specification)'; S = @('skill-testing', 'sdd-spec', 'sdd-verify') }
-    @{ P = '(?i)(?:doc|documentation|readme|guide|manual|help)'; S = @('docs-audit') }
+    @{ P = '(?i)(?:audit|review|check)\s+(?:the\s+)?(?:doc|documentation|readme|guide|docs)'; S = @('docs-audit') }
+    @{ P = '(?i)(?:write|create|design)\s+(?:doc|documentation|readme|guide|manual)'; S = @('code-generation') }
     @{ P = '(?i)(?:commit|pr|pull.request|merge|ship|push)'; S = @('commit-crafter', 'quality-gate', 'branch-pr', 'chained-pr') }
     @{ P = '(?i)(?:deploy|ci|cd|pipeline|github.action|release)'; S = @('ci-cd', 'command-wrapper') }
     @{ P = '(?i)(?:refactor|restructur|clean|migrat|extract)'; S = @('refactoring-planner', 'lean-context') }
@@ -192,7 +193,10 @@ function Get-AgentRecommendation {
     $seen = @{}; $recommended = @()
     foreach ($rec in $agentRecommendations) {
         if ($TaskText -match $rec.P) {
-            foreach ($s in $rec.S) { if (-not $seen[$s]) { $seen[$s] = $true; $recommended += $s } }
+            foreach ($s in $rec.S) {
+                if (-not $skillLookup.ContainsKey($s)) { Write-Warning "skill-graph: unknown skill '$s' in agentRecommendations — skipped"; continue }
+                if (-not $seen[$s]) { $seen[$s] = $true; $recommended += $s }
+            }
         }
     }
     if ($recommended.Count -eq 0) {

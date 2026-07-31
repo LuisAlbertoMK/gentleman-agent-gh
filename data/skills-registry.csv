@@ -66,12 +66,11 @@ e2e-testing|e2e|end to end|browser test|playwright|visual test|screenshot test|p
 recovery-protocol|recovery|no es eso|frustration|stuck|bloqueado|bug|fix|error|specialized|medium|||Recovery protocol for frustration and errors
 context-watchdog|context overflow|token limit|context explosion|specialized|medium|||Monitor and prevent context window overflow
 ci-cd|CI/CD|pipeline|GitHub Actions|continuous integration|specialized|medium|||CI/CD pipeline automation
+code-generation|code generation|new file|new function|script|boilerplate|scaffold|code-ops|medium|||Write code matching codebase patterns
 work-unit-commits|work-unit|commit organization|specialized|low|||Organize commits into logical work units
 self-improvement|self-improvement|improvement cycle|auto-improve|inter 30|cycle|self-reflection|Hermes|error patterns|reflexion|specialized|high||dreaming|Self-improvement cycle with inter(30) minimum
-cognitive-doc-design|doc design|documentation patterns|cognitive load|progressive disclosure|specialized|medium|||Design docs that reduce cognitive load
 comment-writer|comment writer|PR feedback|review comment|write feedback|specialized|low|||Write warm, direct collaboration comments
-senior-engineer|senior architect|trade-offs|system design|arquitectura|specialized|high|||Senior engineer persona for architecture decisions
-prompt-engineering|improve prompt|ReAct|multi-agent|prompt engineering|specialized|medium|||Advanced prompt engineering techniques
+docs-audit|doc audit|documentation audit|docs quality|audit readme|specialized|low|||Audit documentation quality and accuracy
 help|ralph help|commands|plugin help|available commands|specialized|low|||Explain Ralph Loop plugin and available commands
 vision-analyze|vision analyze|image analysis|screenshot analysis|visual inspection|describe screenshot|testing|medium|||Local vision analysis — screenshots, UI review via Ollama
 workflow-optimizer|workflow optimize|process optimize|streamline|reduce steps|automate workflow|specialized|low|||Optimize workflow patterns — faster info access
