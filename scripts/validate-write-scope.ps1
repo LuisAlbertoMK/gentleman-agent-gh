@@ -1,4 +1,6 @@
 #requires -Version 5.1
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 <#
 .SYNOPSIS
     Validates that subagent writes stayed within declared scope.

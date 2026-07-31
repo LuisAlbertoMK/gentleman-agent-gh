@@ -70,6 +70,16 @@ function Out-Message($msg, $color) {
     if (-not $Json) { Write-Host $msg -ForegroundColor $color }
 }
 
+function Merge-ConfigSection($globalSection, $sectionName) {
+    $merged = @{}
+    $globalSection.PSObject.Properties | ForEach-Object { $merged[$_.Name] = $_.Value }
+    if ($projectCfg.ContainsKey($sectionName)) {
+        $projectCfg[$sectionName].PSObject.Properties | ForEach-Object { $merged[$_.Name] = $_.Value }
+    }
+    $projectCfg[$sectionName] = $merged
+    return $merged
+}
+
 # ── Resolve target dir ───────────────────────────────────────────────
 $TargetDir = [System.IO.Path]::GetFullPath($TargetDir)
 if (-not (Test-Path $TargetDir -PathType Container)) {
@@ -147,23 +157,14 @@ if (-not $projectCfg.ContainsKey('$schema') -or $currentSchema -isnot [string] -
 $projectCfg['default_agent'] = $DefaultAgent
 
 # Always merge global MCPs into project config (project overrides win)
+$mergedMcp = $null
 if ($cfg.mcp) {
-    $mergedMcp = @{}
-    $cfg.mcp.PSObject.Properties | ForEach-Object { $mergedMcp[$_.Name] = $_.Value }
-    if ($projectCfg.ContainsKey('mcp')) {
-        $projectCfg['mcp'].PSObject.Properties | ForEach-Object { $mergedMcp[$_.Name] = $_.Value }
-    }
-    $projectCfg['mcp'] = $mergedMcp
+    $mergedMcp = Merge-ConfigSection $cfg.mcp 'mcp'
 }
 
 # Always merge global permissions into project config (project overrides win)
 if ($cfg.permission) {
-    $mergedPerms = @{}
-    $cfg.permission.PSObject.Properties | ForEach-Object { $mergedPerms[$_.Name] = $_.Value }
-    if ($projectCfg.ContainsKey('permission')) {
-        $projectCfg['permission'].PSObject.Properties | ForEach-Object { $mergedPerms[$_.Name] = $_.Value }
-    }
-    $projectCfg['permission'] = $mergedPerms
+    Merge-ConfigSection $cfg.permission 'permission'
 }
 
 # Inherit runtime config sections — project wins on conflict

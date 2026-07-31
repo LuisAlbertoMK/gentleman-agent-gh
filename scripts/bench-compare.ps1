@@ -38,17 +38,26 @@ Write-Host ("  Common: " + $c.Count + " | B: " + $tB + "L | R: " + $tR + "L | D:
 Write-Host ("  B-only: " + $oB.Count + " | R-only: " + $oR.Count)
 Write-Host "<<< Skills - metadata >>>"
 $bP = 0; $rP = 0; $bTr = 0; $rTr = 0; $bTa = 0; $rTa = 0
+function Test-SkillMeta {
+    param([string]$SkillPath)
+    try { $content = Get-Content $SkillPath -Raw -EA Stop } catch { return @{ Placeholder = $false; HasTriggers = $false; HasTags = $false } }
+    return @{
+        Placeholder = $content -match 'description:\s*>\s+\{?\w+\}?\s*skill'
+        HasTriggers = $content -match '(?m)^\s*triggers:'
+        HasTags     = $content -match '(?m)^\s*tags:'
+    }
+}
 foreach ($s in $bSk) {
-  try { $c2 = Get-Content (Join-Path $bSD "$s\SKILL.md") -Raw -EA Stop } catch { Write-Warning "b SKILL.md $($s): $_"; continue }
-  if ($c2 -match 'description:\s*>\s+\{?\w+\}?\s*skill') { $bP++ }
-  if ($c2 -match '(?m)^\s*triggers:') { $bTr++ }
-  if ($c2 -match '(?m)^\s*tags:') { $bTa++ }
+  $m = Test-SkillMeta -SkillPath (Join-Path $bSD "$s\SKILL.md")
+  if ($m.Placeholder) { $bP++ }
+  if ($m.HasTriggers) { $bTr++ }
+  if ($m.HasTags)    { $bTa++ }
 }
 foreach ($s in $rSk) {
-  try { $c3 = Get-Content (Join-Path $rSD "$s\SKILL.md") -Raw -EA Stop } catch { Write-Warning "r SKILL.md $($s): $_"; continue }
-  if ($c3 -match 'description:\s*>\s+\{?\w+\}?\s*skill') { $rP++ }
-  if ($c3 -match '(?m)^\s*triggers:') { $rTr++ }
-  if ($c3 -match '(?m)^\s*tags:') { $rTa++ }
+  $m = Test-SkillMeta -SkillPath (Join-Path $rSD "$s\SKILL.md")
+  if ($m.Placeholder) { $rP++ }
+  if ($m.HasTriggers) { $rTr++ }
+  if ($m.HasTags)    { $rTa++ }
 }
 Write-Host ("  Placeh: B " + $bP + " -> R " + $rP)
 Write-Host ("  Triggr: B " + $bTr + "/" + $bSk.Count + " -> R " + $rTr + "/" + $rSk.Count)
@@ -64,7 +73,8 @@ try { $sf = Get-ChildItem -Filter "*.ps1" -LiteralPath $rSd -EA Stop } catch { W
 foreach ($f in $sf) {
   try { $cc = Get-Content $f.FullName -Raw -EA Stop } catch { continue }
   if ($cc -match 'Set-StrictMode') { $sm++ }
-  $ct += (Select-String '\bcatch\b' -LiteralPath $f.FullName).Count
+  # Count catch blocks from cached content (avoids 2nd file read via Select-String -Path)
+  $ct += [regex]::Matches($cc, '\bcatch\b').Count
 }
 Write-Host ("  Scripts: B " + $bs + " -> R " + $rs)
 Write-Host ("  StrictMd: B 0 -> R " + $sm + "/" + $rs)

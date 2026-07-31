@@ -35,6 +35,18 @@ if ($hasSkills) {
     }
 }
 
+# --- Single-read cache for script content (avoid multiple re-reads) ---
+$scriptContentCache = @{}
+if ($hasScripts) {
+    foreach ($sf in $scriptFiles) {
+        try {
+            $scriptContentCache[$sf.FullName] = Get-Content $sf.FullName -Raw -EA SilentlyContinue
+        } catch {
+            $scriptContentCache[$sf.FullName] = ""
+        }
+    }
+}
+
 # --- PA: Project Artifacts ---
 
 $paScore = 10
@@ -57,15 +69,20 @@ $hasWeakCrypto = $false
 $hasSecrets    = $false
 
 # Check for weak crypto patterns in scripts
-$hasWeakCrypto = $false
 if ($hasScripts) {
-    $weakCryptoMatches = @(
-        Select-String -Path $scriptFiles.FullName -Pattern "MD5|SHA1\b"
-    ) | Where-Object {
-        $_.Line -notmatch "SHA1ToSHA256|SHA256|#deprecat|#legacy|SHA1SHA256|Select-String.*MD5"
+    $weakCryptoMatches = @()
+    foreach ($sf in $scriptFiles) {
+        $content = $scriptContentCache[$sf.FullName]
+        if (-not $content) { continue }
+        $lines = $content -split "`n"
+        foreach ($line in $lines) {
+            if ($line -match "MD5|SHA1\b" -and $line -notmatch "SHA1ToSHA256|SHA256|#deprecat|#legacy|SHA1SHA256|Select-String.*MD5") {
+                $weakCryptoMatches += $line
+            }
+        }
     }
 
-    if ($weakCryptoMatches) {
+    if ($weakCryptoMatches.Count -gt 0) {
         $hasWeakCrypto = $true
         $secScore -= 2
     }
@@ -86,7 +103,8 @@ if ($hasSkills) {
     $secretPattern = [regex]::new("(?i)(api[_-]?key|secret|password|token|credential)\s*[=:]\s*['""][^'""]{8,}")
     foreach ($cachedContent in $skillContentCache.Values) {
         if ($cachedContent -and $secretPattern.IsMatch($cachedContent)) {
-            $secretMatches += [PSCustomObject]@{ Line = $cachedContent }
+            $match = $secretPattern.Match($cachedContent)
+            $secretMatches += [PSCustomObject]@{ Line = $match.Value; Path = $null }
         }
     }
 }
@@ -141,15 +159,23 @@ if ($deadJunctions -gt 0) {
 # Commented-out code patterns in scripts (exclude this file)
 $commentedLines = 0
 if ($hasScripts) {
-    $commentedPatterns = @(
-        Select-String -Path $scriptFiles.FullName -Pattern (
-            '^\s*#\s*function\s+\w+|^\s*#\s*if\s*\(|^\s*#\s*foreach\s*\(|' +
-            '^\s*#\s*for\s*\(|^\s*#\s*while\s*\(|^\s*#\s*switch\s*\(|' +
-            '^\s*#\s*try\s*\{|^\s*#\s*catch\s*\{'
-        ) -EA SilentlyContinue
-    ) | Where-Object { $_.Filename -ne "score-auto.ps1" }
+    $commentedPattern = '^\s*#\s*function\s+\w+|^\s*#\s*if\s*\(|^\s*#\s*foreach\s*\(|' +
+        '^\s*#\s*for\s*\(|^\s*#\s*while\s*\(|^\s*#\s*switch\s*\(|' +
+        '^\s*#\s*try\s*\{|^\s*#\s*catch\s*\{'
+    $commentedPatterns = @()
+    foreach ($sf in $scriptFiles) {
+        if ($sf.Name -eq "score-auto.ps1") { continue }
+        $content = $scriptContentCache[$sf.FullName]
+        if (-not $content) { continue }
+        $lines = $content -split "`n"
+        foreach ($line in $lines) {
+            if ($line -match $commentedPattern) {
+                $commentedPatterns += $line
+            }
+        }
+    }
 
-    $commentedLines = @($commentedPatterns).Count
+    $commentedLines = $commentedPatterns.Count
 }
 
 if ($commentedLines -gt 10) {
@@ -171,7 +197,8 @@ if ($hasScripts) {
     # where pwsh misparses { ... } -ThrottleLimit and throws positional param error
     $scriptStats = @()
     foreach ($sf in $scriptFiles) {
-        $content = [IO.File]::ReadAllText($sf.FullName)
+        $content = $scriptContentCache[$sf.FullName]
+        if (-not $content) { continue }
         $scriptStats += [PSCustomObject]@{
             h = [bool]($content -match '<#')
             p = [bool]($content -match 'param\(')
@@ -454,7 +481,8 @@ Add-Dimension "BI2" $backlogScore @{
 $quietSwitchCount = 0
 if ($hasScripts) {
     $quietSwitchCount = @($scriptFiles | ForEach-Object {
-        $content = [IO.File]::ReadAllText($_.FullName)
+        $content = $scriptContentCache[$_.FullName]
+        if (-not $content) { $false; return }
         if ($content -match '\[switch\]\$Quiet|\[switch\]\$Json') { $true } else { $false }
     } | Where-Object { $_ }).Count
 }

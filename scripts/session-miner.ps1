@@ -15,11 +15,11 @@ if($parts.Count-ge8){$id=0;if($parts[1]){[int]::TryParse($parts[1],[ref]$id) | O
 $p+=[PSCustomObject]@{Id=$id;Date=$parts[2];Pattern=$parts[3];Symptom=$parts[4];RootCause=$parts[5];Fix=$parts[6];Prevention=$parts[7]}}}
 return ,$p}
 function rl{if(-not(Test-Path $lp)){return ,@()}
-try{$c=Get-Content $lp -Raw}catch{Write-Debug "sm: cannot read learnings ($($_.Exception.Message))";return ,@()}
+$c = if($args[0]){$args[0]}else{try{Get-Content $lp -Raw}catch{Write-Debug "sm: cannot read learnings ($($_.Exception.Message))";return ,@()}}
 $k=@();$m=[regex]::Matches($c,'^[\s]*Pattern-Key:\s*([^\n\r]+)',$ro)
 foreach($x in $m){$k+=$x.Groups[1].Value.Trim()};return ,$k}
 function re{if(-not(Test-Path $ep)){return ,@()}
-try{$c=Get-Content $ep -Raw}catch{Write-Debug "sm: cannot read errors ($($_.Exception.Message))";return ,@()}
+$c = if($args[0]){$args[0]}else{try{Get-Content $ep -Raw}catch{Write-Debug "sm: cannot read errors ($($_.Exception.Message))";return ,@()}}
 $e=@();$entries=[regex]::Matches($c,'^##\s+\[\w+-\d+-\d+\]\s+(.+?)$',$ro)
 foreach($entry in $entries){$e+=$entry.Groups[1].Value.Trim()};return ,$e}
 function frp{param([array]$cp,[array]$pk,[int]$mn)
@@ -31,8 +31,9 @@ $r+=[PSCustomObject]@{PatternKey=$e.Name;Count=$e.Value;Cataloged=$cat}}};return
 if($Mode-eq'populate'){
     $today=(Get-Date -Format 'yyyy-MM-dd')
     # Populate LEARNINGS.md with pattern keys
+    $cachedLearnings = $null
     if($PatternKeys -and $PatternKeys.Count-gt0){
-        $existingKeys=@();if(Test-Path $lp){$ec=Get-Content $lp -Raw;$existingKeys=@([regex]::Matches($ec,'^[\s]*Pattern-Key:\s*([^\n\r]+)','Multiline')|ForEach-Object{$_.Groups[1].Value.Trim()})}
+        $existingKeys=@();if(Test-Path $lp){$ec=Get-Content $lp -Raw;$cachedLearnings=$ec;$existingKeys=@([regex]::Matches($ec,'^[\s]*Pattern-Key:\s*([^\n\r]+)','Multiline')|ForEach-Object{$_.Groups[1].Value.Trim()})}
         $newLines=@();$todayKeys=@()
         foreach($pk in $PatternKeys){
             $key=$pk -replace '\s+','-' -replace '[^a-zA-Z0-9\-]','' -replace '-+','-' -replace '^-|-$',''
@@ -47,8 +48,9 @@ if($Mode-eq'populate'){
         } elseif(-not $Json){Write-Host "  ⛏️  No new pattern keys to add (all exist or invalid)"}
     }
     # Populate ERRORS.md with error entries
+    $cachedErrors = $null
     if($ErrorEntries -and $ErrorEntries.Count-gt0){
-        $existingErrors=@();if(Test-Path $ep){$ec=Get-Content $ep -Raw;$existingErrors=@([regex]::Matches($ec,'^##\s+\[\w+-\d+-\d+\]\s+(.+?)$','Multiline')|ForEach-Object{$_.Groups[1].Value.Trim()})}
+        $existingErrors=@();if(Test-Path $ep){$ec=Get-Content $ep -Raw;$cachedErrors=$ec;$existingErrors=@([regex]::Matches($ec,'^##\s+\[\w+-\d+-\d+\]\s+(.+?)$','Multiline')|ForEach-Object{$_.Groups[1].Value.Trim()})}
         $newErrors=@()
         foreach($ee in $ErrorEntries){
             $clean=$ee.Trim()
@@ -65,7 +67,7 @@ if($Mode-eq'populate'){
     # Fall through as check so caller gets repeated-pattern analysis
     $Mode='check'
 }
-$catalog=rc;$patternKeys=rl;$errors=re;$repeated=frp -cp $catalog -pk $patternKeys -mn $Threshold
+$catalog=rc;$patternKeys=rl $cachedLearnings;$errors=re $cachedErrors;$repeated=frp -cp $catalog -pk $patternKeys -mn $Threshold
 if($Mode-eq'check'){$data=[PSCustomObject]@{CatalogEntries=@($catalog).Count;PatternKeys=@($patternKeys).Count;ErrorEntries=@($errors).Count;RepeatedPatterns=@($repeated).Count;Mode='check';Status=if(@($repeated).Count-gt0){'PATTERNS_FOUND'}else{'CLEAN'}}
 if($Json){return($data | ConvertTo-Json)}
 if(-not $Quiet){Write-Host "  Catalog: $(@($catalog).Count) entries`n  Patterns: $(@($patternKeys).Count) keys`n  Errors: $(@($errors).Count) entries`n  Repeated: $(@($repeated).Count) patterns`n  Status: $($data.Status)"};return}

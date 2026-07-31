@@ -81,7 +81,7 @@ else {
     py -m pip install pre-commit -q 2>$null
     if ($?) { ok "pre-commit installed" } else { warn "pre-commit install failed — CI can run it standalone" }
 }
-if (-not [string]::IsNullOrEmpty((py -m pre_commit --version 2>$null))) {
+if ($pc) {
     $hooksPath = git config core.hooksPath 2>$null
     if ([string]::IsNullOrEmpty($hooksPath)) {
         py -m pre_commit install 2>$null
@@ -231,7 +231,7 @@ if (-not $SkipVision) {
         if ($scoopCmd) {
             info "Installing Ollama via scoop..."
             scoop install ollama 2>$null
-            if ($?) { ok "Ollama installed via scoop" } else { warn "Ollama scoop install failed — download from https://ollama.com/download" }
+            if ($?) { $ollamaCmd = Get-Command "ollama" -EA SilentlyContinue; ok "Ollama installed via scoop" } else { warn "Ollama scoop install failed — download from https://ollama.com/download" }
         } else { warn "scoop not found — install Ollama manually from https://ollama.com/download" }
     } else { skip "Ollama already installed" }
     $ollamaExe = if ($ollamaCmd) { $ollamaCmd.Source } else { Join-Path (Join-Path $HOME "scoop") "apps" "ollama" "current" "ollama.exe" }
@@ -247,14 +247,15 @@ if (-not $SkipVision) {
 
 # Step 8: Verify
 info "Verifying setup"
+$verifyCmds = Get-Command gentleman-vmk, codebase-memory-mcp, headroom, engram, ollama -EA SilentlyContinue
 $checks = @(
     @{ Label = "GENTLEMAN_AGENT_ROOT"; Test = { $env:GENTLEMAN_AGENT_ROOT -eq $__rootDir } },
     @{ Label = "opencode.json exists"; Test = { Test-Path (Join-Path $RepoDir "opencode.json") } },
-    @{ Label = "Global shortcut: gentleman-vmk"; Test = { Get-Command "gentleman-vmk" -EA SilentlyContinue } },
-    @{ Label = "MCP: codebase-memory-mcp"; Test = { Get-Command "codebase-memory-mcp" -EA SilentlyContinue } },
-    @{ Label = "MCP: headroom"; Test = { Get-Command "headroom" -EA SilentlyContinue } },
-    @{ Label = "MCP: engram"; Test = { Get-Command "engram" -EA SilentlyContinue } },
-    @{ Label = "Vision: Ollama"; Test = { Get-Command "ollama" -EA SilentlyContinue } },
+    @{ Label = "Global shortcut: gentleman-vmk"; Test = { $verifyCmds.Name -contains "gentleman-vmk" } },
+    @{ Label = "MCP: codebase-memory-mcp"; Test = { $verifyCmds.Name -contains "codebase-memory-mcp" } },
+    @{ Label = "MCP: headroom"; Test = { $verifyCmds.Name -contains "headroom" } },
+    @{ Label = "MCP: engram"; Test = { $verifyCmds.Name -contains "engram" } },
+    @{ Label = "Vision: Ollama"; Test = { $verifyCmds.Name -contains "ollama" } },
     @{ Label = "Vision: moondream model"; Test = { & ollama list 2>$null -match "moondream" } }
 )
 $allOk = $true

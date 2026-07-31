@@ -48,6 +48,14 @@ if (-not (Test-Path $patternsDir)) {
     exit 1
 }
 
+# Pre-build pattern index for O(1) duplicate lookups (avoids N+1)
+$script:patternIndex = @{}
+if (Test-Path $patternsDir) {
+    foreach ($ixf in @(Get-ChildItem $patternsDir -Filter "*.json")) {
+        try { $ixp = Get-Content $ixf.FullName -Raw | ConvertFrom-Json; if ($ixp.title) { $script:patternIndex[$ixp.title.ToLower()] = $ixf.FullName } } catch { }
+    }
+}
+
 function New-PatternId {
     param([string]$Domain, [string]$Subdomain, [string]$Title)
     $slug = ($Title -replace '[^a-zA-Z0-9\s-]', '' -replace '\s+', '-' -replace '--+', '-').ToLower()
@@ -79,17 +87,20 @@ function Save-Pattern {
     $Pattern | Add-Member -NotePropertyName "updated" -NotePropertyValue (Get-Date -Format "yyyy-MM-dd") -Force
     $filename = "$id.json"
     $filepath = Join-Path $patternsDir $filename
-    # Check for duplicate by title fuzzy match
-    $existing = Get-ChildItem $patternsDir -Filter "*.json" | Where-Object {
-        try {
-            $c = Get-Content $_.FullName -Raw | ConvertFrom-Json
-            $c.title -eq $Pattern.title
-        } catch { $false }
+    # Check for duplicate by title (O(1) hash lookup vs N+1 scan)
+    $titleKey = "$($Pattern.title)".ToLower()
+    if ([string]::IsNullOrWhiteSpace($titleKey)) { $titleKey = $id.ToLower() }
+    $existingPath = $script:patternIndex[$titleKey]
+    if (-not $existingPath) {
+        # Fallback: fuzzy match against full index (catches near-duplicates)
+        foreach ($ek in $script:patternIndex.Keys) {
+            if ($ek -match [regex]::Escape($titleKey) -or $titleKey -match [regex]::Escape($ek)) {
+                $existingPath = $script:patternIndex[$ek]; break
+            }
+        }
     }
-    if ($existing) {
-        if (-not $Quiet) { Write-Warning "Pattern already exists: $($existing.FullName) (same title)" }
-        # Update existing
-        $existingPath = $existing[0].FullName
+    if ($existingPath -and (Test-Path $existingPath)) {
+        if (-not $Quiet) { Write-Warning "Pattern already exists: $existingPath (same title)" }
         $oldContent = Get-Content $existingPath -Raw | ConvertFrom-Json
         $oldContent.updated = (Get-Date -Format "yyyy-MM-dd")
         $hasHits = $null -ne ($Pattern.PSObject.Properties['hits'])
@@ -99,6 +110,9 @@ function Save-Pattern {
     }
     # New pattern
     $Pattern | ConvertTo-Json -Depth 6 | Set-Content $filepath -Encoding UTF8
+    # Update index for backlog migration (prevents stale index overwrites)
+    $script:patternIndex[$titleKey] = $filepath
+    foreach ($altKey in @($id.ToLower(), $filename)) { $script:patternIndex[$altKey] = $filepath }
     return @{ Action = "created"; Path = $filepath; Id = $id }
 }
 

@@ -50,6 +50,35 @@ try {
     (git remote) -contains $Name
   }
 
+  # --- Helper: build hash table from git ls-tree ---
+  function Get-FileHashTable([string]$GitRef, [string]$Dir) {
+    $hashes = @{}
+    if ([string]::IsNullOrEmpty($Dir)) {
+      git ls-tree $GitRef | ForEach-Object {
+        $parts = $_ -split '\s+'
+        $hashes[$parts[3]] = $parts[2]
+      }
+    } else {
+      git ls-tree -r $GitRef -- "$Dir" | ForEach-Object {
+        $parts = $_ -split '\s+'
+        $hashes[$parts[3]] = $parts[2]
+      }
+    }
+    return $hashes
+  }
+
+  # --- Helper: convert local path to upstream path ---
+  function Convert-LocalToUpstreamPath([string]$LocalPath) {
+    $result = $LocalPath
+    foreach ($mapping in $pathMappings) {
+      if (-not [string]::IsNullOrEmpty($mapping.LocalPath) -and $LocalPath.StartsWith($mapping.LocalPath)) {
+        $result = $LocalPath.Replace($mapping.LocalPath, $mapping.UpstreamPath)
+        break
+      }
+    }
+    return $result
+  }
+
   # --- Validate remote ---
   if (-not (Test-GitRemote $Remote)) {
     Write-Warning "Remote '$Remote' not found"
@@ -124,36 +153,15 @@ try {
     $modifiedItems = @()
     if ($categoryLabel -ne 'Root files') {
       # Build upstream hash map
-      $upstreamHashes = @{}
-      if ([string]::IsNullOrEmpty($upstreamDir)) {
-        git ls-tree $remoteRef | ForEach-Object {
-          $parts = $_ -split '\s+'
-          $upstreamHashes[$parts[3]] = $parts[2]
-        }
-      } else {
-        git ls-tree -r $remoteRef -- "$upstreamDir" | ForEach-Object {
-          $parts = $_ -split '\s+'
-          $filePath = $parts[3]
-          if (-not [string]::IsNullOrEmpty($localDir) -and $localDir -ne $upstreamDir) {
-            $filePath = $filePath.Replace($upstreamDir, $localDir)
-          }
-          $upstreamHashes[$filePath] = $parts[2]
-        }
+      $upstreamHashes = Get-FileHashTable -GitRef $remoteRef -Dir $upstreamDir
+      if (-not [string]::IsNullOrEmpty($localDir) -and $localDir -ne $upstreamDir) {
+        $new = @{}
+        $upstreamHashes.Keys | ForEach-Object { $new[$_.Replace($upstreamDir, $localDir)] = $upstreamHashes[$_] }
+        $upstreamHashes = $new
       }
 
       # Build local hash map
-      $localHashes = @{}
-      if ([string]::IsNullOrEmpty($localDir)) {
-        git ls-tree $localRef | ForEach-Object {
-          $parts = $_ -split '\s+'
-          $localHashes[$parts[3]] = $parts[2]
-        }
-      } else {
-        git ls-tree -r $localRef -- "$localDir" | ForEach-Object {
-          $parts = $_ -split '\s+'
-          $localHashes[$parts[3]] = $parts[2]
-        }
-      }
+      $localHashes = Get-FileHashTable -GitRef $localRef -Dir $localDir
 
       # Compare hashes
       $commonItems | ForEach-Object {
@@ -204,13 +212,7 @@ try {
 
     foreach ($file in $skillScriptItems) {
       # Reverse-map: local path → upstream path
-      $upstreamFile = $file
-      foreach ($mapping in $pathMappings) {
-        if (-not [string]::IsNullOrEmpty($mapping.LocalPath) -and $file.StartsWith($mapping.LocalPath)) {
-          $upstreamFile = $file.Replace($mapping.LocalPath, $mapping.UpstreamPath)
-          break
-        }
-      }
+      $upstreamFile = Convert-LocalToUpstreamPath $file
 
       # Ensure parent directory exists
       $parentDir = Split-Path $file -Parent
@@ -252,13 +254,7 @@ try {
     }
 
     # Reverse-map
-    $upstreamFile = $TargetFile
-    foreach ($mapping in $pathMappings) {
-      if (-not [string]::IsNullOrEmpty($mapping.LocalPath) -and $TargetFile.StartsWith($mapping.LocalPath)) {
-        $upstreamFile = $TargetFile.Replace($mapping.LocalPath, $mapping.UpstreamPath)
-        break
-      }
-    }
+    $upstreamFile = Convert-LocalToUpstreamPath $TargetFile
 
     if(-not $Quiet) { Write-Host "Checkout '$upstreamFile' from $Remote/$Branch..." }
     git checkout "$Remote/$Branch" -- "$upstreamFile" 2>&1

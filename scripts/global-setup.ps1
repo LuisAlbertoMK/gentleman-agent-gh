@@ -44,9 +44,10 @@ function Sync-File {
     $destDir = Split-Path $Dest -Parent
     if(-not (Test-Path $destDir)){New-Item -ItemType Directory -Path $destDir -Force | Out-Null}
     if((Test-Path $Dest) -and -not $Force){
-        $srcHash = (Get-FileHash $Source).Hash
-        $dstHash = (Get-FileHash $Dest).Hash
-        if($srcHash -eq $dstHash){Add-Result $Label "OK" "Already up to date";return}
+        $srcInfo = Get-Item $Source; $dstInfo = Get-Item $Dest
+        if($srcInfo.Length -eq $dstInfo.Length -and $srcInfo.LastWriteTime -eq $dstInfo.LastWriteTime){
+            Add-Result $Label "OK" "Already up to date";return
+        }
     }
     Copy-Item -LiteralPath $Source -Destination $Dest -Force
     Add-Result $Label "SYNCED" "Copied to $Dest"
@@ -56,33 +57,19 @@ function Sync-File {
 if(-not $Quiet){Write-Output "`n═══ GLOBAL SETUP — opencode ═══`n"}
 Sync-File (Join-Path $gentlemanRoot "AGENTS.md") (Join-Path $globalConfig "AGENTS.md") "AGENTS.md"
 
-# 2. Sync ALL shared prompts (auto-discover from canonical)
-$sharedPromptsSrc = Join-Path (Join-Path $gentlemanRoot "prompts") "shared"
-if (Test-Path $sharedPromptsSrc) {
-    Get-ChildItem $sharedPromptsSrc -Filter "*.md" -Attributes !ReparsePoint | ForEach-Object {
-        $safeName = Split-Path -Leaf $_.Name
-        Sync-File $_.FullName (Join-Path (Join-Path (Join-Path $globalConfig "prompts") "shared") $safeName) "prompts/shared/$safeName"
+# 2. Sync prompts from a source subdir
+function Sync-Prompts {
+    param([string]$SourceDir,[string]$DestSubdir,[string]$IncludeFilter="*.md")
+    if(-not (Test-Path $SourceDir)){return}
+    $destBase = Join-Path (Join-Path $globalConfig "prompts") $DestSubdir
+    Get-ChildItem $SourceDir -Filter $IncludeFilter -File -Attributes !ReparsePoint | ForEach-Object {
+        Sync-File $_.FullName (Join-Path $destBase $_.Name) "prompts/$DestSubdir/$($_.Name)"
     }
 }
-
-# 2b. Sync SDD prompts (auto-discover from canonical)
-$sharedSddSrc = Join-Path (Join-Path $gentlemanRoot "prompts") "sdd"
-if (Test-Path $sharedSddSrc) {
-    Get-ChildItem $sharedSddSrc -Filter "*.md" -Attributes !ReparsePoint | ForEach-Object {
-        $safeName = Split-Path -Leaf $_.Name
-        $destDir = Join-Path (Join-Path $globalConfig "prompts") "sdd"
-        Sync-File $_.FullName (Join-Path $destDir $safeName) "prompts/sdd/$safeName"
-    }
-}
-
-# 2c. Sync root prompts (gentleman-*.md, _*.md — auto-discover, allowlisted)
-$rootPromptsSrc = Join-Path $gentlemanRoot "prompts"
-if (Test-Path $rootPromptsSrc) {
-    Get-ChildItem "$rootPromptsSrc\*" -Include "gentleman-*.md","_*.md" -File -Attributes !ReparsePoint | ForEach-Object {
-        $safeName = Split-Path -Leaf $_.Name
-        Sync-File $_.FullName (Join-Path (Join-Path $globalConfig "prompts") $safeName) "prompts/$safeName"
-    }
-}
+Sync-Prompts (Join-Path (Join-Path $gentlemanRoot "prompts") "shared") "shared"
+Sync-Prompts (Join-Path (Join-Path $gentlemanRoot "prompts") "sdd") "sdd"
+Sync-Prompts (Join-Path $gentlemanRoot "prompts") "" "gentleman-*.md"
+Sync-Prompts (Join-Path $gentlemanRoot "prompts") "" "_*.md"
 
 # 3. Sync shared scripts
 $sharedScripts = @(
@@ -116,16 +103,16 @@ if((Test-Path $canonicalJson) -and (Test-Path $globalJson)){
     $glob = Get-Content $globalJson -Raw -Encoding UTF8 | ConvertFrom-Json
     $changed = $false
     if($canon.agent){
-        $canonAgent = $canon.agent | ConvertTo-Json -Depth 10 -Compress
-        $globAgent = $glob.agent | ConvertTo-Json -Depth 10 -Compress
+        $canonAgent = $canon.agent | ConvertTo-Json -Depth 4 -Compress
+        $globAgent = $glob.agent | ConvertTo-Json -Depth 4 -Compress
         if($canonAgent -ne $globAgent){$glob.agent = $canon.agent;$changed=$true}
     }
     if($canon.permission){
-        $canonPerm = $canon.permission | ConvertTo-Json -Depth 10 -Compress
-        $globPerm = $glob.permission | ConvertTo-Json -Depth 10 -Compress
+        $canonPerm = $canon.permission | ConvertTo-Json -Depth 4 -Compress
+        $globPerm = $glob.permission | ConvertTo-Json -Depth 4 -Compress
         if($canonPerm -ne $globPerm){$glob.permission = $canon.permission;$changed=$true}
     }
-    if($changed){$glob | ConvertTo-Json -Depth 10 | Set-Content $globalJson -Encoding UTF8; Add-Result "opencode.json" "SYNCED" "Updated agent + permission sections"}
+    if($changed){$glob | ConvertTo-Json -Depth 4 | Set-Content $globalJson -Encoding UTF8; Add-Result "opencode.json" "SYNCED" "Updated agent + permission sections"}
     else{Add-Result "opencode.json" "OK" "Already in sync"}
 }else{Add-Result "opencode.json" "SKIP" "Files not found"}
 
@@ -172,18 +159,14 @@ if(-not (Test-Path $registryPath) -and (Test-Path $buildScript)){& $buildScript 
 else{Add-Result "Skill Registry" "OK" "Already exists"}
 
 # Output
+$stats = $results | Group-Object Status -NoElement
+$s = @{}; $stats | ForEach-Object { $s[$_.Name] = $_.Count }
 if($Json){
     ConvertTo-Json @{timestamp=(Get-Date -Format "o");results=$results;summary=@{
-        synced=@($results | Where-Object {$_.status -eq "SYNCED"}).Count
-        ok=@($results | Where-Object {$_.status -eq "OK"}).Count
-        failed=@($results | Where-Object {$_.status -eq "FAIL"}).Count
-        skipped=@($results | Where-Object {$_.status -eq "SKIP"}).Count
+        synced=$s['SYNCED'];ok=$s['OK'];failed=$s['FAIL'];skipped=$s['SKIP']
     }} -Depth 3
 }else{
     Write-Output "`n───────────────────────────────────────"
-    $synced = @($results | Where-Object {$_.status -eq "SYNCED"}).Count
-    $ok = @($results | Where-Object {$_.status -eq "OK"}).Count
-    $failed = @($results | Where-Object {$_.status -eq "FAIL"}).Count
-    Write-Output "Synced: $synced | OK: $ok | Failed: $failed"
+    Write-Output "Synced: $($s['SYNCED']) | OK: $($s['OK']) | Failed: $($s['FAIL'])"
     Write-Output "═══════════════════════════════════════"
 }

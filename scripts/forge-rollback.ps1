@@ -33,6 +33,14 @@ $skillsDir = Join-Path (Join-Path $repoRoot ".agents") "skills"
 
 $actions = @()
 
+# Pre-build pattern index for O(1) lookups (avoids N+1)
+$patternIndex = @{}
+if (Test-Path $patternsDir) {
+    foreach ($pf in @(Get-ChildItem $patternsDir -Filter "*.json")) {
+        try { $pp = Get-Content $pf.FullName -Raw | ConvertFrom-Json; if ($pp.id) { $patternIndex[$pp.id] = $pf.FullName } } catch { }
+    }
+}
+
 # ─── Resolve skill directory ────────────────────────────────────
 if (-not $SkillName -and -not $PatternId) { Write-Error "Provide -SkillName or -PatternId"; exit 1 }
 
@@ -55,11 +63,8 @@ if ($SkillName) {
     }
 }
 
-if ($PatternId) {
-    $found = @(Get-ChildItem $patternsDir -Filter "*.json" | Where-Object {
-        try { (Get-Content $_.FullName -Raw | ConvertFrom-Json).id -eq $PatternId } catch { $false }
-    })
-    if ($found.Length -gt 0) { $resolvedPatternFile = $found[0].FullName }
+if ($PatternId -and $patternIndex.ContainsKey($PatternId)) {
+    $resolvedPatternFile = $patternIndex[$PatternId]
 }
 
 # ─── Remove skill directory ─────────────────────────────────────
