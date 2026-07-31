@@ -6,6 +6,9 @@
     Dot-sourced by analysis scripts. Exposes Get-FileManifest — a single
     inventory of analyzable files with content hashes, so consumers don't
     each walk the tree independently.
+    Lazy hashing: SHA256 is computed only for files whose (length, mtime)
+    changed since the last call; unchanged files reuse their previous hash
+    from a persistent stamp cache (per-repo, in %TEMP%\opencode).
 .NOTES
     This file is NOT meant to be invoked directly.
 #>
@@ -14,7 +17,8 @@ function Get-FileManifest {
     [CmdletBinding()]
     param(
         [Alias('Root')]
-        [string]$Path = (Get-Location).Path
+        [string]$Path = (Get-Location).Path,
+        [switch]$ForceHash
     )
     $root = (Resolve-Path $Path).Path
 
@@ -26,24 +30,57 @@ function Get-FileManifest {
 
     $skillPaths = @(Get-ChildItem -LiteralPath (Join-Path $root '.agents\skills') -File -Filter 'SKILL.md' -Recurse -EA SilentlyContinue)
 
-    $manifest = @($scriptPaths + $skillPaths | ForEach-Object -Parallel {
-        $f = $_
-        $rp = $f.FullName.Substring($using:root.Length).TrimStart('\').Replace('\', '/')
-        $sha256 = ''
+    # --- Lazy hash: load previous stamps from persistent per-repo cache ---
+    $cacheDir  = Join-Path ([IO.Path]::GetTempPath()) 'opencode'
+    $cacheFile = Join-Path $cacheDir "file-manifest-$([BitConverter]::ToString([Security.Cryptography.SHA256]::Create().ComputeHash([Text.Encoding]::UTF8.GetBytes($root))).Replace('-','').Substring(0,16)).json"
+    $prevStamps = @{}
+    if (-not $ForceHash -and (Test-Path $cacheFile)) {
         try {
-            $h = [Security.Cryptography.SHA256]::Create()
-            $sha256 = ([BitConverter]::ToString($h.ComputeHash([IO.File]::ReadAllBytes($f.FullName)))).Replace('-', '').ToLower()
-            $h.Dispose()
-        } catch { $sha256 = '' }
+            $cached = Get-Content -LiteralPath $cacheFile -Raw | ConvertFrom-Json
+            foreach ($p in $cached.stamps.PSObject.Properties) { $prevStamps[$p.Name] = $p.Value }
+        } catch { $prevStamps = @{} }
+    }
+
+    $needHash = @()
+    $manifest = @()
+    foreach ($f in @($scriptPaths + $skillPaths)) {
+        $rp = $f.FullName.Substring($root.Length).TrimStart('\').Replace('\', '/')
         $grp = if ($rp -match '^\.agents/skills/') { 'skill' } else { 'script' }
-        [PSCustomObject]@{
-            relpath = $rp
-            length  = $f.Length
-            mtime   = $f.LastWriteTimeUtc.Ticks
-            sha256  = $sha256
-            group   = $grp
+        $s = $null
+        if ($prevStamps.ContainsKey($rp)) { $s = $prevStamps[$rp] }
+        $stampMatch = $null -ne $s -and [int64]$s.len -eq $f.Length -and [int64]$s.mtime -eq $f.LastWriteTimeUtc.Ticks
+        if ($stampMatch -and -not $ForceHash) {
+            # unchanged: reuse previous hash, no I/O on content
+            $manifest += [PSCustomObject]@{ relpath = $rp; length = $f.Length; mtime = $f.LastWriteTimeUtc.Ticks; sha256 = [string]$s.sha256; group = $grp }
+        } else {
+            $needHash += $f.FullName
+            $manifest += [PSCustomObject]@{ relpath = $rp; length = $f.Length; mtime = $f.LastWriteTimeUtc.Ticks; sha256 = ''; group = $grp }
         }
-    } -ThrottleLimit 8)
+    }
+
+    # --- Hash only the changed/new files, in parallel ---
+    if ($needHash.Count -gt 0) {
+        $hashMap = @{}
+        $hashed = @($needHash | ForEach-Object -Parallel {
+            $fp = $_
+            $h = [Security.Cryptography.SHA256]::Create()
+            try { ([BitConverter]::ToString($h.ComputeHash([IO.File]::ReadAllBytes($fp)))).Replace('-', '').ToLower() } catch { '' } finally { $h.Dispose() }
+        } -ThrottleLimit 8)
+        for ($i = 0; $i -lt $needHash.Count; $i++) {
+            $rp = $needHash[$i].Substring($root.Length).TrimStart('\').Replace('\', '/')
+            $hashMap[$rp] = $hashed[$i]
+        }
+        foreach ($m in $manifest) { if (-not $m.sha256) { $m.sha256 = $hashMap[$m.relpath] } }
+    }
+
+    # --- Persist stamps for next call ---
+    try {
+        if (-not (Test-Path $cacheDir)) { New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null }
+        $stamps = @{}
+        foreach ($m in $manifest) { $stamps[$m.relpath] = @{ len = $m.length; mtime = $m.mtime; sha256 = $m.sha256 } }
+        @{ root = $root; generated = (Get-Date -Format 'o'); stamps = $stamps } |
+            ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $cacheFile -Encoding UTF8
+    } catch { Write-Debug "file-manifest cache save: $($_.Exception.Message)" }
 
     @($manifest | Sort-Object relpath)
 }
