@@ -1,3 +1,15 @@
+2026-07-31 - [audit] PASSED post-fix: a1 Correctness 2 (bug -Parallel order, fix 5d9ae47a) -> a2 C:8 T:9 E:7 S:8 Sp:8 B:8; gaps<=1.5; mem #2230 #2231
+2026-07-31 - PERFORMANCE plan completo: P0-P3 + P2x lazy hash mergeados, bug de orden -Parallel detectado por auditor ciego y fixeado (2/20 trials -> 0/20), re-audit PASSED (Correctness 2->8), sync-all OK
+2026-07-31 - PERFORMANCE plan completo: P0-P3 + P2x lazy hash mergeados, plan doc actualizado, sync-all OK
+2026-07-31 - Branch test
+2026-07-31 - Non-quiet test
+2026-07-31 - Compact
+2026-07-31 - Dry run
+2026-07-31 - Added RBAC support
+2026-07-31 - Test
+2026-07-31 - Gate check
+2026-07-31 - Protected check
+2026-07-31 - Int test
 2026-07-30 - Session close
 2026-07-30 - Session: limit key fix, default_agent global, sync ops
 2026-07-30 - Removed invalid limit key from opencode.json, synced global config, committed fix

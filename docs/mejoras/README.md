@@ -7,6 +7,7 @@
 
 | Date | File | Domain | Key Finding | Status |
 |------|------|--------|-------------|--------|
+| 2026-07-31 | [`skill-usage-audit`](2026-07-31-gentleman-agent-gh-analisis.md) | Skills | Uso real (DB 716 sessions): 3 skills muertas, runtime `skill` roto por misconfig (plugin lazy-loader `skill/` vs `skills/`), 3 refs STALE skill-creator, 1 solape real. | 🏁 active (plan) |
 | 2026-07-29 | [`global-analysis`](2026-07-29-gentleman-agent-gh-global-analysis.md) | Multi-dimension | 15 findings: 84% sin tests (CRITICAL), score drift 9.1→6.2, .gitleaks vacío, -auto deny lists, bash-safe bypasses, BITACORA 121 dupes. | 🏁 active |
 | 2026-07-29 | [`seo-skill`](2026-07-29-seo-skill-analisis.md) | SEO | v2.1→v3.0 upgrade | ✅ completed |
 | 2026-07-28 | [`tdd-testing`](2026-07-28-gentleman-agent-gh-analysis.md) | Testing | 7 findings — validate-write-scope tests (26), close-session tests (43), restore/forge-rollback tests (18), strict_tdd, pre-commit hook, CodeCoverage, Mock. | ✅ 7/7 completed |
@@ -19,11 +20,11 @@
 
 ## Trend Summary
 
-- **Total documents**: 7 active (6 analyses + 1 performance plan)
+- **Total documents**: 8 active (7 analyses + 1 performance plan)
 - **Archived**: 12 stale/superseded documents
 - **Completed**: 4 (tdd-testing, orchestrator, permission-modes, execution-report)
 - **Partial**: 1 (PERFORMANCE-PLAN 2/9)
-- **Active**: 1 (global-analysis with pending items)
+- **Active**: 2 (global-analysis, skill-usage-audit)
 
 ## Quick Reference
 
