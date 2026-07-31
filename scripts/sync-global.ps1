@@ -62,7 +62,7 @@ if(-not $NoAgentSync){Write-Step "Agent sync" {
 # Step 5: Junction verification
 Write-Step "Verify junctions" {
     $skills=Get-ChildItem $dstSkills -Directory -EA SilentlyContinue
-    $bad=$skills|Where-Object{$_ -is [System.IO.DirectoryInfo] -and $_.Target -and -not(Test-Path $_.Target)}
+    $bad=@($skills|Where-Object{$_ -is [System.IO.DirectoryInfo] -and $_.Target -and -not(Test-Path $_.Target)})
     if($bad.Count-gt 0){$bad|ForEach-Object{Write-Host "  [broken] $($_.Name)" -Fore Red};throw "$($bad.Count) broken junctions"}
     Write-Host "  Skills: $($skills.Count) valid | Scripts: $(Test-Path $dstScripts)" -Fore Green
 }

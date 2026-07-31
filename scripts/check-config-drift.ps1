@@ -19,6 +19,11 @@ $gentlemanRoot = if ($env:GENTLEMAN_AGENT_ROOT) { $env:GENTLEMAN_AGENT_ROOT } el
 # ── Config paths ─────────────────────────────────────────────────────────
 $canonicalPath = "$gentlemanRoot/opencode.json"
 $globalPath    = Join-Path (Get-GlobalConfigDir) "opencode.json"
+# Fallback: setups that sync via sync-global.ps1 store the global config as opencode.jsonc
+if (-not (Test-Path -LiteralPath $globalPath)) {
+  $globalJsonc = Join-Path (Get-GlobalConfigDir) "opencode.jsonc"
+  if (Test-Path -LiteralPath $globalJsonc) { $globalPath = $globalJsonc }
+}
 
 $results = [System.Collections.Generic.List[object]]::new()
 
@@ -30,7 +35,9 @@ function Get-SectionHash {
     $parsed = Get-Content -LiteralPath $Path -Raw -Encoding UTF8 | ConvertFrom-Json
     $hashes = @{}
     foreach ($key in $SectionKeys) {
-      $section = $parsed.$key
+      # StrictMode-safe property access: missing property => null section
+      $prop = $parsed.PSObject.Properties[$key]
+      $section = if ($null -ne $prop) { $prop.Value } else { $null }
       if ($null -ne $section) {
         $json = ($section | ConvertTo-Json -Depth 10 -Compress)
         $hashes[$key] = [System.BitConverter]::ToString(
