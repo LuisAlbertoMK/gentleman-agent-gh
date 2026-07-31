@@ -22,15 +22,24 @@ $hasScripts  = $scriptFiles.Count -gt 0
 $hasSkills   = $skillMdFiles.Count -gt 0
 
 # --- Single-read cache for SKILL.md content (avoid N+1 reads) ---
+# Each SKILL.md is read ONCE as raw bytes; UTF-8 text is derived for regex
+# checks and the raw bytes are reused by the Or corruption scan below.
 $skillContentCache = @{}
+$skillByteCache = @{}
 if ($hasSkills) {
     foreach ($skillMd in $skillMdFiles) {
         $cacheKey = $skillMd.FullName
-        try {
-            $skillContentCache[$cacheKey] = Get-Content $cacheKey -Raw -EA SilentlyContinue
-        } catch {
+        $bytes = $null
+        try { $bytes = [System.IO.File]::ReadAllBytes($cacheKey) } catch { $bytes = $null }
+        if ($null -eq $bytes) {
             $skillContentCache[$cacheKey] = ""
+            $skillByteCache[$cacheKey] = @()
+            continue
         }
+        $skillByteCache[$cacheKey] = $bytes
+        $offset = 0
+        if ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) { $offset = 3 }
+        $skillContentCache[$cacheKey] = [System.Text.Encoding]::UTF8.GetString($bytes, $offset, $bytes.Length - $offset)
     }
 }
 
@@ -88,18 +97,26 @@ if ($hasScripts) {
 }
 
 # Check for hardcoded secrets across scripts, skills, workflows, config
-$secretPaths = @()
-if ($hasScripts)  { $secretPaths += $scriptFiles.FullName }
-$secretPaths += @(".\.github\workflows\*.yml", ".\opencode.json")
-
+# Scripts are matched against $scriptContentCache (single read above) — the only
+# Select-String pass left is for the non-cached workflow/config files.
+$secretPattern = [regex]::new("(?i)(api[_-]?key|secret|password|token|credential)\s*[=:]\s*['""][^'""]{8,}")
 $secretMatches = @()
-if ($secretPaths.Count -gt 0) {
-    $secretMatches = @(Select-String -Path $secretPaths -Pattern "(?i)(api[_-]?key|secret|password|token|credential)\s*[=:]\s*['""][^'""]{8,}" -EA SilentlyContinue)
+
+if ($hasScripts) {
+    foreach ($sf in $scriptFiles) {
+        $content = $scriptContentCache[$sf.FullName]
+        if (-not $content) { continue }
+        foreach ($line in ($content -split "`n")) {
+            if ($line -match $secretPattern) { $secretMatches += $line }
+        }
+    }
 }
+
+# Non-cached paths (workflow yml, opencode.json)
+$secretMatches += @(Select-String -Path @(".\.github\workflows\*.yml", ".\opencode.json") -Pattern $secretPattern -EA SilentlyContinue)
 
 # Skill files: regex against cached content (avoid re-reads)
 if ($hasSkills) {
-    $secretPattern = [regex]::new("(?i)(api[_-]?key|secret|password|token|credential)\s*[=:]\s*['""][^'""]{8,}")
     foreach ($cachedContent in $skillContentCache.Values) {
         if ($cachedContent -and $secretPattern.IsMatch($cachedContent)) {
             $match = $secretPattern.Match($cachedContent)
@@ -113,11 +130,14 @@ if ($secretMatches) {
     $secScore -= 3
 }
 
-# Check latest error log or pssa output
+# Check latest error log or pssa output (file read ONCE, reused by SD Gate Pass Rate)
 $errorLogPath = "docs/metricas/errors/LATEST_error.json"
+$latestErrorJson = $null
 if (Test-Path $errorLogPath) {
-    $errorLog = Get-Content $errorLogPath -Raw | ConvertFrom-Json
-    if ($errorLog.source -ne "quality-gate" -or $errorLog.passed -lt 5) {
+    try { $latestErrorJson = Get-Content $errorLogPath -Raw -Encoding UTF8 | ConvertFrom-Json } catch { $latestErrorJson = $null }
+}
+if ($null -ne $latestErrorJson) {
+    if ($latestErrorJson.source -ne "quality-gate" -or $latestErrorJson.passed -lt 5) {
         $secScore -= 1
     }
 } else {
@@ -250,24 +270,23 @@ Add-Dimension "BP" $bpScore @{
 
 $corruptedFiles = 0
 if ($hasSkills) {
-    # FOREACH (not ForEach-Object) — avoids multiline pipeline parsing bug
+    # Reuses $skillByteCache built above — no second physical read of SKILL.md
     foreach ($file in $skillMdFiles) {
-        try {
-            $bytes = [System.IO.File]::ReadAllBytes($file.FullName)
-            $isCorrupted = $false
-            for ($i = 0; $i -lt $bytes.Length - 3; $i++) {
-                # Check for double-encoded UTF-8 (mojibake) patterns
-                if ($bytes[$i] -eq 0xC3 -and $bytes[$i + 1] -eq 0x83 -and $bytes[$i + 2] -ge 0x80) {
-                    $isCorrupted = $true; break
-                }
-                if ($bytes[$i] -eq 0xC3 -and $bytes[$i + 1] -eq 0xA2 -and
-                    $i + 2 -lt $bytes.Length -and $bytes[$i + 2] -eq 0xE2 -and
-                    ($bytes[$i + 3] -eq 0x80 -or $bytes[$i + 3] -eq 0x82)) {
-                    $isCorrupted = $true; break
-                }
+        $bytes = $skillByteCache[$file.FullName]
+        if (-not $bytes) { continue }
+        $isCorrupted = $false
+        for ($i = 0; $i -lt $bytes.Length - 3; $i++) {
+            # Check for double-encoded UTF-8 (mojibake) patterns
+            if ($bytes[$i] -eq 0xC3 -and $bytes[$i + 1] -eq 0x83 -and $bytes[$i + 2] -ge 0x80) {
+                $isCorrupted = $true; break
             }
-            if ($isCorrupted) { $corruptedFiles++ }
-        } catch { Write-Debug "score-dims: $($_.Exception.Message)" }
+            if ($bytes[$i] -eq 0xC3 -and $bytes[$i + 1] -eq 0xA2 -and
+                $i + 2 -lt $bytes.Length -and $bytes[$i + 2] -eq 0xE2 -and
+                ($bytes[$i + 3] -eq 0x80 -or $bytes[$i + 3] -eq 0x82)) {
+                $isCorrupted = $true; break
+            }
+        }
+        if ($isCorrupted) { $corruptedFiles++ }
     }
 }
 
@@ -495,13 +514,12 @@ if ($bitacoraContent) {
     $delegationScore = $math::Min(10, $math::Round($subagentMentions, 0))
 }
 
-# Gate Pass Rate: from capture-errors quality-gate data
+# Gate Pass Rate: from capture-errors quality-gate data (reuses $latestErrorJson)
 $gatePassRate = $null
 $gatePassScore = 0
-$latErrorPath = "docs/metricas/errors/LATEST_error.json"
-if (Test-Path $latErrorPath) {
+if ($null -ne $latestErrorJson) {
     try {
-        $latError = Get-Content $latErrorPath -Raw -Encoding UTF8 | ConvertFrom-Json
+        $latError = $latestErrorJson
         if ($latError.source -eq "quality-gate" -and $latError.total -gt 0) {
             $gatePassRate = $latError.passed / $latError.total
             $gatePassScore = $math::Round($gatePassRate * 10, 1)
@@ -615,10 +633,25 @@ $subScores += $auditFreshScore
 
 # --- SD extra sub-dims ---
 
+# Skill coverage scans — ONE pass over SKILL.md files collecting all flags
+# (redirect / changelog / triggers / Refs) instead of 4 separate scans.
+$redirectSkills = @()
+$skillsWithChangelog = 0
+$skillsWithTriggers = 0
+$skillsWithRefs = 0
+if ($hasSkills) {
+    foreach ($sm in $skillMdFiles) {
+        $content = $skillContentCache[$sm.FullName]
+        if ($sm.Directory.Name -ne '_shared' -and $content -match 'MERGED into|redirect') { $redirectSkills += $sm }
+        if ($content -match 'changelog:') { $skillsWithChangelog++ }
+        if ($content -match 'triggers:')  { $skillsWithTriggers++ }
+        if ($content -match '##\s*Refs')  { $skillsWithRefs++ }
+    }
+}
+
 # Skill Redirect Validation: % of redirect skills pointing to valid targets
 $redirectScore = 10
-if ($hasSkills) {
-    $redirectSkills = @($skillMdFiles | Where-Object { $_.Directory.Name -ne '_shared' -and $skillContentCache[$_.FullName] -match 'MERGED into|redirect' })
+if ($redirectSkills.Count -gt 0) {
     $validRedirects = 0
     foreach ($rs in $redirectSkills) {
         $targetMatch = [regex]::Match($skillContentCache[$rs.FullName], 'MERGED into (\S+)')
@@ -627,7 +660,7 @@ if ($hasSkills) {
             if (Test-Path ".agents/skills/$targetName/SKILL.md") { $validRedirects++ }
         }
     }
-    $redirectScore = if ($redirectSkills.Count -gt 0) { $math::Round($validRedirects / $redirectSkills.Count * 10, 1) } else { 10 }
+    $redirectScore = $math::Round($validRedirects / $redirectSkills.Count * 10, 1)
 }
 $subScores += $redirectScore
 
@@ -651,17 +684,14 @@ $testCoverageScore = if ($totalScripts -gt 0) { $math::Round($testedScripts.Coun
 $subScores += $testCoverageScore
 
 # Skill Changelog Coverage: % of skills with changelog in frontmatter
-$skillsWithChangelog = if ($hasSkills) { @($skillMdFiles | Where-Object { $skillContentCache[$_.FullName] -match 'changelog:' }).Count } else { 0 }
 $changelogScore = if ($totalSkills -gt 0) { $math::Round($skillsWithChangelog / $totalSkills * 10, 1) } else { 0 }
 $subScores += $changelogScore
 
 # Skill Trigger Coverage: % of skills with triggers in frontmatter
-$skillsWithTriggers = if ($hasSkills) { @($skillMdFiles | Where-Object { $skillContentCache[$_.FullName] -match 'triggers:' }).Count } else { 0 }
 $triggerScore = if ($totalSkills -gt 0) { $math::Round($skillsWithTriggers / $totalSkills * 10, 1) } else { 0 }
 $subScores += $triggerScore
 
 # Skill Refs Coverage: % of skills with ## Refs section
-$skillsWithRefs = if ($hasSkills) { @($skillMdFiles | Where-Object { $skillContentCache[$_.FullName] -match '##\s*Refs' }).Count } else { 0 }
 $refsScore = if ($totalSkills -gt 0) { $math::Round($skillsWithRefs / $totalSkills * 10, 1) } else { 0 }
 $subScores += $refsScore
 

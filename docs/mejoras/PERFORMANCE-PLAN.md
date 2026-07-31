@@ -1,7 +1,7 @@
 # Plan de Mejoras de Performance
 
 **Fecha inicio:** 2026-07-11
-**Ultima actualizacion:** 2026-07-11
+**Ultima actualizacion:** 2026-07-31
 **Objetivo:** Reducir tiempo de `!ship` de ~46s a ~1-2s
 
 ## Mediciones Base
@@ -23,15 +23,15 @@
 |----|--------|--------|-----------------|-------------|
 | P0-1 | pssa-gate: solo escanear archivos cambiados (git diff) | ✅ Completado | 2-3h | subagent |
 | P0-2 | score-auto: reemplazar Start-Job por Start-ThreadJob | ✅ Completado | 1h | subagent |
-| P0-3 | pssa-gate: cache de resultados por sesion | 🔲 Pendiente | 1-2h | subagent |
+| P0-3 | pssa-gate: cache de resultados por sesion | ✅ Completado | 1-2h | subagent |
 
 ### P1 - Impacto Medio
 
 | ID | Mejora | Estado | Tiempo Estimado | Responsable |
 |----|--------|--------|-----------------|-------------|
 | P1-1 | Verificar si run-tests.ps1 corre multiples veces en !ship | 🔲 Pendiente | 1h | subagent |
-| P1-2 | score-auto: leer SKILL.md una sola vez, reusar en hashtable | 🔲 Pendiente | 2-3h | subagent |
-| P1-3 | Merge Select-String passes en score-dims.ps1 | 🔲 Pendiente | 1-2h | subagent |
+| P1-2 | score-auto: leer SKILL.md una sola vez, reusar en hashtable | ✅ Completado | 2-3h | subagent |
+| P1-3 | Merge Select-String passes en score-dims.ps1 | ✅ Completado | 1-2h | subagent |
 
 ### P2 - Impacto Bajo
 
@@ -48,6 +48,9 @@
 | 2026-07-11 | - | Mediciones iniciales | Baseline: 46s |
 | 2026-07-11 | P0-2 | Start-Job → Start-ThreadJob (3 calls) | **Real: -4.7s** (37s → 32.3s, sin cache) |
 | 2026-07-11 | P0-1 | pssa-gate.ps1: added `-Mode Incremental` — scans only `git diff --cached` .ps1 files, falls back to full scan if none | **Fallback test OK** — 32.7s (sin archivos staged) |
+| 2026-07-31 | P0-3 | pssa-gate: session cache keyed por git HEAD + count/mtime/size de .ps1 (JSON en %TEMP%\opencode, nombre hasheado). Cache hit salta Invoke-ScriptAnalyzer, shape identica (RuleName/ScriptName/ScriptPath/Line/Severity) | Full scan 42-58s → cache hit **4.2-6.4s (~10x)**; exit 0 + PASSED, misma deuda (946 viol, 91 manual) |
+| 2026-07-31 | P1-2 | score-dims: cada SKILL.md se lee **1 vez** (bytes → texto UTF-8 derivado + bytes reusados por Or). El hashtable existente queda como fuente unica | 82/82 skill files: texto identico a Get-Content -Raw; sin cambio de scores |
+| 2026-07-31 | P1-3 | score-dims: Select-String sobre scripts reemplazado por regex sobre $scriptContentCache (line-split); LATEST_error.json leido 1 vez (Sec + SD); 4 scans de skills (redirect/changelog/triggers/refs) fusionados en 1 pasada | Flags identicos (1/1, 0/0, 82/82, 68/68); secret scan booleano identico; sin cambio de scores |
 
 ## Resultados Verificados
 
