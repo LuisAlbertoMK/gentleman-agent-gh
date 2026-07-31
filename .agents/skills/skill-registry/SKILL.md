@@ -4,6 +4,10 @@ description: "Build and maintain skill registry — scan skill directories, dedu
 triggers: "Skill registry, catalog"
 ---
 
+## When to Use
+Build and maintain skill registry — scan skill directories,
+
+
 Trigger: "update skills", after install/remove skills.
 ## STEPS1. Scan: ~/.config/opencode/skills/*/, ~/.claude/skills/, project .claude/.gemini/.agent/skills/   Skip: sdd-*, _shared, skill-registry   Dedupe: project-level wins2. Compact rules: 5-15 lines, actionable, NO fluff3. Conventions: agents.md/CLAUDE.md/.cursorrules/GEMINI.md → extract paths4. Write: .atl/skill-registry.md + mem_save
 ## OUTPUT

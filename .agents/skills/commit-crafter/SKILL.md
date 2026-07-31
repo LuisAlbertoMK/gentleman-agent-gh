@@ -3,6 +3,10 @@ name: commit-crafter
 description: Craft conventional commit messages from diff analysis.
 triggers: "commit, mensaje, commit message, conventional commit, git commit, craft commit"
 ---
+
+## When to Use
+Craft conventional commit messages from diff analysis.
+
 <!-- karpathy-compressed: 2026-07-09 -->
 ## Type Detection
 | Type | Trigger | Diff Pattern | Example |

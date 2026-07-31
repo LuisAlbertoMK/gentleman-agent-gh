@@ -4,6 +4,10 @@ description: "PDF processing — extract text, parse tables, generate reports"
 triggers: "PDF, extract PDF, parse PDF, merge PDF, generate PDF, PDF table, PDF invoice, read PDF, PDF to text, PDF to markdown"
 ---
 
+## When to Use
+PDF processing — extract text, parse tables, generate report
+
+
 ## Tools
 | Tool | Use | Speed | Install |
 |------|-----|-------|---------|

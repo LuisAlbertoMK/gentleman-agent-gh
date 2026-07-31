@@ -3,7 +3,8 @@ name: deep-debugging
 description: "Trigger: deep debug, root cause, hypothesis, multi-file bug, ambiguous failure. Hypothesis-driven debugging methodology."
 triggers: "deep debug, root cause, hypothesis, multi-file bug, ambiguous failure, debug, RCA"
 ---
-## WHEN: Multi-file bugs, ambiguous failures. NOT for 1-file edits (→ quick-executor), architecture decisions (→ senior-engineer), or refactors (→ refactoring-planner).
+## When to Use
+Multi-file bugs, ambiguous failures. NOT for 1-file edits (→ quick-executor), architecture decisions (→ senior-engineer), or refactors (→ refactoring-planner).
 
 ## METHODOLOGY: Hypothesis-Driven Debugging
 

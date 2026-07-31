@@ -6,7 +6,7 @@ triggers: "Test/verify skill, coverage"
 
 Trigger: After creating/modifying skill, before production use.
 
-## When
+## When to Use
 
 - After new/edited skill
 - Pre-critical-task verification

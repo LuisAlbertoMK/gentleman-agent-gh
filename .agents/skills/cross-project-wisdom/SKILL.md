@@ -4,6 +4,10 @@ description: "Load patterns from prior projects relevant to the current task —
 triggers: "patterns, wisdom, lesson learned, in another project I, last time this, cross-project, retrospectiva, experiencia previa, !wisdom, pattern guard"
 ---
 
+## When to Use
+Load patterns from prior projects relevant to the current ta
+
+
 ## Pattern Load
 
 1. Read all JSON files from `docs/cross-project/patterns/*.json`

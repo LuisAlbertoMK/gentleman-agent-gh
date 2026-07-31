@@ -3,7 +3,7 @@ name: session-resume
 description: "Session continuity — save/restore state, git gate, sparse skill pre-load, Engram recall"
 triggers: "session resume, dónde lo dejamos, continuá, session start, code memory, memory, recordar, acordate, multi-session, donde quedamos, handoff"
 ---
-## Gate
+## When to Use
 1. is git repo? NO → `mem_context` only. YES → check 2 states.
 2. Dirty (uncommitted)? WARN+ask: commit/stash/continue.
 3. Ahead (unpushed)? WARN+ask: push/keep/continue.

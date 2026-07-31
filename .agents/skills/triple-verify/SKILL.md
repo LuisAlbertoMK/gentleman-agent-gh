@@ -3,6 +3,10 @@ name: triple-verify
 description: "Triple verification — 3 enfoques, thresholds por zona, modos !ship/!fast/!draft"
 triggers: "Triple verify, triangulate, 3 enfoques, !ship, !listo, !fast, !draft"
 ---
+
+## When to Use
+Triple verification — 3 enfoques, thresholds por zona, modos
+
 ## Zones
 Zones, thresholds, verify depth defined in `review-rules.jsonc`.
 - **Roja**: full triple-verify (E1+E2+E3)

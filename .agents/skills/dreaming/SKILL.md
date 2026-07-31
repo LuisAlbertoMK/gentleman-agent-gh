@@ -3,7 +3,7 @@ name: dreaming
 description: "Cross-session pattern extraction via Engram. Run via !dream — not automatic."
 triggers: "!dream, dreaming, patrones, memory review, session end, !close, pattern extraction"
 ---
-## TRIGGER
+## When to Use
 Only on explicit request (`!dream`) or user asking. Recommended weekly or after milestone.
 **Auto-pattern**: same error 3x → `auto-pattern-detector.ps1` → propose anti-pattern to immune-system.
 

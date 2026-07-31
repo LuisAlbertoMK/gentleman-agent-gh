@@ -4,6 +4,10 @@ description: "5-phase improvement cycle for external projects — 3+ subagents p
 triggers: "improve external project, mejora proyecto, proyecto externo, 5-phase cycle, ciclo 5 fases, analizá este proyecto, corré el ciclo, revisame el proyecto, !5fases, !extimprove, aplicá las 5 fases"
 ---
 
+## When to Use
+5-phase improvement cycle for external projects — 3+ subagen
+
+
 ## 5-Phase Cycle
 
 Each phase: 3+ subagents via `task()` or `delivery-harness`. Return 4-field: `Decision Taken | Files Changed | Key Findings | Nuance`.

@@ -3,7 +3,8 @@ name: docs-audit
 description: "Trigger: documentation audit, README audit, API docs, onboarding docs, Diátaxis, docs completeness. Audit documentation quality and accuracy."
 triggers: "documentation audit, README audit, API docs, onboarding docs, Diátaxis, docs completeness, docs review, doc audit"
 ---
-## WHEN: Reviewing documentation quality, README files, API docs, onboarding. If no docs → report and stop.
+## When to Use
+Reviewing documentation quality, README files, API docs, onboarding. If no docs → report and stop.
 
 ## SCAN DIMENSIONS
 

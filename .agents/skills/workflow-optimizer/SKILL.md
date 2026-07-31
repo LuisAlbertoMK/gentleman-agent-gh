@@ -4,6 +4,9 @@ description: "Optimize workflow patterns — faster info access, reduced token w
 triggers: [optimize-workflow, faster-access, token-optimization, workflow-pattern, information-access, fluidez]
 ---
 
+## When to Use
+
+
 # Workflow Optimizer — Faster, Smarter, Leaner
 
 ## Core Principles

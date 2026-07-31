@@ -4,6 +4,10 @@ description: "Image optimization — compress, convert WebP/AVIF, resize, descri
 triggers: "compress image, optimize image, resize image, convert webp, convert avif, describe image, image too heavy, slow images, image bug"
 ---
 
+## When to Use
+Image optimization — compress, convert WebP/AVIF, resize, de
+
+
 ## Tools
 | Tool | Use | Install |
 |------|-----|---------|

@@ -3,7 +3,8 @@ name: llm-security
 description: "Trigger: LLM, AI, prompt injection, RAG, OpenAI, Anthropic, Ollama, LangChain, agent, tool use, data exfiltration. Audit LLM integration security."
 triggers: "LLM, AI, prompt injection, RAG, OpenAI, Anthropic, Ollama, LangChain, agent, tool use, data exfiltration, model"
 ---
-## WHEN: Reviewing LLM integrations, AI features, RAG pipelines, or "is this LLM integration secure"
+## When to Use
+Reviewing LLM integrations, AI features, RAG pipelines, or "is this LLM integration secure"
 
 ## SCAN DIMENSIONS (by integration type)
 

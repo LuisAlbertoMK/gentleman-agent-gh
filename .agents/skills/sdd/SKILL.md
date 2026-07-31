@@ -4,6 +4,10 @@ description: "Unified SDD pipeline — 9 phases from init through archive. Use s
 triggers: "SDD pipeline, SDD phase, spec-driven development"
 ---
 
+## When to Use
+Unified SDD pipeline — 9 phases from init through archive. U
+
+
 # SDD Pipeline
 
 **Fast path for LOW-risk changes:** `{file:sdd-quick/SKILL.md}` — 3 phases instead of 9.

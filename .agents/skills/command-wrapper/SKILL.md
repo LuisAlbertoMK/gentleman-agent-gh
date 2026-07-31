@@ -4,6 +4,10 @@ description: "Run commands safely — description, error handling, output parsin
 triggers: "Command wrapper, error handling, output parsing"
 ---
 
+## When to Use
+Run commands safely — description, error handling, output pa
+
+
 Trigger: Running bash commands, detecting errors, parsing output.
 
 ## COMMAND CONTRACT

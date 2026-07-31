@@ -3,7 +3,7 @@ name: auto-metrics
 description: "Self-evaluation scoring. Trigger via !score or !metrics — not automatic."
 triggers: "!score, !metrics, explicit score/metric request, session end via !close"
 ---
-## TRIGGER
+## When to Use
 Only run on explicit request (!score, !metrics, !close) or user asking for score.
 NOT automatic after every task — eliminated to reduce ceremony for trivial changes.
 

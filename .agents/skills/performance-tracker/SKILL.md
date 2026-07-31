@@ -3,6 +3,10 @@ name: performance-tracker
 description: "Score and track app performance — 6 dims, continuous scoring, trend analysis"
 triggers: "performance score, mobile perf, desktop perf, rendimiento, app score, lighthouse, benchmark"
 ---
+
+## When to Use
+Score and track app performance — 6 dims, continuous scoring
+
 ## Scope
 App PERFORMANCE (not agent — use `auto-metrics`). Mobile (Android/iOS), Desktop (Win/Mac/Linux), Web.
 ## 6 Dimensions (1-10)

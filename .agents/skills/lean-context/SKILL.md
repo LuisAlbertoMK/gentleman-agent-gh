@@ -4,6 +4,10 @@ description: "Unified compression levels — LEAN, ULTRA, and CAVEMAN modes for 
 triggers: "Ultra-lean default, compact responses, caveman, /caveman"
 ---
 
+## When to Use
+Unified compression levels — LEAN, ULTRA, and CAVEMAN modes
+
+
 LEAN/ULTRA: default. CAVEMAN: on-demand. Trigger: "stop caveman" → LEAN. New session → default.
 
 ## LEVELS

@@ -5,7 +5,8 @@ triggers: "Code review, CR, revisar código, criticar"
 ---
 4R: each R scored independently→verdict+fixes.
 
-## When: User asks CR·pre-commit complex·pre-merge high-impact PRs
+## When to Use
+User asks CR·pre-commit complex·pre-merge high-impact PRs
 
 ## 4R
 R Risk(error/edge/nil/rollback/monitor)30%|Readability(naming/structure/load/patterns)20%|Reliability(retry/timeout/consistency/data/error-prop)25%|Resilience(fault-isolation/backpressure/circuit-breaker/degradation/recovery)25%

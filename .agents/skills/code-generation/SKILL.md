@@ -3,7 +3,8 @@ name: code-generation
 description: "Trigger: new file, new function, code generation, script, boilerplate, scaffold. Write code matching codebase patterns."
 triggers: "new file, new function, code generation, script, boilerplate, scaffold, create code, write code"
 ---
-## WHEN: New files, new functions, scripts, boilerplate. NOT for debugging (→ deep-debugging) or single-line fixes on existing files (→ quick-executor).
+## When to Use
+New files, new functions, scripts, boilerplate. NOT for debugging (→ deep-debugging) or single-line fixes on existing files (→ quick-executor).
 
 ## WORKFLOW
 1. **CONTEXT**: Read target dir → identify 2-3 relevant files by: (a) files imported by target path, (b) files in same module, (c) similar naming. Read each. Match patterns (imports, naming, error handling, types).

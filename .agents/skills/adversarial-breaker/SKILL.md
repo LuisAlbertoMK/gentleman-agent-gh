@@ -5,7 +5,8 @@ triggers: "adversarial, breaker, !breaker, verify fix, romper, verificar fix, tr
 ---
 Builder≠Evaluator. Independent adversarial check after fix.
 
-## When: fixer done+ROJA/AMARILLA(auth/storage/API)+not config-only. Skip:VERDE·non-code·comments·docs. Token-save:diff<10L+config/lock/docs.
+## When to Use
+fixer done+ROJA/AMARILLA(auth/storage/API)+not config-only. Skip:VERDE·non-code·comments·docs. Token-save:diff<10L+config/lock/docs.
 
 ## Protocol
 1.Bundle:diff+changed_files+fixer_claims+test_results+zone+pipeline_mode

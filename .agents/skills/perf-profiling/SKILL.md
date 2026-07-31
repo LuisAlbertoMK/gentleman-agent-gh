@@ -3,7 +3,8 @@ name: perf-profiling
 description: "Trigger: performance profiling, slow queries, N+1, memory leak, CPU hotspot, profiling, query optimization. Performance audit with measurement."
 triggers: "performance profiling, slow queries, N+1, memory leak, CPU hotspot, profiling, query optimization"
 ---
-## WHEN: Performance profiling, slow queries, memory leaks, CPU bottlenecks. If no performance issue → report and stop.
+## When to Use
+Performance profiling, slow queries, memory leaks, CPU bottlenecks. If no performance issue → report and stop.
 
 ## STEP 1: MEASURE (before grep)
 - **Go**: `go test -bench=. -benchmem -cpuprofile=cpu.prof`

@@ -4,6 +4,10 @@ description: |
 triggers: test, e2e, playwright, browser testing, interactive testing, form testing
 ---
 
+## When to Use
+|
+
+
 # E2E Testing Skill
 
 Hybrid: **simple scripts** for quick checks + **Playwright test runner** for comprehensive testing.

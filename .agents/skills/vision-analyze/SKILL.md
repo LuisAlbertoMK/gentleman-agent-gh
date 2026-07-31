@@ -4,6 +4,10 @@ description: "Local vision analysis — screenshots, UI review, error detection 
 triggers: [screenshot, capture, vision, analyze-ui, visual-review, captura, analizar-imagen]
 ---
 
+## When to Use
+Local vision analysis — screenshots, UI review, error detect
+
+
 # Vision Analyze — Local Screenshot Analysis
 
 ## Setup

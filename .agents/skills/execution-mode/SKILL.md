@@ -4,6 +4,10 @@ description: "Auto-detect task execution mode — QUICK/THOROUGH/DRAFT — based
 triggers: "Execution mode, quick/thorough/draft, resource adaptive, zone green/yellow/orange/red"
 ---
 
+## When to Use
+Auto-detect task execution mode — QUICK/THOROUGH/DRAFT — bas
+
+
 ## Modes
 | Mode | When | Depth | Verification |
 |------|------|-------|-------------|

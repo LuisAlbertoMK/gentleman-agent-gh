@@ -4,6 +4,10 @@ description: "Permanent immunity against repeated errors — detect, diagnose, d
 triggers: "Immune System, anti-pattern, permanent immunity"
 ---
 
+## When to Use
+Permanent immunity against repeated errors — detect, diagnos
+
+
 ## Protocol — Every failure = asset. Once documented -> permanent immunity.
 
 ### 1. DETECT

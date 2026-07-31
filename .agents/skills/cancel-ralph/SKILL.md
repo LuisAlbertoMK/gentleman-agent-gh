@@ -4,6 +4,10 @@ description: Cancel active Ralph Loop
 triggers: "cancel ralph, stop loop, cancel loop, ralph stop, end loop"
 ---
 
+## When to Use
+Cancel active Ralph Loop
+
+
 # Cancel Ralph
 
 Stop an active Ralph Loop before completion.

@@ -4,7 +4,7 @@ description: "Plan commits as reviewable work units."
 triggers: "work unit, commit splitting, commit organization, reviewable commits, split commit, stacked PR, chained PR commits"
 ---
 
-## When
+## When to Use
 - Splitting feature into reviewable work units
 - Preparing commits before PR
 - Turning large change into chained/stacked PRs

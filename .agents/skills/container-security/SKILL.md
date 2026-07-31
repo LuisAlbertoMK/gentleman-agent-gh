@@ -3,7 +3,8 @@ name: container-security
 description: "Trigger: Dockerfile, docker-compose, container, image, Kubernetes, k8s, pod, deployment, helm. Audit container security and orchestration hardening."
 triggers: "Dockerfile, docker-compose, container, image, Kubernetes, k8s, pod, deployment, helm, docker, orchestration"
 ---
-## WHEN: Reviewing Dockerfiles, docker-compose, K8s manifests, Helm charts, or "is this container secure"
+## When to Use
+Reviewing Dockerfiles, docker-compose, K8s manifests, Helm charts, or "is this container secure"
 
 ## SCAN DIMENSIONS
 

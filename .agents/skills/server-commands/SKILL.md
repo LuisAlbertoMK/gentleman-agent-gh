@@ -4,6 +4,10 @@ description: "Run long-lived server processes safely — dev-server.ps1, port de
 triggers: "server, ng serve, npm run dev, dotnet run, python -m http.server, dev server, background process, long-lived, !dev"
 ---
 
+## When to Use
+Run long-lived server processes safely — dev-server.ps1, por
+
+
 Commands like `ng serve`, `npm run dev`, `dotnet run`, `python -m http.server`
 start SERVERS that **never finish**. DO NOT run them via the bash tool directly.
 

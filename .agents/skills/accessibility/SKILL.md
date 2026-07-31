@@ -3,6 +3,10 @@ name: accessibility
 description: "WCAG 2.2 + EAA 2025 — audit and improve web accessibility."
 triggers: "a11y, accessibility, WCAG, screen reader, keyboard navigation, EAA, European Accessibility Act, contrast, focus, touch target"
 ---
+
+## When to Use
+WCAG 2.2 + EAA 2025 — audit and improve web accessibility.
+
 <!-- karpathy-compressed: 2026-07-09 -->
 ## POUR — Perceivable | Operable | Understandable | Robust
 **Perceivable**: 1.1.1 img→alt (deco→`alt=""`, icon→`aria-label`, complex→`aria-describedby`) · 1.4.3/1.4.6 Contrast: normal 4.5:1(AA)/7:1(AAA), large 3:1(AA)/4.5:1(AAA), UI/focus 3:1 · 1.2 Media: captions+desc

@@ -4,7 +4,7 @@ description: "Split oversized changes into chained PRs that protect review focus
 triggers: "chained PR, stacked PR, sequential branches, PR chain, stacked branches, PR stack, oversized PR, 400 lines, review slices"
 ---
 
-## Activation Contract
+## When to Use
 
 Load this skill when a planned PR may exceed **400 changed lines**, SDD forecasts `400-line budget risk: High` or `Chained PRs recommended: Yes`, or the user asks for chained/stacked PRs, review slices, or reviewer-load control.
 

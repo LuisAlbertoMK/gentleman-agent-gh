@@ -3,6 +3,10 @@ name: self-improvement
 description: "Continuous improvement cycle — macro (cycle) + micro (per-task). Merge of self-reflection. inter(30) minimum. SkillOpt-style gated validation."
 triggers: "Self-improvement, improvement cycle, auto-mejora, ciclo de mejora, comienza ciclo, self-reflection, Hermes, reflexioná"
 ---
+
+## When to Use
+Continuous improvement cycle — macro (cycle) + micro (per-ta
+
 ## MACRO (cycle-level) — "comienza ciclo de auto-mejora"
 1st: READ CYCLE.md. Then: Pre-Flight → Diagnose → SkillOpt Gate (per fix) → Verify → Learn → Propagate → Epoch Review.
 Validate per fix: SKILL.md lines ≤20%/size<3KB, .ps1 syntax parse, config trivial. Accept if target≥+0.1 and no dim≤-0.3.

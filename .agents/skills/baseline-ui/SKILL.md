@@ -3,6 +3,10 @@ name: baseline-ui
 description: "Anti-slop UI — layout, typography, responsive, animation, tokens. Use for cleanup or polish."
 triggers: "ui cleanup, polish interface, fix layout, ui slop, generic ui, design review, responsive, container query, flexbox, grid, ui audit"
 ---
+
+## When to Use
+Anti-slop UI — layout, typography, responsive, animation, to
+
 **Stack**: Existing CSS/Tailwind·`cn()`(clsx+tailwind-merge) React·No new approach unless project uses
 **Scope**: Audit&cleanup. For implementation→load **ui-engine** after.
 

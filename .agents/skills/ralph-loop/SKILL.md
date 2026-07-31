@@ -4,6 +4,10 @@ description: Start Ralph Loop - auto-continues until task completion
 triggers: "ralph, ralph loop, auto-continue, iterative loop, /ralph-loop, continuous task, autonomous loop"
 ---
 
+## When to Use
+Start Ralph Loop - auto-continues until task completion
+
+
 # Ralph Loop
 
 Start an iterative development loop that automatically continues until the task is complete.

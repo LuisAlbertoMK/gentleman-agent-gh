@@ -3,6 +3,10 @@ name: quality-gate
 description: "Pre-commit gate — TDD + Pester tests pass, secrets scan, conventional commit, PSSA gate"
 triggers: "Quality gate, pre-commit, PSSA gate"
 ---
+
+## When to Use
+Pre-commit gate — TDD + Pester tests pass, secrets scan, con
+
 **Trigger**: Before ANY `git commit`/`push`/`gh pr create`—ALL gates MUST pass.
 **Portable**: Steps 4/5/6 depend on repo scripts. Missing→`[SKIP]`+warn, continue.
 

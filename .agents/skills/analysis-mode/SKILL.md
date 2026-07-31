@@ -3,6 +3,10 @@ name: analysis-mode
 description: "Trigger: !analisis, !analysis, multi-agent analysis. Read-only 4-phase pipeline."
 triggers: "!analisis, !analysis, analysis mode, multi-agent analysis, smart analysis"
 ---
+
+## When to Use
+Trigger: !analisis, !analysis, multi-agent analysis. Read-on
+
 `!analisis`/`!analysis` as first token.
 
 **Loading**: `skill(name="analysis-mode")`. Fail→`Read` this file(project→global). External: copy to `<project>/.agents/skills/analysis-mode/`.

@@ -3,7 +3,8 @@ name: auth-hardening
 description: "Trigger: auth, authentication, authorization, JWT, OAuth, RBAC, CSRF, session, login, password hashing. Audit and harden authentication and authorization."
 triggers: "auth, authentication, authorization, JWT, OAuth, RBAC, CSRF, session, login, password hashing, token, cookie"
 ---
-## WHEN: Reviewing auth flows, login/signup, token handling, RBAC, or "is this auth secure"
+## When to Use
+Reviewing auth flows, login/signup, token handling, RBAC, or "is this auth secure"
 
 ## SCAN DIMENSIONS
 

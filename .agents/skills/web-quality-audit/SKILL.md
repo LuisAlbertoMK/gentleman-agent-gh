@@ -3,6 +3,10 @@ name: web-quality-audit
 description: "Comprehensive web audit: performance, a11y, SEO, responsive, animation, design tokens."
 triggers: "audit, review web quality, lighthouse, page quality, optimize website, design audit, ui audit, web audit, site review"
 ---
+
+## When to Use
+Comprehensive web audit: performance, a11y, SEO, responsive,
+
 **Pre-req**: Target running+accessible. Public URL(no auth/CAPTCHA/WAF).
 
 ## Perf(30%): LCP<2.5s|INP<200ms|CLS<0.1. WebP/AVIF, code-split, font-display:swap, preconnect, preload LCP, lazy. scheduler.yield(), transform+opacity, scroll-driven

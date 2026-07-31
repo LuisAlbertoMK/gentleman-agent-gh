@@ -3,6 +3,10 @@ name: best-practices
 description: Apply modern web development best practices for security, compatibility, and code quality.
 triggers: "best practices, security audit, modernize code, code quality, check vulnerabilities"
 ---
+
+## When to Use
+Apply modern web development best practices for security, co
+
 # Best practices — modern web dev standards
 ## Security
 HTTPS+HSTS: No mixed. Strict-Transport-Security: max-age=31536000; includeSubDomains; preload

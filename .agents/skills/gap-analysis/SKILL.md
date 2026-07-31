@@ -3,6 +3,10 @@ name: gap-analysis
 description: "Complete gap analysis — 8-dim quality framework, project intake, priority scoring"
 triggers: "Gap analysis, system audit, identificar gaps, project intake"
 ---
+
+## When to Use
+Complete gap analysis — 8-dim quality framework, project int
+
 ## Intake: Classify Tech (Frontend|Backend|DB|Mobile|Desktop|Infra|Full-stack) | Biz (SaaS|ERP|E-com|CMS|API|Web|Desktop|Mobile). Verify: ROADMAP.md | git log | PRD/requirements/spec | README | tests/__tests__/spec | CI/CD config | monitoring
 ## 8 Dims (1-10): 9-10=Leading | 7-8=Minor | 5-6=Needs attention | 3-4=Systemic | 1-2=Rebuild
 1. **UI/UX** (Design, flows, a11y) | 2. **Security** (Auth, encryption, vulns, compliance) | 3. **Optimization** (Bundle, code-split, cache, lazy) | 4. **Performance** (Load, API latency, DB) | 5. **Resource** (Mem, CPU, storage, net) | 6. **Velocity** (Build, dev loop, CI/CD) | 7. **Responsive** (Mobile-first, breakpoints, touch) | 8. **Infra** (Docker, cloud, scaling, DR)

@@ -3,6 +3,10 @@ name: engram-protocol
 description: "Persistent memory protocol — save, search, dreaming, session lifecycle via Engram MCP"
 triggers: "remember, recall, engram, mem_save, mem_search, session close, dreaming, memory, token budget, compression, L1 L2 L3, capture pipeline, project score, bias calibration"
 ---
+
+## When to Use
+Persistent memory protocol — save, search, dreaming, session
+
 **Save**: arch decisions·bugs·tools·config·gotchas·patterns·prefs. Diff topics→reuse `topic_key`; unsure→`mem_suggest_topic_key`. Critical=immediate, minor=flush end.
 
 ## Token Budget

@@ -7,7 +7,7 @@ triggers: "Bitacora, historial, histórico, qué pedí, request log"
 Historical log of user requests per session. Auto-append on session end.
 Trigger: "bitacora", "historial", "histórico", "peticiones", "qué pedí", "request log".
 
-## When
+## When to Use
 - User asks "qué pedí", "bitácora", "historial", "request log"
 - Session end: auto-append entry to `BITACORA.md`
 

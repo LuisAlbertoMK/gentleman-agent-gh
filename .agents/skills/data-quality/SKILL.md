@@ -3,7 +3,8 @@ name: data-quality
 description: "Trigger: data audit, data pipeline audit, schema validation, data governance, ETL audit. Audit data layer quality and reliability."
 triggers: "data audit, data pipeline audit, schema validation, data governance, ETL audit, data quality check, data review"
 ---
-## WHEN: Reviewing data pipelines, schemas, ETL processes, analytics. If no data layer → report and stop.
+## When to Use
+Reviewing data pipelines, schemas, ETL processes, analytics. If no data layer → report and stop.
 
 ## AUDIT ORDER: Schema → Ingestion → Transformation → Output
 

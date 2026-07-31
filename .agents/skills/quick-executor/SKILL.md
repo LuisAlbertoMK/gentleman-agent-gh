@@ -3,7 +3,8 @@ name: quick-executor
 description: "Trigger: quick edit, single file, atomic edit, fast fix, one-line fix. Single-file low-risk changes."
 triggers: "quick edit, single file, atomic edit, fast fix, one-line fix, small change, quick fix"
 ---
-## WHEN: 1 file, clear before/after, low risk. SCOPE GUARD: >1 file → STOP, report to orchestrator or delegate to plan-execution.
+## When to Use
+1 file, clear before/after, low risk. SCOPE GUARD: >1 file → STOP, report to orchestrator or delegate to plan-execution.
 
 ## WORKFLOW
 1. **READ** target file. Not exists → delegate to code-generation. Never create files directly.

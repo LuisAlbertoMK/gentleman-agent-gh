@@ -4,6 +4,10 @@ description: "Iterative prompt optimization — write, measure, cut, repeat with
 triggers: "Karpathy loop, optimize prompt, measure tokens"
 ---
 
+## When to Use
+Iterative prompt optimization — write, measure, cut, repeat
+
+
 ## STYLE (5 Rules)
 1. **ID+TASK=ENOUGH** — identity + task = sufficient context
 2. **MINIMAL** — no 10+ item lists or paragraphs

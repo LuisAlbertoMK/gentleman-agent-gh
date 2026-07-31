@@ -3,6 +3,10 @@ name: skill-graph
 description: "Sparse loading — resolve only relevant skills + dependencies, digest per context budget"
 triggers: "sparse loading, skill resolution, relevant skills, which skill, skill-graph"
 ---
+
+## When to Use
+Sparse loading — resolve only relevant skills + dependencies
+
 ## RESOLVE
 ```powershell
 .\scripts\skill-graph.ps1 -Task "<task>" [-Expand N] [-Format Json|Csv]

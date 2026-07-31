@@ -3,6 +3,10 @@ name: ui-engine
 description: "UI system — Grid/Flexbox/@layer/:has(), container queries, compositor-only animation, OKLCH tokens, component patterns"
 triggers: "ui, layout, responsive, animation, design tokens, css, grid, flexbox, container query, dark mode, component layout, page layout, component patterns, hooks, compound components, state management"
 ---
+
+## When to Use
+UI system — Grid/Flexbox/@layer/:has(), container queries, c
+
 ## Decision Tree
 `1D→Flex|2D→Grid|Child→Subgrid|Parent→:has()|Unknown→auto-fit,minmax(280px,1fr)|CQ(container-type:inline-size)|Page→MQ`
 

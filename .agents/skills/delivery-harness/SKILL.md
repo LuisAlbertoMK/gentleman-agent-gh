@@ -4,6 +4,10 @@ description: "Orchestrate multi-agent work — break goals into work units, dele
 triggers: "Coordinate, orchestrate, multi-agent, delegate work"
 ---
 
+## When to Use
+Orchestrate multi-agent work — break goals into work units,
+
+
 Trigger: Multi-step tasks, parallel subagent work, complex deliverables.
 
 ## WORKFLOW

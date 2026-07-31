@@ -4,6 +4,10 @@ description: "Route tasks by model strength — specialized agents for analysis,
 triggers: "model router, routing, delegate or direct, model decision, specialized agent, implementer"
 ---
 
+## When to Use
+Route tasks by model strength — specialized agents for analy
+
+
 ## ⚠️ SECURITY GATE (always first)
 1. Credentials/secrets/PII? → **DIRECT**
 2. Recurring task (cron/CI)? → **DIRECT**

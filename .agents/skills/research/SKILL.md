@@ -6,7 +6,7 @@ triggers: "Research task, technical investigation, investigar, research, learn n
 
 Structured research: scope, gather, synthesize, decide.
 
-## When
+## When to Use
 Tech evaluation | Library comparison | Architecture research | Security audit | Performance investigation | New domain | Pre-PoC
 
 ## Workflow

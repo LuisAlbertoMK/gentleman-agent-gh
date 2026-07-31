@@ -3,7 +3,8 @@ name: security-scanner
 description: "Pre-commit security scan — detect secrets, injection patterns, dependency vulnerabilities, supply chain risks, and dangerous API usage"
 triggers: "Security, seguridad, vulnerabilidad, auditar, safe check, harden"
 ---
-## WHEN: Before committing sensitive code, deploying, or user asks "is this secure"
+## When to Use
+Before committing sensitive code, deploying, or user asks "is this secure"
 ## SCAN DIMENSIONS
 **Secrets**: `grep: sk-[a-zA-Z0-9]+, BEGIN.*KEY, password\s*=` | **Injection**: Concatenated queries, raw `exec()` | **Sensitive APIs**: `eval()`, `exec()`, `unsafe`, `os/exec` | **Supply Chain**: lockfile integrity, npm audit, typosquatting, postinstall scripts | **Dependencies**: `go list -m` + `npm audit` + safety | **Config**: Debug mode, permissive CORS, no HTTPS | **File access**: Path traversal, symlink attacks | **API Security**: Rate limiting, input validation, request size limits
 ## QUICK PATTERNS

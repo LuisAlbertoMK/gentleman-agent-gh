@@ -6,7 +6,7 @@ triggers: "Mapear, project map, estructura, tech stack, arquitectura"
 
 Scan project structure, detect stack, classify architecture. Auto-link to gap-analysis.
 
-## When
+## When to Use
 New project, unfamiliar codebase, "how is this structured"
 
 ## Project Type

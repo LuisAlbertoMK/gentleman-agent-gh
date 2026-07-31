@@ -4,7 +4,8 @@ description: "Manual pipeline to promote a recurring pattern to an auto-generate
 triggers: "forge, promote pattern, auto-skill, forjar, convertir patrón, skill desde patrón, cross-project-forge"
 ---
 
-## Gate — Is this pattern ready to forge?
+## When to Use
+Is this pattern ready to forge?
 
 Check severity threshold:
 

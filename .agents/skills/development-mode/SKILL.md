@@ -3,6 +3,10 @@ name: development-mode
 description: "System resource prioritization — RAM/CPU/GPU/file I/O optimization. NOT task execution mode (see execution-mode)."
 triggers: "modo desarrollo, dev mode, development mode, performance mode, resource priority"
 ---
+
+## When to Use
+System resource prioritization — RAM/CPU/GPU/file I/O optimi
+
 ## Complementary: opencode-skillful (-30-50%) · opencode-dcp (-50-70%) · context-mode (-98%) · opencode-lazy-loader
 ## Activate (on user approval)
 **Process Priority**: `Get-Process "opencode*","node*","bun*" | ForEach-Object { $_.PriorityClass = [System.Diagnostics.ProcessPriorityClass]::High }`

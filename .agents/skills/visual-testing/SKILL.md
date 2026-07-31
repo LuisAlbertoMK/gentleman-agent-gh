@@ -3,6 +3,10 @@ name: visual-testing
 description: "Visual verification — screenshots, visual regression, UI bug detection"
 triggers: "screenshot, visual diff, visual bug, regression test, VRT, UI broken, text overflow, layout shift, responsive test, visual regression"
 ---
+
+## When to Use
+Visual verification — screenshots, visual regression, UI bug
+
 **Tool**: Playwright—`npx playwright test --project=chromium`
 
 ## Setup

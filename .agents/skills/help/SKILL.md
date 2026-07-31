@@ -3,6 +3,10 @@ name: help
 description: "Explain Ralph Loop plugin and available commands"
 triggers: "help, ralph help, commands, available commands, what can you do, /help"
 ---
+
+## When to Use
+Explain Ralph Loop plugin and available commands
+
 ## /ralph-loop `<task>`: Iterative loop. Auto-continues until `<promise>DONE</promise>`.
 ## /cancel-ralph: Cancel active loop.
 

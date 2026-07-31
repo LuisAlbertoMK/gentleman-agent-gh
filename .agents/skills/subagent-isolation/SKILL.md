@@ -4,6 +4,10 @@ description: "Maintain clean context boundaries between delegated agents — pre
 triggers: "Subagent isolation, context boundaries"
 ---
 
+## When to Use
+Maintain clean context boundaries between delegated agents —
+
+
 ## Isolation Rules
 ### Fresh context per delegation
 Each `delegate` starts CLEAN. Include ALL context needed. Reference Engram IDs. File context -> paths + what to look for.
