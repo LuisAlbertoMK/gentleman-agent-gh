@@ -25,11 +25,12 @@ if (test-path $gA) { Write-Host ("  Global: " + (Get-Line $gA) + "L, " + (Get-By
 Write-Host "<<< Skills - line count >>>"
 $bSD = Join-Path $BDir "skills"
 $rSD = Join-Path (Join-Path $RDir ".agents") "skills"
-try { $bSk = Get-ChildItem -Directory -LiteralPath $bSD -EA Stop | ForEach-Object { $_.Name } } catch { Write-Warning "b skills $($bSD): $_"; $bSk = @() }
-try { $rSk = Get-ChildItem -Directory -LiteralPath $rSD -EA Stop | ForEach-Object { $_.Name } } catch { Write-Warning "r skills $($rSD): $_"; $rSk = @() }
-$c = $bSk | Where-Object { $rSk -contains $_ }
-$oB = $bSk | Where-Object { $rSk -notcontains $_ }
-$oR = $rSk | Where-Object { $bSk -notcontains $_ }
+if (-not (Test-Path $BDir)) { Write-Warning "Backup dir no existe: $BDir — las metricas B seran 0. Usa -BDir con un backup valido." }
+try { $bSk = @(Get-ChildItem -Directory -LiteralPath $bSD -EA Stop | ForEach-Object { $_.Name }) } catch { Write-Warning "b skills $($bSD): $_"; $bSk = @() }
+try { $rSk = @(Get-ChildItem -Directory -LiteralPath $rSD -EA Stop | ForEach-Object { $_.Name }) } catch { Write-Warning "r skills $($rSD): $_"; $rSk = @() }
+$c = @($bSk | Where-Object { $rSk -contains $_ })
+$oB = @($bSk | Where-Object { $rSk -notcontains $_ })
+$oR = @($rSk | Where-Object { $bSk -notcontains $_ })
 $tB = 0; $tR = 0
 foreach ($s in $c) { $tB += (Get-Line (Join-Path $bSD "$s\SKILL.md")); $tR += (Get-Line (Join-Path $rSD "$s\SKILL.md")) }
 $dL = $tR - $tB
@@ -81,10 +82,10 @@ Write-Host ("  StrictMd: B 0 -> R " + $sm + "/" + $rs)
 Write-Host ("  catche:  B 0 -> R " + $ct)
 Write-Host "<<< Infra (no existía en backup) >>>"
 $tsP = Join-Path $RDir "scripts\skill-test-suite.ps1"
-$qgP = Join-Path $RDir ".githooks\pre-commit"
+$qgP = Join-Path $RDir ".githooks\pre-commit-gate.ps1"
 $crP = Join-Path $RDir "scripts\cross-ref-check.ps1"
 $tsS = if (test-path $tsP) { "EXISTS (" + (Get-Line $tsP) + "L)" } else { "MISSING" }
-$qgS = if (test-path $qgP) { "EXISTS (4 checks)" } else { "MISSING" }
+$qgS = if (test-path $qgP) { $qgChecks = [regex]::Matches((Get-Content $qgP -Raw -EA Stop), 'Write-Host\s*"\[(\d+)/').Count; "EXISTS ($qgChecks checks)" } else { "MISSING" }
 $crS = if (test-path $crP) { "EXISTS (" + (Get-Line $crP) + "L)" } else { "MISSING" }
 Write-Host ("  Test suite: " + $tsS)
 Write-Host ("  QGate:      " + $qgS)

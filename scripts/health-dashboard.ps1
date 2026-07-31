@@ -17,6 +17,7 @@ param(
     [string]$OutputPath = "docs\health-report.html",
     [switch]$OpenInBrowser
 )
+Set-StrictMode -Version Latest
 
 $ErrorActionPreference = 'Stop'
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
