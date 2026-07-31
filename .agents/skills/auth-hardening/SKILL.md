@@ -48,7 +48,7 @@ Reviewing auth flows, login/signup, token handling, RBAC, or "is this auth secur
 - Pattern: `{found}` → Fix: `{fix}`
 ```
 
-## RULES
+## Rules
 1. JWT alg FIRST. 2. Role checks BEFORE data. 3. CSRF on ALL state-changing. 4. bcrypt/argon2 ONLY. 5. End: "Remaining risk: NONE/LOW/MED/HIGH (why)"
 
 ## Refs

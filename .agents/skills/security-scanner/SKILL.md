@@ -22,7 +22,7 @@ Before committing sensitive code, deploying, or user asks "is this secure"
 # CRITICAL: {type} in {file:line}
 - Pattern: `{found}` → Fix: `{fix}`
 ```
-## RULES
+## Rules
 1. Run `grep` before manual inspection. Tool first. 2. Critical+High must fix before commit. Medium→suggest. 3. Verify FPs — don't auto-flag env vars. 4. Issues found? Always provide fix, not just warning. 5. End with: "Remaining risk: NONE/LOW/MED/HIGH (why)"
 
 ## Refs

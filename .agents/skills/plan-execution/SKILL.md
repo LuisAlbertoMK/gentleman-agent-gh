@@ -56,7 +56,7 @@ Single task timeout: 5 min. If exceeded → escalate.
 - Last commit: [hash]
 ```
 
-## RULES
+## Rules
 1. Isolate before execute. 2. Verify EVERY task. 3. Rollback on failure. 4. 3 total or 2 consecutive failures → STOP.
 
 ## Refs

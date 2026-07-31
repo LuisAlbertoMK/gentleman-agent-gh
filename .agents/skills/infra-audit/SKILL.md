@@ -47,7 +47,7 @@ Reviewing infrastructure (Terraform, Docker, K8s, CI/CD, Helm, Ansible, CloudFor
 ### Risk: [NONE/LOW/MED/HIGH] — [why]
 ```
 
-## RULES
+## Rules
 1. Audit what's present (progressive). 2. Remote state FIRST. 3. Container security before CI. 4. Pin everything. 5. Both .yaml and .yml.
 
 ## Refs

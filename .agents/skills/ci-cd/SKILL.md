@@ -5,7 +5,7 @@ triggers: "CI/CD pipeline, GitHub Actions, quality gate"
 ---
 Trigger: CI setup, failed PR checks, pipeline config.
 
-## RULES
+## Rules
 Quality gate before tests(fail fast)·Tests on every push·Lint advisory·CI pass before merge·PR checks include spec coverage if SDD
 
 ## LOCAL PRE-PUSH: 1.Quality gate(secrets,commit format) 2.Tests(auto-detect) 3.Lint(if available)

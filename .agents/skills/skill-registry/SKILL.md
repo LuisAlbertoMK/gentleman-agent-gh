@@ -5,20 +5,31 @@ triggers: "Skill registry, catalog"
 ---
 
 ## When to Use
-Build and maintain skill registry — scan skill directories,
+Build and maintain skill registry — scan, dedupe, compact, persist. Trigger: "update skills", after install/remove skills.
 
+## Steps
+1. Scan: `~/.config/opencode/skills/*/`, `~/.claude/skills/`, project `.claude/.gemini/.agent/skills/` — skip `sdd-*`, `_shared`, `skill-registry`; dedupe: project-level wins
+2. Compact rules: 5-15 lines, actionable, NO fluff
+3. Conventions: `agents.md`/`CLAUDE.md`/`.cursorrules`/`GEMINI.md` → extract paths
+4. Write: `.atl/skill-registry.md` + `mem_save`
 
-Trigger: "update skills", after install/remove skills.
-## STEPS1. Scan: ~/.config/opencode/skills/*/, ~/.claude/skills/, project .claude/.gemini/.agent/skills/   Skip: sdd-*, _shared, skill-registry   Dedupe: project-level wins2. Compact rules: 5-15 lines, actionable, NO fluff3. Conventions: agents.md/CLAUDE.md/.cursorrules/GEMINI.md → extract paths4. Write: .atl/skill-registry.md + mem_save
-## OUTPUT
-```markdown# Registry
-## Skills | Trigger | Skill | Path |
-## Compact Rules |
-### {name} - Rule1 |
-## Conventions | File | Path |
+## Output
+```markdown
+# Registry
+
+| Skills | Trigger | Skill | Path |
+| Compact Rules | | | |
+| {name} | Rule1 | | |
+| Conventions | File | Path | |
 ```
-## RULES- ALWAYS write .atl/skill-registry.md- ALWAYS mem_save if available- Compact rules: 5-15 lines each- NO skills → write empty registry
-## EXAMPLE REGISTRY
+
+## Rules
+- ALWAYS write `.atl/skill-registry.md`
+- ALWAYS `mem_save` if available
+- Compact rules: 5-15 lines each
+- NO skills → write empty registry
+
+## Example Registry
 ```
 ## Skills
 | Trigger | Skill | Path |
@@ -26,7 +37,8 @@ Trigger: "update skills", after install/remove skills.
 | code review, 4R | code-review-agent | .agents/skills/code-review-agent/SKILL.md |
 | commit | commit-crafter | .agents/skills/commit-crafter/SKILL.md |
 ```
-## DEDUPLICATION RULES
+
+## Deduplication Rules
 - Project-level skills WIN over global (~/.config/opencode/)
 - Same trigger on multiple skills → keep the more specific one
 - Identical rules → merge, keep the shorter version

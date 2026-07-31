@@ -48,7 +48,7 @@ Reviewing data pipelines, schemas, ETL processes, analytics. If no data layer â†
 - P1: [improvement]
 ```
 
-## RULES
+## Rules
 1. Schema BEFORE ingestion. 2. Measure data (profiling) not just code (grep). 3. Every finding: file:line + evidence.
 
 ## Refs

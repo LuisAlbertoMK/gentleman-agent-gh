@@ -53,7 +53,7 @@ Reviewing LLM integrations, AI features, RAG pipelines, or "is this LLM integrat
 - Pattern: `{found}` → Fix: `{fix}`
 ```
 
-## RULES
+## Rules
 1. Prompt injection FIRST. 2. RAG per-user. 3. Tool privilege boundaries. 4. Output sanitization. 5. End: "Remaining risk: NONE/LOW/MED/HIGH (why)"
 
 ## Refs

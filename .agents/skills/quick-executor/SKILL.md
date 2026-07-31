@@ -38,7 +38,7 @@ If invoked directly (not via orchestrator): report issues as findings, do not es
 Changed [file] (lines N-M). Verified: [pass/fail].
 ```
 
-## RULES
+## Rules
 1. Max 1 file. No exceptions. 2. No rename/extract/refactor adjacent code. 3. No new dependencies. 4. Risk heuristic: size + complexity + deps → if any borderline → STOP.
 
 ## Refs

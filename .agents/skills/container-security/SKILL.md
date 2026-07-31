@@ -51,7 +51,7 @@ Reviewing Dockerfiles, docker-compose, K8s manifests, Helm charts, or "is this c
 - Pattern: `{found}` → Fix: `{fix}`
 ```
 
-## RULES
+## Rules
 1. USER FIRST. 2. Secrets in ENV/ARG = CRITICAL. 3. Multi-stage for prod. 4. Pin versions. 5. End: "Remaining risk: NONE/LOW/MED/HIGH (why)"
 
 ## Refs

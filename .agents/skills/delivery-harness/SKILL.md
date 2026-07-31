@@ -24,7 +24,7 @@ Trigger: Multi-step tasks, parallel subagent work, complex deliverables.
 6. **Reconcile** — merge outputs, resolve conflicts (or escalate)
 7. **Report** — one status: units done, failures, rollback path
 
-## RULES
+## Rules
 - Parallelize ONLY truly independent units
 - If B depends on A → serial, never speculate
 - Each unit MUST have: success criteria, rollback command, max retries (default: 1)

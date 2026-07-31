@@ -8,7 +8,7 @@ triggers: "chained PR, stacked PR, sequential branches, PR chain, stacked branch
 
 Load this skill when a planned PR may exceed **400 changed lines**, SDD forecasts `400-line budget risk: High` or `Chained PRs recommended: Yes`, or the user asks for chained/stacked PRs, review slices, or reviewer-load control.
 
-## Hard Rules
+## Rules
 
 - Split PRs over **400 changed lines** unless a maintainer explicitly accepts `size:exception`.
 - Keep each PR reviewable in about **≤60 minutes**.

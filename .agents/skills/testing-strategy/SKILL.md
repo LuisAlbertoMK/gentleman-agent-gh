@@ -7,7 +7,7 @@ triggers: "testing strategy, test plan, test coverage, test pyramid, test debt, 
 **Output**: Strategy doc/gap analysis—NOT test files/scripts.
 **Mode**: READ-ONLY. Recommend, don't implement.
 
-## Hard Rules
+## Rules
 1.NEVER write test files—delegate to e2e-testing/api-testing/quality-gate
 2.ALWAYS reference existing tests before recommending
 3.Risk:P0=core,P2=nice-to-have

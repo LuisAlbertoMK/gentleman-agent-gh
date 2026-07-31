@@ -32,7 +32,7 @@ If request matches quick-executor scope (single existing file, clear before/afte
 Created/modified [file]. Pattern matched from [source]. Ready for review.
 ```
 
-## RULES
+## Rules
 1. Read before write. Never generate without seeing patterns. 2. Existing files → patch-first. New files → full write. 3. New dependency → STOP, report [name]+[why]+[alternative].
 
 ## Refs

@@ -44,7 +44,7 @@ Performance profiling, slow queries, memory leaks, CPU bottlenecks. If no perfor
 - P2: [finding + evidence]
 ```
 
-## RULES
+## Rules
 1. Measure before optimize (profiling first, grep second). 2. Focus P1s. 3. Every finding: file:line + evidence.
 
 ## Refs

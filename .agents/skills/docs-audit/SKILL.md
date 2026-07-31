@@ -32,7 +32,7 @@ Is the reader trying to understand why? → EXPLANATION
 ```
 Flag gaps: if only one type exists, others are likely missing.
 
-## RULES
+## Rules
 1. **Accuracy BEFORE completeness.** Wrong docs are worse than missing docs. Flag wrong info as CRIT, missing docs as MED.
 2. Diátaxis categories first. 3. Every finding: file:line + severity. 4. End with prioritized action plan.
 

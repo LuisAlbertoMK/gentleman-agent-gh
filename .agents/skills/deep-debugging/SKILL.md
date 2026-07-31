@@ -46,7 +46,7 @@ After 4+ hypothesis rounds: summarize findings, save progress, compress context 
 - Verification: [command + expected]
 ```
 
-## RULES
+## Rules
 1. Max 5 hypotheses before narrowing. Max 3 cycles total. 2. Unclear after 3 cycles → STOP, ask human. 3. Never refactor during bug fix. 4. Verify with evidence, not assumptions.
 
 ## Refs

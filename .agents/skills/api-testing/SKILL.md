@@ -7,7 +7,7 @@ triggers: "api testing, API test, REST test, GraphQL test, endpoint test, contra
 **Mode**: READ-ONLY analysis or test-gen. NEVER call production.
 **Output**: Test plan/collection with assertions, not raw curl.
 
-## Hard Rules
+## Rules
 1.NEVER production/unknown—mock/localhost only. 2.NEVER real credentials—env vars. 3.Format:`.bru`(Bruno)>JSON(Postman)>.ps1 4.Schema:JSON Schema Draft2020-12/OpenAPI3.1 5.Auth:mocked tokens—never real OAuth.
 
 ## Workflow
