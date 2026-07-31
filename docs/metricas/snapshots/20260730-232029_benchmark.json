@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-07-30T23:20:29.0616025-06:00",
+  "system": {
+    "MaxSkillBytes": 3059,
+    "MedianSkillBytes": 2465,
+    "WhenToUsePct": 85.2,
+    "SkillsOver3kb": 0,
+    "RulesPct": 40.7,
+    "TotalSkillBytes": 202236,
+    "ScriptsCount": 78,
+    "AgentsMdLines": 57,
+    "TotalSkillLines": 4753,
+    "FrontmatterPct": 100.0,
+    "MinSkillBytes": 1746,
+    "AvgSkillBytes": 2497.0,
+    "GlobalJunctionsOk": 81,
+    "AgentsMdBytes": 2909,
+    "TotalSkills": 81
+  },
+  "version": "1.0",
+  "commit": "3f13c84b"
+}
