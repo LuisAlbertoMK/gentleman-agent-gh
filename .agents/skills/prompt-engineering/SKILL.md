@@ -3,6 +3,10 @@ name: prompt-engineering
 description: "Design effective prompts using SPEARS framework — scope, principles, examples, assertions, refinements, with ReAct and multi-agent patterns"
 triggers: "Improve prompt, security, ReAct, multi-agent"
 ---
+
+## When to Use
+Design effective prompts using SPEARS framework — scope, principles, examples, assertions, refinements, with ReAct and multi-agent patterns
+
 <!-- karpathy-compressed: 2026-07-09 -->
 ## Rules
 1. **Scope first**: `for [X], in:[Y], out:[Z]` before writing

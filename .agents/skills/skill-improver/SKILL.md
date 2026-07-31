@@ -3,6 +3,10 @@ name: skill-improver
 description: "Audit and improve skills — preserve author intent, fix frontmatter, convert tutorial prose to actionable rules, track usage"
 triggers: "Skill improvement, audit skills, refactor skills, skill refresher, drift detection, auto-heal"
 ---
+
+## When to Use
+Audit and improve skills — preserve author intent, fix frontmatter, convert tutorial prose to actionable rules, track usage
+
 <!-- karpathy-compressed: 2026-07-10 -->
 
 # Skill Improver

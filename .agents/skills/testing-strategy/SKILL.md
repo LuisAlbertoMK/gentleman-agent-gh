@@ -3,6 +3,10 @@ name: testing-strategy
 description: "Test strategy & planning — pyramid analysis, coverage gaps, risk-based prioritization, test debt assessment, ROI-driven test investment."
 triggers: "testing strategy, test plan, test coverage, test pyramid, test debt, test gap, test priority, test audit, quality strategy, what to test, how to test"
 ---
+
+## When to Use
+Test strategy & planning — pyramid analysis, coverage gaps, risk-based prioritization, test debt assessment, ROI-driven test investment.
+
 **Scope**: Test planning/strategy—NOT execution(see `e2e-testing`,`api-testing`,`quality-gate`).
 **Output**: Strategy doc/gap analysis—NOT test files/scripts.
 **Mode**: READ-ONLY. Recommend, don't implement.

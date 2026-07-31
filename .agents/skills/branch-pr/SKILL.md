@@ -3,6 +3,10 @@ name: branch-pr
 description: "Create Gentle AI pull requests with issue-first checks. Trigger: creating, opening, or preparing PRs for review."
 triggers: "pull request, create PR, open PR, branch naming, PR creation, review PR, github pull request"
 ---
+
+## When to Use
+Create Gentle AI pull requests with issue-first checks. Trigger: creating, opening, or preparing PRs for review.
+
 ## Rules
 1. **PR MUST link approved issue** — `Closes/Fixes/Resolves #<N>` in body. Issue MUST have `status:approved`. No link → CI rejects.
 2. **Exactly one `type:*` label** — CI rejects 0 or multiple.

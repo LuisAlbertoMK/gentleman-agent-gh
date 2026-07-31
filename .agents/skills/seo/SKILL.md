@@ -3,7 +3,8 @@ name: seo
 description: "Search engine visibility & ranking — technical SEO, on-page, structured data, E-E-A-T, AI Overviews"
 triggers: "seo, search engine, meta tags, structured data, sitemap, search optimization, ranking, schema, robots.txt, meta description, EEAT, E-E-A-T, AI Overview, SGE, AI Mode, generative search, AEO, GEO, INP, Google Core Update, GA4, topical authority, content cluster"
 ---
-WHEN:SEO audit/meta/sitemap/Core Update/AI Overviews/E-E-A-T/CWV/INP. NOT:content writing/link building/PPC/social. Pre-reqs:Site public·GSC·PageSpeed·RichResultsTest
+## When to Use
+SEO audit/meta/sitemap/Core Update/AI Overviews/E-E-A-T/CWV/INP. NOT:content writing/link building/PPC/social. Pre-reqs:Site public·GSC·PageSpeed·RichResultsTest
 
 ## Rules:1.Indexability first|2.Accuracy>completeness—validate|3.No keyword-stuffing/doorways/link-schemes/AI-scaled|4.Snippet=AI eligibility|5.llms.txt/chunking/AEO/GEO debunked(Google June 2026)
 

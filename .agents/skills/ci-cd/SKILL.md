@@ -3,7 +3,8 @@ name: ci-cd
 description: "CI/CD pipeline setup — GitHub Actions, local pre-push quality gate, auto-detect test runner, SDD spec coverage"
 triggers: "CI/CD pipeline, GitHub Actions, quality gate"
 ---
-Trigger: CI setup, failed PR checks, pipeline config.
+## When to Use
+CI setup, failed PR checks, pipeline config.
 
 ## Rules
 Quality gate before tests(fail fast)·Tests on every push·Lint advisory·CI pass before merge·PR checks include spec coverage if SDD

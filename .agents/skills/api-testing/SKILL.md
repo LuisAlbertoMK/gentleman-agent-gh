@@ -3,6 +3,10 @@ name: api-testing
 description: "API endpoint testing — REST + GraphQL contract validation, schema assertion, collection testing, response validation, auth flows, mock integration."
 triggers: "api testing, API test, REST test, GraphQL test, endpoint test, contract test, schema validation, response validation, auth test, API mock, collection test, Postman, Bruno, insomnia, OpenAPI validation"
 ---
+
+## When to Use
+API endpoint testing — REST + GraphQL contract validation, schema assertion, collection testing, response validation, auth flows, mock integration.
+
 **Scope**: API endpoint behavior—request/response contracts, not UI/infra.
 **Mode**: READ-ONLY analysis or test-gen. NEVER call production.
 **Output**: Test plan/collection with assertions, not raw curl.

@@ -3,6 +3,10 @@ name: judgment-day
 description: "Dual adversarial review orchestrator — 2 profile-scoped code-review-agent instances, verdict synthesis"
 triggers: "Judgment day, JD, dual review, juzgar, adversarial review"
 ---
+
+## When to Use
+Dual adversarial review orchestrator — 2 profile-scoped code-review-agent instances, verdict synthesis
+
 <!-- karpathy-compressed: 2026-07-10 -->
 
 # Judgment Day

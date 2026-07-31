@@ -3,7 +3,8 @@ name: issue-creation
 description: "Create Gentle AI issues with issue-first checks."
 triggers: "create issue, GitHub issue, bug report, feature request, open issue, issue creation, report bug"
 ---
-**Use**: Bug in `gga`·Feature/enhancement·Gentleman-Programming/gentle-ai·Triaging
+## When to Use
+Bug in `gga`·Feature/enhancement·Gentleman-Programming/gentle-ai·Triaging
 
 ## Rules
 1.Blank issues❌—MUST use `.github/ISSUE_TEMPLATE/bug_report.yml` or `feature_request.yml`
