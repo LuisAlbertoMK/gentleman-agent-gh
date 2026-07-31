@@ -2,7 +2,7 @@
 
 > Top-20 daily-use skills. Full table: all 78 skills — use `skill` tool or read this file for complete list.
 >
-> **Version**: 5.2 | **Changelog**: 5.2 (archived 3 dead: cognitive-doc-design, prompt-engineering, senior-engineer → .archive/skills; count 81→78 per cross-ref-check); 5.1 (sync count 93→81 per filesystem audit); 5.0 (compact top-20 table for token reduction); 4.7 (+1 new: adversarial-breaker; count 92→93); 4.6 (count corrected 80→92 per filesystem audit)
+> **Version**: 5.2 | **Changelog**: 5.2 (archived 3 dead: cognitive-doc-design, prompt-engineering, senior-engineer → .archive/skills; count 81→78 per cross-ref-check; global discoverable 93→165 per FS scan: 78 project + 87 global, excl. _shared); 5.1 (sync count 93→81 per filesystem audit); 5.0 (compact top-20 table for token reduction); 4.7 (+1 new: adversarial-breaker; count 92→93); 4.6 (count corrected 80→92 per filesystem audit)
 
 ## Top 20 Daily-Use Skills
 
@@ -48,7 +48,7 @@
 
 ## Load Rule
 
-1. `skill` tool with name (skills.paths registered in opencode.json — 93 skills globally discoverable)
+1. `skill` tool with name (skills.paths registered in opencode.json — 165 skills globally discoverable: 78 project + 87 global)
 2. Fallback: `read skills/{name}/SKILL.md` directly from disk
 3. Assets: `read skills/{name}/references/` or `skills/{name}/assets/` for templates
 

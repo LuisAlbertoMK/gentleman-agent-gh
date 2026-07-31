@@ -1,4 +1,4 @@
-﻿<!-- gentle-ai:persona -->
+<!-- gentle-ai:persona -->
 
 ## Quick Navigation
 
@@ -6,7 +6,7 @@
 |----------|---------|
 | [PROTOCOL.md](PROTOCOL.md) | Operational rules, workflows, shortcuts |
 | [SHORTCUTS.md](SHORTCUTS.md) | All `!command` shortcuts |
-| [SKILLS-INDEX.md](SKILLS-INDEX.md) | 79 skills trigger table |
+| [SKILLS-INDEX.md](SKILLS-INDEX.md) | 78 skills trigger table |
 | [QUICKSTART.md](QUICKSTART.md) | Getting started guide |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture |
 
@@ -54,3 +54,4 @@ PS 5.1 rejects `&&`, `||`. Use `Invoke-Bash` wrapper. **Forbidden**: raw bash ca
 <!-- /gentle-ai:agent-protocol -->
 
 <!-- agent-version: 2.2 — Project: gentleman-agent-gh, self-contained -->
+
