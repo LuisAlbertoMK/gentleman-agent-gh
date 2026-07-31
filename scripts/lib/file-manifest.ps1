@@ -37,7 +37,10 @@ function Get-FileManifest {
     if (-not $ForceHash -and (Test-Path $cacheFile)) {
         try {
             $cached = Get-Content -LiteralPath $cacheFile -Raw | ConvertFrom-Json
-            foreach ($p in $cached.stamps.PSObject.Properties) { $prevStamps[$p.Name] = $p.Value }
+            # Guard: cache is per-repo (16-hex key collision) — never load a foreign repo's stamps
+            if ($cached.root -eq $root) {
+                foreach ($p in $cached.stamps.PSObject.Properties) { $prevStamps[$p.Name] = $p.Value }
+            }
         } catch { $prevStamps = @{} }
     }
 
@@ -59,16 +62,23 @@ function Get-FileManifest {
     }
 
     # --- Hash only the changed/new files, in parallel ---
+    # NOTE: ForEach-Object -Parallel does NOT guarantee output order, so each
+    # hash is bound to its own full path (path\tDigest) — never pair by index.
     if ($needHash.Count -gt 0) {
         $hashMap = @{}
-        $hashed = @($needHash | ForEach-Object -Parallel {
+        $needHash | ForEach-Object -Parallel {
             $fp = $_
             $h = [Security.Cryptography.SHA256]::Create()
-            try { ([BitConverter]::ToString($h.ComputeHash([IO.File]::ReadAllBytes($fp)))).Replace('-', '').ToLower() } catch { '' } finally { $h.Dispose() }
-        } -ThrottleLimit 8)
-        for ($i = 0; $i -lt $needHash.Count; $i++) {
-            $rp = $needHash[$i].Substring($root.Length).TrimStart('\').Replace('\', '/')
-            $hashMap[$rp] = $hashed[$i]
+            try {
+                $digest = ([BitConverter]::ToString($h.ComputeHash([IO.File]::ReadAllBytes($fp)))).Replace('-', '').ToLower()
+                "$fp`t$digest"
+            } catch { "$fp`t" } finally { $h.Dispose() }
+        } -ThrottleLimit 8 | ForEach-Object {
+            $pair = $_ -split "`t", 2
+            if ($pair.Count -eq 2 -and $pair[1]) {
+                $rp = $pair[0].Substring($root.Length).TrimStart('\').Replace('\', '/')
+                $hashMap[$rp] = $pair[1]
+            }
         }
         foreach ($m in $manifest) { if (-not $m.sha256) { $m.sha256 = $hashMap[$m.relpath] } }
     }
