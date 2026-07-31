@@ -72,9 +72,12 @@ function Invoke-E2Checks{
     $sf = @($sb_sf.ToString().Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries))
     if($sf.Count-eq0){Add-Check 'Secrets Scan' $true 'No patterns detected'}else{Add-Check 'Secrets Scan' $false "$($sf.Count) potential secrets: $($sf -join '; ')"}
     Push-Location $Root
-    $gs=$(git status --short)
+    # Runtime state files are tracked but legitimately dirty every session
+    # (score auto-updates them). Ignore them for hygiene; real code changes still fail.
+    $rt=@('\.gentleman-mode$','\.project\.json$','BITACORA\.md$')
+    $gs=@(git status --short | Where-Object {$line=$_;$skip=$false;foreach($p in $rt){if($line-match$p){$skip=$true;break}};-not$skip})
     Pop-Location
-    if([string]::IsNullOrWhiteSpace($gs)){Add-Check 'Git Hygiene' $true 'Working tree clean'}else{Add-Check 'Git Hygiene' $false 'Uncommitted changes detected'}
+    if($gs.Count-eq0){Add-Check 'Git Hygiene' $true 'Working tree clean'}else{Add-Check 'Git Hygiene' $false "Uncommitted changes detected: $($gs -join '; ')"}
     $rp=Join-Path $Root 'review-rules.jsonc'
     if(Test-Path $rp){
         try{
