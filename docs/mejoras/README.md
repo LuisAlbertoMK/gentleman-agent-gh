@@ -8,6 +8,7 @@
 | Date | File | Domain | Key Finding | Status |
 |------|------|--------|-------------|--------|
 | 2026-07-31 | [`skill-usage-audit`](2026-07-31-gentleman-agent-gh-analisis.md) | Skills | Uso real (DB 716 sessions): 3 skills muertas, runtime `skill` roto por misconfig (plugin lazy-loader `skill/` vs `skills/`), 3 refs STALE skill-creator, 1 solape real. | 🏁 active (plan) |
+| 2026-07-31 | [`tests-perf`](2026-07-31-gentleman-agent-gh-tests-perf.md) | Testing/Perf | Baseline suite: 553s secuencial / 150.3s paralelo (4.3×). Outliers: _e2e nested+coverage 178s, ScoreIntegration 88s = 42%. CRÍTICO: parallel unsafe (estado compartido: .gentleman-mode, BITACORA, $env:USERPROFILE). Proyección 150s→25-40s. | 🏁 active (plan) |
 | 2026-07-29 | [`global-analysis`](2026-07-29-gentleman-agent-gh-global-analysis.md) | Multi-dimension | 15 findings: 84% sin tests (CRITICAL), score drift 9.1→6.2, .gitleaks vacío, -auto deny lists, bash-safe bypasses, BITACORA 121 dupes. | 🏁 active |
 | 2026-07-29 | [`seo-skill`](2026-07-29-seo-skill-analisis.md) | SEO | v2.1→v3.0 upgrade | ✅ completed |
 | 2026-07-28 | [`tdd-testing`](2026-07-28-gentleman-agent-gh-analysis.md) | Testing | 7 findings — validate-write-scope tests (26), close-session tests (43), restore/forge-rollback tests (18), strict_tdd, pre-commit hook, CodeCoverage, Mock. | ✅ 7/7 completed |

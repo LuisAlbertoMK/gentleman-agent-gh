@@ -9,6 +9,7 @@
 .PARAMETER Path     One or more test file paths (default: scripts/tests/*.Tests.ps1)
 .PARAMETER NoParallel  Disable parallel file execution (Pester 6 only)
 .PARAMETER CodeCoverage Collect code coverage metrics (Pester 5/6 only; < 50% -> exit 10)
+.PARAMETER IncludeE2E Also run -Tag E2E tests (slow integration/coverage runs); excluded by default
 .EXAMPLE
   .\scripts\run-tests.ps1                      # run all, exit 0/1
   .\scripts\run-tests.ps1 -PassThru            # get results object
@@ -19,7 +20,8 @@ param(
     [switch]$PassThru,
     [string[]]$Path,
     [switch]$NoParallel,
-    [switch]$CodeCoverage
+    [switch]$CodeCoverage,
+    [switch]$IncludeE2E
 )
 
 Set-StrictMode -Version Latest
@@ -89,6 +91,15 @@ if ($pester.Version.Major -ge 5) {
             }
         } elseif (-not $Quiet) {
             Write-Warning "No .ps1 files found for code coverage in $PSScriptRoot"
+        }
+    }
+
+    if (-not $IncludeE2E) {
+        if ($cfg.PSObject.Properties['Filter']) {
+            $cfg.Filter.ExcludeTag = 'E2E'
+            if (-not $Quiet) {
+                Write-Host "Excluding -Tag 'E2E' tests (use -IncludeE2E to run them)" -ForegroundColor Yellow
+            }
         }
     }
 

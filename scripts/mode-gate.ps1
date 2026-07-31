@@ -20,6 +20,9 @@
 .PARAMETER Mode
     Override mode check (default: read from .gentleman-mode).
 
+.PARAMETER ModeFilePath
+    Override the mode file path (default: <repo>\.gentleman-mode).
+
 .PARAMETER Json
     Output JSON instead of human-readable text.
 
@@ -35,14 +38,16 @@ param(
     [ValidateSet('manual', 'semi', 'auto')]
     [string]$Mode,
 
-    [switch]$Json
+    [switch]$Json,
+
+    [string]$ModeFilePath
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Path $PSScriptRoot -Parent
-$modeFile = Join-Path -Path $repoRoot '.gentleman-mode'
+$modeFile = if ($ModeFilePath) { $ModeFilePath } else { Join-Path -Path $repoRoot '.gentleman-mode' }
 
 # --- Resolve current mode ---
 if (-not $Mode) {

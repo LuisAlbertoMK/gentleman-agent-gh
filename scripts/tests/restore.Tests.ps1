@@ -3,11 +3,14 @@
 BeforeAll {
     $scriptsRoot = Resolve-Path "$PSScriptRoot/.."
 
+    # Capture FIRST — if any setup below fails, AfterAll restores the real value
+    # (never a $null placeholder)
+    $script:oldUserProfile = $env:USERPROFILE
+
     $tempRoot = Join-Path ([System.IO.Path]::GetTempPath()) "pester-restore-$(Get-Random)"
     $configDir = Join-Path (Join-Path $tempRoot ".config") "opencode"
     New-Item -ItemType Directory -Path (Join-Path $configDir ".git") -Force -ErrorAction Stop | Out-Null
 
-    $script:oldUserProfile = $env:USERPROFILE
     $env:USERPROFILE = $tempRoot
 
     $lines = Get-Content "$scriptsRoot/restore.ps1" -ErrorAction Stop
@@ -41,7 +44,9 @@ BeforeAll {
 }
 
 AfterAll {
-    $env:USERPROFILE = $script:oldUserProfile
+    if ($null -ne $script:oldUserProfile) {
+        $env:USERPROFILE = $script:oldUserProfile
+    }
     Remove-Variable -Name IsLinux -Scope Global -ErrorAction SilentlyContinue
     Remove-Variable -Name IsMacOS -Scope Global -ErrorAction SilentlyContinue
     Remove-Variable -Name checkoutCalled -Scope Global -ErrorAction SilentlyContinue

@@ -32,12 +32,13 @@ param(
     [switch]$Force,
     [switch]$SkipSummaryGate,
     [string[]]$Discoveries,
-    [string[]]$Errors
+    [string[]]$Errors,
+    [string]$BitacoraPath
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path $PSScriptRoot -Parent
-$bitacoraPath = Join-Path -Path $repoRoot -ChildPath "BITACORA.md"
+$bitacoraPath = if ($BitacoraPath) { $BitacoraPath } else { Join-Path -Path $repoRoot -ChildPath "BITACORA.md" }
 # ponytail: protected files — changes to these REQUIRE external audit
 $protectedFiles = @(
     '.agents/skills/security-scanner/',

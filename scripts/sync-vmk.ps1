@@ -154,7 +154,11 @@ function Sync-Config {
 }
 
 # ── Execute ──────────────────────────────────────────────────────────────
-if ($Target -eq "global") {
+if ($env:PESTER_TEST -eq '1') {
+  # Test mode: never write the user's real global config (opencode.json / AGENTS.md).
+  # Sync-Config stays available for tests that pass their own temp TargetPath.
+  Write-Warning "PESTER_TEST=1 — skipping global config apply (test mode)"
+} elseif ($Target -eq "global") {
   Sync-Config -TargetPath $globalPath -Label "global" -PreserveMCP $false
   if (-not $DryRun) {
     $agentsMdDest = Join-Path $globalConfig "AGENTS.md"

@@ -14,18 +14,22 @@ param([switch]$Quiet)
 BeforeAll {
     $scriptsRoot = Resolve-Path "$PSScriptRoot/.."
     $scriptPath = "$scriptsRoot/permission-gate.ps1"
-    $modeFilePath = Resolve-Path "$scriptsRoot/../.gentleman-mode"
-    $script:originalMode = (Get-Content -LiteralPath $modeFilePath -Raw).Trim()
+    $realModeFile = "$scriptsRoot/../.gentleman-mode"
+    $modeFilePath = Join-Path ([System.IO.Path]::GetTempPath()) ("gentleman-mode-test-{0}.txt" -f ([guid]::NewGuid().ToString("N")))
+    $realMode = if (Test-Path -LiteralPath $realModeFile) { (Get-Content -LiteralPath $realModeFile -Raw).Trim() } else { 'manual' }
+    Set-Content -LiteralPath $modeFilePath -Value $realMode -NoNewline -Encoding ASCII -Force
 
     function Invoke-Gate {
         param([string]$Command, [string]$Mode)
-        $output = & $scriptPath -Command $Command -Mode $Mode -Json 2>&1
+        $output = & $scriptPath -Command $Command -Mode $Mode -ModeFilePath $modeFilePath -Json 2>&1
         $output | Out-String | ConvertFrom-Json
     }
 }
 
 AfterAll {
-    $script:originalMode | Set-Content -LiteralPath $modeFilePath -NoNewline -Encoding ASCII -Force
+    if (Test-Path -LiteralPath $modeFilePath) {
+        Remove-Item -LiteralPath $modeFilePath -Force
+    }
 }
 
 # ============================================================

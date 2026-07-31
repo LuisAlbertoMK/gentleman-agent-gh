@@ -4,7 +4,8 @@
     Non-destructive integration tests for close-session.ps1.
 .NOTES
     Tests output format, parameter passthrough, and JSON contract without
-    modifying real project state. The script's internal logic (needsAudit,
+    modifying real project state. BITACORA writes are redirected to a per-run
+    temp file via -BitacoraPath. The script's internal logic (needsAudit,
     bloat detection, session-miner) is covered by 43 unit tests in
     close-session.Tests.ps1 — this file tests the integration surface:
     parameter binding, JSON contract, and error paths.
@@ -14,18 +15,28 @@ BeforeAll {
     $scriptsRoot = Resolve-Path "$PSScriptRoot/.."
     $scriptPath = "$scriptsRoot/close-session.ps1"
 
-    # Create isolated temp dir — the script still resolves its real paths
-    # (BITACORA, .agents/skills/*) from the real repo root via $PSScriptRoot,
-    # so we can't fully isolate without script patching. Instead, we test:
-    #   1. JSON contract shape (Quiet mode)
-    #   2. Parameter binding
-    #   3. Non-modifying output paths
+    # Isolated temp BITACORA — session entries are written there via -BitacoraPath,
+    # so the repo's real BITACORA.md is never read or modified. The remaining
+    # paths resolved from $PSScriptRoot (git status, .agents/skills/*, AGENTS.md
+    # bloat, session-miner check) are read-only in these tests.
+    $bitacoraPath = Join-Path ([System.IO.Path]::GetTempPath()) ("close-session-bitacora-{0}.md" -f ([guid]::NewGuid().ToString("N")))
+    if (Test-Path -LiteralPath "$scriptsRoot/../BITACORA.md") {
+        Copy-Item -LiteralPath "$scriptsRoot/../BITACORA.md" -Destination $bitacoraPath -Force
+    } else {
+        Set-Content -LiteralPath $bitacoraPath -Value "" -Encoding UTF8
+    }
+}
+
+AfterAll {
+    if (Test-Path -LiteralPath $bitacoraPath) {
+        Remove-Item -LiteralPath $bitacoraPath -Force
+    }
 }
 
 Describe "close-session — Integration: JSON contract" {
 
     It "returns valid JSON in -Quiet mode with expected fields" {
-        $output = & $scriptPath -Goal "IntTestGoal" -Description "Int test" -Quiet 2>&1
+        $output = & $scriptPath -Goal "IntTestGoal" -Description "Int test" -BitacoraPath $bitacoraPath -Quiet 2>&1
         $result = $output | Out-String | ConvertFrom-Json
 
         # Contract: all expected fields must exist
@@ -39,7 +50,7 @@ Describe "close-session — Integration: JSON contract" {
     }
 
     It "changeCount is a valid number" {
-        $output = & $scriptPath -Goal "Test" -Description "Int test" -Quiet 2>&1
+        $output = & $scriptPath -Goal "Test" -Description "Int test" -BitacoraPath $bitacoraPath -Quiet 2>&1
         $result = $output | Out-String | ConvertFrom-Json
         $result.changeCount -is [ValueType] | Should -Be $true
         $result.changeCount | Should -BeGreaterOrEqual 0
@@ -49,13 +60,13 @@ Describe "close-session — Integration: JSON contract" {
         # This test runs against the real project's git status
         # If there are any modified protected files, it will flag them
         # If not, protectedTouched will be empty — both are valid
-        $output = & $scriptPath -Goal "Test" -Description "Protected check" -Quiet 2>&1
+        $output = & $scriptPath -Goal "Test" -Description "Protected check" -BitacoraPath $bitacoraPath -Quiet 2>&1
         $result = $output | Out-String | ConvertFrom-Json
         $result.protectedTouched -is [System.Array] | Should -Be $true
     }
 
     It "auditGatePassed is boolean" {
-        $output = & $scriptPath -Goal "Test" -Description "Gate check" -Quiet 2>&1
+        $output = & $scriptPath -Goal "Test" -Description "Gate check" -BitacoraPath $bitacoraPath -Quiet 2>&1
         $result = $output | Out-String | ConvertFrom-Json
         ($result.auditGatePassed -is [bool]) | Should -Be $true
     }
@@ -64,26 +75,26 @@ Describe "close-session — Integration: JSON contract" {
 Describe "close-session — Integration: parameter binding" {
 
     It "accepts -Goal parameter" {
-        $output = & $scriptPath -Goal "Integrate auth middleware" -Description "Test" -Quiet 2>&1
+        $output = & $scriptPath -Goal "Integrate auth middleware" -Description "Test" -BitacoraPath $bitacoraPath -Quiet 2>&1
         $result = $output | Out-String | ConvertFrom-Json
         $result.goal | Should -Be "Integrate auth middleware"
     }
 
     It "accepts -Description parameter" {
-        $output = & $scriptPath -Goal "Test" -Description "Added RBAC support" -Quiet 2>&1
+        $output = & $scriptPath -Goal "Test" -Description "Added RBAC support" -BitacoraPath $bitacoraPath -Quiet 2>&1
         $result = $output | Out-String | ConvertFrom-Json
         # Description is not in JSON output (it's only in BITACORA), but we can verify no error
         $result | Should -Not -BeNullOrEmpty
     }
 
     It "accepts -DryRun flag" {
-        $output = & $scriptPath -Goal "Test" -Description "Dry run" -DryRun -Quiet 2>&1
+        $output = & $scriptPath -Goal "Test" -Description "Dry run" -BitacoraPath $bitacoraPath -DryRun -Quiet 2>&1
         $result = $output | Out-String | ConvertFrom-Json
         $result.action | Should -Be "close-session"
     }
 
     It "accepts -CompactPrompt flag" {
-        $output = & $scriptPath -Goal "Test" -Description "Compact" -CompactPrompt 2>&1
+        $output = & $scriptPath -Goal "Test" -Description "Compact" -BitacoraPath $bitacoraPath -CompactPrompt 2>&1
         $outputString = $output | Out-String
         $outputString | Should -Match "COMPACT PROMPT FOR NEXT SESSION"
     }
@@ -92,7 +103,7 @@ Describe "close-session — Integration: parameter binding" {
 Describe "close-session — Integration: non-Quiet output format" {
 
     It "outputs compact prompt or session header in non-Quiet mode" {
-        $output = & $scriptPath -Goal "Test" -Description "Non-quiet test" 2>&1
+        $output = & $scriptPath -Goal "Test" -Description "Non-quiet test" -BitacoraPath $bitacoraPath 2>&1
         $outputString = $output | Out-String
         # When changes exist, compact prompt takes priority; when clean, SESSION CLOSE shows
         $hasSessionHeader = $outputString -match "SESSION CLOSE"
@@ -101,7 +112,7 @@ Describe "close-session — Integration: non-Quiet output format" {
     }
 
     It "includes branch and goal in output" {
-        $output = & $scriptPath -Goal "TestBranchGoal" -Description "Branch test" 2>&1
+        $output = & $scriptPath -Goal "TestBranchGoal" -Description "Branch test" -BitacoraPath $bitacoraPath 2>&1
         $outputString = $output | Out-String
         $outputString | Should -Match "Branch|COMPACT PROMPT"
         $outputString | Should -Match "TestBranchGoal"

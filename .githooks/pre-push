@@ -18,6 +18,13 @@ if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
   echo ""
 fi
 
+# Early exit: with no staged changes (typical right after a commit), every
+# staged-check in the gate is a guaranteed no-op — skip the full re-run.
+if git diff --cached --quiet; then
+  echo "No staged changes — quality gate already covered by pre-commit"
+  exit 0
+fi
+
 # Run the quality gate on staged changes
 # This catches any issues that --no-verify might have bypassed
 echo "Running quality gate..."

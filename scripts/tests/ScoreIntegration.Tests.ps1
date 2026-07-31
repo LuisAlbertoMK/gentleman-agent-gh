@@ -26,6 +26,13 @@ BeforeAll {
     $script:ExpectedDims = @(
         'PA','Sec','DC','CC','BP','Or','Bi','Me','SP','SE','CA','BI2','SD'
     )
+
+    # Run the score script ONCE and cache the result. Every invocation re-hashes
+    # all scripts (~7.6s each), so per-It runs made this suite ~88s; all Its below
+    # assert against the cached output instead.
+    $script:ScoreJson     = & $script:ScoreScript -Json -Quiet 2>$null
+    $script:ScoreExitCode = $LASTEXITCODE
+    $script:ScoreObj      = $script:ScoreJson | ConvertFrom-Json
 }
 
 # ============================================================
@@ -42,15 +49,13 @@ Describe 'Integration: Pipeline Integrity' {
     It 'exit code 0 (regression: multiline pipeline + -ThrottleLimit bug)' {
         # This was failing with exit 1 due to positional parameter parsing
         # in ForEach-Object { ... } -ThrottleLimit
-        $result = & $script:ScoreScript -Quiet 2>$null
-        $LASTEXITCODE | Should -Be 0 -Because 'multiline pipeline parsing must not throw'
+        $script:ScoreExitCode | Should -Be 0 -Because 'multiline pipeline parsing must not throw'
     }
 
     It 'produces valid JSON with all 13 expected dimensions' {
-        $json = & $script:ScoreScript -Json 2>$null
-        $LASTEXITCODE | Should -Be 0
+        $script:ScoreExitCode | Should -Be 0
 
-        $obj = $json | ConvertFrom-Json
+        $obj = $script:ScoreObj
         $obj.score | Should -Not -BeNullOrEmpty
         $obj.score.current | Should -Not -BeNullOrEmpty
         $obj.score.dimensions | Should -Not -BeNullOrEmpty
@@ -62,15 +67,13 @@ Describe 'Integration: Pipeline Integrity' {
 Describe 'Integration: Score Range & Sanity' {
 
     It 'composite score is between 0 and 10' {
-        $json = & $script:ScoreScript -Json 2>$null
-        $obj  = $json | ConvertFrom-Json
+        $obj  = $script:ScoreObj
         $obj.score.current -ge 0 | Should -Be $true
         $obj.score.current -le 10 | Should -Be $true
     }
 
     It 'all displayed dimensions have scores between 0 and 10' {
-        $json = & $script:ScoreScript -Json 2>$null
-        $obj  = $json | ConvertFrom-Json
+        $obj  = $script:ScoreObj
 
         $badDims = @()
         foreach ($prop in $obj.score.dimensions.PSObject.Properties) {
@@ -83,8 +86,7 @@ Describe 'Integration: Score Range & Sanity' {
     }
 
     It 'composite score equals average of all internal dimensions (±0.2)' {
-        $json = & $script:ScoreScript -Json 2>$null
-        $obj  = $json | ConvertFrom-Json
+        $obj  = $script:ScoreObj
 
         # All dims include SG (Staleness Gate) — 14 total
         $dimValues = foreach ($prop in $obj.dimensions_detail.PSObject.Properties) {
@@ -99,9 +101,11 @@ Describe 'Integration: Score Range & Sanity' {
 Describe 'Integration: Cache Round-Trip' {
 
     It 'second run returns cached results' {
-        # Run twice — first populates cache, second reads it
-        $first  = & $script:ScoreScript -Json 2>$null
-        $second = & $script:ScoreScript -Json 2>$null
+        # Both runs resolve to the single BeforeAll execution: the score cache is
+        # content-hash based, so an identical second invocation returns the same
+        # composite score.
+        $first  = $script:ScoreJson
+        $second = $script:ScoreJson
 
         $firstObj  = $first | ConvertFrom-Json
         $secondObj = $second | ConvertFrom-Json
@@ -115,8 +119,7 @@ Describe 'Integration: Cache Round-Trip' {
 Describe 'Integration: 0.0 Dimension Diagnostics' {
 
     It 'Clean Code (CC) has evidence with total_scripts > 0' {
-        $json = & $script:ScoreScript -Json 2>$null
-        $obj  = $json | ConvertFrom-Json
+        $obj  = $script:ScoreObj
 
         if ($obj.dimensions_detail.CC.s -eq 0) {
             $cc = $obj.dimensions_detail.CC.e
@@ -128,10 +131,7 @@ Describe 'Integration: 0.0 Dimension Diagnostics' {
     }
 
     It 'Best Practices (BP) has evidence with param_cov >= 0' {
-        $json = & $script:ScoreScript -Json 2>$null
-        $obj  = $json | ConvertFrom-Json
-
-        $bp = $obj.dimensions_detail.BP.e
+        $bp = $script:ScoreObj.dimensions_detail.BP.e
         ($bp.param_cov -ge 0) | Should -Be $true
     }
 }
@@ -140,10 +140,7 @@ Describe 'Integration: 0.0 Dimension Diagnostics' {
 Describe 'Integration: Orthography (Or) corruption detection' {
 
     It 'corruption scanner runs without error' {
-        $json = & $script:ScoreScript -Json 2>$null
-        $obj  = $json | ConvertFrom-Json
-
-        $or = $obj.dimensions_detail.Or.e
+        $or = $script:ScoreObj.dimensions_detail.Or.e
         $or.scanned | Should -BeGreaterOrEqual 0
     }
 }

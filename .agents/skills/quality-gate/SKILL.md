@@ -40,7 +40,7 @@ Breaker:missing→SKIP push|✅→push|🔧→R2|🚫→STOP|⚠→STOP
 `go test ./...`·`npm/pnpm/yarn test`·`cargo test`·`pytest`
 `$secretsPattern='(api[_-]?key|secret|token|-----BEGIN)'; git diff --cached|Select-String -Pattern $secretsPattern`
 `"$env:GENTLEMAN_AGENT_ROOT/scripts/pssa-gate.ps1" -Mode Check`
-`"$env:GENTLEMAN_AGENT_ROOT/scripts/run-tests.ps1" -Quiet`
+`"$env:GENTLEMAN_AGENT_ROOT/scripts/run-tests.ps1" -Quiet` — Note: if *.Tests.ps1 files are staged, the pre-commit hook re-runs the staged subset (now parallel) — this is intentional double coverage; to avoid it, commit tests separately.
 
 ## Refs
 security-scanner·triple-verify·commit-crafter·ci-cd·code-review-agent·adversarial-breaker

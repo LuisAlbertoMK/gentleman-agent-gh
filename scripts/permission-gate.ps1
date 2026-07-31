@@ -19,6 +19,9 @@
 .PARAMETER Mode
     Override mode (default: read from .gentleman-mode)
 
+.PARAMETER ModeFilePath
+    Override the mode file path (default: <repo>\.gentleman-mode)
+
 .PARAMETER ListModes
     Show mode summaries
 
@@ -34,13 +37,14 @@ param(
     [switch]$ListModes,
     [switch]$Json,
     [switch]$Force,
-    [switch]$DryRun
+    [switch]$DryRun,
+    [string]$ModeFilePath
 )
 Set-StrictMode -Version Latest
 
 # --- Resolve paths ---
 $repoRoot   = Split-Path -Path $PSScriptRoot -Parent
-$modeFile   = Join-Path -Path $repoRoot '.gentleman-mode'
+$modeFile   = if ($ModeFilePath) { $ModeFilePath } else { Join-Path -Path $repoRoot '.gentleman-mode' }
 
 # --- Read current mode ---
 if (-not $Mode) {

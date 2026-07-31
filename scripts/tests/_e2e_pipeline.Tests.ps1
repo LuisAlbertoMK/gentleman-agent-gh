@@ -154,6 +154,13 @@ Describe 'E2E: CodeCoverage' {
     It 'CodeCoverage uses PesterConfiguration' {
         Get-Content (Join-Path $script:ProjectRoot "scripts/run-tests.ps1") -Raw | Should -Match 'PesterConfiguration'
     }
+}
+
+# ============================================================
+# Nested coverage run — ~3 min (spawns run-tests.ps1 -CodeCoverage, which
+# forces Pester 6 sequential). Kept out of the default suite via -Tag 'E2E';
+# run explicitly with: scripts/run-tests.ps1 -IncludeE2E
+Describe 'E2E pipeline coverage' -Tag 'E2E' {
 
     It 'CodeCoverage runs a single test file without crashing' {
         $testPath = Join-Path $PSScriptRoot "CacheHash.Tests.ps1"

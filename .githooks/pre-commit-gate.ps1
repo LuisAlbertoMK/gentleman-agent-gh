@@ -165,7 +165,17 @@ Write-Host "[12/13] Pester tests..."
 if ($stagedTests) {
     try {
         Import-Module Pester -ErrorAction Stop
-        $results = Invoke-Pester -Path ($stagedTests | ForEach-Object { Join-Path $RepoRoot $_ }) -PassThru
+        $pester = Get-Module Pester
+        $testPaths = @($stagedTests | ForEach-Object { Join-Path $RepoRoot $_ })
+        $cfg = [PesterConfiguration]@{
+            Run = @{
+                Path     = $testPaths
+                Exit     = $false
+                PassThru = $true
+            }
+        }
+        if ($testPaths.Count -gt 1 -and $pester.Version.Major -ge 5) { $cfg.Run.Parallel = $true }
+        $results = Invoke-Pester -Configuration $cfg
         if ($results.FailedCount -gt 0) { Fail "Pester: $($results.FailedCount) test(s) failed" } else { Pass }
     } catch { Warn "Pester not available: $_" }
 } else { Pass }

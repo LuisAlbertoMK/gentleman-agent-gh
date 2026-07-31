@@ -12,11 +12,24 @@ param([switch]$Quiet)
 Set-StrictMode -Version Latest
 
 BeforeAll {
+    # Test mode: prevents the dot-sourced sync-vmk.ps1 from applying its top-level
+    # global config sync (writing real global opencode.json + AGENTS.md).
+    $script:oldPesterTest = $env:PESTER_TEST
+    $env:PESTER_TEST = '1'
+
     # Dot-source the script — runs main code, sets up $canonical, $results, $DryRun, etc.
     . (Join-Path (Split-Path $PSScriptRoot -Parent) 'sync-vmk.ps1')
 
     # Save the real canonical path for reference
     $script:realCanonicalPath = Join-Path (Split-Path $PSScriptRoot -Parent) "opencode.json"
+}
+
+AfterAll {
+    if ($null -eq $script:oldPesterTest) {
+        Remove-Item Env:PESTER_TEST -ErrorAction SilentlyContinue
+    } else {
+        $env:PESTER_TEST = $script:oldPesterTest
+    }
 }
 
 # ============================================================

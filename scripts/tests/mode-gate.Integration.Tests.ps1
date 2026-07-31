@@ -3,19 +3,36 @@
 .SYNOPSIS
     Integration tests for mode-gate.ps1 — tests the ACTUAL script.
 .NOTES
-    Tests run in the project repo — reads .gentleman-mode but does NOT modify it.
+    Tests run against a per-run temp mode file (-ModeFilePath) — the repo's
+    real .gentleman-mode is never read or written. Safe to run in parallel
+    with permission-gate.Tests.ps1 (each uses its own temp file).
 #>
 
 BeforeAll {
     $scriptsRoot = Resolve-Path "$PSScriptRoot/.."
     $scriptPath = "$scriptsRoot/mode-gate.ps1"
-    $modeFilePath = Resolve-Path "$scriptsRoot/../.gentleman-mode"
-    $script:originalMode = (Get-Content -LiteralPath $modeFilePath -Raw).Trim()
+    $realModeFile = "$scriptsRoot/../.gentleman-mode"
+    $modeFilePath = Join-Path ([System.IO.Path]::GetTempPath()) ("gentleman-mode-test-{0}.txt" -f ([guid]::NewGuid().ToString("N")))
+    $realMode = if (Test-Path -LiteralPath $realModeFile) { (Get-Content -LiteralPath $realModeFile -Raw).Trim() } else { 'manual' }
+    Set-Content -LiteralPath $modeFilePath -Value $realMode -NoNewline -Encoding ASCII -Force
+
+    function Invoke-ModeGate {
+        param(
+            [string]$TargetAgent,
+            [string]$Mode = "",
+            [switch]$Json
+        )
+        $invoke = @{ TargetAgent = $TargetAgent; ModeFilePath = $modeFilePath }
+        if ($Mode) { $invoke.Mode = $Mode }
+        if ($Json) { $invoke.Json = $true }
+        & $scriptPath @invoke 2>&1
+    }
 }
 
 AfterAll {
-    # Restore original mode
-    $script:originalMode | Set-Content -LiteralPath $modeFilePath -NoNewline -Encoding ASCII -Force
+    if (Test-Path -LiteralPath $modeFilePath) {
+        Remove-Item -LiteralPath $modeFilePath -Force
+    }
 }
 
 Describe "Mode gate — auto mode" {
@@ -25,14 +42,14 @@ Describe "Mode gate — auto mode" {
     }
 
     It "ALLOWS -auto suffixed agent in auto mode" {
-        $output = & $scriptPath -TargetAgent "gentleman-quick-auto" -Json 2>&1
+        $output = Invoke-ModeGate -TargetAgent "gentleman-quick-auto" -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
         $result.mode | Should -Be "auto"
     }
 
     It "BLOCKS base agent (no suffix) in auto mode" {
-        $output = & $scriptPath -TargetAgent "gentleman-quick" -Json 2>&1
+        $output = Invoke-ModeGate -TargetAgent "gentleman-quick" -Json
         # Should exit with error
         $result = $output | Out-String -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
         if ($LASTEXITCODE -ne 0) {
@@ -41,13 +58,13 @@ Describe "Mode gate — auto mode" {
     }
 
     It "ALLOWS read-only specialist in auto mode" {
-        $output = & $scriptPath -TargetAgent "gentleman-security" -Json 2>&1
+        $output = Invoke-ModeGate -TargetAgent "gentleman-security" -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
     }
 
     It "ALLOWS SDD sub-agent in auto mode" {
-        $output = & $scriptPath -TargetAgent "sdd-apply" -Json 2>&1
+        $output = Invoke-ModeGate -TargetAgent "sdd-apply" -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
     }
@@ -60,13 +77,13 @@ Describe "Mode gate — manual mode" {
     }
 
     It "ALLOWS base agent (no suffix) in manual mode" {
-        $output = & $scriptPath -TargetAgent "gentleman-quick" -Json 2>&1
+        $output = Invoke-ModeGate -TargetAgent "gentleman-quick" -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
     }
 
     It "BLOCKS -auto suffixed agent in manual mode" {
-        $output = & $scriptPath -TargetAgent "gentleman-quick-auto" -Json 2>&1
+        $output = Invoke-ModeGate -TargetAgent "gentleman-quick-auto" -Json
         $result = $output | Out-String -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
         if ($LASTEXITCODE -ne 0) {
             $result.allowed | Should -Be $false
@@ -77,13 +94,13 @@ Describe "Mode gate — manual mode" {
 Describe "Mode gate — explicit -Mode override" {
 
     It "ALLOWS -auto agent with -Mode auto override" {
-        $output = & $scriptPath -TargetAgent "gentleman-deep-auto" -Mode auto -Json 2>&1
+        $output = Invoke-ModeGate -TargetAgent "gentleman-deep-auto" -Mode auto -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
     }
 
     It "BLOCKS base agent with -Mode auto override" {
-        $output = & $scriptPath -TargetAgent "gentleman-deep" -Mode auto -Json 2>&1
+        $output = Invoke-ModeGate -TargetAgent "gentleman-deep" -Mode auto -Json
         $result = $output | Out-String -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
         if ($LASTEXITCODE -ne 0) {
             $result.allowed | Should -Be $false
@@ -91,7 +108,7 @@ Describe "Mode gate — explicit -Mode override" {
     }
 
     It "ALLOWS base agent with -Mode manual override" {
-        $output = & $scriptPath -TargetAgent "gentleman-deep" -Mode manual -Json 2>&1
+        $output = Invoke-ModeGate -TargetAgent "gentleman-deep" -Mode manual -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
     }
@@ -104,14 +121,14 @@ Describe "Mode gate — semi mode" {
     }
 
     It "ALLOWS -semi suffixed agent in semi mode" {
-        $output = & $scriptPath -TargetAgent "gentleman-quick-semi" -Json 2>&1
+        $output = Invoke-ModeGate -TargetAgent "gentleman-quick-semi" -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
         $result.mode | Should -Be "semi"
     }
 
     It "BLOCKS base agent (no suffix) in semi mode" {
-        $output = & $scriptPath -TargetAgent "gentleman-quick" -Json 2>&1
+        $output = Invoke-ModeGate -TargetAgent "gentleman-quick" -Json
         $result = $output | Out-String -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
         if ($LASTEXITCODE -ne 0) {
             $result.allowed | Should -Be $false
@@ -119,7 +136,7 @@ Describe "Mode gate — semi mode" {
     }
 
     It "BLOCKS -auto agent in semi mode" {
-        $output = & $scriptPath -TargetAgent "gentleman-quick-auto" -Json 2>&1
+        $output = Invoke-ModeGate -TargetAgent "gentleman-quick-auto" -Json
         $result = $output | Out-String -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
         if ($LASTEXITCODE -ne 0) {
             $result.allowed | Should -Be $false
@@ -127,25 +144,25 @@ Describe "Mode gate — semi mode" {
     }
 
     It "ALLOWS read-only specialist in semi mode" {
-        $output = & $scriptPath -TargetAgent "gentleman-security" -Json 2>&1
+        $output = Invoke-ModeGate -TargetAgent "gentleman-security" -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
     }
 
     It "ALLOWS SDD sub-agent in semi mode" {
-        $output = & $scriptPath -TargetAgent "sdd-apply" -Json 2>&1
+        $output = Invoke-ModeGate -TargetAgent "sdd-apply" -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
     }
 
     It "ALLOWS -semi agent with -Mode semi override" {
-        $output = & $scriptPath -TargetAgent "gentleman-deep-semi" -Mode semi -Json 2>&1
+        $output = Invoke-ModeGate -TargetAgent "gentleman-deep-semi" -Mode semi -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
     }
 
     It "BLOCKS -semi agent with -Mode manual override" {
-        $output = & $scriptPath -TargetAgent "gentleman-deep-semi" -Mode manual -Json 2>&1
+        $output = Invoke-ModeGate -TargetAgent "gentleman-deep-semi" -Mode manual -Json
         $result = $output | Out-String -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
         if ($LASTEXITCODE -ne 0) {
             $result.allowed | Should -Be $false
@@ -160,7 +177,7 @@ Describe "Mode gate — edge cases" {
         $backup = Join-Path ([System.IO.Path]::GetTempPath()) "gentleman-mode-bak-$(Get-Random)"
         Move-Item -LiteralPath $modeFilePath -Destination $backup -Force
         try {
-            $output = & $scriptPath -TargetAgent "gentleman-quick" -Json 2>&1
+            $output = Invoke-ModeGate -TargetAgent "gentleman-quick" -Json
             $result = $output | Out-String | ConvertFrom-Json
             $result.mode | Should -Be "manual"
             $result.allowed | Should -Be $true
@@ -170,7 +187,7 @@ Describe "Mode gate — edge cases" {
     }
 
     It "outputs expected JSON fields" {
-        $output = & $scriptPath -TargetAgent "gentleman-quick" -Mode manual -Json 2>&1
+        $output = Invoke-ModeGate -TargetAgent "gentleman-quick" -Mode manual -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.action | Should -Be "mode-gate"
         $result | Get-Member -MemberType NoteProperty | ForEach-Object { $_.Name } | Sort-Object
