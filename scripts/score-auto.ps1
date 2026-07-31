@@ -5,7 +5,7 @@
     Auto-score project metrics across 13 dimensions.
 .DESCRIPTION
     Evaluates project health across 13 dimensions (PA, Sec, DC, CC, BP, Or, Bi, Me, SP, SE, CA, BI2, SD)
-    with 38+ sub-dimensions. Caches results based on git HEAD + script hashes + skill hashes.
+    with 38+ sub-dimensions. Caches results based on script + skill content hashes (git HEAD independent).
     Spawns parallel jobs for cross-ref-check, pssa-gate, and check-backlog-integrity.
 .PARAMETER Json
     Output results as JSON (depth 5).
@@ -13,7 +13,7 @@
     Output minimal score summary (one line).
 .NOTES
     Scores range 0-10 per dimension. Composite score averages all dimensions.
-    Cache invalidated when git HEAD, script sizes, or skill sizes change.
+    Cache invalidated when script or skill content hashes change.
     Sub-dimensions in SD provide granular breakdown.
     Bias calibration warning shown in non-Json mode when calibration data exists (>=2 samples).
 #>
@@ -24,7 +24,7 @@ param(
 
 Set-StrictMode -Version Latest
 
-# ponytail: score cache — git-HEAD based composite hash, fast invalidation
+# ponytail: score cache — content-hash based composite key (no git HEAD), fast invalidation
 
 # ============================================================
 # 1. CACHE CHECK
@@ -46,19 +46,26 @@ $cacheFile = Join-Path $cacheDir "score-cache.json"
 $scriptFiles  = @()
 $skillMdFiles = @()
 $skillDirs    = @()
+$manifest     = @()
+
+. "$repoRoot\scripts\lib\file-manifest.ps1"
 
 try {
-    $gitHead = try { git -C $repoRoot rev-parse HEAD 2>$null } catch { $null }
+    $manifest = @(Get-FileManifest -Path $repoRoot)
 
     # ponytail: consolidated reads — single pass for cache hash + scoring
     $scriptFiles  = @(Get-ChildItem "$repoRoot\scripts\*.ps1" -EA SilentlyContinue)
     $skillMdFiles = @(Get-ChildItem "$repoRoot\.agents\skills\*\SKILL.md" -EA SilentlyContinue)
     $skillDirs    = @(Get-ChildItem -Directory "$repoRoot\.agents\skills" -EA SilentlyContinue | Select-Object -ExpandProperty Name)
 
-    $scriptsHash = ($scriptFiles | ForEach-Object { "$($_.Name):$($_.Length)" } | Sort-Object) -join "|"
-    $skillsHash  = ($skillMdFiles | ForEach-Object { "$($_.Name):$($_.Length)" } | Sort-Object) -join "|"
+    $scriptsHash = ($manifest | Where-Object { $_.group -eq 'script' } | ForEach-Object { "$($_.relpath):$($_.sha256)" } | Sort-Object) -join "|"
+    $skillsHash  = ($manifest | Where-Object { $_.group -eq 'skill' }  | ForEach-Object { "$($_.relpath):$($_.sha256)" } | Sort-Object) -join "|"
 
-    $compositeKey = "$gitHead|$scriptsHash|$skillsHash"
+    $manifestScriptCount = @($manifest | Where-Object { $_.group -eq 'script' }).Count
+    $manifestSkillCount  = @($manifest | Where-Object { $_.group -eq 'skill' }).Count
+    if ($manifestScriptCount -lt $scriptFiles.Count -or $manifestSkillCount -ne $skillMdFiles.Count) { $cacheHash = $null }
+
+    $compositeKey = "$scriptsHash|$skillsHash"
     $cacheHash    = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($compositeKey))
 
     if (Test-Path $cacheFile) {

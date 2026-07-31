@@ -23,9 +23,7 @@ $j=Join-Path (Get-Location).Path $ScriptName;if(Test-Path $j){return (Resolve-Pa
 return $ScriptName }
 
 function Get-PSSACacheKey { param([string]$TargetPath)
-  $head=try{git -C $TargetPath rev-parse HEAD 2>$null}catch{$null}
-  $entries=@(Get-ChildItem -LiteralPath $TargetPath -File -Recurse -Filter '*.ps1' -EA SilentlyContinue | Where-Object{$_.FullName -notmatch '[\\/]node_modules[\\/]'} | ForEach-Object{"$($_.FullName.Substring($TargetPath.Length).Replace('\','/'))|$($_.Length)|$($_.LastWriteTimeUtc.Ticks)"} | Sort-Object)
-  "$head|$($entries.Count)|$($entries -join ';')" }
+  "pssa-granular:$([IO.Path]::GetFullPath($TargetPath))" }
 function Get-PSSACachePath { param([string]$Key)
   $dir=Join-Path ([IO.Path]::GetTempPath()) 'opencode'
   if(-not(Test-Path $dir)){try{New-Item -ItemType Directory -Path $dir -Force|Out-Null}catch{Write-Debug "pssa-cache dir: $($_.Exception.Message)"}}
@@ -34,6 +32,30 @@ function Get-PSSACachePath { param([string]$Key)
   Join-Path $dir "pssa-cache-$($h.Substring(0,24)).json" }
 function Restore-PSSAViolation { param($Items)
   @($Items | ForEach-Object { [PSCustomObject]@{RuleName=[string]$_.RuleName;ScriptName=[string]$_.ScriptName;ScriptPath=[string]$_.ScriptPath;Line=[int]$_.Line;Severity=[string]$_.Severity;Message=[string]$_.Message} }) }
+function Read-PSSACache { param([string]$CacheFile)
+  $c=$null
+  if(Test-Path -LiteralPath $CacheFile){
+    try{
+      $c=Get-Content -LiteralPath $CacheFile -Raw | ConvertFrom-Json
+      if(-not $c -or -not $c.PSObject.Properties['perFile'] -or -not $c.PSObject.Properties['stamps']){$c=$null}
+    }catch{$c=$null}
+  }
+  $c }
+function Save-PSSACache { param([string]$CacheFile,[array]$Results,[array]$Manifest,[string]$Target)
+  try{
+    $perFile=@{}
+    foreach($v in $Results){
+      $sp=[string]$v.ScriptPath
+      if($sp.Length -ge $Target.Length -and $sp.StartsWith($Target,[StringComparison]::OrdinalIgnoreCase)){
+        $rp=$sp.Substring($Target.Length).TrimStart('\').Replace('\','/')
+        if(-not $perFile.ContainsKey($rp)){$perFile[$rp]=@()}
+        $perFile[$rp]+=$v
+      }
+    }
+    $stamps=@{}
+    foreach($m in $Manifest){$stamps[$m.relpath]=@{len=$m.length;mtime=$m.mtime;sha=$m.sha256}}
+    @{generated=(Get-Date -Format 'o');perFile=$perFile;stamps=$stamps} | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $CacheFile -Encoding UTF8
+  }catch{Write-Debug "pssa-cache save: $($_.Exception.Message)"} }
 
 function Resolve-BomEncoding { param([array]$Violations);$n=0;$s=@{}
 foreach($v in $Violations){$fp=Get-FullPath -ScriptName $v.ScriptName -BasePath $target;if($s.ContainsKey($fp)){continue};$s[$fp]=$true
@@ -56,6 +78,7 @@ $di=Split-Path $BaselineFile -Parent;if(-not(Test-Path $di)){New-Item -ItemType 
 $bl | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $BaselineFile -Encoding UTF8;return $bl}
 
 $target=Resolve-Path $Path
+. (Join-Path (Split-Path $PSScriptRoot -Parent) 'scripts\lib\file-manifest.ps1')
 $scanFiles=$null
 if($Mode -eq 'Incremental'){
   $changed=@(git -C $target diff --cached --name-only --diff-filter=ACMR -- '*.ps1' 2>$null | Where-Object {$_} | ForEach-Object {Join-Path $target ($_.Replace('/','\'))} | Where-Object {Test-Path $_})
@@ -64,29 +87,45 @@ if($Mode -eq 'Incremental'){
 }
 if(-not$Quiet){Write-Host "== PSSA Gate - $Mode ==";Write-Host "  Target: $target"}
 $useCache = $Mode -in 'Check','Incremental' -and -not $scanFiles
-$cacheKey = $null
+$cacheFile = $null
+$manifest = $null
 $results = $null
 if($useCache){
-  $cacheKey=Get-PSSACacheKey -TargetPath $target
-  $cacheFile=Get-PSSACachePath -Key $cacheKey
-  if(Test-Path $cacheFile){
-    try{
-      $cached=Get-Content -LiteralPath $cacheFile -Raw | ConvertFrom-Json
-      if($cached.key -eq $cacheKey -and $null -ne $cached.violations){
-        $results=Restore-PSSAViolation $cached.violations
-        Write-Status "PSSA cache hit: $($results.Count) violations"
+  $cacheFile=Get-PSSACachePath -Key (Get-PSSACacheKey -TargetPath $target.Path)
+  $manifest=@(Get-FileManifest -Path $target.Path | Where-Object { $_.group -eq 'script' })
+  $cached=Read-PSSACache -CacheFile $cacheFile
+    if($cached){
+      $stamps=@{};foreach($p in $cached.stamps.PSObject.Properties){$stamps[$p.Name]=$p.Value}
+      $manifestSet=@{};foreach($m in $manifest){$manifestSet[$m.relpath]=$true}
+      $changed=@();$hitCount=0
+      foreach($m in $manifest){
+        $s=$null
+        if($stamps.ContainsKey($m.relpath)){$s=$stamps[$m.relpath]}
+        if($s -and [int64]$s.len -eq $m.length -and [int64]$s.mtime -eq $m.mtime -and [string]$s.sha -eq $m.sha256){$hitCount++}
+        else{$changed+=$m.relpath}
       }
-    }catch{$results=$null}
-  }
+      if($changed.Count -eq 0){
+        $flat=@();foreach($p in $cached.perFile.PSObject.Properties){if($manifestSet.ContainsKey($p.Name)){$flat+=@(Restore-PSSAViolation $p.Value)}}
+        $results=$flat
+        Write-Status "PSSA cache hit: $($results.Count) violations ($hitCount files)"
+      }else{
+        Write-Status "PSSA granular: $($changed.Count) changed file(s), $hitCount cached"
+        $changedSet=@{};foreach($rp in $changed){$changedSet[$rp]=$true}
+        $cachedHits=@();foreach($p in $cached.perFile.PSObject.Properties){if(-not $changedSet.ContainsKey($p.Name) -and $manifestSet.ContainsKey($p.Name)){$cachedHits+=@(Restore-PSSAViolation $p.Value)}}
+        $scanPaths=@($changed|ForEach-Object{Join-Path $target.Path ($_ -replace '/','\')}|Where-Object{Test-Path $_})
+        $newV=@()
+        if($scanPaths.Count -gt 0){$newV=@(Get-PSSAViolation -TargetPath $target.Path -Files $scanPaths)}
+        $newV=@($newV|Where-Object{$_.ScriptPath -notmatch '[\\/]node_modules[\\/]'})
+        $results=@($cachedHits)+@($newV)
+      }
+    }
 }
 if($null -eq $results){
   Write-Status "Scanning..."
-  $results=Get-PSSAViolation -TargetPath $target -Files $scanFiles
+  $results=@(Get-PSSAViolation -TargetPath $target.Path -Files $scanFiles)
   $results=@($results | Where-Object { $_.ScriptPath -notmatch '[\\/]node_modules[\\/]' })
-  if($useCache){
-    try{@{key=$cacheKey;generated=(Get-Date -Format 'o');violations=$results} | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $cacheFile -Encoding UTF8}catch{Write-Debug "pssa-cache save: $($_.Exception.Message)"}
-  }
 }
+if($useCache -and $cacheFile -and $null -ne $manifest){Save-PSSACache -CacheFile $cacheFile -Results $results -Manifest $manifest -Target $target.Path}
 
 if($Mode -eq 'Fix'){Write-Host "`n-- Auto-fix --";$bf=Resolve-BomEncoding -Violations ($results | Where-Object {$_.RuleName -eq 'PSUseBOMForUnicodeEncodedFile'});$sf=Resolve-SwitchDefault -Violations ($results | Where-Object {$_.RuleName -eq 'PSAvoidDefaultValueSwitchParameter'});Write-Host "  BOM: $bf | Switch: $sf";Write-Status "Re-scanning...";$results=Get-PSSAViolation -TargetPath $target -Files $scanFiles}
 

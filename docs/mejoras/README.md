@@ -34,7 +34,7 @@
 | `orchestrator-self-analysis (07-28)` | ✅ Fixed — Pre-Answer Evidence Gate + Confidence Calibration. |
 | `permission-modes (07-28)` | ✅ 3 modes (manual/semi/auto) implemented. switch-mode.ps1 + mode-gate.ps1. |
 | `execution-report (07-24)` | ✅ 12/15 findings implemented. |
-| `PERFORMANCE-PLAN` | `!ship` ~46s → ~32s. 7/9 items remaining (P0-3, P1-1-3, P2-1-3). |
+| `PERFORMANCE-PLAN` | ✅ 9/9 items complete. pssa-gate granular cache: post-commit ~5.5s (antes 33.4s miss). score-auto recompute 35.2s→12.5s. |
 
 ## For Orchestrators
 
