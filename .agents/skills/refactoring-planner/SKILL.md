@@ -4,6 +4,9 @@ description: "Plan refactoring with impact analysis, dependency mapping, and ste
 triggers: "Refactor, refactoring, reestructurar, migrate"
 ---
 
+## When to Use
+Plan refactoring with impact analysis, dependency mapping, step-by-step migration with test baseline.
+
 ## Pre-flight assessment
 | Check | Question | Blocker? |
 |-------|----------|----------|
@@ -16,13 +19,13 @@ triggers: "Refactor, refactoring, reestructurar, migrate"
 | Type | Risk | Rollback | Evidence |
 |------|------|----------|----------|
 | Extract fn | Low | Single revert | Tests pass |
-| Rename/move | Low-Med | Single revert | Tests pass + no import errors |
-| Change signature | Med | Revert + fix callers | Tests pass + integration |
+| Rename/move | Low-Med | Single revert | Tests + imports |
+| Change signature | Med | Revert + fix callers | Tests + integration |
 | Split module | High | Full revert | All above + no regression |
-| Merge modules | High | Full revert | All above + perf check |
+| Merge modules | High | Full revert | Above + perf |
 
 ## Rules
-1. NEVER refactor without test baseline -- no tests -> first task: add tests
+1. NEVER refactor without test baseline -- no tests -> add tests first
 2. Each step independently revertible
 3. After EACH step: `go test ./...`. Never batch before testing
 4. Track: `[x] Step N`
@@ -35,7 +38,7 @@ triggers: "Refactor, refactoring, reestructurar, migrate"
 ### Dependency Map: {A} <- {B} <- {C} (target)
 ### Steps
 1. [SAFE] Action -- tests pass, single revert
-2. [MODERATE] Action -- tests pass, update imports
+2. [MODERATE] Action -- tests pass, fix imports
 3. [RISKY] Action -- integration tests, revert + rebase
 ### Acceptance: after each step -> tests pass
 ```
@@ -44,18 +47,18 @@ triggers: "Refactor, refactoring, reestructurar, migrate"
 1. [PREP] Write tests at entry points → baseline pass
 2. [SAFE] Extract `types.go` from `main.go` → tests pass
 3. [SAFE] Extract `db.go` (data layer) → tests pass, no import cycles
-4. [MODERATE] Extract `handlers.go` → update routes to import from new pkg
+4. [MODERATE] Extract `handlers.go` → update routes/imports
 5. [RISKY] Split into `internal/db`, `internal/api`, `internal/types` → full build + integration
-6. [VERIFY] `go test ./... && go build ./...` → match baseline perf
+6. [VERIFY] `go test ./... && go build ./...` → baseline perf
 
 ## Failure Recovery
 **If tests fail after a step:**
 1. Run `git diff` to see what changed
 2. Failure in refactored code? → fix the mapping error
-3. Failure in unrelated code? → `git stash` the refactor, fix baseline, reapply
-4. Unfixable in 5 min? → `git checkout -- .` on refactor files, redo step
+3. Unrelated failure? → `git stash` refactor, fix baseline, reapply
+4. Unfixable in 5 min? → `git checkout -- .`, redo step
 
-**Rollback per step:** Each step maps to 1-2 files — `git checkout <file>` reverts single-step damage. Only `git revert` the full branch for split/merge steps.
+**Rollback:** Each step maps to 1-2 files — `git checkout <file>` reverts damage; `git revert` full branch for split/merge.
 
 ## Post-Refactor: mem_save
 ```
@@ -63,9 +66,9 @@ title: "Refactored {module} — {extract|rename|split}"
 type: "architecture"
 content: |
   **What**: Extracted {X} from {Y} into standalone package
-  **Why**: {coupling reason, tech debt rationale}
+  **Why**: {coupling reason / tech debt}
   **Where**: {file paths}
-  **Learned**: {import cycle gotcha, unexpected dependency}
+  **Learned**: {import gotchas}
 ```
 
 ## Refs

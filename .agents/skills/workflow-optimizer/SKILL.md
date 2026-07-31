@@ -1,13 +1,11 @@
-﻿---
+---
 name: workflow-optimizer
 description: "Optimize workflow patterns — faster info access, reduced token waste, smarter caching, auto-learning triggers."
 triggers: [optimize-workflow, faster-access, token-optimization, workflow-pattern, information-access, fluidez]
 ---
 
 ## When to Use
-
-
-# Workflow Optimizer — Faster, Smarter, Leaner
+Optimize workflow — faster info access, reduced token waste, smarter caching, auto-learning triggers.
 
 ## Core Principles
 1. **Info Access**: Right info at right time, not all at once
@@ -19,11 +17,11 @@ triggers: [optimize-workflow, faster-access, token-optimization, workflow-patter
 
 ### 1. Pre-flight Check (Before Every Task)
 ```
-1. mem_search(query="<task-keywords>", limit=3) → inject top 3 as context
+1. mem_search("<task-keywords>", limit=3) → inject top 3
 2. Check skill-graph for relevant skills (don't load all)
 3. Verify no recent error on same pattern (immune-system)
 ```
-**Savings**: 2-5K tokens per task, avoids repeating mistakes
+**Savings**: 2-5K tokens/task, avoids repeat mistakes
 
 ### 2. Lazy Loading (Never Load What You Won't Use)
 ```
@@ -35,7 +33,7 @@ triggers: [optimize-workflow, faster-access, token-optimization, workflow-patter
 
 ### 3. Context Compression Levels
 ```
-L1 (every 8 msgs/15 calls): Full summary, -60-70% tokens
+L1 (every 8 msgs/15 calls): Full summary, -60-70%
 L2 (every 20 msgs/>3 L1): 1-2 line decisions + engram ID, -40-50%
 L3 (ORANGE>60%): 1-liner/topic + ref, -80-90%
 ```
@@ -98,10 +96,10 @@ IF repeat_workflow_3x → create skill
 ```
 
 
-**Proactive search**: See `engram-protocol` skill for the authoritative proactive search protocol.
+**Proactive search**: see `engram-protocol` skill.
 
 ## Metrics to Track
-- Token usage per task (reduce by 20% target)
-- Time to first useful output (reduce by 30%)
+- Token usage/task (reduce 20%)
+- Time to first output (reduce 30%)
 - Repeat error rate (target: 0)
-- Skill load accuracy (target: 100% relevant)
+- Skill load accuracy (target 100%)
