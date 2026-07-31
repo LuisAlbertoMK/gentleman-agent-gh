@@ -1,7 +1,7 @@
 {
   "skills": {
     "paths": [
-      ".agents/skills/*"
+      ".agents/skills"
     ]
   },
   "permission": {
@@ -378,7 +378,6 @@
   "plugin": [
     "context-mode",
     "opencode-ralph-loop",
-    "opencode-lazy-loader",
     "opencode-personality"
   ]
 }
