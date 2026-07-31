@@ -178,7 +178,7 @@ $result = [PSCustomObject]@{
     Health      = [PSCustomObject]@{
         LearningsActive = @($learningEntries).Count -gt 0
         ErrorsActive    = @($errorEntries).Count -gt 0
-        CatalogFresh    = $catalogStats.AgeDays -ne $null -and $catalogStats.AgeDays -lt 30
+        CatalogFresh    = $null -ne $catalogStats.AgeDays -and $catalogStats.AgeDays -lt 30
         PatternDrift    = @($patternCounts.GetEnumerator() | Where-Object { $_.Value -ge 3 }).Count
     }
 }

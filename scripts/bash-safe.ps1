@@ -194,7 +194,7 @@ function Invoke-Bash {
                 Write-Warning "[bash-safe] Puerto $port ya está EN USO — otro servidor está corriendo ahí."
                 Write-Warning "[bash-safe]   Descubrí quién: Get-Process -Id ((Get-NetTCPConnection -LocalPort $port).OwningProcess)"
                 Write-Warning "[bash-safe]   O usá un puerto distinto: --port <otro>"
-            } elseif ($inUse -eq $null) { Write-Warning "[bash-safe] No se pudo verificar si el puerto $port está ocupado." }
+            } elseif ($null -eq $inUse) { Write-Warning "[bash-safe] No se pudo verificar si el puerto $port está ocupado." }
         }
     }
 

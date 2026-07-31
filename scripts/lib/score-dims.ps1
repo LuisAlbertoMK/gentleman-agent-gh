@@ -268,7 +268,7 @@ if ($hasSkills) {
                 }
             }
             if ($isCorrupted) { $corruptedFiles++ }
-        } catch { }
+        } catch { Write-Debug "score-dims: $($_.Exception.Message)" }
     }
 }
 

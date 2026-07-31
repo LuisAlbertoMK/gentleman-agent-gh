@@ -49,6 +49,7 @@ if (-not $Url) {
             $found = $true
             break
         } catch {
+            Write-Debug "analyze-page: $($_.Exception.Message)"
             # Port not responding, try next
         }
     }

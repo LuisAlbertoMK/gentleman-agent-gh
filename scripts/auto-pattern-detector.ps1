@@ -60,8 +60,8 @@ function Get-LearningPatternKeys {
         return @()
     }
     $keys = @()
-    $matches = [regex]::Matches($content, 'Pattern-Key:\s*([^\n\r]+)', 'Multiline')
-    foreach ($m in $matches) {
+    $patternMatches = [regex]::Matches($content, 'Pattern-Key:\s*([^\n\r]+)', 'Multiline')
+    foreach ($m in $patternMatches) {
         $keys += $m.Groups[1].Value.Trim()
     }
     return $keys

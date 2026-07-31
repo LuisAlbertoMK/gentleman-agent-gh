@@ -32,7 +32,7 @@ $changes = @()
 $patternIndex = @{}
 if (Test-Path $patternsDir) {
     foreach ($pf in @(Get-ChildItem $patternsDir -Filter "*.json")) {
-        try { $pp = Get-Content $pf.FullName -Raw | ConvertFrom-Json; if ($pp.id) { $patternIndex[$pp.id] = $pf.FullName } } catch { }
+        try { $pp = Get-Content $pf.FullName -Raw | ConvertFrom-Json; if ($pp.id) { $patternIndex[$pp.id] = $pf.FullName } } catch { Write-Debug "wisdom-demote: $($_.Exception.Message)" }
     }
 }
 

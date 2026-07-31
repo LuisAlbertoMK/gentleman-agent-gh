@@ -75,10 +75,10 @@ function Invoke-LazyDetection {
     if ($hasCodePatterns -and $null -ne $signal.code_patterns) {
         foreach ($cp in @($signal.code_patterns)) {
             try {
-                $matches = Select-String -Path "$repoRoot\*.{css,js,html,ps1,ts,jsx,tsx}" `
+                $hits = Select-String -Path "$repoRoot\*.{css,js,html,ps1,ts,jsx,tsx}" `
                     -Pattern $cp -ErrorAction SilentlyContinue -SimpleMatch | Select-Object -First 3
-                if ($matches) {
-                    $files = ($matches | ForEach-Object { $_.Filename }) -join ', '
+                if ($hits) {
+                    $files = ($hits | ForEach-Object { $_.Filename }) -join ', '
                     $warnings += "Code pattern '$cp' found in: $files — pattern $($Pattern.id) may apply"
                 }
             } catch { continue }

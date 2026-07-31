@@ -158,7 +158,12 @@ Describe 'E2E: CodeCoverage' {
     It 'CodeCoverage runs a single test file without crashing' {
         $testPath = Join-Path $PSScriptRoot "CacheHash.Tests.ps1"
         $runner = Join-Path $script:ProjectRoot "scripts/run-tests.ps1"
-        $result = & $runner -Path $testPath -CodeCoverage 2>&1
+        # Run in a child process: in-process invocation nests a Pester coverage
+        # plugin inside the outer runner and crashes (Assert-Success in
+        # Invoke-PluginStep) when the outer suite runs in parallel. A child
+        # process also matches real-world usage of run-tests.ps1 as a standalone.
+        $pwshExe = (Join-Path $PSHOME 'pwsh.exe')
+        $out = & $pwshExe -NoProfile -NonInteractive -Command "& '$runner' -Path '$testPath' -CodeCoverage *> `$null; exit `$LASTEXITCODE"
         # 0 = all passed + coverage OK; 10 = coverage below 50% threshold (expected on partial run)
         @(0, 10) | Should -Contain $LASTEXITCODE
     }

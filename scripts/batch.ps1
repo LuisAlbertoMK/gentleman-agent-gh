@@ -62,7 +62,7 @@ try {
     $entry = "$today - Batch $($nextBatch): $Description"
     $existingLines = Get-Content -LiteralPath $bitacoraPath
     # Dedup guard: skip if entry already exists
-    $isDup = ($existingLines | Where-Object { $_.Trim() -eq $entry.Trim() } | Select-Object -First 1) -ne $null
+    $isDup = $null -ne ($existingLines | Where-Object { $_.Trim() -eq $entry.Trim() } | Select-Object -First 1)
     if ($isDup) {
         Write-Warning "Batch entry already exists, skipping: $entry"
         return

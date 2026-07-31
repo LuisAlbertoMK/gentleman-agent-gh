@@ -205,7 +205,7 @@ if ($PatternsFile -and (Test-Path $PatternsFile)) {
     try {
         $patternData = Get-Content $PatternsFile -Raw | ConvertFrom-Json
         if ($patternData.patterns) { $externalPatterns = $patternData.patterns }
-    } catch { }
+    } catch { Write-Debug "skill-graph: $($_.Exception.Message)" }
 }
 
 # ============================================================================

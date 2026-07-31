@@ -57,7 +57,7 @@ if ($Mode -in @('score', 'full')) {
     try {
         $scoreResult = & "$repoRoot\scripts\score-auto.ps1" -Json -Quiet 2>&1
         $scoreData = $null
-        try { $scoreData = $scoreResult | ConvertFrom-Json } catch { }
+        try { $scoreData = $scoreResult | ConvertFrom-Json } catch { Write-Debug "data-pipeline: $($_.Exception.Message)" }
         if ($scoreData -and $scoreData.score) {
             $results.stages.score = @{
                 status = 'ok'

@@ -89,6 +89,7 @@ if ($pkgJson) {
         if ("typescript" -in $allDeps) { $frameworks += "typescript" }
         $frameworks = $frameworks | Select-Object -Unique
     } catch {
+        Write-Debug "project-profile: $($_.Exception.Message)"
         # package.json parse error, continue
     }
 }

@@ -37,13 +37,13 @@ function Add-Check {
 }
 
 function Run-Script {
-    param([string]$Name, [string]$Path, [string]$Args = "")
+    param([string]$Name, [string]$Path, [string]$ScriptArgs = "")
     if (-not (Test-Path $Path)) {
         Add-Check -Name $Name -Status "SKIP" -Detail "Script not found: $Path"
         return 0
     }
     try {
-        if ($Args) { $out = & $Path @($Args -split ' ') 2>&1 }
+        if ($ScriptArgs) { $out = & $Path @($ScriptArgs -split ' ') 2>&1 }
         else       { $out = & $Path 2>&1 }
         $ec = $LASTEXITCODE
         if ($ec -eq 0) {

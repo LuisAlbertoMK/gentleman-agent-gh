@@ -53,7 +53,7 @@ $entry = "$(Get-Date -Format 'yyyy-MM-dd') - $Description"
 if (Test-Path -LiteralPath $bitacoraPath) {
     $existingLines = Get-Content -LiteralPath $bitacoraPath
     # Guard: skip if exact entry already exists anywhere (prevents multi-session duplicate chains)
-    $isDup = ($existingLines | Where-Object { $_.Trim() -eq $entry.Trim() } | Select-Object -First 1) -ne $null
+    $isDup = $null -ne ($existingLines | Where-Object { $_.Trim() -eq $entry.Trim() } | Select-Object -First 1)
     if (-not $isDup) {
         $existingContent = $existingLines -join "`r`n"
         Set-Content -LiteralPath $bitacoraPath -Value "$entry`r`n$existingContent" -Encoding UTF8

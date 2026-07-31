@@ -52,7 +52,7 @@ if (-not (Test-Path $patternsDir)) {
 $script:patternIndex = @{}
 if (Test-Path $patternsDir) {
     foreach ($ixf in @(Get-ChildItem $patternsDir -Filter "*.json")) {
-        try { $ixp = Get-Content $ixf.FullName -Raw | ConvertFrom-Json; if ($ixp.title) { $script:patternIndex[$ixp.title.ToLower()] = $ixf.FullName } } catch { }
+        try { $ixp = Get-Content $ixf.FullName -Raw | ConvertFrom-Json; if ($ixp.title) { $script:patternIndex[$ixp.title.ToLower()] = $ixf.FullName } } catch { Write-Debug "wisdom-store: $($_.Exception.Message)" }
     }
 }
 

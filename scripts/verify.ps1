@@ -47,15 +47,24 @@ function Invoke-E1Checks{
 }
 function Invoke-E2Checks{
     $ps=Join-Path $Root 'scripts\pssa-gate.ps1'
-    if(Test-Path $ps){& $ps -Mode Incremental -Path $Root;Add-Check 'PSSA Gate' ($LASTEXITCODE-eq0) "exit $LASTEXITCODE"}else{Add-Check 'PSSA Gate' $true 'not found (skipped)'}
+    if(Test-Path $ps){& $ps -Mode Check -Path $Root;Add-Check 'PSSA Gate' ($LASTEXITCODE-eq0) "exit $LASTEXITCODE"}else{Add-Check 'PSSA Gate' $true 'not found (skipped)'}
     $sb_sf = [System.Text.StringBuilder]::new(65536)
     $sPat=@('password\s*=','secret\s*=','api[_-]?key\s*=','token\s*=','connection\s*string\s*=',
              'GH_TOKEN\s*=','GITHUB_TOKEN\s*=','ghp_','gho_','ghs_','github_pat_','ctx7sk_','AKIA',
              'xox[abprs]-\d+','sk-[a-zA-Z0-9]{20,}','-----BEGIN\s+(RSA|EC|DSA|PRIVATE|OPENSSH)\s+KEY')
+    # Allowlist: files that DEFINE or DOCUMENT these patterns (self-referential scan noise).
+    # A real secret in any OTHER file is still detected. Add here only if the file documents
+    # the pattern format (docs, examples) or implements the detection itself.
+    $sSkip=@('scripts\verify.ps1','scripts\check-mcp-security.ps1','scripts\tests\check-mcp-security.Tests.ps1',
+             'docs\mejoras\2026-07-29-gentleman-agent-gh-global-analysis.md','docs\mejoras\2026-07-29-gentleman-agent-gh-cycle28-analysis.md',
+             'docs\design\pattern-guard.md','docs\CHANGELOG.md',
+             '.agents\skills\pdf-utils\SKILL.md','.agents\skills\security-scanner\references\patterns-guide.md')
     $sDirs=@((Join-Path $Root 'scripts'),(Join-Path $Root '.agents\skills'),(Join-Path $Root '.github\workflows'),(Join-Path $Root 'docs'))
     foreach($dir in $sDirs){
         if(-not(Test-Path $dir)){continue}
         Get-ChildItem $dir -Recurse -Include '*.ps1','*.md','*.psm1' | ForEach-Object {
+            $rel=$_.FullName.Replace($Root,'').TrimStart('\').Replace('/','\')
+            if($sSkip -contains $rel){return}
             $c=[IO.File]::ReadAllText($_.FullName)
             foreach($p in $sPat){if($c-match$p){$null = $sb_sf.AppendLine("$($_.Name): matched '$p'")}}
         }

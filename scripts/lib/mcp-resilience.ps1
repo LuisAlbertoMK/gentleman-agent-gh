@@ -111,7 +111,7 @@ function Set-McpCircuitState {
             try {
                 $raw = Get-Content $script:CircuitStateFile -Raw -Encoding UTF8 | ConvertFrom-Json
                 if ($raw) { $raw.PSObject.Properties | ForEach-Object { $cache[$_.Name] = $_.Value } }
-            } catch { }
+            } catch { Write-Debug "mcp-resilience: $($_.Exception.Message)" }
         }
         $cache[$Server] = $State
         $cache | ConvertTo-Json -Depth 10 | Set-Content $script:CircuitStateFile -Encoding UTF8
@@ -228,7 +228,7 @@ function Test-McpServer {
         }
     } finally {
         if ($tcpClient) {
-            try { $tcpClient.Close() } catch { }
+            try { $tcpClient.Close() } catch { Write-Debug "mcp-resilience: $($_.Exception.Message)" }
         }
     }
 }

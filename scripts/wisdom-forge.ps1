@@ -135,7 +135,7 @@ function Test-NoConflict { param([string]$Name); return @(Get-ChildItem $skillsD
 
 $patternIndex = @{}
 foreach ($f in @(Get-ChildItem $patternsDir -Filter '*.json')) {
-    try { $p = Get-Content $f.FullName -Raw | ConvertFrom-Json; if ($p.id) { $patternIndex[$p.id] = $f.FullName } } catch { }
+    try { $p = Get-Content $f.FullName -Raw | ConvertFrom-Json; if ($p.id) { $patternIndex[$p.id] = $f.FullName } } catch { Write-Debug "wisdom-forge: $($_.Exception.Message)" }
 }
 
 # --- Main ---

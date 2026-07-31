@@ -259,7 +259,7 @@ try {
 } finally {
     # Always restore skip-worktree if we removed it
     if ($skipWorktreeRemoved) {
-        try { & "git" "-C" $repoRoot "update-index", "--skip-worktree", ".project.json" 2>$null } catch { }
+        try { & "git" "-C" $repoRoot "update-index", "--skip-worktree", ".project.json" 2>$null } catch { Write-Debug "score-auto: $($_.Exception.Message)" }
     }
 }
 
