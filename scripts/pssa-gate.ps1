@@ -9,7 +9,7 @@
 [string]$Path=(Get-Location).Path,[switch]$Quiet,
 [string]$BaselineFile=(Join-Path $Path 'docs\metricas\pssa-baseline.json'))
 Set-StrictMode -Version Latest;$ErrorActionPreference='Stop'
-$xd=@('experiments','skills');$xdAmp=$xd+'tests';$fr=@('PSUseBOMForUnicodeEncodedFile','PSAvoidDefaultValueSwitchParameter');$tr=@('PSAvoidUsingWriteHost')
+$xd=@('experiments','skills','node_modules');$xdAmp=$xd+'tests';$fr=@('PSUseBOMForUnicodeEncodedFile','PSAvoidDefaultValueSwitchParameter');$tr=@('PSAvoidUsingWriteHost')
 
 function Write-Status { param([string]$Message) if (-not $Quiet) { Write-Host "  $Message" } }
 function Get-PSSAViolation { param([string]$TargetPath,[string[]]$Files)
@@ -52,6 +52,7 @@ if($Mode -eq 'Incremental'){
 if(-not$Quiet){Write-Host "== PSSA Gate - $Mode ==";Write-Host "  Target: $target"}
 Write-Status "Scanning..."
 $results=Get-PSSAViolation -TargetPath $target -Files $scanFiles
+$results=@($results | Where-Object { $_.ScriptPath -notmatch '[\\/]node_modules[\\/]' })
 
 if($Mode -eq 'Fix'){Write-Host "`n-- Auto-fix --";$bf=Resolve-BomEncoding -Violations ($results | Where-Object {$_.RuleName -eq 'PSUseBOMForUnicodeEncodedFile'});$sf=Resolve-SwitchDefault -Violations ($results | Where-Object {$_.RuleName -eq 'PSAvoidDefaultValueSwitchParameter'});Write-Host "  BOM: $bf | Switch: $sf";Write-Status "Re-scanning...";$results=Get-PSSAViolation -TargetPath $target -Files $scanFiles}
 

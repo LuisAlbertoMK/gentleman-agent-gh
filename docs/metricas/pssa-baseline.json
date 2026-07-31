@@ -1,862 +1,754 @@
 {
-  "timestamp": "2026-07-31T09:22:05",
-  "trackedCount": 802,
-  "byFile": [
-    {
-      "count": 2,
-      "file": "_e2e_pipeline.Tests.ps1"
-    },
+  "manualPairs": [
     {
       "count": 1,
-      "file": "Add-Dimension.Tests.ps1"
-    },
-    {
-      "count": 1,
-      "file": "Aggregation.Tests.ps1"
-    },
-    {
-      "count": 6,
-      "file": "analyze-page.ps1"
-    },
-    {
-      "count": 31,
-      "file": "analyze-screenshot.ps1"
-    },
-    {
-      "count": 17,
-      "file": "audit-log.ps1"
-    },
-    {
-      "count": 14,
-      "file": "auto-pattern-detector.ps1"
-    },
-    {
-      "count": 6,
-      "file": "backup.ps1"
-    },
-    {
-      "count": 1,
-      "file": "bash-safe.ps1"
-    },
-    {
-      "count": 2,
-      "file": "bash-safe.Tests.ps1"
-    },
-    {
-      "count": 3,
-      "file": "batch.ps1"
-    },
-    {
-      "count": 29,
-      "file": "bench-compare.ps1"
-    },
-    {
-      "count": 20,
-      "file": "bootstrap.ps1"
-    },
-    {
-      "count": 2,
-      "file": "build-skill-registry.ps1"
-    },
-    {
-      "count": 1,
-      "file": "cache.ps1"
-    },
-    {
-      "count": 1,
-      "file": "CacheHash.Tests.ps1"
-    },
-    {
-      "count": 8,
-      "file": "check-backlog-integrity.ps1"
-    },
-    {
-      "count": 10,
+      "rule": "PSReviewUnusedParameter",
       "file": "check-mcp-security.ps1"
     },
     {
-      "count": 1,
-      "file": "check-mcp-security.Tests.ps1"
-    },
-    {
       "count": 2,
-      "file": "check.ps1"
-    },
-    {
-      "count": 2,
-      "file": "close-session.Integration.Tests.ps1"
-    },
-    {
-      "count": 32,
-      "file": "close-session.ps1"
-    },
-    {
-      "count": 4,
-      "file": "close-session.Tests.ps1"
-    },
-    {
-      "count": 41,
-      "file": "cross-ref-check.ps1"
-    },
-    {
-      "count": 3,
-      "file": "CrossRefPatterns.Tests.ps1"
-    },
-    {
-      "count": 4,
-      "file": "data-pipeline.ps1"
-    },
-    {
-      "count": 3,
-      "file": "destructive-scripts.Tests.ps1"
-    },
-    {
-      "count": 29,
+      "rule": "PSReviewUnusedParameter",
       "file": "dev-server.ps1"
     },
     {
-      "count": 4,
-      "file": "e2e-test.ps1"
-    },
-    {
-      "count": 6,
-      "file": "engram-validate.ps1"
-    },
-    {
-      "count": 2,
-      "file": "engram-validate.Tests.ps1"
-    },
-    {
       "count": 1,
-      "file": "ensure-tools.ps1"
-    },
-    {
-      "count": 7,
-      "file": "expand-config.ps1"
-    },
-    {
-      "count": 9,
-      "file": "extract-skill.ps1"
-    },
-    {
-      "count": 2,
-      "file": "forge-rollback.Integration.Tests.ps1"
-    },
-    {
-      "count": 6,
-      "file": "forge-rollback.ps1"
-    },
-    {
-      "count": 1,
-      "file": "forge-rollback.Tests.ps1"
-    },
-    {
-      "count": 2,
+      "rule": "PSReviewUnusedParameter",
       "file": "global-setup.ps1"
     },
     {
-      "count": 3,
+      "count": 2,
+      "rule": "PSReviewUnusedParameter",
       "file": "health-check.ps1"
     },
     {
       "count": 1,
-      "file": "health-check.Tests.ps1"
-    },
-    {
-      "count": 1,
-      "file": "install_media_pack.ps1"
-    },
-    {
-      "count": 3,
-      "file": "install_webkit_wsl.ps1"
-    },
-    {
-      "count": 1,
+      "rule": "PSReviewUnusedParameter",
       "file": "intake-debug.ps1"
     },
     {
-      "count": 11,
+      "count": 1,
+      "rule": "PSReviewUnusedParameter",
       "file": "intake-verify.ps1"
     },
     {
-      "count": 8,
+      "count": 3,
+      "rule": "PSReviewUnusedParameter",
       "file": "inter-track.ps1"
     },
     {
-      "count": 1,
-      "file": "JsonFast.psm1"
-    },
-    {
-      "count": 1,
-      "file": "JunctionLogic.Tests.ps1"
-    },
-    {
-      "count": 13,
-      "file": "learning-stats.ps1"
-    },
-    {
-      "count": 4,
+      "count": 2,
+      "rule": "PSReviewUnusedParameter",
       "file": "mcp-resilience.ps1"
     },
     {
-      "count": 1,
-      "file": "mode-gate.Integration.Tests.ps1"
-    },
-    {
-      "count": 11,
-      "file": "mode-gate.ps1"
-    },
-    {
-      "count": 9,
-      "file": "pattern-guard.ps1"
-    },
-    {
-      "count": 9,
+      "count": 2,
+      "rule": "PSReviewUnusedParameter",
       "file": "permission-gate.ps1"
     },
     {
       "count": 1,
-      "file": "permission-gate.Tests.ps1"
-    },
-    {
-      "count": 4,
+      "rule": "PSReviewUnusedParameter",
       "file": "pipeline-analyze.ps1"
     },
     {
       "count": 1,
-      "file": "platform.ps1"
-    },
-    {
-      "count": 8,
-      "file": "ponytail-audit.ps1"
-    },
-    {
-      "count": 30,
-      "file": "pre-commit-gate.ps1"
-    },
-    {
-      "count": 17,
-      "file": "project-cycle.ps1"
-    },
-    {
-      "count": 12,
-      "file": "project-profile.ps1"
-    },
-    {
-      "count": 20,
-      "file": "pssa-gate.ps1"
-    },
-    {
-      "count": 19,
-      "file": "pull-upstream.ps1"
-    },
-    {
-      "count": 4,
-      "file": "reinstall_chrome_beta_win.ps1"
-    },
-    {
-      "count": 4,
-      "file": "reinstall_chrome_stable_win.ps1"
-    },
-    {
-      "count": 4,
-      "file": "reinstall_msedge_beta_win.ps1"
-    },
-    {
-      "count": 4,
-      "file": "reinstall_msedge_dev_win.ps1"
-    },
-    {
-      "count": 4,
-      "file": "reinstall_msedge_stable_win.ps1"
-    },
-    {
-      "count": 7,
+      "rule": "PSReviewUnusedParameter",
       "file": "restore-project-score.ps1"
     },
     {
-      "count": 12,
-      "file": "restore.ps1"
-    },
-    {
-      "count": 18,
-      "file": "restore.Tests.ps1"
-    },
-    {
-      "count": 24,
-      "file": "run-dreaming.ps1"
-    },
-    {
-      "count": 19,
-      "file": "run-improvement-cycle.ps1"
-    },
-    {
-      "count": 9,
-      "file": "run-tests.ps1"
-    },
-    {
-      "count": 24,
-      "file": "scan-skills.ps1"
-    },
-    {
-      "count": 15,
-      "file": "score-auto.ps1"
-    },
-    {
-      "count": 1,
-      "file": "score-dims.ps1"
-    },
-    {
-      "count": 4,
-      "file": "ScoreIntegration.Tests.ps1"
-    },
-    {
-      "count": 1,
-      "file": "ScoreMaths.Tests.ps1"
-    },
-    {
-      "count": 14,
-      "file": "session-miner.ps1"
-    },
-    {
-      "count": 11,
-      "file": "session-miner.Tests.ps1"
-    },
-    {
-      "count": 12,
+      "count": 2,
+      "rule": "PSReviewUnusedParameter",
       "file": "setup-install.ps1"
     },
     {
-      "count": 23,
+      "count": 3,
+      "rule": "PSReviewUnusedParameter",
       "file": "setup-machine.ps1"
     },
     {
-      "count": 11,
-      "file": "setup-machine.Tests.ps1"
-    },
-    {
-      "count": 14,
-      "file": "skill-graph.ps1"
-    },
-    {
       "count": 1,
-      "file": "skill-graph.Tests.ps1"
-    },
-    {
-      "count": 1,
+      "rule": "PSReviewUnusedParameter",
       "file": "skill-resolver-fast.ps1"
     },
     {
-      "count": 15,
+      "count": 1,
+      "rule": "PSReviewUnusedParameter",
       "file": "skillspector-gate.ps1"
     },
     {
-      "count": 7,
-      "file": "smoke-all.ps1"
-    },
-    {
-      "count": 5,
-      "file": "smoke-backlog-integrity.ps1"
-    },
-    {
-      "count": 5,
-      "file": "smoke-cycle-loop.ps1"
-    },
-    {
-      "count": 3,
-      "file": "smoke-dreaming.ps1"
-    },
-    {
-      "count": 4,
-      "file": "smoke-jsonfast.ps1"
-    },
-    {
-      "count": 5,
-      "file": "smoke-score-freshness.ps1"
-    },
-    {
-      "count": 5,
-      "file": "smoke-upstream-check.ps1"
-    },
-    {
-      "count": 3,
-      "file": "smoke-wisdom-demote.ps1"
-    },
-    {
-      "count": 6,
-      "file": "smoke-wisdom-forge.ps1"
-    },
-    {
-      "count": 3,
-      "file": "smoke-wisdom-loader.ps1"
-    },
-    {
-      "count": 4,
-      "file": "smoke-wisdom-stats.ps1"
-    },
-    {
-      "count": 2,
-      "file": "smoke-wisdom-store.ps1"
-    },
-    {
-      "count": 11,
-      "file": "switch-mode.ps1"
-    },
-    {
       "count": 1,
-      "file": "sync-all.ps1"
-    },
-    {
-      "count": 21,
+      "rule": "PSReviewUnusedParameter",
       "file": "sync-global-ps5.ps1"
     },
     {
-      "count": 19,
+      "count": 3,
+      "rule": "PSReviewUnusedParameter",
       "file": "sync-global.ps1"
     },
     {
       "count": 2,
+      "rule": "PSReviewUnusedParameter",
       "file": "sync-vmk.ps1"
     },
     {
-      "count": 1,
-      "file": "sync-vmk.Tests.ps1"
-    },
-    {
-      "count": 3,
-      "file": "token-count.ps1"
-    },
-    {
-      "count": 2,
-      "file": "tokenize-all.ps1"
-    },
-    {
-      "count": 16,
-      "file": "tokenize.ps1"
-    },
-    {
       "count": 10,
+      "rule": "PSReviewUnusedParameter",
       "file": "trend.ps1"
     },
     {
-      "count": 13,
-      "file": "use-gentleman.ps1"
-    },
-    {
-      "count": 2,
-      "file": "validate-write-scope.Integration.Tests.ps1"
-    },
-    {
       "count": 1,
-      "file": "validate-write-scope.Tests.ps1"
-    },
-    {
-      "count": 5,
+      "rule": "PSReviewUnusedParameter",
       "file": "verify.ps1"
     },
     {
-      "count": 12,
+      "count": 1,
+      "rule": "PSReviewUnusedParameter",
       "file": "wisdom-demote.ps1"
     },
     {
-      "count": 17,
-      "file": "wisdom-forge.ps1"
-    },
-    {
-      "count": 11,
-      "file": "wisdom-loader.ps1"
-    },
-    {
-      "count": 18,
+      "count": 1,
+      "rule": "PSReviewUnusedParameter",
       "file": "wisdom-stats.ps1"
     },
     {
-      "count": 7,
+      "count": 1,
+      "rule": "PSReviewUnusedParameter",
       "file": "wisdom-store.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseApprovedVerbs",
+      "file": "build-skill-registry.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseApprovedVerbs",
+      "file": "check.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseApprovedVerbs",
+      "file": "health-check.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseApprovedVerbs",
+      "file": "JsonFast.psm1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseApprovedVerbs",
+      "file": "permission-gate.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseApprovedVerbs",
+      "file": "skillspector-gate.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseApprovedVerbs",
+      "file": "smoke-all.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseApprovedVerbs",
+      "file": "wisdom-forge.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseApprovedVerbs",
+      "file": "wisdom-store.ps1"
+    },
+    {
+      "count": 2,
+      "rule": "PSUseDeclaredVarsMoreThanAssignments",
+      "file": "engram-validate.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseDeclaredVarsMoreThanAssignments",
+      "file": "intake-verify.ps1"
+    },
+    {
+      "count": 6,
+      "rule": "PSUseDeclaredVarsMoreThanAssignments",
+      "file": "score-auto.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseShouldProcessForStateChangingFunctions",
+      "file": "cache.ps1"
+    },
+    {
+      "count": 2,
+      "rule": "PSUseShouldProcessForStateChangingFunctions",
+      "file": "dev-server.ps1"
+    },
+    {
+      "count": 2,
+      "rule": "PSUseShouldProcessForStateChangingFunctions",
+      "file": "mcp-resilience.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseShouldProcessForStateChangingFunctions",
+      "file": "platform.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseShouldProcessForStateChangingFunctions",
+      "file": "skill-graph.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseShouldProcessForStateChangingFunctions",
+      "file": "wisdom-forge.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseShouldProcessForStateChangingFunctions",
+      "file": "wisdom-store.ps1"
+    },
+    {
+      "count": 4,
+      "rule": "PSUseSingularNouns",
+      "file": "auto-pattern-detector.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseSingularNouns",
+      "file": "check-backlog-integrity.ps1"
+    },
+    {
+      "count": 2,
+      "rule": "PSUseSingularNouns",
+      "file": "cross-ref-check.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseSingularNouns",
+      "file": "dev-server.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseSingularNouns",
+      "file": "global-setup.ps1"
+    },
+    {
+      "count": 3,
+      "rule": "PSUseSingularNouns",
+      "file": "learning-stats.ps1"
+    },
+    {
+      "count": 3,
+      "rule": "PSUseSingularNouns",
+      "file": "run-dreaming.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseSingularNouns",
+      "file": "sync-global-ps5.ps1"
+    },
+    {
+      "count": 3,
+      "rule": "PSUseSingularNouns",
+      "file": "verify.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseSingularNouns",
+      "file": "wisdom-forge.ps1"
     }
   ],
-  "manualCount": 107,
   "autoFixableCount": 17,
+  "trackedCount": 779,
+  "total": 946,
+  "manualCount": 91,
+  "ampersandCount": 0,
   "byRule": [
     {
-      "rule": "PSAvoidAssignmentToAutomaticVariable",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidAssignmentToAutomaticVariable"
     },
     {
-      "rule": "PSAvoidDefaultValueSwitchParameter",
-      "count": 5
+      "count": 5,
+      "rule": "PSAvoidDefaultValueSwitchParameter"
     },
     {
-      "rule": "PSAvoidGlobalVars",
-      "count": 22
+      "count": 18,
+      "rule": "PSAvoidGlobalVars"
     },
     {
-      "rule": "PSAvoidOverwritingBuiltInCmdlets",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingCmdletAliases",
-      "count": 1
+      "count": 779,
+      "rule": "PSAvoidUsingWriteHost"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
-      "count": 1
+      "count": 60,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSAvoidUsingWMICmdlet",
-      "count": 1
+      "count": 9,
+      "rule": "PSUseApprovedVerbs"
     },
     {
-      "rule": "PSAvoidUsingWriteHost",
-      "count": 802
+      "count": 12,
+      "rule": "PSUseBOMForUnicodeEncodedFile"
     },
     {
-      "rule": "PSReviewUnusedParameter",
-      "count": 60
+      "count": 22,
+      "rule": "PSUseDeclaredVarsMoreThanAssignments"
     },
     {
-      "rule": "PSUseApprovedVerbs",
-      "count": 9
+      "count": 15,
+      "rule": "PSUseShouldProcessForStateChangingFunctions"
     },
     {
-      "rule": "PSUseBOMForUnicodeEncodedFile",
-      "count": 12
-    },
-    {
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
-      "count": 31
-    },
-    {
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
-      "count": 15
-    },
-    {
-      "rule": "PSUseSingularNouns",
-      "count": 24
+      "count": 24,
+      "rule": "PSUseSingularNouns"
     }
   ],
-  "manualPairs": [
+  "timestamp": "2026-07-31T10:26:15",
+  "byFile": [
     {
-      "file": "setup-machine.ps1",
-      "rule": "PSAvoidGlobalVars",
-      "count": 4
-    },
-    {
-      "file": "run-dreaming.ps1",
-      "rule": "PSAvoidOverwritingBuiltInCmdlets",
-      "count": 1
-    },
-    {
-      "file": "wisdom-forge.ps1",
-      "rule": "PSAvoidUsingCmdletAliases",
-      "count": 1
-    },
-    {
-      "file": "install_media_pack.ps1",
-      "rule": "PSAvoidUsingWMICmdlet",
-      "count": 1
-    },
-    {
-      "file": "check-mcp-security.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 1
-    },
-    {
-      "file": "dev-server.ps1",
-      "rule": "PSReviewUnusedParameter",
+      "file": "_e2e_pipeline.Tests.ps1",
       "count": 2
     },
     {
-      "file": "global-setup.ps1",
-      "rule": "PSReviewUnusedParameter",
+      "file": "Add-Dimension.Tests.ps1",
       "count": 1
     },
     {
-      "file": "health-check.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 2
-    },
-    {
-      "file": "intake-debug.ps1",
-      "rule": "PSReviewUnusedParameter",
+      "file": "Aggregation.Tests.ps1",
       "count": 1
     },
     {
-      "file": "intake-verify.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 1
-    },
-    {
-      "file": "inter-track.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 3
-    },
-    {
-      "file": "mcp-resilience.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 2
-    },
-    {
-      "file": "permission-gate.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 2
-    },
-    {
-      "file": "pipeline-analyze.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 1
-    },
-    {
-      "file": "restore-project-score.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 1
-    },
-    {
-      "file": "setup-install.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 2
-    },
-    {
-      "file": "setup-machine.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 3
-    },
-    {
-      "file": "skill-resolver-fast.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 1
-    },
-    {
-      "file": "skillspector-gate.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 1
-    },
-    {
-      "file": "sync-global-ps5.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 1
-    },
-    {
-      "file": "sync-global.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 3
-    },
-    {
-      "file": "sync-vmk.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 2
-    },
-    {
-      "file": "trend.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 10
-    },
-    {
-      "file": "verify.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 1
-    },
-    {
-      "file": "wisdom-demote.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 1
-    },
-    {
-      "file": "wisdom-stats.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 1
-    },
-    {
-      "file": "wisdom-store.ps1",
-      "rule": "PSReviewUnusedParameter",
-      "count": 1
-    },
-    {
-      "file": "build-skill-registry.ps1",
-      "rule": "PSUseApprovedVerbs",
-      "count": 1
-    },
-    {
-      "file": "check.ps1",
-      "rule": "PSUseApprovedVerbs",
-      "count": 1
-    },
-    {
-      "file": "health-check.ps1",
-      "rule": "PSUseApprovedVerbs",
-      "count": 1
-    },
-    {
-      "file": "JsonFast.psm1",
-      "rule": "PSUseApprovedVerbs",
-      "count": 1
-    },
-    {
-      "file": "permission-gate.ps1",
-      "rule": "PSUseApprovedVerbs",
-      "count": 1
-    },
-    {
-      "file": "skillspector-gate.ps1",
-      "rule": "PSUseApprovedVerbs",
-      "count": 1
-    },
-    {
-      "file": "smoke-all.ps1",
-      "rule": "PSUseApprovedVerbs",
-      "count": 1
-    },
-    {
-      "file": "wisdom-forge.ps1",
-      "rule": "PSUseApprovedVerbs",
-      "count": 1
-    },
-    {
-      "file": "wisdom-store.ps1",
-      "rule": "PSUseApprovedVerbs",
-      "count": 1
+      "file": "analyze-page.ps1",
+      "count": 6
     },
     {
       "file": "analyze-screenshot.ps1",
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
-      "count": 1
+      "count": 30
+    },
+    {
+      "file": "audit-log.ps1",
+      "count": 17
     },
     {
       "file": "auto-pattern-detector.ps1",
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
+      "count": 13
+    },
+    {
+      "file": "backup.ps1",
+      "count": 6
+    },
+    {
+      "file": "bash-safe.ps1",
+      "count": 1
+    },
+    {
+      "file": "bash-safe.Tests.ps1",
+      "count": 2
+    },
+    {
+      "file": "batch.ps1",
+      "count": 3
+    },
+    {
+      "file": "bench-compare.ps1",
+      "count": 29
+    },
+    {
+      "file": "bootstrap.ps1",
+      "count": 20
+    },
+    {
+      "file": "build-skill-registry.ps1",
+      "count": 2
+    },
+    {
+      "file": "cache.ps1",
+      "count": 1
+    },
+    {
+      "file": "CacheHash.Tests.ps1",
+      "count": 1
+    },
+    {
+      "file": "check-backlog-integrity.ps1",
+      "count": 8
+    },
+    {
+      "file": "check-mcp-security.ps1",
+      "count": 10
+    },
+    {
+      "file": "check-mcp-security.Tests.ps1",
       "count": 1
     },
     {
       "file": "check.ps1",
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
       "count": 1
     },
     {
-      "file": "dev-server.ps1",
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
+      "file": "close-session.Integration.Tests.ps1",
       "count": 2
     },
     {
+      "file": "close-session.ps1",
+      "count": 32
+    },
+    {
+      "file": "close-session.Tests.ps1",
+      "count": 4
+    },
+    {
+      "file": "cross-ref-check.ps1",
+      "count": 41
+    },
+    {
+      "file": "CrossRefPatterns.Tests.ps1",
+      "count": 3
+    },
+    {
+      "file": "data-pipeline.ps1",
+      "count": 4
+    },
+    {
+      "file": "destructive-scripts.Tests.ps1",
+      "count": 3
+    },
+    {
+      "file": "dev-server.ps1",
+      "count": 27
+    },
+    {
+      "file": "e2e-test.ps1",
+      "count": 4
+    },
+    {
       "file": "engram-validate.ps1",
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
+      "count": 6
+    },
+    {
+      "file": "engram-validate.Tests.ps1",
+      "count": 2
+    },
+    {
+      "file": "ensure-tools.ps1",
+      "count": 1
+    },
+    {
+      "file": "expand-config.ps1",
+      "count": 7
+    },
+    {
+      "file": "extract-skill.ps1",
+      "count": 9
+    },
+    {
+      "file": "forge-rollback.Integration.Tests.ps1",
       "count": 2
     },
     {
       "file": "forge-rollback.ps1",
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
-      "count": 1
+      "count": 5
     },
     {
-      "file": "intake-verify.ps1",
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
-      "count": 1
-    },
-    {
-      "file": "score-auto.ps1",
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
-      "count": 6
-    },
-    {
-      "file": "score-dims.ps1",
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
-      "count": 1
-    },
-    {
-      "file": "switch-mode.ps1",
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
-      "count": 1
-    },
-    {
-      "file": "sync-all.ps1",
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
-      "count": 1
-    },
-    {
-      "file": "cache.ps1",
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
-      "count": 1
-    },
-    {
-      "file": "dev-server.ps1",
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
-      "count": 2
-    },
-    {
-      "file": "mcp-resilience.ps1",
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
-      "count": 2
-    },
-    {
-      "file": "platform.ps1",
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
-      "count": 1
-    },
-    {
-      "file": "skill-graph.ps1",
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
-      "count": 1
-    },
-    {
-      "file": "wisdom-forge.ps1",
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
-      "count": 1
-    },
-    {
-      "file": "wisdom-store.ps1",
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
-      "count": 1
-    },
-    {
-      "file": "auto-pattern-detector.ps1",
-      "rule": "PSUseSingularNouns",
-      "count": 4
-    },
-    {
-      "file": "check-backlog-integrity.ps1",
-      "rule": "PSUseSingularNouns",
-      "count": 1
-    },
-    {
-      "file": "cross-ref-check.ps1",
-      "rule": "PSUseSingularNouns",
-      "count": 2
-    },
-    {
-      "file": "dev-server.ps1",
-      "rule": "PSUseSingularNouns",
+      "file": "forge-rollback.Tests.ps1",
       "count": 1
     },
     {
       "file": "global-setup.ps1",
-      "rule": "PSUseSingularNouns",
+      "count": 2
+    },
+    {
+      "file": "health-check.ps1",
+      "count": 3
+    },
+    {
+      "file": "health-check.Tests.ps1",
+      "count": 1
+    },
+    {
+      "file": "intake-debug.ps1",
+      "count": 1
+    },
+    {
+      "file": "intake-verify.ps1",
+      "count": 11
+    },
+    {
+      "file": "inter-track.ps1",
+      "count": 8
+    },
+    {
+      "file": "JsonFast.psm1",
+      "count": 1
+    },
+    {
+      "file": "JunctionLogic.Tests.ps1",
       "count": 1
     },
     {
       "file": "learning-stats.ps1",
-      "rule": "PSUseSingularNouns",
-      "count": 3
+      "count": 13
+    },
+    {
+      "file": "mcp-resilience.ps1",
+      "count": 4
+    },
+    {
+      "file": "mode-gate.Integration.Tests.ps1",
+      "count": 1
+    },
+    {
+      "file": "mode-gate.ps1",
+      "count": 11
+    },
+    {
+      "file": "pattern-guard.ps1",
+      "count": 9
+    },
+    {
+      "file": "permission-gate.ps1",
+      "count": 9
+    },
+    {
+      "file": "permission-gate.Tests.ps1",
+      "count": 1
+    },
+    {
+      "file": "pipeline-analyze.ps1",
+      "count": 4
+    },
+    {
+      "file": "platform.ps1",
+      "count": 1
+    },
+    {
+      "file": "ponytail-audit.ps1",
+      "count": 8
+    },
+    {
+      "file": "pre-commit-gate.ps1",
+      "count": 30
+    },
+    {
+      "file": "project-cycle.ps1",
+      "count": 17
+    },
+    {
+      "file": "project-profile.ps1",
+      "count": 12
+    },
+    {
+      "file": "pssa-gate.ps1",
+      "count": 20
+    },
+    {
+      "file": "pull-upstream.ps1",
+      "count": 19
+    },
+    {
+      "file": "restore-project-score.ps1",
+      "count": 7
+    },
+    {
+      "file": "restore.ps1",
+      "count": 12
+    },
+    {
+      "file": "restore.Tests.ps1",
+      "count": 18
     },
     {
       "file": "run-dreaming.ps1",
-      "rule": "PSUseSingularNouns",
+      "count": 23
+    },
+    {
+      "file": "run-improvement-cycle.ps1",
+      "count": 19
+    },
+    {
+      "file": "run-tests.ps1",
+      "count": 9
+    },
+    {
+      "file": "scan-skills.ps1",
+      "count": 24
+    },
+    {
+      "file": "score-auto.ps1",
+      "count": 15
+    },
+    {
+      "file": "ScoreIntegration.Tests.ps1",
+      "count": 4
+    },
+    {
+      "file": "ScoreMaths.Tests.ps1",
+      "count": 1
+    },
+    {
+      "file": "session-miner.ps1",
+      "count": 14
+    },
+    {
+      "file": "session-miner.Tests.ps1",
+      "count": 11
+    },
+    {
+      "file": "setup-install.ps1",
+      "count": 12
+    },
+    {
+      "file": "setup-machine.ps1",
+      "count": 19
+    },
+    {
+      "file": "setup-machine.Tests.ps1",
+      "count": 11
+    },
+    {
+      "file": "skill-graph.ps1",
+      "count": 14
+    },
+    {
+      "file": "skill-graph.Tests.ps1",
+      "count": 1
+    },
+    {
+      "file": "skill-resolver-fast.ps1",
+      "count": 1
+    },
+    {
+      "file": "skillspector-gate.ps1",
+      "count": 15
+    },
+    {
+      "file": "smoke-all.ps1",
+      "count": 7
+    },
+    {
+      "file": "smoke-backlog-integrity.ps1",
+      "count": 5
+    },
+    {
+      "file": "smoke-cycle-loop.ps1",
+      "count": 5
+    },
+    {
+      "file": "smoke-dreaming.ps1",
       "count": 3
     },
     {
+      "file": "smoke-jsonfast.ps1",
+      "count": 4
+    },
+    {
+      "file": "smoke-score-freshness.ps1",
+      "count": 5
+    },
+    {
+      "file": "smoke-upstream-check.ps1",
+      "count": 5
+    },
+    {
+      "file": "smoke-wisdom-demote.ps1",
+      "count": 3
+    },
+    {
+      "file": "smoke-wisdom-forge.ps1",
+      "count": 6
+    },
+    {
+      "file": "smoke-wisdom-loader.ps1",
+      "count": 3
+    },
+    {
+      "file": "smoke-wisdom-stats.ps1",
+      "count": 4
+    },
+    {
+      "file": "smoke-wisdom-store.ps1",
+      "count": 2
+    },
+    {
+      "file": "switch-mode.ps1",
+      "count": 10
+    },
+    {
       "file": "sync-global-ps5.ps1",
-      "rule": "PSUseSingularNouns",
+      "count": 21
+    },
+    {
+      "file": "sync-global.ps1",
+      "count": 19
+    },
+    {
+      "file": "sync-vmk.ps1",
+      "count": 2
+    },
+    {
+      "file": "sync-vmk.Tests.ps1",
+      "count": 1
+    },
+    {
+      "file": "token-count.ps1",
+      "count": 3
+    },
+    {
+      "file": "tokenize-all.ps1",
+      "count": 2
+    },
+    {
+      "file": "tokenize.ps1",
+      "count": 16
+    },
+    {
+      "file": "trend.ps1",
+      "count": 10
+    },
+    {
+      "file": "use-gentleman.ps1",
+      "count": 13
+    },
+    {
+      "file": "validate-write-scope.Integration.Tests.ps1",
+      "count": 2
+    },
+    {
+      "file": "validate-write-scope.Tests.ps1",
       "count": 1
     },
     {
       "file": "verify.ps1",
-      "rule": "PSUseSingularNouns",
-      "count": 3
+      "count": 5
+    },
+    {
+      "file": "wisdom-demote.ps1",
+      "count": 12
     },
     {
       "file": "wisdom-forge.ps1",
-      "rule": "PSUseSingularNouns",
-      "count": 1
+      "count": 16
+    },
+    {
+      "file": "wisdom-loader.ps1",
+      "count": 11
+    },
+    {
+      "file": "wisdom-stats.ps1",
+      "count": 18
+    },
+    {
+      "file": "wisdom-store.ps1",
+      "count": 7
     }
-  ],
-  "total": 985,
-  "ampersandCount": 0
+  ]
 }
