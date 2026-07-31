@@ -47,7 +47,7 @@ function Invoke-E1Checks{
 }
 function Invoke-E2Checks{
     $ps=Join-Path $Root 'scripts\pssa-gate.ps1'
-    if(Test-Path $ps){& $ps -Mode Check;Add-Check 'PSSA Gate' ($LASTEXITCODE-eq0) "exit $LASTEXITCODE"}else{Add-Check 'PSSA Gate' $true 'not found (skipped)'}
+    if(Test-Path $ps){& $ps -Mode Incremental -Path $Root;Add-Check 'PSSA Gate' ($LASTEXITCODE-eq0) "exit $LASTEXITCODE"}else{Add-Check 'PSSA Gate' $true 'not found (skipped)'}
     $sb_sf = [System.Text.StringBuilder]::new(65536)
     $sPat=@('password\s*=','secret\s*=','api[_-]?key\s*=','token\s*=','connection\s*string\s*=',
              'GH_TOKEN\s*=','GITHUB_TOKEN\s*=','ghp_','gho_','ghs_','github_pat_','ctx7sk_','AKIA',

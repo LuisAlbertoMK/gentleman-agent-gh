@@ -45,7 +45,7 @@ $bl | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $BaselineFile -Encodin
 $target=Resolve-Path $Path
 $scanFiles=$null
 if($Mode -eq 'Incremental'){
-  $changed=@(git diff --cached --name-only --diff-filter=ACMR -- '*.ps1' 2>$null | Where-Object {$_ -and (Test-Path $_)})
+  $changed=@(git -C $target diff --cached --name-only --diff-filter=ACMR -- '*.ps1' 2>$null | Where-Object {$_} | ForEach-Object {Join-Path $target ($_.Replace('/','\'))} | Where-Object {Test-Path $_})
   if($changed.Count -gt 0){$scanFiles=$changed;Write-Status "Incremental: $($changed.Count) changed file(s)"}
   else{Write-Status "Incremental: no cached .ps1 changes — falling back to full scan"}
 }
@@ -59,9 +59,24 @@ $af=@($results | Where-Object {$_.RuleName -in $fr});$td=@($results | Where-Obje
 $ev=@($manual | Where-Object {$sp=$_.ScriptPath.Replace('\','/');$sk=$false;foreach($d in $xd){if($sp-match"/$d/"){$sk=$true;break}};$sk})
 $manual=@($manual | Where-Object {$sp=$_.ScriptPath.Replace('\','/');$sk=$false;foreach($d in $xd){if($sp-match"/$d/"){$sk=$true;break}};-not$sk})
 
-$kx=@('bash-safe.ps1','pssa-gate.ps1');$av=[IO.Directory]::EnumerateFiles($target, '*.ps1', [IO.SearchOption]::AllDirectories) | ForEach-Object {$rp=$_.Replace($using:target,'').TrimStart('\');$sk=$false;foreach($ex in $using:kx){if($rp-match[regex]::Escape($ex)){$sk=$true}};foreach($d in $using:xd){if($rp-match"^$d[\\/]"){$sk=$true}};if($sk){return}
-try{$ln=[IO.File]::ReadAllText($_)}catch{return};$ln=$ln -split '\r?\n'
-$results=@();for($i=0;$i-lt$ln.Count;$i++){$t=$ln[$i].Trim();if($t-eq''-or$t.StartsWith('#')){continue};if($t-match'(^|[^""])&&([^""]|$)'){$results+=[PSCustomObject]@{ScriptName=$rp;Line=$i+1;Text=$t}}};$results} -ThrottleLimit 4
+$kx=@('bash-safe.ps1','pssa-gate.ps1')
+$xdAmp=@($xd + 'tests')
+$av=[IO.Directory]::EnumerateFiles($target, '*.ps1', [IO.SearchOption]::AllDirectories) | ForEach-Object -Parallel {
+    $rp=$_.Replace($using:target,'').TrimStart('\')
+    $sk=$false
+    foreach($ex in $using:kx){if($rp-match[regex]::Escape($ex)){$sk=$true}}
+    foreach($d in $using:xdAmp){if($rp-match"(^|[\\/])$d[\\/]"){$sk=$true}}
+    if($sk){return}
+    try{$ln=[IO.File]::ReadAllText($_)}catch{return}
+    $ln=$ln -split '\r?\n'
+    $res=@()
+    for($i=0;$i-lt$ln.Count;$i++){
+        $t=$ln[$i].Trim()
+        if($t-eq''-or$t.StartsWith('#')){continue}
+        if($t-match'(^|[^""])&&([^""]|$)'){$res+=[PSCustomObject]@{ScriptName=$rp;Line=$i+1;Text=$t}}
+    }
+    $res
+} -ThrottleLimit 4
 $av=@($av|Where-Object{$_})
 $ac=$av.Count
 
