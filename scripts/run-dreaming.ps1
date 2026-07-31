@@ -30,13 +30,13 @@ if (-not (Test-Path $learningsDir)) {
     New-Item -ItemType Directory -Path $learningsDir -Force | Out-Null
 }
 
-function Write-Log {
+function Write-LogMessage {
     param([string]$Section, [string]$Message)
     $line = "| $timestamp | $cycleId | $Section | $Message |"
     try {
         Add-Content -Path $logFile -Value $line
     } catch {
-        Write-Debug "dreaming: Write-Log failed ($($_.Exception.Message))"
+        Write-Debug "dreaming: Write-LogMessage failed ($($_.Exception.Message))"
     }
 }
 
@@ -254,4 +254,4 @@ if ($learningCounts.Count -gt 0) { $finalPatterns = $learningCounts.Keys.Count }
 # ponytail: explicit GC at session boundary — regex+pattern processing may hold large strings
 $errorCounts=$learningCounts=$repeated=$workflowPatterns=$feedPatterns=$null;[GC]::Collect()
 $msg = "Mode=$Mode | Repeated=$finalRepeated | Patterns=$finalPatterns"
-Write-Log -Section 'Dreaming' -Message $msg
+Write-LogMessage -Section 'Dreaming' -Message $msg

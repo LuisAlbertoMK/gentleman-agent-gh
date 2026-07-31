@@ -124,7 +124,7 @@ function Get-TriggerCache {
     if ($script:triggerCache) { return $script:triggerCache }
     $set = @{}
     foreach ($f in @(Get-ChildItem $skillsDir -Filter 'SKILL.md' -Recurse -EA SilentlyContinue)) {
-        try { $c = Get-Content $f.FullName -Raw; if ($c -match '(?s)triggers:\s*"([^"]+)"') { ($Matches[1] -split ',') | % { $set[$_.Trim().ToLower()] = $true } } } catch { continue }
+        try { $c = Get-Content $f.FullName -Raw; if ($c -match '(?s)triggers:\s*"([^"]+)"') { ($Matches[1] -split ',') | ForEach-Object { $set[$_.Trim().ToLower()] = $true } } } catch { continue }
     }
     $script:triggerCache = $set
     return $set

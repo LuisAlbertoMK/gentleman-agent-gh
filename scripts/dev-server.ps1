@@ -128,11 +128,11 @@ function Start-Server {
     $outStream = [System.IO.StreamWriter]::new($outFile, $false, [System.Text.UTF8Encoding]::new($false))
     $errStream = [System.IO.StreamWriter]::new($errFile, $false, [System.Text.UTF8Encoding]::new($false))
     # Use Register-ObjectEvent: PowerShell .NET events aren't directly callable
-    $outEvent = Register-ObjectEvent -InputObject $p -EventName OutputDataReceived -MessageData $outStream -Action {
+    Register-ObjectEvent -InputObject $p -EventName OutputDataReceived -MessageData $outStream -Action {
         $d = $Event.SourceEventArgs.Data
         if ($d) { $Event.MessageData.WriteLine($d); $Event.MessageData.Flush() }
     }
-    $errEvent = Register-ObjectEvent -InputObject $p -EventName ErrorDataReceived -MessageData $errStream -Action {
+    Register-ObjectEvent -InputObject $p -EventName ErrorDataReceived -MessageData $errStream -Action {
         $d = $Event.SourceEventArgs.Data
         if ($d) { $Event.MessageData.WriteLine($d); $Event.MessageData.Flush() }
     }

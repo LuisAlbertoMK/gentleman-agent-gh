@@ -33,7 +33,6 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
-$scriptName = "analyze-screenshot"
 
 # --- Mode prompts ---
 $modePrompts = @{

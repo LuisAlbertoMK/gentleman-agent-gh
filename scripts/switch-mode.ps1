@@ -38,7 +38,6 @@ Set-StrictMode -Version Latest
 # --- Resolve .gentleman-mode path ---
 $scriptDir = Split-Path -Path $PSScriptRoot -Parent
 $modeFile  = Join-Path -Path $scriptDir '.gentleman-mode'
-$configFile = Join-Path -Path $scriptDir 'opencode.json'
 
 # --- Banner colors ---
 $colors = @{

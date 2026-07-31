@@ -68,7 +68,6 @@ if ($PatternId -and $patternIndex.ContainsKey($PatternId)) {
 }
 
 # ─── Remove skill directory ─────────────────────────────────────
-$skillRemoved = $false
 if ($resolvedSkillDir -and (Test-Path $resolvedSkillDir)) {
     if (-not $Force -and -not $DryRun) {
         $confirm = Read-Host "About to delete skill directory: $resolvedSkillDir. Continue? (y/N)"
@@ -77,12 +76,10 @@ if ($resolvedSkillDir -and (Test-Path $resolvedSkillDir)) {
     if ($DryRun) {
         Write-Output "[DryRun] Would delete: $resolvedSkillDir"
         $actions += "[DryRun] Would remove skill directory: $resolvedSkillDir"
-        $skillRemoved = $true
     } else {
         try {
             Remove-Item -Recurse -Force $resolvedSkillDir
             $actions += "Removed skill directory: $resolvedSkillDir"
-            $skillRemoved = $true
             if (-not $Quiet) { Write-Host "  [✓] Removed: $resolvedSkillDir" }
         } catch {
             Write-Error "Failed to remove skill directory: $($_.Exception.Message)"

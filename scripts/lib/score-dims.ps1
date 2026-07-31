@@ -12,7 +12,6 @@
 #>
 
 # Ensure $PSScriptRoot reflects the caller (score-auto.ps1) directory
-if (-not $PSScriptRoot) { $scriptRoot = $PWD.Path } else { $scriptRoot = $PSScriptRoot }
 # Use $scriptRoot for any relative paths
 
 # --- Null guards: gracefully handle empty file arrays ---

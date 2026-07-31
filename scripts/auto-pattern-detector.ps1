@@ -118,7 +118,6 @@ function Get-LearningEntries {
 $catalogedPatterns = Get-CatalogedPatterns
 $learningKeys = Get-LearningPatternKeys
 $errorEntries = Get-ErrorEntries
-$learningEntries = Get-LearningEntries
 
 # Count pattern key occurrences
 $keyCounts = @{}
@@ -229,6 +228,6 @@ if ($Json) {
 }
 
 # Cleanup
-$catalogedPatterns = $learningKeys = $errorEntries = $learningEntries = $null
+$catalogedPatterns = $learningKeys = $errorEntries = $null
 $keyCounts = $errorTypeCounts = $proposals = $null
 [GC]::Collect()

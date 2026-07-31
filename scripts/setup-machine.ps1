@@ -195,7 +195,10 @@ if (-not $SkipMcp) {
     else {
         info "Installing engram from GitHub releases..."
         try {
-            $os = if ($global:IsWindows -or (-not $global:IsLinux -and -not $global:IsMacOS -and $env:OS -match "Windows")) { "windows" } elseif ($global:IsMacOS) { "darwin" } else { "linux" }
+            $script:IsWindows = $env:OS -eq 'Windows_NT'
+            $script:IsLinux   = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Linux)
+            $script:IsMacOS   = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::OSX)
+            $os = if ($script:IsWindows -or (-not $script:IsLinux -and -not $script:IsMacOS -and $env:OS -match "Windows")) { "windows" } elseif ($script:IsMacOS) { "darwin" } else { "linux" }
             $arch = if ([Environment]::Is64BitOperatingSystem) { "amd64" } else { "arm64" }
             $ext = if ($os -eq "windows") { "zip" } else { "tar.gz" }
             $latest = Invoke-RestMethod -Uri "https://api.github.com/repos/Gentleman-Programming/engram/releases/latest" -EA SilentlyContinue -UseBasicParsing

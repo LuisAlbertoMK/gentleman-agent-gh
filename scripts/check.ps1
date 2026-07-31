@@ -43,8 +43,8 @@ function Run-Script {
         return 0
     }
     try {
-        if ($ScriptArgs) { $out = & $Path @($ScriptArgs -split ' ') 2>&1 }
-        else       { $out = & $Path 2>&1 }
+        if ($ScriptArgs) { & $Path @($ScriptArgs -split ' ') 2>&1 }
+        else       { & $Path 2>&1 }
         $ec = $LASTEXITCODE
         if ($ec -eq 0) {
             Add-Check -Name $Name -Status "OK" -Detail "Exit $ec"

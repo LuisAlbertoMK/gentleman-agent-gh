@@ -63,7 +63,7 @@ $ok = $true
 if (Test-Path $globalSetup) {
     try {
         if ($Json) {
-            $out = & $globalSetup -Force -Json 2>&1
+            & $globalSetup -Force -Json 2>&1
             $results.Add(@{step="global-setup"; status="OK"; detail="Completed"})
         } else {
             & $globalSetup -Force -Quiet:$Quiet
