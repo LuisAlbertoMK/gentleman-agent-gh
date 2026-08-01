@@ -123,7 +123,10 @@ jobs:
           path: ./
           base: ${{ github.event.before }}
           head: HEAD
-          extra_args: --only-verified --fail --exclude-globs '.learnings/*,.backup-*/**'
+          # NOTE: the action already adds --fail; repeating it aborts ("flag 'fail' cannot be repeated").
+          # Globs must NOT be quoted here — bash word-splits $ARGS without re-interpreting quotes,
+          # so quoted globs arrive literally and never match. Delta scan (base=event.before) does not need them.
+          extra_args: --only-verified
 
       - name: SkillSpector — install
         run: pip install git+https://github.com/NVIDIA/SkillSpector.git@v2.5.0 --quiet || echo "SkillSpector install failed"
