@@ -103,8 +103,8 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install PSScriptAnalyzer
-        run: Install-Module PSScriptAnalyzer -RequiredVersion 1.20.0 -Force -Scope CurrentUser
+        - name: Install PSScriptAnalyzer
+          run: Install-Module PSScriptAnalyzer -RequiredVersion 1.25.0 -Force -Scope CurrentUser
 
       - name: pre-commit — security & lint hooks
         run: |
