@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
     Tests for Engram content validation — runs IN-PROCESS against

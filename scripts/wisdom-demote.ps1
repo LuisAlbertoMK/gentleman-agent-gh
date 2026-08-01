@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
     Demote stale patterns and remove unused forged skills.

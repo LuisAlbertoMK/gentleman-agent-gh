@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
     Cross-platform helpers for PowerShell 7 scripts — Windows, Linux, macOS.

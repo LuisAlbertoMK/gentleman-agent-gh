@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
     Mode Gate — pre-delegation validation. Verifies agent suffix matches current mode.

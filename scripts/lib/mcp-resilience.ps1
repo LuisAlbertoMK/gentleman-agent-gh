@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
     MCP server resilience library - health checks, circuit breaker, retry with exponential backoff.

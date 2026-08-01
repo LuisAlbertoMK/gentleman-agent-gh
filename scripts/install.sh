@@ -12,18 +12,17 @@ shopt -s nullglob 2>/dev/null || true
 #   ./scripts/install.sh --skip-shortcuts          # no shell wrappers
 #   ./scripts/install.sh --skip-env-var            # CI/containers
 
-GREEN='\033[0;32m'; CYAN='\033[0;36m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; DIM='\033[2m'; NC='\033[0m'
+GREEN='\033[0;32m'; CYAN='\033[0;36m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; NC='\033[0m'
 info()  { printf '%s==>%s %s\n' "$CYAN" "$NC" "$*"; }
 ok()    { printf '%s[ok]%s %s\n' "$GREEN" "$NC" "$*"; }
 warn()  { printf '%s[warn]%s %s\n' "$YELLOW" "$NC" "$*"; }
 
-YES=false
 INSTALL_GENTLE_AI=false
 SKIP_SHORTCUTS=false
 SKIP_ENV_VAR=false
 while [ $# -gt 0 ]; do
     case "$1" in
-        --yes) YES=true; shift ;;
+        --yes) : ;;  # accepted for CI compatibility; setup is non-interactive
         --install-gentle-ai) INSTALL_GENTLE_AI=true; shift ;;
         --skip-shortcuts) SKIP_SHORTCUTS=true; shift ;;
         --skip-env-var) SKIP_ENV_VAR=true; shift ;;

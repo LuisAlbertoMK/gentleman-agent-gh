@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
   Unified session close — BITACORA + git status + protected files + external auditor gate + mem_session_summary template.

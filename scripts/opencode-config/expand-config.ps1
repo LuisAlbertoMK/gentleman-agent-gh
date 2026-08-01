@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
   Expand $import markers in opencode.json — resolves shared deny rules inline

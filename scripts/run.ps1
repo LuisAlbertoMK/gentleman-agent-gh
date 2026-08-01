@@ -1,5 +1,5 @@
-﻿#!/usr/bin/env pwsh
-#requires -Version 5.1
+#!/usr/bin/env pwsh
+#requires -Version 7
 Set-StrictMode -Version Latest
 param([switch]$Quiet,[string[]]$Args)
 $ErrorActionPreference = 'Continue'

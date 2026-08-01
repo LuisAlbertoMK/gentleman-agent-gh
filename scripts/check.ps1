@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
   One-shot health + tests + drift — semáforo verde/rojo del repo.

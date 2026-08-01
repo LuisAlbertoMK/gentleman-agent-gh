@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7
 
 BeforeAll {
     # Standalone reimplementation of the script's core glob-to-regex conversion

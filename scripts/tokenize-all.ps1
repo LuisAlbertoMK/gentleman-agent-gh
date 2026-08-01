@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
   Tokenize every SKILL.md in the repo (parallel python subprocess)

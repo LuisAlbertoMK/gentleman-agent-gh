@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
   Integration tests for score-auto.ps1 — full pipeline validation.

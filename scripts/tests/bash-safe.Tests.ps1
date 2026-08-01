@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
     Pester tests for bash-safe.ps1 — security validation, server detection, port detection.

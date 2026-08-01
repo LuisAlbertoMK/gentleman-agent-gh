@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
     Pester tests for health-check.ps1 — Test-Junction and Repair-Junction.

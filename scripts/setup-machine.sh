@@ -143,10 +143,10 @@ REPO_CONFIG="${REPO_DIR}/opencode.json"
 if [ -f "$GLOBAL_CONFIG" ] && [ -f "$REPO_CONFIG" ]; then
     # Use jq if available, otherwise minimal sed approach
     if command -v jq &>/dev/null; then
-        local updated=false
+        updated=false
 
         # default_agent
-        local current_agent
+        current_agent
         current_agent=$(jq -r '.default_agent // ""' "$GLOBAL_CONFIG")
         if [ "$current_agent" != "gentleman-vMK" ]; then
             jq '.default_agent = "gentleman-vMK"' "$GLOBAL_CONFIG" > "${GLOBAL_CONFIG}.tmp" && mv "${GLOBAL_CONFIG}.tmp" "$GLOBAL_CONFIG"
@@ -155,7 +155,7 @@ if [ -f "$GLOBAL_CONFIG" ] && [ -f "$REPO_CONFIG" ]; then
 
         # mcp, permission, skills from repo
         for section in mcp permission skills; do
-            local repo_val
+            repo_val
             repo_val=$(jq ".${section} // empty" "$REPO_CONFIG" 2>/dev/null)
             if [ -n "$repo_val" ]; then
                 jq ".${section} = ${repo_val}" "$GLOBAL_CONFIG" > "${GLOBAL_CONFIG}.tmp" && mv "${GLOBAL_CONFIG}.tmp" "$GLOBAL_CONFIG"
@@ -248,7 +248,6 @@ fi
 # These binaries back the MCP servers configured in opencode.json.
 # Without them, OpenCode can load the config but the MCPs won't start.
 info "Installing MCP server binaries"
-any_mcp=false
 
 # 8a. codebase-memory-mcp — npm global
 if command -v codebase-memory-mcp &>/dev/null; then
@@ -257,7 +256,6 @@ else
     info "Installing codebase-memory-mcp..."
     if npm install -g codebase-memory-mcp --no-fund --no-audit --loglevel error 2>/dev/null; then
         ok "codebase-memory-mcp installed"
-        any_mcp=true
     else
         warn "codebase-memory-mcp install failed — run 'npm install -g codebase-memory-mcp' manually"
     fi
@@ -270,7 +268,6 @@ else
     info "Installing headroom..."
     if pip install headroom-ai -q 2>/dev/null; then
         ok "headroom installed"
-        any_mcp=true
     else
         warn "headroom install failed — run 'pip install headroom-ai' manually"
     fi
@@ -296,7 +293,7 @@ else
     ext="tar.gz"
 
     tmp_dir=$(mktemp -d)
-    trap "rm -rf '$tmp_dir'" EXIT
+    trap 'rm -rf "$tmp_dir"' EXIT
 
     # Get latest version from GitHub API
     latest=$(curl -s "https://api.github.com/repos/Gentleman-Programming/engram/releases/latest" 2>/dev/null)
@@ -317,7 +314,6 @@ else
                 cp "$engram_bin" "${bin_dir}/engram"
                 chmod +x "${bin_dir}/engram"
                 ok "engram v${version} installed"
-                any_mcp=true
             else
                 warn "engram: Binary not found in archive"
             fi

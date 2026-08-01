@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
     Pester tests for session-miner.ps1 — learning pipeline, pattern detection, populate mode.

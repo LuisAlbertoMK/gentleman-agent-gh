@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 7
 <# .SYNOPSIS Trend analysis: scoring snapshots over time #>
 $d=$args[0]
 Set-StrictMode -Version Latest

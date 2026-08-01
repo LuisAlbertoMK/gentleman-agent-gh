@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
   Audit trail for .gentleman agent actions — append-only log with read/filter/session.

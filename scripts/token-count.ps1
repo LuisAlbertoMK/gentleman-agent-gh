@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
   Cuenta tokens aproximados en archivos (4 chars = 1 token)

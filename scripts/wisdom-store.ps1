@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
     Save or migrate a cross-project pattern to the Pattern Store + Engram.

@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
     Integration tests for forge-rollback.ps1 — tests the ACTUAL script with temp fixture data.

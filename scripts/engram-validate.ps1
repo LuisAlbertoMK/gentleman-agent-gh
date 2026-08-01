@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
   Validate mem_save content before persisting to Engram — schema, injection, field completeness.

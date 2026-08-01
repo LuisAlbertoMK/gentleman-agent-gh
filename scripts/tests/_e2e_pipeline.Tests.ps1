@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
   E2E pipeline tests for gentleman-agent-gh — validates full integration:
