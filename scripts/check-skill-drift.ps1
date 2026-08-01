@@ -27,7 +27,14 @@ $cd=Join-Path $PSScriptRoot "..\.agents\skills"
 $gd=Join-Path (Get-GlobalConfigDir) "skills"
 $e=@();$w=@();$d=@()
 if(-not (Test-Path $cd)){Write-Error "Canonical dir not found: $cd";exit 2}
-if(-not (Test-Path $gd)){Write-Error "Global dir not found: $gd";exit 2}
+if(-not (Test-Path $gd)){
+  if($Json){
+    @{timestamp=(Get-Date -Format "o");totalSkills=0;junctionSkills=0;realFileSkills=0;warnings=@();drifted=@();errors=@();allSynced=$true;skipped="No global config dir: $gd"} | ConvertTo-Json -Depth 3 | Write-Output
+  }else{
+    Write-Warning "SKIP: No global config dir ($gd) — drift check only applies on machines with global sync. $env:COMPUTERNAME"
+  }
+  return
+}
 $cs=(Get-ChildItem $cd -Directory).PSWhere({$_.Name -ne '_shared'})
 foreach($s in $cs){
   $sn=$s.Name
