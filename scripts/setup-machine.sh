@@ -14,11 +14,11 @@ shopt -s nullglob 2>/dev/null || true
 
 # ── Colors ───────────────────────────────────────────────────────────
 GREEN='\033[0;32m'; CYAN='\033[0;36m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; DIM='\033[2m'; NC='\033[0m'
-info()  { printf "${CYAN}==>${NC} %s\n" "$*"; }
-ok()    { printf "${GREEN}[ok]${NC} %s\n" "$*"; }
-warn()  { printf "${YELLOW}[warn]${NC} %s\n" "$*"; }
-err()   { printf "${RED}[err]${NC} %s\n" "$*"; exit 1; }
-skip()  { printf "${DIM}[skip]${NC} %s\n" "$*"; }
+info()  { printf '%s==>%s %s\n' "$CYAN" "$NC" "$*"; }
+ok()    { printf '%s[ok]%s %s\n' "$GREEN" "$NC" "$*"; }
+warn()  { printf '%s[warn]%s %s\n' "$YELLOW" "$NC" "$*"; }
+err()   { printf '%s[err]%s %s\n' "$RED" "$NC" "$*"; exit 1; }
+skip()  { printf '%s[skip]%s %s\n' "$DIM" "$NC" "$*"; }
 
 # ── Args ─────────────────────────────────────────────────────────────
 REPO_DIR=""
@@ -357,8 +357,8 @@ fi
 
 echo ""
 if [ "$all_ok" = true ]; then
-    printf "${GREEN}✅ Machine setup COMPLETE${NC}\n"
-    printf "   ${CYAN}→ Run 'gentleman-vmk' to launch${NC}\n"
+    printf '%s✅ Machine setup COMPLETE%s\n' "$GREEN" "$NC"
+    printf "   %s→ Run 'gentleman-vmk' to launch%s\n" "$CYAN" "$NC"
 else
-    printf "${YELLOW}⚠️  Setup PARTIAL — review warnings above${NC}\n"
+    printf '%s⚠️  Setup PARTIAL — review warnings above%s\n' "$YELLOW" "$NC"
 fi

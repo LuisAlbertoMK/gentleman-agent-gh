@@ -13,9 +13,9 @@ shopt -s nullglob 2>/dev/null || true
 #   ./scripts/install.sh --skip-env-var            # CI/containers
 
 GREEN='\033[0;32m'; CYAN='\033[0;36m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; DIM='\033[2m'; NC='\033[0m'
-info()  { printf "${CYAN}==>${NC} %s\n" "$*"; }
-ok()    { printf "${GREEN}[ok]${NC} %s\n" "$*"; }
-warn()  { printf "${YELLOW}[warn]${NC} %s\n" "$*"; }
+info()  { printf '%s==>%s %s\n' "$CYAN" "$NC" "$*"; }
+ok()    { printf '%s[ok]%s %s\n' "$GREEN" "$NC" "$*"; }
+warn()  { printf '%s[warn]%s %s\n' "$YELLOW" "$NC" "$*"; }
 
 YES=false
 INSTALL_GENTLE_AI=false
@@ -51,13 +51,13 @@ fi
 # the local environment with a different upstream tool.
 if [ "$INSTALL_GENTLE_AI" = true ]; then
     echo ""
-    printf "${RED}--install-gentle-ai is no longer supported.${NC}\n"
+    printf '%s--install-gentle-ai is no longer supported.%s\n' "$RED" "$NC"
     printf "Install gentle-ai CLI separately from: https://github.com/Gentleman-Programming/gentle-ai\n"
     exit 1
 fi
 
 if ! command -v gentle-ai &>/dev/null; then
-    printf "${YELLOW}[info]${NC} gentle-ai CLI not found. This is optional — gentleman-agent-gh works without it.\n"
+    printf '%s[info]%s gentle-ai CLI not found. This is optional — gentleman-agent-gh works without it.\n' "$YELLOW" "$NC"
     printf "       To install gentle-ai separately, visit: https://github.com/Gentleman-Programming/gentle-ai\n"
 else
     ok "gentle-ai CLI detected (optional dependency)"
@@ -65,6 +65,6 @@ fi
 
 # ── Done ──────────────────────────────────────────────────────────────
 echo ""
-printf "${GREEN}✅ gentleman-agent-gh setup complete${NC}\n"
+printf '%s✅ gentleman-agent-gh setup complete%s\n' "$GREEN" "$NC"
 echo ""
 echo "  Run 'gentleman-vmk' to launch"
