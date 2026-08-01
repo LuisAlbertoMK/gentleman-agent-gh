@@ -1,3 +1,4 @@
+2026-08-01 - Session close: JD quality-gate (a8e213af), rama master local borrada, ref STALE skill-creator corregida (a2cafc43), score snapshot sync (cc1c52b1)
 2026-07-31 - Session close
 2026-07-31 - [audit] PASSED post-fix: a1 Correctness 2 (bug -Parallel order, fix 5d9ae47a) -> a2 C:8 T:9 E:7 S:8 Sp:8 B:8; gaps<=1.5; mem #2230 #2231
 2026-07-31 - PERFORMANCE plan completo: P0-P3 + P2x lazy hash mergeados, bug de orden -Parallel detectado por auditor ciego y fixeado (2/20 trials -> 0/20), re-audit PASSED (Correctness 2->8), sync-all OK
