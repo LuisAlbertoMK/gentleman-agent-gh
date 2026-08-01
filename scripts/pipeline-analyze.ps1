@@ -185,4 +185,3 @@ if ($Mode -in 'report','full') {
 }
 
 Write-Host "✅ pipeline-analyze complete for $projectName"
-

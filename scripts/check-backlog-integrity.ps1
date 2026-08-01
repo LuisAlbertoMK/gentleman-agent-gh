@@ -179,4 +179,3 @@ if ($Json) {
 }
 
 exit $(if ($allPassed) { 0 } else { 1 })
-

@@ -54,4 +54,3 @@ PS 5.1 rejects `&&`, `||`. Use `Invoke-Bash` wrapper. **Forbidden**: raw bash ca
 <!-- /gentle-ai:agent-protocol -->
 
 <!-- agent-version: 2.2 — Project: gentleman-agent-gh, self-contained -->
-

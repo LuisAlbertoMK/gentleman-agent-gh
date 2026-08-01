@@ -97,4 +97,3 @@ if($rr[-1].criticalMissing.Count-gt0 -and -not$Quiet){Write-Host "  Critical: $(
 if($rr[-1].criticalMissing.Count-gt0){exit 2}
 if($opct-lt80){exit 1}
 exit 0}catch{Write-Error "Intake failed: $_";exit 1}
-

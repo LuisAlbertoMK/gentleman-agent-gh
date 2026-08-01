@@ -126,4 +126,3 @@ foreach ($name in $registry.skills.Keys) {
 $compact | ConvertTo-Json -Depth 5 | Set-Content -Path $OutputFile -Encoding UTF8
 
 if (-not $Quiet) { Write-Host "✓ Registry built: $($skills.Count) skills, $($triggerIndex.Count) triggers → $OutputFile" -ForegroundColor Green }
-
