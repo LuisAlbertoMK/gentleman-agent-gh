@@ -30,7 +30,7 @@ Workspace: `<skill>-workspace/`. Results in `iteration-N/eval-ID/{with_skill,bas
 
 ## Installation: Copy to `.opencode/skills/<name>/` (project) or `~/.config/opencode/skills/<name>/` (global). Validate with `skill_validate`.
 ## Plugin tools: skill_validate · skill_parse · skill_eval · skill_aggregate_benchmark · skill_serve_review · skill_stop_review
-## Refs: skill-creator · skill-testing · skill-registry · skill-improver · karpathy-loop
+## Refs: opencode-skill-creator · skill-testing · skill-registry · skill-improver · karpathy-loop
 ## Anti-Patterns: Skip intake · One-shot · No baseline · Overfit evals · Install before validate
 
 ## Example: Creating a Skill
