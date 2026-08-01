@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
     Non-destructive integration tests for close-session.ps1.
@@ -115,6 +115,10 @@ Describe "close-session — Integration: non-Quiet output format" {
         $output = & $scriptPath -Goal "TestBranchGoal" -Description "Branch test" -BitacoraPath $bitacoraPath 2>&1
         $outputString = $output | Out-String
         $outputString | Should -Match "Branch|COMPACT PROMPT"
-        $outputString | Should -Match "TestBranchGoal"
+        # The goal only appears in the compact prompt when changes exist (clean
+        # tree → SESSION CLOSE header without goal). Assert the state-independent
+        # contract: goal is always present in the -Quiet JSON output.
+        $jsonOut = & $scriptPath -Goal "TestBranchGoal" -Description "Branch test" -BitacoraPath $bitacoraPath -Quiet 2>&1 | Out-String | ConvertFrom-Json
+        $jsonOut.goal | Should -Be "TestBranchGoal"
     }
 }
