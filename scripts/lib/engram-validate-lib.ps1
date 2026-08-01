@@ -38,6 +38,7 @@ function Test-EngramContent {
         [switch]$Fix
     )
 
+    process {
     $script:engramQuiet = [bool]$Quiet
 
     $contentStr = ""
@@ -190,5 +191,6 @@ function Test-EngramContent {
             content  = if ($Fix) { $contentStr } else { $null }
         }
         Write-Output $result
+    }
     }
 }

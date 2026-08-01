@@ -119,7 +119,7 @@ $isAlwaysAllowed = $TargetAgent -in $alwaysAllowed
 # In external projects the -auto/-semi variants may not be defined (pre-sync).
 # If the suffixed agent does NOT exist anywhere, allow the base agent instead
 # of dead-blocking the delegation.
-function Test-SuffixedAgentExists {
+function Test-SuffixedAgentPresence {
     param([string]$AgentName)
     $candidates = @(
         (Join-Path (Get-Location) 'opencode.json'),
@@ -148,7 +148,7 @@ if ($isAlwaysAllowed) {
 $fallbackUsed = $false
 if (-not $modeOk -and $Mode -ne 'manual' -and -not $isReadOnly -and -not $hasSuffix) {
     $suffixedAgent = "$TargetAgent$expectedSuffix"
-    if (-not (Test-SuffixedAgentExists -AgentName $suffixedAgent)) {
+    if (-not (Test-SuffixedAgentPresence -AgentName $suffixedAgent)) {
         $modeOk = $true
         $fallbackUsed = $true
     }
