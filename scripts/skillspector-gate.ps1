@@ -20,7 +20,9 @@
   Default 100 accepts self-modification findings (by design).
   Set lower for strict CI: skillspector-gate.ps1 -FailOnRisk 50
 .PARAMETER DockerImage
-  Docker image name when using Docker fallback (default: skillspector).
+  Docker image name when using Docker fallback (default: skillspector:v2.5.0,
+  pinned to match the CLI version — image/CLI drift breaks the JSON-to-file
+  output contract and the gate fails closed).
 .PARAMETER Strict
   Exit with code 1 when scanner is unavailable or risk exceeds threshold.
   Required for CI: skillspector-gate.ps1 -Strict -FailOnRisk 50
@@ -30,7 +32,7 @@
 param(
     [string]$SkillsPath = ".agents/skills",
     [int]$FailOnRisk = 100,
-    [string]$DockerImage = "skillspector",
+    [string]$DockerImage = "skillspector:v2.5.0",
     [switch]$Strict,
     [switch]$Quiet
 )
@@ -39,11 +41,13 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $scriptName = "skillspector-gate"
 $script:RiskExceeded = $false
+$script:ScanFailed = $false
 
 # Resolve full path
 $resolvedPath = Resolve-Path $SkillsPath -ErrorAction SilentlyContinue
 if (-not $resolvedPath) {
-    Write-Warning "${scriptName}: Path '$SkillsPath' not found — skipping"
+    Write-Warning "${scriptName}: Path '$SkillsPath' not found"
+    if ($Strict) { exit 1 }
     exit 0
 }
 
@@ -131,7 +135,8 @@ function Write-Report {
 function Invoke-Scan {
     param([string]$Runner, [string]$JsonOutput)
     if ([string]::IsNullOrWhiteSpace($JsonOutput)) {
-        Write-Warning "${scriptName}: Empty output from $Runner — skipping"
+        Write-Warning "${scriptName}: Empty output from $Runner — gate cannot evaluate"
+        $script:ScanFailed = $true
         return
     }
     # Strip warning lines before JSON (SkillSpector prints warnings to stdout)
@@ -143,7 +148,8 @@ function Invoke-Scan {
         $report = $JsonOutput | ConvertFrom-Json
         Write-Report $report
     } catch {
-        Write-Warning "${scriptName}: Could not parse $Runner output — skipping gate"
+        Write-Warning "${scriptName}: Could not parse $Runner output — gate cannot evaluate"
+        $script:ScanFailed = $true
         if(-not $Quiet) {
           Write-Host "Raw output (first 500 chars):"
           Write-Host ($JsonOutput.Substring(0, [Math]::Min(500, $JsonOutput.Length)))
@@ -156,16 +162,21 @@ $sp = Get-Command "skillspector" -ErrorAction SilentlyContinue
 if ($sp) {
     if(-not $Quiet) { Write-Host "🔍 [CLI] Scanning skills with SkillSpector (static only)..." }
     # --recursive: per-skill JSON goes to --output file, NOT stdout (v2.5.0 quirk)
-    $tempJson = Join-Path ([IO.Path]::GetTempPath()) "skillspector-gate-report-$PID.json"
+    # Atomic exclusive temp name — PID-predictable names are a symlink/TOCTOU vector
+    $tempJson = [IO.Path]::GetTempFileName()
     try {
-        & skillspector scan $resolvedPath --recursive --no-llm --format json --output $tempJson 2>&1 | Out-Null
+        $null = & skillspector scan $resolvedPath --recursive --no-llm --format json --output $tempJson 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "${scriptName}: skillspector CLI exited with code $LASTEXITCODE — gate cannot evaluate"
+            $script:ScanFailed = $true
+        }
         $jsonOutput = if (Test-Path $tempJson) { Get-Content $tempJson -Raw } else { "" }
     } finally {
         # Temp file we created ourselves — .NET Delete avoids cmdlet safety-ceremony
         if (Test-Path $tempJson) { [System.IO.File]::Delete($tempJson) }
     }
     Invoke-Scan -Runner "CLI" -JsonOutput $jsonOutput
-    if ($Strict -and $script:RiskExceeded) { exit 1 }
+    if ($Strict -and ($script:RiskExceeded -or $script:ScanFailed)) { exit 1 }
     exit 0
 }
 
@@ -180,17 +191,24 @@ if ($dockerOk) {
     if(-not $Quiet) { Write-Host "🔍 [Docker] Scanning skills with SkillSpector (static only)..." }
     $hostPath = (Split-Path $resolvedPath.Path -Parent) -replace '\\', '/'
     $scanTarget = "/scan/$(Split-Path $resolvedPath.Path -Leaf)"
-    $reportFile = "/scan/.skillspector-gate-report-$PID.json"
+    # Temp file OUTSIDE the repo tree (atomic name); never write reports into the working copy
+    $tempJson = [IO.Path]::GetTempFileName()
+    $tempJsonName = Split-Path $tempJson -Leaf
+    $tempDirHost = (Split-Path $tempJson -Parent) -replace '\\', '/'
     try {
-        docker run --rm -v "${hostPath}:/scan" $DockerImage scan $scanTarget --recursive --no-llm --format json --output $reportFile 2>&1 | Out-Null
-        $hostReport = Join-Path $hostPath ".skillspector-gate-report-$PID.json"
-        $jsonOutput = if (Test-Path $hostReport) { Get-Content $hostReport -Raw } else { "" }
+        # Skills dir mounted READ-ONLY so the container cannot write back into the repo
+        docker run --rm -v "${hostPath}:/scan:ro" -v "${tempDirHost}:/gateout" $DockerImage scan $scanTarget --recursive --no-llm --format json --output "/gateout/$tempJsonName" 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "${scriptName}: docker run exited with code $LASTEXITCODE — gate cannot evaluate"
+            $script:ScanFailed = $true
+        }
+        $jsonOutput = if (Test-Path $tempJson) { Get-Content $tempJson -Raw } else { "" }
     } finally {
-        $cleanup = Join-Path $hostPath ".skillspector-gate-report-$PID.json"
-        if (Test-Path $cleanup) { [System.IO.File]::Delete($cleanup) }
+        # Container may leave a root-owned file (Linux hosts) — delete best-effort only
+        if (Test-Path $tempJson) { try { [System.IO.File]::Delete($tempJson) } catch { Write-Debug "${scriptName}: temp cleanup: $($_.Exception.Message)" } }
     }
     Invoke-Scan -Runner "Docker" -JsonOutput $jsonOutput
-    if ($Strict -and $script:RiskExceeded) { exit 1 }
+    if ($Strict -and ($script:RiskExceeded -or $script:ScanFailed)) { exit 1 }
     exit 0
 }
 
@@ -198,7 +216,7 @@ if ($dockerOk) {
 if(-not $Quiet) {
   Write-Host "⚪ SkillSpector not installed — skipping"
   Write-Host "   CLI: pip install git+https://github.com/NVIDIA/SkillSpector.git@v2.5.0"
-  Write-Host "   Docker: docker build -t skillspector . (from repo clone)"
+  Write-Host "   Docker: docker build -t skillspector:v2.5.0 . (from repo clone)"
 }
 if ($Strict) {
     Write-Warning "⚠️ SkillSpector unavailable in strict mode — failing gate"

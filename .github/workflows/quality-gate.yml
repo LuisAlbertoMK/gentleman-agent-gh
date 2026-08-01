@@ -129,10 +129,11 @@ jobs:
           extra_args: --only-verified
 
       - name: SkillSpector — install
-        run: pip install git+https://github.com/NVIDIA/SkillSpector.git@v2.5.0 --quiet || echo "SkillSpector install failed"
+        run: pip install git+https://github.com/NVIDIA/SkillSpector.git@v2.5.0 --quiet
 
       - name: SkillSpector security gate
         continue-on-error: false
+        timeout-minutes: 10
         run: ./scripts/skillspector-gate.ps1 -Strict -FailOnRisk 50
 
   tests:
