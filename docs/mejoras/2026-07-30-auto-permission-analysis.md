@@ -1,8 +1,8 @@
 # Análisis: Clasificador de Auto-Permiso — Patrones ASK vs ALLOW
 
-**Fecha**: 2026-07-30  
-**Trigger**: `!analisis` — analizar patrones ASK vs ALLOW para ajustar la allowlist  
-**Pre-Answer Gate**: ✅ Evidencia existente en `docs/mejoras/2026-07-28-permission-modes-analysis.md`  
+**Fecha**: 2026-07-30
+**Trigger**: `!analisis` — analizar patrones ASK vs ALLOW para ajustar la allowlist
+**Pre-Answer Gate**: ✅ Evidencia existente en `docs/mejoras/2026-07-28-permission-modes-analysis.md`
 **Confidence**: Hallazgos con `confidence: high` salvo donde se indique
 
 > **⚠️ Corrección post-review (2026-07-30)**: Este documento fue revisado contra la codebase actual. Se corrigieron:
@@ -35,7 +35,7 @@ Y **3 modos** de operación (leídos de `.gentleman-mode`, actual: **`auto`**):
 ## Hallazgos Clave
 
 ### 🚨 H1. LAYERING BREAK — Las denegaciones globales NO afectan a agents auto/semi
-`confidence: high`  
+`confidence: high`
 **Evidence**: `opencode.json` L8-L81 (global) vs L291-L364 (gentleman-deep-auto permission bloque propio)
 
 Las 60 reglas `deny` globales (python, node, ssh, docker, curl, etc.) SOLO aplican a agents SIN bloque `permission.bash` propio — actualmente solo `gentleman-reviewer`, `sdd-*` subagents, y agents base (`*: ask`).
@@ -47,7 +47,7 @@ Los 5 agents `-auto` y 5 `-semi` tienen SU PROPIO bloque `permission.bash`, lo q
 ---
 
 ### 🚨 H2. ~960 líneas de DUPLICACIÓN — ~90% identical boilerplate
-`confidence: high`  
+`confidence: high`
 **Evidence**: Análisis cuantitativo de opencode.json (ver tool output)
 
 ```
@@ -61,7 +61,7 @@ Cada agente auto re-lista los mismos 61 deny + 10 ask. Cada semi-agent re-lista 
 ---
 
 ### 🚨 H3. ASIMETRÍA en auto agents — `git push --force` inconsistente
-`confidence: high`  
+`confidence: high`
 **Evidence**: `opencode.json` L300 vs L396 vs L491 vs L588 vs L897
 
 | Auto Agent | `git push --force *` |
@@ -77,7 +77,7 @@ Cada agente auto re-lista los mismos 61 deny + 10 ask. Cada semi-agent re-lista 
 ---
 
 ### 🚨 H4. DRIFT entre `permission-gate.ps1` y `opencode.json`
-`confidence: high`  
+`confidence: high`
 **Evidence**: `scripts/permission-gate.ps1` L55-L103 vs `opencode.json` agent blocks
 
 El gate runtime dice:
@@ -91,7 +91,7 @@ El gate runtime dice:
 ---
 
 ### 🚨 H5. SEMI agents: `$import` template vs expanded drift
-`confidence: high`  
+`confidence: high`
 **Evidence**: `scripts/opencode-config/semi-agents.json` L46, L98, L146, L197, L250 (usan `$import`) vs `opencode.json` bloques semi (ya expandidos sin `$import`)
 
 `expand-config.ps1` resuelve el `$import` a `shared-deny-rules.json` inline en `opencode.json`. Pero:
@@ -104,7 +104,7 @@ El gate runtime dice:
 ---
 
 ### 🔶 H6. SEMI allowlist vs GATE allowlist: diferencias menores (ACTUALIZADO)
-`confidence: high`  
+`confidence: high`
 **Evidence**: `opencode.json` semi blocks (32 allows) vs `permission-gate.ps1` L79-L98
 
 > **Corrección**: La versión original de este hallazgo decía que `npm ci` y `pip freeze/list/show` faltaban en el gate. Estaban en `semi-agents.json` como `npm *` / `pip *` (wildcards), y desde entonces se refinaron en AMBAS direcciones (ver cambios pendientes en staging).
@@ -125,7 +125,7 @@ El gate runtime dice:
 ---
 
 ### 🔶 H7. Modo `manual` actualmente INACTIVO
-`confidence: high`  
+`confidence: high`
 **Evidence**: `.gentleman-mode` L1 → `auto`
 
 El sistema está en modo `auto` permanente. El flag de modo está implementado, los agents -semi y -auto existen, el routing en `gentleman-vMK.md` L29-L37 maneja los sufijos... pero **no hay shortcuts `!auto/!semi/!manual` implementados** en ningún lado. `SHORTCUTS.md` menciona la intención (según análisis previo L244-L253) pero no hay handlers.
@@ -133,7 +133,7 @@ El sistema está en modo `auto` permanente. El flag de modo está implementado, 
 ---
 
 ### 🔶 H8. READ-ONLY SPECIALISTS incompletos — faltan 4 agents (ACTUALIZADO)
-`confidence: high`  
+`confidence: high`
 **Evidence**: `scripts/mode-gate.ps1` L65-L69 vs `opencode.json` agents con `bash: *: deny`
 
 `mode-gate.ps1` tiene 3 agents en `readOnlySpecialists` (security, seo, infra). Pero hay **7 agents** con estructura `bash: *: deny + write: deny + edit: deny` en `opencode.json`:

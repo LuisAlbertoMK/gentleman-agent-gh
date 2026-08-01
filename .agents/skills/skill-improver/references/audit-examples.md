@@ -8,7 +8,7 @@
 - [WARN] Body <30 lines → expand with examples
 - Action: add examples in references/
 
-## skill-improver (merged from skill-refresher, 1 file)  
+## skill-improver (merged from skill-refresher, 1 file)
 - [INFO] Frontmatter: OK
 - [WARN] Body <30 lines → expand
 - Action: add health signal examples

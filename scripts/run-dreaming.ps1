@@ -188,16 +188,16 @@ if ($Mode -in 'full','report') {
 # ---- Feed mode: output patterns for skill-graph ----
 if ($Mode -eq 'feed') {
     if(-not $Quiet){Write-Host '[FEED] Running scans first...'}
-    
+
     $errorCounts = Get-ErrorPattern -Path $errorFile
     $repeated = Get-RepeatedPattern -Counts $errorCounts -Threshold 2
     $learningCounts = Get-LearningPattern -Path $logFile
     $workflowPatterns = Get-RepeatedPattern -Counts $learningCounts -Threshold 3
-    
+
     if(-not $Quiet){Write-Host '[FEED] Generating skill-graph patterns...'}
-    
+
     $feedPatterns = @()
-    
+
     # Convert repeated errors to skill-graph patterns
     if ($repeated.Count -gt 0) {
         foreach ($r in $repeated) {
@@ -214,7 +214,7 @@ if ($Mode -eq 'feed') {
             }
         }
     }
-    
+
     # Convert workflow patterns to skill-graph patterns
     if ($workflowPatterns.Count -gt 0) {
         foreach ($wp in $workflowPatterns) {
@@ -231,17 +231,17 @@ if ($Mode -eq 'feed') {
             }
         }
     }
-    
+
     # Output to file or stdout
     $feedOutput = @{ patterns = $feedPatterns; generated = $timestamp; cycleId = $cycleId }
-    
+
     if ($OutputPath) {
         $feedOutput | ConvertTo-Json -Depth 3 | Set-Content -Path $OutputPath -Encoding UTF8
         if(-not $Quiet){Write-Host "  Patterns written to: $OutputPath"}
     } else {
         $feedOutput | ConvertTo-Json -Depth 3
     }
-    
+
     if(-not $Quiet){Write-Host "  Generated $($feedPatterns.Count) pattern(s) for skill-graph"}
 }
 

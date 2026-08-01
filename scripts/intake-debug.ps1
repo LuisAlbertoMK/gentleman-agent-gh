@@ -10,7 +10,7 @@ Set-StrictMode -Version Latest
 & "C:\Program Files\PowerShell\7\pwsh.exe" -NoProfile -Command {
       Set-StrictMode -Version Latest
       $ErrorActionPreference = 'Stop'
-    
+
     # Run the intake script with a wrapper that catches line numbers
     try {
         & 'scripts/intake-verify.ps1' -p '.' -f json

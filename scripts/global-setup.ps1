@@ -1,5 +1,5 @@
 ﻿#requires -Version 7
-<# 
+<#
 .SYNOPSIS
   One-click global setup for opencode. Applies all assets, configures MCPs, ensures skills are synced.
 .DESCRIPTION

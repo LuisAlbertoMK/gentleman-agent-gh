@@ -1,7 +1,7 @@
 # SEO Audit Checklist
 
 ## Critical (must fix)
-- [ ] Page is indexable (no 
+- [ ] Page is indexable (no
 oindex, no blocked by robots.txt)
 - [ ] Unique <title> (50-60ch, keyword-first)
 - [ ] Unique <meta name="description"> (150-160ch with CTA)

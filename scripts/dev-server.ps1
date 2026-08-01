@@ -25,7 +25,7 @@
 .EXAMPLE
     # Start a dev server
     .\scripts\dev-server.ps1 -Action Start -Name frontend -Command npm -Arguments "run dev"
-    
+
     # Check if it's running
     .\scripts\dev-server.ps1 -Action Status -Name frontend
 

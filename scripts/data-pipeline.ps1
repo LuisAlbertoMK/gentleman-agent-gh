@@ -8,7 +8,7 @@
     2. Error capture (capture-errors.ps1)
     3. Metrics snapshot (snapshot to docs/metricas/)
     4. Learning extraction (Engram mem_save)
-    
+
     Modes:
       - score    : compute score only
       - errors   : capture errors only
@@ -103,7 +103,7 @@ if ($Mode -eq 'full') {
         if (-not (Test-Path $metricsDir)) {
             New-Item -ItemType Directory -Path $metricsDir -Force | Out-Null
         }
-        
+
         # Copy LATEST_error.json to timestamped snapshot (with uniqueness)
         $latestError = Join-Path $metricsDir "errors\LATEST_error.json"
         if (Test-Path $latestError) {
@@ -111,7 +111,7 @@ if ($Mode -eq 'full') {
             $snapshot = Join-Path $metricsDir "errors\${timestamp}_error.json"
             Copy-Item $latestError $snapshot -Force
         }
-        
+
         $results.stages.metrics = @{
             status = 'ok'
             action = 'snapshot saved'
@@ -134,7 +134,7 @@ if ($Mode -eq 'full') {
 $antiPatternFile = Join-Path $repoRoot "ANTI-PATTERN-CATALOG.md"
 $content = Get-Content $antiPatternFile -Raw -ErrorAction SilentlyContinue
 $patternCount = ([regex]::Matches($content, '(?m)^###\s+Anti-Pattern:', 'Multiline')).Count
-        
+
         $results.stages.learning = @{
             status        = 'ok'
             anti_patterns = $patternCount
@@ -158,7 +158,7 @@ if ($Json) {
 } elseif (-not $Quiet) {
     Write-Host "Data Pipeline — $($results.mode)" -ForegroundColor Cyan
     Write-Host "=" * 40
-    
+
     foreach ($stage in $results.stages.PSObject.Properties) {
         $status = if ($stage.Value.status -eq 'ok') { "✓" } else { "✗" }
         $color = if ($stage.Value.status -eq 'ok') { "Green" } else { "Red" }

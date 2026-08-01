@@ -395,7 +395,7 @@ Este documento fue verificado por 3 subagentes independientes.
   - 🟡 No cubre: TOCTOU en npx, dependency confusion, SSRF vía Fetch/Playwright.
 - **Veredicto**: Changes needed — aplicados en secciones 3, 3.1, 5.6, y tabla de vectores.
 
-### Subagente B — Technical Configuration Review  
+### Subagente B — Technical Configuration Review
 - **Rol**: Verificar que las configuraciones propuestas sean técnicamente correctas
 - **Enfoque**: Validar sintaxis de `opencode.json`, environment scoping, transport types
 - **Hallazgos**:

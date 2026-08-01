@@ -151,10 +151,10 @@ Each pattern stored as an engram observation:
 Multi-factor scoring for each matched pattern:
 
 ```
-relevance = (biz_type_match * 0.5) 
-          + (tech_layer_match * 0.2) 
-          + (tag_overlap * 0.15) 
-          + (priority_bonus * 0.1) 
+relevance = (biz_type_match * 0.5)
+          + (tech_layer_match * 0.2)
+          + (tag_overlap * 0.15)
+          + (priority_bonus * 0.1)
           + (history_bonus * 0.05)
 ```
 
@@ -193,11 +193,11 @@ Where:
 ```
 LAZY (default)     → grep + glob only (sub-100ms)
                   → run immediately after classification
-                  
+
 BATCH             → grep + glob + static analysis
                   → run in background, collect results
                   → report on session start
-                  
+
 ON_DEMAND         → Playwright + npm audit
                   → run only when user asks or pre-flight gate needs it
 ```
@@ -339,7 +339,7 @@ Task relevance detection: simple keyword overlap between task description and pa
 
 ```
 User says "doesn't apply":
-  └── mem_save(topic_key="patterns/{biz_type}/{pattern-id}/suppressed", 
+  └── mem_save(topic_key="patterns/{biz_type}/{pattern-id}/suppressed",
                 type="feedback", content={reason, date})
   └── Downgrade pattern priority by 1 level for this type
   └── If suppressed 3x for same type → auto-disable pattern for this type
@@ -379,9 +379,9 @@ When a pattern causes harm (wrong fix applied, wasted time):
 Each pattern maintains a health score:
 
 ```
-health = (total_triggers * 0.3) 
-       - (suppressed_count * 0.2) 
-       - (false_positive_count * 0.4) 
+health = (total_triggers * 0.3)
+       - (suppressed_count * 0.2)
+       - (false_positive_count * 0.4)
        + (fix_applied_count * 0.3)
 
 Thresholds:

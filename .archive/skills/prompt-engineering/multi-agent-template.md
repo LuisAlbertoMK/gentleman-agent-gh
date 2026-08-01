@@ -52,7 +52,7 @@ Fallback: [si todos fallan]
 - Logic: [ruting rules]
 - Output: {agent, priority, context}
 
-### Planner  
+### Planner
 - Input: {task, context}
 - Logic: [planning strategy]
 - Output: {steps: [{action, agent, tool}]}

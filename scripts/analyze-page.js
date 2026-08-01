@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
  * analyze-page.js — Capture a web page with Playwright and analyze via Ollama.
- * 
+ *
  * Usage:
  *   node scripts/analyze-page.js <url> [options]
- * 
+ *
  * Options:
  *   --mode, -m      Analysis mode: ui, error, design, accessibility, performance (default: ui)
  *   --model, -l     Ollama model (default: moondream:latest)
@@ -13,7 +13,7 @@
  *   --full, -f      Capture full page (not just viewport)
  *   --ollama, -u    Ollama URL (default: http://localhost:11434)
  *   --no-analysis   Capture only, skip Ollama analysis
- * 
+ *
  * Examples:
  *   node scripts/analyze-page.js http://localhost:3000/catalogos
  *   node scripts/analyze-page.js http://localhost:3000 --mode error --full
@@ -79,7 +79,7 @@ const modePrompts = {
 // --- Capture page ---
 async function capturePage() {
   console.log(`🌐 Launching browser...`);
-  
+
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
     viewport: { width: 1920, height: 1080 },
@@ -90,7 +90,7 @@ async function capturePage() {
   try {
     console.log(`🔗 Navigating to ${url}`);
     await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
-    
+
     if (wait > 0) {
       console.log(`⏳ Waiting ${wait}ms for page to settle...`);
       await page.waitForTimeout(wait);
@@ -101,9 +101,9 @@ async function capturePage() {
     const screenshotPath = output || path.join(process.cwd(), `screenshot-${timestamp}.png`);
 
     console.log(`📸 Capturing ${fullPage ? 'full page' : 'viewport'}...`);
-    await page.screenshot({ 
-      path: screenshotPath, 
-      fullPage: fullPage 
+    await page.screenshot({
+      path: screenshotPath,
+      fullPage: fullPage
     });
 
     // Wait for file to be fully written
@@ -197,7 +197,7 @@ async function analyzeWithOllama(imagePath, model) {
     console.log('');
     console.log('💡 Make sure Ollama is running: ollama serve');
     console.log(`   And model is pulled: ollama pull ${model}`);
-    
+
     return {
       success: false,
       error: err.message,

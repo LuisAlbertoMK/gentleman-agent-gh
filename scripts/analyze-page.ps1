@@ -40,7 +40,7 @@ $analyzePage = Join-Path $scriptDir "analyze-page.js"
 if (-not $Url) {
     $commonPorts = @(3000, 5173, 4200, 8080, 8000, 4000)
     $found = $false
-    
+
     foreach ($port in $commonPorts) {
         try {
             $null = Invoke-WebRequest -Uri "http://localhost:$port" -Method Head -TimeoutSec 1 -ErrorAction Stop
@@ -53,7 +53,7 @@ if (-not $Url) {
             # Port not responding, try next
         }
     }
-    
+
     if (-not $found) {
         Write-Warning "No dev server found on common ports (3000, 5173, 4200, 8080, 8000, 4000)"
         Write-Host "Provide URL explicitly: .\analyze-page.ps1 http://localhost:3000/catalogos"
