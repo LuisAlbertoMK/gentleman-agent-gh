@@ -4,7 +4,8 @@
     Cross-platform helpers for PowerShell 7 scripts — Windows, Linux, macOS.
 .DESCRIPTION
     Dot-sourced by sync-all.ps1, global-setup.ps1, sync-vmk.ps1.
-    Provides: Get-GentlemanRoot, Get-GlobalConfigDir, New-CrossPlatLink, Find-Pwsh.
+    Provides: Get-GentlemanRoot, Get-GentlemanProjectRoot, Get-GlobalConfigDir,
+    New-CrossPlatLink, Find-Pwsh.
 .NOTES
     This file is NOT meant to be invoked directly.
 #>
@@ -14,15 +15,41 @@ function Get-GentlemanRoot {
     .SYNOPSIS
         Returns the canonical gentleman-agent-gh repo root.
     .DESCRIPTION
-        The script's own repo is ALWAYS canonical when platform.ps1 lives in a
-        repo: repo root is derived from $PSScriptRoot (scripts/lib → root).
-        GENTLEMAN_AGENT_ROOT is only a fallback for shims that are not
-        repo-resident (e.g. ~/.config/opencode/scripts/run.ps1).
+        The script's own repo is ALWAYS canonical when platform.ps1 lives inside
+        the real repo: repo root is derived from $PSScriptRoot (scripts/lib → root)
+        and validated with a REAL repo marker (.git). From a global copy
+        (~/.config/opencode/scripts) the marker is absent, so the guard fails and
+        control falls back to $env:GENTLEMAN_AGENT_ROOT — never the global config
+        dir. NOTE: this resolves the SCRIPT'S repo, NOT the current project. For
+        the project's root (mode file, audit log) use Get-GentlemanProjectRoot.
     #>
     $libDir = $PSScriptRoot                    # scripts/lib
     $repoRoot = Split-Path (Split-Path $libDir -Parent) -Parent
-    if (Test-Path -LiteralPath (Join-Path $repoRoot 'scripts\lib\platform.ps1')) { return $repoRoot }
-    return $env:GENTLEMAN_AGENT_ROOT           # shim fallback only
+    if (Test-Path -LiteralPath (Join-Path $repoRoot '.git')) { return $repoRoot }
+    return $env:GENTLEMAN_AGENT_ROOT           # global-copy / shim fallback
+}
+
+function Get-GentlemanProjectRoot {
+    <#
+    .SYNOPSIS
+        Returns the root of the CURRENT project (walk-up from cwd to git root).
+    .DESCRIPTION
+        Starts at (Get-Location).Path and walks UP looking for the first .git
+        marker (project boundary). If found → that directory is the project root.
+        If NO .git is found → returns cwd (deterministic default). NEVER walks
+        past the found .git (cut line — prevents inheriting a mode or audit
+        target from HOME or other unrelated ancestors). Read-only: does not read
+        or write anything.
+    .EXAMPLE
+        Get-GentlemanProjectRoot   # D:\some\git\repo when cwd is inside it
+    #>
+    $dir = (Get-Location).Path
+    while ($true) {
+        if (Test-Path -LiteralPath (Join-Path $dir '.git')) { return $dir }
+        $parent = Split-Path -Parent $dir
+        if (-not $parent -or $parent -eq $dir) { return (Get-Location).Path }
+        $dir = $parent
+    }
 }
 
 function Get-GlobalConfigDir {

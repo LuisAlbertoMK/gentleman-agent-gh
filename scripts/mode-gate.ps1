@@ -21,7 +21,8 @@
     Override mode check (default: read from .gentleman-mode).
 
 .PARAMETER ModeFilePath
-    Override the mode file path (default: <repo>\.gentleman-mode).
+    Override the mode file path (default: nearest .gentleman-mode walking up from
+    cwd, bounded by the project root — see Get-GentlemanProjectRoot).
 
 .PARAMETER Json
     Output JSON instead of human-readable text.
@@ -49,15 +50,30 @@ $ErrorActionPreference = "Stop"
 # Cross-platform helpers (Get-GlobalConfigDir)
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 
-$repoRoot = Split-Path -Path $PSScriptRoot -Parent
-$cwdModeFile = Join-Path -Path (Get-Location) '.gentleman-mode'
-$modeFile = if ($ModeFilePath) { $ModeFilePath } else { Join-Path -Path $repoRoot '.gentleman-mode' }
+$projectRoot = if (Get-Command Get-GentlemanProjectRoot -ErrorAction SilentlyContinue) { Get-GentlemanProjectRoot } else { (Get-Location).Path }
+
+# --- Resolve .gentleman-mode: nearest file walking up from cwd, NEVER past the
+#     project root (git root) — no repo fallback, so an external project without
+#     its own mode file cannot inherit the repo's mode. Mirrors switch-mode. ---
+$modeFile = if ($ModeFilePath) {
+    $ModeFilePath
+} else {
+    $found = $null
+    $dir = (Get-Location).Path
+    while ($dir) {
+        $candidate = Join-Path -Path $dir '.gentleman-mode'
+        if (Test-Path -LiteralPath $candidate) { $found = $candidate; break }
+        if ($dir -eq $projectRoot) { break }
+        $parent = Split-Path -Parent $dir
+        if (-not $parent -or $parent -eq $dir) { break }
+        $dir = $parent
+    }
+    if ($found) { $found } else { Join-Path -Path $projectRoot '.gentleman-mode' }
+}
 
 # --- Resolve current mode ---
 if (-not $Mode) {
-    if (-not $ModeFilePath -and (Test-Path -LiteralPath $cwdModeFile)) {
-        $Mode = (Get-Content -LiteralPath $cwdModeFile -Raw).Trim()
-    } elseif (Test-Path -LiteralPath $modeFile) {
+    if (Test-Path -LiteralPath $modeFile) {
         $Mode = (Get-Content -LiteralPath $modeFile -Raw).Trim()
     } else {
         $Mode = 'manual'  # default fallback

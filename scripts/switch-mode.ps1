@@ -5,7 +5,12 @@
     Gentleman Agent — Permission Mode Switcher
 .DESCRIPTION
     Switches between MANUAL, SEMI, and AUTO permission modes.
-    Creates/reads .gentleman-mode file in the project root.
+    Reads the nearest .gentleman-mode walking up from the current directory,
+    bounded by the project root (first .git — Get-GentlemanProjectRoot), so a
+    global copy of this script still honors the external project's mode without
+    inheriting a mode from HOME or unrelated ancestors.
+    When no mode file exists, defaults to MANUAL; writes target the current
+    directory (cwd) so a -Mode switch creates .gentleman-mode in the project.
 
     MANUAL (default): Every command asks for permission (*: ask)
     SEMI:            Safe commands auto-execute (read-only, test), rest ask
@@ -35,9 +40,27 @@ param(
 )
 Set-StrictMode -Version Latest
 
-# --- Resolve .gentleman-mode path ---
-$scriptDir = Split-Path -Path $PSScriptRoot -Parent
-$modeFile  = Join-Path -Path $scriptDir '.gentleman-mode'
+# Normalize mode to lowercase BEFORE any use/validation (ValidateSet is
+# case-insensitive and does NOT canonicalize: -Mode Semi would write 'Semi').
+if ($Mode) { $Mode = $Mode.ToLower() }
+
+# --- Resolve .gentleman-mode: nearest file walking up from cwd, bounded by the
+#     project root (git root). Never past the project → no mode inheritance from
+#     HOME or unrelated ancestors. Write targets cwd when absent. ---
+$platformLib = Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1"
+if (Test-Path -LiteralPath $platformLib) { . $platformLib }
+$modeFile = $null
+$dir = (Get-Location).Path
+$projectRoot = if (Get-Command Get-GentlemanProjectRoot -ErrorAction SilentlyContinue) { Get-GentlemanProjectRoot } else { $dir }
+while ($dir) {
+    $candidate = Join-Path -Path $dir '.gentleman-mode'
+    if (Test-Path -LiteralPath $candidate) { $modeFile = $candidate; break }
+    if ($dir -eq $projectRoot) { break }
+    $parent = Split-Path -Parent $dir
+    if (-not $parent -or $parent -eq $dir) { break }
+    $dir = $parent
+}
+if (-not $modeFile) { $modeFile = Join-Path -Path $projectRoot '.gentleman-mode' }
 
 # --- Banner colors ---
 $colors = @{

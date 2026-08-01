@@ -206,7 +206,7 @@
       "enabled": true,
       "timeout": 60000,
       "environment": {
-        "CBM_ALLOWED_ROOT": "D:\\gentleman-agent-gh"
+        "CBM_ALLOWED_ROOT": "{env:GENTLEMAN_AGENT_ROOT}"
       }
     },
     "context7": {

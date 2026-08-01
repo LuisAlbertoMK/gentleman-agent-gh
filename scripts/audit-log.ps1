@@ -52,8 +52,15 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Continue"
 
-$repoRoot = Split-Path $PSScriptRoot -Parent
-$logDir = Join-Path $repoRoot ".gentleman"
+# Cross-platform helpers (Get-GentlemanProjectRoot; lib may be absent in a stale global copy)
+$platformLib = Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1"
+if (Test-Path -LiteralPath $platformLib) { . $platformLib }
+
+# Audit log targets the CURRENT PROJECT root (walk-up from cwd to git root),
+# NOT the script's repo — so a globalized copy logs into the external project.
+$projectRoot = if (Get-Command Get-GentlemanProjectRoot -ErrorAction SilentlyContinue) { Get-GentlemanProjectRoot } else { $env:GENTLEMAN_AGENT_ROOT }
+if (-not $projectRoot) { $projectRoot = (Get-Location).Path }
+$logDir = Join-Path $projectRoot ".gentleman"
 $logFile = Join-Path $logDir "audit.log"
 
 if (-not (Test-Path -LiteralPath $logDir)) {
