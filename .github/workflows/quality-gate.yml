@@ -85,6 +85,7 @@ jobs:
       - name: Install
         run: ./scripts/install.sh --yes --skip-env-var --skip-shortcuts
       - name: Shellcheck
+        shell: bash
         run: |
           if command -v shellcheck &>/dev/null; then shellcheck scripts/*.sh
           else for f in scripts/*.sh; do bash -n "$f" && echo "OK: $f" || exit 1; done; fi
@@ -152,13 +153,13 @@ jobs:
           }
           Write-Output "OK: $($results.PassedCount)/$($results.TotalCount) tests passed"
 
-      - name: Benchmark report
-        run: ./scripts/benchmark.ps1 -Snapshot
-
       - name: Windows smoke test
         run: |
           ./scripts/verify.ps1 -Quiet
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Benchmark report
+        run: ./scripts/benchmark.ps1 -Snapshot
 
       - name: Error snapshot
         if: always()
