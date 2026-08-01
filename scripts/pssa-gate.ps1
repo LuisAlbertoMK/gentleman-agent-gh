@@ -173,8 +173,8 @@ if(-not $bl -or -not $bl.PSObject.Properties['manualPairs']){
 }
 $regr=@();$cur=@{}
 if($bl.PSObject.Properties['manualPairs'] -and $manual.Count-gt0){
-  foreach($v in $manual){$k="$($v.RuleName)|$($v.ScriptName)";if($cur.ContainsKey($k)){$cur[$k]++}else{$cur[$k]=1}}
-  $base=@{};foreach($p in $bl.manualPairs){$base["$($p.rule)|$($p.file)"]=[int]$p.count}
+  foreach($v in $manual){$k="$($v.RuleName)|$($v.ScriptName.Replace('\','/'))";if($cur.ContainsKey($k)){$cur[$k]++}else{$cur[$k]=1}}
+  $base=@{};foreach($p in $bl.manualPairs){$base["$($p.rule)|$($p.file.Replace('\','/'))"]=[int]$p.count}
   foreach($k in $cur.Keys){$bc=if($base.ContainsKey($k)){$base[$k]}else{0};if($cur[$k]-gt$bc){$regr+=@{key=$k;now=$cur[$k];base=$bc}}}
 }
 if($regr.Count-gt0){Write-Warning "PSSA Gate: $($regr.Count) REGRESSION(s) vs baseline: $($regr | ForEach-Object {"$($_.key) $($_.base)->$($_.now)"})";$ec=1}
