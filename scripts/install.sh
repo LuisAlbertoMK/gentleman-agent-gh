@@ -22,7 +22,7 @@ SKIP_SHORTCUTS=false
 SKIP_ENV_VAR=false
 while [ $# -gt 0 ]; do
     case "$1" in
-        --yes) : ;;  # accepted for CI compatibility; setup is non-interactive
+        --yes) :; shift ;;  # accepted for CI compatibility; setup is non-interactive
         --install-gentle-ai) INSTALL_GENTLE_AI=true; shift ;;
         --skip-shortcuts) SKIP_SHORTCUTS=true; shift ;;
         --skip-env-var) SKIP_ENV_VAR=true; shift ;;
