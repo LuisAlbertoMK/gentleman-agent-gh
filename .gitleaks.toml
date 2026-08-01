@@ -47,8 +47,8 @@
   description = "Password environment variable assignment"
   regex = '''(?:PASSWORD|PASS|DB_PASSWORD|MYSQL_PWD|PGPASSWORD|REDIS_PASSWORD)\s*=\s*['"][^'"]{6,}['"]'''
 
-[[allowlist]]
-  description = "Global allowlist — path-based (works with non-stdin sources)"
+[allowlist]
+  description = "Global allowlist - path-based (works with non-stdin sources)"
   paths = [
     '''\.backup-.*/.*''',
   ]
