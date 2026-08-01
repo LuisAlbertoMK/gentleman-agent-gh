@@ -4,7 +4,7 @@
  *
  * Generates opencode.json from:
  *   - opencode-base.json (agent definitions WITHOUT permission blocks)
- *   - permission-templates.json (3 shared permission patterns)
+ *   - permission-templates.json (7 shared permission patterns)
  *   - agent-overrides.json (agent-specific extra properties: hidden, custom perms)
  *
  * Usage:
@@ -52,11 +52,28 @@ const TEMPLATE_MAP = {
   'sdd-design': 'readwrite',
   'sdd-explore': 'readwrite',
   'sdd-init': 'readwrite',
-  'sdd-orchestrator': 'readwrite',
+  'sdd-orchestrator': 'sddorchestrator',
   'sdd-propose': 'readwrite',
   'sdd-spec': 'readwrite',
   'sdd-tasks': 'readwrite',
   'sdd-verify': 'readwrite',
+
+  // Mode variants — AUTO (all auto-approve except push + destructive + network)
+  'gentleman-vMK-auto': 'auto',
+  'gentleman-deep-auto': 'auto',
+  'gentleman-quick-auto': 'auto',
+  'gentleman-codex-auto': 'auto',
+  'gentleman-implementer-auto': 'auto',
+
+  // Mode variants — SEMI (safe commands auto, writes/commits ask)
+  'gentleman-vMK-semi': 'semi',
+  'gentleman-deep-semi': 'semi',
+  'gentleman-quick-semi': 'semi',
+  'gentleman-codex-semi': 'semi',
+  'gentleman-implementer-semi': 'semi',
+
+  // Independent evaluator — bash ask, no edit/write
+  'gentleman-reviewer': 'reviewer',
 };
 
 // --- Permission key order (must match original file) ---
@@ -95,7 +112,7 @@ function sortPermKeys(perm, agentName) {
 // --- Merge permissions ---
 console.log('[2/5] Merging permission templates into agent definitions...');
 
-const stats = { orchestrator: 0, readwrite: 0, readonly: 0, total: 0 };
+const stats = { orchestrator: 0, readwrite: 0, readonly: 0, sddorchestrator: 0, reviewer: 0, auto: 0, semi: 0, total: 0 };
 
 const orderedAgents = {};
 for (const [agentName, agentDef] of Object.entries(base.agent)) {
@@ -162,9 +179,13 @@ for (const [agentName, agentDef] of Object.entries(base.agent)) {
 
 base.agent = orderedAgents;
 
-console.log(`  Orchestrator: ${stats.orchestrator} agent(s)`);
-console.log(`  Read/Write:   ${stats.readwrite} agent(s)`);
-console.log(`  Read-Only:    ${stats.readonly} agent(s)`);
+console.log(`  Orchestrator:     ${stats.orchestrator} agent(s)`);
+console.log(`  Read/Write:       ${stats.readwrite} agent(s)`);
+console.log(`  Read-Only:        ${stats.readonly} agent(s)`);
+console.log(`  SDD Orchestrator: ${stats.sddorchestrator} agent(s)`);
+console.log(`  Reviewer:         ${stats.reviewer} agent(s)`);
+console.log(`  AUTO variants:    ${stats.auto} agent(s)`);
+console.log(`  SEMI variants:    ${stats.semi} agent(s)`);
 
 // --- Serialize ---
 console.log('[3/5] Serializing output...');

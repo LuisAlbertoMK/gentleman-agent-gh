@@ -10,7 +10,7 @@
       "git commit *": "ask",
       "git push": "ask",
       "git push *": "ask",
-      "git push --force *": "ask",
+      "git push --force *": "deny",
       "git push --delete *": "ask",
       "git rebase *": "ask",
       "git reset *": "ask",
@@ -18,54 +18,38 @@
       "git branch -D *": "ask",
       "git stash drop *": "ask",
       "gh pr merge *": "ask",
-      "docker *": "deny",
-      "docker-compose *": "deny",
-      "docker compose *": "deny",
-      "ssh *": "deny",
-      "wsl *": "deny",
-      "npx *": "deny",
-      "rm *": "deny",
-      "rm -rf *": "deny",
+      "Add-MpPreference *": "deny",
+      "bitsadmin *": "deny",
+      "certutil *": "deny",
+      "cmd /c *": "deny",
+      "cmd.exe *": "deny",
       "curl *": "deny",
-      "wget *": "deny",
-      "Invoke-WebRequest *": "deny",
-      "Invoke-RestMethod *": "deny",
+      "docker *": "deny",
+      "docker compose *": "deny",
+      "docker-compose *": "deny",
+      "icacls *": "deny",
+      "icm *": "deny",
+      "iex *": "deny",
+      "Invoke-Command *": "deny",
       "Invoke-Expression *": "deny",
+      "Invoke-RestMethod *": "deny",
+      "Invoke-WebRequest *": "deny",
       "irm *": "deny",
       "iwr *": "deny",
-      "iex *": "deny",
-      "Remove-Item *": "deny",
-      "Start-BitsTransfer *": "deny",
       "nc *": "deny",
       "ncat *": "deny",
-      "telnet *": "deny",
-      "Test-NetConnection *": "deny",
-      "cmd /c *": "deny",
-      "powershell -c *": "deny",
-      "powershell -command *": "deny",
-      "Start-Process *": "deny",
-      "Invoke-Command *": "deny",
-      "Register-ScheduledTask *": "deny",
-      "New-Service *": "deny",
-      "sc *": "deny",
-      "reg *": "deny",
-      "Add-MpPreference *": "deny",
-      "Set-MpPreference *": "deny",
-      "schtasks *": "deny",
-      "icacls *": "deny",
-      "net user *": "deny",
       "net localgroup *": "deny",
+      "net session *": "deny",
       "net share *": "deny",
       "net use *": "deny",
-      "net session *": "deny",
-      "cmd.exe *": "deny",
-      "icm *": "deny",
-      "python *": "deny",
-      "python3 *": "deny",
+      "net user *": "deny",
+      "New-Service *": "deny",
       "node *": "deny",
-      "ruby *": "deny",
+      "npx *": "deny",
       "perl *": "deny",
       "php *": "deny",
+      "powershell -c *": "deny",
+      "powershell -command *": "deny",
       "powershell -enc *": "deny",
       "powershell -File *": "deny",
       "powershell.exe -c *": "deny",
@@ -74,10 +58,26 @@
       "powershell.exe -File *": "deny",
       "pwsh *": "deny",
       "pwsh.exe *": "deny",
-      "certutil *": "deny",
-      "bitsadmin *": "deny",
+      "python *": "deny",
+      "python3 *": "deny",
+      "reg *": "deny",
+      "Register-ScheduledTask *": "deny",
+      "Remove-Item *": "deny",
+      "rm -rf *": "deny",
+      "rm *": "deny",
+      "ruby *": "deny",
       "saps *": "deny",
-      "start *": "deny"
+      "sc *": "deny",
+      "schtasks *": "deny",
+      "Set-MpPreference *": "deny",
+      "ssh *": "deny",
+      "start *": "deny",
+      "Start-BitsTransfer *": "deny",
+      "Start-Process *": "deny",
+      "telnet *": "deny",
+      "Test-NetConnection *": "deny",
+      "wget *": "deny",
+      "wsl *": "deny"
     },
     "read": {
       "*": "allow",
@@ -136,14 +136,19 @@
       "opencode.json": "deny",
       "AGENTS.md": "deny",
       "prompts/**/*": "deny",
-      ".agents/**/*": "deny",
       "**/.kube/config": "deny",
       "**/.config/gh/**": "deny",
       "**/.m2/**": "deny",
       "**/*.jks": "deny",
       "**/*.keystore": "deny",
       "**/*.gpg": "deny",
-      "**/.boto": "deny"
+      "**/.boto": "deny",
+      "opencode.jsonc": "deny",
+      ".githooks/**": "deny",
+      ".github/**": "deny",
+      "review-rules.jsonc": "deny",
+      "CYCLE.md": "deny",
+      "ANTI-PATTERN-CATALOG.md": "deny"
     },
     "edit": {
       "*": "allow",
@@ -160,14 +165,24 @@
       "opencode.json": "deny",
       "AGENTS.md": "deny",
       "prompts/**/*": "deny",
-      ".agents/**/*": "deny",
       "**/.kube/config": "deny",
       "**/.config/gh/**": "deny",
       "**/.m2/**": "deny",
       "**/*.jks": "deny",
       "**/*.keystore": "deny",
       "**/*.gpg": "deny",
-      "**/.boto": "deny"
+      "**/.boto": "deny",
+      "**/*.key": "deny",
+      "**/*.pem": "deny",
+      "**/*.p12": "deny",
+      "**/*.pfx": "deny",
+      "**/.git-credentials": "deny",
+      "**/.netrc": "deny",
+      "**/.npmrc": "deny",
+      "**/.docker/config.json": "deny",
+      "**/.aws/credentials": "deny",
+      "**/.azure/accessTokens": "deny",
+      "**/.gnupg/**": "deny"
     }
   },
   "default_agent": "gentleman-vMK",
@@ -237,6 +252,7 @@
   "agent": {
     "gentleman-vMK": {
       "description": "Orchestrator - decomposes tasks, delegates to right agent, synthesizes results. Never implements directly.",
+      "model": "opencode/big-pickle",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-vMK.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "tools": {
@@ -254,8 +270,24 @@
         "engram*": true
       }
     },
+    "gentleman-deep-auto": {
+      "description": "Deep reasoning — AUTO mode (all auto-approve except push + destructive + network)",
+      "model": "opencode/nemotron-3-ultra-free",
+      "mode": "primary",
+      "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "tools": {
+        "codebase-memory*": true,
+        "engram*": true
+      }
+    },
     "gentleman-quick": {
       "description": "Fast executor - single-file atomic edits with immediate verification, scope-guarded",
+      "model": "opencode/mimo-v2.5-free",
+      "mode": "primary",
+      "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}"
+    },
+    "gentleman-quick-auto": {
+      "description": "Fast executor — AUTO mode (all auto-approve except push + destructive + network)",
       "model": "opencode/mimo-v2.5-free",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}"
@@ -264,7 +296,19 @@
       "description": "Code generation - convention mirroring, defensive coding, new files/scripts/boilerplate",
       "model": "opencode/deepseek-v4-flash-free",
       "mode": "primary",
-      "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}"
+      "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "tools": {
+        "codebase-memory*": true
+      }
+    },
+    "gentleman-codex-auto": {
+      "description": "Code generation — AUTO mode (all auto-approve except push + destructive + network)",
+      "model": "opencode/deepseek-v4-flash-free",
+      "mode": "primary",
+      "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "tools": {
+        "codebase-memory*": true
+      }
     },
     "gentleman-security": {
       "description": "Security specialist - STRIDE threat model, CVSS scoring, OWASP Top 10, injection/XSS/auth analysis (FREE TIER)",
@@ -312,34 +356,51 @@
       "description": "Plan executor specialist — implements plans from specialized agents, no deviations (FREE TIER)",
       "model": "opencode/deepseek-v4-flash-free",
       "mode": "primary",
-      "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}"
+      "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "tools": {
+        "codebase-memory*": true
+      }
+    },
+    "gentleman-implementer-auto": {
+      "description": "Plan executor — AUTO mode (all auto-approve except push + destructive + network)",
+      "model": "opencode/deepseek-v4-flash-free",
+      "mode": "primary",
+      "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "tools": {
+        "codebase-memory*": true
+      }
     },
     "sdd-apply": {
       "description": "Implement code changes from task definitions",
+      "model": "opencode/deepseek-v4-flash-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-apply.md}"
     },
     "sdd-archive": {
       "description": "Archive completed change artifacts",
+      "model": "opencode/deepseek-v4-flash-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-archive.md}"
     },
     "sdd-design": {
       "description": "Create technical design from proposals",
+      "model": "opencode/nemotron-3-ultra-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-design.md}"
     },
     "sdd-explore": {
       "description": "Investigate codebase and think through ideas",
+      "model": "opencode/nemotron-3-ultra-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-explore.md}"
     },
     "sdd-init": {
       "description": "Bootstrap SDD context and project configuration",
+      "model": "opencode/deepseek-v4-flash-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-init.md}"
@@ -352,32 +413,104 @@
     },
     "sdd-propose": {
       "description": "Create change proposals from explorations",
+      "model": "opencode/nemotron-3-ultra-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-propose.md}"
     },
     "sdd-spec": {
       "description": "Write detailed specifications from proposals",
+      "model": "opencode/nemotron-3-ultra-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-spec.md}"
     },
     "sdd-tasks": {
       "description": "Break down specs and designs into implementation tasks",
+      "model": "opencode/deepseek-v4-flash-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-tasks.md}"
     },
     "sdd-verify": {
       "description": "Validate implementation against specs",
+      "model": "opencode/big-pickle",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-verify.md}"
+    },
+    "gentleman-vMK-auto": {
+      "description": "Orchestrator — AUTO mode (all auto-approve except push + destructive + network)",
+      "model": "opencode/big-pickle",
+      "mode": "primary",
+      "prompt": "{file:prompts/gentleman-vMK.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "tools": {
+        "engram*": true,
+        "codebase-memory*": true
+      }
+    },
+    "gentleman-deep-semi": {
+      "description": "Deep reasoning — SEMI mode (safe commands auto, writes/commits ask)",
+      "model": "opencode/nemotron-3-ultra-free",
+      "mode": "primary",
+      "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "tools": {
+        "codebase-memory*": true,
+        "engram*": true
+      }
+    },
+    "gentleman-quick-semi": {
+      "description": "Fast executor — SEMI mode (safe commands auto, writes/commits ask)",
+      "model": "opencode/mimo-v2.5-free",
+      "mode": "primary",
+      "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}"
+    },
+    "gentleman-codex-semi": {
+      "description": "Code generation — SEMI mode (safe commands auto, writes/commits ask)",
+      "model": "opencode/deepseek-v4-flash-free",
+      "mode": "primary",
+      "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "tools": {
+        "codebase-memory*": true
+      }
+    },
+    "gentleman-implementer-semi": {
+      "description": "Plan executor — SEMI mode (safe commands auto, writes/commits ask)",
+      "model": "opencode/deepseek-v4-flash-free",
+      "mode": "primary",
+      "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "tools": {
+        "codebase-memory*": true
+      }
+    },
+    "gentleman-vMK-semi": {
+      "description": "Orchestrator — SEMI mode (safe commands auto, writes/commits ask)",
+      "model": "opencode/big-pickle",
+      "mode": "primary",
+      "prompt": "{file:prompts/gentleman-vMK.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "tools": {
+        "engram*": true,
+        "codebase-memory*": true
+      }
+    },
+    "gentleman-reviewer": {
+      "description": "Code review specialist — 4R framework, independent evaluator, adversarial verification (STRONG model)",
+      "model": "claude-sonnet-4-6",
+      "mode": "primary",
+      "prompt": "{file:prompts/gentleman-reviewer.md}\n\n{file:prompts/shared/_return-contract.md}",
+      "tools": {
+        "engram*": true,
+        "codebase-memory*": true
+      }
     }
   },
   "plugin": [
     "context-mode",
     "opencode-ralph-loop",
     "opencode-personality"
-  ]
+  ],
+  "tool_output": {
+    "max_bytes": 4096,
+    "max_lines": 100
+  }
 }
