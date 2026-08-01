@@ -9,10 +9,14 @@
   Self-modification findings (RA1) in dreaming/immune-system skills
   are intentional and do not block the gate.
 
+  Scans each skill independently (--recursive): the directory aggregates
+  into a single 100/100 score when scanned as one unit, which would
+  always fail the gate. Per-skill scores reflect real per-skill risk.
+
 .PARAMETER SkillsPath
   Path to skills directory (default: .agents/skills).
 .PARAMETER FailOnRisk
-  Exit code 1 if risk score exceeds this threshold (0-100, default: 100).
+  Exit code 1 if any skill risk score exceeds this threshold (0-100, default: 100).
   Default 100 accepts self-modification findings (by design).
   Set lower for strict CI: skillspector-gate.ps1 -FailOnRisk 50
 .PARAMETER DockerImage
@@ -20,12 +24,15 @@
 .PARAMETER Strict
   Exit with code 1 when scanner is unavailable or risk exceeds threshold.
   Required for CI: skillspector-gate.ps1 -Strict -FailOnRisk 50
+.PARAMETER Quiet
+  Suppress progress output; only warnings and errors are printed.
 #>
 param(
     [string]$SkillsPath = ".agents/skills",
     [int]$FailOnRisk = 100,
     [string]$DockerImage = "skillspector",
-    [switch]$Strict
+    [switch]$Strict,
+    [switch]$Quiet
 )
 Set-StrictMode -Version Latest
 
@@ -44,6 +51,39 @@ function Write-Report {
     param($report)
     if (-not $report) { if(-not $Quiet) { Write-Host "   ⚪ No report to parse" }; return }
 
+    # Multi-skill report (--recursive): evaluate EACH skill independently.
+    # The consolidated object carries skills[] with per-skill risk_assessment.
+    if ($report.multi_skill -and $report.skills) {
+        $overThreshold = @()
+        foreach ($s in $report.skills) {
+            $realFindings = @($s.issues | Where-Object { $_.id -ne "RA1" })
+            $realCount = $realFindings.Count
+            if ($realCount -gt 0 -and $s.risk_assessment.score -ge $FailOnRisk) {
+                $overThreshold += [PSCustomObject]@{
+                    Skill    = $s.skill.name
+                    Score    = $s.risk_assessment.score
+                    Severity = $s.risk_assessment.severity
+                    Findings = $realCount
+                }
+            }
+        }
+        $scannedCount = [int]$report.skill_count
+        if(-not $Quiet) {
+            Write-Host "   Skills scanned: $scannedCount | Max risk: $($report.max_risk_score)/100"
+        }
+        if ($overThreshold.Count -gt 0) {
+            Write-Warning "⚠️ $($overThreshold.Count) skill(s) exceed threshold ${FailOnRisk}:"
+            foreach ($o in $overThreshold) {
+                Write-Warning "   - $($o.Skill): risk $($o.Score) ($($o.Severity)), $($o.Findings) non-RA1 finding(s)"
+            }
+            $script:RiskExceeded = $true
+        } elseif(-not $Quiet) {
+            Write-Host "   ✅ All skills clean (non-RA1 risk < $FailOnRisk)"
+        }
+        return
+    }
+
+    # Single-skill report (legacy path)
     $riskScore = $report.risk_assessment.score
     $severity = $report.risk_assessment.severity
     $findingsCount = ($report.issues | Measure-Object).Count
@@ -115,7 +155,15 @@ function Invoke-Scan {
 $sp = Get-Command "skillspector" -ErrorAction SilentlyContinue
 if ($sp) {
     if(-not $Quiet) { Write-Host "🔍 [CLI] Scanning skills with SkillSpector (static only)..." }
-    $jsonOutput = & skillspector scan $resolvedPath --no-llm --format json 2>&1 | Out-String
+    # --recursive: per-skill JSON goes to --output file, NOT stdout (v2.5.0 quirk)
+    $tempJson = Join-Path ([IO.Path]::GetTempPath()) "skillspector-gate-report-$PID.json"
+    try {
+        & skillspector scan $resolvedPath --recursive --no-llm --format json --output $tempJson 2>&1 | Out-Null
+        $jsonOutput = if (Test-Path $tempJson) { Get-Content $tempJson -Raw } else { "" }
+    } finally {
+        # Temp file we created ourselves — .NET Delete avoids cmdlet safety-ceremony
+        if (Test-Path $tempJson) { [System.IO.File]::Delete($tempJson) }
+    }
     Invoke-Scan -Runner "CLI" -JsonOutput $jsonOutput
     if ($Strict -and $script:RiskExceeded) { exit 1 }
     exit 0
@@ -132,7 +180,15 @@ if ($dockerOk) {
     if(-not $Quiet) { Write-Host "🔍 [Docker] Scanning skills with SkillSpector (static only)..." }
     $hostPath = (Split-Path $resolvedPath.Path -Parent) -replace '\\', '/'
     $scanTarget = "/scan/$(Split-Path $resolvedPath.Path -Leaf)"
-    $jsonOutput = docker run --rm -v "${hostPath}:/scan" $DockerImage scan $scanTarget --no-llm --format json 2>&1 | Out-String
+    $reportFile = "/scan/.skillspector-gate-report-$PID.json"
+    try {
+        docker run --rm -v "${hostPath}:/scan" $DockerImage scan $scanTarget --recursive --no-llm --format json --output $reportFile 2>&1 | Out-Null
+        $hostReport = Join-Path $hostPath ".skillspector-gate-report-$PID.json"
+        $jsonOutput = if (Test-Path $hostReport) { Get-Content $hostReport -Raw } else { "" }
+    } finally {
+        $cleanup = Join-Path $hostPath ".skillspector-gate-report-$PID.json"
+        if (Test-Path $cleanup) { [System.IO.File]::Delete($cleanup) }
+    }
     Invoke-Scan -Runner "Docker" -JsonOutput $jsonOutput
     if ($Strict -and $script:RiskExceeded) { exit 1 }
     exit 0
