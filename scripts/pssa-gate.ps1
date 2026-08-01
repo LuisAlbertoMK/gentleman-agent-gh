@@ -7,7 +7,7 @@
 [CmdletBinding()]param(
 [Parameter(Position=0)][ValidateSet('Check','Fix','Trend','Incremental')][string]$Mode='Check',
 [string]$Path=(Get-Location).Path,[switch]$Quiet,
-[string]$BaselineFile=(Join-Path $Path 'docs\metricas\pssa-baseline.json'))
+[string]$BaselineFile=(Join-Path $Path 'docs/metricas/pssa-baseline.json'))
 Set-StrictMode -Version Latest;$ErrorActionPreference='Stop'
 $xd=@('experiments','skills','node_modules');$xdAmp=$xd+'tests';$fr=@('PSUseBOMForUnicodeEncodedFile','PSAvoidDefaultValueSwitchParameter');$tr=@('PSAvoidUsingWriteHost')
 
