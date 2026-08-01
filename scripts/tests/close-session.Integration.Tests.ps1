@@ -103,7 +103,8 @@ Describe "close-session — Integration: parameter binding" {
 Describe "close-session — Integration: non-Quiet output format" {
 
     It "outputs compact prompt or session header in non-Quiet mode" {
-        $output = & $scriptPath -Goal "Test" -Description "Non-quiet test" -BitacoraPath $bitacoraPath 2>&1
+        # Header is emitted via Write-Host (information stream #6) — capture it
+        $output = & $scriptPath -Goal "Test" -Description "Non-quiet test" -BitacoraPath $bitacoraPath 6>&1
         $outputString = $output | Out-String
         # When changes exist, compact prompt takes priority; when clean, SESSION CLOSE shows
         $hasSessionHeader = $outputString -match "SESSION CLOSE"
@@ -112,7 +113,8 @@ Describe "close-session — Integration: non-Quiet output format" {
     }
 
     It "includes branch and goal in output" {
-        $output = & $scriptPath -Goal "TestBranchGoal" -Description "Branch test" -BitacoraPath $bitacoraPath 2>&1
+        # Header is emitted via Write-Host (information stream #6) — capture it
+        $output = & $scriptPath -Goal "TestBranchGoal" -Description "Branch test" -BitacoraPath $bitacoraPath 6>&1
         $outputString = $output | Out-String
         $outputString | Should -Match "Branch|COMPACT PROMPT"
         # The goal only appears in the compact prompt when changes exist (clean
