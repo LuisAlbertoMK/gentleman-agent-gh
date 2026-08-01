@@ -91,6 +91,9 @@ jobs:
 
   security:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: pwsh
     steps:
       - uses: actions/checkout@v7
 
@@ -99,13 +102,13 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: pre-commit — all hooks
+      - name: Install PSScriptAnalyzer
+        run: Install-Module PSScriptAnalyzer -RequiredVersion 1.20.0 -Force -Scope CurrentUser
+
+      - name: pre-commit — security & lint hooks
         run: |
-          if (Get-Command pre-commit -ErrorAction SilentlyContinue) {
-            pre-commit run --all-files --show-diff-on-failure
-          } else {
-            pip install pre-commit && pre-commit run --all-files --show-diff-on-failure
-          }
+          if (-not (Get-Command pre-commit -ErrorAction SilentlyContinue)) { pip install pre-commit }
+          pre-commit run --all-files --show-diff-on-failure trailing-whitespace end-of-file-fixer check-yaml check-json check-added-large-files actionlint gitleaks secrets-scan pssa-gate
 
       - name: trufflehog — deep secrets scan
         uses: trufflesecurity/trufflehog@v3.95.9
