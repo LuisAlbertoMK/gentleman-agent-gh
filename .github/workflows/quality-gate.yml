@@ -97,6 +97,8 @@ jobs:
         shell: pwsh
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v7
@@ -119,7 +121,7 @@ jobs:
         uses: trufflesecurity/trufflehog@v3.95.9
         with:
           path: ./
-          base: ${{ github.event.repository.default_branch }}
+          base: ${{ github.event.before }}
           head: HEAD
           extra_args: --only-verified --fail --exclude-globs '.learnings/*,.backup-*/**'
 
