@@ -1,4 +1,4 @@
-﻿{
+{
   "gentleman-deep-semi": {
     "description": "Deep reasoning — SEMI mode (safe commands auto, writes/commits ask)",
     "model": "opencode/nemotron-3-ultra-free",
