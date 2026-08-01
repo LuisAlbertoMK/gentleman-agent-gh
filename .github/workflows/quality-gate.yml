@@ -38,8 +38,9 @@ jobs:
           Get-ChildItem -Recurse -Filter *.ps1 | Where-Object {
             $_.FullName -notmatch 'experiments|node_modules|metricas\\assets'
           } | ForEach-Object {
-            $c = Get-Content $_ -Head 3 -Raw
-            if ($c -notmatch '#requires -Version 7' -and $_.Name -ne 'ps5-detect.ps1') {
+            $c = (Get-Content $_ -Head 3) -join "`n"
+            $ps5Only = $_.Name -in @('ps5-detect.ps1', 'sync-global-ps5.ps1')
+            if ($c -notmatch '#requires -Version 7(\.0)?' -and -not $ps5Only) {
               Write-Output "::warning title=Missing PS7::$($_.Name)"; $fail++; return
             }
             try { $null = [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$null); Write-Output "OK: $($_.Name)" }
