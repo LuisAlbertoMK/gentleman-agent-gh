@@ -200,6 +200,8 @@ if (VALIDATE) {
   if (existing.charCodeAt(0) === 0xFEFF) existing = existing.slice(1);
   // Normalize line endings
   existing = existing.replace(/\r\n/g, '\n');
+  // Ignore trailing newline (end-of-file-fixer may add one)
+  existing = existing.replace(/\n$/, '');
 
   const normalized = output.replace(/\r\n/g, '\n');
 
