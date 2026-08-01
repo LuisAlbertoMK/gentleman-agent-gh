@@ -4,6 +4,8 @@
   2-way config drift detection between gentleman-agent-gh (canonical)
   and opencode-global (~/.config/opencode/).
   Part of P3b — Autonomous Integration Plan.
+  NOTE: the mcp section is machine-specific (local servers, credentials,
+  absolute paths) and is intentionally excluded from comparison and -Fix.
 #>
 param(
   [switch]$Json,
@@ -55,7 +57,9 @@ function Get-SectionHash {
   }
 }
 
-$sectionKeys = @("agent", "skills", "mcp", "permission")
+# mcp is machine-specific (local MCP servers, credentials, absolute paths)
+# and is deliberately NOT compared or synced — -Fix never touches it.
+$sectionKeys = @("agent", "skills", "permission")
 $canonical = Get-SectionHash -Path $canonicalPath -SectionKeys $sectionKeys
 $global    = Get-SectionHash -Path $globalPath -SectionKeys $sectionKeys
 
@@ -98,6 +102,7 @@ if ($Json -or $Quiet) {
   ConvertTo-Json @{
     timestamp = (Get-Date -Format "o")
     version   = "1.0.0"
+    excludedSections = @("mcp")
     files     = @{
       canonical = $canonicalPath
       global    = $globalPath
@@ -120,6 +125,7 @@ if ($Json -or $Quiet) {
     Write-Output "   global:    $($_.global)"
   }
   Write-Output "───────────────────────────────────────────"
+  Write-Output "ℹ️  mcp: skipped — machine-specific section (not compared/synced)"
   Write-Output "Total drifts: $totalDrift"
 }
 exit [Math]::Min($totalDrift, 2)
