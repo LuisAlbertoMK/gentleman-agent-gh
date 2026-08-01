@@ -51,7 +51,7 @@ repos:
 
       - id: secrets-scan
         name: Fast secrets scan
-        entry: pwsh -NoProfile -Command "\$secrets = @('ghp_','gho_','ghs_','github_pat_','ctx7sk_','AKIA','sk-'); \$diff = git diff --cached --name-only; \$found = @(); foreach (\$f in \$diff) { if (-not (Test-Path \$f)) { continue }; \$c = Get-Content \$f -Raw; foreach (\$s in \$secrets) { if (\$c -match [regex]::Escape(\$s)) { \$found += \$f } } }; if (\$found.Count -gt 0) { Write-Host \"SECRETS BLOCKED in: \$(\$found -join ', ')\" -ForegroundColor Red; exit 1 }"
+        entry: pwsh -NoProfile -File scripts/leak-guard.ps1
         language: system
         pass_filenames: false
 
