@@ -79,7 +79,7 @@ Describe 'Test-TrustedSource' {
     }
 
     It 'returns true for engram' {
-        $result = Test-TrustedSource -Command @('engram', 'mcp', '--tools=agent')
+        $result = Test-TrustedSource -Command @('engram', 'mcp', '--tools=mem_save,mem_search,mem_context,mem_session_summary,mem_get_observation,mem_save_prompt,mem_current_project,mem_judge')
         $result | Should -Be $true
     }
 
@@ -164,7 +164,7 @@ Describe 'Get-ServerIdentifier' {
     }
 
     It 'extracts unscoped package name' {
-        $result = Get-ServerIdentifier -Name 'engram' -Command @('engram', 'mcp', '--tools=agent')
+        $result = Get-ServerIdentifier -Name 'engram' -Command @('engram', 'mcp', '--tools=mem_save,mem_search,mem_context,mem_session_summary,mem_get_observation,mem_save_prompt,mem_current_project,mem_judge')
         $result | Should -Be 'engram'
     }
 

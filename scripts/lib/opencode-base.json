@@ -219,7 +219,7 @@
       "command": [
         "engram",
         "mcp",
-        "--tools=agent"
+        "--tools=mem_save,mem_search,mem_context,mem_session_summary,mem_get_observation,mem_save_prompt,mem_current_project,mem_judge"
       ],
       "type": "local",
       "timeout": 30000

@@ -124,7 +124,7 @@ if(-not $SkipMCP -and (Test-Path $globalJson)){
         $config | Add-Member -Name "mcp" -Value @{} -MemberType NoteProperty -Force
     }
     if(-not ($config.mcp.PSObject.Properties['engram'])){
-        $config.mcp | Add-Member -Name "engram" -Value @{type="local";command=@("engram","mcp","--tools=agent");enabled=$true} -MemberType NoteProperty -Force
+        $config.mcp | Add-Member -Name "engram" -Value @{type="local";command=@("engram","mcp","--tools=mem_save,mem_search,mem_context,mem_session_summary,mem_get_observation,mem_save_prompt,mem_current_project,mem_judge");enabled=$true} -MemberType NoteProperty -Force
         $mcpChanged = $true; Add-Result "MCP:engram" "SYNCED" "Added engram MCP server"
     }else{Add-Result "MCP:engram" "OK" "Already configured"}
     $c7Cmd = @("context7-mcp")
