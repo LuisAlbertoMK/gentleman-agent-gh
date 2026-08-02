@@ -95,3 +95,22 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 **Aprendizaje**: (1) El gate mide chars (Get-Content .Length) mientras run-improvement-cycle mide bytes — al recortar hay que pasar AMBOS umbrales (chars <3000 Y bytes <3072); un archivo con muchos chars multibyte (emoji ✅⚠️) puede pasar chars pero fallar bytes. (2) Comprimir sin perder autoridad: tablas y bullets compactos > prosa; eliminar secciones que duplican el frontmatter. (3) Correr run-improvement-cycle + benchmark tras el cambio expone problemas colaterales reales (run-dreaming bug).
 
 ---
+
+## Ciclo 4 — 2026-08-02
+
+**Gap**: `run-dreaming.ps1:134` — `ParentContainsErrorRecordException: The property 'Count' cannot be found` al correr el scan de errores. Reproducible en runtime (benchmark + llamada directa). Causa raíz clásica de PowerShell: `Get-RepeatedPattern` retorna un array de 1 elemento que PowerShell DESENVUELVE a objeto único (hashtable) → `.Count` semántica rota.
+
+**Enfoques evaluados (3)**:
+- A: Wrapper `@(...)` en los call-sites — **GANADOR**: garantiza array en TODOS los modos; patrón idempotente seguro
+- B: `return ,` (unary comma) en la función — rechazado: protege solo 1 caller, el resto quedan expuestos
+- C: Cast `[array]` en la variable — rechazado: más ruido que el wrapper, misma efectividad
+
+**Cambios** (`scripts/run-dreaming.ps1`): wrapper `@(...)` en 4 call-sites de `Get-RepeatedPattern` (bloques quick/report L132 y feed L193/195).
+
+**Hallazgo de semántica (más profundo que el crash)**: pre-fix, con 1 patrón repetido `.Count` devolvía **3** (contaba las keys del hashtable, no los patrones) → severidad/conteos falsos. Post-fix: `Count=1` correcto. Verificado en sandbox (0/1/2/3 patrones: Count correcto, severidad WARNING/CRITICAL correcta, foreach itera bien).
+
+**Resultado E2E**: sin tests dedicados a dreaming; runtime verificado: `run-dreaming.ps1 -Mode report` exit 0 sin crash (antes: crash reproducible en cada corrida).
+
+**Benchmark vs baseline**: crash runtime 1 → 0. Conteo de patrones semánticamente correcto. MEJORA ✅
+
+**Aprendizaje**: (1) Funciones PowerShell que retornan arrays de 1 elemento se desenvuelven — SIEMPRE envolver con `@(...)` en el caller al usar `.Count`/`.Length`/foreach. (2) Un hashtable también tiene `.Count` (keys) — el bug puede ser silencioso: funciona pero devuelve el valor equivocado; el error real se manifiesta como bug de lógica, no excepción. (3) `@(...)` es idempotente y es la convención defensiva estándar.
