@@ -114,3 +114,29 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 **Benchmark vs baseline**: crash runtime 1 → 0. Conteo de patrones semánticamente correcto. MEJORA ✅
 
 **Aprendizaje**: (1) Funciones PowerShell que retornan arrays de 1 elemento se desenvuelven — SIEMPRE envolver con `@(...)` en el caller al usar `.Count`/`.Length`/foreach. (2) Un hashtable también tiene `.Count` (keys) — el bug puede ser silencioso: funciona pero devuelve el valor equivocado; el error real se manifiesta como bug de lógica, no excepción. (3) `@(...)` es idempotente y es la convención defensiva estándar.
+
+---
+## Cierre — 2026-08-02
+
+**Decisión de parada**: condición cumplida — 12 enfoques evaluados (3 por ciclo × 4 ciclos) ≥ 10. `confidence: high` (los 12 enfoques están documentados arriba con su resultado A/B/C).
+
+**Integración**: `experimento/mejora-autonoma-2026-08-02` → merge fast-forward → `plan/globalize` (4b339517). 7 archivos: +171/-37.
+
+**Verificación final post-merge** (rama `plan/globalize` @ 4b339517):
+- Suite E2E completa: **675 pass / 0 fail / 0 skipped** (1 NotRun = fixture de instalación manual, esperado) ✅
+- Gate pre-commit 13/13 en el último commit del experimento ✅
+- Benchmarks por ciclo: 7 failures → 0; warnings skill-graph 6 → 0; skills >3KB 1 → 0; crash runtime run-dreaming 1 → 0
+
+**Balance del experimento (baseline → final)**:
+
+| Métrica | Baseline | Final |
+|---|---|---|
+| Suite E2E | 669 pass / 7 fail | **675 pass / 0 fail** |
+| Gate pre-commit | 13/13 | 13/13 |
+| Warnings skill-graph | 6 | 0 |
+| Skills >3KB | 1 | 0 |
+| Crash runtime run-dreaming | 1 | 0 |
+
+**Archivos tocados**: `scripts/clean-repo.ps1`, `scripts/engram-compact.ps1`, `scripts/skill-graph.ps1`, `scripts/tests/skill-graph.Tests.ps1`, `.agents/skills/opencode-model-router/SKILL.md`, `scripts/run-dreaming.ps1`, `mejora-log.md` (nuevo).
+
+**Pendientes no bloqueantes** (candidatos a futuros ciclos): engram-compact con DB sin tabla `user_prompts` muestra traceback feo en JSON (contrato `ok:false` cumplido); 3 junctions globales degradadas (vmk-skills/prompts, global-skills — preexistente, no causada por el experimento); `gh` CLI no instalado localmente (PRs requieren instalación o push directo).
