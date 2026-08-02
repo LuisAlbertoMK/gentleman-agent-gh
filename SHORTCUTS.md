@@ -15,6 +15,8 @@
 | `!cycle` | Cycle status summary | Check progress |
 | `!sync` | Upstream check + drift + score update | Keep in sync |
 | `!compress` | Karpathy compress skills >2.5KB | Skill optimization |
+| `!engram-compact` | Compact Engram DB — backup, dedupe, purge stale sync, VACUUM (dry-run first) | Memory bloat, slow engram search |
+| `!clean` | Leave repo clean — untracked, .bak/.tmp junk, dangling junctions, optional git gc (dry-run first) | Repo accumulated junk |
 | `!analisis` | Multi-agent analysis (6 specialists, 8 dimensions) | Deep analysis |
 | `!ejecutar` | Execute analysis findings with parallel subagents | After `!analisis` completes |
 

@@ -1,3 +1,4 @@
+2026-08-01 - Session close
 2026-08-01 - Commit 3358a913 + f8e432d3: gentleman-init bootstrap, CBM parametrizado, resolver proyecto, breaker fixes. Push a origin/plan/globalize
 2026-08-01 - Session close: JD quality-gate (a8e213af), rama master local borrada, ref STALE skill-creator corregida (a2cafc43), score snapshot sync (cc1c52b1)
 2026-07-31 - Session close
@@ -151,3 +152,4 @@
 2026-07-05 - Agent optimization analysis saved to docs/optimizaciones/agent-optimization-analysis.md (pending Cycle 20)
 
 | 2026-07-30 | orchestrated analysis | Context optimization + agent engineering deep analysis. Fixed: limit.input, orchestrator models, SDD models, cross-project sync pipeline (sync-vmk + use-gentleman), task permissions parity for vMK-auto/semi. 3 commits. | ✅ completed |
+2026-08-01 - [audit] subagent twins fix: self=NA audit=5/7/5/5/6/5 gaps=NA (no self-scores) — issue2 tabla FIXED+re-audited, issue1 node-deny bloquea regen (manual), issue3 validate-en-CI pendiente
