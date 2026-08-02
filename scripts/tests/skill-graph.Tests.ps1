@@ -179,6 +179,13 @@ Describe 'Get-AgentRecommendation' {
         Register-Skill 'immune-system' 'immunity|anti-pattern|repeated error' 'meta' 'medium' '' '' 'Immune system'
         Register-Skill 'seo' 'SEO|search engine|meta tags|structured data|sitemap' 'web-quality' 'medium' '' '' 'SEO optimization'
         Register-Skill 'research' 'research|investigar|technical investigation|learn|compare solutions' 'research' 'medium' '' '' 'Structured research'
+        # Auto-register every skill referenced in agentRecommendations so the lookup
+        # never warns (recommendation table must stay consistent with the registry).
+        $referenced = @($script:agentRecommendations | ForEach-Object { $_.S } | Sort-Object -Unique)
+        $existing = @($script:skillRegistry | ForEach-Object { $_.Name })
+        foreach ($r in $referenced) {
+            if ($r -notin $existing) { Register-Skill $r '' '' 'low' '' '' "Auto-registered from agentRecommendations" }
+        }
     }
 
     It 'recommends agents for review task' {
@@ -197,6 +204,9 @@ Describe 'Get-AgentRecommendation' {
         $result = @(Get-AgentRecommendation 'improve SEO for the landing page')
         $result | Should -Not -BeNullOrEmpty
         $result | Should -Contain 'seo'
+        # Regression: "improve" contains "pr" but must NOT trigger commit/PR recommendations
+        $result | Should -Not -Contain 'commit-crafter'
+        $result | Should -Not -Contain 'branch-pr'
     }
 
     It 'returns unique recommendations' {

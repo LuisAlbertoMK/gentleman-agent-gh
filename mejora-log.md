@@ -47,4 +47,28 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 
 **Aprendizaje**: (1) `pwsh -Command "& 'script'"` NO propaga exit code de `exit N` del script — usar `-File` o `&` in-process para verificar exit codes en tests futuros. (2) El alias `[Alias()]` en switch es la forma limpia de compat. (3) Algunos tests de destructive-scripts corren sobre todos los scripts del repo — cualquier script nuevo con Remove-Item sin guard dispara failures.
 
+**Verificación final Ciclo 1**: suite E2E completa 676/676 pass, 0 fail (90.98s) ✅ — 7 failures preexistentes cerrados.
+
+---
+## Ciclo 2 — 2026-08-02
+
+**Gap**: Regla `pr` suelta en `agentRecommendations` de `scripts/skill-graph.ps1` (L175 y L181): `(?:commit|pr|pull.request|...)` matcheaba la subcadena "pr" dentro de "improve"/"preview" → recomendaciones falsas de commit/PR. Ej: "improve SEO for the landing page" recomendaba commit-crafter, quality-gate, branch-pr, chained-pr (runtime — oculto por CSV) y emitía 6 warnings en el test (registry parcial).
+
+**Enfoques evaluados (3)**:
+- A: `\bpr\b` (word boundary) en las 2 reglas — **GANADOR**: matchea "PR"/"pr" como palabra, no como subcadena; `pull.request` preserva el wildcard para pull_request/pull-request
+- B: Quitar `pr` de la regla — rechazado: pierde "open a PR" como trigger legítimo
+- C: Case-sensitive `(?i)` global cambiada — rechazado: rompe todos los otros triggers que dependen de case-insensitive
+
+**Cambios**:
+- `scripts/skill-graph.ps1`: L175 `(?:code|security|skill|\bpr\b)`, L181 `(?:commit|\bpr\b|pull.request|merge|ship|push)`
+- `scripts/tests/skill-graph.Tests.ps1`: auto-registro de TODAS las skills referenciadas por `agentRecommendations` en el BeforeEach del Describe (elimina la clase de warning completa, no solo el trigger actual) + 2 aserciones de regresión: "improve SEO" NO debe contener commit-crafter ni branch-pr
+
+**Nota**: El análisis previo ("$PSScriptRoot en ~90 scripts" del 08-01) resultó FALSO POSITIVO — los hits eran texto de help/comentarios; `global-setup.ps1` usa paths relativos a propósito y resuelve con `Join-Path $gentlemanRoot` en consumo. Verificado por scan + lectura. No se "arregló" un problema inexistente.
+
+**Resultado E2E**: skill-graph 18/18 ✅ sin warnings (antes 6 warnings en 2 tests). Runtime verificado: "improve SEO" → solo `seo`; "prepare a PR and commit" → 4 skills correctas; "review the preview branch" → sin falso match L181.
+
+**Benchmark vs baseline**: warnings E2E 6 → 0. Recomendaciones falsas eliminadas. MEJORA ✅
+
+**Aprendizaje**: (1) Alternancias con tokens cortos (`pr`) en regex de recomendación deben usar `\b...\b` — el runtime puede ocultar falsos positivos si las skills existen en el registry; el warning del test es el síntoma visible. (2) El test con registry parcial expone gaps que el runtime disimula — auto-registrar desde la tabla elimina la clase completa. (3) Verificar el gap ANTES de implementar: "arreglos" de falsos positivos documentados añaden ruido sin valor.
+
 ---
