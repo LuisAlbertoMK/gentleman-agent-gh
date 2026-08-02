@@ -140,3 +140,26 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 **Archivos tocados**: `scripts/clean-repo.ps1`, `scripts/engram-compact.ps1`, `scripts/skill-graph.ps1`, `scripts/tests/skill-graph.Tests.ps1`, `.agents/skills/opencode-model-router/SKILL.md`, `scripts/run-dreaming.ps1`, `mejora-log.md` (nuevo).
 
 **Pendientes no bloqueantes** (candidatos a futuros ciclos): engram-compact con DB sin tabla `user_prompts` muestra traceback feo en JSON (contrato `ok:false` cumplido); 3 junctions globales degradadas (vmk-skills/prompts, global-skills — preexistente, no causada por el experimento); `gh` CLI no instalado localmente (PRs requieren instalación o push directo).
+
+---
+## Ciclo 5 — 2026-08-02 (breakers C2/C3/C4, condición de parada §3)
+
+**Gap**: El cierre previo (commit 52a053bc) declaró la condición de parada cumplida SOLO por conteo de enfoques (12 ≥ 10). La revisión contra el protocolo formal expuso que §3 exige ADEMÁS breaker ≥3 ataques por ciclo y "no quedan gaps" — C2/C3/C4 no tenían breaker. Reabierta la parada.
+
+**Breakers ejecutados (subagentes independientes, builder≠evaluator)**:
+- **C2 (skill-graph `\bpr\b`)**: **FIX** — el boundary rompe el plural legítimo "PRs": `review the PRs` pierde commit-crafter/branch-pr (caía al fallback fuzzy con ruido: sdd-spec, baseline-ui, judgment-day). 33 inputs / 36 aserciones → 35 PASS / 1 FAIL. Fix: `\bprs?\b` en L175/L181 + test de regresión plural. Re-verificado: PRs plural→True, PR singular→True, improve/preview→False (falsos muertos).
+- **C3 (SKILL.md compresión)**: **APPROVED** — 13/13 filas de ruteo byte-idénticas tras normalización, SECURITY GATE 4/4, IMPLEMENTER 6/6, CONTEXT→ACTION 6/6, Refs 4/4, STRATEGY 6/6. Pérdidas solo prosa operativa (ruta permission-templates.json, conteo 1643 líneas, flag --validate) + sección "When to Use" (ya truncada en original, duplicada por frontmatter). Gate: chars 2960 <3000 ✓ bytes 3066 <3072 ✓.
+- **C4 (run-dreaming `@()` en call-sites)**: **FIX** — el fix de C4 fue INCOMPLETO: feed mode aún crasheaba en L207 (`$keywords.Count` con 1 keyword scalar → ParentContainsErrorRecordException bajo Set-StrictMode) y L224 (`$null.Count` con 0 keywords). Además el diagnóstico original era impreciso: el entry tiene key literal `Count`, así que `.Count` en elemento desenvuelto devuelve el conteo de ocurrencias (2, 3…) no "3 keys" — el crash pre-fix real era con 0 patrones (`$null.Count`). Fix: wrapper `@(...)` en las 2 asignaciones de `$keywords` (L207/L224). Re-verificado en lab hermético: feed 1 keyword / 0 keywords / multi keyword → exit 0, sin crash (antes 2 crashes distintos).
+
+**Enfoques evaluados para los fixes (2)**:
+- A: `\bprs?\b` (plural opcional) + `@(...)` en `$keywords` — **GANADOR**: 1-char extend por línea, mantiene todos los casos previos, ataca la raíz (singular+plural, scalar+null)
+- B: `\b(?:prs?|pr)\b` explícito — rechazado: redundante, `s?` ya cubre
+- (el fix C4 de @() call-sites se mantiene; la alternativa `return ,$result` en la función queda descartada — protegería solo 1 caller)
+
+**Resultado breaker**: C2 FIX→re-verificado PASS (4/4 ataques), C3 APPROVED (3/3 ángulos), C4 FIX→re-verificado PASS (3/3 casos). **2 bugs reales encontrados por el breaker post-cierre** — el protocolo §3 tenía razón en exigirlo.
+
+**Resultado E2E**: suite completa 676/677 pass (1 NotRun fixture manual, esperado) + 1 test nuevo (plural PRs). skill-graph 19/19.
+
+**Benchmark vs ciclo anterior**: suite 675→676 pass. Falsos positivos PR: 0 (se mantiene) + plural restaurado. Crash feed: 2 → 0. MEJORA ✅
+
+**Aprendizaje**: (1) `\b\b` de regex rompe plurales — siempre probar singular+plural+puntuación en breakers de regex. (2) Los fixes PowerShell de unwrap deben atacar TODOS los call-sites de `.Count`/`.Length`, no solo el sintomático — el mismo patrón se repetía 2 niveles más abajo (L207/L224). (3) El diagnóstico del crash original era impreciso: con key literal `Count` el `.Count` "funciona" pero devuelve el valor equivocado (silencioso) — el crash duro era 0 patrones. (4) Cerrar por conteo de enfoques sin breaker es prematuro — la condición de parada §3 es AND, no OR.
