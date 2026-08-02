@@ -35,6 +35,26 @@ Write-Step "Scripts junction" {
     if (-not (Test-Path $dstScripts)) { New-CrossPlatLink -Path $dstScripts -Target $srcScripts; Write-Host "  Created" -Fore Green } else { Write-Host "  Exists" -Fore Yellow }
 }
 
+# Step 2b: Commands sync (SSoT = repo commands/, hash-based — NOT copy-if-missing)
+Write-Step "Commands sync" {
+    $srcCommands = Resolve-Path "$PSScriptRoot\..\commands" -EA Stop
+    $dstCommands = Join-Path (Get-GlobalConfigDir) "commands"
+    if (-not (Test-Path $dstCommands)) { New-Item -ItemType Directory -Path $dstCommands -Force | Out-Null }
+    $copied = 0; $upToDate = 0
+    foreach ($f in Get-ChildItem -File -Path $srcCommands -Filter *.md) {
+        $dst = Join-Path $dstCommands $f.Name
+        if (Test-Path $dst) {
+            $a = (Get-FileHash $f.FullName -Algorithm SHA256).Hash
+            $b = (Get-FileHash $dst -Algorithm SHA256).Hash
+            if ($a -eq $b) { $upToDate++; continue }
+        }
+        Copy-Item -LiteralPath $f.FullName -Destination $dst -Force
+        $copied++
+    }
+    Write-Host "  $copied copied, $upToDate up-to-date" -Fore Green
+    $report.steps["commands_sync"] = @{copied=$copied; up_to_date=$upToDate}
+}
+
 # Step 3: Global config (MCPs + permissions + agents)
 Write-Step "Global config" {
     if ($Force -or -not (Test-Path $globalCfg)) {
