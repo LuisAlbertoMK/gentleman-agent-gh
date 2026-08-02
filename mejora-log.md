@@ -72,3 +72,26 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 **Aprendizaje**: (1) Alternancias con tokens cortos (`pr`) en regex de recomendación deben usar `\b...\b` — el runtime puede ocultar falsos positivos si las skills existen en el registry; el warning del test es el síntoma visible. (2) El test con registry parcial expone gaps que el runtime disimula — auto-registrar desde la tabla elimina la clase completa. (3) Verificar el gap ANTES de implementar: "arreglos" de falsos positivos documentados añaden ruido sin valor.
 
 ---
+## Ciclo 3 — 2026-08-02
+
+**Gap**: `opencode-model-router` SKILL.md 3741 B / 3626 chars > umbral 3KB del gate [5/13] (run-improvement-cycle: >3072 B; benchmark: >3000 chars). Warning recurrente en CADA commit gate.
+
+**Enfoques evaluados (3)**:
+- A: Compresión editorial (prosa → tablas/listas, quitar duplicados) — **GANADOR**: preserva 100% de la autoridad de ruteo, reduce 18%
+- B: Mover contenido a archivo auxiliar referenciado — rechazado: rompe el consumo directo del SKILL.md como fuente única
+- C: Subir el umbral del gate — rechazado: debilita la guarda de skills infladas para todos
+
+**Cambios** (`.agents/skills/opencode-model-router/SKILL.md`):
+- Eliminado "When to Use" (duplicaba la descripción del frontmatter)
+- Leyenda de tabla comprimida; prosa de RUNTIME REALITY/STRATEGY convertida a bullets compactos
+- Anti-Patterns condensados. Resultado: 3741 B → 3066 B (-18%), 3626 → 2960 chars
+
+**Verificación**: bajo umbral chars (<3000) y bytes (<3072) ✅. Frontmatter válido (run-improvement-cycle [2/9] SKILL.md OK). La tabla de ruteo (13 filas), SECURITY GATE (4 reglas), IMPLEMENTER, CONTEXT→ACTION y Refs intactos — diff verificado sección por sección.
+
+**Hallazgo nuevo expuesto** (no causado por el cambio): `run-dreaming.ps1:134` — `$repeated.Count -gt 0` falla con `ParentContainsErrorRecordException` cuando el scan devuelve UN solo objeto (no array). Bug real preexistente → candidato Ciclo 4.
+
+**Benchmark vs baseline**: skills >3KB en gate 1 → 0 (este archivo). MEJORA ✅
+
+**Aprendizaje**: (1) El gate mide chars (Get-Content .Length) mientras run-improvement-cycle mide bytes — al recortar hay que pasar AMBOS umbrales (chars <3000 Y bytes <3072); un archivo con muchos chars multibyte (emoji ✅⚠️) puede pasar chars pero fallar bytes. (2) Comprimir sin perder autoridad: tablas y bullets compactos > prosa; eliminar secciones que duplican el frontmatter. (3) Correr run-improvement-cycle + benchmark tras el cambio expone problemas colaterales reales (run-dreaming bug).
+
+---

@@ -4,10 +4,6 @@ description: "Route tasks by model strength — specialized agents for analysis,
 triggers: "model router, routing, delegate or direct, model decision, specialized agent, implementer"
 ---
 
-## When to Use
-Route tasks by model strength — specialized agents for analy
-
-
 ## ⚠️ SECURITY GATE (always first)
 1. Credentials/secrets/PII? → **DIRECT**
 2. Recurring task (cron/CI)? → **DIRECT**
@@ -15,7 +11,7 @@ Route tasks by model strength — specialized agents for analy
 4. Otherwise → route below.
 
 ## 🎯 ROUTING TABLE (FREE TIER)
-> Leyenda: ✅ = twin `-sub` existe (delegación real) · ⚠️ = sin twin → DELEGATE cae a fallback `general` (comportamiento esperado hasta crear twin)
+> ✅ = twin `-sub` delegable · ⚠️ = sin twin → `general`
 
 | Task | Action | Agent | Model | Fallback |
 |------|--------|-------|-------|----------|
@@ -38,10 +34,10 @@ Route tasks by model strength — specialized agents for analy
 **Avoid**: Qwen3.7 Max (re-plans, paid), Nemotron 3 Ultra (over-analyzes).
 
 ## ⚠️ RUNTIME REALITY (opencode 1.18.x)
-- Los agentes `gentleman-*` (sin sufijo) están declarados `mode: primary` en opencode.json → el Task tool (delegación) NO los expone; solo expone `mode: subagent`.
-- Los **twins `-sub`** (`gentleman-implementer-sub`, `gentleman-security-sub`, `gentleman-deep-sub`, `gentleman-quick-sub`) SÍ son delegables: `mode: subagent` + `hidden: true` + habilitados en la whitelist `task` del orchestrator (`permission-templates.json` → template `orchestrator`).
-- DELEGATE ✅ = usar el twin. DELEGATE ⚠️ (sin twin) = cae a `general` — NO reportar como falla.
-- ✅ **Regenerado**: `opencode.json` está en sync con la SSoT (1643 líneas). Mantenerlo así: `scripts/regenerate-opencode.ps1` (validate por defecto; `-Yes` regenera + verifica fail-closed). El CI `--validate` falla si deriva.
+- `gentleman-*` sin sufijo = `mode: primary` → Task tool NO los expone.
+- Twins `-sub` (implementer/security/deep/quick) SÍ: `subagent` + `hidden` + whitelist `task` (template `orchestrator`).
+- DELEGATE ✅ = twin. DELEGATE ⚠️ = `general` — NO reportar falla.
+- `opencode.json` sync SSoT: `scripts/regenerate-opencode.ps1` (`-Yes` regenera; CI falla si deriva).
 
 ## 📏 CONTEXT → ACTION
 | Context | Action |
@@ -51,13 +47,10 @@ Route tasks by model strength — specialized agents for analy
 | >150K | Direct forced |
 
 ## 💡 STRATEGY (FREE)
-- **100% Free**: All Zen free models, no subscription
-- **1M context**: Nemotron 3 Ultra Free, DeepSeek V4 Flash Free
-- **Vision**: Kimi K2.5 Free, MiMo V2.5 Free
-- **Fallback**: Big Pickle (docs, SEO, general)
+100% Free · 1M ctx: Nemotron 3 Ultra Free / DeepSeek V4 Flash Free · Vision: Kimi K2.5 / MiMo V2.5 · Fallback: Big Pickle (docs, SEO, general)
 
 ## Refs
 execution-mode · delivery-harness · subagent-isolation · skill-graph
 
 ## Anti-Patterns
-Route sensitive data to subagent · Delegate when context >150K · Skip fallback chain · Route to paid model when free covers it · Forget security gate
+Route sensitive data to subagent · Delegate when context >150K · Skip fallback chain · Pay when free covers it · Forget security gate
