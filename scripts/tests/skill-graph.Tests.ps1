@@ -209,6 +209,13 @@ Describe 'Get-AgentRecommendation' {
         $result | Should -Not -Contain 'branch-pr'
     }
 
+    It 'recommends commit agents for plural PRs' {
+        # Regression: \bprs?\b must keep plural "PRs" triggering commit/PR recommendations
+        $result = @(Get-AgentRecommendation 'review the PRs before merging')
+        $result | Should -Contain 'commit-crafter'
+        $result | Should -Contain 'branch-pr'
+    }
+
     It 'returns unique recommendations' {
         $result = @(Get-AgentRecommendation 'review code and fix bugs and improve quality')
         $result.Count | Should -Be (@($result | Select-Object -Unique)).Count

@@ -172,13 +172,13 @@ function Resolve-Skill {
 # Agent Recommender — regex pattern matching
 # ============================================================================
 $agentRecommendations = @(
-    @{ P = '(?i)(?:review|audit|check|quality|verify|validate)\s.*(?:code|security|skill|\bpr\b)'; S = @('code-review-agent', 'security-scanner', 'quality-gate', 'triple-verify') }
+    @{ P = '(?i)(?:review|audit|check|quality|verify|validate)\s.*(?:code|security|skill|\bprs?\b)'; S = @('code-review-agent', 'security-scanner', 'quality-gate', 'triple-verify') }
     @{ P = '(?i)(?:fix|bug|error|crash|issue|problem|broken|not\s+working)'; S = @('recovery-protocol', 'immune-system', 'triple-verify') }
     @{ P = '(?i)(?:design|architecture|plan|propose|proposal)'; S = @('sdd') }
     @{ P = '(?i)(?:test|testing|coverage|spec|specification)'; S = @('skill-testing', 'sdd-spec', 'sdd-verify') }
     @{ P = '(?i)(?:audit|review|check)\s+(?:the\s+)?(?:doc|documentation|readme|guide|docs)'; S = @('docs-audit') }
     @{ P = '(?i)(?:write|create|design)\s+(?:doc|documentation|readme|guide|manual)'; S = @('code-generation') }
-    @{ P = '(?i)(?:commit|\bpr\b|pull.request|merge|ship|push)'; S = @('commit-crafter', 'quality-gate', 'branch-pr', 'chained-pr') }
+    @{ P = '(?i)(?:commit|\bprs?\b|pull.request|merge|ship|push)'; S = @('commit-crafter', 'quality-gate', 'branch-pr', 'chained-pr') }
     @{ P = '(?i)(?:deploy|ci|cd|pipeline|github.action|release)'; S = @('ci-cd', 'command-wrapper') }
     @{ P = '(?i)(?:refactor|restructur|clean|migrat|extract)'; S = @('refactoring-planner', 'lean-context') }
     @{ P = '(?i)(?:performance|speed|slow|lazy|load\s+time|render|optimize|compress)'; S = @('karpathy-loop', 'performance', 'lean-context') }

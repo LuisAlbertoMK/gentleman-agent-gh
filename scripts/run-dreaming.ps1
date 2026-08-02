@@ -201,9 +201,9 @@ if ($Mode -eq 'feed') {
     # Convert repeated errors to skill-graph patterns
     if ($repeated.Count -gt 0) {
         foreach ($r in $repeated) {
-            $keywords = $r.Text -replace '[^\w\s]','' -split '\s+' |
+            $keywords = @(($r.Text -replace '[^\w\s]','' -split '\s+' |
                 Where-Object { $_.Length -gt 2 } |
-                Select-Object -Unique
+                Select-Object -Unique))
             if ($keywords.Count -gt 0) {
                 $feedPatterns += @{
                     keywords = @($keywords)
@@ -218,9 +218,9 @@ if ($Mode -eq 'feed') {
     # Convert workflow patterns to skill-graph patterns
     if ($workflowPatterns.Count -gt 0) {
         foreach ($wp in $workflowPatterns) {
-            $keywords = "$($wp.Section) $($wp.Message)" -replace '[^\w\s]','' -split '\s+' |
+            $keywords = @(("$($wp.Section) $($wp.Message)" -replace '[^\w\s]','' -split '\s+' |
                 Where-Object { $_.Length -gt 2 } |
-                Select-Object -Unique
+                Select-Object -Unique))
             if ($keywords.Count -gt 0) {
                 $feedPatterns += @{
                     keywords = @($keywords)
