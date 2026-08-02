@@ -64,7 +64,7 @@ jobs:
       - name: Permission consistency
         run: |
           $config = Get-Content 'opencode.json' -Raw | ConvertFrom-Json
-          $readOnlyAgents = @('gentleman-security', 'gentleman-seo', 'gentleman-infra', 'gentleman-frontend', 'gentleman-performance', 'gentleman-datascience', 'gentleman-docs')
+          $readOnlyAgents = @('gentleman-security', 'gentleman-seo', 'gentleman-infra', 'gentleman-frontend', 'gentleman-performance', 'gentleman-datascience', 'gentleman-docs', 'gentleman-security-sub')
           $fail = 0
           foreach ($agent in $readOnlyAgents) {
             $a = $config.agent.$agent
@@ -75,7 +75,11 @@ jobs:
           $orchBash = $config.agent.'gentleman-vMK'.permission.bash
           if ($orchBash.'*' -ne 'ask') { Write-Error "FAIL: orchestrator bash.* = $($orchBash.'*') (expected ask — delegates, never implements)"; $fail++ }
           $orchTask = $config.agent.'gentleman-vMK'.permission.task
-          if (-not $orchTask -or $orchTask.'gentleman-reviewer' -ne 'allow') { Write-Error "FAIL: orchestrator missing task.gentleman-reviewer allow"; $fail++ }
+          if (-not $orchTask -or $orchTask.'*' -ne 'deny') { Write-Error "FAIL: orchestrator task.* must be deny (fail-closed whitelist)"; $fail++ }
+          $subAgents = @('gentleman-deep-sub', 'gentleman-quick-sub', 'gentleman-implementer-sub', 'gentleman-security-sub')
+          foreach ($sub in $subAgents) {
+            if ($orchTask.$sub -ne 'allow') { Write-Error "FAIL: orchestrator missing task.$sub allow"; $fail++ }
+          }
           if ($fail) { exit 1 }
           Write-Output "OK: All permission consistency checks passed"
 

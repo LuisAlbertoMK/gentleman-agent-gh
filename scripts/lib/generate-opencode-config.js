@@ -58,6 +58,12 @@ const TEMPLATE_MAP = {
   'sdd-tasks': 'readwrite',
   'sdd-verify': 'readwrite',
 
+  // Subagent twins (mode: subagent, delegable via Task tool) — mirror primary templates
+  'gentleman-deep-sub': 'readwrite',
+  'gentleman-quick-sub': 'readwrite',
+  'gentleman-implementer-sub': 'readwrite',
+  'gentleman-security-sub': 'readonly',
+
   // Mode variants — AUTO (all auto-approve except push + destructive + network)
   'gentleman-vMK-auto': 'auto',
   'gentleman-deep-auto': 'auto',

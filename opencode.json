@@ -260,7 +260,22 @@
           "*": "ask"
         },
         "task": {
-          "gentleman-reviewer": "allow"
+          "*": "deny",
+          "explore": "allow",
+          "general": "allow",
+          "gentleman-deep-sub": "allow",
+          "gentleman-quick-sub": "allow",
+          "gentleman-implementer-sub": "allow",
+          "gentleman-security-sub": "allow",
+          "sdd-apply": "allow",
+          "sdd-archive": "allow",
+          "sdd-design": "allow",
+          "sdd-explore": "allow",
+          "sdd-init": "allow",
+          "sdd-propose": "allow",
+          "sdd-spec": "allow",
+          "sdd-tasks": "allow",
+          "sdd-verify": "allow"
         }
       },
       "tools": {
@@ -369,6 +384,22 @@
         "engram*": true
       }
     },
+    "gentleman-deep-sub": {
+      "description": "Deep reasoning subagent — hypothesis-driven debugging, root cause analysis (delegable via Task tool)",
+      "model": "opencode/nemotron-3-ultra-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
+      "permission": {
+        "bash": {
+          "*": "ask"
+        }
+      },
+      "tools": {
+        "codebase-memory*": true,
+        "engram*": true
+      }
+    },
     "gentleman-quick": {
       "description": "Fast executor - single-file atomic edits with immediate verification, scope-guarded",
       "model": "opencode/mimo-v2.5-free",
@@ -459,6 +490,18 @@
           "Test-NetConnection *": "deny",
           "wget *": "deny",
           "wsl *": "deny"
+        }
+      }
+    },
+    "gentleman-quick-sub": {
+      "description": "Fast executor subagent — single-file atomic edits with immediate verification (delegable via Task tool)",
+      "model": "opencode/mimo-v2.5-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
+      "permission": {
+        "bash": {
+          "*": "ask"
         }
       }
     },
@@ -571,7 +614,27 @@
           "*": "deny"
         },
         "edit": "deny",
-        "write": "deny"
+        "write": "deny",
+        "task": {
+          "*": "deny"
+        }
+      }
+    },
+    "gentleman-security-sub": {
+      "description": "Security specialist subagent — STRIDE, CVSS, OWASP analysis (delegable via Task tool, read-only)",
+      "model": "opencode/nemotron-3-ultra-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-security.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}",
+      "permission": {
+        "bash": {
+          "*": "deny"
+        },
+        "edit": "deny",
+        "write": "deny",
+        "task": {
+          "*": "deny"
+        }
       }
     },
     "gentleman-seo": {
@@ -584,7 +647,10 @@
           "*": "deny"
         },
         "edit": "deny",
-        "write": "deny"
+        "write": "deny",
+        "task": {
+          "*": "deny"
+        }
       }
     },
     "gentleman-infra": {
@@ -597,7 +663,10 @@
           "*": "deny"
         },
         "edit": "deny",
-        "write": "deny"
+        "write": "deny",
+        "task": {
+          "*": "deny"
+        }
       }
     },
     "gentleman-frontend": {
@@ -610,7 +679,10 @@
           "*": "deny"
         },
         "edit": "deny",
-        "write": "deny"
+        "write": "deny",
+        "task": {
+          "*": "deny"
+        }
       }
     },
     "gentleman-performance": {
@@ -623,7 +695,10 @@
           "*": "deny"
         },
         "edit": "deny",
-        "write": "deny"
+        "write": "deny",
+        "task": {
+          "*": "deny"
+        }
       }
     },
     "gentleman-datascience": {
@@ -636,7 +711,10 @@
           "*": "deny"
         },
         "edit": "deny",
-        "write": "deny"
+        "write": "deny",
+        "task": {
+          "*": "deny"
+        }
       }
     },
     "gentleman-docs": {
@@ -649,7 +727,10 @@
           "*": "deny"
         },
         "edit": "deny",
-        "write": "deny"
+        "write": "deny",
+        "task": {
+          "*": "deny"
+        }
       }
     },
     "gentleman-implementer": {
@@ -657,6 +738,21 @@
       "model": "opencode/deepseek-v4-flash-free",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "permission": {
+        "bash": {
+          "*": "ask"
+        }
+      },
+      "tools": {
+        "codebase-memory*": true
+      }
+    },
+    "gentleman-implementer-sub": {
+      "description": "Plan executor subagent — implements plans from specialized agents, no deviations (delegable via Task tool)",
+      "model": "opencode/deepseek-v4-flash-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
       "permission": {
         "bash": {
           "*": "ask"

@@ -6,7 +6,22 @@
       "*": "ask"
     },
     "task": {
-      "gentleman-reviewer": "allow"
+      "*": "deny",
+      "explore": "allow",
+      "general": "allow",
+      "gentleman-deep-sub": "allow",
+      "gentleman-quick-sub": "allow",
+      "gentleman-implementer-sub": "allow",
+      "gentleman-security-sub": "allow",
+      "sdd-apply": "allow",
+      "sdd-archive": "allow",
+      "sdd-design": "allow",
+      "sdd-explore": "allow",
+      "sdd-init": "allow",
+      "sdd-propose": "allow",
+      "sdd-spec": "allow",
+      "sdd-tasks": "allow",
+      "sdd-verify": "allow"
     }
   },
   "readwrite": {
@@ -19,7 +34,10 @@
       "*": "deny"
     },
     "edit": "deny",
-    "write": "deny"
+    "write": "deny",
+    "task": {
+      "*": "deny"
+    }
   },
   "sddorchestrator": {
     "bash": {

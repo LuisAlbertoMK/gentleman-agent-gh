@@ -27,7 +27,7 @@ Suite of **79 skills** (+ `_shared`) + **123 PowerShell scripts** for [OpenCode]
 ## Features
 
 ### Multi-Agent Architecture
-33 agents total: main orchestrator (`gentleman-vMK`) + 13 specialists + 9 SDD pipeline agents + 5 auto-mode + 5 semi-mode variants:
+37 agents total: main orchestrator (`gentleman-vMK`) + 13 specialists + 4 subagent twins + 9 SDD pipeline agents + 5 auto-mode + 5 semi-mode variants:
 
 | Agent | Model | Specialty |
 |-------|-------|-----------|
@@ -44,6 +44,10 @@ Suite of **79 skills** (+ `_shared`) + **123 PowerShell scripts** for [OpenCode]
 | `gentleman-docs` | big-pickle | Technical writing, docs (FREE TIER) |
 | `gentleman-implementer` | deepseek-v4-flash-free | Plan executor (FREE TIER) |
 | `gentleman-reviewer` | claude-sonnet-4-6 | Code review — 4R (Risk/Readability/Reliability/Resilience) |
+| `gentleman-deep-sub` | nemotron-3-ultra-free | Deep reasoning subagent — delegable via Task tool |
+| `gentleman-quick-sub` | mimo-v2.5-free | Fast executor subagent — delegable via Task tool |
+| `gentleman-implementer-sub` | deepseek-v4-flash-free | Plan executor subagent — delegable via Task tool |
+| `gentleman-security-sub` | nemotron-3-ultra-free | Security audit subagent (read-only) — delegable via Task tool |
 | `sdd-orchestrator` | claude-sonnet-4-6 | SDD pipeline orchestration |
 | `gentleman-deep-auto` | nemotron-3-ultra-free | — AUTO mode (same model, `*: allow`) |
 | `gentleman-quick-auto` | mimo-v2.5-free | — AUTO mode (same model, `*: allow`) |

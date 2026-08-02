@@ -280,6 +280,17 @@
         "engram*": true
       }
     },
+    "gentleman-deep-sub": {
+      "description": "Deep reasoning subagent — hypothesis-driven debugging, root cause analysis (delegable via Task tool)",
+      "model": "opencode/nemotron-3-ultra-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
+      "tools": {
+        "codebase-memory*": true,
+        "engram*": true
+      }
+    },
     "gentleman-quick": {
       "description": "Fast executor - single-file atomic edits with immediate verification, scope-guarded",
       "model": "opencode/mimo-v2.5-free",
@@ -291,6 +302,13 @@
       "model": "opencode/mimo-v2.5-free",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}"
+    },
+    "gentleman-quick-sub": {
+      "description": "Fast executor subagent — single-file atomic edits with immediate verification (delegable via Task tool)",
+      "model": "opencode/mimo-v2.5-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}"
     },
     "gentleman-codex": {
       "description": "Code generation - convention mirroring, defensive coding, new files/scripts/boilerplate",
@@ -315,6 +333,13 @@
       "model": "opencode/nemotron-3-ultra-free",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-security.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}"
+    },
+    "gentleman-security-sub": {
+      "description": "Security specialist subagent — STRIDE, CVSS, OWASP analysis (delegable via Task tool, read-only)",
+      "model": "opencode/nemotron-3-ultra-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-security.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}"
     },
     "gentleman-seo": {
       "description": "Technical SEO analyst - three-pillar audit (Technical/On-Page/Content), E-E-A-T, GEO readiness, schema validation (FREE TIER)",
@@ -357,6 +382,16 @@
       "model": "opencode/deepseek-v4-flash-free",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "tools": {
+        "codebase-memory*": true
+      }
+    },
+    "gentleman-implementer-sub": {
+      "description": "Plan executor subagent — implements plans from specialized agents, no deviations (delegable via Task tool)",
+      "model": "opencode/deepseek-v4-flash-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
       "tools": {
         "codebase-memory*": true
       }
