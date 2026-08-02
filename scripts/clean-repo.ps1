@@ -18,13 +18,14 @@
 .PARAMETER DryRun
   Report only. This is the default when -Yes is absent.
 
-.PARAMETER Yes
-  Apply deletions. By default removes ONLY junk artifacts + dangling junctions.
+.PARAMETER Force
+  Apply deletions. Alias: -Yes (kept for backward compatibility).
+  By default removes ONLY junk artifacts + dangling junctions.
   Untracked files are NEVER removed unless -RemoveUntracked is also passed.
 
 .PARAMETER RemoveUntracked
   Also remove untracked files (the risky category - may hold WIP/config/secrets).
-  Requires -Yes. Explicit opt-in by design.
+  Requires -Force. Explicit opt-in by design.
 
 .PARAMETER Gc
   Also run git gc --prune=now after cleanup.
@@ -34,14 +35,15 @@
 
 .EXAMPLE
   & scripts/clean-repo.ps1                # dry-run report
-  & scripts/clean-repo.ps1 -Yes           # remove junk + dangling junctions only
-  & scripts/clean-repo.ps1 -Yes -RemoveUntracked   # + untracked (review dry-run first!)
-  & scripts/clean-repo.ps1 -Yes -Gc       # + git gc
+  & scripts/clean-repo.ps1 -Force         # remove junk + dangling junctions only
+  & scripts/clean-repo.ps1 -Force -RemoveUntracked   # + untracked (review dry-run first!)
+  & scripts/clean-repo.ps1 -Force -Gc     # + git gc
 #>
 param(
   [string]$RepoRoot = (Get-Location).Path,
   [switch]$DryRun,
-  [switch]$Yes,
+  [Alias('Yes')]
+  [switch]$Force,
   [switch]$RemoveUntracked,
   [switch]$Gc,
   [switch]$Quiet
@@ -49,7 +51,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$apply = $Yes -and (-not $DryRun)
+$apply = $Force -and (-not $DryRun)
 
 # ---- resolve git root ----
 $gitRoot = $null
@@ -102,11 +104,20 @@ if ($apply) {
   if ($RemoveUntracked) {
     foreach ($f in $untracked) {
       $full = Join-Path $gitRoot $f
-      if (Test-Path -LiteralPath $full) { Remove-Item -LiteralPath $full -Recurse -Force -ErrorAction SilentlyContinue }
+      if (Test-Path -LiteralPath $full) {
+        try { Remove-Item -LiteralPath $full -Recurse -Force -ErrorAction Stop }
+        catch { Write-Warning "clean-repo: could not remove untracked '$full': $($_.Exception.Message)" }
+      }
     }
   }
-  foreach ($f in $junk) { Remove-Item -LiteralPath $f -Force -ErrorAction SilentlyContinue }
-  foreach ($d in $dangling) { Remove-Item -LiteralPath $d -Force -ErrorAction SilentlyContinue }
+  foreach ($f in $junk) {
+    try { Remove-Item -LiteralPath $f -Force -ErrorAction Stop }
+    catch { Write-Warning "clean-repo: could not remove junk '$f': $($_.Exception.Message)" }
+  }
+  foreach ($d in $dangling) {
+    try { Remove-Item -LiteralPath $d -Force -ErrorAction Stop }
+    catch { Write-Warning "clean-repo: could not remove dangling junction '$d': $($_.Exception.Message)" }
+  }
   if ($Gc) { & $gitBin -C $gitRoot gc --prune=now 2>$null }
 }
 

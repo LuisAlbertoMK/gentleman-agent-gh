@@ -20,8 +20,8 @@
 .PARAMETER DryRun
   Show what would change without modifying. This is the default when -Yes is absent.
 
-.PARAMETER Yes
-  Apply the changes. Without it the script only reports.
+.PARAMETER Force
+  Apply the changes. Alias: -Yes (kept for backward compatibility). Without it the script only reports.
 
 .PARAMETER PurgeSyncOlderThanDays
   Export + delete sync_mutations older than this many days. 0 = skip purge entirely.
@@ -34,13 +34,14 @@
 
 .EXAMPLE
   & scripts/engram-compact.ps1                       # dry-run report
-  & scripts/engram-compact.ps1 -Yes                  # backup + dedupe + purge(30d) + vacuum
+  & scripts/engram-compact.ps1 -Force                # backup + dedupe + purge(30d) + vacuum
 #>
 param(
   [string]$DbPath = (Join-Path $env:USERPROFILE ".engram\engram.db"),
   [string]$BackupDir = (Join-Path $env:USERPROFILE ".engram\backups"),
   [switch]$DryRun,
-  [switch]$Yes,
+  [Alias('Yes')]
+  [switch]$Force,
   [int]$PurgeSyncOlderThanDays = 30,
   [switch]$Vacuum,
   [switch]$Quiet
@@ -48,7 +49,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$apply = $Yes -and (-not $DryRun)
+$apply = $Force -and (-not $DryRun)
 
 if (-not (Test-Path -LiteralPath $DbPath)) {
   if ($Quiet) { Write-Output (@{ ok = $false; error = "DB not found: $DbPath" } | ConvertTo-Json -Compress) }
@@ -195,7 +196,10 @@ try {
   }
   $rep = $pyOut | Select-Object -Last 1 | ConvertFrom-Json
 } finally {
-  Remove-Item -LiteralPath $pyFile -Force -ErrorAction SilentlyContinue
+  if (Test-Path -LiteralPath $pyFile) {
+    try { Remove-Item -LiteralPath $pyFile -Force -ErrorAction Stop }
+    catch { Write-Warning "engram-compact: could not clean temp file '$pyFile': $($_.Exception.Message)" }
+  }
 }
 
 if ($Quiet) {
