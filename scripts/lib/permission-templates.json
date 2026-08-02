@@ -170,6 +170,7 @@
       "rg *": "allow",
       "which *": "allow",
       "git branch -D *": "ask",
+      "git push --force *": "deny",
       "git stash drop *": "ask",
       "Add-MpPreference *": "deny",
       "bitsadmin *": "deny",
