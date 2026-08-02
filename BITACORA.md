@@ -1,3 +1,4 @@
+2026-08-02 - Commit a86f5342: 25 shortcuts versionados en commands/ (SSoT) + sync-global step 2b hash-based; 3 enfoques benchmarkeados (A/B/C), A gana; SHORTCUTS.md doc actualizado; stale 07-24 resuelto; E1 37/37, E2 25/25, E3 converge; gate 13/13. Push a origin/plan/globalize
 2026-08-02 - Commit 40d7a82c: engram MCP schema 18->8 CORE tools (-41% tok/turno) medido y verificado; SSoT + regen + scripts globales + tests; gate 13/13, Pester 26/26. Push a origin/plan/globalize
 2026-08-01 - Session close
 2026-08-01 - Commit 3358a913 + f8e432d3: gentleman-init bootstrap, CBM parametrizado, resolver proyecto, breaker fixes. Push a origin/plan/globalize
