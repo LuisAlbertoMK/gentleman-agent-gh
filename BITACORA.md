@@ -1,3 +1,4 @@
+2026-08-02 - Commit 40d7a82c: engram MCP schema 18->8 CORE tools (-41% tok/turno) medido y verificado; SSoT + regen + scripts globales + tests; gate 13/13, Pester 26/26. Push a origin/plan/globalize
 2026-08-01 - Session close
 2026-08-01 - Commit 3358a913 + f8e432d3: gentleman-init bootstrap, CBM parametrizado, resolver proyecto, breaker fixes. Push a origin/plan/globalize
 2026-08-01 - Session close: JD quality-gate (a8e213af), rama master local borrada, ref STALE skill-creator corregida (a2cafc43), score snapshot sync (cc1c52b1)
