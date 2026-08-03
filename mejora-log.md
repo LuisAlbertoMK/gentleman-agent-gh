@@ -163,3 +163,14 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 **Benchmark vs ciclo anterior**: suite 675→676 pass. Falsos positivos PR: 0 (se mantiene) + plural restaurado. Crash feed: 2 → 0. MEJORA ✅
 
 **Aprendizaje**: (1) `\b\b` de regex rompe plurales — siempre probar singular+plural+puntuación en breakers de regex. (2) Los fixes PowerShell de unwrap deben atacar TODOS los call-sites de `.Count`/`.Length`, no solo el sintomático — el mismo patrón se repetía 2 niveles más abajo (L207/L224). (3) El diagnóstico del crash original era impreciso: con key literal `Count` el `.Count` "funciona" pero devuelve el valor equivocado (silencioso) — el crash duro era 0 patrones. (4) Cerrar por conteo de enfoques sin breaker es prematuro — la condición de parada §3 es AND, no OR.
+
+---
+## Merge a main — 2026-08-02 (§4 protocolo)
+
+**Condición §4 evaluada**: TODAS las condiciones de parada §3 cumplidas — breakers ≥3 ataques por ciclo (C1 3 ataques, C2 re-verificado 4/4, C3 3/3 APPROVED, C4 re-verificado 3/3), sin gaps nuevos detectables, 676/677 tests E2E (1 NotRun fixture manual esperado), benchmark ≥ ciclo previo en todas las métricas.
+
+**Mecánica**: gh CLI no disponible y curl/Invoke-RestMethod denegados en el entorno → PR por API/CLI imposible. Usuario autorizó vía explícita ("procede") la alternativa B: fast-forward main ← plan/globalize + push directo. Desviación documentada del §4 ("vía PR").
+
+**Contenido del merge**: 17 commits sobre main (948a61ad): trabajo acumulado de plan/globalize (shortcuts SSoT, permissions layering, session-miner schema) + 5 commits del experimento N-ciclos (C1-C4 + breaker C2/C3/C4).
+
+**Verificación post-merge**: suite E2E completa 676/677 pass / 0 fail (corrida sobre el árbol ya integrado), gate 13/13 en el último commit, push verificado local=origin.
