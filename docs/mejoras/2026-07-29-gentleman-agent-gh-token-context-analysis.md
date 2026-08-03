@@ -4,6 +4,12 @@
 **Methodology**: 4 subagentes (performance, architecture, docs, data) + 18 internet sources (ACL 2026, Anthropic, Arxiv, OpenCode ecosystem, agent skills research)
 **Scope**: Full project — prompts, skills, configs, scripts, docs, agent architecture
 
+> ## ⚠️ Corrección 2026-08-03 (verificada contra schema opencode 1.18.11 y binario — Ciclo 8/10)
+>
+> - **Finding 12 (`limit.input: 80000`) es INVALIDO**: la clave `limit.input` NO existe en el schema de configuración de opencode 1.18.11 (docs vigentes 2026-08-03). No implementar. La recomendación original era falsa y el hallazgo del ciclo 8 confirmó que config keys no verificadas contra el schema/binario no deben propagarse (ver ADR-006).
+> - **Finding 13 (`tool_output` limits) YA RESUELTO**: `tool_output.max_bytes: 4096` / `max_lines: 100` configurados en el SSoT y regenerados en `opencode.json`.
+> - El resto de findings de este análisis se revisaron item por item en el Ciclo 8 (ver `mejora-log.md` §Ciclo 8); los que siguen vigentes quedaron cubiertos o justificados como won't-fix.
+
 ---
 
 ## Síntesis de Hallazgos

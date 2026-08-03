@@ -5,20 +5,21 @@
 
 ---
 
-## 🏆 Benchmark Actual (2026-07-16)
+## 🏆 Benchmark Actual (2026-08-03, `benchmark.ps1 -Gate` + snapshot)
 
 | Métrica | Valor |
 |---------|-------|
-| Skills totales | 68 |
-| Total skill bytes | ~168,560B |
-| Skills >3KB | 1 |
-| Avg skill size | 2,400B |
-| Junctions globales OK | 68/68 |
-| Frontmatter coverage | 100% |
-| Scripts root | 68 |
-| Scripts total (c/ subdirs) | 93 |
-| Score (raw) | 9.1/10 |
-| Score (bias-adjusted) | 7.3/10 |
+| Skills totales | 78 |
+| Total skill bytes | 196,262B (4,576 líneas) |
+| Skills >3KB | 0 |
+| Avg skill size | 2,516B (median 2,476B) |
+| Junctions globales OK | 78/78 (modelo híbrido, ver ADR-009) |
+| Frontmatter coverage | 100% (WhenToUse 98.7%, Rules 43.6%) |
+| Scripts | 83 |
+| Suite E2E completa | 702 pass / 0 fail |
+| Gate pre-commit | 14/14 |
+
+> Snapshots machine-readable históricos en `docs/metricas/snapshots/` (p.ej. `20260803-051109_benchmark.json`, baseline hybrid junction 78/78).
 
 ## 🚦 Quality Gate (2026-06-26)
 
