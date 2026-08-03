@@ -220,3 +220,35 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 **Enfoques totales evaluados**: 3 × 6 ciclos = 18 (≥10 requeridos) ✅
 
 **Pendientes restantes** (entorno, no código del repo): 3 junctions globales degradadas (vmk-skills/prompts, global-skills — preexistentes, requieren re-creación manual); `gh` CLI no instalado (PRs futuros).
+
+---
+## Ciclo 7 - 2026-08-02 (skill gaps + directiva modo auto)
+
+**Gap 1 (bug real)**: `e2e-testing/SKILL.md` tenia frontmatter roto — `description: |` y `## When to Use |` con bloque literal VACIO, skill invisible al router semantico.
+
+**Gap 2 (umbral gate [5/13])**: 3 skills sobre 3000ch/3072B: karpathy-loop (3084B), refactoring-planner (3045B), auth-hardening (3031B).
+
+**Enfoques evaluados (3)**:
+- A: Reemplazar frontmatter literal-block roto por description inline + When to Use real en el cuerpo - **GANADOR**
+- B: Compresion minima quirurgica por skill (blank lines, When to Use duplicado, prosa redundante) preservando autoridad - **GANADOR** (4 cortes iterativos por skill hasta bajo umbral)
+- C: Borrar y reescribir skills desde cero - rechazado: riesgo de perder contenido verificado, sin mejora marginal
+
+**Directiva de usuario (modo auto)**: "auto deberia ser autonomo — solo ingresar una peticion y comenzar — pero sin push ni delete automatico, lo demas sin problema".
+- `rm`/`Remove-Item` pasan de deny a ASK en auto (deny en manual/semi preservado)
+- commit/merge/rebase/gh-pr-merge vuelven a allow en auto (autonomia real)
+- push + deletes (rm, Remove-Item, branch -D, stash drop, reset --hard) → ask
+- shared-deny-rules: rm/Remove-Item fuera del floor global (mode-governed)
+
+**Resultado !breaker (4 ataques)**:
+1. Frontmatter parse: 4/4 PASS (description real, sin literal-block roto)
+2. Integridad de contenido: 4/4 PASS (todas las secciones sobrevivieron la compresion)
+3. Scan repo-wide: 79 skills, 0 rotos
+4. Umbrales: 4/4 bajo 3000ch/3072B
++ Breaker de permisos: auto ask para push/deletes, allow para commit/merge/rebase, deny manual/semi rm preservado
+
+**Resultado E2E**: suite completa **683/683 pass / 0 fail** (+4 tests nuevos de permission-gate, 54 total). Gate 13/13 en los 3 commits atomicos. Cross-ref clean.
+
+**Benchmark vs ciclo anterior**: 679→683 tests. Skills >3KB: 3→0. Skills total: 78 (cambio neto: ningun skill borrado, solo comprimido).
+
+**Aprendizaje**: (1) El frontmatter con `description: |` vacio pasa la mayoria de validadores pero rompe routing — el gate [11/13] no capta descripcion vacia, solo ausencia. (2) Separar patrones destructivos del deny global permite ask-per-mode sin degradar manual/semi. (3) El orden de chequeo deny→destructive→mode es la unica forma de que rm sea ask en auto y deny en semi sin duplicar logica.
+---
