@@ -1,16 +1,15 @@
 ---
 name: e2e-testing
-description: |
+description: "E2E testing - hybrid: quick simple scripts (e2t CLI) for smoke checks + Playwright test runner for comprehensive flows, assertions, visual regression, optional Ollama AI analysis."
 triggers: test, e2e, playwright, browser testing, interactive testing, form testing
 ---
-
-## When to Use
-|
-
 
 # E2E Testing Skill
 
 Hybrid: **simple scripts** for quick checks + **Playwright test runner** for comprehensive testing.
+
+## When to Use
+Use for browser-level verification of user flows: smoke tests, form validation, login/dashboard flows, and visual regression. Prefer **Quick Mode** for fast smoke checks with no setup; use **Full Mode** for CI pipelines, assertions, and screenshot comparisons.
 
 ## Quick Mode (Simple Scripts)
 
