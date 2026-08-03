@@ -252,3 +252,36 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 
 **Aprendizaje**: (1) El frontmatter con `description: |` vacio pasa la mayoria de validadores pero rompe routing — el gate [11/13] no capta descripcion vacia, solo ausencia. (2) Separar patrones destructivos del deny global permite ask-per-mode sin degradar manual/semi. (3) El orden de chequeo deny→destructive→mode es la unica forma de que rm sea ask en auto y deny en semi sin duplicar logica.
 ---
+
+---
+## Ciclo 8 - 2026-08-03 (token/context: dead frontmatter + size budget)
+
+**Gap**: dimension token/contexto pedida por el usuario ("reduccion de token o uso de contexto optimizacion mejoras").
+
+**Analisis previo cross-referenciado**: docs/mejoras/2026-07-29-gentleman-agent-gh-token-context-analysis.md — verificado item por item contra docs oficiales opencode 1.18.11 (schema config.json + skills docs):
+- finding 13 (tool_output limits): YA RESUELTO (max_bytes 4096 / max_lines 100 en SSoT)
+- finding 12 (limit.input: 80000): INVALIDO — no existe en schema actual (docs 2026-08-03)
+- engram MCP 18->8 tools (-41%): YA RESUELTO (commit 40d7a82c)
+- triggers frontmatter: ALIVE — consumido por build-skill-registry/skill-graph/skill-resolver-fast + gate [11/13] lo exige
+- Per-session skill floor: ~4590 tokens (167 descripciones) — piso real del system prompt
+
+**Enfoques evaluados (3)**:
+- A: Strip de claves muertas user-invocable/disable-model-invocation - GANADOR (verificado: binario opencode NO contiene las strings, 0 consumidores en repo, schema ignora)
+- B: Size budget guard en regenerate-opencode.ps1 - GANADOR (opencode.json crecio 35.5KB->52.2KB = +47% sin proteccion)
+- C: Consolidar skill-registry.json + skills-registry.csv - RECHAZADO: NO son redundantes (JSON = auto-generado por build-skill-registry para skill-resolver-fast; CSV = registro manual para skill-graph). Consolidar romperia consumidores para cero ganancia per-session
+
+**Cambios**:
+1. 9 skills SDD globales (C:\Users\MK\.config\opencode\skills\sdd-*): removidas user-invocable + disable-model-invocation del frontmatter (-53 chars c/u, ~137 tokens/session). metadata: preservado (SI es reconocida por opencode)
+2. scripts/regenerate-opencode.ps1: -MaxBytes param (default 65536) + check config-size-budget post-write
+
+**Resultado !breaker (9 vectores, subagente independiente)**:
+- Change 1: frontmatter integridad 9/9 PASS, runtime key check PASS (0 hits en binario), repo consumers PASS (0 lectores), gate compliance PASS
+- Change 2: guard fires PASS (MaxBytes 100 -> fail), legit pass PASS, boundary PASS (52205 fail / 52206 pass, -gt correcto), passthrough PASS, idempotency PASS (SHA256 identico)
+- WATCH (preexistente, no C8): sdd-apply sin license:MIT (8 hermanos si) - license es optional, sin impacto
+
+**Resultado E2E**: suite completa 683/683 pass / 0 fail. Gate 13/13 en el commit.
+
+**Benchmark vs ciclo anterior**: 683->683 (sin regresion). opencode.json size: sin guard -> con guard (52206B <= 65536B budget).
+
+**Aprendizaje**: (1) El analisis previo (Jul 29) recomendaba limit.input:80000 pero NO existe en el schema de opencode 1.18.11 - las recomendaciones de config hay que validarlas contra docs vigentes antes de implementar. (2) user-invocable/disable-model-invocation parecian claves de control pero son 100% muertas - verificar siempre con byte-scan del binario + grep de consumidores. (3) "Dos registros que se solapan" puede ser falsa alarma: verificar consumidores antes de consolidar.
+---
