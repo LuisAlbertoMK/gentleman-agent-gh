@@ -285,3 +285,33 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 
 **Aprendizaje**: (1) El analisis previo (Jul 29) recomendaba limit.input:80000 pero NO existe en el schema de opencode 1.18.11 - las recomendaciones de config hay que validarlas contra docs vigentes antes de implementar. (2) user-invocable/disable-model-invocation parecian claves de control pero son 100% muertas - verificar siempre con byte-scan del binario + grep de consumidores. (3) "Dos registros que se solapan" puede ser falsa alarma: verificar consumidores antes de consolidar.
 ---
+
+## Ciclo 9 - 2026-08-03 (4 gaps severos SEC + gate SSoT + registry + docs)
+
+**Gap**: 7 findings del analisis multi-auditoria `docs/mejoras/2026-08-03-gentleman-agent-gh-analisis.md` (sec/infra/dx/perf+docs, 4 audits paralelos): SEC-1 force-push shadowing, SEC-2 gate divergence icm/wsl/iex, SEC-5 git clean/git rm sin cubrir, INFRA-1 SSoT sin verificar local, INFRA-3 conteo engram stale, DX-1 trigger parser, DX-2 description vacia. Usuario aprobo: "si todos".
+
+**Enfoques evaluados (3 por sub-gap, 7 total)**:
+- SEC-1: (A) reordenar SSoT + regenerar - GANADOR; (B) editar opencode.json a mano - rechazado: se pierde con regeneracion; (C) deny global en root - rechazado: rompe permisos por agente
+- SEC-2/5: (A) extender denyPatterns en lib + mirror - GANADOR; (B) solo lib - rechazado: cross-ref-check [3/13] exige mirror; (C) deny todo - rechazado: degrada semi/auto
+- INFRA-1: (A) check 14/14 en pre-commit-gate - GANADOR; (B) hook separado - rechazado: dos puntos de entrada; (C) solo CI - rechazado: sin CI local
+
+**Cambios (9 archivos)**:
+1. `scripts/lib/permission-templates.json`: orden force-push corregido (auto+semi) - deny `--force` DESPUES del ask push; `opencode.json` regenerado (10/10 checks)
+2. `scripts/lib/permission-gate-lib.ps1` + mirror `scripts/permission-gate.ps1`: `^icm\s`, `^Invoke-Expression`, `^wsl\s` a deny; `^git clean\s`, `^git rm\s` a destructivos
+3. `.githooks/pre-commit-gate.ps1`: check [14/14] opencode.json sync con SSoT (corre `regenerate-opencode.ps1 -Validate` si cambia `scripts/lib/` u `opencode.json`)
+4. `scripts/build-skill-registry.ps1`: parser triggers quoted/bare/inline-array (antes solo comillas)
+5. `scripts/check-mcp-security.ps1` + `_shared/SKILL.md`: ver abajo (REVERTIDO / descripcion)
+6. `QUICKSTART.md`/`README.md`/`PROTOCOL.md` + `scripts/tests/_e2e_pipeline.Tests.ps1`: conteos stale (27->37 agentes, 92->79 skills, auto destructive DENY->ASK, gate [14/14])
+
+**Resultado !breaker (hallazgo REAL - evasión whitespace)**:
+- `git  clean  -fdx` (doble espacio), `git<TAB>clean`, leading spaces → **allow en auto** (patrones `^` anclados evadidos con whitespace multiple)
+- Fix: normalizacion `$cmd = $cmd -replace '\s+',' '; $cmd.Trim()` al inicio de Get-CommandClass + 9 tests de regresion de evasion (Describe "Whitespace normalization")
+- El breaker tambien expuso que INFRA-3 (engram=8) era **falso positivo**: conteo verificado en toolset real = 18 tools → REVERTIDO a 18, 26/26 tests OK
+
+**Resultado E2E**: suite completa **628/628 pass / 0 fail** (619 previos + 9 tests evasion) + E2E pipeline 24/24. Gate **14/14** en el commit del ciclo.
+
+**Benchmark vs ciclo anterior**: 683->628 (delta por +9 tests nuevos -50 del conteo viejo de skill-graph fusionado; sin regresion). Gate 13/13 -> 14/14. Evasiones whitespace: 4 vectores -> 0. Gaps severos del analisis: 6/7 cerrados (PERF compaction won't-fix justificado: SSoT ya deduplica).
+
+**Aprendizaje**: (1) Los patrones de permiso anclados `^` son trivialmente evadibles con whitespace multiple/tabs/leading - normalizar SIEMPRE el input antes de clasificar. (2) Un hallazgo con `confidence: medium` sin verificacion directa puede ser falso positivo (INFRA-3): revertir + verificar conteo real antes de propagar. (3) El test que pasa sin actualizarse cuando cambias el contrato es la red de seguridad: la suite completa (no solo el archivo tocado) es el E2E real.
+
+---

@@ -12,7 +12,7 @@ Three modes control how commands are approved:
 |------|----------------------|----------|---------------|
 | **manual** | `manual` | Every command ASKs for approval | No suffix (`gentleman-quick`) |
 | **semi** | `semi` | Safe commands auto-approve (git status/diff/log, npm test, ls, grep, etc.), writes/commits ASK, destructive DENY | `-semi` (`gentleman-quick-semi`) |
-| **auto** | `auto` | All commands auto-approve except pushes + deletes + destructive DENY | `-auto` (`gentleman-quick-auto`) |
+| **auto** | `auto` | All commands auto-approve except pushes + deletes (ASK) + network/interpreter (DENY) | `-auto` (`gentleman-quick-auto`) |
 
 **Switch mode**: `!manual` / `!semi` / `!auto` in OpenCode, or `scripts/switch-mode.ps1 -Mode semi`.
 

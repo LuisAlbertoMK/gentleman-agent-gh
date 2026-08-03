@@ -2,7 +2,7 @@
 
 ## What is this?
 
-**Gentleman Agent** is an **AI software development team** for OpenCode. Instead of a single chatbot, you get 24 specialized agents working together:
+**Gentleman Agent** is an **AI software development team** for OpenCode. Instead of a single chatbot, you get 37 specialized agents working together:
 
 - 🏗️ **Lead Architect** — Senior Architect mentor solving complex tasks
 - 🔒 **Specialists** — Security, performance, frontend, etc. consultants (FREE TIER)
