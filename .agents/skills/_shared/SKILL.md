@@ -1,7 +1,9 @@
 ---
 name: _shared
-description: >
-triggers: "none; shared library only"
+description: "Internal shared references for SDD skills. Not an invokable skill."
+triggers:
+  - sdd shared references
+  - internal shared docs
 ---
 
 ## Purpose

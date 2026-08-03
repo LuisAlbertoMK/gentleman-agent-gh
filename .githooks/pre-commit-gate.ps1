@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 #requires -Version 7
 <#
-.SYNOPSIS Pre-commit quality gate — ALL 13 checks in a single pwsh invocation
+.SYNOPSIS Pre-commit quality gate — ALL 14 checks in a single pwsh invocation
 .DESCRIPTION Called by .githooks/pre-commit. Replaces 9 separate pwsh calls.
   Saves ~1.8s per commit by eliminating redundant process startups.
 #>
@@ -187,6 +187,14 @@ if ($stagedConfig) {
     $importMarkers = git show :opencode.json 2>$null | Select-String -Pattern '\$import'
     if ($importMarkers) { Fail "Config sources changed but opencode.json has unresolved `$import markers" }
     else { Pass }
+} else { Pass }
+
+# [14/14] opencode.json sync with SSoT (scripts/lib/*)
+Write-Host "[14/14] opencode.json sync with SSoT..."
+$stagedLib = $staged | Where-Object { $_ -match '^(scripts/lib/|opencode\.json$)' }
+if ($stagedLib) {
+    & "$RepoRoot/scripts/regenerate-opencode.ps1" -Quiet -ErrorAction SilentlyContinue 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 0) { Pass } else { Fail "opencode.json out of sync with SSoT — run scripts/regenerate-opencode.ps1 -Yes" }
 } else { Pass }
 
 # Summary

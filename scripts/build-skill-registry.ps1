@@ -37,9 +37,15 @@ function Get-Frontmatter {
         $result.name = $Matches[1].Trim()
     }
 
-    # Parse triggers — comma-separated string, may be quoted
-    if ($fm -match "triggers:\s*[""'](.+?)[""']") {
-        $result.triggers = ($Matches[1] -split ",") | ForEach-Object { $_.Trim().ToLower() } | Where-Object { $_ }
+    # Parse triggers — comma-separated string; quoted, bare, or YAML inline array ([a, b])
+    if ($fm -match "(?m)^triggers:\s*(.+?)\s*$") {
+        $raw = $Matches[1].Trim()
+        # Strip surrounding quotes OR YAML inline-array brackets
+        if ($raw -match '^["''](.+)["'']$') { $raw = $Matches[1] }
+        elseif ($raw -match '^\[(.+)\]$')  { $raw = $Matches[1] }
+        if ($raw -and $raw -notmatch '^\s*$' -and $raw -ne 'none') {
+            $result.triggers = ($raw -split ",") | ForEach-Object { $_.Trim().ToLower() } | Where-Object { $_ }
+        }
     }
 
     # Parse tags — inline array [tag1, tag2] or YAML list

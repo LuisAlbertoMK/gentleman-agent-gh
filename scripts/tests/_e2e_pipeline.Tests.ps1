@@ -117,13 +117,14 @@ Describe 'E2E: Security Gates' {
 # ============================================================
 Describe 'E2E: Pre-commit Hook' {
 
-    It 'hook delegates to pre-commit-gate.ps1 with [13/13] checks' {
+    It 'hook delegates to pre-commit-gate.ps1 with [13/13] + [14/14] checks' {
         $hookPath = Join-Path $script:ProjectRoot ".githooks/pre-commit"
         $gatePath = Join-Path $script:ProjectRoot ".githooks/pre-commit-gate.ps1"
         $hookPath | Should -Exist
         $gatePath | Should -Exist
         Get-Content $hookPath -Raw | Should -Match 'pre-commit-gate\.ps1'
         Get-Content $gatePath -Raw | Should -Match '\[13/13\]'
+        Get-Content $gatePath -Raw | Should -Match '\[14/14\]'
     }
 
     It 'hook Pester step uses Invoke-Pester and blocks on failure' {
