@@ -337,7 +337,19 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 
 **Archivos tocados (14)**: `scripts/lib/permission-templates.json`, `opencode.json` (regenerado), `scripts/lib/permission-gate-lib.ps1`, `scripts/permission-gate.ps1`, `scripts/tests/permission-gate.Tests.ps1` (+9 tests), `.githooks/pre-commit-gate.ps1`, `scripts/tests/_e2e_pipeline.Tests.ps1`, `scripts/build-skill-registry.ps1`, `.agents/skills/_shared/SKILL.md`, `QUICKSTART.md`, `README.md`, `PROTOCOL.md`, `mejora-log.md`, `docs/mejoras/2026-08-03-gentleman-agent-gh-analisis.md` (nuevo).
 
-**Pendientes no bloqueantes** (entorno): 3 junctions globales degradadas (vmk-skills/prompts, global-skills — preexistentes, requieren re-creación manual). Enfoques totales evaluados C1-C9: 3×4 (C1-C4) + 2 (C5) + 3 (C6) + 3 (C7) + 3 (C8) + 7 (C9) = 27 ≥ 10 ✅.
+**Pendientes no bloqueantes** (entorno): 3 junctions globales degradadas (vmk-skills/prompts, global-skills) — **resueltas 2026-08-03** (ver sección siguiente). Enfoques totales evaluados C1-C9: 3×4 (C1-C4) + 2 (C5) + 3 (C6) + 3 (C7) + 3 (C8) + 7 (C9) = 27 ≥ 10 ✅.
+
+
+## Cierre pendiente entorno — 2026-08-03 (junctions híbridas)
+
+**Diagnóstico** (mem #2369 + verificación en vivo): 1 de las 3 "degradadas" ya estaba reparada (vmk-prompts-junction); las otras 2 eran **falsos positivos** de `health-check.ps1`, que validaba contra un modelo obsoleto de "junction total por directorio". El modelo real es **híbrido**: `~/.config/opencode/skills` = 78 junctions por-skill (todas vivas, 0 muertas) + 10 dirs reales deliberados (`_shared` con sdd-status-contract.md fuera de repo + 9 sdd-* global-only sin contraparte en repo).
+
+**Fix** (`fix(health): junction checks match hybrid model` — `a6e64345`):
+- `vmk-skills-junction`: valida cobertura real — cada skill del repo (excepto allowlist `_shared`) debe tener junction viva en global; reporta missing/dead targets.
+- `global-skills-junction`: dirs reales permitidos solo si deliberados (`_shared`) o no-skill-de-repo; ya no muestrea solo el primer skill (muestreo = falso WARN sobre `_shared`).
+- Semántica WARN (no FAIL) + `$exitCode` preservadas; `Repair-Junction` sigue usándose solo en `vmk-prompts-junction` (check 2).
+
+**Verificación**: health-check `-AutoRepair` → exit 0, 3/3 OK (antes 2× WARN falsos positivos); suite completa **702/702**; gate **14/14**; push `7f3861d4..a6e64345`. Nota: el benchmark del gate [8/13] ("Global junctions decreased 81→78") observa el mismo baseline obsoleto — el conteo real estable es 78 junctions + 10 dirs reales.
 
 
 ---
