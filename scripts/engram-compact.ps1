@@ -90,10 +90,17 @@ conn.execute("PRAGMA busy_timeout=30000")
 cur = conn.cursor()
 force_vacuum = sys.argv[5] == "1"
 
+def has_table(t):
+    return cur.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (t,)).fetchone() is not None
+
 def count(t):
+    if not has_table(t):
+        return 0
     return cur.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
 
 def dup_rows(t, cols):
+    if not has_table(t):
+        return []
     q = f"SELECT {cols} FROM {t} WHERE {cols} IN (SELECT {cols} FROM {t} GROUP BY {cols} HAVING COUNT(*) > 1)"
     return cur.execute(q).fetchall()
 
@@ -138,7 +145,7 @@ if p_dups:
         report["dedupe_prompts"] = total
 
 # purge sync_mutations older than N days: export first, then delete
-if purge_days > 0:
+if purge_days > 0 and has_table("sync_mutations"):
     cutoff = (datetime.datetime.now() - datetime.timedelta(days=purge_days)).strftime("%Y-%m-%d %H:%M:%S")
     cur.execute("SELECT COUNT(*) FROM sync_mutations WHERE occurred_at < ?", (cutoff,))
     n = cur.fetchone()[0]

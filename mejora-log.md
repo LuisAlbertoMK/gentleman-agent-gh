@@ -174,3 +174,49 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 **Contenido del merge**: 17 commits sobre main (948a61ad): trabajo acumulado de plan/globalize (shortcuts SSoT, permissions layering, session-miner schema) + 5 commits del experimento N-ciclos (C1-C4 + breaker C2/C3/C4).
 
 **Verificación post-merge**: suite E2E completa 676/677 pass / 0 fail (corrida sobre el árbol ya integrado), gate 13/13 en el último commit, push verificado local=origin.
+
+---
+## Ciclo 6 — 2026-08-02 (pendiente no bloqueante del cierre C1, §1.7)
+
+**Gap**: `engram-compact.ps1` crasheaba con **traceback Python crudo** en JSON al procesar una DB sin tabla `user_prompts` (DBs creadas antes del schema de prompts). El report `before` (L101) y `after` (L165/L176) llamaban `count("user_prompts")` incondicionalmente → `sqlite3.OperationalError: no such table` → exit 3 con traceback. El contrato `ok:false` se cumplía pero el mensaje era basura operativa. Pendiente documentado en el cierre de C1 y en la sección Cierre (L42, L142).
+
+**Enfoques evaluados (3)**:
+- A: helper `has_table()` consultando `sqlite_master` — `count()` y `dup_rows()` devuelven `0`/`[]` si la tabla no existe. **GANADOR**: uniforme para `observations`/`user_prompts`/`sync_mutations`, sin try/except disperso, report completo con `prompts: 0`
+- B: try/except por call-site — rechazado: 5 wrappers, riesgo de ocultar errores SQL reales, report a medias
+- C: `CREATE TABLE IF NOT EXISTS` (migración) — rechazado: muta el esquema de la DB del usuario y falsearía el "before"
+
+**Cambios** (`scripts/engram-compact.ps1`, `scripts/tests/engram-compact.Tests.ps1`):
+- `has_table()` + guard en `count()` y `dup_rows()` (L93-102)
+- Guard extra en el bloque de purge: `if purge_days > 0 and has_table("sync_mutations")` — el mismo hueco existía en el purge (usaba `cur.execute` directo, no el helper)
+- 2 tests de regresión nuevos: DB legacy sin `user_prompts` (dry-run: `before.prompts=0`, `ok=true`, exit 0) + apply con `-Vacuum` (report completo, vacuum ejecutado)
+
+**Resultado !breaker (3 ataques × 2 modos = 6 escenarios, subagente independiente)**:
+1. DB sin `user_prompts` (bug reportado) → dry/apply exit 0, `before.obs=1`, `before.prompts=0`, sin crash ✅
+2. DB sin `sync_mutations` (hueco del purge tapado) → dry/apply exit 0, `mutations=0` ✅
+3. DB vacía sin tablas (caso extremo pre-schema) → dry/apply exit 0, todos 0 ✅
+
+**Resultado E2E**: engram-compact 5/5. Suite completa **679/679 pass / 0 fail** (2 tests nuevos + suite previa). Gate pre-commit en el commit del ciclo.
+
+**Benchmark vs ciclo anterior**: suite 676→679 pass. Crash DB-legacy (traceback feo): 1 → 0. Contrato JSON limpio en todos los casos de tabla ausente. MEJORA ✅
+
+**Aprendizaje**: (1) Un script que consulta N tablas con SQL directo debe decidir la política de schema-ausencia UNA vez (helper central) — los call-sites directos (el purge) heredan el bug aunque el helper exista. (2) El breaker con DBs sintéticas por ataque (no una sola fixture) expone huecos que el test feliz no ve. (3) `sqlite3.execute` no acepta multi-statement — para seeds de ataque usar `executescript`.
+
+---
+## Merge Ciclo 6 — 2026-08-02 (§4 protocolo)
+
+**Condición §4 evaluada**: breakers C6 3 ataques × 2 modos ✅, sin gaps nuevos detectables ✅, 679/679 E2E ✅, benchmark ≥ ciclo previo (676→679) ✅. Misma vía autorizada que el merge anterior (FF + push, gh no disponible).
+
+**Balance final del experimento (baseline → final)**:
+
+| Métrica | Baseline | Final |
+|---|---|---|
+| Suite E2E | 669 pass / 7 fail | **679 pass / 0 fail** |
+| Gate pre-commit | 13/13 | 13/13 |
+| Warnings skill-graph | 6 | 0 |
+| Skills >3KB | 1 | 0 |
+| Crash runtime run-dreaming | 1 | 0 |
+| Crash DB-legacy engram-compact | 1 (traceback) | 0 |
+
+**Enfoques totales evaluados**: 3 × 6 ciclos = 18 (≥10 requeridos) ✅
+
+**Pendientes restantes** (entorno, no código del repo): 3 junctions globales degradadas (vmk-skills/prompts, global-skills — preexistentes, requieren re-creación manual); `gh` CLI no instalado (PRs futuros).

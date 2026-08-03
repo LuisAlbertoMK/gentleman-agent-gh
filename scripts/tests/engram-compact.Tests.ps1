@@ -82,3 +82,48 @@ Describe 'engram-compact.ps1 — apply path' {
         $r.after.mutations | Should -Be 1      # 2 - 1 stale
     }
 }
+
+Describe 'engram-compact.ps1 — DB without user_prompts table' {
+    BeforeAll {
+        # seed a DB that predates the user_prompts schema (missing table)
+        $script:legacyDb = Join-Path $script:testDir 'legacy.db'
+        $pyLegacy = @'
+import sqlite3, sys, os
+db = sys.argv[1]
+if os.path.exists(db): os.remove(db)
+conn = sqlite3.connect(db)
+c = conn.cursor()
+c.execute("CREATE TABLE observations (id INTEGER PRIMARY KEY, content TEXT, title TEXT, type TEXT)")
+c.execute("CREATE TABLE sync_mutations (seq INTEGER PRIMARY KEY, occurred_at TEXT, target_key TEXT, entity TEXT, entity_key TEXT, op TEXT, payload TEXT, source TEXT, acked_at TEXT, project TEXT)")
+c.execute("INSERT INTO observations (content, title, type) VALUES ('legacy', 't1', 'discovery')")
+conn.commit(); conn.close()
+print("seeded")
+'@
+        $pyLegacyFile = Join-Path $env:TEMP "engram-compact-legacy-$PID.py"
+        [IO.File]::WriteAllText($pyLegacyFile, $pyLegacy, [Text.UTF8Encoding]::new($false))
+        $null = & python $pyLegacyFile $script:legacyDb
+        Remove-Item -LiteralPath $pyLegacyFile -Force -ErrorAction SilentlyContinue
+    }
+
+    It 'succeeds in dry-run instead of crashing on missing table' {
+        $out = & $script:script -DbPath $script:legacyDb -BackupDir $script:bakDir -Quiet
+        $LASTEXITCODE | Should -Be 0
+        $r = $out | ConvertFrom-Json
+        $r.ok | Should -Be $true
+        $r.mode | Should -Be 'dry-run'
+        $r.before.prompts | Should -Be 0   # missing table counts as 0
+        $r.dedupe_prompts | Should -Be 0   # no crash, nothing to dedupe
+        $r.dedupe_observations | Should -Be 0
+    }
+
+    It 'succeeds in apply and still vacuums' {
+        $out = & $script:script -DbPath $script:legacyDb -BackupDir $script:bakDir -Yes -Vacuum -Quiet
+        $LASTEXITCODE | Should -Be 0
+        $r = $out | ConvertFrom-Json
+        $r.mode | Should -Be 'apply'
+        $r.ok | Should -Be $true
+        $r.after.prompts | Should -Be 0
+        $r.after.observations | Should -Be 1
+        $r.vacuum | Should -Be $true
+    }
+}
