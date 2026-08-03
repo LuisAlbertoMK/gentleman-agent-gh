@@ -25,6 +25,10 @@
 .PARAMETER Quiet
   JSON-only summary on stdout.
 
+.PARAMETER MaxBytes
+  Size budget for opencode.json (default: 65536). Fails the post-write verification
+  if the regenerated file exceeds it — guards against unbounded config growth.
+
 .EXAMPLE
   & scripts/regenerate-opencode.ps1            # validate: is opencode.json in sync?
   & scripts/regenerate-opencode.ps1 -Yes       # regenerate + verify
@@ -33,7 +37,8 @@
 param(
   [switch]$Yes,
   [string]$RepoRoot = (Get-Location).Path,
-  [switch]$Quiet
+  [switch]$Quiet,
+  [int]$MaxBytes = 65536
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -97,6 +102,13 @@ try {
   $result.status = 'fail'
   if ($Quiet) { $result | ConvertTo-Json -Depth 5 | Write-Output }
   exit 1
+}
+
+$sizeBytes = [System.IO.File]::ReadAllBytes((Resolve-Path -LiteralPath $output)).Length
+if ($sizeBytes -gt $MaxBytes) {
+  Add-Check 'config-size-budget' $false "$sizeBytes B > budget $MaxBytes B (grew unbounded — review agent/permission additions)"
+} else {
+  Add-Check 'config-size-budget' $true "$sizeBytes B within budget $MaxBytes B"
 }
 
 $twins = @('gentleman-deep-sub', 'gentleman-quick-sub', 'gentleman-implementer-sub', 'gentleman-security-sub')
