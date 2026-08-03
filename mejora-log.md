@@ -315,3 +315,29 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 **Aprendizaje**: (1) Los patrones de permiso anclados `^` son trivialmente evadibles con whitespace multiple/tabs/leading - normalizar SIEMPRE el input antes de clasificar. (2) Un hallazgo con `confidence: medium` sin verificacion directa puede ser falso positivo (INFRA-3): revertir + verificar conteo real antes de propagar. (3) El test que pasa sin actualizarse cuando cambias el contrato es la red de seguridad: la suite completa (no solo el archivo tocado) es el E2E real.
 
 ---
+
+## Merge Ciclo 9 — 2026-08-03 (§4 protocolo)
+
+**Condición §4 evaluada**: breakers C9 encontraron 1 bug real (whitespace evasion, 4 vectores: doble espacio / triple espacio / tab / leading) + 1 falso positivo revertido (INFRA-3) ✅; sin gaps nuevos detectables (suite completa 702/702 incl. Integration, 0 fail) ✅; E2E pipeline 24/24 ✅; benchmark ≥ ciclo previo (gate 13/13→14/14; evasiones 4→0; 683→702 conteo completo por inclusión de suites Integration en el glob — sin regresión) ✅.
+
+**Mecánica**: 4 commits atomicos (fix/fix/feat/docs, regla Fowler) → FF a main (2d654e7d..d9da66e2) → push a origin. Gate **14/14** en cada commit + post-merge. Rama `experimento/mejora-autonoma-2026-08-03` borrada tras integración. local=origin=d9da66e2 verificado.
+
+**Balance final del experimento (baseline 08-03 → final)**:
+
+| Métrica | Baseline | Final |
+|---|---|---|
+| Suite completa (incl. Integration) | 683* | **702 pass / 0 fail** |
+| Gate pre-commit | 13/13 | **14/14** |
+| Evasiones whitespace de `^` patterns | 4 vectores | 0 |
+| Force-push deny (auto/semi) | shadowed por ask | **deny real** |
+| icm/Invoke-Expression/wsl/git clean/git rm | sin cubrir | **cubiertos** |
+| Skills con triggers perdidos | 3 (e2e-testing, vision-analyze, workflow-optimizer) | 0 |
+
+*683 = conteo C8 sin suites Integration; el conteo comparable con la misma selección C8 no decreció (0 fail en ambas).
+
+**Archivos tocados (14)**: `scripts/lib/permission-templates.json`, `opencode.json` (regenerado), `scripts/lib/permission-gate-lib.ps1`, `scripts/permission-gate.ps1`, `scripts/tests/permission-gate.Tests.ps1` (+9 tests), `.githooks/pre-commit-gate.ps1`, `scripts/tests/_e2e_pipeline.Tests.ps1`, `scripts/build-skill-registry.ps1`, `.agents/skills/_shared/SKILL.md`, `QUICKSTART.md`, `README.md`, `PROTOCOL.md`, `mejora-log.md`, `docs/mejoras/2026-08-03-gentleman-agent-gh-analisis.md` (nuevo).
+
+**Pendientes no bloqueantes** (entorno): 3 junctions globales degradadas (vmk-skills/prompts, global-skills — preexistentes, requieren re-creación manual). Enfoques totales evaluados C1-C9: 3×4 (C1-C4) + 2 (C5) + 3 (C6) + 3 (C7) + 3 (C8) + 7 (C9) = 27 ≥ 10 ✅.
+
+
+---
