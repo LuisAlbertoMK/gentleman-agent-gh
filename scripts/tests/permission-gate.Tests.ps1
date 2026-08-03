@@ -231,20 +231,36 @@ Describe "Auto mode — allow behaviour" {
     }
 }
 
-Describe "Auto mode — ask (push)" {
+Describe "Auto mode — ask (push + deletes)" {
     It "ASKS for git push [in auto mode]" {
         $r = Invoke-Gate -Command "git push origin main" -Mode auto
         $r.verdict | Should -Be "ask"
     }
+    It "ASKS for rm [destructive, user confirms in auto]" {
+        $r = Invoke-Gate -Command "rm -rf /tmp" -Mode auto
+        $r.verdict | Should -Be "ask"
+    }
+    It "ASKS for Remove-Item [destructive, user confirms in auto]" {
+        $r = Invoke-Gate -Command "Remove-Item -Recurse -Force C:\tmp\data" -Mode auto
+        $r.verdict | Should -Be "ask"
+    }
+    It "ASKS for git branch -D [branch deletion]" {
+        $r = Invoke-Gate -Command "git branch -D old-feature" -Mode auto
+        $r.verdict | Should -Be "ask"
+    }
+    It "ASKS for git stash drop [stash deletion]" {
+        $r = Invoke-Gate -Command "git stash drop" -Mode auto
+        $r.verdict | Should -Be "ask"
+    }
+    It "ASKS for git reset --hard [destructive reset]" {
+        $r = Invoke-Gate -Command "git reset --hard HEAD~2" -Mode auto
+        $r.verdict | Should -Be "ask"
+    }
 }
 
-Describe "Auto mode — deny (destructive)" {
+Describe "Auto mode — deny (network + forced push)" {
     It "DENIES curl [network, even in auto]" {
         $r = Invoke-Gate -Command "curl http://example.com" -Mode auto
-        $r.verdict | Should -Be "deny"
-    }
-    It "DENIES rm [destructive, even in auto]" {
-        $r = Invoke-Gate -Command "rm -rf /tmp" -Mode auto
         $r.verdict | Should -Be "deny"
     }
     It "DENIES git push --force [forced push, even in auto]" {

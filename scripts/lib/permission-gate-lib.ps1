@@ -25,8 +25,6 @@ $script:denyPatterns = @(
     '^irm\s', '^iwr\s', '^iex\s', '^Start-BitsTransfer',
     '^ssh\s', '^docker\s', '^docker-compose\s', '^docker compose',
     '^telnet\s', '^ncat\s', '^nc\s', '^Test-NetConnection',
-    # Destructive filesystem
-    '^rm\s', '^rm -rf', '^Remove-Item',
     # Interpreters
     '^python\s', '^python3\s', '^node\s', '^ruby\s', '^perl\s', '^php\s', '^npx\s',
     # System/admin — always blocked
@@ -40,6 +38,11 @@ $script:denyPatterns = @(
     '^saps\s', '^start\s',
     # Push --force is always denied
     '^git push --force', '^git push -f'
+)
+
+# Destructive filesystem — DENY in manual/semi, ASK in auto (user confirms deletes)
+$script:destructivePatterns = @(
+    '^rm\s', '^rm -rf', '^Remove-Item'
 )
 
 # Semi-auto allowlist (safe commands that run without asking in semi mode)
@@ -64,10 +67,13 @@ $script:semiAllowPatterns = @(
     '^git stash list$', '^git status$', '^git diff$', '^git log$'
 )
 
-# Auto-mode: everything allowed EXCEPT pushes + denies + asks
+# Auto-mode: everything allowed EXCEPT pushes + deletes (both ask)
 $script:autoAskPatterns = @(
     '^git push$', '^git push\s', # git push ASKS (not denied) in auto mode
-    '^git push --delete'
+    '^git push --delete',
+    '^git branch -D', '^git branch -d', # branch deletion
+    '^git stash drop', # stash deletion
+    '^git reset' # destructive reset (--hard deletes working tree changes)
 )
 
 # ===== CLASSIFY =====
@@ -76,16 +82,22 @@ function Get-CommandClass {
 
     if (-not $cmd) { return 'help' }
 
-    # 1. Check deny patterns (all modes)
+    # 1. Check deny patterns (all modes) — hard security floor
     foreach ($p in $script:denyPatterns) {
         if ($cmd -match $p) { return 'deny' }
     }
 
-    # 2. Mode-specific checks
+    # 2. Destructive filesystem: DENY in manual/semi, ASK in auto
+    foreach ($p in $script:destructivePatterns) {
+        if ($cmd -match $p) {
+            return $(if ($mode -eq 'auto') { 'ask' } else { 'deny' })
+        }
+    }
+
+    # 3. Mode-specific checks
     switch ($mode) {
         'manual' {
             # Everything asks unless allowed by explicit patterns
-            # (deny patterns already checked above)
             return 'ask'
         }
         'semi' {
@@ -97,7 +109,7 @@ function Get-CommandClass {
             return 'ask'
         }
         'auto' {
-            # Check auto-mode ask patterns (push etc.)
+            # Check auto-mode ask patterns (push, delete)
             foreach ($p in $script:autoAskPatterns) {
                 if ($cmd -match $p) { return 'ask' }
             }

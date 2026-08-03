@@ -11,7 +11,7 @@
     Modes:
       manual → Everything asks (except built-in denials: network, interpreters, destructive)
       semi   → Safe commands (read-only git, filesystem, search, test) auto-allow
-      auto   → Everything auto-allows except push + destructive + network
+      auto   → Everything auto-allows except push + deletes (ask) + network (deny)
 
 .PARAMETER Command
     The full command string to check (e.g. "git push origin main")
@@ -63,7 +63,6 @@ $Mode = Get-ConfiguredMode -Mode $Mode -ModeFilePath $ModeFilePath -RepoRoot $re
 #          '^irm\s', '^iwr\s', '^iex\s', '^Start-BitsTransfer',
 #          '^ssh\s', '^docker\s', '^docker-compose\s', '^docker compose',
 #          '^telnet\s', '^ncat\s', '^nc\s', '^Test-NetConnection',
-#          '^rm\s', '^rm -rf', '^Remove-Item',
 #          '^python\s', '^python3\s', '^node\s', '^ruby\s', '^perl\s', '^php\s', '^npx\s',
 #          '^certutil\s', '^bitsadmin\s', '^schtasks\s', '^reg\s', '^sc\s', '^icacls\s',
 #          '^cmd /c', '^cmd\.exe', '^powershell\s-c\s', '^powershell\s-command\s',
@@ -74,6 +73,8 @@ $Mode = Get-ConfiguredMode -Mode $Mode -ModeFilePath $ModeFilePath -RepoRoot $re
 #          '^Add-MpPreference', '^Set-MpPreference',
 #          '^saps\s', '^start\s',
 #          '^git push --force', '^git push -f'
+#   destructive (deny in manual/semi, ask in auto):
+#          '^rm\s', '^rm -rf', '^Remove-Item'
 #   semi:  '^git status', '^git log', '^git diff', '^git show', '^git branch',
 #          '^git stash list', '^git stash show',
 #          '^ls$', '^ls\s', '^dir$', '^dir\s', '^Get-ChildItem', '^Test-Path',
@@ -93,7 +94,7 @@ if ($ListModes) {
     $summaries = @{
         manual = "Manual: Everything asks (with built-in denials for network/interpreters/destructive)"
         semi   = "Semi:   Read-only git/filesystem/search/test auto-approve, writes ask, destructive denied"
-        auto   = "Auto:   Everything auto-approves except git push (ask) and destructive/network (deny)"
+        auto   = "Auto:   Everything auto-approves except git push + deletes (ask) and network (deny)"
     }
     if ($Json) {
         $summaries | ConvertTo-Json
