@@ -137,38 +137,82 @@ function Repair-Junction {
   if ($check.status -eq "FAIL") { $script:exitCode = 2 }
 }
 
-# ── Check 1: vmk skills junction ────────────────────────────────────────
-Repair-Junction -Path (Join-Path (Get-GlobalConfigDir) "skills") `
-  -ExpectedTarget "$gentlemanRoot/.agents/skills" `
-  -Target "$gentlemanRoot/.agents/skills" `
-  -Label "vmk-skills-junction"
+# ── Check 1: vmk skills junction (hybrid model) ─────────────────────────
+# Model: global skills dir is a REAL dir containing one junction per repo
+# skill, plus deliberate real dirs (_shared + global-only skills like sdd-*).
+# Legacy check expected the WHOLE dir to be a junction — obsolete (false
+# positives against the hybrid model).
+$globalSkillsDir = Join-Path (Get-GlobalConfigDir) "skills"
+$repoSkillsDir = Join-Path $gentlemanRoot ".agents/skills"
+# Repo skills deliberately NOT junctioned (real dir in global, extra content)
+$allowlistReal = @('_shared')
+
+if (Test-Path $globalSkillsDir) {
+  $globalEntries = @(Get-ChildItem -LiteralPath $globalSkillsDir -Force -Directory)
+  $globalByName = @{}
+  foreach ($e in $globalEntries) {
+    $globalByName[$e.Name] = Get-Item $e.FullName -Force
+  }
+  $repoSkills = @(if (Test-Path $repoSkillsDir) { Get-ChildItem -LiteralPath $repoSkillsDir -Directory | ForEach-Object Name } else { @() })
+
+  # Junction coverage: every repo skill (except allowlist) must be a live junction
+  $missingJunction = @()
+  $deadJunction = @()
+  foreach ($s in $repoSkills) {
+    if ($s -in $allowlistReal) { continue }
+    if (-not $globalByName.ContainsKey($s)) {
+      $missingJunction += $s
+      continue
+    }
+    $item = $globalByName[$s]
+    if ($item.LinkType -notin @('Junction', 'SymbolicLink')) {
+      $missingJunction += $s   # real dir where junction expected
+    } elseif (-not (Test-Path $item.Target)) {
+      $deadJunction += $s
+    }
+  }
+
+  if ($missingJunction.Count -eq 0 -and $deadJunction.Count -eq 0) {
+    $checks.Add(@{check = "vmk-skills-junction"; status = "OK"; detail = "Hybrid model OK: $($repoSkills.Count) repo skills covered, $($globalEntries.Count) global entries"})
+  } else {
+    $problems = @()
+    if ($missingJunction.Count) { $problems += "missing junction: $($missingJunction -join ', ')" }
+    if ($deadJunction.Count) { $problems += "dead target: $($deadJunction -join ', ')" }
+    $checks.Add(@{check = "vmk-skills-junction"; status = "WARN"; detail = $problems -join '; '})
+    if ($exitCode -lt 1) { $exitCode = 1 }
+  }
+} else {
+  $checks.Add(@{check = "vmk-skills-junction"; status = "WARN"; detail = "Global skills dir not found"})
+  if ($exitCode -lt 1) { $exitCode = 1 }
+}
+
+# ── Check 3: global skills junction (hybrid model) ───────────────────────
+# Deliberate real dirs in global: _shared + skills that do NOT exist in repo.
+if (Test-Path $globalSkillsDir) {
+  $repoSkillsSet = @(if (Test-Path $repoSkillsDir) { Get-ChildItem -LiteralPath $repoSkillsDir -Directory | ForEach-Object Name } else { @() })
+  $unexpectedReal = @()
+  foreach ($e in @(Get-ChildItem -LiteralPath $globalSkillsDir -Force -Directory)) {
+    $item = Get-Item $e.FullName -Force
+    if ($item.LinkType -notin @('Junction', 'SymbolicLink')) {
+      # Real dir: allowed only if deliberately real or not a repo skill
+      if ($e.Name -ne '_shared' -and $e.Name -in $repoSkillsSet) {
+        $unexpectedReal += $e.Name
+      }
+    }
+  }
+  if ($unexpectedReal.Count -eq 0) {
+    $checks.Add(@{check = "global-skills-junction"; status = "OK"; detail = "Hybrid OK: real dirs are deliberate only"})
+  } else {
+    $checks.Add(@{check = "global-skills-junction"; status = "WARN"; detail = "Repo skill as real dir (should be junction): $($unexpectedReal -join ', ')"})
+    if ($exitCode -lt 1) { $exitCode = 1 }
+  }
+}
 
 # ── Check 2: vmk prompts junction ───────────────────────────────────────
 Repair-Junction -Path (Join-Path (Join-Path (Get-GlobalConfigDir) "prompts") "sdd") `
   -ExpectedTarget "$gentlemanRoot/prompts/sdd" `
   -Target "$gentlemanRoot/prompts/sdd" `
   -Label "vmk-prompts-junction"
-
-# ── Check 3: global skills junction ─────────────────────────────────────
-$globalSkills = Join-Path (Get-GlobalConfigDir) "skills"
-if (Test-Path $globalSkills) {
-  # Junction or real dir — check first skill
-  $sample = Get-ChildItem -LiteralPath $globalSkills -Directory | Select-Object -First 1
-  if ($sample) {
-    $item = Get-Item $sample.FullName -Force
-    if ($item.LinkType -in @("Junction", "SymbolicLink")) {
-      $checks.Add(@{check = "global-skills-junction"; status = "OK"; detail = "$($sample.Name) is junction ✅"})
-    } else {
-      $checks.Add(@{check = "global-skills-junction"; status = "WARN"; detail = "First skill is not a junction"})
-      if ($exitCode -lt 1) { $exitCode = 1 }
-    }
-  } else {
-    $checks.Add(@{check = "global-skills-junction"; status = "WARN"; detail = "Empty skills directory"})
-  }
-} else {
-  $checks.Add(@{check = "global-skills-junction"; status = "WARN"; detail = "Global skills dir not found"})
-  if ($exitCode -lt 1) { $exitCode = 1 }
-}
 
 
 
