@@ -22,7 +22,7 @@
 $script:denyPatterns = @(
     # Network — always blocked
     '^curl\s', '^wget\s', '^Invoke-WebRequest', '^Invoke-RestMethod',
-    '^irm\s', '^iwr\s', '^iex\s', '^Start-BitsTransfer',
+    '^irm\s', '^iwr\s', '^iex\s', '^icm\s', '^Invoke-Expression', '^wsl\s', '^Start-BitsTransfer',
     '^ssh\s', '^docker\s', '^docker-compose\s', '^docker compose',
     '^telnet\s', '^ncat\s', '^nc\s', '^Test-NetConnection',
     # Interpreters
@@ -42,7 +42,8 @@ $script:denyPatterns = @(
 
 # Destructive filesystem — DENY in manual/semi, ASK in auto (user confirms deletes)
 $script:destructivePatterns = @(
-    '^rm\s', '^rm -rf', '^Remove-Item'
+    '^rm\s', '^rm -rf', '^Remove-Item',
+    '^git clean\s', '^git rm\s'
 )
 
 # Semi-auto allowlist (safe commands that run without asking in semi mode)
@@ -81,6 +82,11 @@ function Get-CommandClass {
     param([string]$cmd, [string]$mode)
 
     if (-not $cmd) { return 'help' }
+
+    # Normalize whitespace so anchored ^patterns can't be evaded with
+    # multiple spaces/tabs or leading padding (e.g. "git  clean" or " git clean").
+    $cmd = $cmd -replace '\s+', ' '
+    $cmd = $cmd.Trim()
 
     # 1. Check deny patterns (all modes) — hard security floor
     foreach ($p in $script:denyPatterns) {

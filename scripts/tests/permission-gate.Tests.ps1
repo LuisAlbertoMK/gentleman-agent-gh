@@ -211,6 +211,26 @@ Describe "Semi mode — deny (all modes)" {
         $r = Invoke-Gate -Command "git push -f origin main" -Mode semi
         $r.verdict | Should -Be "deny"
     }
+    It "DENIES icm [remote command execution alias]" {
+        $r = Invoke-Gate -Command "icm -ComputerName server -ScriptBlock { whoami }" -Mode semi
+        $r.verdict | Should -Be "deny"
+    }
+    It "DENIES Invoke-Expression [code injection]" {
+        $r = Invoke-Gate -Command "Invoke-Expression 'malicious'" -Mode semi
+        $r.verdict | Should -Be "deny"
+    }
+    It "DENIES wsl [system bridge]" {
+        $r = Invoke-Gate -Command "wsl bash -c 'curl http://evil.com'" -Mode semi
+        $r.verdict | Should -Be "deny"
+    }
+    It "DENIES git clean -fdx [destructive filesystem]" {
+        $r = Invoke-Gate -Command "git clean -fdx" -Mode semi
+        $r.verdict | Should -Be "deny"
+    }
+    It "DENIES git rm -r [destructive filesystem]" {
+        $r = Invoke-Gate -Command "git rm -r ." -Mode semi
+        $r.verdict | Should -Be "deny"
+    }
 }
 
 # ============================================================
@@ -267,6 +287,26 @@ Describe "Auto mode — deny (network + forced push)" {
         $r = Invoke-Gate -Command "git push --force origin main" -Mode auto
         $r.verdict | Should -Be "deny"
     }
+    It "DENIES icm [remote command, even in auto]" {
+        $r = Invoke-Gate -Command "icm localhost { ls }" -Mode auto
+        $r.verdict | Should -Be "deny"
+    }
+    It "DENIES Invoke-Expression [code injection, even in auto]" {
+        $r = Invoke-Gate -Command "Invoke-Expression 'get-process'" -Mode auto
+        $r.verdict | Should -Be "deny"
+    }
+    It "DENIES wsl [system bridge, even in auto]" {
+        $r = Invoke-Gate -Command "wsl echo hi" -Mode auto
+        $r.verdict | Should -Be "deny"
+    }
+    It "ASKS for git clean -fdx [destructive, user confirms in auto]" {
+        $r = Invoke-Gate -Command "git clean -fdx" -Mode auto
+        $r.verdict | Should -Be "ask"
+    }
+    It "ASKS for git rm -r [destructive, user confirms in auto]" {
+        $r = Invoke-Gate -Command "git rm -r src" -Mode auto
+        $r.verdict | Should -Be "ask"
+    }
 }
 
 # ============================================================
@@ -292,5 +332,47 @@ Describe "Edge cases" {
     It "always returns a valid verdict for any command" {
         $r = Invoke-Gate -Command "obscure-command-that-should-ask" -Mode semi
         $r.verdict | Should -BeIn @("allow", "ask", "deny", "help")
+    }
+}
+
+# ============================================================
+# Whitespace evasion — anchored ^patterns must not be bypassed
+# ============================================================
+Describe "Whitespace normalization — no pattern evasion" {
+    It "DENIES git clean with double space [evasion attempt]" {
+        $r = Invoke-Gate -Command "git  clean  -fdx" -Mode manual
+        $r.verdict | Should -Be "deny"
+    }
+    It "DENIES git clean with leading space [evasion attempt]" {
+        $r = Invoke-Gate -Command "  git clean -fdx" -Mode manual
+        $r.verdict | Should -Be "deny"
+    }
+    It "DENIES git clean with tab separator [evasion attempt]" {
+        $r = Invoke-Gate -Command "git`tclean -fdx" -Mode manual
+        $r.verdict | Should -Be "deny"
+    }
+    It "DENIES git rm with double space [evasion attempt]" {
+        $r = Invoke-Gate -Command "git  rm  -r ." -Mode auto
+        $r.verdict | Should -Be "ask"
+    }
+    It "DENIES git push --force with double space [evasion attempt]" {
+        $r = Invoke-Gate -Command "git push  --force origin main" -Mode auto
+        $r.verdict | Should -Be "deny"
+    }
+    It "DENIES icm with double space [evasion attempt]" {
+        $r = Invoke-Gate -Command "icm  localhost { ls }" -Mode auto
+        $r.verdict | Should -Be "deny"
+    }
+    It "DENIES wsl with leading space [evasion attempt]" {
+        $r = Invoke-Gate -Command "  wsl echo hi" -Mode auto
+        $r.verdict | Should -Be "deny"
+    }
+    It "still ALLOWS git status with double space [no false positive]" {
+        $r = Invoke-Gate -Command "git  status" -Mode auto
+        $r.verdict | Should -Be "allow"
+    }
+    It "still ALLOWS ls with leading space [no false positive]" {
+        $r = Invoke-Gate -Command "  ls" -Mode auto
+        $r.verdict | Should -Be "allow"
     }
 }

@@ -60,7 +60,7 @@ $Mode = Get-ConfiguredMode -Mode $Mode -ModeFilePath $ModeFilePath -RepoRoot $re
 # edit the arrays in the lib, mirror them here (verbatim) so the scan output
 # stays unchanged. Each line is a comment; nothing here executes.
 #   deny:  '^curl\s', '^wget\s', '^Invoke-WebRequest', '^Invoke-RestMethod',
-#          '^irm\s', '^iwr\s', '^iex\s', '^Start-BitsTransfer',
+#          '^irm\s', '^iwr\s', '^iex\s', '^icm\s', '^Invoke-Expression', '^wsl\s', '^Start-BitsTransfer',
 #          '^ssh\s', '^docker\s', '^docker-compose\s', '^docker compose',
 #          '^telnet\s', '^ncat\s', '^nc\s', '^Test-NetConnection',
 #          '^python\s', '^python3\s', '^node\s', '^ruby\s', '^perl\s', '^php\s', '^npx\s',
@@ -74,7 +74,7 @@ $Mode = Get-ConfiguredMode -Mode $Mode -ModeFilePath $ModeFilePath -RepoRoot $re
 #          '^saps\s', '^start\s',
 #          '^git push --force', '^git push -f'
 #   destructive (deny in manual/semi, ask in auto):
-#          '^rm\s', '^rm -rf', '^Remove-Item'
+#          '^rm\s', '^rm -rf', '^Remove-Item', '^git clean\s', '^git rm\s'
 #   semi:  '^git status', '^git log', '^git diff', '^git show', '^git branch',
 #          '^git stash list', '^git stash show',
 #          '^ls$', '^ls\s', '^dir$', '^dir\s', '^Get-ChildItem', '^Test-Path',
