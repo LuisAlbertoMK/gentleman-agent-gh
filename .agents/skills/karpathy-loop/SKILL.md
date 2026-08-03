@@ -7,7 +7,6 @@ triggers: "Karpathy loop, optimize prompt, measure tokens"
 ## When to Use
 Iterative prompt optimization — write, measure, cut, repeat
 
-
 ## STYLE (5 Rules)
 1. **ID+TASK=ENOUGH** — identity + task = sufficient context
 2. **MINIMAL** — no 10+ item lists or paragraphs
@@ -22,14 +21,10 @@ Iterative prompt optimization — write, measure, cut, repeat
 4. **REPEAT**: score improves+tokens down→continue. Drops→revert. Stagnant→new tactic.
 
 ### Concrete example
-**Write** (680 chars/170 tok): "You are a senior code reviewer. Review the following code diff. Focus on error handling..."
-Score: 8/7/4/7 = 6.3 avg
-**Cut T1** (480/120): "You are a senior code reviewer. Review this diff. Focus on error handling, readability..."
-Score: 8/7/7/7 = 7.3 ✓
-**Cut T2** (340/85): "Senior reviewer. Review diff: 4R (Risk/Readability/Reliability/Resilience). Issue→line+problem+fix..."
-Score: 7/9/6/7 = 7.3 ✓
-**Cut T3** (260/65): "Review diff via 4R. Issue: ln+problem+fix. Rate 1-10. <4=BLOCKER. MD."
-Score: 4/9/3/5 = 5.3 ✗ → **REVERT** to T2. Final: 340 chars/85 tok, 7.3/10.
+**Write** (680 chars/170 tok): "You are a senior code reviewer. Review the following code diff. Focus on error handling..." → 6.3 avg
+**Cut T1** (480/120): "You are a senior code reviewer. Review this diff. Focus on error handling, readability..." → 7.3 ✓
+**Cut T2** (340/85): "Senior reviewer. Review diff: 4R (Risk/Readability/Reliability/Resilience). Issue→line+problem+fix..." → 7.3 ✓
+**Cut T3** (260/65): "Review diff via 4R. Issue: ln+problem+fix. Rate 1-10. <4=BLOCKER. MD." → 5.3 ✗ → **REVERT** to T2. Final: 340 chars/85 tok, 7.3/10.
 
 ## Scoring Table
 | Score | Correctness | Conciseness | Robustness |

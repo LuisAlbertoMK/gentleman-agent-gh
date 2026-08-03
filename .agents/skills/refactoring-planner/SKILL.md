@@ -5,9 +5,9 @@ triggers: "Refactor, refactoring, reestructurar, migrate"
 ---
 
 ## When to Use
-Plan refactoring with impact analysis, dependency mapping, step-by-step migration with test baseline.
+Refactoring: impact analysis, dependency mapping, migration steps. Never without test baseline.
 
-## Pre-flight assessment
+## Pre-flight
 | Check | Question | Blocker? |
 |-------|----------|----------|
 | Tests | Existing? Pass rate? | Yes -- no refactor without baseline |

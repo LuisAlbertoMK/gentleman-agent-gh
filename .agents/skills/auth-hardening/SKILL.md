@@ -4,7 +4,7 @@ description: "Trigger: auth, authentication, authorization, JWT, OAuth, RBAC, CS
 triggers: "auth, authentication, authorization, JWT, OAuth, RBAC, CSRF, session, login, password hashing, token, cookie"
 ---
 ## When to Use
-Reviewing auth flows, login/signup, token handling, RBAC, or "is this auth secure"
+Review auth flows, login, token handling, RBAC, or "is this auth secure"
 
 ## SCAN DIMENSIONS
 
