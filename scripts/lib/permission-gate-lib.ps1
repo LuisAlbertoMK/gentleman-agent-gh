@@ -43,7 +43,7 @@ $script:denyPatterns = @(
 # Destructive filesystem — DENY in manual/semi, ASK in auto (user confirms deletes)
 $script:destructivePatterns = @(
     '^rm\s', '^rm -rf', '^Remove-Item',
-    '^git clean\s', '^git rm\s'
+    '^git clean\s', '^git rm\s', '^git checkout --', '^git restore\s'
 )
 
 # Semi-auto allowlist (safe commands that run without asking in semi mode)

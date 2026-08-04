@@ -54,6 +54,10 @@ param(
 )
 Set-StrictMode -Version Latest
 
+# Make native (node) non-zero exits observable as terminating errors in PS 7.3+,
+# and always propagate node's real exit code (see exit at the bottom).
+$PSNativeCommandUseErrorActionPreference = $true
+
 $ErrorActionPreference = 'Stop'
 
 # Resolve script path
@@ -105,3 +109,8 @@ try {
     Write-Error "E2E test failed: $_"
     exit 1
 }
+
+# Belt and suspenders: propagate node's real exit code (PS 5.1 has no
+# $PSNativeCommandUseErrorActionPreference, so a non-zero node exit falls
+# through to here instead of the catch).
+exit $LASTEXITCODE

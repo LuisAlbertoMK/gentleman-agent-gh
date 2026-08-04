@@ -10,16 +10,21 @@
     Supports: *, ? (single char). Does NOT support: **, {a,b}, regex syntax.
 .PARAMETER BaseRef
     Git ref to compare against (default: HEAD).
+.PARAMETER Staged
+    Diff the index (staged changes) against BaseRef instead of the working tree.
+    Used by the pre-commit gate to scope-check what is about to be committed.
 .PARAMETER Json
     Output as JSON.
 .EXAMPLE
     .\scripts\validate-write-scope.ps1 -AllowedPaths "src/auth/*,src/api/*"
     .\scripts\validate-write-scope.ps1 -AllowedPaths "scripts/*" -BaseRef "HEAD~1" -Json
+    .\scripts\validate-write-scope.ps1 -AllowedPaths "scripts/*" -Staged
 #>
 param(
     [Parameter(Mandatory)]
     [string]$AllowedPaths,
     [string]$BaseRef = "HEAD",
+    [switch]$Staged,
     [switch]$Json
 )
 Set-StrictMode -Version Latest
@@ -52,7 +57,11 @@ if ($BaseRef -match '\s') {
 # Run git diff with error checking
 $gitOutput = $null
 try {
-    $gitOutput = & git diff --name-only $BaseRef 2>&1
+    if ($Staged) {
+        $gitOutput = & git diff --cached --name-only $BaseRef 2>&1
+    } else {
+        $gitOutput = & git diff --name-only $BaseRef 2>&1
+    }
     $exitCode = $LASTEXITCODE
 } catch {
     $exitCode = 1

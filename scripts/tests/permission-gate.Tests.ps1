@@ -231,6 +231,14 @@ Describe "Semi mode — deny (all modes)" {
         $r = Invoke-Gate -Command "git rm -r ." -Mode semi
         $r.verdict | Should -Be "deny"
     }
+    It "DENIES git checkout -- . [destructive filesystem]" {
+        $r = Invoke-Gate -Command "git checkout -- ." -Mode semi
+        $r.verdict | Should -Be "deny"
+    }
+    It "DENIES git restore . [destructive filesystem]" {
+        $r = Invoke-Gate -Command "git restore ." -Mode semi
+        $r.verdict | Should -Be "deny"
+    }
 }
 
 # ============================================================
@@ -305,6 +313,14 @@ Describe "Auto mode — deny (network + forced push)" {
     }
     It "ASKS for git rm -r [destructive, user confirms in auto]" {
         $r = Invoke-Gate -Command "git rm -r src" -Mode auto
+        $r.verdict | Should -Be "ask"
+    }
+    It "ASKS for git checkout -- . [destructive, user confirms in auto]" {
+        $r = Invoke-Gate -Command "git checkout -- ." -Mode auto
+        $r.verdict | Should -Be "ask"
+    }
+    It "ASKS for git restore . [destructive, user confirms in auto]" {
+        $r = Invoke-Gate -Command "git restore ." -Mode auto
         $r.verdict | Should -Be "ask"
     }
 }

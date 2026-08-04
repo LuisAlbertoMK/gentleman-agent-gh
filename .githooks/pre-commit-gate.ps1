@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 #requires -Version 7
 <#
-.SYNOPSIS Pre-commit quality gate — ALL 14 checks in a single pwsh invocation
+.SYNOPSIS Pre-commit quality gate — ALL 16 checks in a single pwsh invocation
 .DESCRIPTION Called by .githooks/pre-commit. Replaces 9 separate pwsh calls.
   Saves ~1.8s per commit by eliminating redundant process startups.
 #>
@@ -195,6 +195,35 @@ $stagedLib = $staged | Where-Object { $_ -match '^(scripts/lib/|opencode\.json$)
 if ($stagedLib) {
     & "$RepoRoot/scripts/regenerate-opencode.ps1" -Quiet -ErrorAction SilentlyContinue 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) { Pass } else { Fail "opencode.json out of sync with SSoT — run scripts/regenerate-opencode.ps1 -Yes" }
+} else { Pass }
+
+# [15/15] Write-scope enforcement (OPT-IN via .gentleman/write-scope.json)
+# Absent file => no constraint, pass. Present => staged changes outside
+# allowed_paths fail the gate (wired in as a follow-up to INFRA-I6).
+Write-Host "[15/15] Write-scope check..."
+$scopeFile = Join-Path $RepoRoot '.gentleman\write-scope.json'
+if (Test-Path -LiteralPath $scopeFile) {
+    try {
+        $scope = Get-Content -LiteralPath $scopeFile -Raw -Encoding UTF8 | ConvertFrom-Json
+        $allowed = @($scope.allowed_paths) -join ','
+        if (-not $allowed) { Fail "write-scope.json has no allowed_paths" }
+        else {
+            & "$RepoRoot/scripts/validate-write-scope.ps1" -AllowedPaths $allowed -BaseRef HEAD -Staged -ErrorAction SilentlyContinue 2>&1 | Out-Null
+            if ($LASTEXITCODE -eq 0) { Pass } else { Fail "staged changes outside allowed_paths ($scopeFile)" }
+        }
+    } catch { Fail "write-scope.json parse error: $_" }
+} else { Pass }
+
+# [16/16] Config drift check (repo opencode.json vs global opencode.json(c))
+# Runs ONLY when a global config exists (developer machines synced via
+# sync-global.ps1). Machines without one (fresh clones, CI runners) skip —
+# wiring this into quality-gate.yml would false-fail every CI run.
+Write-Host "[16/16] Config drift check..."
+$globalDir = Join-Path $env:USERPROFILE '.config\opencode'
+$globalConf = @("$globalDir\opencode.json", "$globalDir\opencode.jsonc") | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+if ($globalConf) {
+    & "$RepoRoot/scripts/check-config-drift.ps1" -Quiet -ErrorAction SilentlyContinue 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 0) { Pass } else { Warn "config drift vs global — run scripts/sync-global.ps1" }
 } else { Pass }
 
 # Summary
