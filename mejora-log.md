@@ -353,3 +353,32 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 
 
 ---
+
+## Ciclo 10 - 2026-08-03 (entregables §7 faltantes + docs stale)
+
+**Gap**: El protocolo §7 exige 3 entregables (mejora-log.md, benchmarks.md, adr/) — solo existia mejora-log.md. Ademas, docs stale verificadas: docs/metricas/SUMMARY.md mostraba datos del 2026-07-16 (68 skills, 1 >3KB, 68/68 junctions) vs estado real (78/0/78); el analisis Jul-29 recomendaba limit.input: 80000, clave que NO existe en el schema opencode 1.18.11 (verificado en C8) — recomendacion invalida sin corregir en el doc fuente.
+
+**Enfoques evaluados (3)**:
+- A: benchmarks.md standalone en root (tabla baseline vs ciclo vs final, cross-check contra mejora-log + snapshots) + adr/ con 10 mini-ADRs (uno por decision C1-C9) + fixes de docs stale — **GANADOR**: cumple §7 literal, un solo lugar de verdad por entregable
+- B: Fusionar benchmarks en docs/METRICS.md — rechazado: METRICS.md son success metrics de negocio, no tabla tecnica por ciclo; §7 pide archivo dedicado
+- C: Generar benchmarks.md automaticamente desde snapshots JSON — rechazado: overkill; los snapshots ya son la fuente machine-readable, el log manual es la autoridad historica
+
+**Cambios (17 archivos)**:
+1. enchmarks.md (nuevo): baseline 08-02, tabla C1-C9, estado final, snapshots, deliverable matrix
+2. dr/ (nuevo): README indice + ADR-001..010 (force-switch, regex word boundaries, @() wrapper, has_table, permission layering, dead frontmatter keys, SSoT+size budget, whitespace normalization, hybrid junctions, revert falso positivo)
+3. docs/metricas/SUMMARY.md: tabla Benchmark Actual refrescada al snapshot 2026-08-03 (78 skills / 0 >3KB / 78 junctions / 83 scripts)
+4. docs/mejoras/2026-07-29-*-token-context-analysis.md: bloque Correccion 2026-08-03 (finding 12 limit.input INVALIDO, finding 13 tool_output YA RESUELTO)
+
+**Resultado !breaker (6 ataques, subagente independiente)**:
+1. Precision numerica: **FAIL** → 1 hallazgo real: benchmarks.md fila C5 decia "676 → 677" (confundio passing/total de "676/677 pass" con baseline→final); correcto = 675 → 676 (C4 L126 675/0, C5 L163 675→676, C6 L200 baseline 676). **FIX aplicado** + re-verificado.
+2. Traceabilidad ADRs: PASS 10/10 (decisiones reales, ciclos correctos, refs plausibles)
+3. Indice vs archivos: PASS (10 archivos existen, titulos coinciden)
+4. Aritmetica enfoques: PASS en benchmarks.md — documenta la inconsistencia del propio log: mejora-log.md L340 declara 27 pero la suma de sus componentes (3x4+2+3+3+3+7) = 30; conteo conservador de sets A/B/C explicitos = 26. En cualquier interpretacion ≥ 10 requeridos ✅
+5. Consistencia docs fix: PASS (SUMMARY.md 11/11 metricas coinciden con snapshot JSON; correccion Jul-29 cita finding 12/13 exactos)
+6. Contrato §7: PASS (3 entregables existen con contenido real)
+
+**Resultado E2E**: suite completa **702/702 pass / 0 fail / 0 skipped / 0 NotRun** (124.7s). Gate **14/14** en los 3 commits atomicos (docs/fix/docs).
+
+**Benchmark vs ciclo anterior**: entregables §7 1/3 → 3/3. Docs stale: SUMMARY.md 07-16 → 08-03 (78/0/78); limit.input invalido → corregido. Suite 702/702 sin regresion. MEJORA ✅
+
+**Aprendizaje**: (1) Los entregables del protocolo no se auto-generan — verificar el contrato §7 en el cierre de CADA experimento. (2) Notacion "N/M pass" (passing/total) es ambigua como baseline→final — el breaker la atrapo, pero documentar siempre como "X pass / Y fail". (3) La aritmetica de conteo de enfoques en el log (L340: 27 vs suma real 30) es un error preexistente — documentado, no reescrito (el log es historico).
