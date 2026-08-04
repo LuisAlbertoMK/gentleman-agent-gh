@@ -31,7 +31,7 @@ Bugs preexistentes registrados al setup (mejora-log.md L18–21):
 | C2 | Regla `pr` suelta en `agentRecommendations` (skill-graph) | Warnings skill-graph | 6 → 0 | ✅ MEJORA |
 | C3 | `opencode-model-router/SKILL.md` > 3KB (gate [5/13]) | Skills >3KB | 1 → 0 | ✅ MEJORA |
 | C4 | Crash `run-dreaming.ps1:134` (unwrap PS de array 1-elemento) | Crash runtime | 1 → 0 | ✅ MEJORA |
-| C5 | Breaker post-cierre: plural `PRs`, feed-mode crash | Suite / falsos PR / crash feed | 676 → 677 / 0 / 2 → 0 | ✅ MEJORA (2 bugs reales encontrados post-cierre) |
+| C5 | Breaker post-cierre: plural `PRs`, feed-mode crash | Suite / falsos PR / crash feed | 675 → 676 / 0 / 2 → 0 | ✅ MEJORA (2 bugs reales encontrados post-cierre) |
 | C6 | Traceback SQL en `engram-compact` (DB sin tabla `user_prompts`) | Suite / crash DB-legacy | 676 → **679** / 1 → 0 | ✅ MEJORA |
 | C7 | Frontmatter roto e2e-testing + 3 skills >3KB + directiva modo auto | Suite / skills >3KB | 679 → **683** (+4 tests permission) / 3 → 0 | ✅ MEJORA |
 | C8 | Token/contexto: claves frontmatter muertas + size budget | Suite / opencode.json | 683 → 683 (sin regresión) / 52,206 B ≤ 65,536 B | ✅ SIN REGRESIÓN |
