@@ -2,8 +2,9 @@
 <#
 .SYNOPSIS
     Pester tests for benchmark.ps1 — R6 pinned-baseline gate + time-series
-    snapshots, R8 dead-junction metric. Runs the REAL script in-process and
-    asserts exit codes via $LASTEXITCODE.
+    snapshots, R8 dead-junction metric, R8b CI-aware junction coverage gate
+    (skipped when $env:CI / $env:GITHUB_ACTIONS is set). Runs the REAL script
+    in-process and asserts exit codes via $LASTEXITCODE.
 .NOTES
     ponytail: the snapshot test writes benchmarks/YYYY-MM-DD.json and cleans up.
     Junction state is controlled by overriding $env:USERPROFILE INSIDE a child
@@ -99,6 +100,50 @@ Describe 'R8: junction validity (DeadJunctions)' {
             $out = & pwsh -NoProfile -Command $gateRun 2>&1 | Out-String
             $LASTEXITCODE | Should -Be 2
             $out | Should -Match "Dead junctions"
+        } finally {
+            Remove-Item $tmpRoot -Recurse -Force -ErrorAction SilentlyContinue
+        }
+    }
+}
+
+Describe 'R8b: CI-aware junction coverage gate' {
+
+    It 'fails on junction-coverage regression when not in CI' {
+        $tmpRoot = Join-Path ([System.IO.Path]::GetTempPath()) "bench-r8b-$([guid]::NewGuid())"
+        New-Item -ItemType Directory -Path $tmpRoot -Force | Out-Null
+        $bl = Join-Path $tmpRoot "baseline.json"
+        try {
+            # Baseline pinned in a junctioned env (simulates the repo baseline, jo=78).
+            $jsonRun = "`$env:USERPROFILE='$tmpRoot'; & '$($script:bench.Path)' -Json"
+            & pwsh -NoProfile -Command $jsonRun | Out-File $bl -Encoding utf8
+            $obj = Get-Content $bl -Raw | ConvertFrom-Json
+            $obj.system.GlobalJunctionsOk = 78
+            $obj | ConvertTo-Json -Depth 3 | Out-File $bl -Encoding utf8
+            # Same fake env WITHOUT junctions (jo=0 < 78) and CI vars explicitly cleared.
+            $gateRun = "`$env:USERPROFILE='$tmpRoot'; `$env:CI=`$null; Remove-Item Env:GITHUB_ACTIONS -ErrorAction SilentlyContinue; & '$($script:bench.Path)' -Gate -Baseline '$bl'; if(`$LASTEXITCODE) { exit `$LASTEXITCODE }"
+            $out = & pwsh -NoProfile -Command $gateRun 2>&1 | Out-String
+            $LASTEXITCODE | Should -Be 2
+            $out | Should -Match "Global junctions decreased"
+        } finally {
+            Remove-Item $tmpRoot -Recurse -Force -ErrorAction SilentlyContinue
+        }
+    }
+
+    It 'skips the junction-coverage regression when CI=1' {
+        $tmpRoot = Join-Path ([System.IO.Path]::GetTempPath()) "bench-r8b-ci-$([guid]::NewGuid())"
+        New-Item -ItemType Directory -Path $tmpRoot -Force | Out-Null
+        $bl = Join-Path $tmpRoot "baseline.json"
+        try {
+            $jsonRun = "`$env:USERPROFILE='$tmpRoot'; & '$($script:bench.Path)' -Json"
+            & pwsh -NoProfile -Command $jsonRun | Out-File $bl -Encoding utf8
+            $obj = Get-Content $bl -Raw | ConvertFrom-Json
+            $obj.system.GlobalJunctionsOk = 78
+            $obj | ConvertTo-Json -Depth 3 | Out-File $bl -Encoding utf8
+            # Same 0-junction env, but CI=1 → coverage regression skipped → gate passes.
+            $gateRun = "`$env:USERPROFILE='$tmpRoot'; `$env:CI='1'; Remove-Item Env:GITHUB_ACTIONS -ErrorAction SilentlyContinue; & '$($script:bench.Path)' -Gate -Baseline '$bl'; if(`$LASTEXITCODE) { exit `$LASTEXITCODE }"
+            $out = & pwsh -NoProfile -Command $gateRun 2>&1 | Out-String
+            $LASTEXITCODE | Should -Be 0
+            $out | Should -Not -Match "REGRESSIONS"
         } finally {
             Remove-Item $tmpRoot -Recurse -Force -ErrorAction SilentlyContinue
         }

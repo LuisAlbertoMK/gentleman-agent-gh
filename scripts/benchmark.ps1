@@ -95,7 +95,12 @@ if($Gate){
     if($sys.AgentsMdBytes-gt$pz.AgentsMdBytes*1.1){$reg+="AGENTS.md grew >10% ($($pz.AgentsMdBytes)->$($sys.AgentsMdBytes))"}
     if($sys.TotalSkillBytes-gt$pz.TotalSkillBytes*1.05){$reg+="Total skill bytes grew >5% ($($pz.TotalSkillBytes)->$($sys.TotalSkillBytes))"}
     if($sys.SkillsOver3kb-gt$pz.SkillsOver3kb){$reg+="Skills >3KB increased ($($pz.SkillsOver3kb)->$($sys.SkillsOver3kb))"}
-    if($sys.GlobalJunctionsOk-lt$pz.GlobalJunctionsOk){$reg+="Global junctions decreased ($($pz.GlobalJunctionsOk)->$($sys.GlobalJunctionsOk))"}
+    # Junction-coverage regression is CI-aware: fresh runners have 0 junctions
+    # (0 < baseline would guarantee a red gate). Junction state is owned by
+    # health-check.ps1 on real machines; CI proves repo metrics only. The
+    # DeadJunctions>0 check below is still enforced EVERYWHERE (CI-safe: no
+    # junctions on a runner means none can be dead).
+    if(-not $env:CI -and -not $env:GITHUB_ACTIONS -and $sys.GlobalJunctionsOk-lt$pz.GlobalJunctionsOk){$reg+="Global junctions decreased ($($pz.GlobalJunctionsOk)->$($sys.GlobalJunctionsOk))"}
     if($sys.DeadJunctions-gt0){$reg+="Dead junctions detected ($($sys.DeadJunctions))"}
   }catch{Write-Debug "bench: baseline compare failed ($($_.Exception.Message))"}
   if($reg.Count-gt0){Write-Output "BENCHMARK REGRESSIONS:";$reg | ForEach-Object {Write-Output "  - $_"};dump $sys;exit 2}
