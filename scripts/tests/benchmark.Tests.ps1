@@ -58,6 +58,7 @@ Describe 'R6: pinned baseline gate' {
         $snapFile = Join-Path $script:benchmarksDir "$today.json"
         $latFile = Join-Path $script:latDir "LATEST_benchmark.json"
         $pre = Test-Path $snapFile
+        $backup = if ($pre) { Get-Content $snapFile -Raw } else { $null }
         if ($pre) { Remove-Item $snapFile -Force }
         try {
             & $script:bench -Snapshot 2>&1 | Out-Null
@@ -67,7 +68,8 @@ Describe 'R6: pinned baseline gate' {
             $s.system.DeadJunctions | Should -Not -Be $null
             $s.system.TokenEstimate | Should -BeGreaterThan 0
         } finally {
-            if (-not $pre) { Remove-Item $snapFile -Force -ErrorAction SilentlyContinue }
+            if ($pre) { Set-Content $snapFile $backup -Encoding UTF8 -NoNewline }
+            else { Remove-Item $snapFile -Force -ErrorAction SilentlyContinue }
         }
     }
 }
