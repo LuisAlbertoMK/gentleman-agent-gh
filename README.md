@@ -15,10 +15,10 @@
 
 ---
 
-Suite of **79 skills** (+ `_shared`) + **123 PowerShell scripts** for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
+Suite of **79 skills** (+ `_shared`) + **83 PowerShell scripts** for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
-> **Score**: 9.1/10 (13 dimensions) — tracking in .project.json.
+> **Score**: 9.3/10 (13 dimensions) — tracking in .project.json.
 > **Skills**: 79 (+ `_shared`)
 > **Cycle**: 28 active (Security Hardening + Quality Recovery)
 
@@ -110,7 +110,7 @@ The project runs continuous improvement cycles (CYCLE.md):
 | `!analisis` | Multi-agent analysis (6 specialists, 8 dimensions) |
 
 ### SDD Pipeline (Spec-Driven Development)
-8 complete phases: `init → propose → spec → design → tasks → apply → verify → archive`
+9 complete phases: `init → explore → propose → design → spec → tasks → apply → verify → archive`
 
 ---
 
@@ -148,7 +148,7 @@ The project uses two MCPs for cross-session memory:
 
 ---
 
-## Scripts (123 in scripts/)
+## Scripts (83 in scripts/)
 
 | Script | Purpose |
 |--------|---------|
@@ -187,7 +187,7 @@ gentleman-agent-gh/
 │   ├── code-review-agent/
 │   └── .../
 ├── skills/                  # Junctions workspace (git-ignored)
-├── scripts/                 # 123 PowerShell scripts
+├── scripts/                 # 83 PowerShell scripts
 │   └── smoke/               # Smoke tests
 ├── docs/                    # Documentation
 │   ├── metricas/            # Session metrics

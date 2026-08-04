@@ -115,7 +115,7 @@ This automatically:
 ## Next steps
 
 1. **Read [AGENTS.md](AGENTS.md)** to understand the full protocol
-2. **Explore skills** in `.agents/skills/` (92 available)
+2. **Explore skills** in `.agents/skills/` (79 available)
 3. **Try `!analisis`** for multi-agent analysis of your project
 4. **Check [CYCLE.md](CYCLE.md)** to see the current improvement cycle
 

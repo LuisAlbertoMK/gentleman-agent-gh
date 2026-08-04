@@ -17,15 +17,15 @@
 | Frontmatter coverage | 100% (WhenToUse 98.7%, Rules 43.6%) |
 | Scripts | 83 |
 | Suite E2E completa | 702 pass / 0 fail |
-| Gate pre-commit | 14/14 |
+| Gate pre-commit | 16/16 |
 
 > Snapshots machine-readable históricos en `docs/metricas/snapshots/` (p.ej. `20260803-051109_benchmark.json`, baseline hybrid junction 78/78).
 
-## 🚦 Quality Gate (2026-06-26)
+## 🚦 Quality Gate (2026-08-04)
 
 | Resultado | Valor |
 |-----------|-------|
-| Passed | 9/9 |
+| Passed | 16/16 |
 | Failed | 0 |
 
 ## ⚙️ Baselines

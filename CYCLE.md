@@ -6,7 +6,7 @@
 
 ## Objective
 
-**Cycle 28** (ACTIVE): Security hardening + quality recovery — implement findings from global analysis (2026-07-29). Restore 4 score dims at 0.0. Compress skills >3KB. **Target**: 9.1→9.5/10 (current: 9.1/10, 4 dims restored).
+**Cycle 28** (ACTIVE): Security hardening + quality recovery — implement findings from global analysis (2026-07-29). Restore 4 score dims at 0.0. Compress skills >3KB. **Target**: 9.3→9.5/10 (current: 9.3/10, 4 dims restored).
 
 **Previous**: Cycle 27 — Deep audit, fix, and refactor del repo. **Result**: SUCCESS (10/10 backlog, score 9.1/10 → 6.2/10 post-close).
 
@@ -40,7 +40,7 @@
 | Automation claims verified | 100% of claims pass smoke test | per-claim smoke script |
 | Subagent delegations per session | >=3 delegations (3 verificación siempre) | bitacora + engram |
 | Dreaming auto-trigger | fires on every 5th self-check | Learning Loop (unconditional) |
-| Skill sizes | 0 >3KB, avg <2.0KB | `scripts/benchmark.ps1` (current: avg 1.8KB, 0 >3KB ✓) |
+| Skill sizes | 0 >3KB, avg <2.0KB | `scripts/benchmark.ps1` (current: avg 2.5KB, 0 >3KB ✓) |
 | Working tree hygiene | 0 cambios sin commit al cerrar ciclo | `git status --short` |
 | Cross-ref | 0 errors | `scripts/cross-ref-check.ps1` |
 
@@ -164,8 +164,8 @@ LOOP:
 
 ## Archived Cycles
 
-- Cycles 6-17: `docs/ciclos/cycle-archive-6-17.md`
-- Cycles 18-26: `docs/ciclos/cycle-archive-6-17.md` (appended)
+- Cycles 6-17: `.archive/ciclos/cycle-archive-6-17.md`
+- Cycles 18-26: `.archive/ciclos/` — `cycle18-20260704.md` … `cycle26-20260709.md`
 - Cycle 27: cycle artifacts pending archive
 
 Only the current cycle is maintained in this file for active reference.
