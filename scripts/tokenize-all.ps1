@@ -5,20 +5,24 @@
 .DESCRIPTION
   Escanea todos los skills y calcula tokens usando tiktoken (si instalado)
   o heurística chars/3.5 como fallback. Output opcional a CSV.
-  Usa ForEach-Object para tokenizar skills concurrentemente.
+  Usa ForEach-Object -Parallel para tokenizar skills concurrentemente (pwsh 7).
 .PARAMETER Path
   Directorio de skills (default: .agents/skills/).
 .PARAMETER OutCsv
   Ruta para exportar resultados a CSV.
 .PARAMETER ThrottleLimit
   Max concurrent python processes (default: 5, CPU-based).
+.PARAMETER Divisor
+  Heurística chars por token (default: 3.5 — alineado con token-count.ps1 y
+  la métrica TokenEstimate de benchmark.ps1).
 #>
 
 param(
     [switch]$Quiet,
     [string]$Path = (Join-Path (Split-Path $PSScriptRoot -Parent) ".agents\skills"),
     [string]$OutCsv = "",
-    [int]$ThrottleLimit = 5
+    [int]$ThrottleLimit = 5,
+    [double]$Divisor = 3.5
 )
 
 $ErrorActionPreference = 'Stop'
@@ -27,12 +31,12 @@ Set-StrictMode -Version Latest
 if (-not (Test-Path $Path)) { Write-Error "[tokenize] Skills dir not found: $Path"; exit 1 }
 
 $skills = Get-ChildItem $Path -Directory
-$rows = $skills | ForEach-Object {
+$rows = $skills | ForEach-Object -Parallel {
     $md = Join-Path $_.FullName "SKILL.md"
     if (-not (Test-Path $md)) { return }
     $content = Get-Content $md -Raw
     $chars = $content.Length
-    $heur = [int]($chars / 3.5)
+    $heur = [int]($chars / $using:Divisor)
     $tokens = $null
     try {
         $escaped = $md -replace "'", "''"

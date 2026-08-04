@@ -2,7 +2,8 @@
 
 > Entregable §7 del protocolo: tabla baseline vs. cada ciclo vs. final.
 > Fuente única de verdad de los datos: `mejora-log.md` (por ciclo, secciones C1–C9) y
-> `docs/metricas/snapshots/` (snapshots machine-readable de `benchmark.ps1 -Gate`).
+> `benchmarks/` (snapshots time-series `YYYY-MM-DD.json` de `benchmark.ps1 -Snapshot`,
+> `benchmark-baseline.json` pinned por `-SetBaseline`; `bench-compare.ps1` agrega la tendencia).
 
 ---
 
@@ -66,6 +67,8 @@ Notas de conteo:
 | Snapshot | Commit | Contenido |
 |---|---|---|
 | `docs/metricas/snapshots/20260803-051109_benchmark.json` | 535a87f7 | hybrid junction baseline 78/78 — Skills 78, >3KB 0, Junctions 78/78, Scripts 83 |
+| `benchmarks/` (`YYYY-MM-DD.json`, desde Fase 2 R6) | — | time-series diaria con `DeadJunctions`, `TokenEstimate`, `BenchmarkSeconds` |
+| `benchmark-baseline.json` (raíz, `-SetBaseline`) | — | baseline PINNED del gate `benchmark.ps1 -Gate` (ya no móvil) |
 
 ---
 

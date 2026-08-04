@@ -10,7 +10,8 @@
   - Prompts junction
   - Git status
   - Skill drift detection
-  Uses lib/cache.ps1 with 1h TTL for performance.
+  Junction checks bypass the 1h cache — always fresh, so degraded junctions
+  surface immediately (WARN → exit 1, FAIL → exit 2).
 .PARAMETER AutoRepair
   Auto-fix broken junctions instead of just reporting.
 .PARAMETER Json
@@ -33,29 +34,6 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
-
-# ── Cache check (1h TTL — junctions rarely change) ─────────────────────
-# ponytail: unified cache
-$cacheScript = Join-Path $PSScriptRoot "lib/cache.ps1"
-if (-not $AutoRepair) {
-  $cached = & $cacheScript -Action get -Key "health-check" -TtlSeconds 3600
-  if ($cached) {
-    if ($Json) { Write-Output ($cached | ConvertTo-Json -Depth 3) }
-    elseif (-not $Quiet) {
-      Write-Output "`n═══════════════════════════════════════════"
-      Write-Output "  HEALTH CHECK — gentleman-vMK (cached)"
-      Write-Output "═══════════════════════════════════════════"
-      $cached.checks | ForEach-Object {
-        $icon = switch ($_.status) { "OK" { "✅" } "WARN" { "🟡" } "FAIL" { "🔴" } default { "❓" } }
-        Write-Output "$icon $($_.check): $($_.detail)"
-      }
-      Write-Output "───────────────────────────────────────────"
-      $exitLabel = switch ($cached.exitCode) { 0 { "✅ ALL OK" } 1 { "🟡 WARNINGS" } 2 { "🔴 CRITICAL" } }
-      Write-Output "Exit: $($cached.exitCode) — $exitLabel"
-    }
-    exit $cached.exitCode
-  }
-}
 
 $gentlemanRoot = Get-GentlemanRoot
 
@@ -134,7 +112,9 @@ function Repair-Junction {
     $check = Test-Junction -Path $Path -ExpectedTarget $ExpectedTarget -Label $Label
   }
   $script:checks.Add($check)
+  # Prompts junction degradation escalates: FAIL → exit 2, WARN → exit 1
   if ($check.status -eq "FAIL") { $script:exitCode = 2 }
+  elseif ($check.status -eq "WARN") { if ($script:exitCode -lt 1) { $script:exitCode = 1 } }
 }
 
 # ── Check 1: vmk skills junction (hybrid model) ─────────────────────────
@@ -217,7 +197,8 @@ Repair-Junction -Path (Join-Path (Join-Path (Get-GlobalConfigDir) "prompts") "sd
 
 
 # ── Write cache ────────────────────────────────────────────────────────
-# ponytail: unified cache
+# ponytail: unified cache (read is bypassed — junction checks always fresh)
+$cacheScript = Join-Path $PSScriptRoot "lib/cache.ps1"
 $healthResult = @{
   timestamp = (Get-Date -Format "o")
   version   = "1.0.0"

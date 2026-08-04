@@ -1,106 +1,75 @@
 #requires -Version 7
 <#
 .SYNOPSIS
-    Benchmark comparativo: backup pre-sprint3 vs gentleman-agent-gh (actual)
+    Benchmark trend — time-series aggregation of benchmarks/*.json + pinned baseline.
+.DESCRIPTION
+    Aggregates every dated snapshot in benchmarks/ plus the pinned baseline into
+    a chronological table (last -Top entries). Columns:
+    date | skills | junctions | avg-bytes | benchmark-seconds | token-estimate | delta-vs-prev
+.PARAMETER Baseline
+    Path to the pinned baseline file (default: repo-root benchmark-baseline.json).
+.PARAMETER Json
+    Emit the trend rows as JSON instead of a table.
+.PARAMETER Top
+    Number of most-recent entries to show (default: 10).
 #>
 param(
-  [string]$BDir = (Join-Path (Join-Path $HOME ".config") "opencode" ".bak" "pre-sprint3-apply-20260607-005330"),
-  [string]$RDir = "$PSScriptRoot\.."
+  [string]$Baseline = (Join-Path (Split-Path $PSScriptRoot -Parent) "benchmark-baseline.json"),
+  [switch]$Json,
+  [int]$Top = 10
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
-$RDir = (Resolve-Path $RDir).Path
-try {
-function Get-Line { param($P) try { if (test-path $P) { (Get-Content $P -EA Stop | Measure-Object -Line).Lines } else { 0 } } catch { Write-Warning "GL $($P): $_"; 0 } }
-function Get-Byte { param($P) try { if (test-path $P) { (Get-Item $P -EA Stop).Length } else { 0 } } catch { Write-Warning "GB $($P): $_"; 0 } }
-Write-Host "<<< AGENTS.md 3-way >>>"
-$bA = Join-Path $BDir "AGENTS.md"
-$rA = Join-Path $RDir "AGENTS.md"
-$gA = Join-Path (Get-GlobalConfigDir) "AGENTS.md"
-Write-Host ("  vMK (Go): ?L")
-Write-Host ("  Backup: " + (Get-Line $bA) + "L, " + (Get-Byte $bA) + "B")
-Write-Host ("  Repo:   " + (Get-Line $rA) + "L, " + (Get-Byte $rA) + "B")
-if (test-path $gA) { Write-Host ("  Global: " + (Get-Line $gA) + "L, " + (Get-Byte $gA) + "B") }
-Write-Host "<<< Skills - line count >>>"
-$bSD = Join-Path $BDir "skills"
-$rSD = Join-Path (Join-Path $RDir ".agents") "skills"
-if (-not (Test-Path $BDir)) { Write-Warning "Backup dir no existe: $BDir — las metricas B seran 0. Usa -BDir con un backup valido." }
-try { $bSk = @(Get-ChildItem -Directory -LiteralPath $bSD -EA Stop | ForEach-Object { $_.Name }) } catch { Write-Warning "b skills $($bSD): $_"; $bSk = @() }
-try { $rSk = @(Get-ChildItem -Directory -LiteralPath $rSD -EA Stop | ForEach-Object { $_.Name }) } catch { Write-Warning "r skills $($rSD): $_"; $rSk = @() }
-$c = @($bSk | Where-Object { $rSk -contains $_ })
-$oB = @($bSk | Where-Object { $rSk -notcontains $_ })
-$oR = @($rSk | Where-Object { $bSk -notcontains $_ })
-$tB = 0; $tR = 0
-foreach ($s in $c) { $tB += (Get-Line (Join-Path $bSD "$s\SKILL.md")); $tR += (Get-Line (Join-Path $rSD "$s\SKILL.md")) }
-$dL = $tR - $tB
-$pC = if ($tB -gt 0) { [math]::Round($dL / $tB * 100, 1) } else { 0 }
-Write-Host ("  Common: " + $c.Count + " | B: " + $tB + "L | R: " + $tR + "L | D: " + $dL + "L (" + $pC + "%)")
-Write-Host ("  B-only: " + $oB.Count + " | R-only: " + $oR.Count)
-Write-Host "<<< Skills - metadata >>>"
-$bP = 0; $rP = 0; $bTr = 0; $rTr = 0; $bTa = 0; $rTa = 0
-function Test-SkillMeta {
-    param([string]$SkillPath)
-    try { $content = Get-Content $SkillPath -Raw -EA Stop } catch { return @{ Placeholder = $false; HasTriggers = $false; HasTags = $false } }
-    return @{
-        Placeholder = $content -match 'description:\s*>\s+\{?\w+\}?\s*skill'
-        HasTriggers = $content -match '(?m)^\s*triggers:'
-        HasTags     = $content -match '(?m)^\s*tags:'
-    }
+$r = Split-Path $PSScriptRoot -Parent
+$sn = Join-Path $r "benchmarks"
+
+function Get-Row {
+  param($System, [string]$Date)
+  $n = $System.PSObject.Properties.Name
+  [PSCustomObject]@{
+    Date = $Date
+    Skills = $System.TotalSkills
+    Junctions = $System.GlobalJunctionsOk
+    AvgBytes = $System.AvgSkillBytes
+    BenchmarkSeconds = if ($n -contains 'BenchmarkSeconds') { $System.BenchmarkSeconds } else { $null }
+    TokenEstimate = if ($n -contains 'TokenEstimate') { $System.TokenEstimate } else { $null }
+  }
 }
-foreach ($s in $bSk) {
-  $m = Test-SkillMeta -SkillPath (Join-Path $bSD "$s\SKILL.md")
-  if ($m.Placeholder) { $bP++ }
-  if ($m.HasTriggers) { $bTr++ }
-  if ($m.HasTags)    { $bTa++ }
+
+$rows = [System.Collections.Generic.List[object]]::new()
+if (Test-Path $Baseline) {
+  $b = Get-Content $Baseline -Raw | ConvertFrom-Json
+  if ($b.system) { $rows.Add((Get-Row $b.system "baseline")) }
 }
-foreach ($s in $rSk) {
-  $m = Test-SkillMeta -SkillPath (Join-Path $rSD "$s\SKILL.md")
-  if ($m.Placeholder) { $rP++ }
-  if ($m.HasTriggers) { $rTr++ }
-  if ($m.HasTags)    { $rTa++ }
+if (Test-Path $sn) {
+  Get-ChildItem $sn -Filter *.json | Sort-Object Name | ForEach-Object {
+    try {
+      $s = Get-Content $_.FullName -Raw | ConvertFrom-Json
+      if (-not $s.system) { return }
+      $rows.Add((Get-Row $s.system $_.BaseName))
+    } catch { Write-Warning "bench-compare: skip $($_.Name): $($_.Exception.Message)" }
+  }
 }
-Write-Host ("  Placeh: B " + $bP + " -> R " + $rP)
-Write-Host ("  Triggr: B " + $bTr + "/" + $bSk.Count + " -> R " + $rTr + "/" + $rSk.Count)
-Write-Host ("  Tags:   B " + $bTa + "/" + $bSk.Count + " -> R " + $rTa + "/" + $rSk.Count)
-Write-Host ("  Descr real: B NO -> R SI")
-Write-Host "<<< Scripts >>>"
-$bSd = Join-Path $BDir "scripts"
-$rSd = Join-Path $RDir "scripts"
-if (test-path $bSd) { try { $bs = (Get-ChildItem -Filter "*.ps1" -LiteralPath $bSd -EA Stop).Count } catch { $bs = 0 } } else { $bs = 0 }
-try { $rs = (Get-ChildItem -Filter "*.ps1" -LiteralPath $rSd -EA Stop).Count } catch { Write-Warning "r scripts $($rSd): $_"; $rs = 0 }
-$sm = 0; $ct = 0
-try { $sf = Get-ChildItem -Filter "*.ps1" -LiteralPath $rSd -EA Stop } catch { Write-Warning "r scripts dir $($rSd): $_"; $sf = @() }
-foreach ($f in $sf) {
-  try { $cc = Get-Content $f.FullName -Raw -EA Stop } catch { continue }
-  if ($cc -match 'Set-StrictMode') { $sm++ }
-  # Count catch blocks from cached content (avoids 2nd file read via Select-String -Path)
-  $ct += [regex]::Matches($cc, '\bcatch\b').Count
+if ($rows.Count -eq 0) {
+  Write-Output "No benchmark data found (benchmarks/*.json or $Baseline)."
+  exit 0
 }
-Write-Host ("  Scripts: B " + $bs + " -> R " + $rs)
-Write-Host ("  StrictMd: B 0 -> R " + $sm + "/" + $rs)
-Write-Host ("  catche:  B 0 -> R " + $ct)
-Write-Host "<<< Infra (no existía en backup) >>>"
-$tsP = Join-Path $RDir "scripts\skill-test-suite.ps1"
-$qgP = Join-Path $RDir ".githooks\pre-commit-gate.ps1"
-$crP = Join-Path $RDir "scripts\cross-ref-check.ps1"
-$tsS = if (test-path $tsP) { "EXISTS (" + (Get-Line $tsP) + "L)" } else { "MISSING" }
-$qgS = if (test-path $qgP) { $qgChecks = [regex]::Matches((Get-Content $qgP -Raw -EA Stop), 'Write-Host\s*"\[(\d+)/').Count; "EXISTS ($qgChecks checks)" } else { "MISSING" }
-$crS = if (test-path $crP) { "EXISTS (" + (Get-Line $crP) + "L)" } else { "MISSING" }
-Write-Host ("  Test suite: " + $tsS)
-Write-Host ("  QGate:      " + $qgS)
-Write-Host ("  Cross-ref:  " + $crS)
-$dL2 = $tR - $tB
-$pC2 = if ($tB -gt 0) { [math]::Round($dL2 / $tB * 100, 1) } else { 0 }
-Write-Host "<<< SUMMARY >>>"
-Write-Host ("  Common: " + $c.Count + " | " + $tB + "L -> " + $tR + "L (" + $pC2 + "%)")
-Write-Host ("  Placeh: " + $bP + " -> " + $rP)
-Write-Host ("  Triggr: " + $bTr + " -> " + $rTr)
-Write-Host ("  Tags:   " + $bTa + " -> " + $rTa)
-Write-Host ("  Scripts: " + $bs + " -> " + $rs + " (SM: " + $sm + "/" + $rs + ")")
-Write-Host ("  Tests:  " + $tsS)
-Write-Host ("  QGate:  " + $qgS)
-} catch {
-  Write-Error "Benchmark failed: $_"
-  exit 1
+
+$from = [Math]::Max(0, $rows.Count - $Top)
+$view = @($rows[$from..($rows.Count - 1)])
+$prev = $null
+$withDelta = foreach ($row in $view) {
+  $delta = if ($prev) {
+    $dS = $row.Skills - $prev.Skills
+    $dB = $row.AvgBytes - $prev.AvgBytes
+    "{0:+0;-0;0} skills, {1:+0;-0;0}B avg" -f $dS, $dB
+  } else { "—" }
+  $prev = $row
+  $row | Select-Object *, @{n = 'DeltaVsPrev'; e = { $delta }}
+}
+
+if ($Json) {
+  $withDelta | ConvertTo-Json -Depth 3
+} else {
+  $withDelta | Format-Table Date, Skills, Junctions, AvgBytes, BenchmarkSeconds, TokenEstimate, DeltaVsPrev -AutoSize
 }

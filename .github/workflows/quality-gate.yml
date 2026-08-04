@@ -184,7 +184,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Benchmark report
-        run: ./scripts/benchmark.ps1 -Snapshot
+        run: ./scripts/benchmark.ps1 -Snapshot -Gate
 
       - name: Error snapshot
         if: always()

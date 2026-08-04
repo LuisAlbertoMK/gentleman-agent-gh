@@ -1,9 +1,9 @@
 #requires -Version 7
 <#
 .SYNOPSIS
-  Cuenta tokens aproximados en archivos (4 chars = 1 token)
+  Cuenta tokens aproximados en archivos (default: 3.5 chars = 1 token)
 .DESCRIPTION
-  Estimación rápida de tokens usando heurística chars/4. Soporta múltiples
+  Estimación rápida de tokens usando heurística chars/Divisor. Soporta múltiples
   archivos, directorios y búsqueda recursiva.
 .PARAMETER Path
   Archivo(s) específico(s) a contar.
@@ -11,24 +11,28 @@
   Directorio a escanear (default: skills/).
 .PARAMETER Recurse
   Buscar recursivamente en subdirectorios.
+.PARAMETER Divisor
+  Heurística chars por token (default: 3.5 — alineado con tokenize-all.ps1 y
+  la métrica TokenEstimate de benchmark.ps1).
 #>
 
 param(
     [switch]$Quiet,
   [string[]]$Path = @(),
   [string]$Dir = "",
-  [switch]$Recurse
+  [switch]$Recurse,
+  [double]$Divisor = 3.5
 )
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-# Rough token counter: ~4 chars per token for code/text
+# Rough token counter: ~3.5 chars per token for code/text
 function Get-TokenCount {
   param([string]$Content)
-  # Strip whitespace, count ~4 chars/token
+  # Strip whitespace, count ~Divisor chars/token
   $clean = $Content -replace '\s+', ' '
-  return [math]::Max(1, [int]($clean.Length / 4))
+  return [math]::Max(1, [int]($clean.Length / $Divisor))
 }
 
 try {

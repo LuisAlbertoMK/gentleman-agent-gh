@@ -1,0 +1,26 @@
+{
+  "system": {
+    "MinSkillBytes": 1800,
+    "ScriptsCount": 83,
+    "TotalSkillLines": 4576,
+    "DeadJunctions": 0,
+    "TotalSkillBytes": 196262,
+    "MedianSkillBytes": 2476.0,
+    "RulesPct": 43.6,
+    "AgentsMdBytes": 2909,
+    "GlobalJunctionsOk": 78,
+    "TokenEstimate": 56075,
+    "FrontmatterPct": 100.0,
+    "TotalSkills": 78,
+    "AvgSkillBytes": 2516.0,
+    "AgentsMdLines": 57,
+    "BenchmarkSeconds": 0.644,
+    "MaxSkillBytes": 2999,
+    "SkillsOver3kb": 0,
+    "WhenToUsePct": 98.7,
+    "SuiteSeconds": 0
+  },
+  "version": "1.0",
+  "commit": "61ef3513",
+  "timestamp": "2026-08-04T11:44:37.3526552-06:00"
+}

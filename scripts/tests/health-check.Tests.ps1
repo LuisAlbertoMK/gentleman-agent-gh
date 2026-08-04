@@ -44,6 +44,9 @@ BeforeAll {
 
     function Repair-Junction {
         param([string]$Path, [string]$Target, [string]$Label)
+        $check = Test-Junction -Path $Path -ExpectedTarget $Target -Label $Label
+        if ($check.status -eq "FAIL") { $script:testExitCode = 2 }
+        elseif ($check.status -eq "WARN") { if ($script:testExitCode -lt 1) { $script:testExitCode = 1 } }
         if (Test-Path $Path) {
             $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
             if ($item -and $item.LinkType -eq 'Junction') {
@@ -163,5 +166,59 @@ Describe 'Repair-Junction' {
 
         { Repair-Junction -Path $realDir -Target $script:targetDir -Label "safe-skip" } | Should -Not -Throw
         Test-Path $realDir | Should -Be $true
+    }
+}
+
+# ============================================================
+Describe 'Repair-Junction exit escalation (R9: prompts junction WARN → exit 1)' {
+    BeforeEach {
+        $script:testExitCode = 0
+        $script:escRoot = Join-Path ([System.IO.Path]::GetTempPath()) "pester-esc-$(Get-Random)"
+        New-Item -ItemType Directory -Path $script:escRoot -Force | Out-Null
+        $script:escTarget = Join-Path $script:escRoot "target"
+        New-Item -ItemType Directory -Path $script:escTarget -Force | Out-Null
+        $script:escJunction = Join-Path $script:escRoot "junction"
+        New-Item -ItemType Junction -Path $script:escJunction -Target $script:escTarget -Force | Out-Null
+    }
+
+    AfterEach {
+        if (Test-Path $script:escRoot) {
+            Remove-Item -Path $script:escRoot -Recurse -Force -ErrorAction SilentlyContinue
+        }
+    }
+
+    It 'keeps exit 0 for a valid junction (OK stays green)' {
+        Repair-Junction -Path $script:escJunction -Target $script:escTarget -Label "ok"
+        $script:testExitCode | Should -Be 0
+    }
+
+    It 'exits 1 when the junction target mismatches (WARN)' {
+        $wrong = Join-Path $script:escRoot "wrong"
+        New-Item -ItemType Directory -Path $wrong -Force | Out-Null
+        Repair-Junction -Path $script:escJunction -Target $wrong -Label "mismatch"
+        $script:testExitCode | Should -Be 1
+    }
+
+    It 'exits 1 when the path is a real dir, not a junction (WARN)' {
+        $real = Join-Path $script:escRoot "real"
+        New-Item -ItemType Directory -Path $real -Force | Out-Null
+        Repair-Junction -Path $real -Target $script:escTarget -Label "real-dir"
+        $script:testExitCode | Should -Be 1
+    }
+
+    It 'exits 2 when the junction target is missing (FAIL)' {
+        $tempTarget = Join-Path $script:escRoot "temp-target"
+        New-Item -ItemType Directory -Path $tempTarget -Force | Out-Null
+        $j = Join-Path $script:escRoot "dead"
+        New-Item -ItemType Junction -Path $j -Target $tempTarget -Force | Out-Null
+        Remove-Item -Path $tempTarget -Recurse -Force
+        Repair-Junction -Path $j -Target $script:escTarget -Label "dead-target"
+        $script:testExitCode | Should -Be 2
+    }
+
+    It 'exits 2 when the path is missing (FAIL)' {
+        $missing = Join-Path $script:escRoot "nope"
+        Repair-Junction -Path $missing -Target $script:escTarget -Label "missing"
+        $script:testExitCode | Should -Be 2
     }
 }
