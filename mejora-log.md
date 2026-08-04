@@ -382,3 +382,27 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 **Benchmark vs ciclo anterior**: entregables §7 1/3 → 3/3. Docs stale: SUMMARY.md 07-16 → 08-03 (78/0/78); limit.input invalido → corregido. Suite 702/702 sin regresion. MEJORA ✅
 
 **Aprendizaje**: (1) Los entregables del protocolo no se auto-generan — verificar el contrato §7 en el cierre de CADA experimento. (2) Notacion "N/M pass" (passing/total) es ambigua como baseline→final — el breaker la atrapo, pero documentar siempre como "X pass / Y fail". (3) La aritmetica de conteo de enfoques en el log (L340: 27 vs suma real 30) es un error preexistente — documentado, no reescrito (el log es historico).
+
+## Merge Ciclo 10 — 2026-08-04 (§4 protocolo)
+
+**Condicion §4 evaluada**: TODAS las condiciones de parada §5 cumplidas — breaker C10 6 ataques (1 hallazgo real corregido y re-verificado), sin gaps ICE nuevos detectables (analisis 08-03: 6/7 cerrados + won't-fix justificado; entregables §7 completos), E2E 702/702 pass / 0 fail, benchmark >= ciclo anterior en todas las metricas (entregables 1/3 -> 3/3).
+
+**Mecanica**: misma via autorizada que merges previos (FF + push directo; PR por API no viable en este entorno, ver C9). Usuario autorizo: "procede con la recomendacion".
+
+**Contenido del merge**: 5 commits atomicos del branch experimento/mejora-autonoma-2026-08-04 sobre main (1710c7e9).
+
+**Balance del experimento (baseline 08-02 -> final 08-04)**:
+
+| Metrica | Baseline | Final |
+|---|---|---|
+| Suite E2E completa | 669 pass / 7 fail | **702 pass / 0 fail** |
+| Gate pre-commit | 13/13 | **14/14** |
+| Entregables §7 (mejora-log/benchmarks/adr) | 1/3 | **3/3** |
+| Docs stale (SUMMARY.md, limit.input) | 2 | 0 |
+| Skills >3KB | 1 | 0 |
+| Evasiones whitespace de ^ patterns | 4 | 0 |
+| Junctions (modelo hibrido) | - | **78/78** |
+
+**Enfoques totales evaluados**: 26-30 segun conteo (mejora-log L340 declara 27; suma de componentes 30; sets A/B/C explicitos 26) — >= 10 requeridos en cualquier interpretacion ✅
+
+**Verificacion post-merge**: gate en el ultimo commit del experimento + suite E2E 702/702 sobre el arbol integrado; push verificado local=origin.
