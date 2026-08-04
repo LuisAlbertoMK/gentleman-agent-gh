@@ -354,7 +354,7 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 
 ---
 
-## Ciclo 10 - 2026-08-03 (entregables §7 faltantes + docs stale)
+## Ciclo 10 - 2026-08-04 (entregables §7 faltantes + docs stale)
 
 **Gap**: El protocolo §7 exige 3 entregables (mejora-log.md, benchmarks.md, adr/) — solo existia mejora-log.md. Ademas, docs stale verificadas: docs/metricas/SUMMARY.md mostraba datos del 2026-07-16 (68 skills, 1 >3KB, 68/68 junctions) vs estado real (78/0/78); el analisis Jul-29 recomendaba limit.input: 80000, clave que NO existe en el schema opencode 1.18.11 (verificado en C8) — recomendacion invalida sin corregir en el doc fuente.
 
