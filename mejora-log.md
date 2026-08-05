@@ -569,3 +569,31 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 **Benchmark vs ciclo anterior**: TokenEstimate estancado en ~55K (−14 tok, marginal). El lever de prompts queda bloqueado.
 
 **Aprendizaje**: (1) Security policy `prompts/**/*` protege el system prompt del modelo de auto-modificaciones — es correcto que esté bloqueado; la reducción de prompts/shared requiere decisión humana/Politica (ver ADR-018). (2) El avg target 2,000B no es alcanzable con body compression sola: 78 skills × 475B gap = 37,050B = 13.5% del total — requiere touching descriptions (hecho, −3.5%) + prompts (bloqueado). (3) Los subagentes (`gentleman-implementer-sub`, `gentleman-deep-sub`, `gentleman-quick-sub`) devolvieron resultado vacío 2x (C4 implementer + C4/C5b breaker) — no confiar en empty output; siempre verificar con git status/diff.
+
+---
+
+# Corrida 3 — 2026-08-05 (v2)
+
+Fecha inicio: 2026-08-05
+Branch: `experimento/mejora-autonoma-2026-08-05` (base: main HEAD ab553823)
+Presupuesto: **N=6 ciclos máx**, umbral de rendimiento decreciente **5%** (si la mejora marginal de un ciclo < 5% vs. ciclo anterior → parar aunque queden gaps menores)
+Checkpoint humano: **cada 2 ciclos**
+Métricas de benchmark: Pester suite completa (pass/fail), opencode.json size vs. budget 65,536 B, gate pre-commit 18/18, counts skills/docs, npm audit vulns por severidad
+
+## Baseline (setup) — capturado 2026-08-05
+
+| Métrica | Valor |
+|---|---|
+| Suite Pester (33 archivos, incl. 4 Integration) | **732 pass / 0 fail / 0 skip** |
+| Gate pre-commit | **18/18 ALL CLEAR** |
+| opencode.json | 53,556 B / 1,690 líneas (budget 65,536 B) |
+| Skills | 79 proyecto / 88 global |
+| npm audit | **2 vulns: 0 low / 1 moderate (hono <4.12.34) / 1 HIGH (fast-uri 3.0.0-3.1.4) / 0 crit** — ambas transitivas, fix disponible |
+
+### Bugs preexistentes conocidos (registrados al setup)
+1. npm: `fast-uri` HIGH (transitiva, rango 3.0.0-3.1.4) + `hono` moderate (<4.12.34) — fix disponibles → gap Ciclo 1
+2. Warnings PSSA: 14 scripts sin `SupportsShouldProcessing` (info-level, no bloquean) — gap menor candidato
+3. Pending C5 (v2): lever `prompts/shared/` bloqueado por policy (ADR-018) — requiere decisión humana, NO elegible para esta corrida
+4. Pendientes de entorno (no código, memoria #2378): 3 junctions globales degradadas (vmk-skills/prompts, global-skills) — tarea manual
+
+---
