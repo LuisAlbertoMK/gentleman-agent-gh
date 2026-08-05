@@ -93,6 +93,8 @@ IF repeat_workflow_3x → create skill
 - User mentions project → mem_search(project="<name>")
 - User mentions feature → mem_search(query="<feature>")
 - User mentions error → mem_search(type="bugfix", query="<error>")
+
+## Metrics to Track
 ```
 
 

@@ -36,8 +36,7 @@ All phases share: `{file:sdd/references/sdd-phase-common.md}`
 **Orchestrator**: Load this skill for overview → load specific phase for details.
 **Subagent**: Load phase file via `{file:sdd/phases/{N}-{name}.md}`.
 
-Individual wrapper skills (`sdd-init`, `sdd-explore`, etc.) each load their phase from this shared structure.
-
+Each `sdd-*` wrapper loads its phase from here.
 
 ## Choosing Your Path
 
@@ -54,7 +53,7 @@ Individual wrapper skills (`sdd-init`, `sdd-explore`, etc.) each load their phas
 ```
 Known codebase? ← Schema unchanged? ← No new deps? ← LOW risk? ← <4 files?
 ```
-When unsure: start full, skip phases after `[Explore]` if scope confirms fast path.
+When unsure: start full; after `[Explore]`, switch to fast path if scope confirms.
 
 ## Orchestrator Routing
 ```
@@ -65,7 +64,7 @@ Fast path?    → switch to sdd-quick after Propose
 ```
 Each phase writes to `sdd/registry/{change-id}/{phase}.md`.
 
-## Delivery-Harness Integration
+### Delivery-Harness Integration
 | SDD Phase | Harness Unit |
 |-----------|-------------|
 | Explore + Design | Work Unit 1 (analysis) |
@@ -73,7 +72,7 @@ Each phase writes to `sdd/registry/{change-id}/{phase}.md`.
 | Apply | Work Unit 3-N (parallel impl) |
 | Verify | Gate → archive |
 
-Use `delivery-harness` when SDD task list exceeds 5 apply steps.
+Use `delivery-harness` when SDD task list >5 apply steps.
 
 ## Refs
 execution-mode · quality-gate · triple-verify · delivery-harness · project-mapper
