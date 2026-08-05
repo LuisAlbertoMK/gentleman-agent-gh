@@ -168,3 +168,15 @@ Nota: opencode.json creció 52,206→53,556B (+1,350B) desde audit 08-03 — 82%
 | Gate pathspec secrets | typo latente | `*.Tests.ps1` | eliminado | ✅ FIX |
 | B1 opencode.json | 53,556 B | 53,556 B | 0 | ✅ dentro budget |
 | B3 Gate | 18/18 | 18/18 | 0 | ✅ |
+
+### Cycle 3 — Post (2026-08-05)
+
+| Métrica | Baseline | Post-C3 | Delta | Verdict |
+|---|---|---|---|---|
+| PSSA PSReviewUnusedParameter | 44 | 33 | −11 reales | ✅ MEJORA |
+| Params muertos sin contrato | 6 | 0 | −6 | ✅ MEJORA |
+| Bugs latentes (crash StrictMode) | 2 | 0 | −2 | ✅ FIX |
+| wisdom-stats -Trend | fantasma (DOC sin impl) | implementado + snapshot | — | ✅ FEAT |
+| Suite Pester | 744/0 | 744/0 | 0 | ✅ estable |
+| B1 opencode.json | 53,556 B | 53,556 B | 0 | ✅ dentro budget |
+| B3 Gate | 18/18 | 18/18 | 0 | ✅ |

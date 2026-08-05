@@ -654,6 +654,37 @@ Métricas de benchmark: Pester suite completa (pass/fail), opencode.json size vs
 
 **Checkpoint humano §4 (C1+C2)**: aprobado 2026-08-05 — usuario continuó con C3-C6. Presupuesto restante: 4/6 ciclos. Condición de parada §5 activa (rendimiento marginal <5%).
 
+---
+
+## Ciclo 3 — 2026-08-05 (corrida 3) — PSReviewUnusedParameter: 44 hits → 33 (−11 reales), 2 bugs latentes corregidos
+
+**Gap**: 44 warnings PSSA `PSReviewUnusedParameter` en producción (104 scripts). Análisis previo 08-04 lo había marcado "42 casos con revisión individual (riesgo de contrato)". Verificado con análisis por archivo (44 casos): **29 falsos positivos** de PSSA (uso por scope dinámico/scriptblock que la regla no sigue — trend.ps1×10 closures, verify Root, inter-track, sync-global, dev-server, check-mcp-security, global-setup, skillspector-gate, intake-verify Format) + **15 muertos reales**. ICE: 6×9×6=324.
+
+**Enfoques evaluados (3)**:
+- A: Clasificar los 44 individualmente (uso real vs muerto vs contrato) → eliminar muertos sin contrato, USAR los de contrato (C9-v2) — **GANADOR**
+- B: Eliminar todos los "unused" mecánicamente — rechazado: rompe contratos (destructive-scripts.Tests.ps1 exige `[switch]$Force|DryRun` en scripts destructivos; DOC `.PARAMETER` = contrato público)
+- C: Silenciar con SuppressMessage — rechazado: patrón de escape, no resuelve raíz
+
+**Cambios**:
+- Eliminados 6 params muertos sin contrato (verificado: 0 callers, 0 tests, 0 doc): pipeline-analyze `Quiet`, setup-install `Quiet`+`Yes`, skill-resolver-fast `Quiet`, sync-global-ps5 `Name` (param + arg del caller), intake-debug `Quiet`
+- `health-check.ps1`: **2 bugs latentes corregidos** — (1) L109 referenciaba `$Force` INEXISTENTE (param block solo AutoRepair/Json/Quiet/DryRun): con junction dañada y sin `-AutoRepair`, StrictMode crasheaba justo cuando más se necesitaba; (2) `DryRun` declarado pero muerto. Fix C9-v2: `[switch]$DryRun` y `[switch]$Force` reales, pasados a `Repair-Junction` como params explícitos (dry-run reporta, force/autorepair reparan). El test destructive-scripts L60-66 dependía del `$Force` fantasma para pasar — mi fix expuso esa dependencia y la resolví con param real (208/208)
+- `mcp-resilience.ps1` `ServerName` (L164): usado en Detail del probe remote (contrato DOC "Display name for logging")
+- `wisdom-stats.ps1` `Trend`: DOC prometía "Compare with previous stats snapshot" pero el cuerpo NO lo implementaba — implementado: escribe/lee `docs/metricas/snapshots/LATEST_wisdom_stats.json`, añade Previous/TotalDelta/HitsDelta; **+1 bug latente**: `($patterns | Where-Object...).Count` sin `@()` crasheaba (unwrap, patrón C1-L116) — fix `@()`
+- `restore-project-score.ps1` `DryRun`: eliminado primero (parecía sin contrato) → el test destructive-scripts (script destructivo por nombre `restore`) lo exige → **restaurado y usado** (reporta sin restaurar, exit 0)
+
+**Resultado Breaker/QA (3 ataques)**:
+1. PSSA recheck por archivo → clasificación de los 44, no conteo global
+2. Suite completa → **3 failures reales**: restore-project-score DryRun (contrato destructivo que la eliminación rompió — el breaker atrapó el error de mi clasificación inicial) + health-check ×2 (test dependía del `$Force` fantasma que eliminé). Ambos corregidos con param REAL (C9-v2), no con evasión
+3. Suite completa post-fix → **744/744 pass / 0 fail**; smoke: `health-check -DryRun` exit 0, `wisdom-stats -Trend` crea snapshot y compara en segunda corrida
+
+**Regla Fowler**: commits `cd86b9a2` (chore: eliminar 6 muertos) + `0c85c5cf` (fix: usar 4 params de contrato + 2 bugs latentes + snapshot). Gate 18/18 ALL CLEAR en ambos.
+
+**Benchmark vs baseline**: PSSA PSReviewUnusedParameter **44 → 33** (−11 reales: 6 eliminados + 5 usados/pasados; los 33 restantes = 25 FP de scope dinámico + 8 contratos destructivos pendientes (permission-gate Force/DryRun, setup-machine Quiet/DryRun/Force, wisdom-demote Force, wisdom-store Force, sync-vmk Force) + mcp-resilience TimeoutMs deferred). Suite 744/744. MEJORA ✅
+
+**Aprendizaje**: (1) PSSA PSReviewUnusedParameter NO sigue uso dentro de funciones hijas ni scriptblocks — `$script:X` o `$X` bare en una función NO silencian el warning; la forma fiable es pasar el param a la función (`-AutoRepair:$AutoRepair`) o usarlo en script scope. (2) El test destructive-scripts.Tests.ps1 selecciona por NOMBRE (`restore|store|force|...`) O contenido (`Remove-Item`) — un script con `git checkout` destructivo cae por nombre aunque no tenga Remove-Item; la clasificación "sin contrato" debe chequear el test ANTES de eliminar. (3) Un warning PSSA puede ser la ÚNICA evidencia de que un test pasa — si el test depende de una variable muerta que estás eliminando, el test falla: es señal de que el script DEBÍA tener ese param real (C9-v2: usar, no evadir). (4) `$Force` fantasma en health-check era un crash latente por StrictMode — los params muertos en scripts destructivos no son cosméticos: o se usan o se documenta el bug que ocultan.
+
+---
+
 **Aprendizaje**: (1) En Pester 6 las funciones helper definidas a nivel raíz del archivo NO son visibles en los It — definir en `BeforeAll`. (2) Los tests de seguridad con fixtures de secretos requieren que el secrets scan del gate excluya los test files — el pathspec `*.tests.ps1` (minúscula) no matcheaba `.Tests.ps1`; case importa en pathspecs de git. (3) `git diff 2>&1` NO devuelve solo strings: los warnings de git (CRLF) llegan como ErrorRecord — siempre filtrar `-is [string]` antes de `.Trim()`. (4) Los tests que asumen "árbol limpio contra HEAD" son flaky en proyectos con runtime state auto-update (`.project.json`) — ignorar los runtime files explícitamente (patrón ya usado en verify.ps1).
 
 ---
