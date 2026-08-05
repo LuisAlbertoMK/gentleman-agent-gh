@@ -652,6 +652,8 @@ Métricas de benchmark: Pester suite completa (pass/fail), opencode.json size vs
 
 **Benchmark vs baseline**: suite **732 → 744** (+12 tests, 0 fail). Cobertura directa: +2 scripts (verify, expand-config). Flaky determinista eliminado (T1/T3 pasan bajo cualquier estado de runtime files). MEJORA ✅
 
+**Checkpoint humano §4 (C1+C2)**: aprobado 2026-08-05 — usuario continuó con C3-C6. Presupuesto restante: 4/6 ciclos. Condición de parada §5 activa (rendimiento marginal <5%).
+
 **Aprendizaje**: (1) En Pester 6 las funciones helper definidas a nivel raíz del archivo NO son visibles en los It — definir en `BeforeAll`. (2) Los tests de seguridad con fixtures de secretos requieren que el secrets scan del gate excluya los test files — el pathspec `*.tests.ps1` (minúscula) no matcheaba `.Tests.ps1`; case importa en pathspecs de git. (3) `git diff 2>&1` NO devuelve solo strings: los warnings de git (CRLF) llegan como ErrorRecord — siempre filtrar `-is [string]` antes de `.Trim()`. (4) Los tests que asumen "árbol limpio contra HEAD" son flaky en proyectos con runtime state auto-update (`.project.json`) — ignorar los runtime files explícitamente (patrón ya usado en verify.ps1).
 
 ---
