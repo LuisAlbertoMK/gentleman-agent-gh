@@ -506,3 +506,37 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 **Benchmark vs ciclo anterior**: gate 17/17 → **18/18**. Suite 723 (3 fail) → **726/0**. PSSA health-check 3 → 2 (baseline). Contrato `-Json` roto → cumplido en todas las rutas. MEJORA ✅
 
 **Aprendizaje**: (1) El gate [12/13] solo corre Pester sobre tests STAGED — un commit que toca scripts sin tests pasa el gate sin correr la suite completa; la suite completa ES el E2E real (lección C9 re-validada con 3 regresiones reales del C2). (2) Silenciar PSSA borrando params públicos rompe contratos documentados — la forma correcta es USAR el param (pasarlo a la función) o patrón condition-read; nunca eliminarlo si un test/doc lo exige. (3) `$script:Force` dentro de función NO cuenta como uso para PSReviewUnusedParameter — usar `$Force` bare (resolución dinámica por scope chain). (4) Todo early-exit debe respetar el contrato de salida del script (-Json): un solo `Write-Host` rompe a todos los callers que parsean stdout.
+
+---
+
+## Ciclo 4 — 2026-08-04 (v2) — Token reduction (user priority, mem #2390)
+
+**Gap**: Reducir token footprint de skills sin degradar calidad/routing (prioridad de usuario, mem #2390). Análisis previo: `docs/mejoras/2026-07-29-token-context-analysis.md`; avg skill 2,532B vs target 2,000B; 18 skills >2,900B en riesgo de >3KB WARN.
+
+**Alcance corregido (vs plan original)**: Description compression a ≤120 chars preservando routing keywords (estándar wisdom-forge L180) + body compression de las 18 skills más grandes. **RECHAZADOS**: (1) SKILLS-INDEX merge — `cross-ref-check.ps1:89` lo parsea; rompería gate [3/13]; (2) descriptions agresivas ≤60B — `skill-resolver-fast.ps1` L39-77 puntúa por `trigger_index` + names; descriptions alimentan `build-skill-registry`; corte conservador preserva routing. Verificado: resolver top-3 sin cambio en 3 queries de prueba (deep-debugging/auth-hardening/e2e-testing).
+
+**Cambios (44 skills tocados)**:
+- Description truncation a ≤120 chars con keywords de routing preservadas
+- Body compression en las 18 skills >2,900B (prosa → bullets, eliminación de secciones duplicadas, compresión editorial)
+
+**Métricas**:
+
+| Métrica | Antes | Después | Δ |
+|---|---|---|---|
+| Total skill bytes | 200,064 | 193,067 | −6,997B (−3.5%) |
+| Avg bytes/skill | 2,516 | 2,475 | −41B |
+| Max skill bytes | 3,066 | 2,874 | −192B |
+| Skills >3KB | 0 | 0 | 0 |
+| TokenEstimate | 56,075 | 55,162 | −913 |
+| WhenToUse intact | 98.7% | 98.7% | 0 |
+| Frontmatter intact | 100% | 100% | 0 |
+
+**Resultado !breaker (2 MAJOR findings, ambas auth-hardening)**: "revocation" eliminada del check de Refresh; "audience" eliminada del check de JWT — ambas **RESTauradas**. refactoring-planner/skill-graph/llm-security/workflow-optimizer verificadas: rules preservadas (rewrites semantically-equivalent).
+
+**Resultado E2E**: 726/726 pass / 0 fail (con `-IncludeE2E`). Suite default muestra 1 NotRun INTENCIONAL — test E2E-tagged de cobertura a 3 min excluido por diseño desde `c0f0b459`.
+
+**Commits**: `bb136a69` feat(skills) + `cb25d103` fix(skills) trailing blank line. **Regla Fowler**: 2 commits atómicos; gate **18/18 ALL CLEAR** en cada uno.
+
+**Benchmark vs ciclo anterior**: suite 726/726 sin regresión. Token footprint −3.5% sin pérdida de routing. MEJORA ✅
+
+**Aprendizaje**: (1) La compresión de descriptions ≤120B preservando keywords de routing es el sweet spot — ≤60B rompe el scoring del resolver porque las descriptions alimentan `build-skill-registry`. (2) SKILLS-INDEX no es mergeable: `cross-ref-check.ps1:89` lo parsea como fuente de verdad — rompería el gate sin aviso visible. (3) Body compression de skills grandes (>2,900B) tiene retorno decreciente — el gap avg 2,475B vs target 2,000B requiere compresión más agresiva del body de las top-10, que es el siguiente lever (deferred).
