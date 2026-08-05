@@ -540,3 +540,32 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 **Benchmark vs ciclo anterior**: suite 726/726 sin regresión. Token footprint −3.5% sin pérdida de routing. MEJORA ✅
 
 **Aprendizaje**: (1) La compresión de descriptions ≤120B preservando keywords de routing es el sweet spot — ≤60B rompe el scoring del resolver porque las descriptions alimentan `build-skill-registry`. (2) SKILLS-INDEX no es mergeable: `cross-ref-check.ps1:89` lo parsea como fuente de verdad — rompería el gate sin aviso visible. (3) Body compression de skills grandes (>2,900B) tiene retorno decreciente — el gap avg 2,475B vs target 2,000B requiere compresión más agresiva del body de las top-10, que es el siguiente lever (deferred).
+
+---
+
+## Ciclo 5 — 2026-08-04 (v2) — Token reduction: policy-blocked lever + C5b trim
+
+**Gap**: El análisis C4 identificó `prompts/shared/` como el lever mayor per-session (8,894B = 2,223 tok/sesión, 23.8% del system prompt floor), inyectado en TODOS los agentes vía `{file:prompts/shared/_core-behavior-gp.md}` (ver `scripts/lib/opencode-base.json` L259-527+). Compresión propuesta: karpathy-loop de `_core-behavior-gp.md` (3,446B).
+
+**BLOCKER ARQUITECTÓNICO (ADR-018)**: La política de permisos deniega `prompts/**/*` (`deny`). El orchestrator **no puede** editar `prompts/shared/_core-behavior-gp.md` ni ningún archivo en `prompts/` — el gate de seguridad rechazó el Write intentado. El protocolo v2 exige: "If scope exceeds your mandate → STOP, let orchestrator re-route. Never force through." → **No se fuerza.**
+
+**C5b (lo permitido)**: Compresión de cuerpos de 2 skills grandes no-security:
+- `sdd/SKILL.md`: prosa redundante comprimida («Individual wrapper skills...load their phase from this shared structure» → «Each sdd-* wrapper loads its phase from here»), "SDD task list exceeds 5" → ">5".
+- `workflow-optimizer/SKILL.md`: 3 blank lines finales colapsadas a 1.
+- Reglas preservadas al 100% (verificación diff: ninguna regla/constraint eliminada). auth-hardening NO tocado (riesgo de sobre-compresión del C4).
+
+**Métricas**:
+
+| Métrica | Antes (C4) | Después (C5b) | Δ |
+|---|---|---|---|
+| Total skill bytes | 193,067 | 193,018 | −49B |
+| Avg bytes/skill | 2,475 | 2,475 | ~0 |
+| TokenEstimate | 55,162 | 55,148 | −14 |
+
+**¡CRÍTICO para el objetivo del usuario!**: El −3.5% alcanzado en C4 + el −0.026% en C5b juntos NO logran el target avg 2,000B (24% sobre). El 23.8% de la reducción potencial real (`prompts/shared/`) está **bloqueado por policy de seguridad**. El resto de skill bodies tiene retorno decreciente <10B/skill.
+
+**Commits**: `9eee9d8a` docs(skills): C5b token trim. Gate **18/18 ALL CLEAR**.
+
+**Benchmark vs ciclo anterior**: TokenEstimate estancado en ~55K (−14 tok, marginal). El lever de prompts queda bloqueado.
+
+**Aprendizaje**: (1) Security policy `prompts/**/*` protege el system prompt del modelo de auto-modificaciones — es correcto que esté bloqueado; la reducción de prompts/shared requiere decisión humana/Politica (ver ADR-018). (2) El avg target 2,000B no es alcanzable con body compression sola: 78 skills × 475B gap = 37,050B = 13.5% del total — requiere touching descriptions (hecho, −3.5%) + prompts (bloqueado). (3) Los subagentes (`gentleman-implementer-sub`, `gentleman-deep-sub`, `gentleman-quick-sub`) devolvieron resultado vacío 2x (C4 implementer + C4/C5b breaker) — no confiar en empty output; siempre verificar con git status/diff.
