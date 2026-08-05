@@ -147,7 +147,12 @@ function Sync-Config {
     else { $target | Add-Member -Name "tools" -Value $canonical.tools -MemberType NoteProperty }
   }
 
-  # MCP is NOT synced by design — managed separately by global-setup.ps1
+  # MCP is preserved by design (managed separately by global-setup.ps1).
+  # With PreserveMCP=true (default) an mcp section is never compared nor synced;
+  # with -PreserveMCP:$false the repo config's mcp section wins over the target's.
+  if (-not $PreserveMCP -and $canonical.PSObject.Properties['mcp']) {
+    $target | Add-Member -Name "mcp" -Value $canonical.mcp -MemberType NoteProperty -Force
+  }
 
   $target | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $TargetPath -Encoding UTF8
   $results.Add(@{target=$Label; status="SYNCED"; detail="Updated: $($changes -join ', ')"})
@@ -159,11 +164,15 @@ if ($env:PESTER_TEST -eq '1') {
   # Sync-Config stays available for tests that pass their own temp TargetPath.
   Write-Warning "PESTER_TEST=1 — skipping global config apply (test mode)"
 } elseif ($Target -eq "global") {
-  Sync-Config -TargetPath $globalPath -Label "global" -PreserveMCP $false
+  Sync-Config -TargetPath $globalPath -Label "global" -PreserveMCP $true
   if (-not $DryRun) {
     $agentsMdDest = Join-Path $globalConfig "AGENTS.md"
-    Copy-Item -LiteralPath (Join-Path $gentlemanRoot "AGENTS.md") $agentsMdDest -Force -ErrorAction SilentlyContinue
-    $results.Add(@{target="global-agents-md"; status="SYNCED"; detail="AGENTS.md copied"})
+    if ((Test-Path $agentsMdDest) -and -not $Force) {
+      $results.Add(@{target="global-agents-md"; status="SKIP"; detail="AGENTS.md already exists (use -Force to overwrite)"})
+    } else {
+      Copy-Item -LiteralPath (Join-Path $gentlemanRoot "AGENTS.md") $agentsMdDest -Force -ErrorAction SilentlyContinue
+      $results.Add(@{target="global-agents-md"; status="SYNCED"; detail="AGENTS.md copied"})
+    }
   } else {
     $results.Add(@{target="global-agents-md"; status="DRY-RUN"; detail="Would copy AGENTS.md"})
   }

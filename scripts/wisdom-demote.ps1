@@ -71,6 +71,16 @@ if ($runAll -or $RemoveOnly) {
         if ($sc -match 'source_pattern:\s*"([^"]+)"') { $src = $Matches[1] }
         if ($DryRun) { $changes += @{Action="REMOVE_DRYRUN";Target=$skillDir.Name;Reason="Not resolved in $days days (>=14)";SourcePattern=$src}; if (-not $Quiet) { Write-Host "  [DRY] Would remove: $($skillDir.Name)" } }
         else {
+            # Safety guard: never delete a forged skill that an ACTIVE pattern still references,
+            # unless the caller explicitly overrides with -Force (C4 gating real).
+            if ($src -and $patternIndex.ContainsKey($src)) {
+                $sp = Get-Content $patternIndex[$src] -Raw | ConvertFrom-Json
+                if ($sp.status -eq 'active' -and -not $Force) {
+                    $changes += @{Action="REMOVE_SKIPPED";Target=$skillDir.Name;Reason="Pattern active ($src) references this skill; use -Force to override"}
+                    if (-not $Quiet) { Write-Host "  [SKIP] $($skillDir.Name): active pattern $src references it (use -Force)" }
+                    continue
+                }
+            }
             Remove-Item -Recurse -Force $skillDir.FullName
             $changes += @{Action="REMOVED";Target=$skillDir.Name;Reason="Not resolved in $days days (>=14)";SourcePattern=$src}
             if ($src -and $patternIndex.ContainsKey($src)) {

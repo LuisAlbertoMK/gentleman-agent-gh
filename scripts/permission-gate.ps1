@@ -107,12 +107,19 @@ if ($ListModes) {
 try {
     $verdict = Get-CommandClass -cmd $Command -mode $Mode
 
+    # -Force: override 'ask' -> 'allow' for headless automation that already vetted the command.
+    # -DryRun: pure evaluation mode — never applies the -Force override.
+    if ($verdict -eq 'ask' -and $Force -and -not $DryRun) {
+        $verdict = 'allow'
+    }
+
     if ($Json) {
         @{
             action  = 'permission-gate'
             command = $Command
             mode    = $Mode
             verdict = $verdict
+            dry_run = $DryRun.IsPresent
             rule    = switch ($verdict) {
                 'deny'  { 'Built-in security restriction' }
                 'allow' { "Allowed in $Mode mode" }

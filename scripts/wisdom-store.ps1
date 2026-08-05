@@ -150,15 +150,23 @@ if ($MigrateBacklog) {
                 continue
             }
             $result = Save-Pattern $pattern
-            # Remove from backlog
-            if ($DryRun) {
-                Write-Output "[DryRun] Would delete: $($file.FullName)"
-            } else {
-                Remove-Item $file.FullName -Force
-            }
+            # Compute save outcome BEFORE any destructive step (avoids stale $result across iterations)
             $rAction = if ($result -and $result.ContainsKey('Action')) { $result.Action } else { "unknown" }
             $rId = if ($result -and $result.ContainsKey('Id')) { $result.Id } else { "" }
             $rPath = if ($result -and $result.ContainsKey('Path')) { $result.Path } else { "" }
+            # Remove from backlog — only if save fully succeeded, or user forced (-Force)
+            if ($DryRun) {
+                Write-Output "[DryRun] Would delete: $($file.FullName)"
+            } elseif ($rAction -in @("created", "updated")) {
+                Remove-Item $file.FullName -Force
+            } elseif ($Force) {
+                Remove-Item $file.FullName -Force
+                if (-not $Quiet) { Write-Warning "[Force] Deleted backlog despite failed save: $($file.Name)" }
+            } else {
+                if (-not $Quiet) { Write-Warning "Backlog preserved (save failed): $($file.Name) — retry or use -Force to delete anyway" }
+                $results += @{ File = $file.Name; Status = "preserved"; Id = $rId; Path = $rPath }
+                continue
+            }
             $results += @{ File = $file.Name; Status = $rAction; Id = $rId; Path = $rPath }
             if (-not $Quiet) { Write-Host "[$($result.Action)] $($result.Id)" }
         } catch {
