@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 #requires -Version 7
 <#
-.SYNOPSIS Pre-commit quality gate — ALL 16 checks in a single pwsh invocation
+.SYNOPSIS Pre-commit quality gate — ALL 17 checks in a single pwsh invocation
 .DESCRIPTION Called by .githooks/pre-commit. Replaces 9 separate pwsh calls.
   Saves ~1.8s per commit by eliminating redundant process startups.
 #>
@@ -11,6 +11,7 @@ $ErrorActionPreference = 'Stop'
 if (-not $RepoRoot) { $RepoRoot = (git rev-parse --show-toplevel 2>$null) ?? '.' }
 
 $passed = 0; $failed = 0; $blocked = $false
+$configSizeBudget = 65536  # ADR-007: opencode.json size budget (bytes)
 
 function Pass { $script:passed++; Write-Host "  $([char]0x1b)[32mOK$([char]0x1b)[0m" }
 function Warn  { param([string]$Msg) $script:passed++; if ($Msg) { Write-Host "  $([char]0x1b)[33m$Msg$([char]0x1b)[0m" } else { Write-Host "  $([char]0x1b)[33mWARN$([char]0x1b)[0m" } }
@@ -225,6 +226,17 @@ if ($globalConf) {
     & "$RepoRoot/scripts/check-config-drift.ps1" -Quiet -ErrorAction SilentlyContinue 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) { Pass } else { Warn "config drift vs global — run scripts/sync-global.ps1" }
 } else { Pass }
+
+# [17/17] Config size budget (ADR-007)
+# Enforces opencode.json ≤ 65,536 B so config growth cannot silently creep past
+# the budget. Mirrored in quality-gate.yml ("Config size budget" step).
+Write-Host "[17/17] Config size budget..."
+$configPath = Join-Path $RepoRoot 'opencode.json'
+if (Test-Path -LiteralPath $configPath) {
+    $configSize = (Get-Item -LiteralPath $configPath).Length
+    if ($configSize -gt $configSizeBudget) { Fail "opencode.json exceeds $configSizeBudget B budget (ADR-007): $configSize B" }
+    else { Pass }
+} else { Fail "opencode.json not found at $configPath" }
 
 # Summary
 Write-Host "`n=== Gate: $passed/$($passed+$failed) passed ==="

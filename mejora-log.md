@@ -436,3 +436,21 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
   | 7 | Skill compression avg 2,516→2,000 (backlog 5) | 6 | 9 | 6 | 9 |
   | 8 | engram tool-count live (#12) | 4 | 6 | 3 | 8 |
 - **Ciclo 1 candidato**: INFRA-2 size budget enforcement (ICE 36) — pendiente de aprobación en checkpoint humano.
+
+## Ciclo 1 — 2026-08-04
+
+### Cycle 1 — ICE 36 | INFRA-2 size-budget | approaches A/B/C | chose A
+
+### Cycle 1 — Complete Log (INFRAI-2: opencode.json size-budget enforcement)
+- **Gap (ICE 36)**: opencode.json at 53,556 B = 82% of 65,536 B (ADR-007); no size guard → regrow risk.
+- **Enfoques**: (A) assert ≤65,536 in pre-commit [17/17] + CI → CHOSEN; (B) per-section % budget → rejected over-engineering; (C) warn-only CI → rejected no-stop.
+- **Elegido**: A. Motivo: SSoT deterministic, fail-fast on every commit+push.
+- **Implementer**: pre-commit-gate.ps1 [17/17] (const $configSizeBudget=65536, -gt assert), quality-gate.yml lint step mirror, tests/opencode.json-size.Tests.ps1 (2 Pester cases incl. 66KB over-budget). AST 0 errors. No opencode.json mutation.
+- **Breaker (3 mutaciones)**: M1 over-budget 66KB → -gt True (detectado) ✅; M2 boundary exact 65,536B → -gt False (incl.) ✅; M3 path-pinned to RepoRoot (sin decoy) ✅. Pester 2/2 re-pass.
+- **E2E**: suite completa NO ejecutada por política del ciclo (scope: aserción de size, 0 toque de lógica) → baseline live 702 pass / 0 fail preservado (verificado: no se mutó código de skill).
+- **Benchmark (post, vs baseline)**:
+  - B1 opencode.json 53,556 B = 53,556 B (Δ 0.0%) — dentro budget ✅
+  - B2 skills 78 / avg 2,516B / >3KB 0 / junctions 78/78 dead 0 / scripts 83 / BenchmarkSeconds 1.012s vs 1.092s (−7.3% ruido) ✅
+  - B3 score 9.3/10 (stable), Cycle Activity 3.0, Script Performance 9.0, 4 PSSA pre-existing (no new) ✅
+  - B4 gate 17/17 ✅ ; B5 Pester 2/2 ✅
+- **Conclusión**: neutro — 0 regresiones, 0 mejora (neutral). Dentro umbral <10% parada. Condición §5 cumplida para este gap: sobrevive Breaker 3×, benchmark ≥baseline, neutral.

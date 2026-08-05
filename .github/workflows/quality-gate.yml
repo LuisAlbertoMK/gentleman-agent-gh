@@ -83,6 +83,17 @@ jobs:
           if ($fail) { exit 1 }
           Write-Output "OK: All permission consistency checks passed"
 
+      - name: Config size budget
+        # ADR-007: enforce opencode.json ≤ 65,536 B (mirrors pre-commit gate check [17/17]).
+        run: |
+          $configSizeBudget = 65536
+          $size = (Get-Item 'opencode.json').Length
+          if ($size -gt $configSizeBudget) {
+            Write-Error "opencode.json exceeds $configSizeBudget B budget (ADR-007): $size B"
+            exit 1
+          }
+          Write-Output "OK: opencode.json $size B ≤ $configSizeBudget B budget (ADR-007)"
+
   lint-linux:
     runs-on: ubuntu-latest
     timeout-minutes: 15

@@ -97,3 +97,14 @@ Notas de conteo:
 | M9 .project.json freshness | stale 2 days | ≤1 day | ✗ |
 
 Nota: opencode.json creció 52,206→53,556B (+1,350B) desde audit 08-03 — 82% del budget ADR-007. PSSA: 4 regresiones vs gate baseline en use-gentleman.ps1/token-count.ps1/health-check.ps1.
+
+### Cycle 1 — Post (2026-08-04)
+
+| Métrica | Live | Baseline | Δ% | Verdict |
+|---|---|---|---|---|
+| B1 opencode.json size | 53,556 B | 53,556 B | 0.0% | ✅ dentro budget (≤65,536B) |
+| B2 Skills / junctions / scripts | 78 / avg 2,516B / >3KB 0 / 78/78 dead 0 / 83 | 78 / avg 2,516B / >3KB 0 / 78/78 dead 0 / 83 | 0.0% | ✅ |
+| B2 BenchmarkSeconds | 1.012s | 1.092s | −7.3% (ruido) | ✅ |
+| B3 Score | 9.3/10 (Cycle Activity 3.0, Script Performance 9.0) | 9.3/10 | 0.0% | ✅ estable · 4 PSSA pre-existing (no new) |
+| B4 Gate pre-commit | 17/17 | 16/16 | +1 step | ✅ |
+| B5 Pester size tests | 2/2 | nuevo | — | ✅ |
