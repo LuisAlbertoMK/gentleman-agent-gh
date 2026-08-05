@@ -22,7 +22,6 @@
 #>
 
 param(
-    [switch]$Quiet,
     [Parameter(Mandatory=$true)]
     [string]$ProjectPath,
     [ValidateSet('gather','report','full')]

@@ -14,7 +14,6 @@
     Path to skill-registry.json. Default: scripts/skill-registry.json
 #>
 param(
-    [switch]$Quiet,
     [Parameter(Mandatory = $true)]
     [string]$Task,
 

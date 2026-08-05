@@ -29,7 +29,7 @@ function Sync-DirectoryFile { param([string]$SrcDir,[string]$DstDir,[switch]$IsD
     }
 }
 
-function Sync-SingleFile { param([string]$Src,[string]$Dst,[string]$Name,[switch]$IsDryRun,[ref]$Count)
+function Sync-SingleFile { param([string]$Src,[string]$Dst,[switch]$IsDryRun,[ref]$Count)
     if (-not (Test-Path $Src -PathType Leaf)) { return }
     $needsCopy = -not (Test-Path $Dst)
     if (-not $needsCopy) { try { $needsCopy = (Get-FileHash -Path $Src).Hash -ne (Get-FileHash -Path $Dst -EA SilentlyContinue).Hash } catch { $needsCopy = $true } }
@@ -66,7 +66,7 @@ Write-Host "  Scripts: $scriptsCopied/$scriptsTotal" -Fore Green
 Write-Host "`n[3] Config sync" -ForegroundColor Cyan
 $configFiles = @("AGENTS.md","ANTI-PATTERN-CATALOG.md","SKILLS-INDEX.md","CYCLE.md","BITACORA.md","review-rules.jsonc","PROJECT-SCORE.md","skills-lock.json","opencode.json","opencode.jsonc")
 $configCopied = 0
-foreach ($cfgFile in $configFiles) { Sync-SingleFile -Src (Join-Path $repoRoot $cfgFile) -Dst (Join-Path $globalCfg $cfgFile) -Name $cfgFile -IsDryRun:$DryRun -Count ([ref]$configCopied) }
+foreach ($cfgFile in $configFiles) { Sync-SingleFile -Src (Join-Path $repoRoot $cfgFile) -Dst (Join-Path $globalCfg $cfgFile) -IsDryRun:$DryRun -Count ([ref]$configCopied) }
 Write-Host "  Config: $configCopied/$($configFiles.Count)" -Fore Green
 
 # Steps 4-6: Commands, Prompts, Plugins (identical pattern)

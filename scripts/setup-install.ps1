@@ -11,12 +11,9 @@
 .EXAMPLE
     .\scripts\setup-install.ps1                 # interactive
     .\scripts\setup-install.ps1 -InstallGentleAI  # auto-install dep
-    .\scripts\setup-install.ps1 -Yes             # non-interactive
 #>
 param(
-    [switch]$Quiet,
-    [switch]$InstallGentleAI,
-    [switch]$Yes
+    [switch]$InstallGentleAI
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
