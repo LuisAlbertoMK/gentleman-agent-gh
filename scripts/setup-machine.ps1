@@ -291,7 +291,11 @@ $checks = @(
     @{ Label = "MCP: headroom"; Test = { $verifyCmds.Name -contains "headroom" } },
     @{ Label = "MCP: engram"; Test = { $verifyCmds.Name -contains "engram" } },
     @{ Label = "Vision: Ollama"; Test = { $verifyCmds.Name -contains "ollama" } },
-    @{ Label = "Vision: moondream model"; Test = { & ollama list 2>$null -match "moondream" } }
+    @{ Label = "Vision: moondream model"; Test = {
+    $exe = (Get-Command "ollama" -EA SilentlyContinue)?.Source
+    if (-not $exe) { $exe = Join-Path (Join-Path $HOME "scoop") "apps" "ollama" "current" "ollama.exe" }
+    if ($exe -and (Test-Path $exe)) { (& $exe list 2>$null) -match "moondream" } else { $false }
+} }
 )
 $allOk = $true
 foreach ($c in $checks) {
