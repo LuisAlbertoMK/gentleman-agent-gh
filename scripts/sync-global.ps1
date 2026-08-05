@@ -64,8 +64,9 @@ Write-Step "Global config" {
         # into the global bash map so dangerous commands are denied even outside this repo.
         try {
             $denyFloorRaw = Get-Content (Join-Path $PSScriptRoot "opencode-config\shared-deny-rules.json") -Raw | ConvertFrom-Json
-            foreach ($dp in $denyFloorRaw.PSObject.Properties) { $cfg.permission.bash[$dp.Name] = $dp.Value }
-            Write-Host "  Ported $($denyFloorRaw.PSObject.Properties.Count) deny-floor rules (SEC-F2)" -Fore Green
+            $ported = 0
+            foreach ($dp in $denyFloorRaw.PSObject.Properties) { $cfg.permission.bash[$dp.Name] = $dp.Value; $ported++ }
+            Write-Host "  Ported $ported deny-floor rules (SEC-F2)" -Fore Green
         } catch { Write-Warning "  Could not read shared-deny-rules.json: $_" }
         if($cfg.agent.Keys.Count -eq 0){$cfg.agent=@{}}
         $cfg|ConvertTo-Json -Depth 10|Set-Content $globalCfg -Encoding UTF8 -Force
