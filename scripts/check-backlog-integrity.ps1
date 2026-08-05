@@ -28,6 +28,23 @@ $ErrorActionPreference = 'Stop'
 
 $results = @{ checks = @(); passed = 0; failed = 0; errors = @() }
 
+function Write-ErrorJson {
+    param([string]$Message)
+    if ($Json) {
+        $results.errors += $Message
+        $results.allPassed = $false
+        $results.passed = 0
+        $results.failed = 0
+        $results.totalItems = 0
+        $results.score = 0
+        $results.timestamp = (Get-Date -Format 'o')
+        Write-Output ($results | ConvertTo-Json -Depth 3)
+    } else {
+        Write-Host $Message
+    }
+    exit 1
+}
+
 function Add-Check {
     param([string]$Item, [bool]$Passed, [string]$Detail)
     $script:results.checks += @{ item = $Item; passed = $Passed; detail = $Detail }
@@ -47,7 +64,7 @@ function Test-CommitExistence {
 
 # Parse backlog table from CYCLE.md
 $cyclePath = Join-Path $RepoRoot 'CYCLE.md'
-if (-not (Test-Path $cyclePath)) { Write-Host 'CYCLE.md not found'; exit 1 }
+if (-not (Test-Path $cyclePath)) { Write-ErrorJson 'CYCLE.md not found' }
 
 $cycleContent = Get-Content $cyclePath -Raw -Encoding UTF8
 
@@ -77,7 +94,7 @@ if (-not $tableSection) {
     }
 }
 
-if (-not $tableSection) { Write-Host 'Backlog table not found in CYCLE.md'; exit 1 }
+if (-not $tableSection) { Write-ErrorJson 'Backlog table not found in CYCLE.md' }
 
 # Parse pipe-delimited rows (skip header and separator lines)
 $rows = $tableSection -split "`n" | Where-Object { $_ -match '^\|' -and $_ -notmatch '^\|[\s-]+\|' }
@@ -103,7 +120,7 @@ foreach ($row in $rows) {
     }
 }
 
-if ($items.Count -eq 0) { Write-Host 'No backlog items found'; exit 1 }
+if ($items.Count -eq 0) { Write-ErrorJson 'No backlog items found' }
 
 # --- Check each item ---
 $allPassed = $true
