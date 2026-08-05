@@ -20,7 +20,8 @@ param(
     [switch]$Quiet,
   [string[]]$Path = @(),
   [string]$Dir = "",
-    [switch]$Recurse
+    [switch]$Recurse,
+  [double]$Divisor = 3.5
 )
 
 $ErrorActionPreference = 'Stop'
@@ -58,7 +59,7 @@ try {
   foreach ($f in $targets) {
     $content = try { Get-Content -LiteralPath $f.FullName -Raw -ErrorAction Stop } catch { Write-Warning "Could not read file '$($f.FullName)': $_"; $null }
     if (-not $content) { continue }
-    $tokens = Get-TokenCount $content
+    $tokens = Get-TokenCount $content $Divisor
     $results += [PSCustomObject]@{
       File = $f.FullName
       Tokens = $tokens

@@ -106,7 +106,7 @@ function Set-Junction {
 function Repair-Junction {
   param([string]$Path, [string]$ExpectedTarget, [string]$Target, [string]$Label)
   $check = Test-Junction -Path $Path -ExpectedTarget $ExpectedTarget -Label $Label
-  if ($check.status -eq "FAIL" -and $script:AutoRepair) {
+  if ($check.status -ne "OK" -and ($script:AutoRepair -or $Force)) {
     Set-Junction -Path $Path -Target $Target -Label $Label
     $check = Test-Junction -Path $Path -ExpectedTarget $ExpectedTarget -Label $Label
   }
