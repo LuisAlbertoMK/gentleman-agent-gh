@@ -476,3 +476,33 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 - **Fix**: (A) `Convert-FileRefsToAbsolute`: added top-level `if ($null -ne $Root) { }` so PSSA statically counts `$Root` as read (condition-reference is traced, unlike guard-method/closure/self-assign). (B) `Convert-ConfigFileRef`: preserved null-guard + PSCustomObject/IList recursion (dead-code order verified). (C) `validate-write-scope.ps1`: `AllowEmptyCollection()` (B3) + `Where-Object` empty-tree filter (B2). (D) `tests/validate-write-scope.Tests.ps1`: 4/4 (T1-T4; in-repo scratch `tests/_scratch_vws.txt`, no `$TestDrive` outside-repo; inclusive `scripts/*.ps1,tests/*` allowlist so dirty-tree runs pass without stash).
 - **Verification**: ISA `use-gentleman` count 1→0 (`Root` L176/L179 resolved); `validate-write-scope` ISA 0; Pester 4/4; **PSSA Gate PASSED**, score-auto 9.3/10, 0 regressions ("51 known violations, no regression"); quality-gate 17/17 ALL CLEAR. Commit 8b13631a pushed (dde689d2→8b13631a; pre-push gate passed).
 - **Process lecciones (portar a AGENTS.md / immune-system)**: (1) verbose-verify agent delegations → empty/truncated reports; route multi-file+verify to `quick-sub` atomic edits + run heavy checks (ISA/Pester/score) in orchestrator bash with controlled output; (2) PSSA closure-FP → top-level `if ($null -ne $param)` condition read; func-scope attr NO suppresses; (3) `git stash push -- <paths> -m msg` parses `-m` as pathspec — put `-m` BEFORE `--` or avoid stash.
+
+---
+## Ciclo 3 — 2026-08-04 (v2) — ICE 27 | R10: wire check-backlog-integrity al gate
+
+**Gap**: `check-backlog-integrity.ps1` existía y lo consumían `score-auto.ps1` (job paralelo) + smoke tests, pero NO estaba en el pre-commit gate (17 checks, ninguno lo llamaba) ni en CI. Recomendación R10 del análisis 08-04 ("wire check-backlog-integrity al gate — habría capturado el drift de CYCLE.md:21"). Gap #3 del kickoff v2 (ICE 27).
+
+**Enfoques evaluados (3)**:
+- A: check [18/18] en pre-commit-gate.ps1, incondicional (como [17/17]), fail-closed si falta el script + mirror en quality-gate.yml (job lint) — **GANADOR**: fail-fast en commit y push/PR, patrón idéntico a [17/17] size budget
+- B: solo gate local, sin CI — rechazado: CI es el gate de PRs y contribuidores, drift quedaría sin cubrir en merge
+- C: mantener solo en score-auto/smoke (status quo) — rechazado: no bloquea nada, el drift pasa silencioso
+
+**Cambios (4 archivos)**:
+1. `.githooks/pre-commit-gate.ps1`: check [18/18] Backlog integrity (L241-250) — corre el script con `*> $null`, `Pass`/`Fail` según `$LASTEXITCODE`, fail-closed si el script no existe
+2. `.github/workflows/quality-gate.yml`: step "Backlog integrity check" en job lint (L97-106) — `./scripts/check-backlog-integrity.ps1` + `exit 1` en fallo
+3. `scripts/tests/backlog-integrity.Tests.ps1` (NUEVO): 6 tests Pester 5 — backlog válido exit 0; commit hash inexistente exit 1; implementación prematura exit 1; status desconocido exit 1; CYCLE.md ausente exit 1; error JSON válido con -Json
+4. `scripts/check-backlog-integrity.ps1`: helper `Write-ErrorJson` (L31-45) — los 3 early-exits (L62/92/118) emiten JSON válido con `-Json` en vez de texto crudo (hallazgo breaker MEDIUM)
+
+**Resultado !breaker (7 ataques, 30+ sub-casos, subagente independiente)**:
+- 1 MEDIUM real: early-exit paths violaban el contrato `-Json` (`Write-Host 'CYCLE.md not found'` → texto crudo, parse error para callers JSON). **FIX aplicado** (Write-ErrorJson) + test #6. Re-verificado: 3 sites emiten JSON válido, exit 1.
+- 1 LOW: mensaje confuso en tabla malformada ("Unknown status: 30m" — columnas desalineadas). Documentado, no bloquea.
+- Ataques 1-7 PASS (tablas malformadas, hashes 40-char/blob/uppercase, absolute paths, statuses emoji/uppercase/case, gate BLOCKED en backlog corrupto y hash-identical restore, JSON contract, CI step static review).
+- Evasión verificada: `git clean -fdx` con doble espacio no aplica aquí (check corre script, no regex de comandos).
+
+**Resultado E2E**: suite completa **726/726 pass / 0 fail** (191s). Gate **18/18 ALL CLEAR** en los 3 commits atómicos. Benchmark `-Gate` OK (78 skills, >3KB 0, junctions 78/78).
+
+**Regresión C2 corregida (protocolo §3.5, cero excepciones)**: la suite completa expuso 3 failures PREEXISTENTES, regresión del C2 (que silenció PSSA borrando params públicos): (1) `token-count.ps1` perdió el param público `-Divisor` (test R7: 20≠10) — restaurado + pasado a `Get-TokenCount`; (2) `health-check.ps1` perdió `[switch]$Force` (guarda destructiva: 2 tests) — restaurado con semántica real (repara junctions WARN además de FAIL, L109). PSSA health-check vuelve a baseline 2 (AutoRepair FP + DryRun legítimo) usando `$Force` bare (PSSA no rastrea `$script:Force`). 3 commits separados por tipo (feat/fix/fix).
+
+**Benchmark vs ciclo anterior**: gate 17/17 → **18/18**. Suite 723 (3 fail) → **726/0**. PSSA health-check 3 → 2 (baseline). Contrato `-Json` roto → cumplido en todas las rutas. MEJORA ✅
+
+**Aprendizaje**: (1) El gate [12/13] solo corre Pester sobre tests STAGED — un commit que toca scripts sin tests pasa el gate sin correr la suite completa; la suite completa ES el E2E real (lección C9 re-validada con 3 regresiones reales del C2). (2) Silenciar PSSA borrando params públicos rompe contratos documentados — la forma correcta es USAR el param (pasarlo a la función) o patrón condition-read; nunca eliminarlo si un test/doc lo exige. (3) `$script:Force` dentro de función NO cuenta como uso para PSReviewUnusedParameter — usar `$Force` bare (resolución dinámica por scope chain). (4) Todo early-exit debe respetar el contrato de salida del script (-Json): un solo `Write-Host` rompe a todos los callers que parsean stdout.
