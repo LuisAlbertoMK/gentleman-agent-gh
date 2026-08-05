@@ -406,3 +406,33 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 **Enfoques totales evaluados**: 26-30 segun conteo (mejora-log L340 declara 27; suma de componentes 30; sets A/B/C explicitos 26) — >= 10 requeridos en cualquier interpretacion ✅
 
 **Verificacion post-merge**: gate en el ultimo commit del experimento + suite E2E 702/702 sobre el arbol integrado; push verificado local=origin.
+
+---
+
+## Mejora Autónoma Iterativa v2 — Kickoff (2026-08-04)
+
+- **Setup**: branch `experimento/mejora-autonoma-2026-08-04` creado desde main @ da9907a6 (R1-R10 batch + sync-global fix, all pushed to origin/main). Working tree clean.
+- **Métricas M1-M9** (definidas §0):
+  - M1 Gate pre-commit 16/16 (baseline: 16/16 ✓)
+  - M2 E2E suite 100% (702 pass / 0 fail, último run completo)
+  - M3 Skill sizes: avg ≤2,000B AND 0 skills >3KB (baseline: avg 2,516B ✓, 0 >3KB ✓)
+  - M4 Score ≥9.5 (baseline: 9.3/10)
+  - M5 PSSA: <50 real warnings AND 0 gate regressions (baseline: 921 warnings, 4 regressions vs gate baseline)
+  - M6 opencode.json ≤65,536B (ADR-007 budget; baseline: 53,556B = 82%)
+  - M7 Cross-ref 0 errors (baseline: 10/10 OK)
+  - M8 BenchmarkSeconds estable (baseline: 1.092s)
+  - M9 .project.json freshness ≤1 day (baseline: stale 2 days ✗)
+- **Presupuesto**: máx 3 ciclos por bloque de sesión; ≤45 min por ciclo; umbral de rendimiento decreciente: mejora marginal <10% vs ciclo previo → STOP; checkpoint humano por ciclo (N=1, usuario presente).
+- **Baseline (live, capturado 2026-08-04)**: Skills 78 (196,262B total, 4,576 líneas, avg 2,516B, median 2,476B, range 1800-2999B, frontmatter 100%, WhenToUse 98.7%, Rules 43.6%); Junctions 78/78 (dead 0); Scripts 83; TokenEstimate 56,075; Score 9.3/10 (dims: Cycle Activity 3.0, Score Depth 8.2, Script Performance 9.0, Clean Code 9.9); PSSA total 1,110 (0 err / 921 warn / 189 info) con 4 regresiones vs gate (use-gentleman.ps1: PSUseSingularNouns 0→1, PSReviewUnusedParameter 0→1; token-count.ps1: PSReviewUnusedParameter 0→1; health-check.ps1: PSReviewUnusedParameter 2→3); opencode.json 53,556B (82%, creció +1,350B vs audit 08-03: 52,206B).
+- **Descubrimientos del baseline**: (a) INFRA-2 size budget trending peor (82%, creció); (b) 4 regresiones PSSA introducidas en R7/R9 (token-count.ps1, health-check.ps1 tocados); (c) Cycle Activity 3.0/10.
+- **Tabla ICE** (I×C/E; I=Impacto 1-10, C=Confianza 0-1→9/10, E=Esfuerzo 1-10):
+  | # | Gap | I | C | E | ICE |
+  | 1 | INFRA-2: enforce size budget en pre-commit+CI (#13) | 8 | 9 | 2 | 36 |
+  | 2 | Fix 4 regresiones PSSA vs gate baseline | 7 | 9 | 2 | 31.5 |
+  | 3 | Wire check-backlog-integrity al gate (R10 parcial) | 6 | 9 | 2 | 27 |
+  | 4 | audit-log CSV formula injection (#14) | 3 | 9 | 1 | 27 |
+  | 5 | `git push -f` deny + semi npm/pip estrecho (#10) | 5 | 9 | 2 | 22.5 |
+  | 6 | Cycle Activity 3.0/10 | 5 | 8 | 4 | 10 |
+  | 7 | Skill compression avg 2,516→2,000 (backlog 5) | 6 | 9 | 6 | 9 |
+  | 8 | engram tool-count live (#12) | 4 | 6 | 3 | 8 |
+- **Ciclo 1 candidato**: INFRA-2 size budget enforcement (ICE 36) — pendiente de aprobación en checkpoint humano.

@@ -79,3 +79,21 @@ Notas de conteo:
 | `mejora-log.md` | presente (C1–C9) | presente + C10 |
 | `benchmarks.md` | **ausente** | ✅ creado |
 | `adr/` (mini-ADRs) | **ausente** | ✅ creado (10 ADRs + índice) |
+
+---
+
+## Mejora Autónoma v2 — Baseline (2026-08-04)
+
+| Métrica | Valor live | Target | Estado |
+|---|---|---|---|
+| M1 Gate pre-commit | 16/16 | 16/16 | ✓ |
+| M2 Suite E2E | 702 pass / 0 fail | 100% | ✓ |
+| M3 Skill sizes | avg 2,516B; 0 >3KB | avg ≤2,000B AND 0 >3KB | ⚠ avg por encima |
+| M4 Score | 9.3/10 | ≥9.5 | ⚠ |
+| M5 PSSA | 921 warnings; 4 regresiones vs gate | <50 warnings AND 0 regresiones | ✗ |
+| M6 opencode.json | 53,556B = 82% | ≤65,536B | ✓ |
+| M7 Cross-ref | 10/10 OK | 0 errores | ✓ |
+| M8 BenchmarkSeconds | 1.092s | estable | ✓ |
+| M9 .project.json freshness | stale 2 days | ≤1 day | ✗ |
+
+Nota: opencode.json creció 52,206→53,556B (+1,350B) desde audit 08-03 — 82% del budget ADR-007. PSSA: 4 regresiones vs gate baseline en use-gentleman.ps1/token-count.ps1/health-check.ps1.

@@ -16,5 +16,8 @@
 | [ADR-008](ADR-008-whitespace-normalization.md) | Normalizar input antes de clasificar comandos | C9 | `-replace '\s+',' '` + Trim previo a Get-CommandClass |
 | [ADR-009](ADR-009-hybrid-junction-model.md) | Modelo híbrido de junctions | C9 post | Junctions por-skill + dirs reales deliberados |
 | [ADR-010](ADR-010-revert-false-positive.md) | Revertir hallazgo falso positivo | C9 | engram = 18 tools (no 8) |
+| [ADR-011](ADR-011-mejora-autonoma-v2-kickoff.md) | Mejora Autónoma v2 — kickoff | 2026-08-04 | Accepted |
+| [ADR-012](ADR-012-sync-global-deny-count-fix.md) | sync-global deny-count fix | 2026-08-04 | Accepted |
+| [ADR-013](ADR-013-backlog5-criterion-conjunctive.md) | Backlog 5 criterion conjunctive | 2026-08-04 | Accepted |
 
 **Convención**: Status = Accepted salvo indicación; decisiones con `confidence: high` verificadas por breaker por ciclo.
