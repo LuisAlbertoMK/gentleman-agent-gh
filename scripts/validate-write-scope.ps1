@@ -86,7 +86,19 @@ if ($null -eq $gitOutput) {
 
 # Filter empty/whitespace entries: a clean tree makes `git diff --name-only` emit a
 # single empty string, which would otherwise be scored as a false-VIOLATION.
-$changedFiles = @($changedFiles | Where-Object { $_ -and [string]$_.Trim() })
+# git stderr (e.g. CRLF normalization warnings) arrives as ErrorRecord via 2>&1 —
+# keep only text lines so .Trim() can never hit a non-string.
+$changedFiles = @($changedFiles | Where-Object { $_ -is [string] -and $_.Trim() })
+
+# Runtime state files auto-update every session (score, mode, bitacora) — not real
+# change units. Same allowlist as scripts/verify.ps1 Git Hygiene check (L77).
+$runtimeFiles = @('\.gentleman-mode$', '\.project\.json$', 'BITACORA\.md$')
+$changedFiles = @($changedFiles | Where-Object {
+    $file = $_
+    $skip = $false
+    foreach ($p in $runtimeFiles) { if ($file -match $p) { $skip = $true; break } }
+    -not $skip
+})
 
 if ($changedFiles.Count -eq 0) {
     if ($Json) {
