@@ -94,6 +94,17 @@ jobs:
           }
           Write-Output "OK: opencode.json $size B ≤ $configSizeBudget B budget (ADR-007)"
 
+      - name: Backlog integrity check
+        # Verifies CYCLE.md backlog item status matches repo reality
+        # (mirrors pre-commit gate check [18/18]).
+        run: |
+          ./scripts/check-backlog-integrity.ps1
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "backlog integrity check failed — CYCLE.md status does not match repo reality"
+            exit 1
+          }
+          Write-Output "OK: backlog integrity check passed"
+
   lint-linux:
     runs-on: ubuntu-latest
     timeout-minutes: 15

@@ -238,6 +238,17 @@ if (Test-Path -LiteralPath $configPath) {
     else { Pass }
 } else { Fail "opencode.json not found at $configPath" }
 
+# [18/18] Backlog integrity check
+# Verifies CYCLE.md backlog item status matches repo reality. Runs ALWAYS
+# (like [17/17]) and is fail-closed if the script is missing. Mirrored in
+# .github/workflows/quality-gate.yml ("Backlog integrity check" step).
+Write-Host "[18/18] Backlog integrity check..."
+$backlogScript = Join-Path $RepoRoot 'scripts/check-backlog-integrity.ps1'
+if (Test-Path -LiteralPath $backlogScript) {
+    & "$RepoRoot/scripts/check-backlog-integrity.ps1" *> $null
+    if ($LASTEXITCODE -eq 0) { Pass } else { Fail "backlog integrity check failed — CYCLE.md status does not match repo reality" }
+} else { Fail "backlog-integrity.ps1 not found at $backlogScript" }
+
 # Summary
 Write-Host "`n=== Gate: $passed/$($passed+$failed) passed ==="
 if ($blocked) { Write-Host "  $([char]0x1b)[31mBLOCKED$([char]0x1b)[0m" }
