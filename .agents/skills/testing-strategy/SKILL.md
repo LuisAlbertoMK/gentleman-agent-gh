@@ -1,6 +1,6 @@
 ---
 name: testing-strategy
-description: "Test strategy & planning — pyramid analysis, coverage gaps, risk-based prioritization, test debt assessment, ROI-driven test investment."
+description: "Test strategy - pyramid analysis, coverage gaps, risk-based prioritization, test debt, ROI-driven investment."
 triggers: "testing strategy, test plan, test coverage, test pyramid, test debt, test gap, test priority, test audit, quality strategy, what to test, how to test"
 ---
 

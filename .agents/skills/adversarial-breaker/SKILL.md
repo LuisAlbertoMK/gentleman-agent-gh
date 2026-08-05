@@ -3,13 +3,12 @@ name: adversarial-breaker
 description: "Adversarial verification — fixer→breaker chain. Independent offensive agent."
 triggers: "adversarial, breaker, !breaker, verify fix, romper, verificar fix, try to break, offensive verification"
 ---
-Builder≠Evaluator. Independent adversarial check after fix.
 
 ## When to Use
 fixer done+ROJA/AMARILLA(auth/storage/API)+not config-only. Skip:VERDE·non-code·comments·docs. Token-save:diff<10L+config/lock/docs.
 
 ## Protocol
-1.Bundle:diff+changed_files+fixer_claims+test_results+zone+pipeline_mode
+1.Bundle:diff+files+fixer_claims+test_results+zone+pipeline_mode
 2.Engram:`mem_search("breaker/{target}",topic_key:"breaker/{target}")`→`## Past Attack Context`
 3.Zone:`review-rules.jsonc`. AMARILLA+auth→ROJA
 4.Profiles:`references/profiles/`by ext. `.agents/attack-surface.{project}.md`→inject

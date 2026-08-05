@@ -1,6 +1,6 @@
 ---
 name: research
-description: "Structured research workflow for technical investigations — define scope, gather evidence, synthesize findings, document decisions"
+description: "Structured research workflow - define scope, gather evidence, synthesize findings, document decisions."
 triggers: "Research task, technical investigation, investigar, research, learn new tech, compare solutions, evaluate options"
 ---
 

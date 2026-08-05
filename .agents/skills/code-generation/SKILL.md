@@ -1,6 +1,6 @@
 ---
 name: code-generation
-description: "Trigger: new file, new function, code generation, script, boilerplate, scaffold. Write code matching codebase patterns."
+description: "Trigger: new file, function, code generation, script, boilerplate, scaffold. Write code matching codebase patterns."
 triggers: "new file, new function, code generation, script, boilerplate, scaffold, create code, write code"
 ---
 ## When to Use

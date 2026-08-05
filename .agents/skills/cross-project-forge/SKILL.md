@@ -1,6 +1,6 @@
 ---
 name: cross-project-forge
-description: "Manual pipeline to promote a recurring pattern to an auto-generated skill — triggered when a pattern hits its severity threshold."
+description: "Manual pipeline promoting a recurring pattern to an auto-generated skill when it hits severity threshold."
 triggers: "forge, promote pattern, auto-skill, forjar, convertir patrón, skill desde patrón, cross-project-forge"
 ---
 

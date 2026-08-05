@@ -1,6 +1,6 @@
 ---
 name: cross-project-wisdom
-description: "Load patterns from prior projects relevant to the current task — advisory knowledge transfer across repos. Trigger: patterns, wisdom, lesson learned, in another project I, last time this happened, cross-project, retrospectiva, experiencia previa, !wisdom"
+description: "Prior-project patterns - advisory cross-repo knowledge. Trigger: patterns, wisdom, cross-project, retrospectiva"
 triggers: "patterns, wisdom, lesson learned, in another project I, last time this, cross-project, retrospectiva, experiencia previa, !wisdom, pattern guard"
 ---
 

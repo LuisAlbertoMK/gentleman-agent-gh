@@ -5,8 +5,7 @@ triggers: "SDD pipeline, SDD phase, spec-driven development"
 ---
 
 ## When to Use
-Unified SDD pipeline — 9 phases from init through archive. U
-
+Unified SDD pipeline — 9 phases from init through archive.
 
 # SDD Pipeline
 
@@ -38,7 +37,7 @@ All phases share: `{file:sdd/references/sdd-phase-common.md}`
 **Subagent**: Load phase file via `{file:sdd/phases/{N}-{name}.md}`.
 
 Individual wrapper skills (`sdd-init`, `sdd-explore`, etc.) each load their phase from this shared structure.
-Common protocol migrated from `_shared/sdd-phase-common.md`.
+
 
 ## Choosing Your Path
 
@@ -59,7 +58,7 @@ When unsure: start full, skip phases after `[Explore]` if scope confirms fast pa
 
 ## Orchestrator Routing
 ```
-phase=init    → sdd-init
+phase=init → sdd-init
 phase=explore → sdd-explore
 phase=propose → sdd-propose
 Fast path?    → switch to sdd-quick after Propose

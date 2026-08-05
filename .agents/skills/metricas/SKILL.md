@@ -1,6 +1,6 @@
 ---
 name: metricas
-description: "On-demand before/after comparison with delta and % improvement — git diff or bookmark mode, tokenization, multi-language auto-detect. NOT self-evaluation — that's auto-metrics (!score/!metrics)."
+description: "Before/after delta + % comparison - git diff or bookmark mode, tokenization, multi-language. NOT self-evaluation."
 triggers: "Metricas, before/after, % improvement, tokenization, delta"
 ---
 

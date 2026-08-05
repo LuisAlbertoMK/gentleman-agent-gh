@@ -10,7 +10,7 @@ Persistent memory protocol — save, search, dreaming, session
 **Save**: arch decisions·bugs·tools·config·gotchas·patterns·prefs. Diff topics→reuse `topic_key`; unsure→`mem_suggest_topic_key`. Critical=immediate, minor=flush end.
 
 ## Token Budget
->500 tok→summary. 5 turns no progress→`lean-context CAVEMAN lite`. 10→`mem_session_summary`+reset. Self-check/5calls. Every25→`mem_save(topic_key=checkpoint/session-state)`.
+>500 tok→summary. 5 turns no progress→`lean-context CAVEMAN lite`. 10→`mem_session_summary`+reset. Self-check/5 calls.
 L1(~8msgs/15calls):−60-70%. L2(~20msgs/>3L1):1-2 lines+Engram ID −40-50%. L3(>60%):1-liner/topic+`Ref:engram-obs-{id}`−80-90%.
 
 ## Capture Pipeline
@@ -21,7 +21,7 @@ Validate: `scripts/engram-validate.ps1` exists→run after `mem_save`.
 ## Memory Search
 "remember"/"recall"→`mem_context`→`mem_search`→`mem_get_observation`. Proactive: known-area·unfamiliar·first msg.
 Task injection: extract keywords, `mem_search(query,type="bugfix|pattern|decision",limit=3)`, inject top3.
-Authority skill for proactive search. workflow-optimizer+session-resume reference this.
+Authority skill for proactive search.
 
 ## Dreaming
 `mem_search(type="error|bugfix")`. Same error2x→catalog. 3x→AGENTS.md rule. Auto:`session-miner.ps1 -Mode scan -Json` every5th error.

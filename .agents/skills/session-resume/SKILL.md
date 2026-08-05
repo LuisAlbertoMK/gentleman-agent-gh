@@ -17,7 +17,7 @@ triggers: "session resume, dónde lo dejamos, continuá, session start, code mem
 4. `mem_search(query="project/{name}", scope=project, limit=1)`
 5. If missing → trigger Project fingerprint (dreaming)
 
-**Pre-answer search**: See `engram-protocol` skill for proactive search protocol. See also `gentleman-vMK.md` for the Pre-Answer Evidence Gate (hard gate).
+**Pre-answer search**: `engram-protocol` for proactive search; `gentleman-vMK.md` = Pre-Answer Evidence Gate.
 
 ## Skill Pre-load
 ```powershell
@@ -64,8 +64,6 @@ file created/deleted · >20 line change · discovery · important question · de
 ## Anti-Patterns
 Auto-commit/push · mid-task runs · output >10 lines · skip "small project" · skip skill-graph
 
-## Resources
-Engram `mem_context` · quality-gate · recovery-protocol · skill-graph.ps1
 
 ## Refs
 dreaming · skill-graph · recovery-protocol · context-watchdog · quality-gate

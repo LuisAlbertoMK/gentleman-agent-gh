@@ -9,16 +9,13 @@ Pre-commit gate — TDD + Pester tests pass, secrets scan, con
 
 **Trigger**: Before ANY `git commit`/`push`/`gh pr create`—ALL gates MUST pass.
 **Portable**: Steps 4/5/6 depend on repo scripts. Missing→`[SKIP]`+warn, continue.
-
 ## 1. TDD Gate
 Auto-detect: `go.mod`→`go test`|`package.json`→`npm/pnpm/bun test`|`Cargo.toml`→`cargo test`|`pyproject`→`pytest`. No runner→`[SKIP] TDD:no test runner detected`. Fail→NO commit. file:line:error.
-
 ## 2. Credential Scan
 `git diff --cached` for api keys/passwords/credentials/private keys/long base64. Match→BLOCK.
 
 ## 3. Conventional Commit
 `^(build|chore|ci|cycle|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9\._-]+\))?!?: .+`. Invalid→BLOCK+show.
-
 ## 4. PSSA Gate
 If `$env:GENTLEMAN_AGENT_ROOT/scripts/pssa-gate.ps1` exists→`-Mode Check`. Auto-fix→`-Mode Fix`. Manual=0 or user-ok. Else→`[SKIP] PSSA:not found`.
 
@@ -40,7 +37,7 @@ Breaker:missing→SKIP push|✅→push|🔧→R2|🚫→STOP|⚠→STOP
 `go test ./...`·`npm/pnpm/yarn test`·`cargo test`·`pytest`
 `$secretsPattern='(api[_-]?key|secret|token|-----BEGIN)'; git diff --cached|Select-String -Pattern $secretsPattern`
 `"$env:GENTLEMAN_AGENT_ROOT/scripts/pssa-gate.ps1" -Mode Check`
-`"$env:GENTLEMAN_AGENT_ROOT/scripts/run-tests.ps1" -Quiet` — Note: if *.Tests.ps1 files are staged, the pre-commit hook re-runs the staged subset (now parallel) — this is intentional double coverage; to avoid it, commit tests separately.
+`"$env:GENTLEMAN_AGENT_ROOT/scripts/run-tests.ps1" -Quiet` — Note: if *.Tests.ps1 files are staged, the pre-commit hook re-runs the staged subset (now parallel) — intentional double coverage; commit tests separately.
 
 ## Refs
 security-scanner·triple-verify·commit-crafter·ci-cd·code-review-agent·adversarial-breaker

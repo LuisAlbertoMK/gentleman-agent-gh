@@ -1,6 +1,6 @@
 ---
 name: data-quality
-description: "Trigger: data audit, data pipeline audit, schema validation, data governance, ETL audit. Audit data layer quality and reliability."
+description: "Trigger: data audit, pipeline audit, schema validation, data governance, ETL. Audit data quality and reliability."
 triggers: "data audit, data pipeline audit, schema validation, data governance, ETL audit, data quality check, data review"
 ---
 ## When to Use

@@ -1,6 +1,6 @@
 ---
 name: comment-writer
-description: "Write warm, direct collaboration comments. Trigger: PR feedback, issue replies, reviews, Slack messages, or GitHub comments."
+description: "Write warm, direct collaboration comments. Trigger: PR feedback, issue replies, reviews, Slack messages, GitHub."
 triggers: "comments, PR feedback, review comment, GitHub comment, write feedback"
 ---
 

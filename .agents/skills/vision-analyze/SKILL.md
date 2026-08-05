@@ -1,6 +1,6 @@
 ---
 name: vision-analyze
-description: "Local vision analysis — screenshots, UI review, error detection via Ollama. Zero cost, 100% local. NOT visual regression — for Playwright VRT use visual-testing."
+description: "Local vision analysis - screenshots, UI review, error detection via Ollama. 100% local. NOT visual regression."
 triggers: [screenshot, capture, vision, analyze-ui, visual-review, captura, analizar-imagen]
 ---
 

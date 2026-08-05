@@ -1,6 +1,6 @@
 ---
 name: subagent-isolation
-description: "Maintain clean context boundaries between delegated agents — prevent hallucination cascades, cross-contamination, and enforce error isolation"
+description: "Clean context boundaries between agents - prevent hallucination cascades, cross-contamination, enforce error isolation."
 triggers: "Subagent isolation, context boundaries"
 ---
 

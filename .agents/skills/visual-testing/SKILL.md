@@ -1,6 +1,6 @@
 ---
 name: visual-testing
-description: "Visual verification — screenshots, visual regression, UI bug detection via Playwright. For zero-cost local LLM image analysis use vision-analyze."
+description: "Visual verification - screenshots, visual regression, UI bug detection via Playwright. See vision-analyze for LLM."
 triggers: "screenshot, visual diff, visual bug, regression test, VRT, UI broken, text overflow, layout shift, responsive test, visual regression"
 ---
 

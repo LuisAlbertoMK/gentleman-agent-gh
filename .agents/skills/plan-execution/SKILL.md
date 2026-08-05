@@ -1,6 +1,6 @@
 ---
 name: plan-execution
-description: "Trigger: execute plan, implement plan, step-by-step execution, task execution, plan completion. Execute implementation plans with rollback."
+description: "Trigger: execute plan, implement plan, step-by-step execution, plan completion. Execute plans with rollback."
 triggers: "execute plan, implement plan, step-by-step execution, task execution, plan completion, run plan, do plan"
 ---
 ## When to Use

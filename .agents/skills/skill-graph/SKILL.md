@@ -48,7 +48,6 @@ hop 2: command-wrapper      → [bash-safe]
 | Same item in loop | Circular dep | Report to skill-registry; BFS capped at 10 unique |
 | Empty task (`-Task ""`) | No input | Defaults to `"task"` scan — rarely useful; always pass a real task |
 
-**Empty task edge case**: `-Task ""` matches on empty string — returns everything. Always provide a concrete task.
 
 ## DIGEST
 | Context | Strategy | Target |

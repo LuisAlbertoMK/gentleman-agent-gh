@@ -30,7 +30,7 @@ triggers: "model router, routing, delegate or direct, model decision, specialize
 | Default | DIRECT | `gentleman-vMK` | — | — |
 
 ## 🔧 IMPLEMENTER
-`gentleman-implementer-sub` (DeepSeek V4 Flash Free) — precise plan execution. No unrequested changes.
+`gentleman-implementer-sub` (DeepSeek V4 Flash Free) — precise execution. No unrequested changes.
 **Avoid**: Qwen3.7 Max (re-plans, paid), Nemotron 3 Ultra (over-analyzes).
 
 ## ⚠️ RUNTIME REALITY (opencode 1.18.x)
@@ -46,8 +46,6 @@ triggers: "model router, routing, delegate or direct, model decision, specialize
 | 50K-100K | Prefer fast models |
 | >150K | Direct forced |
 
-## 💡 STRATEGY (FREE)
-100% Free · 1M ctx: Nemotron 3 Ultra Free / DeepSeek V4 Flash Free · Vision: Kimi K2.5 / MiMo V2.5 · Fallback: Big Pickle (docs, SEO, general)
 
 ## Refs
 execution-mode · delivery-harness · subagent-isolation · skill-graph

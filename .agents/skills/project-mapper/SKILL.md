@@ -1,6 +1,6 @@
 ---
 name: project-mapper
-description: "Scan project structure, detect tech stack, classify architecture, and generate dependency map with auto-chain to gap-analysis"
+description: "Scan project structure, detect tech stack, classify architecture, generate dependency map; auto-chains to gap-analysis."
 triggers: "Mapear, project map, estructura, tech stack, arquitectura"
 ---
 

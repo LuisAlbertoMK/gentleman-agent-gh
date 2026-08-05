@@ -5,11 +5,11 @@ triggers: [optimize-workflow, faster-access, token-optimization, workflow-patter
 ---
 
 ## When to Use
-Optimize workflow — faster info access, reduced token waste, smarter caching, auto-learning triggers.
+Optimize workflow — faster info access, token economy, caching, auto-learning triggers.
 
 ## Core Principles
-1. **Info Access**: Right info at right time, not all at once
-2. **Token Economy**: Every token must earn its place
+1. **Info Access**: Right info, right time
+2. **Token Economy**: Every token earns its place
 3. **Auto-Learning**: Patterns → rules → habits → instinct
 4. **Cache Aggressively**: Compute once, reuse everywhere
 
@@ -18,10 +18,10 @@ Optimize workflow — faster info access, reduced token waste, smarter caching, 
 ### 1. Pre-flight Check (Before Every Task)
 ```
 1. mem_search("<task-keywords>", limit=3) → inject top 3
-2. Check skill-graph for relevant skills (don't load all)
+2. Check skill-graph for relevant skills
 3. Verify no recent error on same pattern (immune-system)
 ```
-**Savings**: 2-5K tokens/task, avoids repeat mistakes
+**Savings**: 2-5K tokens/task
 
 ### 2. Lazy Loading (Never Load What You Won't Use)
 ```
@@ -29,7 +29,7 @@ Optimize workflow — faster info access, reduced token waste, smarter caching, 
 - Bug fix → recovery-protocol + immune-system (skip sdd-propose)
 - Review → code-review-agent + judgment-day (skip sdd-*)
 ```
-**Savings**: 5-15K tokens per session
+**Savings**: 5-15K tokens/session
 
 ### 3. Context Compression Levels
 ```
@@ -85,7 +85,7 @@ IF repeat_workflow_3x → create skill
 ```
 1. mem_context (recent history, fast)
 2. mem_search (full-text, thorough)
-3. mem_get_observation (full content)
+3. mem_get_observation (full)
 ```
 
 ### Proactive Loading
@@ -96,10 +96,10 @@ IF repeat_workflow_3x → create skill
 ```
 
 
-**Proactive search**: see `engram-protocol` skill.
+
 
 ## Metrics to Track
 - Token usage/task (reduce 20%)
-- Time to first output (reduce 30%)
+- Time to first output (-30%)
 - Repeat error rate (target: 0)
 - Skill load accuracy (target 100%)

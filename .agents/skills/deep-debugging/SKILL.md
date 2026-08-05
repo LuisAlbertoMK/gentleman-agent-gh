@@ -1,6 +1,6 @@
 ---
 name: deep-debugging
-description: "Trigger: deep debug, root cause, hypothesis, multi-file bug, ambiguous failure. Hypothesis-driven debugging methodology."
+description: "Trigger: deep debug, root cause, hypothesis, multi-file bug, ambiguous failure. Hypothesis-driven debugging."
 triggers: "deep debug, root cause, hypothesis, multi-file bug, ambiguous failure, debug, RCA"
 ---
 ## When to Use

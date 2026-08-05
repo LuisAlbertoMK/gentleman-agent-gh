@@ -1,6 +1,6 @@
 ---
 name: execution-mode
-description: "Auto-detect task execution mode — QUICK/THOROUGH/DRAFT — based on scope/risk/familiarity. NOT system resource optimization (see development-mode)."
+description: "Auto-detect task execution mode - QUICK/THOROUGH/DRAFT - from scope/risk/familiarity. Not resource optimization."
 triggers: "Execution mode, quick/thorough/draft, resource adaptive, zone green/yellow/orange/red"
 ---
 
@@ -30,8 +30,6 @@ Auto-detect task execution mode — QUICK/THOROUGH/DRAFT — bas
 | 1 file | High (data loss) | Known | "delete","drop","rm" | THOROUGH (override) |
 User says "careful"/"validate" while QUICK→escalate to THOROUGH. User override wins.
 
-## Auto-detect (when unspecified)
-Scope (1-file vs multi), risk (typo vs data loss), familiarity (3x+ vs new), keywords ("fix" vs "redesign" vs "explore").
 
 ## Context Zones (via context-watchdog)
 GREEN <40%: Full depth | YELLOW 40-60%: L1+L2 compression | ORANGE 60-80%: L2+L3, compact@70% | RED >80%: mem_save+break session

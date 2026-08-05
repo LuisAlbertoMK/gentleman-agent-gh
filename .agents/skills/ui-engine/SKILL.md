@@ -9,14 +9,12 @@ UI system — Grid/Flexbox/@layer/:has(), container queries, c
 
 ## Decision Tree
 `1D→Flex|2D→Grid|Child→Subgrid|Parent→:has()|Unknown→auto-fit,minmax(280px,1fr)|CQ(container-type:inline-size)|Page→MQ`
-
 ## Layout
 `.flex{display:flex;flex-wrap:wrap;gap:1rem}.flex>*,.fi{flex:1 1 250px;min-inline-size:0}`
 `.ga{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}`
 `.pg{display:grid;grid-template-areas:"hd hd""sd mn""ft ft";grid-template-columns:250px 1fr}`
 `@layer base,components,utilities,overrides;`
 Flex:`flex:1`|`1 1 250px`|`auto`push|`margin:auto`center|`shrink:0`. Grid:`span2`|`area:hd`|`place-items:center`. Max3nest.
-
 ## Responsive
 MQ=page. CQ=components.
 `.card-wrapper{container-type:inline-size;container-name:card-cq}`
@@ -29,7 +27,7 @@ PRIM→SEM→COMP:`--blue-500→--primary→--btn-bg`
 `--s1:4px;--s2:8px;--s3:16px;--s4:24px;--s5:32px;--s6:48px;--s7:64px;--s8:96px`
 `--xs:clamp(.75rem,1.5vw,.8rem);--base:clamp(1rem,2.5vw,1.125rem);--xl:clamp(1.25rem,3.5vw,1.5rem)`
 `:root{color-scheme:light dark}[data-theme="dark"]{--sf:oklch(15%.02 260);--tx:oklch(90%.02 260)}`
-OKLCH>HSL:perceptual,dark,wide-gamut,≥4.5:1. `vw`page,`cqi`in `container-type:inline-size`.
+OKLCH>HSL:perceptual,dark,wide-gamut,≥4.5:1. `vw`=page,`cqi`=container.
 
 ## Animation
 4p:State·Feedback·Attention·Spatial. Else cut. Only `transform`/`opacity`.
@@ -45,5 +43,4 @@ State:URL→SC→TanStack Query→useState→Zustand(default)→Redux(rare). RSC
 
 ## Anti-Patterns
 Flex2D·Grid1D·!important vs @layer·flex:1 w/o min-inline-size:0·container-type:size w/o block-size·grid-auto-flow:dense·MQ for components·Decorative·>500ms·transition:all·HSL/RGB·Fixed font·cqi outside container·Prop drill>3L·DerivedStateInUseEffect·Context high-freq·HOCs new·Redux default
-
 ## Loading: ui-engine→baseline-ui→accessibility→performance

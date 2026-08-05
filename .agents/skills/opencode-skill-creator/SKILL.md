@@ -7,7 +7,7 @@ triggers: "create skill, edit skill, opencode skill, skill eval, evaluate prompt
 ## When to Use
 Create, test, evaluate, and iterate OpenCode skills with man
 
-<!-- karpathy-compressed: 2026-07-09 -->
+
 Loop: Decide → Draft → Test prompts → Run (with-skill & baseline) → Review → Iterate → Install.
 
 ## Creating a skill

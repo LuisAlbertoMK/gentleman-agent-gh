@@ -7,7 +7,7 @@ triggers: "a11y, accessibility, WCAG, screen reader, keyboard navigation, EAA, E
 ## When to Use
 WCAG 2.2 + EAA 2025 — audit and improve web accessibility.
 
-<!-- karpathy-compressed: 2026-07-09 -->
+
 ## POUR — Perceivable | Operable | Understandable | Robust
 **Perceivable**: 1.1.1 img→alt (deco→`alt=""`, icon→`aria-label`, complex→`aria-describedby`) · 1.4.3/1.4.6 Contrast: normal 4.5:1(AA)/7:1(AAA), large 3:1(AA)/4.5:1(AAA), UI/focus 3:1 · 1.2 Media: captions+desc
 **Operable**: 2.1.1 Keyboard: prefer native · **2.4.13 Focus**: min 2px solid `outline`+`outline-offset:2px` on `:focus-visible`, never `outline:none` · 2.4.1 Skip links → `#main-content` · **2.5.8 AA Targets**: ≥24×24px, **enhanced 44×44px** touch-first · 2.5.7 Dragging: single-pointer alt · 2.3 Motion: `@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}`
@@ -30,16 +30,3 @@ WCAG 2.2 + EAA 2025 — audit and improve web accessibility.
 ## Grid A11y: NEVER `grid-auto-flow: dense` on interactive (breaks DOM tab flow). Preserve source order · TEST keyboard tab through every responsive variant.
 ## REFS: [WCAG 2.2](https://www.w3.org/TR/WCAG22/) · [EAA](https://digital-strategy.ec.europa.eu/en/policies/european-accessibility-act) · [WAI-ARIA](https://www.w3.org/TR/wai-aria/) · [axe](https://www.deque.com/axe/) · baseline-ui · web-quality-audit · ui-engine
 
-## Example: Quick A11y Fix
-```css
-/* Before: no focus indicator */
-.btn { border: none; }
-
-/* After: WCAG 2.4.13 compliant */
-.btn:focus-visible {
-  outline: 2px solid var(--clr-focus, Highlight);
-  outline-offset: 2px;
-}
-/* Touch target: min 44×44px */
-.btn { min-width: 44px; min-height: 44px; }
-```

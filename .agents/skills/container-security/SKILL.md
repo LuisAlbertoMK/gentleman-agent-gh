@@ -1,6 +1,6 @@
 ---
 name: container-security
-description: "Trigger: Dockerfile, docker-compose, container, image, Kubernetes, k8s, pod, deployment, helm. Audit container security and orchestration hardening."
+description: "Trigger: Dockerfile, docker-compose, Kubernetes, k8s, pod, deployment, helm. Audit container security hardening."
 triggers: "Dockerfile, docker-compose, container, image, Kubernetes, k8s, pod, deployment, helm, docker, orchestration"
 ---
 ## When to Use

@@ -1,6 +1,6 @@
 ---
 name: e2e-testing
-description: "E2E testing - hybrid: quick simple scripts (e2t CLI) for smoke checks + Playwright test runner for comprehensive flows, assertions, visual regression, optional Ollama AI analysis."
+description: "E2E testing - hybrid: e2t CLI smoke checks + Playwright for flows, assertions, visual regression, Ollama AI analysis."
 triggers: test, e2e, playwright, browser testing, interactive testing, form testing
 ---
 

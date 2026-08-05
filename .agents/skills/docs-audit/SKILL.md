@@ -1,6 +1,6 @@
 ---
 name: docs-audit
-description: "Trigger: documentation audit, README audit, API docs, onboarding docs, Diátaxis, docs completeness. Audit documentation quality and accuracy."
+description: "Trigger: documentation audit, README audit, API docs, onboarding docs, Diataxis. Audit docs quality and accuracy."
 triggers: "documentation audit, README audit, API docs, onboarding docs, Diátaxis, docs completeness, docs review, doc audit"
 ---
 ## When to Use

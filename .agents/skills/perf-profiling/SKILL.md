@@ -1,6 +1,6 @@
 ---
 name: perf-profiling
-description: "Trigger: performance profiling, slow queries, N+1, memory leak, CPU hotspot, profiling, query optimization. Performance audit with measurement."
+description: "Trigger: performance profiling, slow queries, N+1, memory leak, CPU hotspot, query optimization. Audit with measurement."
 triggers: "performance profiling, slow queries, N+1, memory leak, CPU hotspot, profiling, query optimization"
 ---
 ## When to Use
