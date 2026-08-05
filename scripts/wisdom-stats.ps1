@@ -117,9 +117,28 @@ $result = [PSCustomObject]@{
     TotalHits       = $totalHits
     AvgAgeDays      = $avgAgeDays
 
-    RecentlyUpdated = ($patterns | Where-Object {
+    RecentlyUpdated = @($patterns | Where-Object {
         $_.updated -and (([DateTime]::Now - [DateTime]::ParseExact($_.updated, "yyyy-MM-dd", $null)).Days -le 7)
     }).Count
+}
+
+# Trend: compare with previous snapshot (if available), then persist current.
+if ($Trend) {
+    $snapDir = Join-Path (Join-Path $repoRoot "docs\metricas") "snapshots"
+    $snapFile = Join-Path $snapDir "LATEST_wisdom_stats.json"
+    $prev = $null
+    if (Test-Path $snapFile) {
+        try { $prev = Get-Content $snapFile -Raw | ConvertFrom-Json } catch { $prev = $null }
+    }
+    if ($prev -and $prev.Status -eq "OK") {
+        $result | Add-Member -NotePropertyName Previous -NotePropertyValue $prev
+        $result | Add-Member -NotePropertyName TotalDelta -NotePropertyValue ($result.Total - $prev.Total)
+        $result | Add-Member -NotePropertyName HitsDelta -NotePropertyValue ($result.TotalHits - $prev.TotalHits)
+    } else {
+        $result | Add-Member -NotePropertyName Previous -NotePropertyValue $null
+    }
+    if (-not (Test-Path $snapDir)) { New-Item -ItemType Directory -Path $snapDir -Force | Out-Null }
+    $result | ConvertTo-Json -Depth 4 | Set-Content -Path $snapFile -Encoding utf8
 }
 
 if ($Json) {

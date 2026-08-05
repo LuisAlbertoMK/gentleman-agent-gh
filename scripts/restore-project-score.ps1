@@ -70,6 +70,10 @@ if ($parseOk) {
 
 # --- Restore from git HEAD ---
 if ($needsRestore) {
+  if ($DryRun) {
+    if (-not $Quiet) { Write-Host "[dry-run] would restore .project.json to committed version" -ForegroundColor Yellow }
+    exit 0
+  }
   try {
     # skip-worktree blocks checkout, need to temporarily remove it
     & "git" "update-index", "--no-skip-worktree", ".project.json"

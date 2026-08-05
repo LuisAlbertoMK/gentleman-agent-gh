@@ -186,14 +186,14 @@ function Test-McpServer {
                 $sw.Stop()
                 return [PSCustomObject]@{
                     Status = "OK"
-                    Detail = "Remote reachable: $($uri.Host)"
+                    Detail = "Remote reachable: $ServerName ($($uri.Host))"
                     LatencyMs = $sw.ElapsedMilliseconds
                 }
             } else {
                 $sw.Stop()
                 return [PSCustomObject]@{
                     Status = "FAIL"
-                    Detail = "Remote timeout: $($uri.Host) ($TimeoutMs ms)"
+                    Detail = "Remote timeout: $ServerName ($($uri.Host)) ($TimeoutMs ms)"
                     LatencyMs = $sw.ElapsedMilliseconds
                 }
             }

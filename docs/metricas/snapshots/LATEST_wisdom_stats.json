@@ -1,0 +1,47 @@
+{
+  "Timestamp": "2026-08-05T15:30:23Z",
+  "Status": "OK",
+  "Total": 3,
+  "Errors": 0,
+  "ErrorFiles": [],
+  "SeverityDistribution": {
+    "HIGH": 2,
+    "MEDIUM": 1
+  },
+  "DomainDistribution": {
+    "css": 1,
+    "ux": 2
+  },
+  "StatusDistribution": {
+    "active": 3
+  },
+  "AvgConfidence": 0.917,
+  "TotalHits": 7.0,
+  "AvgAgeDays": 29.0,
+  "RecentlyUpdated": 0,
+  "Previous": {
+    "Timestamp": "2026-08-05T15:30:22Z",
+    "Status": "OK",
+    "Total": 3,
+    "Errors": 0,
+    "ErrorFiles": [],
+    "SeverityDistribution": {
+      "HIGH": 2,
+      "MEDIUM": 1
+    },
+    "DomainDistribution": {
+      "css": 1,
+      "ux": 2
+    },
+    "StatusDistribution": {
+      "active": 3
+    },
+    "AvgConfidence": 0.917,
+    "TotalHits": 7.0,
+    "AvgAgeDays": 29.0,
+    "RecentlyUpdated": 0,
+    "Previous": null
+  },
+  "TotalDelta": 0,
+  "HitsDelta": 0.0
+}

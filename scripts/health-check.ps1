@@ -28,7 +28,8 @@ param(
   [switch]$AutoRepair,      # Auto-fix broken junctions
   [switch]$Json,            # JSON output for agent consumption
   [switch]$Quiet,           # Exit code only, minimal output
-  [switch]$DryRun
+  [switch]$DryRun,
+  [switch]$Force
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -104,11 +105,15 @@ function Set-Junction {
 
 # ── Wrapper: Test-Junction → Repair → Re-Test → Collect ──────────────────
 function Repair-Junction {
-  param([string]$Path, [string]$ExpectedTarget, [string]$Target, [string]$Label)
+  param([string]$Path, [string]$ExpectedTarget, [string]$Target, [string]$Label, [switch]$AutoRepair, [switch]$DryRun)
   $check = Test-Junction -Path $Path -ExpectedTarget $ExpectedTarget -Label $Label
-  if ($check.status -ne "OK" -and ($script:AutoRepair -or $Force)) {
-    Set-Junction -Path $Path -Target $Target -Label $Label
-    $check = Test-Junction -Path $Path -ExpectedTarget $ExpectedTarget -Label $Label
+  if ($check.status -ne "OK") {
+    if ($DryRun) {
+      if (-not $Quiet) { Write-Output "[dry-run] would repair $Label" }
+    } elseif ($AutoRepair -or $Force) {
+      Set-Junction -Path $Path -Target $Target -Label $Label
+      $check = Test-Junction -Path $Path -ExpectedTarget $ExpectedTarget -Label $Label
+    }
   }
   $script:checks.Add($check)
   # Prompts junction degradation escalates: FAIL → exit 2, WARN → exit 1
@@ -191,7 +196,8 @@ if (Test-Path $globalSkillsDir) {
 Repair-Junction -Path (Join-Path (Join-Path (Get-GlobalConfigDir) "prompts") "sdd") `
   -ExpectedTarget "$gentlemanRoot/prompts/sdd" `
   -Target "$gentlemanRoot/prompts/sdd" `
-  -Label "vmk-prompts-junction"
+  -Label "vmk-prompts-junction" `
+  -AutoRepair:$AutoRepair -DryRun:$DryRun -Force:$Force
 
 
 
