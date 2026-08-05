@@ -132,3 +132,28 @@ Nota: opencode.json creció 52,206→53,556B (+1,350B) desde audit 08-03 — 82%
 #### Cycle 2 start
 - Scope: resolve 4 PSSA regressions via targeted renames + param moves/removals.
 - Same files as above. No cross-file coupling detected.
+
+---
+
+## Corrida 3 (2026-08-05) — protocolo v2, N=6 ciclos, umbral decreciente 5%
+
+### Baseline (setup)
+
+| Métrica | Valor |
+|---|---|
+| B1 opencode.json size | 53,556 B (budget 65,536 B) |
+| B2 Pester suite (33 archivos, incl. 4 Integration) | 732 pass / 0 fail / 0 skip |
+| B3 Gate pre-commit | 18/18 ALL CLEAR |
+| B4 Skills proyecto / global | 79 / 88 |
+| B5 npm audit vulns | 2 (1 HIGH fast-uri, 1 moderate hono) / 0 crit |
+
+### Cycle 1 — Post (2026-08-05)
+
+| Métrica | Baseline | Post-C1 | Delta | Verdict |
+|---|---|---|---|---|
+| B5 npm audit vulns | 2 (1 HIGH + 1 mod) | 0 | -100% | ✅ MEJORA |
+| B2 Pester suite | 732/0 | 732/0 | 0 | ✅ estable |
+| B1 opencode.json | 53,556 B | 53,556 B | 0 | ✅ dentro budget |
+| B3 Gate | 18/18 | 18/18 | 0 | ✅ |
+
+**Extra C1**: postinstall npm reparado (runner pwsh vs PowerShell 5.1), lock desync resuelto (server-sequential-thinking 2026.7.4).

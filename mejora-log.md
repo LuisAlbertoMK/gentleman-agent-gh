@@ -597,3 +597,33 @@ Métricas de benchmark: Pester suite completa (pass/fail), opencode.json size vs
 4. Pendientes de entorno (no código, memoria #2378): 3 junctions globales degradadas (vmk-skills/prompts, global-skills) — tarea manual
 
 ---
+
+## Ciclo 1 — 2026-08-05 (corrida 3) — npm audit: 2 vulns (fast-uri HIGH + hono moderate)
+
+**Gap**: npm audit reporta 2 vulnerabilidades transitivas: `fast-uri` 3.0.0-3.1.4 (HIGH, via ajv→MCP SDK dev) y `hono` <4.12.34 (moderate, via @hono/node-server→MCP SDK dev). Ambas con fix disponible. ICE: 7×9×8 = 504 → gap #1.
+
+**Enfoques evaluados (3)**:
+- A: `npm install` (sincroniza lock desync) + `npm audit fix` (patch/minor, sin major) — **GANADOR**: resuelve ambas sin tocar majors
+- B: `npm audit fix --force` — rechazado: major upgrades de MCP SDK con riesgo de romper el server local
+- C: overrides manuales en package.json — rechazado: innecesario si A alcanza (y A alcanzó)
+
+**Hallazgo BREAKER (bug preexistente, corregido por §3.5 cero excepciones)**: `npm install` fallaba en postinstall — `expand-config` corre con Windows PowerShell 5.1 (`powershell` en package.json) pero `expand-config.ps1`/`tokenize-all.ps1`/`bash-safe.ps1` tienen `#requires -Version 7` → ScriptRequiresUnmatchedPSVersion. Fix: runner `powershell` → `pwsh` en los 3 scripts npm. Postinstall verificado EXIT=0, sin drift en opencode.json.
+
+**Gap adicional detectado (desync lock)**: `@modelcontextprotocol/server-sequential-thinking` instalado en 2025.12.18 vs. `2026.7.4` requerido — resuelto por `npm install` (now 2026.7.4).
+
+**Cambios**:
+- `package-lock.json`: fast-uri 3.1.4→3.1.5, hono 4.12.32→4.13.0 (commit `b1b42c14`)
+- `package.json`: runner pwsh ×3 scripts (commit `f55e4562`)
+
+**Resultado Breaker/QA (3 ataques)**:
+1. npm audit → **0 vulnerabilities** (antes 2: 1 HIGH + 1 moderate)
+2. `npm ls fast-uri hono` → fast-uri@3.1.5, hono@4.13.0 (fix confirmado en node_modules)
+3. Suite Pester completa → **732/732 pass / 0 fail** (2 failures temporales durante el ciclo = check Git Hygiene por working tree dirty, no regresión — verificado al re-correr con árbol limpio)
+
+**Regla Fowler**: 2 commits atómicos (`fix(npm)` + `fix(deps)`), gate **18/18 ALL CLEAR** en cada uno.
+
+**Benchmark vs baseline**: npm vulns **2 → 0** (100%). Suite 732/0 estable. opencode.json 53,556 B sin drift. MEJORA ✅
+
+**Aprendizaje**: (1) npm corre postinstall con `powershell.exe` (5.1) en Windows aunque el shell del dev sea pwsh 7 — cualquier script con `#requires -Version 7` enganchado a npm debe declarar runner `pwsh`. (2) El check "Git Hygiene" de la suite es dependiente del estado del repo: falla con working tree dirty durante un ciclo — es un artefacto del proceso, verificar failures SIEMPRE con el árbol limpio. (3) `npm audit fix` sin `--force` resuelve vulns transitivas patch/minor sin tocar majors — preferirlo siempre primero.
+
+---
