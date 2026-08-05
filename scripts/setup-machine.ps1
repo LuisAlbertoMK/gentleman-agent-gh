@@ -19,12 +19,15 @@
     Skip global shell shortcut creation
 .PARAMETER SkipMcp
     Skip MCP server binary installation
+.PARAMETER DryRun
+    Report what would change without applying anything (no installs, no writes)
+.PARAMETER Force
+    Re-apply steps that are already in place (overrides 'already exists' skips)
 .EXAMPLE
     .\scripts\setup-machine.ps1
     .\scripts\setup-machine.ps1 -RepoDir D:\gentleman-agent-gh
 #>
 param(
-    [switch]$Quiet,
     [string]$RepoDir = (Get-Location).Path,
     [switch]$SkipEnvVar,
     [switch]$SkipShortcuts,
@@ -82,11 +85,15 @@ else {
     if ($?) { ok "pre-commit installed" } else { warn "pre-commit install failed — CI can run it standalone" }
 }
 if ($pc) {
-    $hooksPath = git config core.hooksPath 2>$null
-    if ([string]::IsNullOrEmpty($hooksPath)) {
-        py -m pre_commit install 2>$null
-        if ($?) { ok "pre-commit hooks installed" } else { warn "pre-commit hooks install failed" }
-    } else { skip "pre-commit hooks (hooksPath=$hooksPath — managed by OpenCode)" }
+    if ($DryRun) {
+        info "Would install pre-commit hooks"
+    } else {
+        $hooksPath = git config core.hooksPath 2>$null
+        if ([string]::IsNullOrEmpty($hooksPath) -or $Force) {
+            py -m pre_commit install 2>$null
+            if ($?) { ok "pre-commit hooks installed" } else { warn "pre-commit hooks install failed" }
+        } else { skip "pre-commit hooks (hooksPath=$hooksPath — managed by OpenCode)" }
+    }
 }
 
 # Step 3: OpenCode env vars
@@ -98,10 +105,13 @@ $ocVars = @{
 }
 foreach ($kv in $ocVars.GetEnumerator()) {
     $current = [Environment]::GetEnvironmentVariable($kv.Key, "User")
-    if ($current -ne $kv.Value) {
-        [Environment]::SetEnvironmentVariable($kv.Key, $kv.Value, "User")
-        Set-Item -Path "env:$($kv.Key)" -Value $kv.Value
-        ok "$($kv.Key) set"
+    if ($current -ne $kv.Value -or $Force) {
+        if ($DryRun) { info "Would set $($kv.Key)=$($kv.Value)" }
+        else {
+            [Environment]::SetEnvironmentVariable($kv.Key, $kv.Value, "User")
+            Set-Item -Path "env:$($kv.Key)" -Value $kv.Value
+            ok "$($kv.Key) set"
+        }
     } else { skip "$($kv.Key) already set" }
 }
 
@@ -114,11 +124,16 @@ if (-not $SkipShortcuts) {
     foreach ($sc in $shortcuts) {
         $ps1Path = Join-Path $npmDir "$($sc.Name).ps1"
         $cmdPath = Join-Path $npmDir "$($sc.Name).cmd"
-        if (-not (Test-Path $ps1Path)) {
+        if ($DryRun) {
+            if (-not (Test-Path $ps1Path) -or $Force) { info "Would create $ps1Path" }
+            if (-not (Test-Path $cmdPath) -or $Force) { info "Would create $cmdPath" }
+            continue
+        }
+        if (-not (Test-Path $ps1Path) -or $Force) {
             Set-Content -Path $ps1Path -Value "# $($sc.Name).ps1`n$($sc.Ps1Cmd)`nif (`$LASTEXITCODE -and `$LASTEXITCODE -ne 0) { exit `$LASTEXITCODE }"
             ok "Created $ps1Path"
         } else { skip "$ps1Path already exists" }
-        if (-not (Test-Path $cmdPath)) {
+        if (-not (Test-Path $cmdPath) -or $Force) {
             Set-Content -Path $cmdPath -Value "@echo off`n$($sc.CmdCmd)"
             ok "Created $cmdPath"
         } else { skip "$cmdPath already exists" }
@@ -130,19 +145,23 @@ info "Syncing global opencode config from repo"
 $globalConfigPath = Join-Path (Get-GlobalConfigDir) "opencode.json"
 $repoConfigPath = Join-Path $RepoDir "opencode.json"
 if ((Test-Path $globalConfigPath) -and (Test-Path $repoConfigPath)) {
-    $globalConfig = Get-Content $globalConfigPath -Raw | ConvertFrom-Json
-    $repoConfig = Get-Content $repoConfigPath -Raw | ConvertFrom-Json
-    $synced = $false
-    if (-not $globalConfig.default_agent -or $globalConfig.default_agent -ne "gentleman-vMK") {
-        $globalConfig | Add-Member -NotePropertyName "default_agent" -NotePropertyValue "gentleman-vMK" -Force
-        $synced = $true
+    if ($DryRun) {
+        info "Would sync global opencode config from repo"
+    } else {
+        $globalConfig = Get-Content $globalConfigPath -Raw | ConvertFrom-Json
+        $repoConfig = Get-Content $repoConfigPath -Raw | ConvertFrom-Json
+        $synced = $Force
+        if (-not $globalConfig.default_agent -or $globalConfig.default_agent -ne "gentleman-vMK") {
+            $globalConfig | Add-Member -NotePropertyName "default_agent" -NotePropertyValue "gentleman-vMK" -Force
+            $synced = $true
+        }
+        foreach ($section in @("mcp", "permission", "skills", "agent")) {
+            $repoValue = $repoConfig.$section
+            if ($repoValue) { $globalConfig | Add-Member -NotePropertyName $section -NotePropertyValue $repoValue -Force; $synced = $true }
+        }
+        if ($synced) { $globalConfig | ConvertTo-Json -Depth 10 | Set-Content $globalConfigPath; ok "Global config synced" }
+        else { skip "Global config already up to date" }
     }
-    foreach ($section in @("mcp", "permission", "skills", "agent")) {
-        $repoValue = $repoConfig.$section
-        if ($repoValue) { $globalConfig | Add-Member -NotePropertyName $section -NotePropertyValue $repoValue -Force; $synced = $true }
-    }
-    if ($synced) { $globalConfig | ConvertTo-Json -Depth 10 | Set-Content $globalConfigPath; ok "Global config synced" }
-    else { skip "Global config already up to date" }
 } else { warn "Global or repo config not found — sync manually" }
 
 # Step 6: Global skill config + prompts junction + AGENTS.md
@@ -150,7 +169,9 @@ info "Setting up global skill config"
 $globalSkillsDir = Join-Path (Get-GlobalConfigDir) "skills"
 $repoSkillsDir = Join-Path $RepoDir ".agents\skills"
 if (-not (Test-Path $globalSkillsDir)) { New-Item -ItemType Directory -Path $globalSkillsDir -Force | Out-Null }
-if (-not (Test-Path "$globalSkillsDir\_shared")) {
+if ($DryRun) {
+    if (-not (Test-Path "$globalSkillsDir\_shared") -or $Force) { info "Would create skills junction at $globalSkillsDir" }
+} elseif (-not (Test-Path "$globalSkillsDir\_shared") -or $Force) {
     New-CrossPlatLink -Path "$globalSkillsDir" -Target $repoSkillsDir
     if ($?) { ok "Skills junction created at $globalSkillsDir" }
     else { warn "Could not create junction (needs admin/elevation). Copy skills manually." }
@@ -161,7 +182,9 @@ $globalPromptsDir = Join-Path (Get-GlobalConfigDir) "prompts"
 $repoSddDir = Join-Path $RepoDir "prompts\sdd"
 if (Test-Path $repoSddDir) {
     $sddJunction = "$globalPromptsDir\sdd"
-    if (-not (Test-Path $sddJunction)) {
+    if ($DryRun) {
+        if (-not (Test-Path $sddJunction) -or $Force) { info "Would create prompts junction at $sddJunction" }
+    } elseif (-not (Test-Path $sddJunction) -or $Force) {
         if (-not (Test-Path $globalPromptsDir)) { New-Item -ItemType Directory -Path $globalPromptsDir -Force | Out-Null }
         New-CrossPlatLink -Path $sddJunction -Target $repoSddDir
         if ($?) { ok "Prompts junction created at $sddJunction" }
@@ -172,14 +195,17 @@ if (Test-Path $repoSddDir) {
 $globalAgentsMd = Join-Path (Get-GlobalConfigDir) "AGENTS.md"
 $repoAgentsMd = Join-Path $RepoDir "AGENTS.md"
 if (Test-Path $repoAgentsMd) {
-    if (-not (Test-Path $globalAgentsMd)) { Copy-Item -Path $repoAgentsMd -Destination $globalAgentsMd -Force; ok "AGENTS.md copied to global config" }
+    if ($DryRun) {
+        if (-not (Test-Path $globalAgentsMd) -or $Force) { info "Would copy AGENTS.md to global config" }
+    } elseif (-not (Test-Path $globalAgentsMd) -or $Force) { Copy-Item -Path $repoAgentsMd -Destination $globalAgentsMd -Force; ok "AGENTS.md copied to global config" }
     else { skip "AGENTS.md already exists in global config" }
 } else { warn "Repo AGENTS.md not found at $repoAgentsMd" }
 
 # Step 7: Install MCP server binaries
 function Install-McpServer {
-    param([string]$Name, [scriptblock]$Check, [scriptblock]$Install, [string]$ManualHint)
-    if (& $Check) { skip "$Name already installed"; return $false }
+    param([string]$Name, [scriptblock]$Check, [scriptblock]$Install, [string]$ManualHint, [switch]$DoDryRun)
+    if ((& $Check) -and -not $Force) { skip "$Name already installed"; return $false }
+    if ($DoDryRun) { info "Would install $Name"; return $false }
     try { info "Installing $Name..."; $script:LASTEXITCODE = 0; & $Install; if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw "exit code $LASTEXITCODE" }; ok "$Name installed"; return $true }
     catch { warn "$Name install failed — $ManualHint"; return $false }
 }
@@ -187,11 +213,12 @@ function Install-McpServer {
 if (-not $SkipMcp) {
     info "Installing MCP server binaries"
     $anyMcp = $false
-    $anyMcp = (Install-McpServer -Name "codebase-memory-mcp" -Check { Get-Command "codebase-memory-mcp" -EA SilentlyContinue } -Install { npm install -g codebase-memory-mcp --no-fund --no-audit --loglevel error 2>$null } -ManualHint "npm install -g codebase-memory-mcp") -or $anyMcp
-    $anyMcp = (Install-McpServer -Name "headroom" -Check { Get-Command "headroom" -EA SilentlyContinue } -Install { pip install headroom-ai -q 2>$null } -ManualHint "pip install headroom-ai") -or $anyMcp
+    $anyMcp = (Install-McpServer -Name "codebase-memory-mcp" -Check { Get-Command "codebase-memory-mcp" -EA SilentlyContinue } -Install { npm install -g codebase-memory-mcp --no-fund --no-audit --loglevel error 2>$null } -ManualHint "npm install -g codebase-memory-mcp" -DoDryRun:$DryRun) -or $anyMcp
+    $anyMcp = (Install-McpServer -Name "headroom" -Check { Get-Command "headroom" -EA SilentlyContinue } -Install { pip install headroom-ai -q 2>$null } -ManualHint "pip install headroom-ai" -DoDryRun:$DryRun) -or $anyMcp
 
     # engram — GitHub releases (GoReleaser binary)
-    if (Get-Command "engram" -EA SilentlyContinue) { skip "engram already installed" }
+    if ((Get-Command "engram" -EA SilentlyContinue) -and -not $Force) { skip "engram already installed" }
+    elseif ($DryRun) { info "Would install engram from GitHub releases" }
     else {
         info "Installing engram from GitHub releases..."
         try {
@@ -228,23 +255,28 @@ if (-not $SkipMcp) {
 # Step 7b: Ollama (vision analysis)
 if (-not $SkipVision) {
     info "Setting up Ollama for local vision analysis"
-    $ollamaCmd = Get-Command "ollama" -EA SilentlyContinue
-    if (-not $ollamaCmd) {
-        $scoopCmd = Get-Command "scoop" -EA SilentlyContinue
-        if ($scoopCmd) {
-            info "Installing Ollama via scoop..."
-            scoop install ollama 2>$null
-            if ($?) { $ollamaCmd = Get-Command "ollama" -EA SilentlyContinue; ok "Ollama installed via scoop" } else { warn "Ollama scoop install failed — download from https://ollama.com/download" }
-        } else { warn "scoop not found — install Ollama manually from https://ollama.com/download" }
-    } else { skip "Ollama already installed" }
-    $ollamaExe = if ($ollamaCmd) { $ollamaCmd.Source } else { Join-Path (Join-Path $HOME "scoop") "apps" "ollama" "current" "ollama.exe" }
-    if (Test-Path $ollamaExe) {
-        $models = & $ollamaExe list 2>$null
-        if ($models -notmatch "moondream") {
-            info "Pulling moondream:latest model (~1.7GB, vision analysis)..."
-            & $ollamaExe pull moondream:latest 2>$null
-            if ($?) { ok "moondream:latest pulled" } else { warn "moondream pull failed — run: ollama pull moondream:latest" }
-        } else { skip "moondream:latest already pulled" }
+    if ($DryRun) {
+        if (-not (Get-Command "ollama" -EA SilentlyContinue) -or $Force) { info "Would install Ollama" }
+        if (-not (Get-Command "moondream" -EA SilentlyContinue)) { info "Would pull moondream:latest model" }
+    } else {
+        $ollamaCmd = Get-Command "ollama" -EA SilentlyContinue
+        if (-not $ollamaCmd -or $Force) {
+            $scoopCmd = Get-Command "scoop" -EA SilentlyContinue
+            if ($scoopCmd) {
+                info "Installing Ollama via scoop..."
+                scoop install ollama 2>$null
+                if ($?) { $ollamaCmd = Get-Command "ollama" -EA SilentlyContinue; ok "Ollama installed via scoop" } else { warn "Ollama scoop install failed — download from https://ollama.com/download" }
+            } else { warn "scoop not found — install Ollama manually from https://ollama.com/download" }
+        } else { skip "Ollama already installed" }
+        $ollamaExe = if ($ollamaCmd) { $ollamaCmd.Source } else { Join-Path (Join-Path $HOME "scoop") "apps" "ollama" "current" "ollama.exe" }
+        if (Test-Path $ollamaExe) {
+            $models = & $ollamaExe list 2>$null
+            if ($models -notmatch "moondream") {
+                info "Pulling moondream:latest model (~1.7GB, vision analysis)..."
+                & $ollamaExe pull moondream:latest 2>$null
+                if ($?) { ok "moondream:latest pulled" } else { warn "moondream pull failed — run: ollama pull moondream:latest" }
+            } else { skip "moondream:latest already pulled" }
+        }
     }
 } else { skip "Vision setup (via -SkipVision)" }
 
@@ -269,8 +301,12 @@ foreach ($c in $checks) {
 
 if ($allOk) {
     Write-Host ""
-    Write-Host "✅ Machine setup COMPLETE" -ForegroundColor Green
-    Write-Host "   → Run 'gentleman-vmk' to launch" -ForegroundColor Cyan
+    if ($DryRun) {
+        Write-Host "✅ DRY-RUN — nothing was applied. Review steps above, then re-run without -DryRun." -ForegroundColor Cyan
+    } else {
+        Write-Host "✅ Machine setup COMPLETE" -ForegroundColor Green
+        Write-Host "   → Run 'gentleman-vmk' to launch" -ForegroundColor Cyan
+    }
 } else {
     Write-Host ""
     Write-Host "⚠️  Setup PARTIAL — review warnings above" -ForegroundColor Yellow
