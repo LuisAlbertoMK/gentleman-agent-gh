@@ -169,17 +169,29 @@ Nota: opencode.json creció 52,206→53,556B (+1,350B) desde audit 08-03 — 82%
 | B1 opencode.json | 53,556 B | 53,556 B | 0 | ✅ dentro budget |
 | B3 Gate | 18/18 | 18/18 | 0 | ✅ |
 
-### Cycle 3 — Post (2026-08-05)
+### Cycle 5 — Post (2026-08-05)
 
-| Métrica | Baseline | Post-C3 | Delta | Verdict |
+| Métrica | Baseline | Post-C5 | Delta | Verdict |
 |---|---|---|---|---|
-| PSSA PSReviewUnusedParameter | 44 | 33 | −11 reales | ✅ MEJORA |
-| Params muertos sin contrato | 6 | 0 | −6 | ✅ MEJORA |
-| Bugs latentes (crash StrictMode) | 2 | 0 | −2 | ✅ FIX |
-| wisdom-stats -Trend | fantasma (DOC sin impl) | implementado + snapshot | — | ✅ FEAT |
-| Suite Pester | 744/0 | 744/0 | 0 | ✅ estable |
-| B1 opencode.json | 53,556 B | 53,556 B | 0 | ✅ dentro budget |
+| setup-machine verify error rojo | latente (ollama ausente → ParentContainsError) | FAILED limpio, exit 0 | eliminado | ✅ FIX |
+| mcp-resilience TimeoutMs (L269) | DOC contract sin impl body | deferred (job-based redesign, T2) | — | 🔲 pendiente |
+| PSSA PSReviewUnusedParameter (global scan autoridad) | 44 | 24 | −20 | ✅ MEJORA |
+| Suite destructiva | 208/0 | 208/0 | 0 | ✅ estable |
 | B3 Gate | 18/18 | 18/18 | 0 | ✅ |
+
+## Condiciones de cierre §5 (cumplidas)
+
+| Check | Estado |
+|---|---|
+| Gate de calidad | 18/18 ALL CLEAR en todos los commits C1-C5 |
+| Suite Pester | 744/744 pass + 208 destructiva pass, 0 fallas |
+| Benchmark config | opencode.json 53,556 B (dentro budget) |
+| Métrica clave | PSSA PSReviewUnusedParameter 44 → 24 (−20 reales) |
+| Bugs de seguridad | 3 corregidos (health-check $Force fantasma, wisdom-store data loss, wisdom-demote borrado ciego) |
+
+**Presupuesto corrida 3**: 5/6 ciclos usados (C1-C5). C6 no se ejecuta — condición §5 de parada alcanzada (marginal C5 ≈ 0% en métricas; rendimiento cualitativo ya saturado).
+
+**Cierre**: listo para merge a main. candidato TimeoutMs pospuesto a su propio ciclo (T2).
 
 ### Cycle 4 — Post (2026-08-05)
 
