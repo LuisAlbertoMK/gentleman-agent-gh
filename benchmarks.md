@@ -180,3 +180,19 @@ Nota: opencode.json creció 52,206→53,556B (+1,350B) desde audit 08-03 — 82%
 | Suite Pester | 744/0 | 744/0 | 0 | ✅ estable |
 | B1 opencode.json | 53,556 B | 53,556 B | 0 | ✅ dentro budget |
 | B3 Gate | 18/18 | 18/18 | 0 | ✅ |
+
+### Cycle 4 — Post (2026-08-05)
+
+| Métrica | Baseline | Post-C4 | Delta | Verdict |
+|---|---|---|---|---|
+| PSSA PSReviewUnusedParameter | 44 | 25 | −19 (vs 33 post-C3) | ✅ MEJORA |
+| Params de contrato sin implementar | 8 | 0 | −8 | ✅ MEJORA |
+| Bugs de seguridad (data loss / borrado ciego) | 2 | 0 | −2 | ✅ FIX |
+| wisdom-store backlog loss | latente | preserved si save falla | eliminado | ✅ FIX |
+| wisdom-demote skill borrado referenciado | latente | SKIP sin -Force | eliminado | ✅ FIX |
+| sync-vmk PreserveMCP | `$false` literal vs DOC | `$true` + semántica real | alineado | ✅ FIX |
+| permission-gate -Force/-DryRun | declarados | ask→allow / evaluación pura | real | ✅ FEAT |
+| setup-machine DryRun/Force | declarados | 7 bloques gateados + re-apply | real | ✅ FEAT |
+| Suite destructiva | 208/0 | 208/0 | 0 | ✅ estable |
+| B1 opencode.json | 53,556 B | 53,556 B | 0 | ✅ dentro budget |
+| B3 Gate | 18/18 | 18/18 | 0 | ✅ |

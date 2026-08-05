@@ -685,6 +685,37 @@ Métricas de benchmark: Pester suite completa (pass/fail), opencode.json size vs
 
 ---
 
+## Ciclo 4 — 2026-08-05 (corrida 3) — Gating real de switches destructivos: 8 params de contrato resueltos + 2 bugs de seguridad
+
+**Gap**: tras C3 quedaban 8 params `Force`/`DryRun`/`Quiet` declarados por contrato destructivo pero SIN implementación real en el cuerpo (PSSA los marcaba "unused" con razón: los flags `-Force` de cmdlets no cuentan). Verificado por archivo: la mayoría son switches de scripts con operación destructiva real que el test destructive-scripts.Tests.ps1 exige declarar (L151-161: safety guard `SupportsShouldProcessing|DryRun|WhatIf|-Confirm` O param `$Force`) — declararlos y no usarlos = falsa sensación de seguridad. ICE: 8×9×6=432.
+
+**Enfoques evaluados (3)**:
+- A: Dar semántica real a cada switch (C9-v2: USAR) — **GANADOR**
+- B: Eliminar los switches muertos — parcialmente inviable: el test destructivo L86 exige param DryRun en scripts clasificados (`git push` en DOC de permission-gate) y L60-66 exige `-Force` param
+- C: Suprimir warning PSSA — rechazado (patrón de escape, la deuda de seguridad persiste)
+
+**Cambios (6 scripts)**:
+- `wisdom-store.ps1` — **fix de data loss**: el flujo borraba el archivo de backlog INCLUSO si `Save-Pattern` fallaba (excepción) o devolvía algo distinto de created/updated; además `$result` stale entre iteraciones (si Save lanza, el borrado usaba el resultado de la iteración anterior). Fix: `$rAction` se computa ANTES del borrado; se borra solo si `created|updated` o con `-Force` explícito; si no → `preserved` + warning "retry or use -Force"
+- `wisdom-demote.ps1` — **fix de borrado ciego**: sin `-Force`, SKIP del borrado de un skill dir si un pattern ACTIVO del index lo referencia (source_pattern en SKILL.md); nuevo Action `REMOVE_SKIPPED` en el reporte
+- `sync-vmk.ps1` — `PreserveMCP` (param de `Sync-Config`) estaba muerto y el caller pasaba `$false` LITERAL contradiciendo el DOC "MCP is NOT synced by design". Fix: caller `-PreserveMCP $true` + semántica real (con `$false` el canonical sobrescribe mcp del target; con `$true` se preserva — comportamiento actual intacto). `Force` (script): AGENTS.md destino ya existente → SKIP salvo `-Force` (antes sobrescribía ciegamente)
+- `permission-gate.ps1` — `Force` = override `ask`→`allow` (headless automation); `DryRun` = evaluación pura que suprime el override (`-Force -DryRun` → devuelve `ask`); nuevo campo `dry_run` en JSON. Ambos usados, contrato destructivo intacto
+- `setup-machine.ps1` — `DryRun` implementado en los 7 bloques mutadores (pre-commit hooks, env vars, shortcuts, config sync, junctions, MCP installs, Ollama) con "Would ..."; `Force` = override de los skip idempotentes (re-aplicar); kill param `Quiet` muerto (0 callers, 0 DOC, 0 tests — el único `-Quiet` del cuerpo era flag de Select-String); DOC añadido `.PARAMETER DryRun`/`.PARAMETER Force`
+
+**Resultado Breaker/QA (3 ataques)**:
+1. PSSA recheck por archivo → los 8 contratos + PreserveMCP limpiados; detectó el `Quiet` de setup-machine como 9º muerto (el breaker atrapó lo que el análisis inicial marcó como "contrato" — revisado: Quiet NO es guard destructivo, eliminado legalmente)
+2. Suite destructiva → **1 failure real**: eliminar `DryRun` de permission-gate rompió el test L86 (exige DryRun param en scripts con `git push`) — el breaker atrapó mi clasificación inicial errónea; fix C9-v2: re-añadido con semántica real (DryRun suprime el override Force), NO evasión
+3. Suite completa post-fix → **210+208 pass / 0 fail**; smoke: `permission-gate -Force` → allow vs `-Force -DryRun` → ask; `setup-machine -DryRun -SkipMcp -SkipVision -SkipShortcuts` → solo "Would ..." sin aplicar nada
+
+**Regla Fowler**: commits `933d64f1` (fix: gating real 4 scripts) + `82bdf1c2` (fix: setup-machine DryRun/Force + kill Quiet). Gate 18/18 ALL CLEAR en ambos.
+
+**Benchmark vs baseline**: PSSA PSReviewUnusedParameter **33 → 25** (8 contratos + PreserveMCP resueltos con semántica real; quedan 25 FP de scope dinámico documentados + `mcp-resilience TimeoutMs` deferred). Bugs de seguridad corregidos: 2 (data loss wisdom-store, borrado ciego wisdom-demote). Suite 208/208 destructiva + 210 sync/destructive previa. MEJORA ✅
+
+**Aprendizaje**: (1) Un switch `Force` declarado sin uso NO es cosmético: en scripts destructivos es una promesa de seguridad incumplida que el test destructivo valida solo a nivel de DECLARACIÓN — la implementación es responsabilidad del autor. (2) El test destructivo L86 exige DryRun param REAL (no solo $Force): scripts que matchean `git push` en comentarios DOC (permission-gate L31) caen en el clasificador → eliminar DryRun = test falla; la salida correcta es darle semántica (evaluación pura). (3) `$result` en loops con try/catch: si la función lanza, la variable conserva el valor de la iteración ANTERIOR — computar el outcome del save ANTES de la operación destructiva. (4) El clasificador destructivo matchea contenido crudo (comentarios incluidos): cadenas `git push` en `.EXAMPLE` de DOC son clasificadores legítimos — no "ruido". (5) C4 reveló el patrón de fondo: params de contrato = declarados por un test pero la implementación del gating queda a medias → el test valida la FORMA, no el COMPORTAMIENTO; el breaker con smoke real es lo que atrapa la diferencia.
+
+---
+
+---
+
 **Aprendizaje**: (1) En Pester 6 las funciones helper definidas a nivel raíz del archivo NO son visibles en los It — definir en `BeforeAll`. (2) Los tests de seguridad con fixtures de secretos requieren que el secrets scan del gate excluya los test files — el pathspec `*.tests.ps1` (minúscula) no matcheaba `.Tests.ps1`; case importa en pathspecs de git. (3) `git diff 2>&1` NO devuelve solo strings: los warnings de git (CRLF) llegan como ErrorRecord — siempre filtrar `-is [string]` antes de `.Trim()`. (4) Los tests que asumen "árbol limpio contra HEAD" son flaky en proyectos con runtime state auto-update (`.project.json`) — ignorar los runtime files explícitamente (patrón ya usado en verify.ps1).
 
 ---
