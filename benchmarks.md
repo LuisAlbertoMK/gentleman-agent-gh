@@ -157,3 +157,14 @@ Nota: opencode.json creció 52,206→53,556B (+1,350B) desde audit 08-03 — 82%
 | B3 Gate | 18/18 | 18/18 | 0 | ✅ |
 
 **Extra C1**: postinstall npm reparado (runner pwsh vs PowerShell 5.1), lock desync resuelto (server-sequential-thinking 2026.7.4).
+
+### Cycle 2 — Post (2026-08-05)
+
+| Métrica | Baseline | Post-C2 | Delta | Verdict |
+|---|---|---|---|---|
+| B2 Pester suite | 732/0 | 744/0 | +12 tests | ✅ MEJORA |
+| Cobertura directa scripts | 23 | 25 | +2 | ✅ MEJORA |
+| Flaky validate-write-scope | latente (T1/T3) | 4/4 estable | eliminado | ✅ FIX |
+| Gate pathspec secrets | typo latente | `*.Tests.ps1` | eliminado | ✅ FIX |
+| B1 opencode.json | 53,556 B | 53,556 B | 0 | ✅ dentro budget |
+| B3 Gate | 18/18 | 18/18 | 0 | ✅ |

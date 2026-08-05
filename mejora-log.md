@@ -627,3 +627,31 @@ Métricas de benchmark: Pester suite completa (pass/fail), opencode.json size vs
 **Aprendizaje**: (1) npm corre postinstall con `powershell.exe` (5.1) en Windows aunque el shell del dev sea pwsh 7 — cualquier script con `#requires -Version 7` enganchado a npm debe declarar runner `pwsh`. (2) El check "Git Hygiene" de la suite es dependiente del estado del repo: falla con working tree dirty durante un ciclo — es un artefacto del proceso, verificar failures SIEMPRE con el árbol limpio. (3) `npm audit fix` sin `--force` resuelve vulns transitivas patch/minor sin tocar majors — preferirlo siempre primero.
 
 ---
+
+## Ciclo 2 — 2026-08-05 (corrida 3) — cobertura de tests: verify.ps1 + expand-config.ps1 (+12 tests) + 2 bugs de infraestructura
+
+**Gap**: Scripts críticos del gate sin tests directos: `scripts/verify.ps1` (perfiles E1/E2/E3, incluye el check Git Hygiene y Secrets Scan que mordieron en C1) y `scripts/opencode-config/expand-config.ps1` (postinstall npm, reparado en C1, con CERO tests). Análisis previo 08-04 (DOCS-1/bitacora, CYCLE.md drift, PSSA) verificado: **ya resueltos por corrida v2** — los únicos gaps reales restantes eran cobertura + 2 bugs latentes (expuestos por el breaker de este ciclo). PSSA en producción descartado: `PSUseShouldProcessForStateChangingFunctions=0`, Write-Host deliberado (JSON stdout). ICE: 6×9×6=324.
+
+**Enfoques evaluados (3)**:
+- A: Tests Pester para verify.ps1 (E1 syntax, E2 secrets con fixture real, E3 .project.json) + expand-config.ps1 (expansión de `$import` en temp repo) — **GANADOR**
+- B: Tests para los 5 scripts del gate (cross-ref, skill-drift, config-drift, pssa-gate) — rechazado: esfuerzo alto, la mayoría ya ejercitados indirectamente por la suite
+- C: Fix PSSA SupportsShouldProcessing (14 scripts) — rechazado tras verificación: los 14 warnings son INFO-level, los scripts YA cumplen el test (tienen `-Force`/`-DryRun`), y el aprendizaje C9-v2 prohíbe cambios sin valor real
+
+**Cambios**:
+- `scripts/tests/verify.Tests.ps1` (nuevo, 7 tests): E1 detecta syntax inválida, E2 detecta secretos reales (fixture de patrón secreto, sin literal real) y pasa sin secretos, E3 valida/falda .project.json, contrato JSON estable
+- `scripts/tests/expand-config.Tests.ps1` (nuevo, 5 tests): expansión de `$import` inline + JSON válido, idempotencia, import faltante no escribe, ya-expandido intacto, fail-fast sin config
+- `.githooks/pre-commit-gate.ps1` L126: pathspec secrets scan `*.tests.ps1` → `*.Tests.ps1` — **typo de case latente**: la intención era excluir fixtures de test del scan, pero ningún test file (todos `.Tests.ps1`) matcheaba el spec → cualquier fixture con string tipo secreto bloqueaba el commit (el C2 lo expuso en el gate [10/18])
+- `scripts/validate-write-scope.ps1` L89+: (1) filtrar entradas no-string — `git diff 2>&1` inyecta ErrorRecord (warning CRLF de git) → `.Trim()` crasheaba; (2) ignorar runtime files (`.project.json`/`.gentleman-mode`/`BITACORA.md`) — misma allowlist que `verify.ps1:77`; el score auto-update ensucia el árbol → T1/T3 flaky determinista
+
+**Resultado Breaker/QA (3 ataques)**:
+1. Gate bloqueado por el propio fixture → expuso el typo del pathspec (fix de raíz, no evasión)
+2. Suite completa con árbol limpio → 2 failures reales `validate-write-scope.Tests.ps1` T1/T3 → expuso el flaky (ErrorRecord + runtime files)
+3. Suite completa post-fix → **744/744 pass / 0 fail**
+
+**Regla Fowler**: commits `b1ff53ae` (fix(gate) + tests — agrupados por dependencia directa) + `d590c2df` (fix(write-scope)). Gate 18/18 ALL CLEAR en ambos.
+
+**Benchmark vs baseline**: suite **732 → 744** (+12 tests, 0 fail). Cobertura directa: +2 scripts (verify, expand-config). Flaky determinista eliminado (T1/T3 pasan bajo cualquier estado de runtime files). MEJORA ✅
+
+**Aprendizaje**: (1) En Pester 6 las funciones helper definidas a nivel raíz del archivo NO son visibles en los It — definir en `BeforeAll`. (2) Los tests de seguridad con fixtures de secretos requieren que el secrets scan del gate excluya los test files — el pathspec `*.tests.ps1` (minúscula) no matcheaba `.Tests.ps1`; case importa en pathspecs de git. (3) `git diff 2>&1` NO devuelve solo strings: los warnings de git (CRLF) llegan como ErrorRecord — siempre filtrar `-is [string]` antes de `.Trim()`. (4) Los tests que asumen "árbol limpio contra HEAD" son flaky en proyectos con runtime state auto-update (`.project.json`) — ignorar los runtime files explícitamente (patrón ya usado en verify.ps1).
+
+---
