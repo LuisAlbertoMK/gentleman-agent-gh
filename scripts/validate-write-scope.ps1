@@ -22,7 +22,8 @@
 #>
 param(
     [Parameter(Mandatory)]
-    [string]$AllowedPaths,
+    [System.Management.Automation.AllowEmptyCollection()]
+    [string[]]$AllowedPaths,
     [string]$BaseRef = "HEAD",
     [switch]$Staged,
     [switch]$Json
@@ -83,6 +84,10 @@ if ($null -eq $gitOutput) {
     $changedFiles = @($gitOutput)
 }
 
+# Filter empty/whitespace entries: a clean tree makes `git diff --name-only` emit a
+# single empty string, which would otherwise be scored as a false-VIOLATION.
+$changedFiles = @($changedFiles | Where-Object { $_ -and [string]$_.Trim() })
+
 if ($changedFiles.Count -eq 0) {
     if ($Json) {
         @{ status = "CLEAN"; violations = @(); clean = @(); totalChanged = 0; totalViolations = 0; message = "No changed files detected" } | ConvertTo-Json -Depth 3
@@ -124,8 +129,11 @@ foreach ($file in $changedFiles) {
                 break
             }
         } catch {
-            # Invalid pattern - skip it, don't crash
-            Write-Debug "Invalid pattern '$pattern': $($_.Exception.Message)"
+            # Invalid pattern -> fail CLOSED. A malformed pattern must never let a
+            # violating file through as CLEAN (silent skip was a fails-open risk).
+            $msg2 = "Invalid pattern '$pattern': $($_.Exception.Message)"
+            if ($Json) { @{ status = 'error'; message = $msg2 } | ConvertTo-Json } else { Write-Output "ERROR: $msg2" }
+            exit 1
         }
     }
     if ($matched) {

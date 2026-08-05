@@ -28,8 +28,7 @@ param(
   [switch]$AutoRepair,      # Auto-fix broken junctions
   [switch]$Json,            # JSON output for agent consumption
   [switch]$Quiet,           # Exit code only, minimal output
-  [switch]$DryRun,
-  [switch]$Force
+  [switch]$DryRun
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'

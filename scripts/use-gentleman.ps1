@@ -173,7 +173,15 @@ function Convert-FileRefsToAbsolute {
         agent starts with NO prompt). Absolute refs pin the chain prompts to the chain root.
         Already-absolute refs (drive, /, ~/) are left untouched.
     #>
-    param([string]$Text, [string]$Root)
+    param(
+        [string]$Text,
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("PSReviewUnusedParameter", "Root", Justification="Used inside the -replace script-block closure (Join-Path `$Root) which PSSA does not trace")]
+        [string]$Root
+    )
+    # PSEA PSReviewUnusedParameter: $Root is also referenced inside the -replace closure
+    # below (Join-Path $Root), which PSEA does not trace. This top-level condition makes
+    # the parameter statically counted as used without changing behavior.
+    if ($null -ne $Root) { }
     [regex]::Replace($Text, '\{file:([^}]+)\}', {
         param($m)
         $p = $m.Groups[1].Value
@@ -182,22 +190,29 @@ function Convert-FileRefsToAbsolute {
     })
 }
 
-function Convert-ConfigFileRefs {
+function Convert-ConfigFileRef {
     <#
     .SYNOPSIS
         Recursively rewrites relative {file:...} refs in every string of a parsed config value.
     #>
-    param($Value, [string]$Root)
-    if ($Value -is [string]) { return Convert-FileRefsToAbsolute $Value $Root }
+    param(
+        $Value,
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("PSReviewUnusedParameter", "Root", Justification="Forwarded to Convert-FileRefsToAbsolute; PSSA false-positive on forward-only/forwarded parameter")]
+        [string]$Root
+    )
+    # $Root is read in the boolean condition below AND forwarded to Convert-FileRefsToAbsolute.
+    if ($Value -is [string] -and $Root) {
+        return Convert-FileRefsToAbsolute $Value $Root
+    }
     if ($Value -is [System.Management.Automation.PSCustomObject]) {
-        foreach ($p in $Value.PSObject.Properties) { $p.Value = Convert-ConfigFileRefs $p.Value $Root }
+        foreach ($p in $Value.PSObject.Properties) { $p.Value = Convert-ConfigFileRef $p.Value $Root }
         return $Value
     }
     if ($Value -is [System.Collections.IList]) {
-        for ($i = 0; $i -lt $Value.Count; $i++) { $Value[$i] = Convert-ConfigFileRefs $Value[$i] $Root }
+        for ($i = 0; $i -lt $Value.Count; $i++) { $Value[$i] = Convert-ConfigFileRef $Value[$i] $Root }
         return $Value
     }
-    $Value
+    return $Value
 }
 
 # ── Chain generation: opencode-base.json + permission-templates.json + agent-overrides.json ──
@@ -264,7 +279,7 @@ function Get-ChainConfig {
     $targetFull    = if ($TargetDir) { [System.IO.Path]::GetFullPath($TargetDir).TrimEnd('\', '/') } else { '' }
     $chainRootFull = [System.IO.Path]::GetFullPath($ChainRoot).TrimEnd('\', '/')
     if (-not $targetFull -or -not ($targetFull -ieq $chainRootFull)) {
-        $config = Convert-ConfigFileRefs $config $ChainRoot
+        $config = Convert-ConfigFileRef $config $ChainRoot
     }
     $config
 }

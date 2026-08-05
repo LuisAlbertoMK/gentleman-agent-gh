@@ -454,3 +454,18 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
   - B3 score 9.3/10 (stable), Cycle Activity 3.0, Script Performance 9.0, 4 PSSA pre-existing (no new) ✅
   - B4 gate 17/17 ✅ ; B5 Pester 2/2 ✅
 - **Conclusión**: neutro — 0 regresiones, 0 mejora (neutral). Dentro umbral <10% parada. Condición §5 cumplida para este gap: sobrevive Breaker 3×, benchmark ≥baseline, neutral.
+
+---
+
+### Cycle 1 — Close (write-scope fail-closed + test)
+
+- **Gap**: `validate-write-scope.ps1` catch block silently skipped malformed glob patterns (Write-Debug only) — fails-open risk: a malformed pattern could let a violating file through as CLEAN.
+- **Fix**: Replaced silent skip with fail-closed: emit ERROR (respect -Json), `exit 1`.
+- **ADR**: `adr/ADR-015-write-scope-failclosed.md` — root cause + decision (fail-closed).
+- **Verification**: Parser::ParseFile 0 errors; Pester `tests/validate-write-scope.Tests.ps1` 4/4 pass.
+
+### Cycle 2 — Kickoff (PSSA regressions)
+
+- **Gap**: score-auto gate flagged 4 PSSA regressions vs gate baseline: `use-gentleman.ps1` PSUseSingularNouns 0→1 (`Convert-ConfigFileRefs`), `token-count.ps1` PSReviewUnusedParameter 0→1 (`Divisor`), `health-check.ps1` PSReviewUnusedParameter 2→3 (+1).
+- **Fix**: (A) Rename `Convert-ConfigFileRefs` → `Convert-ConfigFileRef` (4 call-sites, no cross-file usage). (B) Move `$Divisor` into `Get-TokenCount` function param (removes script-level unused param). (C) Remove unused `$Force` param from `health-check.ps1` (brings 3→2 = baseline).
+- **Verification**: PSSA re-run BEFORE/AFTER on each file; count returns to baseline (1→0, 1→0, 3→2).

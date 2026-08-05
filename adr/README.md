@@ -19,5 +19,6 @@
 | [ADR-011](ADR-011-mejora-autonoma-v2-kickoff.md) | Mejora Autónoma v2 — kickoff | 2026-08-04 | Accepted |
 | [ADR-012](ADR-012-sync-global-deny-count-fix.md) | sync-global deny-count fix | 2026-08-04 | Accepted |
 | [ADR-013](ADR-013-backlog5-criterion-conjunctive.md) | Backlog 5 criterion conjunctive | 2026-08-04 | Accepted |
+| [ADR-015](ADR-015-write-scope-failclosed.md) | Write-scope fail-closed on invalid patterns | C1-close | Malformed pattern → ERROR + exit 1 |
 
 **Convención**: Status = Accepted salvo indicación; decisiones con `confidence: high` verificadas por breaker por ciclo.

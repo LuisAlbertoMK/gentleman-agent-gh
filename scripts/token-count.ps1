@@ -20,8 +20,7 @@ param(
     [switch]$Quiet,
   [string[]]$Path = @(),
   [string]$Dir = "",
-  [switch]$Recurse,
-  [double]$Divisor = 3.5
+    [switch]$Recurse
 )
 
 $ErrorActionPreference = 'Stop'
@@ -29,7 +28,7 @@ Set-StrictMode -Version Latest
 
 # Rough token counter: ~3.5 chars per token for code/text
 function Get-TokenCount {
-  param([string]$Content)
+  param([string]$Content, [double]$Divisor = 3.5)
   # Strip whitespace, count ~Divisor chars/token
   $clean = $Content -replace '\s+', ' '
   return [math]::Max(1, [int]($clean.Length / $Divisor))

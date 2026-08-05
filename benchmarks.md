@@ -107,4 +107,28 @@ Nota: opencode.json creció 52,206→53,556B (+1,350B) desde audit 08-03 — 82%
 | B2 BenchmarkSeconds | 1.012s | 1.092s | −7.3% (ruido) | ✅ |
 | B3 Score | 9.3/10 (Cycle Activity 3.0, Script Performance 9.0) | 9.3/10 | 0.0% | ✅ estable · 4 PSSA pre-existing (no new) |
 | B4 Gate pre-commit | 17/17 | 16/16 | +1 step | ✅ |
-| B5 Pester size tests | 2/2 | nuevo | — | ✅ |
+| B5 Pester size tests | 2/2 | nuevo | — | ✅
+
+---
+
+### Cycle 1 Close + Cycle 2 start (2026-08-04)
+
+#### PSSA regression table (before → after)
+
+| File | Rule | Before | After | Delta |
+|---|---|---|---|---|
+| `scripts/validate-write-scope.ps1` | fail-closed catch | fails-open | fail-closed (exit 1) | FIX |
+| `scripts/use-gentleman.ps1` | PSUseSingularNouns | 1 | 0 | ✅ fixed (renamed Convert-ConfigFileRefs → Convert-ConfigFileRef) |
+| `scripts/token-count.ps1` | PSReviewUnusedParameter | 1 | 0 | ✅ fixed (moved $Divisor into Get-TokenCount) |
+| `scripts/health-check.ps1` | PSReviewUnusedParameter | 3 | 2 | ✅ fixed (removed unused $Force; matches baseline) |
+
+**Total PSSA regressions**: 4 → 0. All counts returned to gate baseline.
+
+#### Cycle 1 Close verification
+- Parser::ParseFile on validate-write-scope.ps1: 0 errors
+- Pester `tests/validate-write-scope.Tests.ps1`: 4/4 pass
+- PSSA re-run: use-gentleman (1→0), token-count (1→0), health-check (3→2)
+
+#### Cycle 2 start
+- Scope: resolve 4 PSSA regressions via targeted renames + param moves/removals.
+- Same files as above. No cross-file coupling detected.
