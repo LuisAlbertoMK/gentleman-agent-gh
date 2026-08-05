@@ -1,3 +1,4 @@
+2026-08-04 - Session close
 2026-08-03 - Session close
 2026-08-02 - Cierre experimento N-ciclos: C6 engram-compact (e1a2d9a0), junction prompts/sdd reparada, gh 2.97.0 instalado
 2026-08-02 - Commit a86f5342: 25 shortcuts versionados en commands/ (SSoT) + sync-global step 2b hash-based; 3 enfoques benchmarkeados (A/B/C), A gana; SHORTCUTS.md doc actualizado; stale 07-24 resuelto; E1 37/37, E2 25/25, E3 converge; gate 13/13. Push a origin/plan/globalize
