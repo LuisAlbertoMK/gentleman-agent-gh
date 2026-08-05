@@ -719,3 +719,51 @@ Métricas de benchmark: Pester suite completa (pass/fail), opencode.json size vs
 **Aprendizaje**: (1) En Pester 6 las funciones helper definidas a nivel raíz del archivo NO son visibles en los It — definir en `BeforeAll`. (2) Los tests de seguridad con fixtures de secretos requieren que el secrets scan del gate excluya los test files — el pathspec `*.tests.ps1` (minúscula) no matcheaba `.Tests.ps1`; case importa en pathspecs de git. (3) `git diff 2>&1` NO devuelve solo strings: los warnings de git (CRLF) llegan como ErrorRecord — siempre filtrar `-is [string]` antes de `.Trim()`. (4) Los tests que asumen "árbol limpio contra HEAD" son flaky en proyectos con runtime state auto-update (`.project.json`) — ignorar los runtime files explícitamente (patrón ya usado en verify.ps1).
 
 ---
+
+## Ciclo 5 — 2026-08-05 (corrida 3) — Fix verify setup-machine (error rojo con ollama ausente)
+
+**Gap**: bug pre-existente visto en el smoke del C4: `setup-machine.ps1` Step 8 Verify reportaba un error rojo (`ParentContainsErrorRecordException: variable cannot be retrieved` → `property 'Source' cannot be found`) cuando `ollama` no estaba instalado, en vez de un `[warn] ... - FAILED` limpio. Root cause verificado: (1) `$ollamaExe` se define SOLO dentro `if (-not $SkipVision)` (L249-277) pero el check L294 del verify lo referenciaba → con -SkipVision o ollama ausente, variable inexistente; (2) `(Get-Command "ollama" -EA SilentlyContinue).Source` sobre $null lanza `ParentContainsErrorRecordException` (el `-EA SilentlyContinue` suprime el "command not found" de Get-Command, pero `.Source` sobre $null no se suprime); (3) `& ollama list 2>$null -match "moondream"` parseaba `-match` como argumento a `ollama` (no como operador PowerShell), dando false positive (ollama existente = PASS aunque no tuviera moondream). ICE: 1×1×1=1.
+
+**Enfoques**: A: resolver `$ollamaExe` inline en el check con operador `?.` + `Test-Path` (no depender de scope del Step 7b) — **GANADOR**.
+
+**Cambios**:
+- L294: `{ & ollama list 2>$null -match "moondream" }` → `{ $exe = (Get-Command "ollama" -EA SilentlyContinue)?.Source; if (-not $exe) { $exe = Join-Path (Join-Path $HOME "scoop") "apps" "ollama" "current" "ollama.exe" }; if ($exe -and (Test-Path $exe)) { (& $exe list 2>$null) -match "moondream" } else { $false } }` — `-match` opera sobre el OUTPUT capturado `(& $exe list)`, no como argumento a ollama; `?.` evita el crash sobre $null.
+
+**Resultado Breaker/QA**:
+1. PSSA setup-machine → CLEAN
+2. Smoke `setup-machine -DryRun -SkipMcp -SkipVision -SkipShortcuts`: antes error rojo stacktrace → ahora `[warn] Vision: moondream model - FAILED` (limpio), `exit=0`
+3. PSSA global autoridad (`Invoke-ScriptAnalyzer PSReviewUnusedParameter` sobre todos los scripts): **24 warnings** (confirmado conteo real — mi inferencia de 25 post-C4 estaba 1 punto alto por FP de scope dinámico)
+4. Destructiva 208/208
+
+**Commit**: `1a259e9b` (fix). Gate 18/18 ALL CLEAR.
+
+**Benchmark vs baseline**: PSSA PSReviewUnusedParameter global **44 → 24** (−20 reales en 5 ciclos; C5 = −1 respecto al post-C4 de 25, corregido al escaneo autoridad real). Suite destructiva 208/208. MEJORA ✅
+
+**Aprendizaje**: (1) Un check de verify que referencia una variable definida en un bloque condicional (`if (-not $SkipVision)`) seRompe en las rutas que saltan ese bloque → verificaciones deben ser AUTÓNOMAS (resolver recursos inline, no depender de state del setup). (2) `Get-Command "x" -EA SilentlyContinue` devuelve $null → `.Source` lanza `ParentContainsErrorRecordException`; usar `?.` en PS 7+ (`Get-Command "x" -EA SilentlyContinue)?.Source`). (3) `& cmd -flag "x"` dentro de un scriptblock de test NO equivale a `-match` de PowerShell: se pasa como argumento al proceso → el verify original daba false positive (ollama existente = PASS aunque no tuviera moondream); el fix opera `-match` sobre el *output* capturado `(& $exe list 2>$null)`. (4) El count PSSA global por escaneo autoridad (24) difiere de la inferencia por-delta (25) — los FPs de scope dinámico (closure/scriptblock) hacen que estimar el total por deltas acumule ±1; usar el escaneo real como source of truth.
+
+---
+
+## C6 — Cierre de corrida 3 (2026-08-05)
+
+**Presupuesto**: 5/6 ciclos usados (C1-C5). C6 no ejecutado: condición §5 de parada alcanzada (marginal C5 ≈ 0% en métricas; valor cualitativo saturado — 3 bugs de seguridad corregidos, PSSA 44→24).
+
+**Condiciones §5 de cierre (todas cumplidas)**:
+| Check | Estado |
+|---|---|
+| Gate de calidad | 18/18 ALL CLEAR en los 9 commits C1-C5 |
+| Suite Pester | 744/744 + destructiva 208/208, **0 fallas** |
+| opencode.json | 53,556 B / budget 65,536 B ✅ |
+| Métrica clave | PSSA PSReviewUnusedParameter 44 → 24 (−20) |
+| Bugs de seguridad | 3 corregidos (health-check $Force fantasma/crash latente, wisdom-store data loss, wisdom-demote borrado ciego) |
+| Write-scope | todos los cambios en scripts/*, verify.ps1 corrió 2/2 |
+
+**Commits de la corrida 3**:
+- C1: `f55e4562` (fix(npm) runner pwsh), `b1b42c14` (fix(deps) fast-uri hono), `049f9d4a` (docs C1)
+- C2: `b1ff53ae` (fix(gate) pathspec + tests), `d590c2df` (fix(write-scope))
+- C3: `cd86b9a2` (chore eliminar 6 params), `0c85c5cf` (fix 2 bugs latentes), `49c16e80` not... (docs C3) — [nota: 49c16e80 fue docs C3]
+- C4: `933d64f1` (fix gating 4 scripts), `82bdf1c2` (fix setup-machine), `80e9acdc` (docs C4)
+- C5: `1a259e9b` (fix verify moondream check)
+
+**Pendiente (candidato corrida 4/T2, no C6)**: `mcp-resilience.ps1` `TimeoutMs` (L269, función `Invoke-McpWithRetry`) — DOC contract sin implementación real en el body (usa timeout hardcodeado de `Invoke-WebRequest -TimeoutSec`), requiere rediseño job-based con callers → T2 (multi-file, arquitectura), merece análisis dedicado.
+
+**Propuesta**: merge `experimento/mejora-autonoma-2026-08-05` → main. Riesgo bajo (suite 744+208, gate 18/18, PSSA 44→24, 3 bugs de seguridad). TimeoutMs pospuesto.
