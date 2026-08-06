@@ -24,8 +24,19 @@ Quick-reference troubleshooting for gentleman-agent-gh operations.
 | Symptom | Diagnosis | Fix | Prevention |
 |---------|-----------|-----|------------|
 | Subagent returns empty/wrong output | Agent hit context limit or misunderstood scope | Check agent's `_return-contract.md` output. Retry with narrower scope | Use `subagent-isolation` skill; keep delegation contracts precise |
+| **Subagent "completed" but no output** | (a) Free-tier model hit output truncation, (b) stdout truncated by verbose verification, (c) model fell back to `general` due to `mode: primary` not being delegable | Run `git diff --name-only HEAD` — if empty, treat as silent failure. Retry with narrower scope (max 2 files). If still empty → escalate | Post-delegation git verification is MANDATORY. Never trust "completed" without diff proof. See `gentleman-vMK.md` post-delegation gate |
 | Write-scope violation detected | Subagent wrote outside declared allowed_paths | Report to user. Use `git checkout -- <file>` to revert violations | Declare precise allowed_paths in delegation contract |
 | Agent fails 2x consecutively | Root cause unclear or task too complex | STOP delegation. Report to user in natural language. Consider: (a) broader search, (b) different agent, (c) manual intervention | Follow Failure Escalation protocol in orchestrator prompt |
+
+### Post-Delegation Output Verification Protocol
+
+**MANDATORY for ALL subagent delegations** — enforced by `gentleman-vMK.md`:
+
+1. **Git diff check**: `git diff --name-only HEAD` — if EMPTY → subagent produced NO changes
+2. **Git status check**: `git status --short` — verify expected files appear
+3. **Empty output protocol**: If diff is empty AND subagent said "completed" → **SILENT FAILURE**
+4. **Retry**: Narrower scope (max 2 files). If still empty → escalate to human
+5. **File-based fallback**: If stdout may truncate (verbose output, multi-file), instruct subagent to write 4-field report to `docs/agentes/{task}/05-completion-report.md` and echo only the file path
 
 ## Memory System Issues
 

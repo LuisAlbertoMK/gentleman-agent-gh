@@ -48,6 +48,12 @@ Suite of **79 skills** (+ `_shared`) + **83 PowerShell scripts** for [OpenCode](
 | `gentleman-quick-sub` | mimo-v2.5-free | Fast executor subagent — delegable via Task tool |
 | `gentleman-implementer-sub` | deepseek-v4-flash-free | Plan executor subagent — delegable via Task tool |
 | `gentleman-security-sub` | nemotron-3-ultra-free | Security audit subagent (read-only) — delegable via Task tool |
+| `gentleman-seo-sub` | nemotron-3-ultra-free | SEO/content audit subagent (read-only) — delegable via Task tool |
+| `gentleman-infra-sub` | deepseek-v4-flash-free | Infrastructure subagent (read-only) — delegable via Task tool |
+| `gentleman-frontend-sub` | kimi-k2.5-free | Frontend/UI subagent (read-only) — delegable via Task tool |
+| `gentleman-performance-sub` | nemotron-3-ultra-free | Performance subagent (read-only) — delegable via Task tool |
+| `gentleman-datascience-sub` | mimo-v2.5-free | Data science subagent (read-only) — delegable via Task tool |
+| `gentleman-docs-sub` | big-pickle | Documentation subagent (read-only) — delegable via Task tool |
 | `sdd-orchestrator` | claude-sonnet-4-6 | SDD pipeline orchestration |
 | `gentleman-deep-auto` | nemotron-3-ultra-free | — AUTO mode (same model, `*: allow`) |
 | `gentleman-quick-auto` | mimo-v2.5-free | — AUTO mode (same model, `*: allow`) |

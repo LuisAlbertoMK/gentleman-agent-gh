@@ -81,6 +81,18 @@ After EVERY delegation that modifies files:
 
 Runtime enforcement — not advisory. Catches ~30% of subtle bugs in ~10 seconds.
 
+## Post-Delegation Output Verification (MANDATORY for ALL delegations)
+
+Before trusting ANY subagent output — ALWAYS verify the work was actually done:
+
+1. **Git diff check**: `git diff --name-only HEAD` — if output is EMPTY, subagent produced NO file changes
+2. **Git status check**: `git status --short` — verify expected files appear as Modified/Created
+3. **Empty output protocol**: If diff is empty AND subagent reported "completed" →
+   treat as SILENT FAILURE. Do NOT trust the subagent's return.
+4. **Retry protocol**: Retry with narrower scope (max 1-2 files). If still empty → STOP, escalate to human.
+5. **Root cause**: Empty output typically means: (a) free-tier model hit output truncation, (b) stdout was truncated by verbose verification, (c) model fell back to `general` due to `mode: primary` not delegating. See `docs/mejoras/2026-08-01-custom-agents-runtime-fallback.md` + `mejora-log.md:571`.
+6. **Budget pre-check**: If delegation spans >5 files OR >50 lines of changes OR >3 tool calls expected → do NOT delegate. Use `delivery-harness` to break into isolated work units, OR handle in orchestrator bash with controlled output.
+
 ## Failure Escalation
 
 If agent fails 2x → STOP. Report to human in natural language (not raw YAML):

@@ -111,7 +111,7 @@ if ($sizeBytes -gt $MaxBytes) {
   Add-Check 'config-size-budget' $true "$sizeBytes B within budget $MaxBytes B"
 }
 
-$twins = @('gentleman-deep-sub', 'gentleman-quick-sub', 'gentleman-implementer-sub', 'gentleman-security-sub')
+$twins = @('gentleman-deep-sub', 'gentleman-quick-sub', 'gentleman-implementer-sub', 'gentleman-security-sub', 'gentleman-seo-sub', 'gentleman-infra-sub', 'gentleman-frontend-sub', 'gentleman-performance-sub', 'gentleman-datascience-sub', 'gentleman-docs-sub')
 foreach ($t in $twins) {
   $a = $cfg.agent.$t
   if (-not $a) { Add-Check "twin-$t" $false 'missing from opencode.json' }
@@ -129,7 +129,7 @@ if (-not $orchTask -or $orchTask.'*' -ne 'deny') {
   else { Add-Check 'orch-task-failclosed' $true 'fail-closed with all 4 twins allowed' }
 }
 
-$readOnly = @('gentleman-security', 'gentleman-seo', 'gentleman-infra', 'gentleman-frontend', 'gentleman-performance', 'gentleman-datascience', 'gentleman-docs', 'gentleman-security-sub')
+$readOnly = @('gentleman-security', 'gentleman-seo', 'gentleman-infra', 'gentleman-frontend', 'gentleman-performance', 'gentleman-datascience', 'gentleman-docs', 'gentleman-security-sub', 'gentleman-seo-sub', 'gentleman-infra-sub', 'gentleman-frontend-sub', 'gentleman-performance-sub', 'gentleman-datascience-sub', 'gentleman-docs-sub')
 $roFail = @($readOnly | Where-Object { $cfg.agent.$_.permission.bash.'*' -ne 'deny' })
 if ($roFail) { Add-Check 'readonly-bash-deny' $false "not deny: $($roFail -join ', ')" }
 else { Add-Check 'readonly-bash-deny' $true "$($readOnly.Count) read-only agents deny bash.*" }

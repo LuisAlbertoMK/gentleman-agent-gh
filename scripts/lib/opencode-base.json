@@ -379,6 +379,48 @@
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-docs.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}"
     },
+    "gentleman-seo-sub": {
+      "description": "Technical SEO analyst subagent — three-pillar audit, E-E-A-T, schema validation (delegable via Task tool, read-only)",
+      "model": "opencode/nemotron-3-ultra-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-seo.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}"
+    },
+    "gentleman-infra-sub": {
+      "description": "Infrastructure subagent — container security, K8s reliability, IaC quality, CI/CD security (delegable via Task tool, read-only)",
+      "model": "opencode/deepseek-v4-flash-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-infra.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}"
+    },
+    "gentleman-frontend-sub": {
+      "description": "Frontend subagent — WCAG 2.2 AA, component architecture, design tokens (delegable via Task tool, read-only)",
+      "model": "opencode/kimi-k2.5-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-frontend.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}"
+    },
+    "gentleman-performance-sub": {
+      "description": "Performance subagent — Amdahl's Law, N+1, complexity, profiling (delegable via Task tool, read-only)",
+      "model": "opencode/nemotron-3-ultra-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-performance.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}"
+    },
+    "gentleman-datascience-sub": {
+      "description": "Data science subagent — data quality, SQL audit, statistical validity (delegable via Task tool, read-only)",
+      "model": "opencode/mimo-v2.5-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-datascience.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}"
+    },
+    "gentleman-docs-sub": {
+      "description": "Documentation subagent — Diátaxis framework, completeness audit (delegable via Task tool, read-only)",
+      "model": "opencode/big-pickle",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-docs.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}"
+    },
     "gentleman-implementer": {
       "description": "Plan executor specialist — implements plans from specialized agents, no deviations (FREE TIER)",
       "model": "opencode/deepseek-v4-flash-free",

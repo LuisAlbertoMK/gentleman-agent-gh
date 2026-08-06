@@ -16,12 +16,12 @@ triggers: "model router, routing, delegate or direct, model decision, specialize
 | Task | Action | Agent | Model | Fallback |
 |------|--------|-------|-------|----------|
 | Security/vulnerability ✅ | DELEGATE | `gentleman-security-sub` | Nemotron 3 Ultra Free (1M) | `gentleman-deep-sub` → `general` |
-| SEO/content ⚠️ | DELEGATE | `gentleman-seo` | Nemotron 3 Super Free | `general` |
-| Infrastructure/K8s/Terraform ⚠️ | DELEGATE | `gentleman-infra` | DeepSeek V4 Flash Free (1M) | `general` |
-| Frontend/UI/a11y ⚠️ | DELEGATE | `gentleman-frontend` | Kimi K2.5 Free (262K) | `general` |
-| Performance/profiling ⚠️ | DELEGATE | `gentleman-performance` | Nemotron 3 Ultra Free (1M) | `general` |
-| Data/SQL/Python ⚠️ | DELEGATE | `gentleman-datascience` | MiMo V2.5 Free | `general` |
-| Documentation ⚠️ | DELEGATE | `gentleman-docs` | Big Pickle (always free) | `general` |
+| SEO/content ✅ | DELEGATE | `gentleman-seo-sub` | Nemotron 3 Super Free | `gentleman-deep-sub` → `general` |
+| Infrastructure/K8s/Terraform ✅ | DELEGATE | `gentleman-infra-sub` | DeepSeek V4 Flash Free (1M) | `general` |
+| Frontend/UI/a11y ✅ | DELEGATE | `gentleman-frontend-sub` | Kimi K2.5 Free (262K) | `general` |
+| Performance/profiling ✅ | DELEGATE | `gentleman-performance-sub` | Nemotron 3 Ultra Free (1M) | `general` |
+| Data/SQL/Python ✅ | DELEGATE | `gentleman-datascience-sub` | MiMo V2.5 Free | `general` |
+| Documentation ✅ | DELEGATE | `gentleman-docs-sub` | Big Pickle (always free) | `general` |
 | Implement plan ✅ | DELEGATE | `gentleman-implementer-sub` | DeepSeek V4 Flash Free (1M) | `gentleman-quick-sub` → `general` |
 | Architecture/code review | DIRECT | `gentleman-vMK` | — | — |
 | Quick edit ✅ | DELEGATE | `gentleman-quick-sub` | MiMo V2.5 Free | `general` |

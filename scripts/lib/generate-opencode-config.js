@@ -64,6 +64,14 @@ const TEMPLATE_MAP = {
   'gentleman-implementer-sub': 'readwrite',
   'gentleman-security-sub': 'readonly',
 
+  // Read-only specialist twins — delegable via Task tool (previously ⚠️ fallback to general)
+  'gentleman-seo-sub': 'readonly',
+  'gentleman-infra-sub': 'readonly',
+  'gentleman-frontend-sub': 'readonly',
+  'gentleman-performance-sub': 'readonly',
+  'gentleman-datascience-sub': 'readonly',
+  'gentleman-docs-sub': 'readonly',
+
   // Mode variants — AUTO (all auto-approve except push + destructive + network)
   'gentleman-vMK-auto': 'auto',
   'gentleman-deep-auto': 'auto',

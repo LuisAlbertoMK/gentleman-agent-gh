@@ -1,4 +1,4 @@
-# Return Contract — Canonical
+﻿# Return Contract — Canonical
 
 Every delegation output MUST include this 4-field block AS-IS (never summarized):
 
@@ -31,6 +31,16 @@ The old 5-field format (`status | summary | files_changed | verification | escal
 - `subagent-isolation` skill enforces this contract
 - `delivery-harness` skill requires this format in delegation output
 - Orchestrator synthesizes from this format, never from raw subagent output
+
+## File-Based Output Fallback (MANDATORY when stdout may truncate)
+
+If stdout is at risk of truncation (verbose verification, large output, multi-file tasks):
+1. **Write the 4-field report to a file**: `docs/agentes/{task}/05-completion-report.md`
+2. **Echo ONLY the file path** to stdout as your final message
+3. **Never** rely on stdout alone for deliverable content — the orchestrator may receive an empty or truncated string
+
+This prevents the "subagent completed but with no output" failure mode documented in `mejora-log.md:571`
+and `RUNBOOK.md:26`.
 
 ---
 *Canonical source for all agent return formats.*
