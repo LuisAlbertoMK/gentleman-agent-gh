@@ -299,6 +299,12 @@ $checks = @(
 )
 $allOk = $true
 foreach ($c in $checks) {
+    if (($SkipShortcuts -and $c.Label -like "Global shortcut*") -or `
+        ($SkipMcp      -and $c.Label -like "MCP*") -or `
+        ($SkipVision   -and $c.Label -like "Vision*")) {
+        skip "$($c.Label) (via skip flag)"
+        continue
+    }
     if (& $c.Test) { ok $c.Label }
     else { warn "$($c.Label) — FAILED"; $allOk = $false }
 }
