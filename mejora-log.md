@@ -828,3 +828,17 @@ Métricas de benchmark: Pester suite completa (pass/fail), opencode.json size vs
 **Benchmark vs baseline**: Warn noise en commits ROZA ~100% → 0% (post-clearance). False positives: 0. Latencia: ~0ms (Test-Path en working dir).
 
 **Aprendizaje**: (1) `.githooks/pre-commit-gate.ps1` es el root-of-trust security boundary — changes MUST be additive (Warn fallback preserved) + syntax-validated via `[Parser]::ParseFile` BEFORE commit (un syntax error paralice todos los commits). (2) Marker files gitignored preservan `.gitkeep` via negación (`!.jd-cleared/.gitkeep`). (3) `git add .jd-cleared/.gitkeep` works a pesar de `.jd-cleared/*` el .gitignore porque la negación re-includes el .gitkeep.
+
+### Gap item 2 (ICE 12/27) — sync-all / global-setup drift + self-copy (VERIFIED + FIXED)
+**Gap**: advisor `[16/16] config drift vs global`. Compacted summary marcaba "global-setup FAIL (preexistent self-copy bug in prompts/sdd/sdd-apply.md)".
+
+**Verificación**:
+1. `sync-global.ps1` Step 2b (L46-49): hash-based compare (SHA256) antes de Copy-Item — NO brute-force copy. Steps 1-5 usan junctions (`New-CrossPlatLink` L189). **El "self-copy bug" está RESUELTO** en el código actual.
+2. `prompts/sdd/sdd-apply.md`: 1-line stub esperado ("Read ~/.config/opencode/skills/sdd-apply/SKILL.md"), no es un content bug.
+3. `check-config-drift.ps1`: compara secciones `agent/skills/permission` (excluye mcp) entre repo canonical y global config.
+
+**Fix aplicado**: `check-config-drift.ps1 -Fix` — sync global config desde canonical repo, **preservando mcp** (L91-96 sobreescribe solo agent/skills/permission). Resultado: agent 43→45, totalDrift 1→0, exitCode 1→0. Advisor [16/16] cleared.
+
+**Benchmark**: config drift (global vs repo) 1 → 0 seccion (exitCode 1→0). Global agents 43→45 (sync w/ twins). 0 data loss (mcp preserved).
+
+**Aprendizaje**: (1) El advisor [16/16] era GLOBAL CONFIG DRIFT env-local (no un repo bug ni self-copy) — usuarios devcen correr `check-config-drift.ps1 -Fix` cuando el global opencode.json esté stale. (2) `check-config-drift -Fix` preserve mcp (machine-specific) sobreescribiendo solo secciones comparables. (3) El "self-copy" era un bug PREVIO evitado por el hash-based + junction design actual.
