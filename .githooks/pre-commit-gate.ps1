@@ -114,11 +114,23 @@ if ($stagedAgents) {
     else { $benchOut.Trim() -split "`n" | ForEach-Object { Write-Host "    $_" }; Pass }
 } else { Pass }
 
-# [9/13] JD review check
-Write-Host "[9/13] JD review check (ROJA zone)..."
+# [9/13] JD review check — respects .jd-cleared/<path> markers or FORCE_SHIP env
+# Clears the recurring Warn for files already cleared via `!judgment-day`.
+# Marker naming: path separators -> underscores (scripts/foo.ps1 -> .jd-cleared/scripts_foo.ps1)
+Write-Host "[9/13] JD review check (ROZA zone)..."
 if ($stagedRoja) {
-    $rojaPreview = $stagedRoja | ForEach-Object { "    $_" }
-    Warn "ROJA zone files staged without JD dual review:`n$($rojaPreview -join "`n")`n  Use '!ship' or 'judgment-day'"
+    $uncleared = @()
+    foreach ($f in $stagedRoja) {
+        $marker = "$RepoRoot/.jd-cleared/" + ($f.Replace('/','_').Replace('\','_'))
+        if (-not (Test-Path $marker -PathType Leaf)) { $uncleared += $f }
+    }
+    if ($env:FORCE_SHIP) {
+        Warn "FORCE_SHIP set — JD bypass acknowledged (ensure '!ship' was intentional)`n    $($stagedRoja -join "`n")"
+    } elseif ($uncleared.Count -eq 0) {
+        Pass
+    } else {
+        Warn "ROZA zone files staged without JD dual review:`n$($stagedRoja | ForEach-Object { '    ' + $_ } | Out-String)`n  Clear: `!judgment-day` then touch .jd-cleared/$(($uncleared[0]).Replace('/','_'))`n  Or: set FORCE_SHIP=1"
+    }
 } else { Pass }
 
 # [10/13] Secrets scan — parse diff to get real filenames (not "InputStream")

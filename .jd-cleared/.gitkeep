@@ -1,0 +1,6 @@
+.jd-cleared/.gitkeep — placeholder so the marker directory ships.
+Run `!judgment-day` on staged ROZA-zone files, then:
+  touch .jd-cleared/<path-with-slashes-as-underscores>
+  # e.g. scripts/foo.ps1 -> .jd-cleared/scripts_foo.ps1
+
+Markers are gitignored (`.jd-cleared/*`) — only `.gitkeep` is tracked.
