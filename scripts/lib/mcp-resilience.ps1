@@ -293,7 +293,27 @@ function Invoke-McpWithRetry {
     for ($i = 0; $i -le $MaxRetries; $i++) {
         $attempts++
         try {
-            $result = & $ScriptBlock
+            # Per-attempt timeout: run the scriptblock in a cancellable runspace
+            # (native .NET, same-process) so a hanging MCP call is aborted instead of
+            # blocking the retry loop. Unlike Start-Job, this preserves the caller's
+            # closures and propagates scriptblock exceptions to the catch below.
+            $ps = [System.Management.Automation.PowerShell]::Create()
+            [void]$ps.AddScript($ScriptBlock)
+            $async = $ps.BeginInvoke()
+            if ($async.AsyncWaitHandle.WaitOne($TimeoutMs, $false)) {
+                # EndInvoke wraps scriptblock errors in a .NET TargetInvocation wrapper;
+                # re-throw the InnerException so the caller sees the real message ("boom").
+                try {
+                    $result = $ps.EndInvoke($async)
+                } catch {
+                    $inner = $_.Exception.InnerException
+                    throw ($inner ? $inner : $_)
+                }
+            } else {
+                $ps.Stop()
+                $async.AsyncWaitHandle.WaitOne(500) | Out-Null
+                throw "Timed out after $TimeoutMs ms"
+            }
             $newState = @{
                 State = "CLOSED"
                 FailureCount = 0
@@ -312,6 +332,8 @@ function Invoke-McpWithRetry {
                 Error = $null
             }
         } catch {
+            # Propagates either a scriptblock exception (via EndInvoke) or our
+            # "Timed out after N ms" throw — both feed the retry/circuit-breaker.
             $lastError = $_.Exception.Message
             $consecutiveFailures++
 
@@ -319,6 +341,11 @@ function Invoke-McpWithRetry {
                 $delay = $BaseDelayMs * [math]::Pow(2, $i)
                 $totalDelay += $delay
                 Start-Sleep -Milliseconds $delay
+            }
+        } finally {
+            if ($ps) {
+                try { $ps.Runspace.Dispose() } catch { Write-Debug "mcp-resilience: $($_.Exception.Message)" }
+                $ps.Dispose()
             }
         }
     }
