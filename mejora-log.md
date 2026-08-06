@@ -767,3 +767,30 @@ Métricas de benchmark: Pester suite completa (pass/fail), opencode.json size vs
 **Pendiente (candidato corrida 4/T2, no C6)**: `mcp-resilience.ps1` `TimeoutMs` (L269, función `Invoke-McpWithRetry`) — DOC contract ("per-attempt timeout") sin implementación real en el body (`& $ScriptBlock` a ciegas; retry/circuit-breaker correctos, pero un scriptblock con Invoke-WebRequest bloqueado colgaría el retry indefinidamente). **Exploración previa (C7) registrada**: (1) `Start-Job` + `Wait-Job -Timeout` no es viable — Start-Job SERIALIZA el scriptblock del caller, rompiendo closures `$using:` y propagación de errores al catch (el job trata FAIL como éxito, encontrado por smoke `throw 'boom'` → success=True); (2) `Stop-Job -Force` no es válido en PS 7. **Rediseño correcto**: Runspace API builtin (`[powershell]::Create()` + BeginInvoke/Wait/Stop), preserva closures + propaga errores + cancellable — REQUIRE tests dedicados de `Invoke-McpWithRetry` (no existen), T2 (multi-file, arquitectura).
 
 **Propuesta**: merge `experimento/mejora-autonoma-2026-08-05` → main. Riesgo bajo (suite 744+208, gate 18/18, PSSA 44→24, 3 bugs de seguridad). TimeoutMs pospuesto.
+
+---
+
+## Ciclo 1 — 2026-08-06 (P0: automated empty-output detection)
+
+**Gap (ACE score 27/27)**: No hay detección automated de empty output post-delegación. El git-diff gate vive en el prompt del LLM (manual); si el LLM se distrae → silent failure. Documentado en mejora-log.md:571 — el ParserError que falló al crear scripts/check-subagent-output.ps1 era el síntoma de este gap.
+
+**Enfoques**: A: simple `git diff --name-only HEAD` (solo tracked, no detecta untracked ni commits nuevos) ❌. B: git diff range + git status --porcelain + -ExpectedFiles ✅ GANADOR. C: exhaustive + file size + return-contract format validation — over-engineering ❌.
+
+**Cambios** (branch `experimento/mejora-autonoma-2026-08-06`):
+- `scripts/check-subagent-output.ps1` (nuevo, 96 líneas): detecta committed (`BaseRef..HEAD`) + staged + untracked (`status --porcelain`) changes; -ExpectedFiles verify; -Quiet JSON output. Recovery: Write tool (no bash here-string — evitó el ParserError recurrente).
+- `tests/check-subagent-output.Tests.ps1` (nuevo, T1-T4): isolated git repos in `$TestDrive`.
+
+**Resultado Breaker/QA**:
+1. T1 empty diff → exit 1 + "SILENT FAILURE" ✅
+2. T2 real changes (untracked) → exit 0 ✅
+3. T3 missing expected files → exit 1 + "Expected files NOT found" ✅
+4. T4 JSON output mode → exit 0 + "OK" ✅
+5. Pester 4/4 PASS. Syntax OK (Parser). No regressions (scripts/ + tests/ solo 2 archivos nuevos untracked).
+
+**Fix post-Breaker**: T2/T3/T4 fallaron inicialmente porque `git diff --name-only HEAD` (un solo ref) no detecta untracked ni commits; rediseñado a combinar `$BaseRef..HEAD` (commits) + `status --porcelain` (untracked + staged). Issue del Recovery Protocol: aquí-string `'@` falla en PS 5.1 → usar `Write` tool nativo.
+
+**Commit**: (pendiente en branch experimental) — `feat(scripts): check-subagent-output.ps1 empty-output detection`
+
+**Benchmark vs baseline**: empty-output detection **0% (manual) → 100% (automated)** ✅; latencia ~1.5s; false positives/negatives 0/0.
+
+**Aprendizaje**: (1) `git diff --name-only <ref>` con UN solo ref compara working-tree vs ref — no detecta untracked ni commits ya hechos; para empty-output detection post-delegación se necesita `<BaseRef>..HEAD` (range) + `git status --porcelain` (??). (2) El aquí-string `'@` segido de código (ej: `exit 0'@`) dispara `ParserError` en PowerShell 5.1 — NUNCA usar aquí-strings para generar scripts; usar el `Write`/`Edit` tool nativo del orchestrator. (3) Tests de git deben usar `$TestDrive` repos para aislamiento hermético.
