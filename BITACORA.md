@@ -1,3 +1,4 @@
+2026-08-05 - Session close
 2026-08-04 - Session close
 2026-08-03 - Session close
 2026-08-02 - Cierre experimento N-ciclos: C6 engram-compact (e1a2d9a0), junction prompts/sdd reparada, gh 2.97.0 instalado
