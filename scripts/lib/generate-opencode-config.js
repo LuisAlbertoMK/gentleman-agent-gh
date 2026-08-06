@@ -62,6 +62,7 @@ const TEMPLATE_MAP = {
   'gentleman-deep-sub': 'readwrite',
   'gentleman-quick-sub': 'readwrite',
   'gentleman-implementer-sub': 'readwrite',
+  'gentleman-codex-sub': 'readwrite',
   'gentleman-security-sub': 'readonly',
 
   // Read-only specialist twins — delegable via Task tool (previously ⚠️ fallback to general)
@@ -88,6 +89,7 @@ const TEMPLATE_MAP = {
 
   // Independent evaluator — bash ask, no edit/write
   'gentleman-reviewer': 'reviewer',
+  'gentleman-reviewer-sub': 'reviewer',
 };
 
 // --- Permission key order (must match original file) ---

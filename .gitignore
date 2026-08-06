@@ -134,3 +134,8 @@ TestResults.xml
 
 # Archived stale documentation
 .archive/
+
+# JD review clearance markers — run `!judgment-day` then touch .jd-cleared/<path>
+# (path separators become underscores; scripts/foo.ps1 -> .jd-cleared/scripts_foo.ps1)
+.jd-cleared/*
+!.jd-cleared/.gitkeep
