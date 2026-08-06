@@ -624,6 +624,21 @@
         "codebase-memory*": true
       }
     },
+    "gentleman-codex-sub": {
+      "description": "Code generation subagent — convention mirroring, defensive coding, new files/scripts/boilerplate (delegable via Task tool, returns via {file:prompts/shared/_return-contract.md})",
+      "model": "opencode/deepseek-v4-flash-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
+      "permission": {
+        "bash": {
+          "*": "ask"
+        }
+      },
+      "tools": {
+        "codebase-memory*": true
+      }
+    },
     "gentleman-security": {
       "description": "Security specialist - STRIDE threat model, CVSS scoring, OWASP Top 10, injection/XSS/auth analysis (FREE TIER)",
       "model": "opencode/nemotron-3-ultra-free",
@@ -1772,6 +1787,24 @@
       "description": "Code review specialist — 4R framework, independent evaluator, adversarial verification (STRONG model)",
       "model": "claude-sonnet-4-6",
       "mode": "primary",
+      "prompt": "{file:prompts/gentleman-reviewer.md}\n\n{file:prompts/shared/_return-contract.md}",
+      "permission": {
+        "bash": {
+          "*": "ask"
+        },
+        "edit": "deny",
+        "write": "deny"
+      },
+      "tools": {
+        "engram*": true,
+        "codebase-memory*": true
+      }
+    },
+    "gentleman-reviewer-sub": {
+      "description": "Code review subagent — 4R framework, independent evaluator, adversarial verification (delegable via Task tool, read-only)",
+      "model": "claude-sonnet-4-6",
+      "hidden": true,
+      "mode": "subagent",
       "prompt": "{file:prompts/gentleman-reviewer.md}\n\n{file:prompts/shared/_return-contract.md}",
       "permission": {
         "bash": {
