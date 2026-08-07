@@ -41,4 +41,20 @@ Describe "check-token-budget.ps1 — budget logic (C9)" {
         $json.stats.skills.count | Should -BeGreaterThan 0
         $json.stats.skills.budget | Should -Be 2000
     }
+
+    It "JSON includes prompts stats with overBudgetFiles (regression guard)" {
+        $r = & pwsh -NoProfile -Command "& '$scriptPath' -Json" 2>&1
+        $jsonLine = $r | Where-Object { $_ -match '^\{' } | Select-Object -First 1
+        $json = $jsonLine | ConvertFrom-Json -ErrorAction SilentlyContinue
+        $json | Should -Not -BeNull
+        $json.stats.prompts | Should -Not -BeNull
+        $json.stats.prompts.overBudgetFiles | Should -Not -BeNullOrEmpty
+        $json.stats.prompts.passed | Should -BeOfType [bool]
+        $json.stats.prompts.budget | Should -Be 2000
+    }
+
+    It "exits code 1 when budget exceeded (current repo state)" {
+        & pwsh -NoProfile -Command "& '$scriptPath' -Json > `$null" 2>&1 | Out-Null
+        $global:LASTEXITCODE | Should -Be 1
+    }
 }

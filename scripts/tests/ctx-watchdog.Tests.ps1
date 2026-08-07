@@ -29,3 +29,33 @@ Describe "Get-ContextZone — zone logic (C8)" {
     It "CRITICAL zone at 96%" { $r = Get-ContextZone 96;  $r.zone | Should -Be "CRITICAL"; $r.level | Should -Be "L3" }
     It "calculates 90% from bytes ratio" { $r = Get-ContextZone 90; $r.zone | Should -Be "RED" }
 }
+
+Describe "ctx-watchdog.ps1 — script execution (C8)" {
+    BeforeAll {
+        $scriptPath = Join-Path (Split-Path $PSScriptRoot -Parent) 'ctx-watchdog.ps1'
+    }
+
+    It "script has no parse errors" {
+        $tokens = $null; $errors = $null
+        [System.Management.Automation.Language.Parser]::ParseFile($scriptPath, [ref]$tokens, [ref]$errors) | Out-Null
+        $errors.Count | Should -Be 0
+    }
+
+    It "outputs ORANGE zone for 75% usage" {
+        $r = & pwsh -NoProfile -Command "& '$scriptPath' -UsagePercent 75" 2>&1
+        $r | Should -Match 'ORANGE'
+    }
+
+    It "outputs CRITICAL zone for 96% usage" {
+        $r = & pwsh -NoProfile -Command "& '$scriptPath' -UsagePercent 96" 2>&1
+        $r | Should -Match 'CRITICAL'
+    }
+
+    It "JSON output has correct zone/level for 85%" {
+        $r = & pwsh -NoProfile -Command "& '$scriptPath' -UsagePercent 85 -Json" 2>&1
+        $jsonLine = $r | Where-Object { $_ -match '^\{' } | Select-Object -First 1
+        $json = $jsonLine | ConvertFrom-Json
+        $json.zone | Should -Be 'RED'
+        $json.level | Should -Be 'L2'
+    }
+}
