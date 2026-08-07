@@ -438,3 +438,90 @@ Describe "Unicode whitespace normalization — no pattern evasion" {
         $r.verdict | Should -Be "allow"
     }
 }
+
+# ============================================================
+# SSoT supply-chain deny floor — permission-templates.json
+# (opencode agent config layer; C3b Gap 1: npm/pip/yarn/pnpm/bun
+#  install vectors must DENY in auto+semi, legitimate run/test/ci
+#  and pip read-only queries must stay ALLOW).
+# NOTE: these assert the SSoT rules that generate opencode.json,
+# NOT the runtime lib Get-CommandClass verdicts (separate layer).
+# ============================================================
+Describe "SSoT supply-chain deny floor (permission-templates.json)" {
+    BeforeAll {
+        $script:tpl = Get-Content (Join-Path (Split-Path $PSScriptRoot -Parent) 'lib\permission-templates.json') -Raw | ConvertFrom-Json
+
+        function Get-SSoTRule {
+            param([string]$Mode, [string]$Cmd)
+            $rules = $script:tpl.$Mode.bash
+            $toks = $Cmd -split '\s+'
+            $bestScore = [int]::MinValue
+            $bestVerdict = $rules.'*'
+            foreach ($prop in $rules.PSObject.Properties) {
+                $parts = $prop.Name -split '\s+'
+                $wild = $parts[$parts.Count - 1] -eq '*'
+                $n = if ($wild) { $parts.Count - 1 } else { $parts.Count }
+                if ($toks.Count -lt $n) { continue }
+                $ok = $true
+                for ($i = 0; $i -lt $n; $i++) { if ($toks[$i] -ne $parts[$i]) { $ok = $false; break } }
+                if (-not $ok) { continue }
+                if (-not $wild -and $toks.Count -ne $n) { continue }
+                $score = if ($wild) { $n + 1000 } else { $n + 10000 }
+                if ($score -gt $bestScore) { $bestScore = $score; $bestVerdict = $prop.Value }
+            }
+            return $bestVerdict
+        }
+    }
+
+    It "DENIES npm install in auto [supply chain]" {
+        Get-SSoTRule auto "npm install evil-pkg" | Should -Be "deny"
+    }
+    It "DENIES npm i -g in auto [supply chain]" {
+        Get-SSoTRule auto "npm i -g evil" | Should -Be "deny"
+    }
+    It "DENIES pip install in auto [supply chain]" {
+        Get-SSoTRule auto "pip install numpy" | Should -Be "deny"
+    }
+    It "DENIES pip3 install in auto [supply chain]" {
+        Get-SSoTRule auto "pip3 install evil" | Should -Be "deny"
+    }
+    It "DENIES yarn add in auto [supply chain]" {
+        Get-SSoTRule auto "yarn add evil" | Should -Be "deny"
+    }
+    It "DENIES bun install in auto [supply chain]" {
+        Get-SSoTRule auto "bun install evil" | Should -Be "deny"
+    }
+    It "DENIES npx in auto [supply chain]" {
+        Get-SSoTRule auto "npx evil" | Should -Be "deny"
+    }
+    It "DENIES npm exec in auto [supply chain - arbitrary code]" {
+        Get-SSoTRule auto "npm exec -y evil" | Should -Be "deny"
+    }
+    It "ALLOWS npm run build in auto [legitimate]" {
+        Get-SSoTRule auto "npm run build" | Should -Be "allow"
+    }
+    It "ALLOWS npm test in auto [legitimate]" {
+        Get-SSoTRule auto "npm test" | Should -Be "allow"
+    }
+    It "ALLOWS npm ci in auto [legitimate lockfile install]" {
+        Get-SSoTRule auto "npm ci" | Should -Be "allow"
+    }
+    It "DENIES npm install in semi [supply chain]" {
+        Get-SSoTRule semi "npm install evil-pkg" | Should -Be "deny"
+    }
+    It "DENIES npm ci in semi [C3b gap fix]" {
+        Get-SSoTRule semi "npm ci" | Should -Be "deny"
+    }
+    It "DENIES pip install in semi [supply chain]" {
+        Get-SSoTRule semi "pip install evil" | Should -Be "deny"
+    }
+    It "ALLOWS npm run build in semi [legitimate]" {
+        Get-SSoTRule semi "npm run build" | Should -Be "allow"
+    }
+    It "ALLOWS pip freeze in semi [read-only info]" {
+        Get-SSoTRule semi "pip freeze" | Should -Be "allow"
+    }
+    It "ALLOWS pip show in semi [read-only info]" {
+        Get-SSoTRule semi "pip show requests" | Should -Be "allow"
+    }
+}
