@@ -56,6 +56,43 @@ $ErrorActionPreference = "Continue"
 $platformLib = Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1"
 if (Test-Path -LiteralPath $platformLib) { . $platformLib }
 
+<#
+.SYNOPSIS
+    RFC 4180 field escaping that also neutralizes CSV formula injection.
+.DESCRIPTION
+    Prepares an untrusted string (e.g. a Detail / command line) for a single
+    quoted field of the audit CSV. Guarantees the field can never be
+    interpreted by a spreadsheet program as a formula, and never corrupts the
+    log row structure. It:
+      1. collapses CR / LF / tab into a single space (kills multi-line row
+         injection and tab-prefixed formula triggers);
+      2. prefixes a single quote to a leading '=', '+', '-', '@' so Excel/Libre
+         Calc read the cell as literal text, never a formula;
+      3. doubles any embedded double quotes per RFC 4180;
+      4. wraps the whole (possibly comma-bearing) field in double quotes.
+.NOTES
+    Only the Detail field is attacker-controlled; the other fields (timestamp,
+    agent, mode, action) come from validated parameters and stay unquoted so
+    the read/session parsers keep matching on ", ALLOW," / "^yyyy-MM-dd ...".
+#>
+function ConvertTo-SafeCsvField {
+    param([Parameter(Mandatory)][ValidateNotNullOrEmpty()][string]$Field)
+
+    # (1) Collapse CR/LF/tab — kills row-spraying and tab-based formula triggers
+    $safe = $Field -replace "[\t\r\n]+", ' '
+
+    # (2) Neutralize a leading formula-trigger so Excel/LibreOffice won't eval it
+    if ($safe -match '^[=+\-@]') {
+        $safe = "'" + $safe
+    }
+
+    # (3) RFC 4180: double any embedded double quote
+    $safe = $safe -replace '"', '""'
+
+    # (4) Wrap the field in double quotes
+    return '"' + $safe + '"'
+}
+
 # Audit log targets the CURRENT PROJECT root (walk-up from cwd to git root),
 # NOT the script's repo — so a globalized copy logs into the external project.
 $projectRoot = if (Get-Command Get-GentlemanProjectRoot -ErrorAction SilentlyContinue) { Get-GentlemanProjectRoot } else { $env:GENTLEMAN_AGENT_ROOT }
@@ -70,7 +107,7 @@ if (-not (Test-Path -LiteralPath $logDir)) {
 switch ($Command) {
     'append' {
         $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-        $safeDetail = $Detail -replace '[\r\n]+', ' ' -replace ',', ';'
+        $safeDetail = ConvertTo-SafeCsvField -Field $Detail
         $line = "$timestamp, $Agent, $Mode, $Action, $safeDetail"
         Add-Content -LiteralPath $logFile -Value $line -Encoding UTF8
         Write-Verbose "audit: $line"
