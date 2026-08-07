@@ -14,6 +14,8 @@
     Output format: Text (default), Json, or Csv
 .PARAMETER Quiet
     Suppress informational messages
+.PARAMETER NoCache
+    Bypass the persistent registry cache (.learnings/skill-graph-cache.json) — always re-parse the CSV
 #>
 param(
     [string]$Task = "",
@@ -22,7 +24,8 @@ param(
     [switch]$RecommendAgent,
     [ValidateSet("Text", "Json", "Csv")][string]$Format = "Text",
     [switch]$Quiet,
-    [string]$PatternsFile = ""
+    [string]$PatternsFile = "",
+    [switch]$NoCache
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -31,60 +34,140 @@ $ErrorActionPreference = 'Stop'
 # Registry — compact array format [name, triggers, category, effort, deps, related, desc]
 # ============================================================================
 $registryCsv = Join-Path (Split-Path $PSScriptRoot -Parent) 'data/skills-registry.csv'
-
-
-
+$cacheDir = Join-Path (Split-Path $PSScriptRoot -Parent) '.learnings'
+$cacheFile = Join-Path $cacheDir 'skill-graph-cache.json'
+$cacheTtlMinutes = 60
 
 $validCategories = @('meta','quality','coordination','code-ops','specialized','testing','web-quality','memory','documents','compression','performance','research','SDD')
 $validEfforts = @('low','medium','high')
 
-$skillRegistry = foreach ($line in (Get-Content $registryCsv | Select-Object -Skip 1 | Where-Object { $_.Trim() })) {
-    $parts = $line.Split('|')
-    $name = $parts[0]
-    $len = $parts.Length
-
-    # Description = always last field
-    $descIdx = $len - 1
-
-    # Find Effort by scanning from end for known values (stop at first match)
-    $effIdx = -1
-    for ($i = $descIdx - 1; $i -ge 1; $i--) {
-        $v = $parts[$i].Trim().ToLowerInvariant()
-        if ($v -in $validEfforts) { $effIdx = $i; break }
-    }
-
-    # Find Category by scanning from effort position backwards for known values
-    $catIdx = -1
-    if ($effIdx -gt 0) {
-        for ($i = $effIdx - 1; $i -ge 1; $i--) {
-            $v = $parts[$i].Trim()
-            if ($v -in $validCategories) { $catIdx = $i; break }
-        }
-    }
-
-    # Triggers = fields between Name and Category (positions 1..catIdx-1)
-    $triggers = if ($catIdx -gt 1) { ($parts[1..($catIdx-1)] -join '|') } else { '' }
-
-    # DependsOn = non-empty fields between Effort and Description
-    # NOTE: Related cannot be distinguished from DependsOn in pipe-delimited format
-    # (both can contain pipes). All mid-fields go into DependsOn.
-    $midFields = @()
-    if ($effIdx -gt 0) {
-        for ($i = $effIdx + 1; $i -lt $descIdx; $i++) {
-            if ($parts[$i].Trim() -ne '') { $midFields += $parts[$i] }
-        }
-    }
-
-    [PSCustomObject]@{
-        Name        = $name
-        Triggers    = $triggers
-        Category    = if ($catIdx -gt 0) { $parts[$catIdx] } else { '' }
-        Effort      = if ($effIdx -gt 0) { $parts[$effIdx] } else { '' }
-        DependsOn   = ($midFields -join '|')
-        Related     = ''
-        Description = $parts[$descIdx]
+function Get-FileSha256 {
+    <#
+    .SYNOPSIS
+        Compute lowercase SHA256 hex digest of a string (cache key source)
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string]$Content
+    )
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes($Content)
+        return [Convert]::ToHexString($sha.ComputeHash($bytes)).ToLowerInvariant()
+    } finally {
+        $sha.Dispose()
     }
 }
+
+function Get-SkillRegistry {
+    <#
+    .SYNOPSIS
+        Parse skills-registry.csv with persistent caching.
+    .DESCRIPTION
+        Cold path parses the pipe-delimited CSV and persists the parsed registry
+        to $CachePath keyed by a SHA256 hash of the CSV content. Warm path loads
+        the cache when: hash matches current CSV content, cache mtime is within
+        $TtlMinutes, and the cache parses as valid JSON. Any mismatch, staleness,
+        corruption, or -NoCache forces a cold re-parse (which overwrites the cache).
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string]$CsvPath,
+        [Parameter(Mandatory)][string]$CachePath,
+        [switch]$NoCache,
+        [int]$TtlMinutes = $cacheTtlMinutes
+    )
+
+    $csvRaw = Get-Content $CsvPath -Raw
+    $csvHash = Get-FileSha256 $csvRaw
+
+    # --- Cache hit: load persisted registry when hash matches and cache is fresh ---
+    if (-not $NoCache -and (Test-Path $CachePath)) {
+        try {
+            $cached = Get-Content $CachePath -Raw | ConvertFrom-Json
+            $cacheAgeMinutes = ((Get-Date) - (Get-Item $CachePath).LastWriteTime).TotalMinutes
+            if ($null -ne $cached -and $cached.hash -eq $csvHash -and $cacheAgeMinutes -lt $TtlMinutes -and $cached.skills) {
+                return @($cached.skills | ForEach-Object {
+                    [PSCustomObject]@{
+                        Name        = $_.Name
+                        Triggers    = $_.Triggers
+                        Category    = $_.Category
+                        Effort      = $_.Effort
+                        DependsOn   = $_.DependsOn
+                        Related     = $_.Related
+                        Description = $_.Description
+                    }
+                })
+            }
+        } catch {
+            # Corrupt or unreadable cache — fall through to cold parse (overwrites cache below)
+        }
+    }
+
+    # --- Cold parse (original pipe-delimited parsing) ---
+    $registry = foreach ($line in (Get-Content $CsvPath | Select-Object -Skip 1 | Where-Object { $_.Trim() })) {
+        $parts = $line.Split('|')
+        $name = $parts[0]
+        $len = $parts.Length
+
+        # Description = always last field
+        $descIdx = $len - 1
+
+        # Find Effort by scanning from end for known values (stop at first match)
+        $effIdx = -1
+        for ($i = $descIdx - 1; $i -ge 1; $i--) {
+            $v = $parts[$i].Trim().ToLowerInvariant()
+            if ($v -in $validEfforts) { $effIdx = $i; break }
+        }
+
+        # Find Category by scanning from effort position backwards for known values
+        $catIdx = -1
+        if ($effIdx -gt 0) {
+            for ($i = $effIdx - 1; $i -ge 1; $i--) {
+                $v = $parts[$i].Trim()
+                if ($v -in $validCategories) { $catIdx = $i; break }
+            }
+        }
+
+        # Triggers = fields between Name and Category (positions 1..catIdx-1)
+        $triggers = if ($catIdx -gt 1) { ($parts[1..($catIdx-1)] -join '|') } else { '' }
+
+        # DependsOn = non-empty fields between Effort and Description
+        # NOTE: Related cannot be distinguished from DependsOn in pipe-delimited format
+        # (both can contain pipes). All mid-fields go into DependsOn.
+        $midFields = @()
+        if ($effIdx -gt 0) {
+            for ($i = $effIdx + 1; $i -lt $descIdx; $i++) {
+                if ($parts[$i].Trim() -ne '') { $midFields += $parts[$i] }
+            }
+        }
+
+        [PSCustomObject]@{
+            Name        = $name
+            Triggers    = $triggers
+            Category    = if ($catIdx -gt 0) { $parts[$catIdx] } else { '' }
+            Effort      = if ($effIdx -gt 0) { $parts[$effIdx] } else { '' }
+            DependsOn   = ($midFields -join '|')
+            Related     = ''
+            Description = $parts[$descIdx]
+        }
+    }
+
+    # --- Persist cache keyed by CSV content hash (non-fatal on failure) ---
+    try {
+        $cacheParent = Split-Path $CachePath -Parent
+        if (-not (Test-Path $cacheParent)) { New-Item -ItemType Directory -Path $cacheParent -Force | Out-Null }
+        @{ hash = $csvHash; cachedAt = (Get-Date).ToUniversalTime().ToString('o'); skills = @($registry) } |
+            ConvertTo-Json -Depth 4 |
+            Set-Content -Path $CachePath -Encoding utf8
+    } catch {
+        Write-Debug "skill-graph: cache write failed: $($_.Exception.Message)"
+    }
+
+    return @($registry)
+}
+
+$skillRegistry = @(Get-SkillRegistry -CsvPath $registryCsv -CachePath $cacheFile -NoCache:$NoCache)
 
 # ============================================================================
 # Graph — build adjacency graph from registry
