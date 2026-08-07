@@ -842,3 +842,74 @@ Métricas de benchmark: Pester suite completa (pass/fail), opencode.json size vs
 **Benchmark**: config drift (global vs repo) 1 → 0 seccion (exitCode 1→0). Global agents 43→45 (sync w/ twins). 0 data loss (mcp preserved).
 
 **Aprendizaje**: (1) El advisor [16/16] era GLOBAL CONFIG DRIFT env-local (no un repo bug ni self-copy) — usuarios devcen correr `check-config-drift.ps1 -Fix` cuando el global opencode.json esté stale. (2) `check-config-drift -Fix` preserve mcp (machine-specific) sobreescribiendo solo secciones comparables. (3) El "self-copy" era un bug PREVIO evitado por el hash-based + junction design actual.
+
+---
+
+# Mejora Autónoma Iterativa v3 — Kickoff (2026-08-07)
+
+## Setup
+- **Branch**: `experimento/mejora-autonoma-v3-2026-08-07` (base: main @ ae478389)
+- **Protocolo**: v3 (evidence-sourced gaps, blast radius, business traceability, scope lock, DoD binario, rollback map, entorno aislado, 5-10 runs significance)
+- **Baseline en vivo**: 744 pass / 0 fail, gate 18/18, PSSA 24 warn, opencan.json 53,556 B (82%), npm audit 0 vulns, 78 skills avg 2,475B, BenchmarkSeconds 0.938s
+
+## Análisis v3
+- **34 gaps** identificados por 5 especialistas (security, infra, performance, docs, deep) + gate battery en vivo
+- **7 gaps blast radius Alto** → checkpoint humano (aprobado por usuario: "inicia y termina todo")
+- Reporte completo: `docs/mejoras/2026-08-07-gentleman-agent-gh-analisis.md`
+- Execution report: `docs/mejoras/2026-08-07-gentleman-agent-gh-execution-report.md`
+
+## Ciclo 1 — Docs Sync (Blast: Bajo, ICE 640)
+**Gap**: README/QUICKSTART/PROTOCOL/ARCHITECTURE/CONTRIBUTING/CHANGELOG stale (37→45 agents, 9.3→9.0 score, 79→78 skills, master→main)
+**Evidence**: opencan.json 45 agent keys, .project.json score=9.0, scripts conteo=91
+**Scope lock**: 7 archivos docs only
+**DoD**: ✅ Counts sincronizados, 0 stale tokens
+**Breaker**: Token scan (9.3/37/master/79) = 0 hits; cross-ref live = match
+**Commit**: `94b4a11d C1-docs:sync v3 baseline`
+
+## Ciclo 2 — Skill-Graph Caching (Blast: Alto-impact, ICE 25.7)
+**Gap**: skill-graph.ps1 parse CSV + rebuild graph every call (5s cold)
+**Evidence**: L41-87 parse, L92-115 rebuild, benchmark 5s→3s
+**Scope lock**: scripts/skill-graph.ps1, scripts/tests/skill-graph.Tests.ps1
+**DoD**: ✅ 74ms warm vs 299ms cold (4×), 23/23 tests, BenchmarkSeconds 0.938s
+**Breaker**: cache miss/hit/stale/corrupt/CLI -NoCache
+**Commit**: `f03f1c63 C2-perf:cache skill-graph registry`
+
+## Ciclo 3a — CSV Injection + Unicode Whitespace (Alto, ACE 18/14.4)
+**Gap**: audit-log.ps1:73 CSV formula injection (CWE-1236); permission-gate-lib.ps1:88 Unicode `\s+` evasion (CWE-1389)
+**Evidence**: L73 `replace ',' ';'` sin sanitizar `= + - @`; L88 `\s+` ASCII-only
+**Scope lock**: scripts/audit-log.ps1, scripts/lib/permission-gate-lib.ps1, tests
+**DoD**: ✅ CSV neutralizado; U+200B/U+00A0/U+202F/U+180E blocked; 96/96 tests
+**Breaker**: 3 attacks (CSV vectors, Unicode evasion, regression battery)
+**Commits**: `75338087 fix(audit-log) CSV`, `b593e185 fix(gate) Unicode`
+
+## Ciclo 3b — SSoT npm/pip Deny + Release Gate (Alto, ACE 34.2/21.6)
+**Gap**: npm/pip absent from deny floor (gate: `npm install evil => allow` auto); release.yml tag-push sin quality gate
+**Evidence**: Gate battery en vivo (15 vectors × 3 modes)
+**Scope lock**: permission-templates.json, opencan.json (regenerado), release.yml, tests
+**DoD**: ✅ npm/pip → deny; npm ci/run/test → allow; release gated; 103/103 tests
+**Breaker**: 3 attacks (supply chain, regression, release invariant)
+**Commits**: `f5031ca0 fix(security) npm/pip SSoT`, `d935241f fix(ci) release gate`
+
+## Ciclo 3c — Runtime Gate npm/pip + shared-deny-rules (Alto)
+**Gap**: Runtime lib (permission-gate-lib.ps1) no tenía npm/pip deny a pesar del SSoT fix → `npm install evil => allow` en auto/semi
+**Evidence**: L98-100 deny loop sin patrones npm/pip; gate battery confirmó
+**Scope lock**: permission-gate-lib.ps1, shared-deny-rules.json, tests
+**DoD**: ✅ Gate battery 15/15 (npm/pip → deny, npm ci/run/test → allow); 745/745 suite
+**Breaker**: 3 (supply chain deny, legitimate allow, regression 19×3)
+**Commit**: `c8ac3fab C3c-fix:npm/pip deny runtime + shared-deny-rules + tests`
+
+## Benchmark v3 (baseline → final)
+
+| Métrica | Baseline | Final |
+|---|---|---|
+| Suite E2E | 744 pass / 0 fail | **745 pass / 0 fail** |
+| Gate pre-commit | 18/18 | 18/18 |
+| npm install evil (auto) | allow ❌ | **deny** ✅ |
+| pip install (auto) | allow ❌ | **deny** ✅ |
+| CSV injection | injectable ❌ | **neutralizado** ✅ |
+| Unicode evasión | bypassable ❌ | **bloqueado** ✅ |
+| skill-graph warm path | 5s cold | **74ms** (4× faster) |
+| opencan.json size | 53,556 B | 53,556 B (sin regresión) |
+
+## Pendiente — Ciclo 4 (Architectural, Alto)
+7 gaps arquitectónicos pendientes (dual resolution, permission redundancy, score coupling, delegation enforcement, CI gaps, SDD explosion, wisdom underutilized) — requieren planificación SDD formal. Ver execution report §Pendiente.

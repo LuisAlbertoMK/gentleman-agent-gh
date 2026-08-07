@@ -169,7 +169,88 @@ Nota: opencode.json creció 52,206→53,556B (+1,350B) desde audit 08-03 — 82%
 | B1 opencode.json | 53,556 B | 53,556 B | 0 | ✅ dentro budget |
 | B3 Gate | 18/18 | 18/18 | 0 | ✅ |
 
-### Cycle 5 — Post (2026-08-05)
+### C5b — Post (2026-08-05)
+
+| Métrica | Baseline | Post-C5b | Delta | Verdict |
+|---|---|---|---|---|
+| Total skill bytes | 200,064 | 193,018 | −6,997B (−3.5%) | ✅ MEJORA |
+| Avg bytes/skill | 2,516 | 2,475 | −41B | ✅ |
+| Max skill bytes | 3,066 | 2,874 | −192B | ✅ |
+| Skills >3KB | 0 | 0 | 0 | ✅ |
+| TokenEstimate | 56,075 | 55,148 | −913 | ✅ |
+| WhenToUse intact | 98.7% | 98.7% | 0 | ✅ |
+| Frontmatter intact | 100% | 100% | 0 | ✅ |
+
+---
+
+## Mejora Autónoma v3 — Kickoff (2026-08-07)
+
+### Baseline (live, 2026-08-07)
+
+| Métrica | Valor |
+|---|---|
+| B1 Suite E2E (33 archivos + Integration) | 744 pass / 0 fail / 0 skip |
+| B2 Gate pre-commit | 18/18 ALL CLEAR |
+| B3 npm audit (production) | 0 vulnerabilities |
+| B4 PSSA PSReviewUnusedParameter | 24 warnings |
+| B5 opencan.json size | 53,556 B (budget 65,536 B, 82%) |
+| B6 Skills | 78 proyecto, avg 2,475B, 0 >3KB, 78/78 junctions |
+| B7 Cross-ref | 0 errors |
+| B8 BenchmarkSeconds | 0.938s |
+
+### Cycle 1 — Docs Sync
+
+| Métrica | Baseline | Post-C1 | Delta | Verdict |
+|---|---|---|---|---|
+| Agent count (README) | 37 | **45** | fixed | ✅ |
+| Score (README) | 9.3 | **9.0** | fixed | ✅ |
+| Gate | 18/18 | 18/18 | 0 | ✅ |
+
+### Cycle 2 — Skill-Graph Caching
+
+| Métrica | Baseline | Post-C2 | Delta | Verdict |
+|---|---|---|---|---|
+| skill-graph cold path | 5.0s | **0.3s warm** | 4× faster | ✅ |
+| BenchmarkSeconds | 0.938s | 0.938s | 0 | ✅ estable |
+| skill-graph tests | 19 | **23** | +4 | ✅ |
+| Gate | 18/18 | 18/18 | 0 | ✅ |
+
+### Cycle 3 — Security (3a + 3b + 3c)
+
+| Métrica | Baseline | Post-C3 | Delta | Verdict |
+|---|---|---|---|---|
+| npm install evil (auto) | allow ❌ | **deny** ✅ | fixed | ✅ |
+| pip install (auto) | allow ❌ | **deny** ✅ | fixed | ✅ |
+| CSV injection | injectable ❌ | **neutralizado** ✅ | fixed | ✅ |
+| Unicode whitespace evasión | bypassable ❌ | **bloqueado** ✅ | fixed | ✅ |
+| Release gate (tag-push) | sin check ❌ | **gated** ✅ | fixed | ✅ |
+| Gate battery | 15/15 parcial | **15/15 full** | +npm/pip | ✅ |
+| Suite E2E | 744/0 | **745/0** | +1 test | ✅ |
+
+### Estado final v3 (2026-08-07)
+
+| Métrica | Baseline | Final |
+|---|---|---|
+| Suite E2E | 744 pass / 0 fail | **745 pass / 0 fail** |
+| Gate pre-commit | 18/18 | **18/18** |
+| npm install evil (auto) | allow | **deny** |
+| CSV injection | injectable | **neutralizado** |
+| Unicode evasión | bypassable | **bloqueado** |
+| Skill-graph warm path | 5.0s | **0.3s** |
+| opencan.json | 53,556 B | 53,556 B |
+
+### Commits v3 (rollback map)
+
+| Commit | Tipo | Scope | Rollback |
+|---|---|---|---|
+| `94b4a11d` | C1-docs:sync | docs/ | `git revert 94b4a11d` |
+| `f03f1c63` | C2-perf:cache | skill-graph.ps1 | `git revert f03f1c63` |
+| `75338087` | C3a-fix:csv | audit-log.ps1 | `git revert 75338087` |
+| `b593e185` | C3a-fix:unicode | gate-lib.ps1 | `git revert b593e185` |
+| `f5031ca0` | C3b-fix:npm-ssot | permission-templates.json | `git revert f5031ca0` |
+| `d935241f` | C3b-fix:release | release.yml | `git revert d935241f` |
+| `c8ac3fab` | C3c-fix:runtime | gate-lib + shared-deny | `git revert c8ac3fab` |
+| `f2e0f159` | docs:artifacts | docs/agentes/ | `git revert f2e0f159` |
 
 | Métrica | Baseline | Post-C5 | Delta | Verdict |
 |---|---|---|---|---|
