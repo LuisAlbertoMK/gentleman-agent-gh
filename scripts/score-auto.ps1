@@ -85,6 +85,8 @@ try {
 # ============================================================
 
 Push-Location $repoRoot
+# C4c: Single path definition — CWD-independent .project.json reference
+$projectJsonPath = Join-Path $repoRoot ".project.json"
 
 $math       = [math]
 $dimensions = @{}
@@ -131,7 +133,7 @@ $crossRefClean = try { ($crossRefOutput | ConvertFrom-Json -EA SilentlyContinue)
 $backlogData   = try { $backlogRaw | ConvertFrom-Json -EA SilentlyContinue } catch { $null }
 
 $hasReadme      = Test-Path "README.md"
-$hasProjectJson = Test-Path ".project.json"
+$hasProjectJson = Test-Path $projectJsonPath  # C4c: use single path definition
 
 # ============================================================
 # 3. DIMENSION SCORING
@@ -205,9 +207,9 @@ foreach ($key in $dimNames.Keys) {
 }
 
 # Compare with existing .project.json for trend
-if (Test-Path ".project.json") {
+if (Test-Path $projectJsonPath) {
     try {
-        $prevProjectData = Get-Content ".project.json" -Raw -Encoding UTF8 | ConvertFrom-Json
+        $prevProjectData = Get-Content $projectJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
         $prevScore = $prevProjectData.score.current
 
         if ($finalScore -gt $prevScore) {
@@ -248,7 +250,7 @@ try {
 
 # --- Sync .project.json (single source of truth) ---
 try {
-    $pjPath = Join-Path $repoRoot ".project.json"
+    $pjPath = $projectJsonPath  # C4c: single path definition (no Join-Path + hardcoded string)
     $skipWorktreeRemoved = $false
 
     # Validation: ensure score is sane before writing (ported from restore-project-score.ps1)

@@ -529,9 +529,11 @@ if ($null -ne $latestErrorJson) {
     } catch { $gatePassScore = 0 }
 }
 
+# C4c: $projectJsonPath set by score-auto.ps1 before dot-sourcing this file
+if (-not $projectJsonPath) { $projectJsonPath = ".project.json" }
 # Cross-Ref Freshness: when was .project.json last updated
 $crossRefFreshScore = 10
-$pjPath = ".project.json"
+$pjPath = $projectJsonPath
 if (Test-Path $pjPath) {
     $pjAge = [int]((Get-Date) - (Get-Item $pjPath).LastWriteTime).TotalDays
     if ($pjAge -gt 7)  { $crossRefFreshScore = 5 }
@@ -715,7 +717,7 @@ Add-Dimension "SD" $depthScore @{
 $sgScore = 10
 $sgDaysOld = 0
 $sgLastUpdated = "unknown"
-$pjStalenessPath = ".project.json"
+$pjStalenessPath = $projectJsonPath  # C4c: use externally-set path
 if (Test-Path $pjStalenessPath) {
     try {
         $pjData = Get-Content $pjStalenessPath -Raw | ConvertFrom-Json
