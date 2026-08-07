@@ -168,17 +168,17 @@ Describe "Semi mode — ask (not in allowlist)" {
         $r = Invoke-Gate -Command "Set-Content -Path test.txt -Value 'hello'" -Mode semi
         $r.verdict | Should -Be "ask"
     }
-    It "ASKS for pip install [env change]" {
+    It "DENIES pip install [supply chain]" {
         $r = Invoke-Gate -Command "pip install requests" -Mode semi
-        $r.verdict | Should -Be "ask"
+        $r.verdict | Should -Be "deny"
     }
-    It "ASKS for npm install [env change]" {
+    It "DENIES npm install [supply chain]" {
         $r = Invoke-Gate -Command "npm install lodash" -Mode semi
-        $r.verdict | Should -Be "ask"
+        $r.verdict | Should -Be "deny"
     }
-    It "ASKS for npm uninstall [env change]" {
+    It "DENIES npm uninstall [supply chain]" {
         $r = Invoke-Gate -Command "npm uninstall lodash" -Mode semi
-        $r.verdict | Should -Be "ask"
+        $r.verdict | Should -Be "deny"
     }
 }
 
@@ -412,10 +412,10 @@ Describe "Unicode whitespace normalization — no pattern evasion" {
         $r.verdict | Should -Not -Be "allow"
         $r.verdict | Should -Be "ask"
     }
-    It "ASKS npm install with no-break space U+00A0 [semi — never allow]" {
+    It "DENIES npm install with no-break space U+00A0 [semi — supply chain]" {
         $r = Invoke-Gate -Command ('npm' + [char]0x00A0 + 'install lodash') -Mode semi
         $r.verdict | Should -Not -Be "allow"
-        $r.verdict | Should -Be "ask"
+        $r.verdict | Should -Be "deny"
     }
     It "DENIES git clean with narrow no-break space U+202F [manual]" {
         $r = Invoke-Gate -Command ('git' + [char]0x202F + 'clean -fdx') -Mode manual

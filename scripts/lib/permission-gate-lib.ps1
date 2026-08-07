@@ -37,7 +37,12 @@ $script:denyPatterns = @(
     '^Add-MpPreference', '^Set-MpPreference',
     '^saps\s', '^start\s',
     # Push --force is always denied
-    '^git push --force', '^git push -f'
+    '^git push --force', '^git push -f',
+    # Package managers — supply chain attack prevention (prevents npm install <evil-pkg> etc.)
+    '^npm\sexec\s', '^npm\sinstall\s', '^npm\si\s', '^npm\sadd\s',
+    '^npm\suninstall\s', '^npm\sremove\s', '^npm\supdate\s', '^npm\spublish\s',
+    '^pip\sinstall\s', '^pip3\sinstall\s',
+    '^yarn\s(install|add)\s', '^pnpm\s(install|add|i)\s', '^bun\s(install|add)\s'
 )
 
 # Destructive filesystem — DENY in manual/semi, ASK in auto (user confirms deletes)
@@ -63,7 +68,7 @@ $script:semiAllowPatterns = @(
     # Build/test
     '^npm test', '^pytest\s', '^go test', '^Invoke-Pester',
     '^dotnet test', '^cargo test', '^npm run', '^npm ci',
-    '^pip (freeze|list|show|install --user)(\s|$)',
+    '^pip (freeze|list|show)(\s|$)',
     # Git read-only (no args)
     '^git stash list$', '^git status$', '^git diff$', '^git log$'
 )
