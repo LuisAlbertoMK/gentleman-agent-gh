@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # Pre-commit hook — Gentleman Agent quality gate
-# All 13 checks run via pre-commit-gate.ps1 (single pwsh invocation).
+# All 21 checks run via pre-commit-gate.ps1 (single pwsh invocation).
 # Skippable with: git commit --no-verify
 #
 

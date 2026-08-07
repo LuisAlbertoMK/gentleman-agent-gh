@@ -67,15 +67,17 @@ if (Test-Path $PromptsPath) {
 }
 if ($promptFiles.Count -gt 0) {
     $avgPrompt = [math]::Round(($promptFiles | Measure-Object -Property Length -Average).Average, 0)
+    $overBudgetPrompt = $promptFiles | Where-Object { $_.Length -gt $BudgetBytes }
     $stats.prompts = [PSCustomObject]@{
         count      = $promptFiles.Count
         average    = $avgPrompt
         budget     = $BudgetBytes
         underBudget = ($promptFiles | Where-Object { $_.Length -le $BudgetBytes }).Count
+        overBudgetFiles = $overBudgetPrompt.Count
         passed     = $avgPrompt -le $BudgetBytes
     }
     if ($avgPrompt -gt $BudgetBytes) {
-        $violations += "prompts avg $($avgPrompt)B exceeds $BudgetBytes B budget"
+        $violations += "prompts avg $($avgPrompt)B exceeds $BudgetBytes B budget ($($overBudgetPrompt.Count) files over)"
     }
 }
 
@@ -88,7 +90,8 @@ if ($Json) {
         violations = $violations
         stats     = $stats
     } | ConvertTo-Json -Compress
-    exit (if ($passed) { 0 } else { 1 })
+    $ec = if ($passed) { 0 } else { 1 }
+    exit $ec
 }
 
 # Human-readable
@@ -101,4 +104,5 @@ if ($passed) {
     $violations | ForEach-Object { Write-Output "   X  $_" }
 }
 
-exit (if ($passed) { 0 } else { 1 })
+$ec = if ($passed) { 0 } else { 1 }
+exit $ec

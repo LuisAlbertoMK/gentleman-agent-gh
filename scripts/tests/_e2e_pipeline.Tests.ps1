@@ -117,7 +117,7 @@ Describe 'E2E: Security Gates' {
 # ============================================================
 Describe 'E2E: Pre-commit Hook' {
 
-    It 'hook delegates to pre-commit-gate.ps1 with [13/13] + [14/14] checks' {
+    It 'hook delegates to pre-commit-gate.ps1 with [13/13] through [21/21] checks' {
         $hookPath = Join-Path $script:ProjectRoot ".githooks/pre-commit"
         $gatePath = Join-Path $script:ProjectRoot ".githooks/pre-commit-gate.ps1"
         $hookPath | Should -Exist
@@ -125,6 +125,9 @@ Describe 'E2E: Pre-commit Hook' {
         Get-Content $hookPath -Raw | Should -Match 'pre-commit-gate\.ps1'
         Get-Content $gatePath -Raw | Should -Match '\[13/13\]'
         Get-Content $gatePath -Raw | Should -Match '\[14/14\]'
+        Get-Content $gatePath -Raw | Should -Match '\[19/19\]'
+        Get-Content $gatePath -Raw | Should -Match '\[20/20\]'
+        Get-Content $gatePath -Raw | Should -Match '\[21/21\]'
     }
 
     It 'hook Pester step uses Invoke-Pester and blocks on failure' {
@@ -140,6 +143,22 @@ Describe 'E2E: Pre-commit Hook' {
         for ($i = 1; $i -le 13; $i++) {
             $content | Should -Match "\[$i/13\]"
         }
+    }
+
+    It 'gate includes C6/C8/C9 validation checks for new scripts' {
+        $gatePath = Join-Path $script:ProjectRoot ".githooks/pre-commit-gate.ps1"
+        $content = Get-Content $gatePath -Raw
+        $content | Should -Match '\[19/19\] Token budget'
+        $content | Should -Match '\[20/20\] Budget script validation'
+        $content | Should -Match '\[21/21\] Context watchdog'
+        $content | Should -Match 'check-token-budget\.ps1'
+        $content | Should -Match 'check-budget\.ps1'
+        $content | Should -Match 'ctx-watchdog\.ps1'
+    }
+
+    It 'gate header reflects 21 total checks' {
+        $gatePath = Join-Path $script:ProjectRoot ".githooks/pre-commit-gate.ps1"
+        Get-Content $gatePath -Raw | Should -Match 'ALL 21 checks'
     }
 }
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 #requires -Version 7
 <#
-.SYNOPSIS Pre-commit quality gate — ALL 17 checks in a single pwsh invocation
+.SYNOPSIS Pre-commit quality gate — ALL 21 checks in a single pwsh invocation
 .DESCRIPTION Called by .githooks/pre-commit. Replaces 9 separate pwsh calls.
   Saves ~1.8s per commit by eliminating redundant process startups.
 #>
@@ -260,6 +260,61 @@ if (Test-Path -LiteralPath $backlogScript) {
     & "$RepoRoot/scripts/check-backlog-integrity.ps1" *> $null
     if ($LASTEXITCODE -eq 0) { Pass } else { Fail "backlog integrity check failed — CYCLE.md status does not match repo reality" }
 } else { Fail "backlog-integrity.ps1 not found at $backlogScript" }
+
+# [19/19] Token budget check (C9)
+# Runs check-token-budget.ps1 to audit skill/prompt file sizes against
+# the 2,000-byte average target (ADR-007). Uses Warn (not Fail) since
+# oversize skills are a known condition under ADR-018.
+Write-Host "[19/19] Token budget check..."
+$budgetScript = Join-Path $RepoRoot 'scripts/check-token-budget.ps1'
+if (Test-Path -LiteralPath $budgetScript) {
+    $budgetOut = & "$RepoRoot/scripts/check-token-budget.ps1" -Json 2>&1 | Out-String
+    $budgetResult = try { $budgetOut | ConvertFrom-Json -ErrorAction Stop } catch { $null }
+    if ($budgetResult -and -not $budgetResult.passed) {
+        $skillAvg = if ($budgetResult.stats.skills) { $budgetResult.stats.skills.average } else { 'N/A' }
+        $promptAvg = if ($budgetResult.stats.prompts) { $budgetResult.stats.prompts.average } else { 'N/A' }
+        $overFiles = 0
+        if ($budgetResult.stats.skills) { $overFiles += $budgetResult.stats.skills.overBudgetFiles }
+        if ($budgetResult.stats.prompts) { $overFiles += $budgetResult.stats.prompts.overBudgetFiles }
+        Warn "token budget exceeded — skills $($skillAvg)B/$($budgetResult.budget), prompts $($promptAvg)B/$($budgetResult.budget) ($overFiles files over)"
+    } else { Pass }
+} else {
+    Warn "check-token-budget.ps1 not found"
+}
+
+# [20/20] Budget script validation (C6)
+# Verifies check-budget.ps1 is present and syntactically valid —
+# ensures the budget enforcement tool is available for runtime use
+# by the orchestrator during agent sessions.
+Write-Host "[20/20] Budget script validation..."
+$budgetRuntime = Join-Path $RepoRoot 'scripts/check-budget.ps1'
+if (Test-Path -LiteralPath $budgetRuntime) {
+    $btTokens = $null; $btErrors = $null
+    [System.Management.Automation.Language.Parser]::ParseFile($budgetRuntime, [ref]$btTokens, [ref]$btErrors) | Out-Null
+    if ($btErrors) {
+        $btErrors | ForEach-Object { Write-Host "    $_" }
+        Fail "check-budget.ps1 has syntax errors"
+    } else { Pass }
+} else {
+    Warn "check-budget.ps1 not found"
+}
+
+# [21/21] Context watchdog validation (C8)
+# Verifies ctx-watchdog.ps1 is present and syntactically valid —
+# ensures the context-zone monitoring tool is available for runtime
+# use by the skill-graph during agent sessions.
+Write-Host "[21/21] Context watchdog validation..."
+$watchdogScript = Join-Path $RepoRoot 'scripts/ctx-watchdog.ps1'
+if (Test-Path -LiteralPath $watchdogScript) {
+    $wdTokens = $null; $wdErrors = $null
+    [System.Management.Automation.Language.Parser]::ParseFile($watchdogScript, [ref]$wdTokens, [ref]$wdErrors) | Out-Null
+    if ($wdErrors) {
+        $wdErrors | ForEach-Object { Write-Host "    $_" }
+        Fail "ctx-watchdog.ps1 has syntax errors"
+    } else { Pass }
+} else {
+    Warn "ctx-watchdog.ps1 not found"
+}
 
 # Summary
 Write-Host "`n=== Gate: $passed/$($passed+$failed) passed ==="
