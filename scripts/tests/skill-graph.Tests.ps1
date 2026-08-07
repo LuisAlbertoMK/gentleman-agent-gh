@@ -271,6 +271,55 @@ Describe 'Skill Graph Integration' {
 }
 
 # ============================================================
+Describe 'Resolve-Skill C4a: name-match bonus (dual resolution alignment)' {
+    BeforeEach {
+        $script:skillRegistry = @()
+        # Name-match bonus: skill name contains token but triggers don't
+        Register-Skill 'accessibility' 'a11y|wcag|screen reader' 'web-quality' 'medium' '' '' 'Web accessibility audit'
+        Register-Skill 'seo-tools' 'SEO|meta tags|sitemap|structured data' 'web-quality' 'medium' '' '' 'SEO optimization tools'
+    }
+
+    It 'applies name-match bonus (3 pts) when task token matches skill name but not triggers' {
+        # "accessibility" matches the skill NAME but NOT any trigger (a11y|wcag|screen reader)
+        $results = @(Resolve-Skill 'accessibility please' 0)
+
+        $results.Count | Should -Be 1
+        $results[0].Name | Should -Be 'accessibility'
+        $results[0].Score | Should -Be 3  # name bonus only, no trigger match
+    }
+
+    It 'combines trigger match (1pt) + name bonus (3pts) for score 4' {
+        # "a11y" matches trigger "a11y" (+1) AND token "accessibility" matches name (+3)
+        $results = @(Resolve-Skill 'accessibility a11y' 0)
+
+        $results[0].Name | Should -Be 'accessibility'
+        $results[0].Score | Should -Be 4  # 1 trigger + 3 name
+    }
+
+    It 'does NOT apply name bonus when token only matches trigger' {
+        # "a11y" only matches trigger, skill name "accessibility" doesn't contain "a11y"
+        $results = @(Resolve-Skill 'a11y testing' 0)
+
+        $results[0].Name | Should -Be 'accessibility'
+        $results[0].Score | Should -Be 1  # only trigger match
+    }
+
+    It 'uses same token-split regex as skill-resolver-fast.ps1 (C4a alignment)' {
+        # Both resolvers must tokenize identically: \s+|[-_/.,!?;:()]
+        # "triple-verify" splits to ["triple", "verify"] (hyphen is delimiter)
+        # "pre.commit" splits to ["pre", "commit"] (dot is delimiter)
+        $testTask = 'triple-verify pre.commit'
+        $tokens = $testTask.ToLowerInvariant() -split '\s+|[-_/.,!?;:()]' |
+            Where-Object { $_.Length -gt 2 } | Select-Object -Unique
+
+        $tokens | Should -Contain 'triple'
+        $tokens | Should -Contain 'verify'
+        $tokens | Should -Contain 'pre'
+        $tokens | Should -Contain 'commit'
+    }
+}
+
+# ============================================================
 Describe 'Skill Registry Cache' {
     BeforeAll {
         $script:testCsv = Join-Path $TestDrive 'test-registry.csv'

@@ -213,6 +213,12 @@ function Resolve-Skill {
                 if ($trigger.ToLowerInvariant() -match $pattern) { $matchCount++; break }
             }
         }
+        # Name match bonus — aligned with skill-resolver-fast.ps1 (C4a: dual resolution fix)
+        $skillNameLower = $skill.Name.ToLowerInvariant()
+        foreach ($token in $Tokens) {
+            $pattern = [regex]::Escape($token)
+            if ($skillNameLower -match $pattern) { $matchCount += 3; break }
+        }
         if ($matchCount -gt 0) { $SkillScores[$skill.Name] = $matchCount }
     }
     if ($externalPatterns.Count -gt 0) {

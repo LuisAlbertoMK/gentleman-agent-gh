@@ -31,45 +31,41 @@ if (-not (Test-Path $RegistryPath)) {
 
 $registry = Get-Content -Path $RegistryPath -Raw | ConvertFrom-Json
 $taskLower = $Task.ToLower()
-$taskTokens = $taskLower -split "[\s,;:.!?]+" | Where-Object { $_.Length -gt 2 }
+# Token-split aligned with skill-graph.ps1 Resolve-Skill (C4a: dual resolution fix)
+$taskTokens = $taskLower -split '\s+|[-_/.,!?;:()]' |
+    Where-Object { $_.Length -gt 2 } | Select-Object -Unique
 
 $scores = @{}
 
-foreach ($trigger in $registry.trigger_index.PSObject.Properties) {
-    $triggerKey = $trigger.Name.ToLower()
-    $skillNames = $trigger.Value
-
-    # Score: count token overlaps between task and trigger
-    $triggerTokens = $triggerKey -split "[\s,;/]+" | Where-Object { $_.Length -gt 2 }
-    $matchCount = 0
-    foreach ($tt in $triggerTokens) {
-        foreach ($tk in $taskTokens) {
-            if ($tk -eq $tt -or $tk -like "*$tt*" -or $tt -like "*$tk*") {
-                $matchCount++
-                break
+# Match algorithm aligned with skill-graph.ps1 (C4a: dual resolution fix)
+# Uses [regex]::Escape + -match (trigger key contains token) instead of bidirectional -like
+# Each task token contributes at most 1 match per skill (break after first trigger match)
+foreach ($tk in $taskTokens) {
+    $pattern = [regex]::Escape($tk)
+    foreach ($trigger in $registry.trigger_index.PSObject.Properties) {
+        $triggerKey = $trigger.Name.ToLower()
+        if ($triggerKey -match $pattern) {
+            foreach ($skillName in $trigger.Value) {
+                if (-not $scores.ContainsKey($skillName)) {
+                    $scores[$skillName] = 0
+                }
+                $scores[$skillName]++
             }
-        }
-    }
-
-    if ($matchCount -gt 0) {
-        foreach ($skillName in $skillNames) {
-            if (-not $scores.ContainsKey($skillName)) {
-                $scores[$skillName] = 0
-            }
-            $scores[$skillName] += $matchCount
+            break  # align with skill-graph: one count per token
         }
     }
 }
 
-# Also check skill names directly
+# Also check skill names directly — aligned with skill-graph (regex match, +3 bonus)
 foreach ($skill in $registry.skills.PSObject.Properties) {
     $name = $skill.Name.ToLower()
     foreach ($tk in $taskTokens) {
-        if ($name -like "*$tk*") {
+        $namePattern = [regex]::Escape($tk)
+        if ($name -match $namePattern) {
             if (-not $scores.ContainsKey($skill.Name)) {
                 $scores[$skill.Name] = 0
             }
-            $scores[$skill.Name] += 3  # name match = high score
+            $scores[$skill.Name] += 3  # name match = high score (aligned with skill-graph)
             break
         }
     }
