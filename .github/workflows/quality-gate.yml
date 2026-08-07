@@ -105,7 +105,43 @@ jobs:
           }
           Write-Output "OK: backlog integrity check passed"
 
-  lint-linux:
+      - name: Token budget check
+        # ADR-007/C9: audit skill/prompt file sizes against 2,000B avg target
+        # (mirrors pre-commit gate check [19/19]). Warn-level — oversize skills
+        # are under ADR-018 (prompts immutable), not a commit blocker.
+        run: |
+          $result = & ./scripts/check-token-budget.ps1 -Json 2>&1 | Out-String
+          $jsonLine = $result | Where-Object { $_ -match '^\{' } | Select-Object -First 1
+          $json = $jsonLine | ConvertFrom-Json -ErrorAction SilentlyContinue
+          if ($json -and -not $json.passed) {
+            $skillAvg = if ($json.stats.skills) { $json.stats.skills.average } else { 'N/A' }
+            $promptAvg = if ($json.stats.prompts) { $json.stats.prompts.average } else { 'N/A' }
+            $overFiles = 0
+            if ($json.stats.skills) { $overFiles += $json.stats.skills.overBudgetFiles }
+            if ($json.stats.prompts) { $overFiles += $json.stats.prompts.overBudgetFiles }
+            Write-Output "::warning title=Token Budget::skills $($skillAvg)B/$($json.budget), prompts $($promptAvg)B/$($json.budget) ($overFiles files over)"
+          }
+          else { Write-Output "OK: All skills/prompts within token budget" }
+
+      - name: Budget script validation
+        # (mirrors pre-commit gate check [20/20]).
+        run: |
+          $path = 'scripts/check-budget.ps1'
+          $tokens = $null; $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$tokens, [ref]$errors) | Out-Null
+          if ($errors) { Write-Error "check-budget.ps1 has syntax errors"; exit 1 }
+          Write-Output "OK: check-budget.ps1 syntax validated"
+
+      - name: Context watchdog validation
+        # (mirrors pre-commit gate check [21/21]).
+        run: |
+          $path = 'scripts/ctx-watchdog.ps1'
+          $tokens = $null; $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$tokens, [ref]$errors) | Out-Null
+          if ($errors) { Write-Error "ctx-watchdog.ps1 has syntax errors"; exit 1 }
+          Write-Output "OK: ctx-watchdog.ps1 syntax validated"
+
+    lint-linux:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:

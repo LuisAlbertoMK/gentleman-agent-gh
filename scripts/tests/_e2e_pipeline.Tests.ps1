@@ -160,6 +160,18 @@ Describe 'E2E: Pre-commit Hook' {
         $gatePath = Join-Path $script:ProjectRoot ".githooks/pre-commit-gate.ps1"
         Get-Content $gatePath -Raw | Should -Match 'ALL 21 checks'
     }
+
+    It 'CI workflow mirrors new gate checks [19-21]' {
+        $ciPath = Join-Path $script:ProjectRoot ".github/workflows/quality-gate.yml"
+        $ciPath | Should -Exist
+        $content = Get-Content $ciPath -Raw
+        $content | Should -Match 'Token budget check'
+        $content | Should -Match '\[19/19\]'
+        $content | Should -Match 'Budget script validation'
+        $content | Should -Match '\[20/20\]'
+        $content | Should -Match 'Context watchdog validation'
+        $content | Should -Match '\[21/21\]'
+    }
 }
 
 # ============================================================
