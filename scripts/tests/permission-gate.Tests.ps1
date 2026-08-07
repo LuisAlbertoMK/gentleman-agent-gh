@@ -392,3 +392,49 @@ Describe "Whitespace normalization — no pattern evasion" {
         $r.verdict | Should -Be "allow"
     }
 }
+
+# ============================================================
+# Unicode whitespace evasion — \p{Zs} separators + \p{Cf} format
+# chars (U+200B ZWSP, U+00A0 NBSP, U+202F, U+180E) must not
+# bypass anchored ^patterns
+# ============================================================
+Describe "Unicode whitespace normalization — no pattern evasion" {
+    It "DENIES git clean with zero-width space U+200B [manual]" {
+        $r = Invoke-Gate -Command ('git' + [char]0x200B + 'clean -fdx') -Mode manual
+        $r.verdict | Should -Be "deny"
+    }
+    It "DENIES git clean with zero-width space U+200B [semi]" {
+        $r = Invoke-Gate -Command ('git' + [char]0x200B + 'clean -fdx') -Mode semi
+        $r.verdict | Should -Be "deny"
+    }
+    It "ASKS git clean with zero-width space U+200B [auto — never allow]" {
+        $r = Invoke-Gate -Command ('git' + [char]0x200B + 'clean -fdx') -Mode auto
+        $r.verdict | Should -Not -Be "allow"
+        $r.verdict | Should -Be "ask"
+    }
+    It "ASKS npm install with no-break space U+00A0 [semi — never allow]" {
+        $r = Invoke-Gate -Command ('npm' + [char]0x00A0 + 'install lodash') -Mode semi
+        $r.verdict | Should -Not -Be "allow"
+        $r.verdict | Should -Be "ask"
+    }
+    It "DENIES git clean with narrow no-break space U+202F [manual]" {
+        $r = Invoke-Gate -Command ('git' + [char]0x202F + 'clean -fdx') -Mode manual
+        $r.verdict | Should -Be "deny"
+    }
+    It "DENIES git clean with Mongolian vowel separator U+180E [manual]" {
+        $r = Invoke-Gate -Command ('git' + [char]0x180E + 'clean -fdx') -Mode manual
+        $r.verdict | Should -Be "deny"
+    }
+    It "DENIES git clean with triple space [evasion attempt]" {
+        $r = Invoke-Gate -Command "git  clean  -fdx" -Mode manual
+        $r.verdict | Should -Be "deny"
+    }
+    It "DENIES git clean with LEADING zero-width space U+200B [manual]" {
+        $r = Invoke-Gate -Command ([char]0x200B + 'git clean -fdx') -Mode manual
+        $r.verdict | Should -Be "deny"
+    }
+    It "still ALLOWS git status with U+200B [no false positive]" {
+        $r = Invoke-Gate -Command ('git' + [char]0x200B + 'status') -Mode auto
+        $r.verdict | Should -Be "allow"
+    }
+}

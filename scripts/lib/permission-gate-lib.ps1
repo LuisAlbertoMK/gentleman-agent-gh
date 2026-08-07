@@ -84,8 +84,14 @@ function Get-CommandClass {
     if (-not $cmd) { return 'help' }
 
     # Normalize whitespace so anchored ^patterns can't be evaded with
-    # multiple spaces/tabs or leading padding (e.g. "git  clean" or " git clean").
-    $cmd = $cmd -replace '\s+', ' '
+    # multiple spaces/tabs, leading padding (e.g. "git  clean" or " git clean"),
+    # or Unicode whitespace/format characters (e.g. "git`u{200B}clean" —
+    # zero-width space, U+00A0 no-break space, U+202F narrow no-break space,
+    # U+180E Mongolian vowel separator). \s alone misses the Cf format chars;
+    # \p{Zs} adds every space-separator, \p{Cf} every format char (ZWSP etc.).
+    # The collapse maps them all to a regular space so .Trim() can then strip
+    # any leading/trailing padding.
+    $cmd = $cmd -replace '[\s\p{Zs}\p{Cf}]+', ' '
     $cmd = $cmd.Trim()
 
     # 1. Check deny patterns (all modes) — hard security floor
