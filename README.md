@@ -2,7 +2,7 @@
 
 ## What is this?
 
-**Gentleman Agent** is an **AI software development team** for OpenCode. Instead of a single chatbot, you get 37 specialized agents working together:
+**Gentleman Agent** is an **AI software development team** for OpenCode. Instead of a single chatbot, you get 45 specialized agents working together:
 
 - 🏗️ **Lead Architect** — Senior Architect mentor solving complex tasks
 - 🔒 **Specialists** — Security, performance, frontend, etc. consultants (FREE TIER)
@@ -15,19 +15,19 @@
 
 ---
 
-Suite of **79 skills** (+ `_shared`) + **83 PowerShell scripts** for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
+Suite of **78 skills** (+ `_shared`) + **91 top-level scripts** (84 PowerShell + 7 shell) for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
-> **Score**: 9.3/10 (13 dimensions) — tracking in .project.json.
-> **Skills**: 79 (+ `_shared`)
-> **Cycle**: 28 active (Security Hardening + Quality Recovery)
+> **Score**: 9.0/10 (13 dimensions) — tracking in .project.json.
+> **Skills**: 78 (+ `_shared`)
+> **Cycle**: 28 (active) — Security Hardening + Quality Recovery
 
 ---
 
 ## Features
 
 ### Multi-Agent Architecture
-37 agents total: main orchestrator (`gentleman-vMK`) + 13 specialists + 4 subagent twins + 9 SDD pipeline agents + 5 auto-mode + 5 semi-mode variants:
+45 agents total: main orchestrator (`gentleman-vMK`) + 12 specialists + 12 subagent twins + 9 SDD pipeline agents + 5 auto-mode + 5 semi-mode variants (`sdd-orchestrator` orchestrates the SDD phases over the 9 phase subagents):
 
 | Agent | Model | Specialty |
 |-------|-------|-----------|
@@ -45,6 +45,7 @@ Suite of **79 skills** (+ `_shared`) + **83 PowerShell scripts** for [OpenCode](
 | `gentleman-implementer` | deepseek-v4-flash-free | Plan executor (FREE TIER) |
 | `gentleman-reviewer` | claude-sonnet-4-6 | Code review — 4R (Risk/Readability/Reliability/Resilience) |
 | `gentleman-deep-sub` | nemotron-3-ultra-free | Deep reasoning subagent — delegable via Task tool |
+| `gentleman-codex-sub` | deepseek-v4-flash-free | Code generation subagent — delegable via Task tool |
 | `gentleman-quick-sub` | mimo-v2.5-free | Fast executor subagent — delegable via Task tool |
 | `gentleman-implementer-sub` | deepseek-v4-flash-free | Plan executor subagent — delegable via Task tool |
 | `gentleman-security-sub` | nemotron-3-ultra-free | Security audit subagent (read-only) — delegable via Task tool |
@@ -54,6 +55,7 @@ Suite of **79 skills** (+ `_shared`) + **83 PowerShell scripts** for [OpenCode](
 | `gentleman-performance-sub` | nemotron-3-ultra-free | Performance subagent (read-only) — delegable via Task tool |
 | `gentleman-datascience-sub` | mimo-v2.5-free | Data science subagent (read-only) — delegable via Task tool |
 | `gentleman-docs-sub` | big-pickle | Documentation subagent (read-only) — delegable via Task tool |
+| `gentleman-reviewer-sub` | claude-sonnet-4-6 | Code review subagent — 4R (Risk/Readability/Reliability/Resilience) |
 | `sdd-orchestrator` | claude-sonnet-4-6 | SDD pipeline orchestration |
 | `gentleman-deep-auto` | nemotron-3-ultra-free | — AUTO mode (same model, `*: allow`) |
 | `gentleman-quick-auto` | mimo-v2.5-free | — AUTO mode (same model, `*: allow`) |
@@ -150,11 +152,11 @@ The project uses two MCPs for cross-session memory:
 
 | Scope | Count | Reference |
 |-------|-------|-----------|
-| Skills | 79 specialized skills for analysis, security, testing, docs, and more | See [SKILLS-INDEX.md](SKILLS-INDEX.md) for full trigger table |
+| Skills | 78 specialized skills for analysis, security, testing, docs, and more | See [SKILLS-INDEX.md](SKILLS-INDEX.md) for full trigger table |
 
 ---
 
-## Scripts (83 in scripts/)
+## Scripts (91 top-level in scripts/)
 
 | Script | Purpose |
 |--------|---------|
@@ -188,12 +190,12 @@ The project uses two MCPs for cross-session memory:
 
 ```
 gentleman-agent-gh/
-├── .agents/skills/          # 79 skills + _shared (canonical, git-tracked)
+├── .agents/skills/          # 78 skills + _shared (canonical, git-tracked)
 │   ├── quality-gate/
 │   ├── code-review-agent/
 │   └── .../
 ├── skills/                  # Junctions workspace (git-ignored)
-├── scripts/                 # 83 PowerShell scripts
+├── scripts/                 # 91 top-level scripts (84 PowerShell + 7 shell)
 │   └── smoke/               # Smoke tests
 ├── docs/                    # Documentation
 │   ├── metricas/            # Session metrics

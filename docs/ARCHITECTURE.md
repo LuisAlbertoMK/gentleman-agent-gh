@@ -6,7 +6,7 @@
 
 ## System Overview
 
-Gentleman Agent is a **multi-agent AI development team** for OpenCode. It provides 24 specialized agents, 79 skills, and 123 PowerShell scripts that work together to deliver verified, high-quality code changes.
+Gentleman Agent is a **multi-agent AI development team** for OpenCode. It provides 45 agents, 78 skills, and 91 top-level scripts (84 PowerShell + 7 shell) that work together to deliver verified, high-quality code changes.
 
 ### Core Principles
 
@@ -73,7 +73,7 @@ Gentleman Agent is a **multi-agent AI development team** for OpenCode. It provid
 
 ### 2. Skill Layer (`.agents/skills/`)
 
-79 skills + `_shared` references. Organized by domain:
+78 skills + `_shared` references. Organized by domain:
 
 | Domain | Skills | Examples |
 |--------|--------|----------|
@@ -90,7 +90,7 @@ Gentleman Agent is a **multi-agent AI development team** for OpenCode. It provid
 
 ### 3. Script Layer (`scripts/`)
 
-123 PowerShell scripts organized by function:
+91 top-level scripts (84 PowerShell + 7 shell) organized by function:
 
 | Category | Scripts | Key Files |
 |----------|---------|-----------|
@@ -273,7 +273,7 @@ Fix applied
 
 ```
 gentleman-agent-gh/
-├── .agents/skills/          # 79 skills + _shared
+├── .agents/skills/          # 78 skills + _shared
 ├── .github/workflows/       # CI/CD (quality-gate, release)
 ├── docs/
 │   ├── ARCHITECTURE.md      # This file
@@ -288,7 +288,7 @@ gentleman-agent-gh/
 ├── scripts/
 │   ├── lib/                 # Shared libraries (score-dims.ps1)
 │   ├── tests/               # Pester tests
-│   └── *.ps1                # 123 operational scripts
+│   └── *.ps1                # 84 operational PowerShell scripts (+ 7 .sh)
 ├── AGENTS.md                # Persona + project rules
 ├── PROTOCOL.md              # Operational workflows
 ├── opencode.json            # Agent definitions + permissions

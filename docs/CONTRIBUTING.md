@@ -7,7 +7,7 @@
 
 ## Development workflow
 
-1. Fork the repo and create a branch from `master`
+1. Fork the repo and create a branch from `main`
 2. Make changes using conventional commits (`feat:`, `fix:`, `docs:`, `refactor:`, `cycle:`)
 3. Ensure quality gate passes locally: run the checks in `.github/workflows/quality-gate.yml`
 4. Open a PR with a clear description and link to the related issue
@@ -44,7 +44,7 @@
    ---
    ```
 4. **Keep it under 3KB** — use Karpathy compression (rules > tutorial prose)
-5. **Register in skill-graph.ps1**: Add a `Register-Skill` line with triggers, category, effort, dependencies
+5. **Register in `data/skills-registry.csv`**: Add a `Name|Triggers|Category|Effort|DependsOn|Related|Description` row (consumed by `skill-graph.ps1`)
 6. **Add to SKILLS-INDEX.md**: Add a trigger row in the trigger table
 7. **Validate**: Run `scripts/skill-validate.ps1` for a 3-trial benchmark
 8. **Test**: Run `scripts/scan-skills.ps1` to verify registration completeness

@@ -121,7 +121,7 @@ Default: **LOW**. No auto-metrics/auditor for trivial/low.
 ## Project Context
 
 - **Repo**: Gentleman Agent — OpenCode skills, scripts & config
-- **Skills**: `.agents/skills/` (79 + `_shared`, git-tracked) · workspace `skills/` (junctions, git-ignored). Overrides: `skill-validate.ps1`, `check-skill-drift.ps1`, `check-config-drift.ps1`, `skill-graph.ps1`, `health-check.ps1`, `sync-vmk.ps1`.
+- **Skills**: `.agents/skills/` (78 + `_shared`, git-tracked) · workspace `skills/` (junctions, git-ignored). Overrides: `skill-validate.ps1`, `check-skill-drift.ps1`, `check-config-drift.ps1`, `skill-graph.ps1`, `health-check.ps1`, `sync-vmk.ps1`.
 - **Cycle manifest**: `CYCLE.md` | **Global config**: `~/.config/opencode/skills/` | **Quality standard**: `docs/operations/quality-standard.md` | **Metrics**: `docs/metricas/`
 
 ---

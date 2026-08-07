@@ -8,6 +8,16 @@ once releases begin.
 
 ## [Unreleased]
 
+### v3 Baseline Sync (2026-08-07)
+
+### Changed
+- All docs — counts/date synced to v3 baseline: 45 agents, 78 skills (+ `_shared`), 91 top-level scripts (84 PowerShell + 7 shell; 138 .ps1 total), score 9.0/10 (trend down)
+- `README.md` — agent count corrected to 45 (added `gentleman-codex-sub`, `gentleman-reviewer-sub`), score corrected to 9.0/10 (Cycle 28 active), skills 78, top-level scripts 91
+- `QUICKSTART.md` — agent count corrected to 45, skills 78
+- `PROTOCOL.md` — skills 78
+- `docs/ARCHITECTURE.md` — agents corrected to 45, skills 78, top-level scripts 91
+- `docs/CONTRIBUTING.md` — default branch corrected to `main`, skill registration via `data/skills-registry.csv`
+
 ### Cycle 28 — Security Hardening + Quality Recovery (2026-07-29)
 
 ### Added
