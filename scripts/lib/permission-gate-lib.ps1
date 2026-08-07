@@ -19,31 +19,68 @@
 
 # These patterns are checked in order: deny → allow → ask (default)
 
-$script:denyPatterns = @(
-    # Network — always blocked
-    '^curl\s', '^wget\s', '^Invoke-WebRequest', '^Invoke-RestMethod',
-    '^irm\s', '^iwr\s', '^iex\s', '^icm\s', '^Invoke-Expression', '^wsl\s', '^Start-BitsTransfer',
-    '^ssh\s', '^docker\s', '^docker-compose\s', '^docker compose',
-    '^telnet\s', '^ncat\s', '^nc\s', '^Test-NetConnection',
-    # Interpreters
-    '^python\s', '^python3\s', '^node\s', '^ruby\s', '^perl\s', '^php\s', '^npx\s',
-    # System/admin — always blocked
-    '^certutil\s', '^bitsadmin\s', '^schtasks\s', '^reg\s', '^sc\s', '^icacls\s',
-    '^cmd /c', '^cmd\.exe', '^powershell\s-c\s', '^powershell\s-command\s',
-    '^powershell\s-enc\s', '^powershell\s-File\s', '^powershell\.exe',
-    '^pwsh\s', '^pwsh\.exe',
-    '^Start-Process', '^Invoke-Command', '^Register-ScheduledTask', '^New-Service',
-    '^net user', '^net localgroup', '^net share', '^net use', '^net session',
-    '^Add-MpPreference', '^Set-MpPreference',
-    '^saps\s', '^start\s',
-    # Push --force is always denied
-    '^git push --force', '^git push -f',
-    # Package managers — supply chain attack prevention (prevents npm install <evil-pkg> etc.)
-    '^npm\sexec\s', '^npm\sinstall\s', '^npm\si\s', '^npm\sadd\s',
-    '^npm\suninstall\s', '^npm\sremove\s', '^npm\supdate\s', '^npm\spublish\s',
-    '^pip\sinstall\s', '^pip3\sinstall\s',
-    '^yarn\s(install|add)\s', '^pnpm\s(install|add|i)\s', '^bun\s(install|add)\s'
-)
+# C4b: Convert shared-deny-rules.json glob → PowerShell regex
+# "curl *" → '^curl\b' (matches "curl" bare or "curl <args>")
+# "npm install *" → '^npm\s+install\b'
+function Convert-FromDenyGlob {
+    param([string]$Glob)
+    $trimmed = $Glob.Trim()
+    if ($trimmed -match '\s+\*\s*$') {
+        $prefix = $trimmed -replace '\s+\*\s*$', ''
+        $escaped = [regex]::Escape($prefix) -replace '\\ ', '\s+'
+        return '^' + $escaped + '\b'
+    }
+    return '^' + ([regex]::Escape($trimmed) -replace '\\ ', '\s+') + '\b'
+}
+
+# C4b: Load deny patterns from shared-deny-rules.json (single source of truth)
+# Eliminates 22 hardcoded patterns duplicated across permission-gate-lib.ps1,
+# shared-deny-rules.json, and permission-templates.json.
+# All deny rules now live ONLY in shared-deny-rules.json.
+$denyRulesPath = Join-Path (Split-Path $PSScriptRoot -Parent) 'opencode-config' 'shared-deny-rules.json'
+$script:denyPatterns = @()
+
+if (Test-Path $denyRulesPath) {
+    try {
+        $denyRules = Get-Content $denyRulesPath -Raw | ConvertFrom-Json
+        # C4b: Exclude destructive patterns from deny list — they're handled by
+        # $script:destructivePatterns with mode-specific behavior (ask in auto, deny in manual/semi)
+        $destructiveGlobs = @('git checkout -- *', 'git clean *', 'git restore *', 'git rm *')
+        $script:denyPatterns = @($denyRules.PSObject.Properties |
+            Where-Object { $_.Value -eq 'deny' -and $destructiveGlobs -notcontains $_.Name } |
+            ForEach-Object { Convert-FromDenyGlob $_.Name } |
+            Sort-Object -Unique)
+    } catch {
+        Write-Debug "permission-gate-lib: shared-deny-rules.json load failed: $($_.Exception.Message)"
+    }
+}
+
+# C4b: Fallback — if JSON load failed, use embedded patterns (safety net)
+# This preserves the original 22 patterns as a fallback if shared-deny-rules.json
+# is missing or corrupt. In normal operation, patterns load from the JSON file.
+if ($script:denyPatterns.Count -eq 0) {
+    Write-Warning "permission-gate-lib: shared-deny-rules.json not loaded, using embedded fallback"
+    $script:denyPatterns = @(
+        '^curl\s', '^wget\s', '^Invoke-WebRequest', '^Invoke-RestMethod',
+        '^irm\s', '^iwr\s', '^iex\s', '^icm\s', '^Invoke-Expression', '^wsl\s', '^Start-BitsTransfer',
+        '^ssh\s', '^docker\s', '^docker-compose\s', '^docker compose',
+        '^telnet\s', '^ncat\s', '^nc\s', '^Test-NetConnection',
+        '^python\s', '^python3\s', '^node\s', '^ruby\s', '^perl\s', '^php\s', '^npx\s',
+        '^certutil\s', '^bitsadmin\s', '^schtasks\s', '^reg\s', '^sc\s', '^icacls\s',
+        '^cmd /c', '^cmd\.exe', '^powershell\s-c\s', '^powershell\s-command\s',
+        '^powershell\s-enc\s', '^powershell\s-File\s', '^powershell\.exe',
+        '^pwsh\s', '^pwsh\.exe',
+        '^Start-Process', '^Invoke-Command', '^Register-ScheduledTask', '^New-Service',
+        '^net user', '^net localgroup', '^net share', '^net use', '^net session',
+        '^Add-MpPreference', '^Set-MpPreference',
+        '^saps\s', '^start\s',
+        '^git push --force', '^git push -f',
+        '^npm\sexec\s', '^npm\sinstall\s', '^npm\si\s', '^npm\sadd\s',
+        '^npm\suninstall\s', '^npm\sremove\s', '^npm\supdate\s', '^npm\spublish\s',
+        '^pip\sinstall\s', '^pip3\sinstall\s',
+        '^yarn\s(install|add)\s', '^pnpm\s(install|add|i)\s', '^bun\s(install|add)\s'
+    )
+}
 
 # Destructive filesystem — DENY in manual/semi, ASK in auto (user confirms deletes)
 $script:destructivePatterns = @(

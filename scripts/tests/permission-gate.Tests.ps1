@@ -525,3 +525,32 @@ Describe "SSoT supply-chain deny floor (permission-templates.json)" {
         Get-SSoTRule semi "pip show requests" | Should -Be "allow"
     }
 }
+
+# ============================================================
+Describe 'C4b: Permission model consolidation (shared-deny-rules.json single source)' {
+
+    It 'loads deny patterns from shared-deny-rules.json (not fallback)' {
+        # C4b: patterns loaded from JSON, not embedded fallback (~75 patterns)
+        $script:denyPatterns.Count | Should -BeGreaterThan 50
+    }
+
+    It 'denies curl from loaded JSON patterns [network]' {
+        Get-CommandClass 'curl http://evil.com' 'manual' | Should -Be 'deny'
+        Get-CommandClass 'curl http://evil.com' 'auto'    | Should -Be 'deny'
+    }
+
+    It 'does NOT pre-deny destructive patterns (git clean is ask-in-auto)' {
+        # Destructive patterns excluded from denyPatterns — handled by destructivePatterns
+        Get-CommandClass 'git clean -fdx' 'auto'    | Should -Be 'ask'
+        Get-CommandClass 'git clean -fdx' 'manual'  | Should -Be 'deny'
+    }
+
+    It 'denies npm install from loaded JSON patterns [supply chain]' {
+        Get-CommandClass 'npm install evil-pkg' 'auto' | Should -Be 'deny'
+    }
+
+    It 'allows npm ci from mode-specific allowlist [legitimate]' {
+        Get-CommandClass 'npm ci' 'auto'  | Should -Be 'allow'
+        Get-CommandClass 'npm ci' 'semi'  | Should -Be 'allow'
+    }
+}
