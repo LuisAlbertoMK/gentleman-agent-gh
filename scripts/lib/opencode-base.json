@@ -450,6 +450,44 @@
         "codebase-memory*": true
       }
     },
+    "gentleman-deep-sub-auto": {
+      "description": "Deep reasoning subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
+      "model": "opencode/nemotron-3-ultra-free",
+      "mode": "subagent",
+      "hidden": true,
+      "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
+      "tools": {
+        "codebase-memory*": true,
+        "engram*": true
+      }
+    },
+    "gentleman-quick-sub-auto": {
+      "description": "Fast executor subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
+      "model": "opencode/mimo-v2.5-free",
+      "mode": "subagent",
+      "hidden": true,
+      "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}"
+    },
+    "gentleman-codex-sub-auto": {
+      "description": "Code generation subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
+      "model": "opencode/deepseek-v4-flash-free",
+      "mode": "subagent",
+      "hidden": true,
+      "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
+      "tools": {
+        "codebase-memory*": true
+      }
+    },
+    "gentleman-implementer-sub-auto": {
+      "description": "Plan executor subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
+      "model": "opencode/deepseek-v4-flash-free",
+      "mode": "subagent",
+      "hidden": true,
+      "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
+      "tools": {
+        "codebase-memory*": true
+      }
+    },
     "gentleman-implementer-auto": {
       "description": "Plan executor — AUTO mode (all auto-approve except push + destructive + network)",
       "model": "opencode/deepseek-v4-flash-free",

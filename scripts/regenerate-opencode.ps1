@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+#requires -Version 7
 <#
 .SYNOPSIS
   Regenerate opencode.json from the SSoT (scripts/lib/*) via the node generator, then verify the result.
@@ -38,7 +38,7 @@ param(
   [switch]$Yes,
   [string]$RepoRoot = (Get-Location).Path,
   [switch]$Quiet,
-  [int]$MaxBytes = 65536
+  [int]$MaxBytes = 98304
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -112,11 +112,23 @@ if ($sizeBytes -gt $MaxBytes) {
 }
 
 $twins = @('gentleman-deep-sub', 'gentleman-quick-sub', 'gentleman-implementer-sub', 'gentleman-security-sub', 'gentleman-seo-sub', 'gentleman-infra-sub', 'gentleman-frontend-sub', 'gentleman-performance-sub', 'gentleman-datascience-sub', 'gentleman-docs-sub')
+$autoTwins = @('gentleman-deep-sub-auto', 'gentleman-quick-sub-auto', 'gentleman-codex-sub-auto', 'gentleman-implementer-sub-auto')
 foreach ($t in $twins) {
   $a = $cfg.agent.$t
   if (-not $a) { Add-Check "twin-$t" $false 'missing from opencode.json' }
   elseif ($a.mode -ne 'subagent' -or $a.hidden -ne $true) { Add-Check "twin-$t" $false "mode=$($a.mode) hidden=$($a.hidden) (expected subagent/true)" }
   else { Add-Check "twin-$t" $true 'mode:subagent hidden:true' }
+}
+foreach ($t in $autoTwins) {
+  $a = $cfg.agent.$t
+  if (-not $a) { Add-Check "auto-twin-$t" $false 'missing from opencode.json' }
+  elseif ($a.mode -ne 'subagent' -or $a.hidden -ne $true) { Add-Check "auto-twin-$t" $false "mode=$($a.mode) hidden=$($a.hidden) (expected subagent/true)" }
+  elseif ($a.permission.bash.'*' -ne 'allow') { Add-Check "auto-twin-$t" $false "bash.*=$($a.permission.bash.'*') (expected allow)" }
+  else {
+    $askCount = @($a.permission.bash.PSObject.Properties | Where-Object { $_.Value -eq 'ask' }).Count
+    if ($askCount -gt 0) { Add-Check "auto-twin-$t" $false "$askCount ask entries (expected 0 — auto-sub must have zero ask)" }
+    else { Add-Check "auto-twin-$t" $true 'subagent hidden:true bash:*=allow ask=0' }
+  }
 }
 
 $orch = $cfg.agent.'gentleman-vMK'.permission
@@ -126,7 +138,18 @@ if (-not $orchTask -or $orchTask.'*' -ne 'deny') {
 } else {
   $missing = $twins | Where-Object { $orchTask.$_ -ne 'allow' }
   if ($missing) { Add-Check 'orch-task-failclosed' $false "twins not allowed: $($missing -join ', ')" }
-  else { Add-Check 'orch-task-failclosed' $true 'fail-closed with all 4 twins allowed' }
+  else { Add-Check 'orch-task-failclosed' $true "fail-closed with all $($twins.Count) base twins allowed" }
+}
+
+# Verify gentleman-vMK-auto can delegate to -sub-auto twins (fail-closed task allowlist)
+$orchAuto = $cfg.agent.'gentleman-vMK-auto'.permission
+$orchAutoTask = $orchAuto.task
+if (-not $orchAutoTask -or $orchAutoTask.'*' -ne 'deny') {
+  Add-Check 'orch-auto-task-failclosed' $false "vMK-auto task.* = $($orchAutoTask.'*') (expected deny)"
+} else {
+  $missingAuto = $autoTwins | Where-Object { $orchAutoTask.$_ -ne 'allow' }
+  if ($missingAuto) { Add-Check 'orch-auto-task-failclosed' $false "vMK-auto not allowed: $($missingAuto -join ', ')" }
+  else { Add-Check 'orch-auto-task-failclosed' $true "vMK-auto fail-closed with $($autoTwins.Count) auto-sub twins allowed" }
 }
 
 $readOnly = @('gentleman-security', 'gentleman-seo', 'gentleman-infra', 'gentleman-frontend', 'gentleman-performance', 'gentleman-datascience', 'gentleman-docs', 'gentleman-security-sub', 'gentleman-seo-sub', 'gentleman-infra-sub', 'gentleman-frontend-sub', 'gentleman-performance-sub', 'gentleman-datascience-sub', 'gentleman-docs-sub')

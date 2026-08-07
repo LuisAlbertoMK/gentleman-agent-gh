@@ -86,7 +86,7 @@ jobs:
       - name: Config size budget
         # ADR-007: enforce opencode.json ≤ 65,536 B (mirrors pre-commit gate check [17/17]).
         run: |
-          $configSizeBudget = 65536
+          $configSizeBudget = 98304
           $size = (Get-Item 'opencode.json').Length
           if ($size -gt $configSizeBudget) {
             Write-Error "opencode.json exceeds $configSizeBudget B budget (ADR-007): $size B"

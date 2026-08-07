@@ -168,6 +168,14 @@
       "yarn *": "deny"
     }
   },
+  "auto-sub": {
+    "bash": {
+      "*": "allow"
+    },
+    "task": {
+      "*": "deny"
+    }
+  },
   "semi": {
     "bash": {
       "*": "ask",

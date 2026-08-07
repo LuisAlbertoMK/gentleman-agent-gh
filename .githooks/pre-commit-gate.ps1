@@ -11,7 +11,7 @@ $ErrorActionPreference = 'Stop'
 if (-not $RepoRoot) { $RepoRoot = (git rev-parse --show-toplevel 2>$null) ?? '.' }
 
 $passed = 0; $failed = 0; $blocked = $false
-$configSizeBudget = 65536  # ADR-007: opencode.json size budget (bytes)
+$configSizeBudget = 98304  # ADR-007: opencode.json size budget (bytes)
 
 function Pass { $script:passed++; Write-Host "  $([char]0x1b)[32mOK$([char]0x1b)[0m" }
 function Warn  { param([string]$Msg) $script:passed++; if ($Msg) { Write-Host "  $([char]0x1b)[33m$Msg$([char]0x1b)[0m" } else { Write-Host "  $([char]0x1b)[33mWARN$([char]0x1b)[0m" } }

@@ -44,5 +44,25 @@
   },
   "sdd-verify": {
     "hidden": true
+  },
+  "gentleman-vMK-auto": {
+    "extraPermKeys": {
+      "task": {
+        "*": "deny",
+        "gentleman-deep-sub-auto": "allow",
+        "gentleman-quick-sub-auto": "allow",
+        "gentleman-codex-sub-auto": "allow",
+        "gentleman-implementer-sub-auto": "allow",
+        "sdd-apply": "allow",
+        "sdd-archive": "allow",
+        "sdd-design": "allow",
+        "sdd-explore": "allow",
+        "sdd-init": "allow",
+        "sdd-propose": "allow",
+        "sdd-spec": "allow",
+        "sdd-tasks": "allow",
+        "sdd-verify": "allow"
+      }
+    }
   }
 }

@@ -62,6 +62,10 @@ Suite of **78 skills** (+ `_shared`) + **91 top-level scripts** (84 PowerShell +
 | `gentleman-codex-auto` | deepseek-v4-flash-free | — AUTO mode (same model, `*: allow`) |
 | `gentleman-implementer-auto` | deepseek-v4-flash-free | — AUTO mode (same model, `*: allow`) |
 | `gentleman-vMK-auto` | default | — AUTO mode (orchestrator, `*: allow`) |
+| `gentleman-deep-sub-auto` | nemotron-3-ultra-free | — AUTO sub agent (same model, `*: allow`) |
+| `gentleman-quick-sub-auto` | mimo-v2.5-free | — AUTO sub agent (same model, `*: allow`) |
+| `gentleman-codex-sub-auto` | deepseek-v4-flash-free | — AUTO sub agent (same model, `*: allow`) |
+| `gentleman-implementer-sub-auto` | deepseek-v4-flash-free | — AUTO sub agent (same model, `*: allow`) |
 | `gentleman-deep-semi` | nemotron-3-ultra-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
 | `gentleman-quick-semi` | mimo-v2.5-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
 | `gentleman-codex-semi` | deepseek-v4-flash-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |

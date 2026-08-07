@@ -80,6 +80,12 @@ const TEMPLATE_MAP = {
   'gentleman-codex-auto': 'auto',
   'gentleman-implementer-auto': 'auto',
 
+  // Mode variants — AUTO subagent twins (zero-ask, delegable via Task tool in auto mode)
+  'gentleman-deep-sub-auto': 'auto-sub',
+  'gentleman-quick-sub-auto': 'auto-sub',
+  'gentleman-codex-sub-auto': 'auto-sub',
+  'gentleman-implementer-sub-auto': 'auto-sub',
+
   // Mode variants — SEMI (safe commands auto, writes/commits ask)
   'gentleman-vMK-semi': 'semi',
   'gentleman-deep-semi': 'semi',
@@ -128,7 +134,7 @@ function sortPermKeys(perm, agentName) {
 // --- Merge permissions ---
 console.log('[2/5] Merging permission templates into agent definitions...');
 
-const stats = { orchestrator: 0, readwrite: 0, readonly: 0, sddorchestrator: 0, reviewer: 0, auto: 0, semi: 0, total: 0 };
+const stats = { orchestrator: 0, readwrite: 0, readonly: 0, sddorchestrator: 0, reviewer: 0, auto: 0, 'auto-sub': 0, semi: 0, total: 0 };
 
 const orderedAgents = {};
 for (const [agentName, agentDef] of Object.entries(base.agent)) {
@@ -200,8 +206,9 @@ console.log(`  Read/Write:       ${stats.readwrite} agent(s)`);
 console.log(`  Read-Only:        ${stats.readonly} agent(s)`);
 console.log(`  SDD Orchestrator: ${stats.sddorchestrator} agent(s)`);
 console.log(`  Reviewer:         ${stats.reviewer} agent(s)`);
-console.log(`  AUTO variants:    ${stats.auto} agent(s)`);
-console.log(`  SEMI variants:    ${stats.semi} agent(s)`);
+  console.log(`  AUTO variants:    ${stats.auto} agent(s)`);
+  console.log(`  AUTO-SUB variants: ${stats['auto-sub']} agent(s)`);
+  console.log(`  SEMI variants:    ${stats.semi} agent(s)`);
 
 // --- Serialize ---
 console.log('[3/5] Serializing output...');

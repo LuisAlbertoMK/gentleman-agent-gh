@@ -971,6 +971,76 @@
         "codebase-memory*": true
       }
     },
+    "gentleman-deep-sub-auto": {
+      "description": "Deep reasoning subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
+      "model": "opencode/nemotron-3-ultra-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
+      "permission": {
+        "bash": {
+          "*": "allow"
+        },
+        "task": {
+          "*": "deny"
+        }
+      },
+      "tools": {
+        "codebase-memory*": true,
+        "engram*": true
+      }
+    },
+    "gentleman-quick-sub-auto": {
+      "description": "Fast executor subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
+      "model": "opencode/mimo-v2.5-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
+      "permission": {
+        "bash": {
+          "*": "allow"
+        },
+        "task": {
+          "*": "deny"
+        }
+      }
+    },
+    "gentleman-codex-sub-auto": {
+      "description": "Code generation subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
+      "model": "opencode/deepseek-v4-flash-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
+      "permission": {
+        "bash": {
+          "*": "allow"
+        },
+        "task": {
+          "*": "deny"
+        }
+      },
+      "tools": {
+        "codebase-memory*": true
+      }
+    },
+    "gentleman-implementer-sub-auto": {
+      "description": "Plan executor subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
+      "model": "opencode/deepseek-v4-flash-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
+      "permission": {
+        "bash": {
+          "*": "allow"
+        },
+        "task": {
+          "*": "deny"
+        }
+      },
+      "tools": {
+        "codebase-memory*": true
+      }
+    },
     "gentleman-implementer-auto": {
       "description": "Plan executor — AUTO mode (all auto-approve except push + destructive + network)",
       "model": "opencode/deepseek-v4-flash-free",
@@ -1332,6 +1402,22 @@
           "wsl *": "deny",
           "yarn": "deny",
           "yarn *": "deny"
+        },
+        "task": {
+          "*": "deny",
+          "gentleman-deep-sub-auto": "allow",
+          "gentleman-quick-sub-auto": "allow",
+          "gentleman-codex-sub-auto": "allow",
+          "gentleman-implementer-sub-auto": "allow",
+          "sdd-apply": "allow",
+          "sdd-archive": "allow",
+          "sdd-design": "allow",
+          "sdd-explore": "allow",
+          "sdd-init": "allow",
+          "sdd-propose": "allow",
+          "sdd-spec": "allow",
+          "sdd-tasks": "allow",
+          "sdd-verify": "allow"
         }
       },
       "tools": {
