@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 7
 <#
 .SYNOPSIS
     Mode-aware agent routing — resolves the correct agent variant for delegation.
@@ -36,7 +36,7 @@
     .\scripts\route-agent.ps1 -BaseAgent gentleman-quick -Mode auto -Json
 #>
 param(
-    [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
+    [Parameter(Mandatory)]
     [string]$BaseAgent,
 
     [ValidateSet('manual', 'semi', 'auto')]
@@ -110,4 +110,4 @@ if ($Json) {
 # Human-readable output for direct invocation
 Write-Output "🔀 → $TargetAgent | $note"
 
-return $TargetAgent
+    return $TargetAgent

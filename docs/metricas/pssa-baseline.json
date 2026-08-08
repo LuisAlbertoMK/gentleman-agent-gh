@@ -1,10 +1,88 @@
 {
-  "timestamp": "2026-07-31T11:41:08",
-  "total": 908,
+  "total": 875,
+  "manualCount": 36,
+  "autoFixableCount": 7,
+  "manualPairs": [
+    {
+      "count": 1,
+      "rule": "InvalidSyntaxAroundProcessBlock",
+      "file": "route-agent.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSReviewUnusedParameter",
+      "file": "check-mcp-security.ps1"
+    },
+    {
+      "count": 2,
+      "rule": "PSReviewUnusedParameter",
+      "file": "dev-server.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSReviewUnusedParameter",
+      "file": "global-setup.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSReviewUnusedParameter",
+      "file": "intake-verify.ps1"
+    },
+    {
+      "count": 3,
+      "rule": "PSReviewUnusedParameter",
+      "file": "inter-track.ps1"
+    },
+    {
+      "count": 3,
+      "rule": "PSReviewUnusedParameter",
+      "file": "route-agent.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSReviewUnusedParameter",
+      "file": "skillspector-gate.ps1"
+    },
+    {
+      "count": 3,
+      "rule": "PSReviewUnusedParameter",
+      "file": "sync-global.ps1"
+    },
+    {
+      "count": 10,
+      "rule": "PSReviewUnusedParameter",
+      "file": "trend.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSReviewUnusedParameter",
+      "file": "verify.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseApprovedVerbs",
+      "file": "use-gentleman.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseDeclaredVarsMoreThanAssignments",
+      "file": "intake-verify.ps1"
+    },
+    {
+      "count": 6,
+      "rule": "PSUseDeclaredVarsMoreThanAssignments",
+      "file": "score-auto.ps1"
+    },
+    {
+      "count": 1,
+      "rule": "PSUseProcessBlockForPipelineCommand",
+      "file": "route-agent.ps1"
+    }
+  ],
   "byFile": [
     {
       "file": "_e2e_pipeline.Tests.ps1",
-      "count": 2
+      "count": 1
     },
     {
       "file": "Add-Dimension.Tests.ps1",
@@ -24,11 +102,19 @@
     },
     {
       "file": "audit-log.ps1",
-      "count": 17
+      "count": 16
+    },
+    {
+      "file": "audit-log.Tests.ps1",
+      "count": 3
     },
     {
       "file": "auto-pattern-detector.ps1",
-      "count": 9
+      "count": 8
+    },
+    {
+      "file": "backlog-integrity.Tests.ps1",
+      "count": 2
     },
     {
       "file": "backup.ps1",
@@ -36,19 +122,15 @@
     },
     {
       "file": "bash-safe.ps1",
-      "count": 1
+      "count": 2
     },
     {
       "file": "bash-safe.Tests.ps1",
-      "count": 2
+      "count": 1
     },
     {
       "file": "batch.ps1",
       "count": 3
-    },
-    {
-      "file": "bench-compare.ps1",
-      "count": 29
     },
     {
       "file": "bootstrap.ps1",
@@ -64,7 +146,7 @@
     },
     {
       "file": "check-backlog-integrity.ps1",
-      "count": 7
+      "count": 5
     },
     {
       "file": "check-mcp-security.ps1",
@@ -75,8 +157,12 @@
       "count": 1
     },
     {
+      "file": "check-subagent-output.Tests.ps1",
+      "count": 1
+    },
+    {
       "file": "close-session.Integration.Tests.ps1",
-      "count": 2
+      "count": 1
     },
     {
       "file": "close-session.ps1",
@@ -84,7 +170,7 @@
     },
     {
       "file": "close-session.Tests.ps1",
-      "count": 4
+      "count": 3
     },
     {
       "file": "cross-ref-check.ps1",
@@ -99,6 +185,14 @@
       "count": 4
     },
     {
+      "file": "delegation-registry.ps1",
+      "count": 1
+    },
+    {
+      "file": "delegation-registry.Tests.ps1",
+      "count": 1
+    },
+    {
       "file": "destructive-scripts.Tests.ps1",
       "count": 3
     },
@@ -111,28 +205,20 @@
       "count": 4
     },
     {
-      "file": "engram-validate.ps1",
-      "count": 6
-    },
-    {
-      "file": "engram-validate.Tests.ps1",
-      "count": 2
-    },
-    {
       "file": "ensure-tools.ps1",
       "count": 1
     },
     {
       "file": "expand-config.ps1",
-      "count": 7
+      "count": 6
+    },
+    {
+      "file": "expand-config.Tests.ps1",
+      "count": 2
     },
     {
       "file": "extract-skill.ps1",
       "count": 9
-    },
-    {
-      "file": "forge-rollback.Integration.Tests.ps1",
-      "count": 2
     },
     {
       "file": "forge-rollback.ps1",
@@ -143,19 +229,15 @@
       "count": 1
     },
     {
+      "file": "generate-config.Tests.ps1",
+      "count": 2
+    },
+    {
       "file": "global-setup.ps1",
       "count": 1
     },
     {
-      "file": "health-check.ps1",
-      "count": 2
-    },
-    {
       "file": "health-check.Tests.ps1",
-      "count": 1
-    },
-    {
-      "file": "intake-debug.ps1",
       "count": 1
     },
     {
@@ -171,28 +253,28 @@
       "count": 1
     },
     {
-      "file": "learning-stats.ps1",
-      "count": 10
-    },
-    {
-      "file": "mcp-resilience.ps1",
+      "file": "leak-guard.ps1",
       "count": 2
     },
     {
-      "file": "mode-gate.Integration.Tests.ps1",
-      "count": 1
+      "file": "learning-stats.ps1",
+      "count": 9
     },
     {
       "file": "mode-gate.ps1",
       "count": 11
     },
     {
+      "file": "opencode.json-size.Tests.ps1",
+      "count": 2
+    },
+    {
       "file": "pattern-guard.ps1",
-      "count": 9
+      "count": 8
     },
     {
       "file": "permission-gate.ps1",
-      "count": 8
+      "count": 6
     },
     {
       "file": "permission-gate.Tests.ps1",
@@ -200,7 +282,7 @@
     },
     {
       "file": "pipeline-analyze.ps1",
-      "count": 4
+      "count": 3
     },
     {
       "file": "ponytail-audit.ps1",
@@ -208,7 +290,7 @@
     },
     {
       "file": "pre-commit-gate.ps1",
-      "count": 30
+      "count": 40
     },
     {
       "file": "project-cycle.ps1",
@@ -220,7 +302,7 @@
     },
     {
       "file": "pssa-gate.ps1",
-      "count": 20
+      "count": 21
     },
     {
       "file": "pull-upstream.ps1",
@@ -239,6 +321,10 @@
       "count": 18
     },
     {
+      "file": "route-agent.ps1",
+      "count": 5
+    },
+    {
       "file": "run-dreaming.ps1",
       "count": 20
     },
@@ -248,7 +334,7 @@
     },
     {
       "file": "run-tests.ps1",
-      "count": 9
+      "count": 10
     },
     {
       "file": "scan-skills.ps1",
@@ -260,7 +346,7 @@
     },
     {
       "file": "ScoreIntegration.Tests.ps1",
-      "count": 4
+      "count": 2
     },
     {
       "file": "ScoreMaths.Tests.ps1",
@@ -272,15 +358,15 @@
     },
     {
       "file": "session-miner.Tests.ps1",
-      "count": 11
+      "count": 10
     },
     {
       "file": "setup-install.ps1",
-      "count": 12
+      "count": 10
     },
     {
       "file": "setup-machine.ps1",
-      "count": 19
+      "count": 17
     },
     {
       "file": "setup-machine.Tests.ps1",
@@ -295,12 +381,8 @@
       "count": 1
     },
     {
-      "file": "skill-resolver-fast.ps1",
-      "count": 1
-    },
-    {
       "file": "skillspector-gate.ps1",
-      "count": 14
+      "count": 16
     },
     {
       "file": "smoke-all.ps1",
@@ -356,15 +438,11 @@
     },
     {
       "file": "sync-global-ps5.ps1",
-      "count": 20
-    },
-    {
-      "file": "sync-global.ps1",
       "count": 19
     },
     {
-      "file": "sync-vmk.ps1",
-      "count": 2
+      "file": "sync-global.ps1",
+      "count": 21
     },
     {
       "file": "sync-vmk.Tests.ps1",
@@ -388,10 +466,10 @@
     },
     {
       "file": "use-gentleman.ps1",
-      "count": 13
+      "count": 15
     },
     {
-      "file": "validate-write-scope.Integration.Tests.ps1",
+      "file": "use-gentleman.Tests.ps1",
       "count": 2
     },
     {
@@ -403,6 +481,10 @@
       "count": 2
     },
     {
+      "file": "verify.Tests.ps1",
+      "count": 1
+    },
+    {
       "file": "wisdom-demote.ps1",
       "count": 12
     },
@@ -412,193 +494,68 @@
     },
     {
       "file": "wisdom-loader.ps1",
-      "count": 11
-    },
-    {
-      "file": "wisdom-stats.ps1",
-      "count": 18
-    },
-    {
-      "file": "wisdom-store.ps1",
-      "count": 5
-    }
-  ],
-  "manualPairs": [
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "check-mcp-security.ps1",
-      "count": 1
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "dev-server.ps1",
-      "count": 2
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "global-setup.ps1",
-      "count": 1
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "health-check.ps1",
-      "count": 2
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "intake-debug.ps1",
-      "count": 1
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "intake-verify.ps1",
-      "count": 1
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "inter-track.ps1",
-      "count": 3
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "mcp-resilience.ps1",
-      "count": 2
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "permission-gate.ps1",
-      "count": 2
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "pipeline-analyze.ps1",
-      "count": 1
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "restore-project-score.ps1",
-      "count": 1
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "setup-install.ps1",
-      "count": 2
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "setup-machine.ps1",
-      "count": 3
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "skill-resolver-fast.ps1",
-      "count": 1
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "skillspector-gate.ps1",
-      "count": 1
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "sync-global-ps5.ps1",
-      "count": 1
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "sync-global.ps1",
-      "count": 3
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "sync-vmk.ps1",
-      "count": 2
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "trend.ps1",
       "count": 10
     },
     {
-      "rule": "PSReviewUnusedParameter",
-      "file": "verify.ps1",
-      "count": 1
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
-      "file": "wisdom-demote.ps1",
-      "count": 1
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
       "file": "wisdom-stats.ps1",
-      "count": 1
+      "count": 16
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "wisdom-store.ps1",
-      "count": 1
-    },
-    {
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
-      "file": "engram-validate.ps1",
-      "count": 2
-    },
-    {
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
-      "file": "intake-verify.ps1",
-      "count": 1
-    },
-    {
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
-      "file": "score-auto.ps1",
-      "count": 6
+      "count": 4
     }
   ],
-  "manualCount": 53,
-  "trackedCount": 779,
-  "autoFixableCount": 17,
+  "ampersandCount": 0,
+  "timestamp": "2026-08-08T13:03:23",
+  "trackedCount": 766,
   "byRule": [
     {
-      "count": 1,
-      "rule": "PSAvoidAssignmentToAutomaticVariable"
+      "rule": "InvalidSyntaxAroundProcessBlock",
+      "count": 1
     },
     {
-      "count": 5,
-      "rule": "PSAvoidDefaultValueSwitchParameter"
+      "rule": "PSAvoidAssignmentToAutomaticVariable",
+      "count": 1
     },
     {
-      "count": 18,
-      "rule": "PSAvoidGlobalVars"
+      "rule": "PSAvoidGlobalVars",
+      "count": 18
     },
     {
-      "count": 1,
-      "rule": "PSAvoidUsingEmptyCatchBlock"
+      "rule": "PSAvoidUsingWriteHost",
+      "count": 766
     },
     {
-      "count": 779,
-      "rule": "PSAvoidUsingWriteHost"
+      "rule": "PSPossibleIncorrectUsageOfRedirectionOperator",
+      "count": 1
     },
     {
-      "count": 60,
-      "rule": "PSReviewUnusedParameter"
+      "rule": "PSReviewUnusedParameter",
+      "count": 44
     },
     {
-      "count": 12,
-      "rule": "PSUseBOMForUnicodeEncodedFile"
+      "rule": "PSUseApprovedVerbs",
+      "count": 1
     },
     {
-      "count": 22,
-      "rule": "PSUseDeclaredVarsMoreThanAssignments"
+      "rule": "PSUseBOMForUnicodeEncodedFile",
+      "count": 7
     },
     {
-      "count": 6,
-      "rule": "PSUseShouldProcessForStateChangingFunctions"
+      "rule": "PSUseDeclaredVarsMoreThanAssignments",
+      "count": 19
     },
     {
-      "count": 4,
-      "rule": "PSUseSingularNouns"
+      "rule": "PSUseProcessBlockForPipelineCommand",
+      "count": 1
+    },
+    {
+      "rule": "PSUseShouldProcessForStateChangingFunctions",
+      "count": 12
+    },
+    {
+      "rule": "PSUseSingularNouns",
+      "count": 4
     }
-  ],
-  "ampersandCount": 0
+  ]
 }

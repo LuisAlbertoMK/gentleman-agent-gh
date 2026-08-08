@@ -9,12 +9,8 @@ Before answering "what's missing", "qué falta", "gaps", "needs improvement", "q
 4. **Cross-reference**: IF finding exists → cite file:line. IF novel → flag as `confidence: unvalidated`
 5. NEVER present speculation as fact. Use explicit confidence markers: `confidence: high | medium | low | unvalidated`
 
-**Violation**: If you skip this gate and the user catches unverified claims, this is a protocol violation. Default-FAIL applies.
-- **Confidence markers**: Add `confidence:` to EVERY claim in analysis responses.
-  - `high` = tool output backs it
-  - `medium` = reasonable inference
-  - `low` = speculation
-  - `unvalidated` = novel, needs analysis
+**Violation**: Skipping this gate → protocol violation → Default-FAIL.
+- Add `confidence:` to EVERY claim: `high`|`medium`|`low`|`unvalidated`
 
 ## Routing
 
@@ -85,13 +81,12 @@ Runtime enforcement — not advisory. Catches ~30% of subtle bugs in ~10 seconds
 
 Before trusting ANY subagent output — ALWAYS verify the work was actually done:
 
-1. **Git diff check**: `git diff --name-only HEAD` — if output is EMPTY, subagent produced NO file changes
-2. **Git status check**: `git status --short` — verify expected files appear as Modified/Created
-3. **Empty output protocol**: If diff is empty AND subagent reported "completed" →
-   treat as SILENT FAILURE. Do NOT trust the subagent's return.
-4. **Retry protocol**: Retry with narrower scope (max 1-2 files). If still empty → STOP, escalate to human.
-5. **Root cause**: Empty output typically means: (a) free-tier model hit output truncation, (b) stdout was truncated by verbose verification, (c) model fell back to `general` due to `mode: primary` not delegating. See `docs/mejoras/2026-08-01-custom-agents-runtime-fallback.md` + `mejora-log.md:571`.
-6. **Budget pre-check**: If delegation spans >5 files OR >50 lines of changes OR >3 tool calls expected → do NOT delegate. Use `delivery-harness` to break into isolated work units, OR handle in orchestrator bash with controlled output.
+1. **Git diff**: `git diff --name-only HEAD` — empty = silent failure
+2. **Git status**: `git status --short` — verify expected files Modified/Created
+3. **Empty + "completed"** → SILENT FAILURE — don't trust the return
+4. **Retry**: narrower scope (1-2 files). Still empty → STOP, escalate
+5. **Root cause**: truncation / verbose stdout / wrong model — see `docs/mejoras/2026-08-01-custom-agents-runtime-fallback.md`
+6. **Budget**: >5 files OR >50 lines OR >3 tool calls → don't delegate. Use `delivery-harness`.
 
 ## Failure Escalation
 
@@ -106,13 +101,6 @@ Autonomy zones from _core-behavior-gp.md govern context-budget behavior. Task Co
 
 ## Audit Trail (MANDATORY — auto and semi mode)
 
-Before session end / `mem_session_summary`, call audit-log for accountability:
-```
-scripts/audit-log.ps1 session
-```
-In auto/semi mode, append entries for significant actions:
-- `scripts/audit-log.ps1 append -agent <agent> -mode <mode> -action ALLOW -detail "cmd"`
-- `scripts/audit-log.ps1 append -agent <agent> -mode <mode> -action WRITE -detail "path"`
-- `scripts/audit-log.ps1 append -agent <agent> -mode <mode> -action DENY -detail "cmd"`
+Call `scripts/audit-log.ps1 session` before `mem_session_summary`. Append `-action ALLOW/WRITE/DENY -detail "..."`.
 
 {file:prompts/shared/_core-behavior-gp.md}

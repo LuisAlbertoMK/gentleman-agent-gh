@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 7
 <#
 .SYNOPSIS
     Post-delegation verification — combines git-diff + write-scope + empty-output
@@ -22,8 +22,8 @@
     Git reference to diff against (default: HEAD).
 
 .PARAMETER AllowedPaths
-    Regex pattern(s) that modified files must match. If provided, write-scope
-    validation runs. If omitted, only empty-output + git status checks run.
+    Regex pattern(s) that modified files must match. REQUIRED for write-scope validation —
+    if omitted, the check FAILS (fail-closed). Enforced by v3 Perm-4.
 
 .PARAMETER ExpectedFiles
     Filenames that SHOULD appear in the diff (passed to check-subagent-output).
@@ -53,7 +53,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 # --- C9/JD fix: escape single quotes to prevent command injection ---
-function Escape-SqlQuote {
+function ConvertTo-SqlLiteral {
     param([string]$Value)
     $Value.Replace("'", "''")
 }
@@ -92,11 +92,11 @@ $results = @{
 # --- 1. Empty-output detection ---
 $csoScript = Join-Path $RepoRoot 'scripts\check-subagent-output.ps1'
 if (Test-Path $csoScript) {
-    $escapedBase = Escape-SqlQuote $BaseRef
-    $escapedRoot = Escape-SqlQuote $RepoRoot
+    $escapedBase = ConvertTo-SqlLiteral $BaseRef
+    $escapedRoot = ConvertTo-SqlLiteral $RepoRoot
     $csoCmd = "& '$csoScript' -BaseRef '$escapedBase' -RepoRoot '$escapedRoot' -Quiet"
     if ($ExpectedFiles) {
-        $escapedFiles = ($ExpectedFiles | ForEach-Object { "'" + (Escape-SqlQuote $_) + "'" }) -join ' '
+        $escapedFiles = ($ExpectedFiles | ForEach-Object { "'" + (ConvertTo-SqlLiteral $_) + "'" }) -join ' '
         $csoCmd += " -ExpectedFiles " + $escapedFiles
     }
     $csoSubproc = Invoke-SubprocessWithTimeout -CommandLine $csoCmd -TimeoutSec $TimeoutSeconds
@@ -122,8 +122,8 @@ if (Test-Path $csoScript) {
 if ($AllowedPaths) {
     $wsScript = Join-Path $RepoRoot 'scripts\validate-write-scope.ps1'
     if (Test-Path $wsScript) {
-        $escapedPaths = "'" + ((Escape-SqlQuote ($AllowedPaths -join ','))) + "'"
-        $escapedBase  = Escape-SqlQuote $BaseRef
+        $escapedPaths = "'" + ((ConvertTo-SqlLiteral ($AllowedPaths -join ','))) + "'"
+        $escapedBase  = ConvertTo-SqlLiteral $BaseRef
         $wsCmd = "& '$wsScript' -AllowedPaths $escapedPaths -BaseRef '$escapedBase'"
         $wsSubproc = Invoke-SubprocessWithTimeout -CommandLine $wsCmd -TimeoutSec $TimeoutSeconds
         if ($wsSubproc.timedOut) {
@@ -144,7 +144,8 @@ if ($AllowedPaths) {
         Write-Warning "validate-write-scope.ps1 not found at $wsScript — write-scope check skipped"
     }
 } else {
-    $results.checks += [PSCustomObject]@{ name = "write_scope"; passed = $true; detail = "no AllowedPaths specified (skipped)" }
+    $results.checks += [PSCustomObject]@{ name = "write_scope"; passed = $false; detail = "FAIL-CLOSED: AllowedPaths not provided — write-scope mandatory for all subagent delegations" }
+    $results.passed = $false
 }
 
 # --- 3. Git status summary ---
