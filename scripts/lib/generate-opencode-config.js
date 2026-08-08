@@ -27,8 +27,51 @@ const OUTPUT_PATH = path.join(ROOT, 'opencode.json');
 
 const VALIDATE = process.argv.includes('--validate');
 
-// --- Agent-to-template mapping ---
-// ALL agents must be listed here. Unmapped agents are REJECTED (fail-closed).
+// --- Role keywords for auto-registration (checked when not in explicit map) ---
+// Mirrors $RoleKeywords in scripts/lib/template-detection.ps1
+const ROLE_KEYWORDS = {
+  security:    'readonly',
+  infra:       'readonly',
+  docs:        'readonly',
+  seo:         'readonly',
+  frontend:    'readonly',
+  performance: 'readonly',
+  datascience: 'readonly',
+  reviewer:    'reviewer',
+  vMK:         'orchestrator',
+};
+
+// --- Detect template for an agent name ---
+// Resolution order (must mirror Detect-Template in template-detection.ps1 exactly):
+//   1. Explicit lookup in TEMPLATE_MAP (SSOT anchor)
+//   2. Suffix auto-registration (-sub-auto → auto-sub, -semi → semi, -auto → auto, -sub → recurse)
+//   3. Role keyword matching
+//   4. Fail-closed — throw
+function detectTemplate(agentName) {
+  // 1. Explicit lookup — SSOT anchor, always wins
+  if (TEMPLATE_MAP[agentName]) {
+    return TEMPLATE_MAP[agentName];
+  }
+
+  // 2. Suffix auto-registration (longest suffix first)
+  if (agentName.endsWith('-sub-auto')) return 'auto-sub';
+  if (agentName.endsWith('-semi'))      return 'semi';
+  if (agentName.endsWith('-auto'))     return 'auto';
+  if (agentName.endsWith('-sub'))      return detectTemplate(agentName.slice(0, -4));
+
+  // 3. Role keyword matching
+  for (const [keyword, template] of Object.entries(ROLE_KEYWORDS)) {
+    if (agentName.includes(keyword)) {
+      return template;
+    }
+  }
+
+  // 4. Fail-closed
+  throw new Error(`No template mapping found for agent '${agentName}'. Add explicit entry to TEMPLATE_MAP or follow naming conventions.`);
+}
+
+// --- Agent-to-template mapping (SSOT anchor) ---
+// ALL agents should be listed here. New agents following naming conventions are auto-detected.
 const TEMPLATE_MAP = {
   // Orchestrator — full bash allow + extra language denials
   'gentleman-vMK': 'orchestrator',
@@ -138,11 +181,7 @@ const stats = { orchestrator: 0, readwrite: 0, readonly: 0, sddorchestrator: 0, 
 
 const orderedAgents = {};
 for (const [agentName, agentDef] of Object.entries(base.agent)) {
-  const templateName = TEMPLATE_MAP[agentName];
-  if (!templateName) {
-    console.error(`ERROR: Agent "${agentName}" has no template mapping. Add it to TEMPLATE_MAP.`);
-    process.exit(1);
-  }
+  const templateName = detectTemplate(agentName);
   const template = templates[templateName];
 
   if (!template) {

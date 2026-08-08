@@ -100,7 +100,7 @@ function Get-SkillRegistry {
                 })
             }
         } catch {
-            # Corrupt or unreadable cache — fall through to cold parse (overwrites cache below)
+            Write-Debug "skill-graph: corrupt/unreadable cache — fall through to cold parse"
         }
     }
 

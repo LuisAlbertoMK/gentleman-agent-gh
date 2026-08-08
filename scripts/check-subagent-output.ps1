@@ -43,6 +43,7 @@ $ErrorActionPreference = "Stop"
 
 # C4d: Validate 4-field return contract (Decision Taken | Files Changed | Key Findings | Nuance)
 function Validate-AgentReturnContract {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseApprovedVerbs', '')]
     param([string]$Output, [string]$AgentName = "unknown")
     $requiredHeaders = @('## Decision Taken', '## Files Changed', '## Key Findings', '## Nuance')
     $missing = @()
@@ -94,13 +95,13 @@ $committed = @()
 try {
     $committed = git -C $RepoRoot diff --name-only "$BaseRef..HEAD" 2>&1 |
         Where-Object { $_ -and $_ -notmatch "^warning:" -and $_ -notmatch "^\s*$" }
-} catch {}
+    } catch { Write-Debug "check-subagent-output: committed git diff failed (non-fatal) — $_" }
 
 # 2. Working-tree changes incl. untracked (via status porcelain)
 $statusRaw = @()
 try {
     $statusRaw = git -C $RepoRoot status --porcelain 2>&1
-} catch {}
+    } catch { Write-Debug "check-subagent-output: git status failed (non-fatal) — $_" }
 $wcFiles = @($statusRaw | Where-Object { $_ -and $_ -notmatch "^warning:" } |
     ForEach-Object {
         $path = ($_ -replace '^\?\?\s+', '' -replace '^[MADRCU?!]+\s+', '').Trim()

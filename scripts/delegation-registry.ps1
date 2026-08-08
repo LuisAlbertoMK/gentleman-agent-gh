@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 7
 <#
 .SYNOPSIS
     Async delegation registry — manages state for non-blocking subagent delegations.
@@ -14,6 +14,7 @@
 
     State is persisted in .learnings/delegation-registry.json (atomic reads/writes).
     Each entry has a TTL (default 60 min) after which it's auto-purged.
+    Thread-safe via named mutex — concurrent invocations serialize safely.
 
 .PARAMETER Action
     The registry operation to perform.
@@ -90,7 +91,19 @@ if (-not (Test-Path $registryDir)) {
     New-Item -ItemType Directory -Path $registryDir -Force | Out-Null
 }
 
-# --- Load registry (with retry) ---
+# --- Concurrency control: named mutex prevents race condition on registry file ---
+# Named "Global\..." so it works across PowerShell processes (pwsh subprocess invocations).
+$repoId = ([System.Security.Cryptography.MD5]::Create().ComputeHash([System.Text.Encoding]::UTF8.GetBytes($RepoRoot)) | ForEach-Object { $_.ToString("x2") }) -join ''
+$mutexName = "Global\GentlemanDelegationRegistry-$repoId"
+$mutex = New-Object System.Threading.Mutex($false, $mutexName)
+$mutexAcquired = $false
+try {
+    $mutexAcquired = $mutex.WaitOne(10000)  # 10s timeout
+    if (-not $mutexAcquired) {
+        throw "delegation-registry: could not acquire lock within 10s (another instance may be stuck)"
+    }
+
+# --- Load registry ---
 function Get-RegistryData {
     if (-not (Test-Path $registryFile)) { return @{} }
     try {
@@ -101,12 +114,15 @@ function Get-RegistryData {
         }
         return $result
     } catch {
-        Write-Debug "delegation-registry: load failed: $($_.Exception.Message)"
+        Write-Warning "delegation-registry: registry load failed — starting fresh. Error: $($_.Exception.Message)"
+        # Preserve a corrupted backup for diagnosis
+        $corruptBackup = $registryFile + '.corrupt'
+        Copy-Item -LiteralPath $registryFile -Destination $corruptBackup -Force -ErrorAction SilentlyContinue
         return @{}
     }
 }
 
-# --- Save registry (atomic write) ---
+# --- Save registry (atomic write: write .tmp → Move-Item) ---
 function Set-RegistryData {
     [CmdletBinding(SupportsShouldProcess)]
     param([hashtable]$Registry)
@@ -121,11 +137,17 @@ function Set-RegistryData {
 function Clear-RegistryExpired {
     [CmdletBinding(SupportsShouldProcess)]
     param([hashtable]$Registry, [int]$MaxAgeMinutes)
+    if ($Registry.Count -eq 0) { return $Registry }
     $now = Get-Date
     $expired = @($Registry.Keys | Where-Object {
         $entry = $Registry[$_]
-        $entryAge = ($now - [datetime]$entry.registered).TotalMinutes
-        $entryAge -gt $MaxAgeMinutes
+        if (-not $entry.registered) { return $true }
+        try {
+            $entryAge = ($now - [datetime]$entry.registered).TotalMinutes
+            $entryAge -gt $MaxAgeMinutes
+        } catch {
+            $true  # Unparseable date → prune
+        }
     })
     if ($PSCmdlet.ShouldProcess("registry", "Prune expired entries")) {
         foreach ($k in $expired) { $Registry.Remove($k) }
@@ -133,8 +155,27 @@ function Clear-RegistryExpired {
     return $Registry
 }
 
-# --- Main ---
-$reg = Clear-RegistryExpired (Get-RegistryData) $TtlMinutes
+# --- TTL pruning throttle: skip if pruned within the last minute ---
+$pruneMarker = Join-Path $registryDir '.last-prune'
+$shouldPrune = $true
+if (Test-Path $pruneMarker) {
+    try {
+        $lastPrune = [DateTime](Get-Content $pruneMarker -Raw -Encoding UTF8 -ErrorAction SilentlyContinue)
+        if ((Get-Date) - $lastPrune -lt [TimeSpan]::FromMinutes(1)) {
+            $shouldPrune = $false
+        }
+    } catch {
+        Write-Debug "delegation-registry: prune marker corrupt — pruning anyway"
+    }
+}
+
+# --- Main: load + prune, then dispatch ---
+if ($shouldPrune) {
+    $reg = Clear-RegistryExpired (Get-RegistryData) $TtlMinutes
+    Set-Content $pruneMarker -Value (Get-Date -Format "o") -NoNewline -Encoding UTF8
+} else {
+    $reg = Get-RegistryData
+}
 
 switch ($Action) {
     "register" {
@@ -172,7 +213,7 @@ switch ($Action) {
             exit 1
         }
         $entry = $reg[$TaskId]
-        # Update status
+        # Update status: pending → running on first poll
         if ($entry.status -eq "pending") {
             $entry.status = "running"
             $reg[$TaskId] = $entry
@@ -194,7 +235,8 @@ switch ($Action) {
         }
         $entry = $reg[$TaskId]
 
-        # Run post-delegation-check with stored params
+        # Run post-delegation-check with stored params (command-string approach
+        # mirrors the pattern used elsewhere — allows pwsh -Command with quoted args)
         $pdcScript = Join-Path $RepoRoot 'scripts\post-delegation-check.ps1'
         $cmd = "& '$pdcScript' -BaseRef '$($entry.base_ref)' -RepoRoot '$RepoRoot' -Quiet"
         if ($entry.allowed_paths) {
@@ -211,8 +253,9 @@ switch ($Action) {
         $jsonLine = $result | Where-Object { $_ -match '^\{' } | Select-Object -First 1
         $json = $jsonLine | ConvertFrom-Json -ErrorAction SilentlyContinue
 
+        # Update entry status using direct hashtable assignment (not Add-Member)
         $entry.status = if ($json -and $json.passed) { "resolved" } else { "failed" }
-        $entry | Add-Member -NotePropertyName "resolved" -NotePropertyValue (Get-Date -Format "o") -Force
+        $entry.resolved = (Get-Date -Format "o")
         $reg[$TaskId] = $entry
         Set-RegistryData $reg
 
@@ -234,8 +277,7 @@ switch ($Action) {
         if (-not $NewPrompt) { throw "re-prompt requires -NewPrompt" }
 
         $entry = $reg[$TaskId]
-        $newReprompts = @($entry.re_prompts) + @(@{ at = (Get-Date -Format "o"); prompt = $NewPrompt })
-        $entry | Add-Member -NotePropertyName "re_prompts" -NotePropertyValue $newReprompts -Force
+        $entry.re_prompts = @($entry.re_prompts) + @(@{ at = (Get-Date -Format "o"); prompt = $NewPrompt })
         $entry.status = "re-prompted"
         $reg[$TaskId] = $entry
         Set-RegistryData $reg
@@ -267,4 +309,10 @@ switch ($Action) {
             }
         }
     }
+}
+} finally {
+    if ($mutexAcquired) {
+        $mutex.ReleaseMutex() | Out-Null
+    }
+    $mutex.Dispose()
 }

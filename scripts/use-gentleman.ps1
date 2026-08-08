@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 7
 <#
 .SYNOPSIS
     Gentleman-ize any project — bootstrap opencode.json from the generation chain
@@ -121,56 +121,8 @@ function Merge-ProjectSection {
     [pscustomobject]$merged
 }
 
-# ── Chain: permission template map (SSoT mirror of scripts/lib/generate-opencode-config.js) ──
-$templateMap = @{
-    'gentleman-vMK' = 'orchestrator'
-    'gentleman-security' = 'readonly'
-    'gentleman-seo' = 'readonly'
-    'gentleman-infra' = 'readonly'
-    'gentleman-frontend' = 'readonly'
-    'gentleman-performance' = 'readonly'
-    'gentleman-datascience' = 'readonly'
-    'gentleman-docs' = 'readonly'
-    'gentleman-deep' = 'readwrite'
-    'gentleman-quick' = 'readwrite'
-    'gentleman-codex' = 'readwrite'
-    'gentleman-implementer' = 'readwrite'
-    'gentleman-deep-sub' = 'readwrite'
-    'gentleman-quick-sub' = 'readwrite'
-    'gentleman-implementer-sub' = 'readwrite'
-    'gentleman-security-sub' = 'readonly'
-    'gentleman-seo-sub' = 'readonly'
-    'gentleman-infra-sub' = 'readonly'
-    'gentleman-frontend-sub' = 'readonly'
-    'gentleman-performance-sub' = 'readonly'
-    'gentleman-datascience-sub' = 'readonly'
-    'gentleman-docs-sub' = 'readonly'
-    'sdd-apply' = 'readwrite'
-    'sdd-archive' = 'readwrite'
-    'sdd-design' = 'readwrite'
-    'sdd-explore' = 'readwrite'
-    'sdd-init' = 'readwrite'
-    'sdd-orchestrator' = 'sddorchestrator'
-    'sdd-propose' = 'readwrite'
-    'sdd-spec' = 'readwrite'
-    'sdd-tasks' = 'readwrite'
-    'sdd-verify' = 'readwrite'
-    'gentleman-vMK-auto' = 'auto'
-    'gentleman-deep-auto' = 'auto'
-    'gentleman-quick-auto' = 'auto'
-    'gentleman-codex-auto' = 'auto'
-    'gentleman-implementer-auto' = 'auto'
-    'gentleman-deep-sub-auto' = 'auto'
-    'gentleman-quick-sub-auto' = 'auto'
-    'gentleman-codex-sub-auto' = 'auto'
-    'gentleman-implementer-sub-auto' = 'auto'
-    'gentleman-vMK-semi' = 'semi'
-    'gentleman-deep-semi' = 'semi'
-    'gentleman-quick-semi' = 'semi'
-    'gentleman-codex-semi' = 'semi'
-    'gentleman-implementer-semi' = 'semi'
-    'gentleman-reviewer' = 'reviewer'
-}
+# ── Template detection (shared module — SSoT mirror of generate-opencode-config.js) ──
+. (Join-Path (Join-Path $PSScriptRoot 'lib') 'template-detection.ps1')
 
 # ── Chain generation: opencode-base.json + permission-templates.json + agent-overrides.json ──
 function Convert-FileRefsToAbsolute {
@@ -238,12 +190,12 @@ function Get-ChainConfig {
     $templates = Get-Content $tplPath  -Raw | ConvertFrom-Json
     $overrides = if (Test-Path $ovrPath) { Get-Content $ovrPath -Raw | ConvertFrom-Json } else { $null }
 
-    # FIX 6: templateMap SSoT guard — every agent in opencode-base.json must be mapped and
-    # every referenced template must exist. Fail-fast with a clear message, not a generic throw.
+    # templateMap SSoT guard — every agent in opencode-base.json must resolve to a template
+    # and every referenced template must exist. Fail-fast with a clear message.
     foreach ($name in $base.agent.PSObject.Properties.Name) {
-        $mapped = $templateMap[$name]
+        $mapped = Detect-Template -AgentName $name
         if (-not $mapped) {
-            throw "Chain generation: agent '$name' in opencode-base.json is missing from `$templateMap. Add '$name' = '<template>' to `$templateMap in Get-ChainConfig (use-gentleman.ps1)."
+            throw "Chain generation: cannot resolve template for agent '$name' in opencode-base.json. Add explicit entry to `$TemplateMap in template-detection.ps1 or follow naming conventions."
         }
         if (-not $templates.PSObject.Properties[$mapped]) {
             throw "Chain generation: template '$mapped' (mapped for agent '$name') missing from permission-templates.json."
@@ -254,7 +206,7 @@ function Get-ChainConfig {
     foreach ($p in $base.agent.PSObject.Properties) {
         $name    = $p.Name
         $def     = Get-DeepClone $p.Value
-        $tplName = $templateMap[$name]
+        $tplName = Detect-Template -AgentName $name
         if (-not $tplName) { throw "Chain generation: no permission template mapped for agent '$name'" }
         $tpl = Get-DeepClone $templates.$tplName
         if (-not $tpl) { throw "Chain generation: template '$tplName' missing from permission-templates.json" }

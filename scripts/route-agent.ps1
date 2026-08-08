@@ -91,10 +91,16 @@ elseif ($ModeAwareAgents -contains $BaseAgent) {
     $TargetAgent = $BaseAgent + $suffix
 }
 else {
-    # SDD phase agents (sdd-*) and any non-mode-aware agent: no suffix
+    # SDD phase agents (sdd-*) and non-mode-aware subagent twins (gentleman-*-sub): no suffix
     $TargetAgent = $BaseAgent
     $suffix      = ""
-    $note        = "non-mode-aware agent — no suffix"
+    # Warn for truly unknown agents (not sdd-* or *-sub variants)
+    if ('sdd', '-sub' | Where-Object { $BaseAgent.Contains($_) }) {
+        $note = "non-mode-aware agent — no suffix"
+    } else {
+        Write-Warning "route-agent: '$BaseAgent' is not a recognized agent — no suffix applied"
+        $note = "unknown agent — no suffix (WARNING)"
+    }
 }
 
 if ($Json) {
