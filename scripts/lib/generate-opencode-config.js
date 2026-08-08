@@ -160,7 +160,7 @@ for (const [agentName, agentDef] of Object.entries(base.agent)) {
   }
   if (agentOverrides.extraPermKeys) {
     // Guard against clobbering template permissions
-    const templateKeys = ['bash', 'edit', 'read', 'write'];
+    const templateKeys = Object.keys(template);
     const collisions = templateKeys.filter(k => k in agentOverrides.extraPermKeys);
     if (collisions.length > 0) {
       console.error(`ERROR: extraPermKeys for "${agentName}" collides with template keys: ${collisions.join(', ')}`);
