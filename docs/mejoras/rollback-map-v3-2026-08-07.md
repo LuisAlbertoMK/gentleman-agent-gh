@@ -41,9 +41,18 @@
 |---|---|---|
 | `f2e0f159` | docs/agentes/docs-v3-kickoff/, docs/agentes/security-c3a/, docs/agentes/security-C3b/ | `git revert f2e0f159` |
 
+## Cycle #3 v3 — Gap D: Benchmark Fixture (Blast: Bajo)
+
+| Gap | Commit | Archivos | `git revert` |
+|---|---|---|---|
+| Gap D: benchmark context mismatch (orchestrator vs subagent) → false +97.4% regression | `1b7a2c92` | `scripts/tests/fixtures/generate-config-latency-baseline.json`, `scripts/tests/generate-config.Tests.ps1` (R9 test) | `git revert 1b7a2c92` |
+
+> **Gap D fix**: Created machine-readable fixture with pinned median+IQR baseline. The R9 Pester test measures both baseline AND comparison in the SAME execution context (test process), 5 runs, median — eliminates the cross-context mismatch that caused false positives in Cycle #1.
+
 ## Full rollback (all v3)
 
 ```bash
-git revert f2e0f159 c8ac3fab f03f1c63 94b4a11d d935241f f5031ca0 b593e185 75338087
+git revert 1b7a2c92 f2e0f159 c8ac3fab f03f1c63 94b4a11d d935241f f5031ca0 b593e185 75338087
 # (reverse order of application for cleanest state)
+# v3 cycles: 1b7a2c92=C3 Gap D fixture · 4519466f=C2 H2 fix
 ```
