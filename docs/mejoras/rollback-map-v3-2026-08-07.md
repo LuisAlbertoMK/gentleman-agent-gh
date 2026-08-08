@@ -49,10 +49,18 @@
 
 > **Gap D fix**: Created machine-readable fixture with pinned median+IQR baseline. The R9 Pester test measures both baseline AND comparison in the SAME execution context (test process), 5 runs, median — eliminates the cross-context mismatch that caused false positives in Cycle #1.
 
+## Cycle #4 v3 — PSSA Clean Code (Blast: Bajo)
+
+| Gap | Commit | Archivos | `git revert` |
+|---|---|---|---|
+| PSSA PSAvoidDefaultValueSwitchParameter — 5 `[switch]$Json = $true` defaults | `d1496bfe` | `scripts/auto-pattern-detector.ps1`, `scripts/learning-stats.ps1`, `scripts/pattern-guard.ps1`, `scripts/wisdom-loader.ps1`, `scripts/wisdom-stats.ps1`, `scripts/lib/score-dims.ps1` | `git revert d1496bfe` |
+
+> **Fix**: Changed `[switch]$Json = $true` → `[bool]$Json = $true` in 5 scripts (JSON output stays default-true, now PSSA-clean). Updated `score-dims.ps1` Tool-Hygiene regex to also match `[bool]$Json`. PSSA 5→0. Score tests 36/36.
+
 ## Full rollback (all v3)
 
 ```bash
 git revert 1b7a2c92 f2e0f159 c8ac3fab f03f1c63 94b4a11d d935241f f5031ca0 b593e185 75338087
 # (reverse order of application for cleanest state)
-# v3 cycles: 1b7a2c92=C3 Gap D fixture · 4519466f=C2 H2 fix
+# v3 cycles: 1b7a2c92=C3 Gap D fixture · d1496bfe=C4 PSSA 5 → 0 · 4519466f=C2 H2 fix
 ```
