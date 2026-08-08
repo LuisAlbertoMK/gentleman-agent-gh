@@ -1,0 +1,35 @@
+=== Unit D verification — 2026-08-07 ===
+
+[1] Pester re-run Unit A (live):
+$ pwsh -NoProfile -Command "Invoke-Pester -Path 'scripts/tests/generate-config.Tests.ps1' -PassThru | Select-Object PassedCount, FailedCount, TotalCount | Format-List"
+
+Running tests from 1 files.
+[+] D:\gentleman-agent-gh\scripts\tests\generate-config.Tests.ps1 8.02s
+Tests completed in 8.1s
+Tests Passed: 6, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+
+PassedCount : 6
+FailedCount : 0
+TotalCount  : 6
+
+[2] grep extraPermKeys (scripts/lib/generate-opencode-config.js):
+  Line 161: if (agentOverrides.extraPermKeys) {
+  Line 164: const collisions = templateKeys.filter(k => k in agentOverrides.extraPermKeys);
+  Line 166: console.error(...collides with template keys...)
+  Line 169: Object.assign(permission, agentOverrides.extraPermKeys);
+  (L163 = const templateKeys = ['bash', 'edit', 'read', 'write']; — leído con read tool)
+
+[3] grep "task" en scripts/lib/permission-templates.json:
+  Line 8: "task": {          (orchestrator)
+  Line 44: "task": {          (readonly)
+  Line 175: "task": {         (auto-sub)
+  auto template (L67-170): solo bash — NO task. readwrite: solo bash. reviewer: bash/edit/write.
+
+[4] agent-overrides.json (68 líneas) — 2 bloques extraPermKeys.task:
+  sdd-orchestrator (L17-35): delegate/delegation_list/delegation_read/task {*:deny + allowlist sdd-*}
+  gentleman-vMK-auto (L48-67): task {*:deny + allowlist 4 sub-auto + sdd-*}
+
+[5] git log -- scripts/tests/generate-config.Tests.ps1 → (sin salida) = archivo nuevo uncommitted
+    git log -1 -- scripts/lib/generate-opencode-config.js → a4fd00d6 feat(config): ask-free auto-sub twins (2026-08-07 16:39:27 -0600)
+
+[6] git status: test file + docs sin commitear (ciclo test-only, sin commits — consistente con brief)
