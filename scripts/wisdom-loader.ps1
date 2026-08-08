@@ -29,7 +29,7 @@ param(
     [string]$Keywords = "",
     [string]$Severity = "LOW",
     [int]$Limit = 5,
-    [switch]$Json = $true
+    [bool]$Json = $true
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"

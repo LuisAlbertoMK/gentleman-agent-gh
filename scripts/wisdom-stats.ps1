@@ -14,7 +14,7 @@
     .\scripts\wisdom-stats.ps1 -Json
 #>
 param(
-    [switch]$Json = $true,
+    [bool]$Json = $true,
     [switch]$Trend
 )
 Set-StrictMode -Version Latest

@@ -17,7 +17,7 @@
 #>
 param(
     [int]$Threshold = 3,
-    [switch]$Json = $true,
+    [bool]$Json = $true,
     [switch]$Quiet
 )
 

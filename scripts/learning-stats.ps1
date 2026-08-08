@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 7
 <#
 .SYNOPSIS
     Learning statistics — pattern occurrences and trends over time.
@@ -11,7 +11,7 @@
     . "$PSScriptRoot\learning-stats.ps1"
 #>
 param(
-    [switch]$Json = $true,
+    [bool]$Json = $true,
     [switch]$Quiet
 )
 

@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 7
 <#
 .SYNOPSIS
     LAZY detection: check current code for cross-project pattern matches.
@@ -24,7 +24,7 @@ param(
     [ValidateSet("LAZY", "BATCH", "ON_DEMAND")]
     [string]$Mode = "LAZY",
     [string]$PatternId = "",
-    [switch]$Json = $true
+    [bool]$Json = $true
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"

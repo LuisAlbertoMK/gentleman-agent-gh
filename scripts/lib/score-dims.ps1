@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 7
 
 <#
 .SYNOPSIS
@@ -501,7 +501,7 @@ if ($hasScripts) {
     $quietSwitchCount = @($scriptFiles | ForEach-Object {
         $content = $scriptContentCache[$_.FullName]
         if (-not $content) { $false; return }
-        if ($content -match '\[switch\]\$Quiet|\[switch\]\$Json') { $true } else { $false }
+        if ($content -match '\[switch\]\$Quiet|\[switch\]\$Json|\[bool\]\$Json') { $true } else { $false }
     } | Where-Object { $_ }).Count
 }
 $toolHygieneScore = if ($totalScripts -gt 0) { $math::Round($quietSwitchCount / $totalScripts * 10, 1) } else { 0 }
