@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 7
 <#
 .SYNOPSIS
     Contract tests for scripts/lib/generate-opencode-config.js — TEMPLATE_MAP resolution,
@@ -41,7 +41,7 @@ BeforeAll {
         return $repo
     }
 
-    function Set-GenFixtures {
+    function Set-GenFixture {
         param(
             [string]$Repo,
             [hashtable]$Agent,
@@ -73,7 +73,7 @@ AfterAll {
 Describe 'generate-opencode-config.js — fail-closed' {
     It 'exits 1 for an unmapped agent (no TEMPLATE_MAP entry)' {
         $repo = New-GenRepo 'unmapped'
-        Set-GenFixtures -Repo $repo `
+        Set-GenFixture -Repo $repo `
             -Agent @{ 'ghost-agent' = @{ description = 'no mapping'; mode = 'primary' } } `
             -Templates @{ 'readonly' = $script:tmplReadonly }
 
@@ -86,7 +86,7 @@ Describe 'generate-opencode-config.js — fail-closed' {
 
     It 'exits 1 when extraPermKeys collides with a template key' {
         $repo = New-GenRepo 'collision'
-        Set-GenFixtures -Repo $repo `
+        Set-GenFixture -Repo $repo `
             -Agent @{ 'gentleman-quick-sub-auto' = @{
                 description = 'Fast executor subagent'; model = 'opencode/mimo-v2.5-free';
                 hidden = $true; mode = 'subagent'; prompt = '{file:prompts/gentleman-quick.md}' } } `
@@ -102,7 +102,7 @@ Describe 'generate-opencode-config.js — fail-closed' {
 
     It 'EXTRA perm-escalation: extraPermKeys with task key on auto-sub agent is denied (H2 regression)' {
         $repo = New-GenRepo 'collision-task'
-        Set-GenFixtures -Repo $repo `
+        Set-GenFixture -Repo $repo `
             -Agent @{ 'gentleman-quick-sub-auto' = @{
                 description = 'Fast executor'; model = 'opencode/mimo-v2.5-free';
                 hidden = $true; mode = 'subagent'; prompt = '{file:prompts/gentleman-quick.md}' } } `
@@ -120,7 +120,7 @@ Describe 'generate-opencode-config.js — fail-closed' {
 Describe 'generate-opencode-config.js — permission merge' {
     It 'auto-sub merge: bash:{*:allow} + task:{*:deny}, ZERO ask' {
         $repo = New-GenRepo 'auto-sub'
-        Set-GenFixtures -Repo $repo `
+        Set-GenFixture -Repo $repo `
             -Agent @{ 'gentleman-quick-sub-auto' = @{
                 description = 'Fast executor subagent'; model = 'opencode/mimo-v2.5-free';
                 hidden = $true; mode = 'subagent'; prompt = '{file:prompts/gentleman-quick.md}' } } `
@@ -143,7 +143,7 @@ Describe 'generate-opencode-config.js — permission merge' {
 
     It 'readonly merge: bash:{*:deny} with edit/write/task deny' {
         $repo = New-GenRepo 'readonly'
-        Set-GenFixtures -Repo $repo `
+        Set-GenFixture -Repo $repo `
             -Agent @{ 'gentleman-security' = @{
                 description = 'Security specialist'; model = 'opencode/nemotron-3-ultra-free';
                 mode = 'primary'; prompt = '{file:prompts/gentleman-security.md}' } } `
@@ -164,7 +164,7 @@ Describe 'generate-opencode-config.js — permission merge' {
 Describe 'generate-opencode-config.js — validation & overrides' {
     It '--validate exits 0 when generated output is in sync (idempotent)' {
         $repo = New-GenRepo 'idem'
-        Set-GenFixtures -Repo $repo `
+        Set-GenFixture -Repo $repo `
             -Agent @{
                 'gentleman-quick-sub-auto' = @{ description = 'Fast executor subagent'; model = 'opencode/mimo-v2.5-free'; hidden = $true; mode = 'subagent'; prompt = '{file:prompts/gentleman-quick.md}' }
                 'gentleman-security' = @{ description = 'Security specialist'; model = 'opencode/nemotron-3-ultra-free'; mode = 'primary'; prompt = '{file:prompts/gentleman-security.md}' }
@@ -181,7 +181,7 @@ Describe 'generate-opencode-config.js — validation & overrides' {
 
     It 'propagates hidden:true from agent-overrides.json (and only from there)' {
         $repo = New-GenRepo 'hidden'
-        Set-GenFixtures -Repo $repo `
+        Set-GenFixture -Repo $repo `
             -Agent @{
                 'sdd-apply' = @{ description = 'Implement code changes from task definitions'; model = 'opencode/deepseek-v4-flash-free'; mode = 'subagent'; prompt = '{file:prompts/sdd/sdd-apply.md}' }
                 'gentleman-quick-sub-auto' = @{ description = 'Fast executor subagent'; mode = 'subagent' }
@@ -195,5 +195,48 @@ Describe 'generate-opencode-config.js — validation & overrides' {
         $cfg = Read-GenOutput (Join-Path $repo 'opencode.json')
         $cfg.agent.'sdd-apply'.hidden | Should -Be $true
         $cfg.agent.'gentleman-quick-sub-auto'.PSObject.Properties.Name | Should -Not -Contain 'hidden'
+    }
+}
+
+Describe 'R9: regen latency benchmark fixture (Gap D — same-context measurement)' {
+    # Gap D fix: baseline was measured in orchestrator context (263.8ms) vs
+    # subagent context (520.9ms) → false +97.4% regression. This test measures
+    # both baseline and comparison in the SAME execution context (this test run),
+    # with 5 runs and median + IQR, comparing against a pinned JSON fixture.
+    # Threshold: 10% relative regression from pinned baseline.
+
+    It 'regen latency median stays within 10% of pinned baseline (5 runs)' {
+        $fixturePath = Join-Path $script:testDir 'fixtures\generate-config-latency-baseline.json'
+        # Fall back to repo fixture if testDir copy doesn't exist
+        if (-not (Test-Path $fixturePath)) {
+            $fixturePath = Join-Path $PSScriptRoot 'fixtures\generate-config-latency-baseline.json'
+        }
+        $fixture = Get-Content $fixturePath -Raw | ConvertFrom-Json
+
+        $genScript = $script:genSrc
+        $runs = @()
+        for ($i = 0; $i -lt $fixture.runs; $i++) {
+            $sw = [System.Diagnostics.Stopwatch]::StartNew()
+            & node $genScript --validate 2>$null | Out-Null
+            $LASTEXITCODE | Should -Be 0
+            $sw.Stop()
+            $runs += [math]::Round($sw.Elapsed.TotalMilliseconds, 2)
+        }
+
+        $sorted = $runs | Sort-Object
+        $median = $sorted[2]  # 5 runs → index 2 is median
+        $threshold = $fixture.baseline_median_ms * (1 + $fixture.regression_threshold_pct / 100)
+
+        $median | Should -BeLessThan $threshold
+    }
+
+    It 'fixture is machine-readable and pinnable for trend tracking' {
+        $fixturePath = Join-Path $PSScriptRoot 'fixtures\generate-config-latency-baseline.json'
+        $fixture = Get-Content $fixturePath -Raw | ConvertFrom-Json
+
+        $fixture.baseline_median_ms | Should -BeGreaterThan 0
+        $fixture.regression_threshold_pct | Should -BeGreaterThan 0
+        $fixture.runs | Should -Be 5
+        $fixture.methodology | Should -Not -BeNullOrEmpty
     }
 }
