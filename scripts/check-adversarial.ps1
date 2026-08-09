@@ -22,8 +22,7 @@
 #>
 param(
     [string]$RepoRoot = (git rev-parse --show-toplevel 2>$null) ?? '.',
-    [switch]$Quiet,
-    [switch]$UseStaged
+    [switch]$Quiet
 )
 
 Set-StrictMode -Version Latest
@@ -51,13 +50,13 @@ foreach ($f in $stagedItems) {
     $full = Join-Path $RepoRoot $f
     if (-not (Test-Path $full -PathType Leaf)) { continue }
     $ext = [System.IO.Path]::GetExtension($f).ToLower()
-    $profile = $ext -replace '^\.', ''
-    $rulesFile = Join-Path $rulesDir "$profile.json"
+    $langProfile = $ext -replace '^\.', ''
+    $rulesFile = Join-Path $rulesDir "$langProfile.json"
     if (Test-Path $rulesFile) {
         $stagedFiles += [PSCustomObject]@{
             RelativePath = $f
             FullPath     = $full
-            Profile      = $profile
+            Profile      = $langProfile
             RulesFile    = $rulesFile
         }
     }
