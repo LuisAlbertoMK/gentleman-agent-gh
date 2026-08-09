@@ -1,6 +1,6 @@
 # SKILLS INDEX (Compact)
 
-> Top-20 daily-use skills. Full table: all 79 skills — use `skill` tool or read this file for complete list.
+> Top-20 daily-use skills. Full table: all 87 skills — use `skill` tool or read this file for complete list.
 >
 > **Version**: 5.2 | **Changelog**: 5.2 (archived 3 dead: cognitive-doc-design, prompt-engineering, senior-engineer → .archive/skills; count 81→78 per cross-ref-check; global discoverable 93→165 per FS scan: 78 project + 87 global, excl. _shared); 5.1 (sync count 93→81 per filesystem audit); 5.0 (compact top-20 table for token reduction); 4.7 (+1 new: adversarial-breaker; count 92→93); 4.6 (count corrected 80→92 per filesystem audit)
 
@@ -35,7 +35,7 @@
 | Quality | quality-gate, code-review-agent, triple-verify, auto-metrics, external-auditor, immune-system, testing-strategy |
 | Code | commit-crafter, code-generation, quick-executor, refactoring-planner |
 | Security | security-scanner, auth-hardening, container-security, llm-security |
-| SDD | sdd (unified pipeline), sdd-quick, sdd-apply, sdd-design |
+| SDD | sdd (unified pipeline), sdd-quick, sdd-propose, sdd-design, sdd-apply, sdd-verify |
 | Coordination | delivery-harness, branch-pr, issue-creation, command-wrapper |
 | Analysis | analysis-mode, deep-debugging |
 | Memory | session-resume, engram-protocol, dreaming, bitacora |
