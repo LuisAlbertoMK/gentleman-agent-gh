@@ -316,6 +316,17 @@ if (Test-Path -LiteralPath $watchdogScript) {
     Warn "ctx-watchdog.ps1 not found"
 }
 
+# [22/22] Adversarial-breaker profile scan — lightweight commit-time scan.
+# Runs AFTER Verify ([12/13] Pester tests) — catches obvious security patterns.
+# The full adversarial-breaker skill (sub-agent deep analysis) is triggered
+# manually via `!breaker` or auto-triggered in SDD post-Verify for ROZA zone.
+Write-Host "[22/22] Adversarial-breaker profile scan..."
+$stagedSecurity = $staged | Where-Object { $_ -match '\.ps1$' }
+if ($stagedSecurity) {
+    & "$RepoRoot/scripts/check-adversarial.ps1" -RepoRoot $RepoRoot -ErrorAction SilentlyContinue 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 0) { Pass } else { Fail "adversarial profile violations — see output above, touch .breaker-cleared/<file> markers or set FORCE_SHIP=1" }
+} else { Pass }
+
 # Summary
 Write-Host "`n=== Gate: $passed/$($passed+$failed) passed ==="
 if ($blocked) { Write-Host "  $([char]0x1b)[31mBLOCKED$([char]0x1b)[0m" }
