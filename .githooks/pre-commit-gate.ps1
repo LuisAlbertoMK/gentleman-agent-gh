@@ -129,7 +129,7 @@ if ($stagedRoja) {
     } elseif ($uncleared.Count -eq 0) {
         Pass
     } else {
-        Warn "ROZA zone files staged without JD dual review:`n$($stagedRoja | ForEach-Object { '    ' + $_ } | Out-String)`n  Clear: `!judgment-day` then touch .jd-cleared/$(($uncleared[0]).Replace('/','_'))`n  Or: set FORCE_SHIP=1"
+        Fail "ROZA zone files staged without JD dual review — BLOCKED:`n  $($uncleared | ForEach-Object { '    ' + $_ } | Out-String)  Run `!judgment-day` or touch .jd-cleared markers, or set FORCE_SHIP=1"
     }
 } else { Pass }
 

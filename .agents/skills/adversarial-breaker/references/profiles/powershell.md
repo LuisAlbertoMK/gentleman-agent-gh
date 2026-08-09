@@ -26,6 +26,22 @@
 - `Get-Command` / `& $variable` — indirect execution?
 - Module autoloading — can user force-load a malicious module?
 
+### SSRF / Network
+- `Invoke-WebRequest` / `Invoke-RestMethod` — URL from config or user input? SSRF to internal endpoints (169.254.169.254, localhost)?
+- `WebClient.DownloadString()` — unsanitized URL?
+- `$PSDefaultParameterValues` — redirect `Invoke-WebRequest` to attacker proxy?
+
+### Code Execution (Dynamic)
+- `$ExecutionContext.InvokeCommand.InvokeScript()` — dynamic script block from string?
+- `New-Object -ComObject` — COM objects allow privilege escalation?
+- `[System.Reflection.Assembly]::Load()` — arbitrary .NET assembly load?
+- `[ScriptBlock]::Create()` — bypasses AMSI?
+
+### PowerShell Remoting
+- `Enter-PSSession` / `New-PSSession` — remote execution targets injectable?
+- `Invoke-Command -ComputerName` — credential delegation risk?
+- `$using:` scope in remote contexts — injection surface?
+
 ### Data Leakage
 - `Write-Host` / `Write-Output` — secrets in console?
 - `Export-Clixml` / `Out-File` — unencrypted sensitive data?
@@ -51,3 +67,5 @@
 - `Get-Content` on user-provided paths without `-LiteralPath`
 - `ConvertTo-Json` depth issues (default 2)
 - Pipeline variable leak (`$_` in nested pipelines)
+- AMSI bypass techniques — check for `amsiInit`, `[Ref].Assembly`, reflection-based obfuscation
+- `$env:` variable manipulation for PATH hijacking or credential discovery
