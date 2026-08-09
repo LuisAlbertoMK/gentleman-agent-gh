@@ -50,7 +50,15 @@ foreach ($f in $stagedItems) {
     $full = Join-Path $RepoRoot $f
     if (-not (Test-Path $full -PathType Leaf)) { continue }
     $ext = [System.IO.Path]::GetExtension($f).ToLower()
-    $langProfile = $ext -replace '^\.', ''
+    $extKey = $ext.TrimStart('.')
+    # Map .ps1/.psm1/.psd1 → powershell profile, or use ext name directly
+    if (Test-Path (Join-Path $rulesDir "$extKey.json")) {
+        $langProfile = $extKey
+    }     elseif ((Test-Path -LiteralPath (Join-Path $rulesDir "powershell.json")) -and @('ps1','psm1','psd1') -contains $extKey) {
+        $langProfile = 'powershell'
+    } else {
+        continue
+    }
     $rulesFile = Join-Path $rulesDir "$langProfile.json"
     if (Test-Path $rulesFile) {
         $stagedFiles += [PSCustomObject]@{

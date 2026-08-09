@@ -161,7 +161,7 @@ if($manual.Count-gt0){Write-Host "`n-- Manual review (PSSA) --";$manual | Group-
 
 $ec=0
 switch($Mode){
-'Trend'{$bl=Save-Baseline -Results $results -ManualV $manual -AmpersandCount $ac;$prior=if(Test-Path $BaselineFile){Get-Content -LiteralPath $BaselineFile -Raw | ConvertFrom-Json}else{$null}
+'Trend'{$prior=if(Test-Path $BaselineFile){Get-Content -LiteralPath $BaselineFile -Raw | ConvertFrom-Json}else{$null};$bl=Save-Baseline -Results $results -ManualV $manual -AmpersandCount $ac
 if($prior){$d=$results.Count-$prior.total;$s=if($d-gt0){'+'}else{''};$pa=if($prior.PSObject.Properties['ampersandCount']){($prior.ampersandCount -as[int])}else{0};$ad=$ac-$pa;$as=if($ad-gt0){'+'}else{''}
 Write-Host "`n-- Trend --";Write-Host "  PSSA: $($prior.total)->$($results.Count)|D:$s$d";Write-Host "  &&: $($prior.ampersandCount)->$ac|D:$as$ad"
 if($d-gt0-or$ad-gt0){Write-Warning "  Some INCREASED"}elseif($d-lt0-and$ad-le0){Write-Host "  DECREASED - good!"}else{Write-Host "  Steady."}}else{Write-Host "  No prior data."}}
