@@ -24,6 +24,43 @@ Suite of **78 skills** (+ `_shared`) + **91 top-level scripts** (84 PowerShell +
 
 ---
 
+## Prerequisites
+
+- **OpenCode** (latest) — [github.com/sst/opencode](https://github.com/sst/opencode)
+- **PowerShell 7+** (Windows) / **bash** (Linux/macOS)
+- **Node.js** — for npm-based tools
+
+## Quick Start
+
+1. **Clone & install**: `git clone https://github.com/LuisAlbertoMK/gentleman-agent-gh.git && cd gentleman-agent-gh && ./scripts/install.sh`
+2. **Open**: `opencode` in the project folder — `gentleman-vMK` loads automatically
+3. **Ask**: "Analyze my project" · "Review this file" · "Create a test"
+4. **Shortcuts**: `!score` · `!health` · `!analisis`
+5. **Close**: `!close`
+
+> Full walkthrough: [QUICKSTART.md](QUICKSTART.md)
+
+## Configuration
+
+The `.gentleman-mode` file at project root controls permission level:
+
+| Mode | Content | Behavior |
+|------|---------|----------|
+| `manual` | `manual` | Agent asks before every tool call |
+| `semi` | `semi` | Safe commands auto-approved, rest asks |
+| `auto` | `auto` | Most things auto-approved (except push/delete) |
+
+Switch modes:
+
+```powershell
+.\scripts\switch-mode.ps1 -Mode semi   # change mode
+.\scripts\switch-mode.ps1 -Status      # check current mode
+```
+
+> Default is `manual`. See [PROTOCOL.md](PROTOCOL.md) for full mode behavior.
+
+---
+
 ## Features
 
 ### Multi-Agent Architecture
