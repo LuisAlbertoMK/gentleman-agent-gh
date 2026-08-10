@@ -181,6 +181,58 @@ Describe "permission-gate-lib.ps1" {
             $result = Get-CommandClass -cmd "git diff" -mode "semi"
             $result | Should -Be "allow"
         }
+
+        It "Classifies new package manager bare/wildcard patterns as deny in all modes" {
+            # bun bare and wildcard (added to shared-deny-rules.json)
+            $result = Get-CommandClass -cmd "bun" -mode "auto"
+            $result | Should -Be "deny"
+            $result = Get-CommandClass -cmd "bun run test" -mode "auto"
+            $result | Should -Be "deny"
+            $result = Get-CommandClass -cmd "bun" -mode "semi"
+            $result | Should -Be "deny"
+            $result = Get-CommandClass -cmd "bun" -mode "manual"
+            $result | Should -Be "deny"
+
+            # pnpm bare and wildcard
+            $result = Get-CommandClass -cmd "pnpm" -mode "auto"
+            $result | Should -Be "deny"
+            $result = Get-CommandClass -cmd "pnpm test" -mode "auto"
+            $result | Should -Be "deny"
+            $result = Get-CommandClass -cmd "pnpm" -mode "semi"
+            $result | Should -Be "deny"
+
+            # yarn bare and wildcard
+            $result = Get-CommandClass -cmd "yarn" -mode "auto"
+            $result | Should -Be "deny"
+            $result = Get-CommandClass -cmd "yarn test" -mode "auto"
+            $result | Should -Be "deny"
+            $result = Get-CommandClass -cmd "yarn" -mode "semi"
+            $result | Should -Be "deny"
+
+            # pip3 bare and wildcard
+            $result = Get-CommandClass -cmd "pip3" -mode "auto"
+            $result | Should -Be "deny"
+            $result = Get-CommandClass -cmd "pip3 list" -mode "auto"
+            $result | Should -Be "deny"
+            $result = Get-CommandClass -cmd "pip3" -mode "semi"
+            $result | Should -Be "deny"
+        }
+
+        It "Verifies semi-mode allowlist still works for npm test/run/ci and pip freeze/list/show" {
+            # These should still be ALLOW in semi mode (not broken by new deny patterns)
+            $result = Get-CommandClass -cmd "npm test" -mode "semi"
+            $result | Should -Be "allow"
+            $result = Get-CommandClass -cmd "npm run build" -mode "semi"
+            $result | Should -Be "allow"
+            $result = Get-CommandClass -cmd "npm ci" -mode "semi"
+            $result | Should -Be "allow"
+            $result = Get-CommandClass -cmd "pip freeze" -mode "semi"
+            $result | Should -Be "allow"
+            $result = Get-CommandClass -cmd "pip list" -mode "semi"
+            $result | Should -Be "allow"
+            $result = Get-CommandClass -cmd "pip show requests" -mode "semi"
+            $result | Should -Be "allow"
+        }
     }
 
     Context "Get-ConfiguredMode Function" {

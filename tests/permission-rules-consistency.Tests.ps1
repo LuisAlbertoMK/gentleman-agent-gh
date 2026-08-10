@@ -52,6 +52,21 @@ Describe "Permission Rules Consistency" {
             $ruleNames | Should -Contain "node *"
             $ruleNames | Should -Contain "ruby *"
         }
+
+        It "Includes package manager bare/wildcard deny patterns (bun, pnpm, yarn, pip3)" {
+            $denyRules = Get-Content $denyRulesPath -Raw | ConvertFrom-Json
+            $ruleNames = $denyRules | Get-Member -MemberType NoteProperty | ForEach-Object { $_.Name }
+            # Bare commands
+            $ruleNames | Should -Contain "bun"
+            $ruleNames | Should -Contain "pnpm"
+            $ruleNames | Should -Contain "yarn"
+            $ruleNames | Should -Contain "pip3"
+            # Wildcard patterns
+            $ruleNames | Should -Contain "bun *"
+            $ruleNames | Should -Contain "pnpm *"
+            $ruleNames | Should -Contain "yarn *"
+            $ruleNames | Should -Contain "pip3 *"
+        }
     }
 
     Context "opencode.json Permission Structure" {

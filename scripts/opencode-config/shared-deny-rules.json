@@ -1,6 +1,8 @@
 {
   "Add-MpPreference *": "deny",
   "bitsadmin *": "deny",
+  "bun": "deny",
+  "bun *": "deny",
   "bun add *": "deny",
   "bun install *": "deny",
   "certutil *": "deny",
@@ -48,7 +50,11 @@
   "perl *": "deny",
   "php *": "deny",
   "pip install *": "deny",
+  "pip3": "deny",
+  "pip3 *": "deny",
   "pip3 install *": "deny",
+  "pnpm": "deny",
+  "pnpm *": "deny",
   "pnpm add *": "deny",
   "pnpm i *": "deny",
   "pnpm install *": "deny",
@@ -79,6 +85,8 @@
   "Test-NetConnection *": "deny",
   "wget *": "deny",
   "wsl *": "deny",
+  "yarn": "deny",
+  "yarn *": "deny",
   "yarn add *": "deny",
   "yarn install *": "deny"
 }
