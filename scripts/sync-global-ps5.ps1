@@ -4,12 +4,23 @@
     Sync gentleman-agent-gh to global OpenCode config — PS 5.1 compatible.
 .DESCRIPTION
     Creates skill junctions, copies missing scripts, syncs AGENTS.md + configs.
+    Fully self-contained — no PS7-only lib dependencies, runs on PS 5.1.
 .PARAMETER DryRun  Show what would be done without making changes.
 #>
 param([switch]$DryRun)
+
+function Get-GlobalConfigDir {
+    $base = if ($env:OS -eq 'Windows_NT') { $env:USERPROFILE } else { $HOME }
+    return Join-Path (Join-Path $base ".config") "opencode"
+}
+function New-CrossPlatLink {
+    param([string]$Path, [string]$Target)
+    if ($env:OS -eq 'Windows_NT') { New-Item -ItemType Junction -Path $Path -Target $Target -Force | Out-Null }
+    else { New-Item -ItemType SymbolicLink -Path $Path -Target $Target -Force | Out-Null }
+}
+
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
-. (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 $repoRoot = Resolve-Path "$PSScriptRoot\.." -ErrorAction Stop
 $srcSkills = Join-Path $repoRoot ".agents\skills"
 $srcScripts = Join-Path $repoRoot "scripts"
