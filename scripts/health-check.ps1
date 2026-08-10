@@ -18,6 +18,10 @@
   Output results as JSON for agent consumption.
 .PARAMETER Quiet
   Exit code only, minimal output (0=OK, 1=warnings, 2=failures).
+.PARAMETER DryRun
+  Report which junctions would be repaired without applying changes.
+.PARAMETER Force
+  Repair junctions even without -AutoRepair (same effect as -AutoRepair).
 .EXAMPLE
   .\scripts\health-check.ps1              # interactive health check
   .\scripts\health-check.ps1 -Json        # JSON for agent

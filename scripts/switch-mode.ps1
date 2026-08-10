@@ -25,6 +25,14 @@
 .PARAMETER Help
     Show help banner
 
+.PARAMETER DryRun
+    Reserved for parity with sibling scripts; accepted but not used
+    by the switch logic.
+
+.PARAMETER Force
+    Reserved for parity with sibling scripts; accepted but not used
+    by the switch logic.
+
 .EXAMPLE
     ./switch-mode.ps1 -Mode semi
     ./switch-mode.ps1 -Status
