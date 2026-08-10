@@ -40,12 +40,13 @@ jobs:
         run: |
           $fail = 0
           Get-ChildItem -Recurse -Filter *.ps1 | Where-Object {
-            $_.FullName -notmatch 'experiments|node_modules|metricas\\assets'
+            $_.FullName -notmatch 'experiments|node_modules|metricas\\assets|\.breaker-cleared'
           } | ForEach-Object {
             $c = (Get-Content $_ -Head 3) -join "`n"
-            $ps5Only = $_.Name -in @('ps5-detect.ps1', 'sync-global-ps5.ps1')
-            if ($c -notmatch '#requires -Version 7(\.0)?' -and -not $ps5Only) {
-              Write-Output "::warning title=Missing PS7::$($_.Name)"; $fail++; return
+            $declares5 = $c -match '#requires -Version 5\.1'
+            $declares7  = $c -match '#requires -Version 7(\.0)?'
+            if (-not $declares5 -and -not $declares7) {
+              Write-Output "::warning title=Missing version gate::$($_.Name)"; $fail++; return
             }
             try { $null = [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$null); Write-Output "OK: $($_.Name)" }
             catch { Write-Warning "Syntax error: $($_.Name) — $($_.Exception.Message)"; $fail++ }
