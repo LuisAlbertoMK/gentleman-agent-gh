@@ -190,7 +190,15 @@ if ($stagedTests) {
         if ($pester.Version.Major -ge 5 -and $cfg.PSObject.Properties['Filter']) { $cfg.Filter.ExcludeTag = 'E2E' }
         if ($testPaths.Count -gt 1 -and $pester.Version.Major -ge 5) { $cfg.Run.Parallel = $true }
         $results = Invoke-Pester -Configuration $cfg
-        if ($results.FailedCount -gt 0) { Fail "Pester: $($results.FailedCount) test(s) failed" } else { Pass }
+        if ($null -eq $results) {
+            Warn "Pester: no results returned"
+        } elseif ($null -eq $results.FailedCount) {
+            Warn "Pester: FailedCount property not available (Pester version mismatch)"
+        } elseif ($results.FailedCount -gt 0) {
+            Fail "Pester: $($results.FailedCount) test(s) failed"
+        } else {
+            Pass
+        }
     } catch { Warn "Pester not available: $_" }
 } else { Pass }
 

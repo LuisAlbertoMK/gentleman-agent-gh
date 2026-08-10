@@ -86,7 +86,9 @@ foreach ($sf in $stagedFiles) {
     }
 
     $rules = (Get-Content $sf.RulesFile -Raw -Encoding UTF8 | ConvertFrom-Json).rules
-    $lines = Get-Content $sf.FullPath
+    $lines = @(Get-Content $sf.FullPath)
+
+    if ($lines.Count -eq 0) { continue }
 
     for ($i = 0; $i -lt $lines.Count; $i++) {
         $lineNum = $i + 1
