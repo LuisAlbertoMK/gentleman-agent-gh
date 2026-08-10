@@ -27,7 +27,8 @@ Suite of **78 skills** (+ `_shared`) + **91 top-level scripts** (84 PowerShell +
 ## Prerequisites
 
 - **OpenCode** (latest) — [github.com/sst/opencode](https://github.com/sst/opencode)
-- **PowerShell 7+** (Windows) / **bash** (Linux/macOS)
+- **PowerShell 7+** (Windows) / **bash** (Linux/macOS) — required for scripts & tests
+- **PowerShell 5.1** (Windows) — orchestrator host shell; scripts declare `#requires -Version (5.1|7)` (see [docs/operations/RUNBOOK.md](docs/operations/RUNBOOK.md))
 - **Node.js** — for npm-based tools
 
 ## Quick Start

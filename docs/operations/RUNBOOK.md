@@ -51,5 +51,6 @@ Quick-reference troubleshooting for gentleman-agent-gh operations.
 | Symptom | Diagnosis | Fix | Prevention |
 |---------|-----------|-----|------------|
 | Script fails with parse error | Unicode chars (em-dash, arrows) in PS file | Replace with ASCII: `--` instead of `—`, `->` instead of `→` | Use only ASCII in .ps1 files |
-| `#requires -Version 7` blocks execution | Running on PowerShell 5.1 | Nearly all scripts require PS7. Install PS7 or use `scripts/sync-global-ps5.ps1` for PS5.1-compatible wrappers. Only `mcp-resilience.ps1` and `validate-write-scope.ps1` are PS5.1-compatible | Target PS7; use PS5.1 wrappers for critical scripts only |
+| `#requires -Version 7` blocks execution | Running on PowerShell 5.1 | Install PS7+ (`winget install Microsoft.PowerShell`) or invoke the CMD wrapper (`scripts\sync-all.bat`) which forwards to pwsh | Target PS7+ for all new scripts; declare `#requires -Version (5.1|7)` in every .ps1 |
+| Script declares 5.1 but dot-sources a PS7 lib | PS 5.1 rejects the lib's `#requires -Version 7` | Keep 5.1-declared scripts fully self-contained (no PS7-only libs) — see `scripts/sync-global-ps5.ps1`, the only PS5.1-compatible script | Test `scripts/tests/powershell-compat.Tests.ps1` enforces declaration=reality |
 | DateTime round-trip fails through JSON | Culture-dependent serialization | Use `Get-IsoTimestamp` / `ConvertFrom-IsoTimestamp` helpers from `scripts/lib/mcp-resilience.ps1` | Never pass raw DateTime through ConvertTo-Json/ConvertFrom-Json |

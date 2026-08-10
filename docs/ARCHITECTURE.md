@@ -260,7 +260,7 @@ Fix applied
 | Layer | Technology |
 |-------|-----------|
 | Runtime | OpenCode (AI agent framework) |
-| Language | PowerShell 7.6+ (scripts), JavaScript/Node.js (analysis) |
+| Language | PowerShell 7.6+ (scripts/tests), PowerShell 5.1 (Windows orchestrator shell only), JavaScript/Node.js (analysis) |
 | Memory | Engram MCP (persistent across sessions) |
 | CI/CD | GitHub Actions (quality-gate.yml, release.yml) |
 | Version Control | Git with skip-worktree for computed files |
