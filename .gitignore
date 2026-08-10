@@ -56,6 +56,12 @@ scripts/.env
 # ============================================
 # Temp / scratch
 # ============================================
+# Stray PowerShell redirect targets (broken `> $null` writes)
+$null
+_testrun.log
+_toolout.log
+_toolout2.log
+_toolout*.log
 tmp/
 temp/
 scratch/
