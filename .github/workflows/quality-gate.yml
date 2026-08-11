@@ -247,3 +247,31 @@ jobs:
       - name: Error snapshot
         if: always()
         run: ./scripts/capture-errors.ps1 -Snapshot
+
+  tests-v1:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: write
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Cache PowerShell modules
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~\\Documents\\PowerShell\\Modules
+          key: psmodules-v1-${{ hashFiles('tests/*.Tests.ps1') }}
+          restore-keys: psmodules-v1-
+
+      - name: Pester unit tests (v1 experiment)
+        run: |
+          $results = Invoke-Pester -Path './tests/*.Tests.ps1' -PassThru
+          if ($results.FailedCount -gt 0) {
+            Write-Error "Pester v1: $($results.FailedCount) test(s) failed"
+            exit 1
+          }
+          Write-Output "OK: $($results.PassedCount)/$($results.TotalCount) tests passed"
