@@ -115,8 +115,11 @@ Describe "check-subagent-output.ps1 — contract validation flag in Quiet mode (
         $valid = "## Decision Taken`nFix C4d`n## Files Changed`nsrc/x.ts`n## Key Findings`n1. [HIGH] f`n## Nuance`nok"
         $tmpFile = Join-Path $TestDrive 'agent_out.txt'
         Set-Content -Path $tmpFile -Value $valid -NoNewline
-        $result = & pwsh -NoProfile -Command "& '$scriptPath' -Quiet -AgentOutput ((Get-Content -Raw '$tmpFile'))"
-        $json = $result | ConvertFrom-Json -ErrorAction SilentlyContinue
+        # SAFE transport: read content in-process and pass as a real argument to the
+        # child script via -File, instead of double-interpolating the agent output
+        # inside a -Command string (which corrupts content containing quotes/`/'$').
+        $content = Get-Content -Raw -Path $tmpFile
+        $json = & pwsh -NoProfile -File $scriptPath -Quiet -AgentOutput $content | ConvertFrom-Json -ErrorAction SilentlyContinue
         $json.contract_valid | Should -BeTrue
     }
 
@@ -124,8 +127,9 @@ Describe "check-subagent-output.ps1 — contract validation flag in Quiet mode (
         $bad = "## Decision Taken`nFix`n## Files Changed`nsrc/x.ts`n## Key Findings`n1. [HIGH] f"
         $tmpFile = Join-Path $TestDrive 'agent_out_bad.txt'
         Set-Content -Path $tmpFile -Value $bad -NoNewline
-        $result = & pwsh -NoProfile -Command "& '$scriptPath' -Quiet -AgentOutput ((Get-Content -Raw '$tmpFile'))"
-        $json = $result | ConvertFrom-Json -ErrorAction SilentlyContinue
+        $content = Get-Content -Raw -Path $tmpFile
+        # SAFE transport: see note in the well-formed test above.
+        $json = & pwsh -NoProfile -File $scriptPath -Quiet -AgentOutput $content | ConvertFrom-Json -ErrorAction SilentlyContinue
         $json.contract_valid | Should -BeFalse
     }
 }
