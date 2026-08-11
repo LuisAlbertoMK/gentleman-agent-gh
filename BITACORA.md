@@ -1,3 +1,4 @@
+2026-08-11 - Session close
 2026-08-11 - E2E fix + skills >3KB decision (opción A): fix fail E2E `contract_valid=true` transport (pwsh -Command→-File arg, 7 edits sdd-* prose-only conserva calidad pero no alcanza <3072; spec densa). Decision: aceptar Warn, priorizar calidad funcional (Score size dim 10→7). Verificado benchmark -Gate + run-tests.ps1 (873/875, solo flaky R9). Pendiente: posible ADR relax umbral 3KB para skills SDD procedimentales. See ADR-009 + baseline §3.5.
 2026-08-07 - Session close
 2026-08-07 - Completed C6/C8/C9 quality gate integration (3 new checks [19/21]) + CI mirror in quality-gate.yml + 9 regression-guard tests + 2 bug fixes in check-token-budget.ps1. Quality gate: 21/21 ALL CLEAR. Full suite: 848/848 pass. Merged into main, pushed to origin.
