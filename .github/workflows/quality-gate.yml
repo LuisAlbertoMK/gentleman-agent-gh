@@ -36,6 +36,15 @@ jobs:
       - name: opencode.json config validation
         run: node scripts/lib/generate-opencode-config.js --validate
 
+      - name: npm audit (advisory report)
+        # Non-blocking visibility for supply-chain. Pinning direct deps (package.json exact
+        # versions) already reduces drift; CI pins exact via package-lock.json. Known-acceptable
+        # vulns (e.g. transitive fast-uri via playwright) are tracked in adr/ADR-021 and
+        # graduated to blocking only after remediation. Blocking gate is a future ADR.
+        continue-on-error: true
+        run: |
+          npm audit --audit-level=high || echo "::warning title=npm audit::Review 'high'+ vulnerabilities (see adr/ADR-021 for allowlist)"
+
       - name: PS7 checks (syntax + version gate)
         run: |
           $fail = 0
