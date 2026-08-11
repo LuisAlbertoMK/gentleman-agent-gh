@@ -1,0 +1,20 @@
+# DRAFT — awaiting CI/PSSA/Pester validation (node/pwsh=negated local)
+# P1.9 — Engram TTL/purge (patch draft, NOT applied)
+
+**Scope lock**: `scripts/wisdom-demote.ps1` (-All), `scripts/engram-compact.ps1`, política por tipo (low=30d, config=90d).
+**Cita plan**: plan-kimi-k3.md:101 (P3.19) — "Engram TTL/purge: política por tipo (low=30d, config=90d) + wisdom-demote.ps1 -All en ciclo de mejora"; :62 (F14 crecimiento unbounded); §9:171.
+**Blast**: Medio (borra memoria — guard por tipo). **Regla**: commit `feat(scripts):`.
+
+```diff
+--- a/scripts/engram-compact.ps1
++++ b/scripts/engram-compact.ps1
+@@ (param block, aprox — verify at apply) @@
++param([string]$Type, [int]$TTLDays = 30)   # low=30, config=90
++if ($Type -eq 'config') { $TTLDays = 90 }
++& "$PSScriptRoot\wisdom-demote.ps1" -All -OlderThanDays $TTLDays
+```
+
+**Idempotencia**: TTL por fecha de creación; re-run no borra doble (entrada ya ausente).
+**Rollback**: snapshot Engram previo (export) antes de primer purge.
+**DoD**: entradas low>30d y config>90d purgadas; high/wisdom intactas; gate verde.
+**CI fallback (local negado)**: `gh workflow run quality-gate.yml` + Pester suite `scripts/tests/*.Tests.ps1`.

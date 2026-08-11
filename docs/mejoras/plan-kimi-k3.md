@@ -202,3 +202,18 @@ Drafts `docs/mejoras/_karpathy-drafts/` aplicados a canónicos (verificación `(
 **Deferred (HIGH-BLAST — requieren review humano, drafts quedan como -draft)**: prompts/gentleman-vMK.md (5088→1985B), prompts/shared/_core-behavior-gp.md (3446→1888B). Deferred-by-design: gobiernan el protocolo operativo del agente (fail-closed, return-contract, permission layering); aplicar sin checkpoint humano viola el principio de blast radius Alto (§1 protocolo v3) y ADR-018/ADR-005.
 
 **Deferred por permission model**: prompts/sdd/sdd-orchestrator.md (SKIP arriba).
+
+## 11. Implementation backlog (SAFE — 2026-08-11)
+
+SAFE backlog: writes SOLO a `docs/mejoras/_impl-drafts/` + este §11. Sin git commit (pedir). Sin node/npm/pwsh/python (skip+[SKIP-toolchain]). Canonical fail-closed intactos. won't-fix (root→agentes) intacto. `regenerate-opencode.ps1` NO modificado (help-comment 65536 = cosmético pre-existente; ADR-007 Amendment cubre la realidad 98,304). master→main = skip manual.
+
+| Item | Blast | Status | Next step |
+|---|---|---|---|
+| SDD skills (7) regenerados con frontmatter canónico verbatim + prosa karpathy | Bajo | **DONE** — `_impl-drafts/sdd-{spec,archive,propose,tasks,apply,init,verify}.md`, todos ≤3072B (apply exacto 3072) | Review + apply 1 commit/skill, prefix `karpathy:`, tag `archive/pre-karpathy-*`, DoD gate verde |
+| prompts/gentleman-vMK.md + `_core-behavior-gp.md` (HIGH-BLAST) | **ALTO** | Draft intacto en `_karpathy-drafts/` — **requiere review humano (gobierna protocolo del agente)** | Checkpoint humano; ADR-018/005; aplicar solo tras OK |
+| protocolo_mejora_autonoma_v3.md | Bajo | **DONE** — `_impl-drafts/protocolo-v3.md` 4422B/55L (canónico ya comprimido §10); checkpoints v3-vs-v2 + humano + rollback preservados | Verificar diff vs canónico, sin re-apply |
+| P1.11b flaky retry (`quality-gate.yml:242`) | Bajo | **DONE** — `_impl-drafts/p1.11b-quality-gate-retry.patch` (-RetryCount 2) | Apply + CI green; rollback: revert 1-línea |
+| P3.18 auto-dream (`close-session.ps1:161`) | Bajo | **DONE** — `_impl-drafts/p3.18-close-session-autodream.patch` (3-line insert, guard DryRun/Force) | Apply + verificar 5º close dispara dreaming |
+| P2.15 bulk-ops ctx_execute | Bajo | **DONE** — `_impl-drafts/ctx-bulk-ops-guidance.md` (benchmark.ps1:40, skill-graph) | Prompts/scripts canonicalizar regla |
+| master→main (branch default) | Manual | Pending — usuario (GitHub Settings + delete remoto) | Snapshot ya en tag `archive/gentle-ai-go-snapshot-v2` |
+| CODE CI+PEV: perf-caches (P2.12), async-delegation (P3.22), memory-TTL (P3.19), injection-sanitization (P1.7) | Medio/Alto | Deferred (requieren CI + PEV gate) | Implementar con plan→aprobación→ejecución→verificación |

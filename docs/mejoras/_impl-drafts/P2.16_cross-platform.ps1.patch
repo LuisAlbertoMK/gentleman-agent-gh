@@ -1,0 +1,22 @@
+# DRAFT — awaiting CI/PSSA/Pester validation (node/pwsh=negated local)
+# P2.16 — Cross-platform: shell detect + symlinks (patch draft, NOT applied)
+
+**Scope lock**: `scripts/bootstrap.ps1`, `scripts/setup-machine.ps1` — detección de shell (bash/zsh) + symlinks.
+**Cita plan**: plan-kimi-k3.md:96 (P2.16) — "Cross-platform: detección de shell + symlinks en bootstrap.ps1/setup-machine.ps1 (bash/zsh)"; :61 (F13 bootstrap/setup Windows-only); :23 (135/136 scripts `#requires -Version 7`, solo sync-global-ps5.ps1 declara 5.1).
+**Blast**: Medio (setup nuevo en non-Windows). **Regla**: commit `feat(scripts):`.
+
+```diff
+--- a/scripts/setup-machine.ps1
++++ b/scripts/setup-machine.ps1
+@@ (inicio, aprox — verify at apply) @@
++$isWindows = $env:OS -match 'Windows'
++if (-not $isWindows) {
++  $shell = if (Get-Command zsh) { 'zsh' } else { 'bash' }
++  & $shell ./scripts/bootstrap.sh   # symlinks bash/zsh en lugar de cmd
++}
+```
+
+**Idempotencia**: guard `if (-not $isWindows)` + Test-Path en symlinks (no recrear).
+**Rollback**: git revert (setup aditivo, sin tocar Windows path).
+**DoD**: bootstrap corre en Linux runner (job ubuntu smoke) + Windows intacto.
+**CI fallback (local negado)**: `gh workflow run quality-gate.yml` con matrix [windows-latest, ubuntu-latest] ; pwsh solo en Windows runner.

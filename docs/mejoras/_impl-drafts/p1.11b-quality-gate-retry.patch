@@ -1,0 +1,24 @@
+# P1.11b — Flaky retry en tests (patch draft, NOT applied)
+
+**Scope lock**: `.github/workflows/quality-gate.yml` — job `pester` (Pester unit tests, línea 240-247).
+**Cita**: `quality-gate.yml:233` (job con cache `psmodules` + `Invoke-Pester` de `scripts/tests/`).
+**Blast**: Bajo (CI-only, sin cambio de contrato). **Regla**: 1 commit por unidad, prefix `fix(ci):`.
+**Justificación**: plan-kimi-k3 §3 P1.11 — "Flaky retry: retry ×1 en tests con red/MCP".
+
+```diff
+--- a/.github/workflows/quality-gate.yml
++++ b/.github/workflows/quality-gate.yml
+@@ -240,7 +240,7 @@
+       - name: Pester unit tests
+         run: |
+-          $results = Invoke-Pester -Path './scripts/tests/*.Tests.ps1' -PassThru
++          $results = Invoke-Pester -Path './scripts/tests/*.Tests.ps1' -PassThru -RetryCount 2
+           if ($results.FailedCount -gt 0) {
+             Write-Error "Pester: $($results.FailedCount) test(s) failed"
+             exit 1
+           }
+```
+
+**Nota**: el job `tests-v1` (línea 280-287) NO se toca — experimento aparte con suite `tests/`; decisión merge/archive es ítem F4 separado. `-RetryCount 2` = máximo 2 reintentos por test flaky (Pester 5).
+**Rollback**: `git revert` del commit (cambio atómico de 1 línea).
+**DoD**: CI green en próximo run + 0 tests flaky reincidentes.

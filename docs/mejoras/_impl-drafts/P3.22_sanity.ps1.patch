@@ -1,0 +1,20 @@
+# DRAFT — awaiting CI/PSSA/Pester validation (node/pwsh=negated local)
+# P3.22 — Sanity: gate 22/22 con registro de cambio (patch draft, NOT applied)
+
+**Scope lock**: `.github/workflows/quality-gate.yml` (jobs `tests`/`tests-v1`) — sanity step que verifica gate count vs SSoT y falla si difiere sin registro.
+**Cita plan**: plan-kimi-k3.md:64 (F16) — "gate 18/18 vs 22/22 sin registro de cuándo cambió"; :18 (tests-v1 corre en CI — baseline 08-10 erróneo).
+**Blast**: Bajo (CI check). **Regla**: commit `fix(ci):`.
+
+```diff
+--- a/.github/workflows/quality-gate.yml
++++ b/.github/workflows/quality-gate.yml
+@@ (tras job tests-v1, aprox — verify at apply) @@
++      - name: Sanity gate count (F16)
++        run: |
++          $n = (Get-Content docs/mejoras/gate-history.md | Select-Object -Last 1)
++          if ($n -notmatch "$env:GITHUB_RUN_ID") { Write-Error "gate count changed without log"; exit 1 }
+```
+
+**Idempotencia**: compare por run-id; sin estado acumulado. **Rollback**: git revert.
+**DoD**: cambio de gate count requiere línea en gate-history.md; CI falla si no.
+**CI fallback (local negado)**: `gh workflow run quality-gate.yml` ; `pwsh -c "Invoke-Pester ./scripts/tests/*.Tests.ps1 -PassThru"` en runner.

@@ -1,0 +1,17 @@
+# DRAFT — awaiting CI/PSSA/Pester validation (node/pwsh=negated local)
+# P3.20 — Skill deprecation: marcar + excluir (patch draft, NOT applied)
+
+**Scope lock**: frontmatter de skills (campo `deprecated: true`) + `scripts/build-skill-registry.ps1` (excluir deprecated del listado) + `scripts/list-skills.ps1`.
+**Cita plan**: plan-kimi-k3.md:63 (F15) — "166 skills listados en cada system prompt (78 proyecto + 88 global) — tabla completa inline"; :60 (F12 skills SDD >3KB, jerarquía).
+**Blast**: Bajo (exclusión de listado; skills siguen presentes en disco). **Regla**: commit `chore(skills):`.
+
+```diff
+--- a/scripts/build-skill-registry.ps1
++++ b/scripts/build-skill-registry.ps1
+@@ (filtro de inventario, aprox — verify at apply) @@
++  if ($skill.Frontmatter.deprecated -eq $true) { continue }  # P3.20
+```
+
+**Idempotencia**: re-run idéntico (filtro determinista por frontmatter).
+**Rollback**: git revert + quitar flag del frontmatter. **DoD**: skills deprecated fuera del registry y del count 166; drift-check verde.
+**CI fallback (local negado)**: `gh workflow run quality-gate.yml` ; `pwsh -c "./scripts/build-skill-registry.ps1 -Verify"`.

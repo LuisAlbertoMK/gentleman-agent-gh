@@ -1,0 +1,18 @@
+# DRAFT — awaiting CI/PSSA/Pester validation (node/pwsh=negated local)
+# P3.23 — Verbose guard: cap en salida de scripts (patch draft, NOT applied)
+
+**Scope lock**: `scripts/*.ps1` con salida verbosa (candidatos: session-miner, ctx-watchdog, delegation-registry) — env var `GA_VERBOSE_LIMIT` cap de líneas.
+**Cita plan**: plan-kimi-k3.md §10:202 (deferred HIGH-BLAST — _core-behavior-gp.md gobierna protocolo del agente, ADR-018/005) — **OVERLAP: fail-closed por defecto ya silencia verbose; este patch puede duplicarlo o contradecirlo**.
+**Blast**: ALTO (puede silenciar verbose legítimo — requiere sign-off humano explícito). **Regla**: NO commit sin checkpoint humano.
+
+```diff
+--- a/scripts/session-miner.ps1
++++ b/scripts/session-miner.ps1
+@@ (tras $result, aprox — verify at apply) @@
++$limit = [int]($env:GA_VERBOSE_LIMIT ?? 200)   # P3.23 proposal — review needed
++if ($result.Count -gt $limit) { $result = $result | Select-Object -First $limit }
+```
+
+**Idempotencia**: env-var default 200; sin env → límite activo. **Rollback**: git revert.
+**DoD**: sign-off humano + test de que verbose legítimo no se trunca por defecto.
+**CI fallback (local negado)**: `gh workflow run quality-gate.yml` ; `pwsh -c "Invoke-Pester ./scripts/tests/*.Tests.ps1 -PassThru"`.
