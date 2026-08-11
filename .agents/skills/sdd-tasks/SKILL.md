@@ -15,20 +15,16 @@ triggers: "SDD tasks, task planning, implementation tasks, work breakdown, task 
 **Executor Override**: If you ARE `sdd-tasks` sub-agent → execute directly.
 
 ## Language Contract
-
-SDD artifacts default to English. Spanish only if explicitly requested. Comments follow target context language.
+SDD artifacts default to English; Spanish only if requested. Comments follow target context language.
 
 ## Purpose
-
 Create `tasks.md` — actionable implementation steps organized by phase, from proposal + specs + design.
 
 ## Inputs
-
 Change name, artifact store (`engram | openspec | hybrid | none`), delivery strategy (`ask-on-risk | auto-chain | single-pr | exception-ok`).
 
 ## Persistence
-
-Follow `skills/_shared/sdd-phase-common.md` Sections B+C.
+Per `sdd-phase-common.md` §B+C.
 
 | Mode | Read | Save |
 |------|------|------|
@@ -66,14 +62,10 @@ Header with workload forecast table (changed lines, budget risk, chained PRs, sp
 - Threat-matrix: RED-test task before each production task (skip `N/A`)
 
 #### Workload Forecast
-
 Estimate if >400 changed lines (additions + deletions). Signals: file count, phases, integration, tests, docs, migrations.
-
-If **High** or likely >400: `Chained PRs recommended: Yes`, split into work units → chained PRs. Each PR needs: start, finish, verification, scope, test command, runtime harness, rollback boundary.
-
-**Ask user chain strategy**: stacked-to-main (merge to main, fast iteration), feature-branch-chain (PRs target previous PR, rollback control), size:exception (single PR + maintainer approval, generated/migration code).
-
-Set `Decision needed` per strategy: `ask-on-risk`→Yes, `auto-chain`→No, `single-pr`→Yes, `exception-ok`→No
+If **High** or likely >400: `Chained PRs recommended: Yes`, split into work units → chained PRs (each needs: start, finish, verification, scope, test command, runtime harness, rollback boundary).
+**Chain strategy**: stacked-to-main (merge to main, fast iteration) · feature-branch-chain (PRs target previous PR, rollback control) · size-exception (single PR + maintainer approval, generated/migration code).
+Set `Decision needed` per strategy: `ask-on-risk`→Yes · `auto-chain`→No · `single-pr`→Yes · `exception-ok`→No
 
 **Guard contract** (required plain-text lines):
 ```text

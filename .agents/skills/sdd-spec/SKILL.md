@@ -13,30 +13,26 @@ triggers: "SDD spec, specification, given when then, requisitos, spec writing"
 > **ORCHESTRATOR GATE**: If loaded via `skill()` tool, STOP. Delegate to `sdd-spec` sub-agent. If you ARE the sub-agent, ignore this gate — execute below.
 
 ## Language
-
-Artifacts: English (default). Spanish only if explicitly requested — neutral/professional. Comments follow target context language.
+Artifacts: English (default); Spanish only if requested (neutral/professional). Comments follow target context language.
 
 ## Input
-
 From orchestrator: change name, artifact store mode (`engram | openspec | hybrid | none`).
 
 ## Persistence
-
-Follow **Section B+C** from `skills/_shared/sdd-phase-common.md`:
-- **engram**: Read `sdd/{change-name}/proposal`. Multi-domain → concatenate with domain headers. Save as `sdd/{change-name}/spec`.
-- **openspec**: Read `skills/_shared/openspec-convention.md`.
-- **hybrid**: Both — Engram artifact + filesystem domain files.
+Per `sdd-phase-common.md` §B+C:
+- **engram**: Read `sdd/{change-name}/proposal` (concatenate multi-domain with domain headers); save as `sdd/{change-name}/spec`.
+- **openspec**: Read `openspec-convention.md`.
+- **hybrid**: Both — Engram + filesystem.
 - **none**: Return only. No file creation.
 
 ## Workflow
 
-### 1. Load Skills
-Follow **Section A** from `skills/_shared/sdd-phase-common.md`.
+### 1. Load Skills — §A of `sdd-phase-common.md`
 
 ### 2. Identify Domains
 Read proposal's **Capabilities section**:
 - **New Capabilities** → FULL spec at `openspec/specs/<name>/spec.md`
-- **Modified Capabilities** → DELTA spec at `openspec/changes/{change-name}/specs/<name>/spec.md`; read existing spec first
+- **Modified Capabilities** → DELTA spec at `openspec/changes/{change-name}/specs/<name>/spec.md`; read existing first
 
 Fallback: infer from "Affected Areas" if no Capabilities section.
 
@@ -128,13 +124,5 @@ Next step: design (sdd-design) or tasks (sdd-tasks).
 - Apply `rules.specs` from `openspec/config.yaml`
 - **Size**: spec artifact <650 words. Prefer requirement tables. Each scenario: 3-5 lines max
 - Return envelope per **Section D** from `skills/_shared/sdd-phase-common.md`
-
-## RFC 2119 Quick Ref
-
-| Keyword | Meaning |
-|---------|---------|
-| MUST/SHALL | Absolute requirement |
-| MUST NOT/SHALL NOT | Absolute prohibition |
-| SHOULD | Recommended (exceptions with justification) |
-| MAY | Optional |
+(RFC 2119: MUST/SHALL=absolute, MUST NOT/SHALL NOT=prohibited, SHOULD=recommended w/ justification, MAY=optional — see Rules above)
 

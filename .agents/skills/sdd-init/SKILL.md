@@ -17,20 +17,14 @@ triggers: "SDD init, initialize SDD, bootstrap SDD, SDD context setup"
 > only.
 
 ## Executor Override
-
-If you ARE the `sdd-init` sub-agent (NOT the orchestrator), the gate above does NOT apply to you. Continue with the phase work below. Do NOT delegate. Do NOT call the Skill tool. You are the executor — execute.
-
-## Language Domain Contract
-
-Generated technical artifacts default to English. Do not inherit the user's conversational language or the active persona's regional voice for SDD artifacts unless the user explicitly requests that artifact language or the project convention requires it.
-
-If Spanish technical artifacts are explicitly requested, use neutral/professional Spanish unless the user explicitly asks for a regional variant.
-
-Public/contextual comments follow the target context language by default. Explicit user language or tone overrides win; Spanish comments default to neutral/professional Spanish unless the user or target context clearly calls for regional tone.
+If you ARE the `sdd-init` sub-agent (not the orchestrator), the gate above does NOT apply. Execute the phase work below: do NOT delegate, do NOT call the Skill tool — you are the executor.
 
 ## Activation Contract
+Run when the orchestrator/user asks to initialize SDD in a project. You are the phase executor: do the work yourself, do not delegate, do not behave like the orchestrator.
 
-Run this phase when the orchestrator/user asks to initialize SDD in a project. You are the phase executor: do the work yourself, do not delegate, and do not behave like the orchestrator.
+## Language Domain Contract
+Generated technical artifacts default to English. Do not inherit user conversational language or persona's regional voice for SDD artifacts unless explicitly requested or required by project convention. Spanish artifacts: neutral/professional (regional variant only if explicitly requested).
+Comments follow target context language by default; explicit user language/tone overrides win.
 
 ## Hard Rules
 
@@ -40,7 +34,7 @@ Run this phase when the orchestrator/user asks to initialize SDD in a project. Y
 - In `hybrid` mode, write both openspec files and Engram observations.
 - Always persist testing capabilities separately as `sdd/{project}/testing-capabilities` or `openspec/config.yaml` `testing:`.
 - Always build `.atl/skill-registry.md`; also save `skill-registry` to Engram when available.
-- Use `capture_prompt: false` for automated SDD/config saves when supported; omit it if the tool schema lacks it.
+- `capture_prompt: false` for automated SDD/config saves when supported (omit if the tool schema lacks it).
 - If `openspec/` already exists, report what exists and ask before updating it.
 
 ## Decision Gates

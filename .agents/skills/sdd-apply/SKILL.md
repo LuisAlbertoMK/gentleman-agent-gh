@@ -13,14 +13,12 @@ triggers: "SDD apply, implement SDD, code change, SDD implementation, apply task
 > **Executor Override**: If you ARE the sub-agent, ignore gate. Execute directly.
 
 ## Input
-
-Change name, task(s), artifact store mode (`engram | openspec | hybrid | none`), structured status (`skills/_shared/sdd-status-contract.md`), delivery strategy (`ask-on-risk | auto-chain | single-pr | exception-ok`), PR slice or `size:exception`.
+Change name, task(s), artifact store mode (`engram | openspec | hybrid | none`), structured status (`sdd-status-contract.md`), delivery strategy (`ask-on-risk | auto-chain | single-pr | exception-ok`), PR slice or `size:exception`.
 
 ## Persistence
-
-Follow **Section B+C** from `skills/_shared/sdd-phase-common.md`.
-- **engram**: Read `sdd/{change-name}/proposal|spec|design|tasks`. Mark via `mem_update`. Save `apply-progress`.
-- **openspec**: Read `skills/_shared/openspec-convention.md`. Mark `[x]` in `tasks.md`.
+Per `sdd-phase-common.md` §B+C:
+- **engram**: Read `sdd/{change-name}/proposal|spec|design|tasks`; mark via `mem_update`; save `apply-progress`.
+- **openspec**: Read `openspec-convention.md`; mark `[x]` in `tasks.md`.
 - **hybrid**: Both. **none**: Return progress only.
 
 ## Status Guard
@@ -63,6 +61,7 @@ Read task → spec scenarios → design → existing patterns → write code →
 Follow **Section C** from `skills/_shared/sdd-phase-common.md`. Save `apply-progress` (topic_key: `sdd/{change-name}/apply-progress`). Re-read persisted tasks — confirm `[x]` visible. Return per **Section D**: Completed, Files Changed, TDD Evidence (strict), Deviations, Issues, Remaining, Workload/PR Boundary, Status.
 
 ## Rules
-
-Artifacts default to English. Specs = acceptance criteria; read before coding. Follow design decisions — no freelancing (wrong → note in summary). Match project patterns. Consume/produce structured status; never infer from conversation. STOP on `blocked`, unsafe `actionContext`, outside `allowedEditRoots`, or no workload decision. `openspec`: mark `[x]` as you go; internal todos ≠ completion. Chained/stacked → autonomous one deliverable. Never implement unassigned tasks. Follow loaded skills. Apply `rules.apply` from `openspec/config.yaml`.
+- Artifacts: English. Specs = acceptance criteria — read before coding. Follow design decisions (freelancing → note as deviation). Match project patterns. Consume/produce structured status; never infer from conversation.
+- STOP on: `blocked`, unsafe `actionContext`, outside `allowedEditRoots`, or no workload decision.
+- `openspec`: mark `[x]` as you go (internal todos ≠ completion). Chained/stacked → autonomous one deliverable. Never implement unassigned tasks. Follow loaded skills. Apply `rules.apply` from `config.yaml`.
 

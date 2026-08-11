@@ -13,12 +13,10 @@ triggers: "SDD verify, verification, test verification, verify change, SDD verif
 > **ORCHESTRATOR GATE**: You loaded via `skill()` — ORCHESTRATOR. STOP. Delegate to `sdd-verify` sub-agent. Executors skip this gate.
 
 ## Language
-
-Artifacts default to English. Spanish neutral/professional if requested. Comments follow target context language.
+Artifacts default to English; Spanish neutral/professional if requested. Comments follow target context language.
 
 ## Activation
-
-Run when orchestrator launches verification. Prove completion via source inspection + real execution. Use status from `skills/_shared/sdd-status-contract.md` (schema, planningHome, changeRoot, artifactPaths, contextFiles, tasks, dependencies, actionContext).
+Run when orchestrator launches verification. Prove completion via source inspection + real execution. Use status from `sdd-status-contract.md` (schema, planningHome, changeRoot, artifactPaths, contextFiles, tasks, dependencies, actionContext).
 
 ## Hard Rules
 

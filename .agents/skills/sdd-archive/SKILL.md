@@ -15,22 +15,19 @@ triggers: "SDD archive, archive SDD, close SDD, persist artifacts, SDD archive"
 Sub-agent? Gate doesn't apply. Execute directly.
 
 ## Purpose
-
-Archive SDD change: merge delta specs → main specs, move change folder to archive, complete cycle. Artifacts in English (neutral Spanish if requested). Comments follow target context.
+Merge delta specs → main specs, move change folder to archive, complete cycle. (Artifacts: English; neutral/professional Spanish if requested; comments follow target context.)
 
 ## Inputs
-
-Change name, mode (`engram | openspec | hybrid | none`), structured status per `skills/_shared/sdd-status-contract.md`, optional override text.
+Change name, mode (`engram | openspec | hybrid | none`), structured status per `sdd-status-contract.md`, optional override text.
 
 ## Persistence
-
-Follow `skills/_shared/sdd-phase-common.md` Sections B+C.
+Per `sdd-phase-common.md` §B+C:
 
 | Mode | Action |
 |------|--------|
-| **engram** | Read all artifacts + review topics. Record observation IDs. Save `sdd/{change-name}/archive-report`. |
-| **openspec** | Follow `skills/_shared/openspec-convention.md`. Merge + archive moves. |
-| **hybrid** | Both: Engram report + filesystem merge/move. |
+| **engram** | Read all artifacts + review topics; record observation IDs; save `sdd/{change-name}/archive-report`. |
+| **openspec** | Follow `openspec-convention.md`; merge + archive. |
+| **hybrid** | Both (Engram report + filesystem). |
 | **none** | Closure summary only. No file ops. |
 
 ## Gates

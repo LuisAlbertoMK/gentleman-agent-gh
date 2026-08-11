@@ -14,25 +14,22 @@ triggers: "SDD propose, proposal, intent, approach, change proposal, SDD proposa
 > **Executor Override**: If you ARE the sub-agent, ignore gate. Execute below. Do NOT delegate.
 
 ## Contract
-
-Artifacts default to English. Spanish only if explicitly requested.
+Artifacts default to English; Spanish only if explicitly requested.
 
 ## Inputs
-
 - Change name, exploration analysis OR user description, store mode (`engram | openspec | hybrid | none`)
 
 ## Persistence
-
-Follow **Sections B+C** from `skills/_shared/sdd-phase-common.md`.
+Per `sdd-phase-common.md` §B+C:
 
 | Mode | Behavior |
 |------|----------|
-| `engram` | Read `sdd/{change-name}/explore` + `sdd-init/{project}` (opt). Save as `sdd/{change-name}/proposal`. |
-| `openspec` | Follow `skills/_shared/openspec-convention.md`. |
-| `hybrid` | Both — Engram (primary) + filesystem. |
+| `engram` | Read `sdd/{change-name}/explore` + `sdd-init/{project}` (opt); save as `sdd/{change-name}/proposal`. |
+| `openspec` | Follow `openspec-convention.md`. |
+| `hybrid` | Both (Engram primary + filesystem). |
 | `none` | Return only. No files. |
 
-Never force `openspec/` unless user requested or mode=`hybrid`.
+Never force `openspec/` unless requested or `hybrid`.
 
 ## Steps
 
