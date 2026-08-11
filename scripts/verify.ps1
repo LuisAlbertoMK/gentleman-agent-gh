@@ -43,11 +43,18 @@ function Invoke-E1Check{
     $bf = @($sb_bf.ToString().Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries))
     if($bf.Count-eq0){Add-Check 'Skill Frontmatter' $true 'All frontmatter valid'}else{Add-Check 'Skill Frontmatter' $false "$($bf.Count) issues: $($bf -join '; ')"}
     $xs=Join-Path $sDir 'cross-ref-check.ps1'
-    if(Test-Path $xs){& $xs;Add-Check 'Cross-Ref Check' ($LASTEXITCODE-eq0) "exit $LASTEXITCODE"}else{Add-Check 'Cross-Ref Check' $true 'not found (skipped)'}
+    if(Test-Path $xs){
+        $cmd=(Resolve-Path $xs).Path
+        if($cmd.StartsWith($sDir)){& $cmd;Add-Check 'Cross-Ref Check' ($LASTEXITCODE-eq0) "exit $LASTEXITCODE"}else{Add-Check 'Cross-Ref Check' $false 'path outside scripts dir'}
+    }else{Add-Check 'Cross-Ref Check' $true 'not found (skipped)'}
 }
 function Invoke-E2Check{
     $ps=Join-Path $Root 'scripts\pssa-gate.ps1'
-    if(Test-Path $ps){& $ps -Mode Check -Path $Root;Add-Check 'PSSA Gate' ($LASTEXITCODE-eq0) "exit $LASTEXITCODE"}else{Add-Check 'PSSA Gate' $true 'not found (skipped)'}
+    if(Test-Path $ps){
+        $cmd=(Resolve-Path $ps).Path
+        $scriptsDir=Join-Path $Root 'scripts'
+        if($cmd.StartsWith($scriptsDir)){& $cmd -Mode Check -Path $Root;Add-Check 'PSSA Gate' ($LASTEXITCODE-eq0) "exit $LASTEXITCODE"}else{Add-Check 'PSSA Gate' $false 'path outside scripts dir'}
+    }else{Add-Check 'PSSA Gate' $true 'not found (skipped)'}
     $sb_sf = [System.Text.StringBuilder]::new(65536)
     $sPat=@('password\s*=','secret\s*=','api[_-]?key\s*=','token\s*=','connection\s*string\s*=',
              'GH_TOKEN\s*=','GITHUB_TOKEN\s*=','ghp_','gho_','ghs_','github_pat_','ctx7sk_','AKIA',
@@ -55,7 +62,7 @@ function Invoke-E2Check{
     # Allowlist: files that DEFINE or DOCUMENT these patterns (self-referential scan noise).
     # A real secret in any OTHER file is still detected. Add here only if the file documents
     # the pattern format (docs, examples) or implements the detection itself.
-    $sSkip=@('scripts\verify.ps1','scripts\check-mcp-security.ps1','scripts\tests\check-mcp-security.Tests.ps1',
+    $sSkip=@('scripts\verify.ps1','scripts\check-mcp-security.ps1','scripts\tests\check-mcp-security.Tests.ps1','scripts\tests\verify.Tests.ps1',
              'docs\mejoras\2026-07-29-gentleman-agent-gh-global-analysis.md','docs\mejoras\2026-07-29-gentleman-agent-gh-cycle28-analysis.md',
              'docs\design\pattern-guard.md','docs\CHANGELOG.md',
              '.agents\skills\pdf-utils\SKILL.md','.agents\skills\security-scanner\references\patterns-guide.md')

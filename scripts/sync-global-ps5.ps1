@@ -14,9 +14,10 @@ function Get-GlobalConfigDir {
     return Join-Path (Join-Path $base ".config") "opencode"
 }
 function New-CrossPlatLink {
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param([string]$Path, [string]$Target)
-    if ($env:OS -eq 'Windows_NT') { New-Item -ItemType Junction -Path $Path -Target $Target -Force | Out-Null }
-    else { New-Item -ItemType SymbolicLink -Path $Path -Target $Target -Force | Out-Null }
+    if ($env:OS -eq 'Windows_NT') { if ($PSCmdlet.ShouldProcess($Target, "Create junction: $Path")) { New-Item -ItemType Junction -Path $Path -Target $Target -Force | Out-Null } }
+    else { if ($PSCmdlet.ShouldProcess($Target, "Create symlink: $Path")) { New-Item -ItemType SymbolicLink -Path $Path -Target $Target -Force | Out-Null } }
 }
 
 Set-StrictMode -Version Latest
