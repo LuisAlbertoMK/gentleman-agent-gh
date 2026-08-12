@@ -1,4 +1,4 @@
-# ADR-019: Mejora Autónoma Iterativa v2 — Corrida 3 Kickoff
+# ADR-026: Mejora Autónoma Iterativa v2 — Corrida 3 Kickoff
 
 - **Status**: Accepted · **Date**: 2026-08-05 · **Type**: process
 - **Context**: Corridas 1 y 2 completadas con merge verificado a main (7f3861d4). El usuario pidió corrida nueva con presupuesto explícito: N=6 ciclos máx, umbral decreciente 5%.

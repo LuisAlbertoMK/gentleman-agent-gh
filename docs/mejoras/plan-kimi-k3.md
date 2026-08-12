@@ -195,7 +195,7 @@ Drafts `docs/mejoras/_karpathy-drafts/` aplicados a canónicos (verificación `(
 **ADR alignment (Option B)** — prosa budget 65,536 → 98,304 (= 65,536×1.5 headroom), citas históricas preservadas:
 - ADR-011: métrica M7 `opencode.json ≤65,536B` → `≤98,304B (= 65,536×1.5 headroom)`.
 - ADR-014: Decision `assert ≤65,536 B` → `≤98,304 B (= 65,536×1.5 headroom)`; Context "53,556 B = 82% of 65,536 B" preservado + nota "(budget formalizado a 98,304 en ADR-007 amend 2026-08-11; 65,536 era el base-original)". Refs sin tocar.
-- ADR-019: `opencode.json ≤65,536B (53,556B baseline)` → `≤98,304B (= 65,536×1.5 headroom) (53,556B baseline)` — baseline histórico preservado.
+- ADR-026: `opencode.json ≤65,536B (53,556B baseline)` → `≤98,304B (= 65,536×1.5 headroom) (53,556B baseline)` — baseline histórico preservado.
 - ADR-007: ya alineado (amend 2026-08-11 presente); won't-fix PERF-1 (root→agentes) NO tocado.
 - scripts/regenerate-opencode.ps1 comentario `-MaxBytes` (default: 65536) → `98304 = 65,536x1.5 headroom, per ADR-007 amend`.
 

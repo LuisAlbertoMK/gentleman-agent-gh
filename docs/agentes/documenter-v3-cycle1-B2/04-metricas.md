@@ -5,7 +5,7 @@
 | Métrica | Valor | Fuente |
 |---|---|---|
 | Cycle log | 7,209 B · `docs/mejoras/2026-08-07-v3-cycle1-B2.md` | [IO.File] |
-| ADR-008 | 3,346 B · Proposed | [IO.File] |
+| ADR-024 | 3,346 B · Proposed | [IO.File] |
 | mejora-log append | 94,282 B total (+~2.3 KB append) | [IO.File] |
 | Archivos Unit D | 11 (3 entregables + 8 report) | glob |
 
@@ -15,8 +15,8 @@
 |---|---|---|
 | Tests E2E green (6/6) | ✅ PASS | Pester 8.02s, 6/6 (re-verificación Unit D) |
 | Benchmark no regresivo | ❌ FAIL | +97.4% (520.9 vs 263.8 ms) — Gap D metodología |
-| 0 vulns nuevas | ⚠️ FAIL provisional | H2 HIGH latente — fix Cycle #2 (ADR-008) |
-| ADR escrito | ✅ PASS | docs/adr/008 (Proposed) |
+| 0 vulns nuevas | ⚠️ FAIL provisional | H2 HIGH latente — fix Cycle #2 (ADR-024) |
+| ADR escrito | ✅ PASS | adr/ADR-024 (Proposed) |
 | Commits taggeados | N/A | 0 commits (test-only Enfoque B2) |
 
 **Score de cierre**: 2/5 cumplidos · 2 FAILs provisionales (benchmark metodología, H2) · 1 N/A.

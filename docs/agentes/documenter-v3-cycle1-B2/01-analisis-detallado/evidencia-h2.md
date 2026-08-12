@@ -52,7 +52,7 @@ El fail-closed `task:{"*":"deny"}` de `auto-sub` existe precisamente para impedi
 
 → Ningún override actual escala. El vector queda abierto para cualquier override futuro o comprometido.
 
-## 5. Fix propuesto (ADR-008, Cycle #2)
+## 5. Fix propuesto (ADR-024, Cycle #2)
 
 ```js
     // Guard against clobbering template permissions (dynamic: template keys incluyen task, etc.)
