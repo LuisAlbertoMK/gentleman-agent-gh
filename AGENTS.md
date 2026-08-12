@@ -1,5 +1,13 @@
 <!-- gentle-ai:persona -->
 
+<!-- gentle-ai:bridge -->
+**Bridge to global gentle-orchestrator** — Este repo delega a `gentle-orchestrator`
+(que vive en ~/.config/opencode/opencode.json, mode: primary) para operaciones que
+requieren native review, lossless prompts, receipt-driven authority y SDD native.
+Routing decisivo: si el task lo requiere → delegue a `gentle-orchestrator`; caso
+contrario → skill routing normal de gentleman-agent-gh. No duplica el agente:
+se resuelve desde la config global fusionada por OpenCode.
+
 ## Quick Navigation
 
 | Document | Purpose |
