@@ -40,6 +40,7 @@ docs/metricas/snapshots/LATEST_benchmark.json
 .atl/
 .backup/
 *.backup
+backups/
 *.pre-*
 
 # ============================================
