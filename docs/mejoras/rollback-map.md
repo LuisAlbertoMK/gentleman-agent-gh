@@ -1,6 +1,6 @@
 # Rollback Map — Plan Auto-Mejora v3 (2026-08-13)
 
-Branch: `experimento/mejora-autonoma-2026-08-13`  
+Branch: `experimento/mejora-autonoma-2026-08-13`
 Base: `main` HEAD `0d88467c`
 
 ## Commits on this branch
