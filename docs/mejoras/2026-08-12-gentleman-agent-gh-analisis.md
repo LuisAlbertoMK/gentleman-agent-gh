@@ -28,6 +28,7 @@ Recolectado via evidence gate + scans frescos en 5 runs donde aplica:
 | **M6** Token budget (avg) | **2,631 B** | ≤2,000 B | gate [19/22] | ❌ GAP |
 | **M7** Cross-ref junctions | **88 missing** (WARN) | 0 | `cross-ref-check.ps1:4` | ⚠️ |
 | **M8** Score (overall) | **8.8/10** | ≥9.5 | `score-auto.ps1` | ⚠️ |
+| **M13** Agent count | **49** (README said 45) | 49 | `opencode.json` | ❌ GAP (stale in README L5/L68) |
 | **M9** Score Depth (SD) | 7.7/10 | ≥9.5 | `score-auto.ps1` | ⚠️ |
 | **M10** Cycle Activity (CA) | 3.0/10 | improve | `score-auto.ps1` | ❌ |
 | **M11** SSoT freshness | .project.json 1 day | ≤1 day | `git log` | ✅ OK |
