@@ -2,7 +2,7 @@
 
 ## What is this?
 
-**Gentleman Agent** is an **AI software development team** for OpenCode. Instead of a single chatbot, you get 45 specialized agents working together:
+**Gentleman Agent** is an **AI software development team** for OpenCode. Instead of a single chatbot, you get 49 specialized agents working together:
 
 - 🏗️ **Lead Architect** — Senior Architect mentor solving complex tasks
 - 🔒 **Specialists** — Security, performance, frontend, etc. consultants (FREE TIER)
@@ -15,11 +15,11 @@
 
 ---
 
-Suite of **78 skills** (+ `_shared`) + **91 top-level scripts** (84 PowerShell + 7 shell) for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
+Suite of **87 skills** (+ `_shared`) + **99 top-level scripts** (92 PowerShell + 7 shell) for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
-> **Score**: 9.0/10 (13 dimensions) — tracking in .project.json.
-> **Skills**: 78 (+ `_shared`)
+> **Score**: 8.8/10 (14 dimensions) — tracking in .project.json.
+> **Skills**: 87 (+ `_shared`)
 > **Cycle**: 28 (active) — Security Hardening + Quality Recovery
 
 ---
@@ -65,7 +65,7 @@ Switch modes:
 ## Features
 
 ### Multi-Agent Architecture
-45 agents total: main orchestrator (`gentleman-vMK`) + 12 specialists + 12 subagent twins + 9 SDD pipeline agents + 5 auto-mode + 5 semi-mode variants (`sdd-orchestrator` orchestrates the SDD phases over the 9 phase subagents):
+49 agents total: main orchestrator (`gentleman-vMK`) + 12 specialists + 12 subagent twins + 10 SDD pipeline agents + 5 auto-mode + 5 semi-mode variants + 4 subagent auto variants (`sdd-orchestrator` orchestrates the SDD phases over the 9 phase subagents):
 
 | Agent | Model | Specialty |
 |-------|-------|-----------|
@@ -232,12 +232,12 @@ The project uses two MCPs for cross-session memory:
 
 ```
 gentleman-agent-gh/
-├── .agents/skills/          # 78 skills + _shared (canonical, git-tracked)
+├── .agents/skills/          # 87 skills + _shared (canonical, git-tracked)
 │   ├── quality-gate/
 │   ├── code-review-agent/
 │   └── .../
 ├── skills/                  # Junctions workspace (git-ignored)
-├── scripts/                 # 91 top-level scripts (84 PowerShell + 7 shell)
+├── scripts/                 # 99 top-level scripts (92 PowerShell + 7 shell)
 │   └── smoke/               # Smoke tests
 ├── docs/                    # Documentation
 │   ├── metricas/            # Session metrics

@@ -237,14 +237,25 @@ lint-linux:
       - name: Skill drift check
         run: ./scripts/check-skill-drift.ps1
 
-      - name: Pester unit tests
+      - name: Pester unit tests + coverage
+        # Measure-only: coverage is captured and reported but never breaks CI
+        # until a baseline is established. Ratchet upward via -Strict later.
+        # (AUDIT-gentleman-agent-gh.md Section 5.2 gap: coverage tracking absent)
+        run: ./scripts/tests/Coverage.ps1
+        shell: pwsh
+
+      - name: Show coverage summary
+        if: always()
         run: |
-          $results = Invoke-Pester -Path './scripts/tests/*.Tests.ps1' -PassThru
-          if ($results.FailedCount -gt 0) {
-            Write-Error "Pester: $($results.FailedCount) test(s) failed"
-            exit 1
+          if (Test-Path ./scripts/tests/_coverage/summary.json) {
+            Write-Output "## Coverage summary"
+            Get-Content ./scripts/tests/_coverage/summary.json
           }
-          Write-Output "OK: $($results.PassedCount)/$($results.TotalCount) tests passed"
+
+      - name: Dead-code ratchet (warn-only)
+        # AUDIT-gentleman-agent-gh.md Section 5.3 deadcode-ratchet equivalent for
+        # PowerShell. Measure-only until baseline is clean; then add -FailOnDead to block merges.
+        run: ./scripts/check-deadcode.ps1
 
       - name: Windows smoke test
         run: |

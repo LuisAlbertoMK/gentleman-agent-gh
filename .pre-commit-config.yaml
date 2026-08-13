@@ -62,7 +62,13 @@ repos:
         types: [file]
         files: \.ps1$
         pass_filenames: false
-        timeout: 120
+          timeout: 120
+
+      - id: deadcode-ratchet
+        name: Dead-code ratchet (PS)
+        entry: pwsh -NoProfile -File scripts/check-deadcode.ps1
+        language: system
+        pass_filenames: false
 
       - id: opencode-config-sync
         name: opencode.json sync check
