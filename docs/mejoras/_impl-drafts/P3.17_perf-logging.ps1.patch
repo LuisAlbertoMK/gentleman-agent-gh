@@ -1,0 +1,18 @@
+# DRAFT — awaiting CI/PSSA/Pester validation (node/pwsh=negated local)
+# P3.17 — Perf logging: métricas SSoT (patch draft, NOT applied)
+
+**Scope lock**: `scripts/benchmark.ps1:40` (benchmark.ps1 -Snapshot -Gate) — registrar test-count y gate con fecha; SSoT en docs/mejoras/benchmarks.md.
+**Cita plan**: plan-kimi-k3.md:64 (F16) — "Métricas sin SSoT: test count varía 709/732/874 según doc; gate 18/18 vs 22/22 sin registro de cuándo cambió"; §11:217 (benchmark.ps1:40 citado en ctx-bulk-ops).
+**Blast**: Bajo (logging-only). **Regla**: commit `feat(scripts):`.
+
+```diff
+--- a/scripts/benchmark.ps1
++++ b/scripts/benchmark.ps1
+@@ -40,3 +40,6 @@ (aprox — verify at apply) @@
++$stamp = "{0} | tests={1} | gate={2}" -f (Get-Date -Format yyyy-MM-dd), $TestCount, $GateSummary
++Add-Content -Path "$PSScriptRoot\..\docs\mejoras\benchmarks.md" -Value $stamp
+```
+
+**Idempotencia**: 1 línea append por run; histórico preservado (sin overwrite).
+**Rollback**: git revert (logging puro). **DoD**: benchmarks.md con serie temporal y fecha; contadores reconciliados entre docs.
+**CI fallback (local negado)**: `gh workflow run quality-gate.yml` (job tests → step Benchmark report) ; verificar `docs/mejoras/benchmarks.md` en CI.

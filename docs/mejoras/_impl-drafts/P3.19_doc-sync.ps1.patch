@@ -1,0 +1,18 @@
+# DRAFT — awaiting CI/PSSA/Pester validation (node/pwsh=negated local)
+# P3.19 — Doc sync: baseline vs CI truth (patch draft, NOT applied)
+
+**Scope lock**: `docs/mejoras/benchmarks.md` + `.github/workflows/quality-gate.yml` — job que reconcilia docs contra resultados CI (test counts, gate).
+**Cita plan**: plan-kimi-k3.md:64 (F16) — "Métricas sin SSoT... gate 18/18 vs 22/22 sin registro de cuándo cambió"; :120 (trend table: tests/ en CI "no corre" era erróneo — docs desincronizados con realidad).
+**Blast**: Bajo (docs + CI check). **Regla**: commit `docs(mejoras):` + `fix(ci):`.
+
+```diff
+--- a/.github/workflows/quality-gate.yml
++++ b/.github/workflows/quality-gate.yml
+@@ (tras step Benchmark report ~255, aprox) @@
++      - name: Doc sync check (F16)
++        run: ./scripts/bench-compare.ps1 -Baseline docs/mejoras/benchmarks.md -FailOnDrift
+```
+
+**Idempotencia**: check read-only; solo falla si docs divergen de CI (sin mutar).
+**Rollback**: git revert (check aditivo). **DoD**: benchmarks.md refleja último CI run; drift → fail visible.
+**CI fallback (local negado)**: `gh workflow run quality-gate.yml` ; `pwsh -c "./scripts/bench-compare.ps1 -Baseline docs/mejoras/benchmarks.md"` en runner.

@@ -1,8 +1,8 @@
 # 02 — Plan de Implementación (handoff a Cycle #2 v3)
 
-> Alcance: fix H2 (ADR-008) + Gap D + commits de cierre. Cambios SUGERIDOS — este plan no los ejecuta (Unit D es read-only).
+> Alcance: fix H2 (ADR-024) + Gap D + commits de cierre. Cambios SUGERIDOS — este plan no los ejecuta (Unit D es read-only).
 
-## Task 1: Fix H2 — guard de colisión dinámico (ADR-008)
+## Task 1: Fix H2 — guard de colisión dinámico (ADR-024)
 
 - **Files**: `scripts/lib/generate-opencode-config.js` (L163) + `scripts/tests/generate-config.Tests.ps1` (nuevo test) | **Change type**: modify/add
 - **Before** (L163):
@@ -33,7 +33,7 @@
 
 ## Task 3: Cierre de ciclo — commits
 
-- **Files**: `scripts/tests/generate-config.Tests.ps1` (test file, hoy uncommitted) + `docs/mejoras/2026-08-07-v3-cycle1-B2.md` + `docs/adr/008-auto-sub-permission-merge-safety.md` + `mejora-log.md` | **Change type**: add
+- **Files**: `scripts/tests/generate-config.Tests.ps1` (test file, hoy uncommitted) + `docs/mejoras/2026-08-07-v3-cycle1-B2.md` + `adr/ADR-024-auto-sub-permission-merge-safety.md` + `mejora-log.md` | **Change type**: add
 - **Convención**: commits taggeados por ciclo (`C1-test:`, `C2-fix:`, `C1-docs:`) — rollback map en `docs/mejoras/rollback-map-v3-2026-08-07.md`.
 - **Verification**: `git log --oneline` muestra tags; pre-commit gate 18/18; `--validate` sync SSoT. | **Risk**: LOW
 

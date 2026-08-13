@@ -1,0 +1,22 @@
+# P3.18 — Auto-dream en close-session.ps1 (patch draft, NOT applied)
+
+**Scope lock**: `scripts/close-session.ps1` — insert de 3 líneas tras línea 161 (bloque session-miner).
+**Cita**: `close-session.ps1:161` (add-member minerWarning) + `scripts/run-dreaming.ps1:12-17` (`-Mode report|quick`, `-Quiet`).
+**Blast**: Bajo (hook de cierre de sesión, no toca protocolo). **Regla**: commit `feat(scripts):`.
+**Justificación**: plan-kimi-k3 §3 P3.18 — "Auto-dream: trigger en close-session.ps1 cada N sesiones (CYCLE.md: 'every 5th self-check')".
+
+**Nota ShouldProcess**: `close-session.ps1` declara `param(...)` sin `[CmdletBinding(SupportsShouldProcess)]` (línea 26), por lo que `$PSCmdlet.ShouldProcess()` NO está disponible. El guard usa los switches existentes `-DryRun`/`-Force` (líneas 31-32) — semánticamente equivalente: dry-run y force nunca disparan dreaming. Contador "5th session" derivado de entradas de BITACORA (dedup guard en línea 56-57 garantiza 1 entrada por sesión).
+
+```diff
+--- a/scripts/close-session.ps1
++++ b/scripts/close-session.ps1
+@@ -161,6 +161,9 @@
+ if ($minerOutput) { $result | Add-Member -NotePropertyName "minerWarning" -NotePropertyValue $minerOutput }
++# P3.18 auto-dream: every 5th close triggers dreaming (guard: -DryRun/-Force skip, BITACORA count %5)
++$dreamCount = @(Get-Content -LiteralPath $bitacoraPath -ErrorAction SilentlyContinue).Count
++if (-not $DryRun -and -not $Force -and ($dreamCount -gt 0 -and ($dreamCount % 5 -eq 0))) { & "$PSScriptRoot\run-dreaming.ps1" -Mode report -Quiet }
+ # Compact prompt: show if explicitly requested, or when changes exist and not explicitly disabled
+```
+
+**Rollback**: `git revert` del commit (insert atómico de 3 líneas).
+**DoD**: al 5º close con entradas BITACORA → dreaming corre en modo `report` silencioso; `-DryRun`/`-Force` no disparan.

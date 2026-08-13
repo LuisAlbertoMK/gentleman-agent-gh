@@ -1,0 +1,23 @@
+# DRAFT — awaiting CI/PSSA/Pester validation (node/pwsh=negated local)
+# P1.8 — Log de mode-gate fallback (patch draft, NOT applied)
+
+**Scope lock**: `scripts/mode-gate.ps1:163-171` (fallback block, verificado) + `scripts/audit-log.ps1`.
+**Cita plan**: plan-kimi-k3.md:85 (P1.9) — "Log de mode-gate fallback: cuando $fallbackUsed=$true → audit-log.ps1 + warning visible al usuario"; :16 (F8, by-design pero riesgo de privilegio).
+**Blast**: Bajo (logging-only, sin cambio de contrato). **Regla**: commit `feat(scripts):`.
+
+```diff
+--- a/scripts/mode-gate.ps1
++++ b/scripts/mode-gate.ps1
+@@ -168,4 +168,7 @@
+         $modeOk = $true
+         $fallbackUsed = $true
+     }
+ }
++# P1.8: audit fallback (F8) — visible + persistido
++if ($fallbackUsed) { & "$PSScriptRoot\audit-log.ps1" -Entry "mode-gate fallback: $TargetAgent"; Write-Warning "FALLBACK mode-gate: sufijo $expectedSuffix ausente -> agente base $TargetAgent" }
+```
+
+**Idempotencia**: log por ocurrencia; $fallbackUsed es $true solo cuando ocurre — sin doble registro.
+**Rollback**: git revert (insert 1 línea + bloque de 3).
+**DoD**: fallback real -> 1 entrada audit-log + warning visible; PSSA sin regresión.
+**CI fallback (local negado)**: `gh workflow run quality-gate.yml` (hook pssa-gate cubre PSSA).

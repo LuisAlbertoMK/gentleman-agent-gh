@@ -12,7 +12,7 @@
 **Objetivo**: Que los 99 tests del experimento v1 (root `tests/`) pasen en CI, no solo localmente.
 
 **Resultado**:
-- ✅ 3 enfoques evaluados (A/B/C) — ADR-009
+- ✅ 3 enfoques evaluados (A/B/C) — ADR-025
 - ✅ **Opción A elegida**: nuevo job paralelo `tests-v1`
 - ✅ YAML validado con `pyyaml.safe_load`
 - ✅ Tests v1 localmente: **99 passed, 0 failed, 1 skipped**
@@ -32,7 +32,7 @@
 
 ## Mini-ADR
 
-**Decisión**: A (job paralelo). **Por qué**: zero-touch al job estable de 875 tests + paralelo (sin latencia) + cache key independiente. B y C afectan failure domains / out of scope respectivamente. Ver `docs/adr/009-ci-coverage-root-tests.md`.
+**Decisión**: A (job paralelo). **Por qué**: zero-touch al job estable de 875 tests + paralelo (sin latencia) + cache key independiente. B y C afectan failure domains / out of scope respectivamente. Ver `adr/ADR-025-ci-coverage-root-tests.md`.
 
 ## Breaker/QA
 
@@ -58,4 +58,4 @@
 
 **Tipo**: `ci`
 **Archivo**: `.github/workflows/quality-gate.yml` (+28 líneas)
-**ADR**: `docs/adr/009-ci-coverage-root-tests.md` (nuevo)
+**ADR**: `adr/ADR-025-ci-coverage-root-tests.md` (nuevo)

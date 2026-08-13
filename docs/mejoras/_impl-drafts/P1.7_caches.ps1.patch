@@ -1,0 +1,21 @@
+# DRAFT — awaiting CI/PSSA/Pester validation (node/pwsh=negated local)
+# P1.7 — Caches TTL+content-hash (patch draft, NOT applied)
+
+**Scope lock**: `scripts/skill-graph.ps1` (BFS memo), `.atl/.skill-registry.cache.json` (hoy solo fingerprint), `scripts/benchmark.ps1:40` (incremental).
+**Cita plan**: plan-kimi-k3.md:90 (P2.12) — "Caches con TTL + content-hash: .atl/.skill-registry.cache.json (hoy solo fingerprint), memoizar BFS de skill-graph.ps1 keyed por task-hash + dir-mtime, benchmark incremental (solo skills cambiados)"; §9:171.
+**Blast**: Medio (scripts de indexado). **Regla**: commit `feat(scripts):`.
+
+```diff
+--- a/scripts/skill-graph.ps1
++++ b/scripts/skill-graph.ps1
+@@ (BFS memo, aprox — verify at apply) @@
+-  $cache = Get-Content $cachePath -Raw      # fingerprint only
++  $taskHash = (Get-FileHash -InputObject ($tasks -join '')).Hash
++  $dirMtime = (Get-Item $skillRoot).LastWriteTimeUtc
++  if ((Test-Path $cachePath) -and $cacheTaskHash -eq $taskHash -and $cacheDirMtime -ge $dirMtime) { return $cache }
+```
+
+**Idempotencia**: cache re-validado por task-hash + dir-mtime en cada run; regen solo si cambió.
+**Rollback**: git revert (cambio local a 1 función).
+**DoD**: benchmark incremental (solo skills cambiados) + gate verde.
+**CI fallback (local negado)**: `gh workflow run quality-gate.yml` → job `tests` (Pester + benchmark).

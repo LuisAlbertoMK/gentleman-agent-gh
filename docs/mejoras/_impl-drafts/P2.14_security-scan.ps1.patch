@@ -1,0 +1,28 @@
+# DRAFT — awaiting CI/PSSA/Pester validation (node/pwsh=negated local)
+# P2.14 — Security scan: pin deps + npm audit (patch draft, NOT applied)
+
+**Scope lock**: `package.json:34-39` (caret ranges, verificado en plan) + `.github/workflows/quality-gate.yml` security job (pssa block ~206-216).
+**Cita plan**: plan-kimi-k3.md:77 (P0.4) — "Pinear deps: quitar ^ en package.json, lock + npm audit en CI security job"; :17 (F6 supply chain, caret ranges).
+**Blast**: Bajo (deps + CI). **Regla**: commit `fix(ci):` + `chore(deps):`.
+
+```diff
+--- a/.github/workflows/quality-gate.yml
++++ b/.github/workflows/quality-gate.yml
+@@ (tras step pssa-gate, aprox) @@
++      - name: npm audit gate (F6)
++        run: npm audit --audit-level=high --omit=dev
+```
+
+```diff
+--- a/package.json
++++ b/package.json
+@@ -34,3 +34,3 @@ (pin — quitar caret)
+-  "playwright": "^1.61.1",
+-  "token-optimizer-opencode": "^1.1.0"
++  "playwright": "1.61.1",
++  "token-optimizer-opencode": "1.1.0"
+```
+
+**Idempotencia**: npm audit re-ejecutable; lockfile regenerado con `npm install` post-pin.
+**Rollback**: git revert de ambos commits. **DoD**: 0 high/critical en audit; lockfile committeado.
+**CI fallback (local negado)**: `gh workflow run quality-gate.yml` ; `npm audit --audit-level=high` en runner.

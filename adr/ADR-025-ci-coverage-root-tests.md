@@ -1,4 +1,4 @@
-# ADR-009: CI coverage for root `tests/` experiment
+# ADR-025: CI coverage for root `tests/` experiment
 
 - **Status**: Accepted (Ciclo 1 v2)
 - **Date**: 2026-08-09

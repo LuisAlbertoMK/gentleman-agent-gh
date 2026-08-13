@@ -151,21 +151,21 @@ jobs:
           if ($errors) { Write-Error "ctx-watchdog.ps1 has syntax errors"; exit 1 }
           Write-Output "OK: ctx-watchdog.ps1 syntax validated"
 
-    lint-linux:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    defaults:
-      run:
-        shell: pwsh
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - name: Install
-        run: ./scripts/install.sh --yes --skip-env-var --skip-shortcuts
-      - name: Shellcheck
-        shell: bash
-        run: |
-          if command -v shellcheck &>/dev/null; then shellcheck scripts/*.sh
-          else for f in scripts/*.sh; do bash -n "$f" && echo "OK: $f" || exit 1; done; fi
+lint-linux:
+  runs-on: ubuntu-latest
+  timeout-minutes: 15
+  defaults:
+    run:
+      shell: pwsh
+  steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+    - name: Install
+      run: ./scripts/install.sh --yes --skip-env-var --skip-shortcuts
+    - name: Shellcheck
+      shell: bash
+      run: |
+        if command -v shellcheck &>/dev/null; then shellcheck scripts/*.sh
+        else for f in scripts/*.sh; do bash -n "$f" && echo "OK: $f" || exit 1; done; fi
 
   security:
     runs-on: ubuntu-latest

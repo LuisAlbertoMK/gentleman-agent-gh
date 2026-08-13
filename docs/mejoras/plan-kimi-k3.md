@@ -119,6 +119,14 @@ El sistema está **maduro y bien defendido** (fail-closed, ADRs, benchmarks cont
 | Autonomía self-improvement | — | manual (08-08 🔴) | sigue manual | 🔴 abierto 3 días |
 | tests/ en CI | "no corre" (08-10, erróneo) | job tests-v1 activo | activo | 🟢 mejor de lo creído |
 
+## Trend delta (post-apply 2026-08-11, karpathy drafts)
+| Métrica | Antes | Hoy | Δ |
+|---|---|---|---|
+| skills SDD >3KB (F12) | 7 (3,650-4,494B) | 0 (≤3,071B) | 🟢 cumplido |
+| prompts/ >2KB (F17) | 6/28 (gentleman-deep 2,328B, gentleman-codex 2,102B, sdd-orchestrator 3,061B…) | 4/28 (sdd-orchestrator sin aplicar, ver §10) | 🟡 parcial |
+| protocolo v3 | 7,109B / 96 líneas | 4,423B / 55 líneas | 🟢 -38% |
+| ADR-011/014/019 prosa budget | citaba 65,536B | 98,304 (= 65,536×1.5 headroom) + nota histórica | 🟢 alineado |
+
 ## 5. Engram Persistence
 - **Topic key**: `analysis/gentleman-agent-gh` · **Fecha**: 2026-08-11 · Guardado vía `mem_save` (título `analysis:gentleman-agent-gh:2026-08-11`).
 
@@ -134,3 +142,78 @@ Cuando lo apruebes: decime "implementar P0" (o la fase que elijas) y lo ruteo co
 **Me faltaron (incorporados de laguna)**: budget de `prompts/` (F17), bytes exactos por skill SDD, compresión del protocolo v3, hygiene del branch `master`, y el formato operativo rollback+DoD por ítem. Ninguno cambia la prioridad estratégica; todos ya están integrados arriba.
 
 **Conclusión**: análisis estratégico completo (8 dims) ✅; granularidad táctica de tamaños docs/skills inicialmente parcial → ahora completa tras el cruce. Los dos planes son complementarios, no redundantes.
+
+---
+
+## 8. Ralph long-tail log (karpathy compression — drafts ONLY, 2026-08-11)
+
+READ-then-DRAFT-ONLY bajo `docs/mejoras/_karpathy-drafts/`. NADA aplicado a canónicos. Verificación por `(Get-Item).Length`. Sin git/npm/node/python (solo Read/Write/Get-Item).
+
+| # | Archivo fuente | Antes (B) | Draft (B) | Budget (B) | Estado |
+|---|---|---|---|---|---|
+| 1 | prompts/gentleman-vMK.md | 5088 | 1985 | 2000 | OK — **HIGH-BLAST** (requiere review humano) |
+| 2 | prompts/shared/_core-behavior-gp.md | 3446 | 1888 | 2000 | OK — **HIGH-BLAST** (requiere review humano) |
+| 3 | prompts/sdd/sdd-orchestrator.md | 3061 | 1998 | 2000 | OK |
+| 4 | prompts/gentleman-deep.md | 2328 | 1633 | 2000 | OK |
+| 5 | prompts/gentleman-codex.md | 2102 | 1621 | 2000 | OK |
+| 6 | .agents/skills/sdd-spec/SKILL.md | 4494 | 2085 | 3072 | OK |
+| 7 | .agents/skills/sdd-archive/SKILL.md | 4471 | 2726 | 3072 | OK |
+| 8 | .agents/skills/sdd-propose/SKILL.md | 4369 | 2305 | 3072 | OK |
+| 9 | .agents/skills/sdd-tasks/SKILL.md | 4354 | 2975 | 3072 | OK |
+| 10 | .agents/skills/sdd-apply/SKILL.md | 4117 | 3071 | 3072 | OK |
+| 11 | .agents/skills/sdd-init/SKILL.md | 3989 | 2460 | 3072 | OK |
+| 12 | .agents/skills/sdd-verify/SKILL.md | 3650 | 2804 | 3072 | OK |
+
+**Findings correction (protocolo v3)**: inventory decía `docs/protocolo_mejora_autonoma_v3.md` NOT FOUND → **falso**. El archivo EXISTE en `docs/protocolo_mejora_autonoma_v3.md` (raíz de docs/, no docs/mejoras/). No se comprimió (F2/P2.13c sigue pendiente). Corrige claim "laguna stale" → la laguna era del inventario, no del archivo.
+
+## 9. Pendientes (tras drafts 08-11)
+
+- **CODE** (requieren CI + PEV gate, del plan §3): perf-caches (TTL+hash, P2.12), async-delegation (P3.22), memory-TTL/purge Engram (P3.19), injection-sanitization (P1.7).
+- **12 drafts karpathy pendientes de tu review + apply** (1 commit por skill, prefix `karpathy:`, tag `archive/pre-karpathy-*`, DoD gate verde). HIGH-BLAST primero: vMK + core-behavior.
+- **Manual tuyo**: master→main en GitHub Settings + delete remoto (snapshot ya en tag `archive/gentle-ai-go-snapshot-v2`).
+- **Compresión protocolo v3** (96→≤55 líneas) sigue pendiente — archivo en `docs/protocolo_mejora_autonoma_v3.md`.
+
+
+## 10. Aplicado / Pendiente (READ-VERIFY-APPLY 2026-08-11)
+
+Drafts `docs/mejoras/_karpathy-drafts/` aplicados a canónicos (verificación `(Get-Item).Length`). HIGH-BLAST intactos.
+
+| # | Archivo canónico | Antes (B) | Después (B) | Budget (B) | Status |
+|---|---|---|---|---|---|
+| 1 | prompts/gentleman-deep.md | 2328 | 1633 | 2000 | OK (byte-idéntico al draft) |
+| 2 | prompts/gentleman-codex.md | 2102 | 1621 | 2000 | OK (byte-idéntico al draft) |
+| 3 | prompts/sdd/sdd-orchestrator.md | 3061 | 3061 | 2000 | **SKIP — BLOCKED**: permission model deny `prompts/**/*` (write+edit). Draft queda como -draft |
+| 4 | .agents/skills/sdd-spec/SKILL.md | 4494 | 2085 | 3072 | OK |
+| 5 | .agents/skills/sdd-archive/SKILL.md | 4471 | 2726 | 3072 | OK |
+| 6 | .agents/skills/sdd-propose/SKILL.md | 4369 | 2305 | 3072 | OK |
+| 7 | .agents/skills/sdd-tasks/SKILL.md | 4354 | 2975 | 3072 | OK |
+| 8 | .agents/skills/sdd-apply/SKILL.md | 4117 | 3071 | 3072 | OK |
+| 9 | .agents/skills/sdd-init/SKILL.md | 3989 | 2460 | 3072 | OK |
+| 10 | .agents/skills/sdd-verify/SKILL.md | 3650 | 2804 | 3072 | OK |
+| 11 | docs/protocolo_mejora_autonoma_v3.md | 7109 (96 líneas) | 4423 (55 líneas) | ≤55 líneas | OK (-38%) |
+
+**ADR alignment (Option B)** — prosa budget 65,536 → 98,304 (= 65,536×1.5 headroom), citas históricas preservadas:
+- ADR-011: métrica M7 `opencode.json ≤65,536B` → `≤98,304B (= 65,536×1.5 headroom)`.
+- ADR-014: Decision `assert ≤65,536 B` → `≤98,304 B (= 65,536×1.5 headroom)`; Context "53,556 B = 82% of 65,536 B" preservado + nota "(budget formalizado a 98,304 en ADR-007 amend 2026-08-11; 65,536 era el base-original)". Refs sin tocar.
+- ADR-026: `opencode.json ≤65,536B (53,556B baseline)` → `≤98,304B (= 65,536×1.5 headroom) (53,556B baseline)` — baseline histórico preservado.
+- ADR-007: ya alineado (amend 2026-08-11 presente); won't-fix PERF-1 (root→agentes) NO tocado.
+- scripts/regenerate-opencode.ps1 comentario `-MaxBytes` (default: 65536) → `98304 = 65,536x1.5 headroom, per ADR-007 amend`.
+
+**Deferred (HIGH-BLAST — requieren review humano, drafts quedan como -draft)**: prompts/gentleman-vMK.md (5088→1985B), prompts/shared/_core-behavior-gp.md (3446→1888B). Deferred-by-design: gobiernan el protocolo operativo del agente (fail-closed, return-contract, permission layering); aplicar sin checkpoint humano viola el principio de blast radius Alto (§1 protocolo v3) y ADR-018/ADR-005.
+
+**Deferred por permission model**: prompts/sdd/sdd-orchestrator.md (SKIP arriba).
+
+## 11. Implementation backlog (SAFE — 2026-08-11)
+
+SAFE backlog: writes SOLO a `docs/mejoras/_impl-drafts/` + este §11. Sin git commit (pedir). Sin node/npm/pwsh/python (skip+[SKIP-toolchain]). Canonical fail-closed intactos. won't-fix (root→agentes) intacto. `regenerate-opencode.ps1` NO modificado (help-comment 65536 = cosmético pre-existente; ADR-007 Amendment cubre la realidad 98,304). master→main = skip manual.
+
+| Item | Blast | Status | Next step |
+|---|---|---|---|
+| SDD skills (7) regenerados con frontmatter canónico verbatim + prosa karpathy | Bajo | **DONE** — `_impl-drafts/sdd-{spec,archive,propose,tasks,apply,init,verify}.md`, todos ≤3072B (apply exacto 3072) | Review + apply 1 commit/skill, prefix `karpathy:`, tag `archive/pre-karpathy-*`, DoD gate verde |
+| prompts/gentleman-vMK.md + `_core-behavior-gp.md` (HIGH-BLAST) | **ALTO** | Draft intacto en `_karpathy-drafts/` — **requiere review humano (gobierna protocolo del agente)** | Checkpoint humano; ADR-018/005; aplicar solo tras OK |
+| protocolo_mejora_autonoma_v3.md | Bajo | **DONE** — `_impl-drafts/protocolo-v3.md` 4422B/55L (canónico ya comprimido §10); checkpoints v3-vs-v2 + humano + rollback preservados | Verificar diff vs canónico, sin re-apply |
+| P1.11b flaky retry (`quality-gate.yml:242`) | Bajo | **DONE** — `_impl-drafts/p1.11b-quality-gate-retry.patch` (-RetryCount 2) | Apply + CI green; rollback: revert 1-línea |
+| P3.18 auto-dream (`close-session.ps1:161`) | Bajo | **DONE** — `_impl-drafts/p3.18-close-session-autodream.patch` (3-line insert, guard DryRun/Force) | Apply + verificar 5º close dispara dreaming |
+| P2.15 bulk-ops ctx_execute | Bajo | **DONE** — `_impl-drafts/ctx-bulk-ops-guidance.md` (benchmark.ps1:40, skill-graph) | Prompts/scripts canonicalizar regla |
+| master→main (branch default) | Manual | Pending — usuario (GitHub Settings + delete remoto) | Snapshot ya en tag `archive/gentle-ai-go-snapshot-v2` |
+| CODE CI+PEV: perf-caches (P2.12), async-delegation (P3.22), memory-TTL (P3.19), injection-sanitization (P1.7) | Medio/Alto | Deferred (requieren CI + PEV gate) | Implementar con plan→aprobación→ejecución→verificación |

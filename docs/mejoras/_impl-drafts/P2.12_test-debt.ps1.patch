@@ -1,0 +1,23 @@
+# DRAFT — awaiting CI/PSSA/Pester validation (node/pwsh=negated local)
+# P2.12 — Test debt: coverage + suite única (patch draft, NOT applied)
+
+**Scope lock**: `.github/workflows/quality-gate.yml:261-287` (job `tests-v1`, verificado) — Pester `-CodeCoverage` + publicar reporte; decisión merge/archive `tests/` vs `scripts/tests/`.
+**Cita plan**: plan-kimi-k3.md:86 (P1.10) — "Coverage en CI: Pester -CodeCoverage + publicar reporte; decidir merge o archive de tests/ vs scripts/tests/ (una sola suite, una sola verdad)"; :18 (F4 doble suite 46 vs 44, job tests-v1).
+**Blast**: Bajo (CI-only). **Regla**: commit `fix(ci):`.
+
+```diff
+--- a/.github/workflows/quality-gate.yml
++++ b/.github/workflows/quality-gate.yml
+@@ -282,3 +282,6 @@
+-          $results = Invoke-Pester -Path './tests/*.Tests.ps1' -PassThru
++          $results = Invoke-Pester -Path './tests/*.Tests.ps1' -PassThru -CodeCoverage
++          $results.CodeCoverage | ConvertTo-Json | Out-File ./coverage-v1.json
+           if ($results.FailedCount -gt 0) {
+             Write-Error "Pester v1: $($results.FailedCount) test(s) failed"
+             exit 1
+           }
+```
+
+**Idempotencia**: re-run sobrescribe coverage-v1.json; sin estado acumulado.
+**Rollback**: git revert (2 líneas). **DoD**: %coverage publicado por suite; decisión merge/archive registrada en ADR.
+**CI fallback (local negado)**: `gh workflow run quality-gate.yml --ref <branch>` ; `pwsh -c "Invoke-Pester ./tests/*.Tests.ps1 -PassThru -CodeCoverage"`.

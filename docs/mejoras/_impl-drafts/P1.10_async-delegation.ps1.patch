@@ -1,0 +1,19 @@
+# DRAFT — awaiting CI/PSSA/Pester validation (node/pwsh=negated local)
+# P1.10 — Async delegation (patch draft, NOT applied)
+
+**Scope lock**: `scripts/post-delegation-check.ps1` (flag -Async + polling, Approach B 08-08).
+**Cita plan**: plan-kimi-k3.md:104 (P3.22) — "Async delegation (Approach B del 08-08): -Async en post-delegation-check + polling"; :51 (F3 autonomía manual); §9:171.
+**Blast**: Medio (cambia flujo de delegación). **Regla**: commit `feat(scripts):`.
+
+```diff
+--- a/scripts/post-delegation-check.ps1
++++ b/scripts/post-delegation-check.ps1
+@@ (param block, aprox — verify at apply) @@
++param([switch]$Async, [int]$PollIntervalSec = 10)
++if ($Async) { while (-not (Test-DelegationDone)) { Start-Sleep -Seconds $PollIntervalSec } }
+```
+
+**Idempotencia**: polling con flag -Async; sin flag -> comportamiento síncrono previo intacto.
+**Rollback**: git revert (cambio atómico param + guard).
+**DoD**: delegación async completa con polling sin bloquear; tests de delegación verdes.
+**CI fallback (local negado)**: `gh workflow run quality-gate.yml` + `pwsh -File scripts/run-tests.ps1`.

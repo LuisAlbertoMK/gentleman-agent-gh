@@ -12,4 +12,4 @@
 
 - 4 vectores de evasión H1–H4 sobre el pipeline de permisos. H2 documentado en `evidencia-h2.md` (re-verificado por Unit D con read/grep).
 - H1/H3/H4: detalle completo en la evidencia de la sesión ses_0214c7 (orquestador). Este log registra el inventario y el H2, que es el que entra al DoD.
-- Clasificación: Unit B marca H2 crítico; DoD §1.4 lo puntúa HIGH (latente). El ADR-008 lo registra como Proposed.
+- Clasificación: Unit B marca H2 crítico; DoD §1.4 lo puntúa HIGH (latente). El ADR-024 lo registra como Proposed.
