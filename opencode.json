@@ -2306,7 +2306,7 @@
   },
   "rules": {
     "routing": {
-      "description": "Bridge rule (gentle-ai:bridge). gentle-orchestrator is resolved from the merged GLOBAL config (~/.config/opencap/opencap.json). For tasks requiring native review / lossless prompts / receipt-driven authority / SDD native, route to gentle-orchestrator. This rule is non-breaking: unknown to older runtimes, it is ignored and the existing commands/sdd-*.md delegation (agent: gentle-orchestrator) still applies.",
+      "description": "Bridge rule (gentle-ai:bridge). gentle-orchestrator is resolved from the merged GLOBAL config (~/.config/opencode/opencode.json). For tasks requiring native review / lossless prompts / receipt-driven authority / SDD native, route to gentle-orchestrator. This rule is non-breaking: unknown to older runtimes, it is ignored and the existing commands/sdd-*.md delegation (agent: gentle-orchestrator) still applies.",
       "delegate_when_contains": [
         "sdd",
         "review",

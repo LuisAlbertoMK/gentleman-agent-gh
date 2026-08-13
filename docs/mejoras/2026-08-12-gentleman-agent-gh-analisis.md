@@ -22,7 +22,7 @@ Recolectado via evidence gate + scans frescos en 5 runs donde aplica:
 |---|---|---|---|---|
 | **M1** Gate pre-commit | 22/22 ALL CLEAR | 22/22 | `.githooks/pre-commit-gate.ps1` | ✅ OK |
 | **M2** npm audit (production) | 0 vulnerabilities | 0 | `npm audit --omit=dev` | ✅ OK |
-| **M3** opencap.json size | 73,754 B (75%) | ≤98,304 B | `(Get-Item).Length` | ✅ OK |
+| **M3** opencode.json size | 73,754 B (75%) | ≤98,304 B | `(Get-Item).Length` | ✅ OK |
 | **M4** E2E Suite (Pester) | 81 tests (gate OK) | 100% pass | pre-commit [12/22] | ✅ OK |
 | **M5** Skills >3KB | **7** (todas sdd-*) | 0 | skill size scan | ❌ GAP |
 | **M6** Token budget (avg) | **2,631 B** | ≤2,000 B | gate [19/22] | ❌ GAP |
@@ -38,7 +38,7 @@ Recolectado via evidence gate + scans frescos en 5 runs donde aplica:
 
 ```
 66  BITACORA.md
-57  opencap.json
+57  opencode.json
 39  .project.json
 37  .github/workflows/quality-gate.yml
 36  mejora-log.md
@@ -129,3 +129,4 @@ El gap de docs stale (G1) es **confirmado y actualizado** con nuevas discrepanci
 | 4 | G4: PSSA warnings | 🔴 Pending | Reduce PSSA warnings |
 
 **Engram Persistence**: `analysis/gentleman-agent-gh/v3-2026-08-12` · confidence: high
+

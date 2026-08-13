@@ -919,7 +919,7 @@ Métricas de benchmark: Pester suite completa (pass/fail), opencode.json size vs
 # Cycle #1 v3 (Enfoque B2) — Re-run: guard de merge de permisos `auto-sub` (2026-08-07)
 
 > Unidades A–D · Subagentes: A=ses_0216, B=ses_0214c7 (adversarial), C=ses_021558/ses_021593 (benchmark), D=documenter (este log)
-> Log detallado: `docs/mejoras/2026-08-07-v3-cycle1-B2.md` · ADR: `docs/adr/008-auto-sub-permission-merge-safety.md`
+> Log detallado: `docs/mejoras/2026-08-07-v3-cycle1-B2.md` · ADR: `adr/ADR-024-auto-sub-permission-merge-safety.md`
 
 ## Ciclo 1 v3 B2 — Scope test-only (Enfoque B2, cierre de Cycle #1)
 **Gap**: (1) `generate-opencode-config.js` sin suite de tests de contrato; (2) guard de colisión `extraPermKeys` con blind spot `task` (H2).
@@ -928,8 +928,8 @@ Métricas de benchmark: Pester suite completa (pass/fail), opencode.json size vs
 **DoD §1.4**:
 - [x] Tests E2E green (6/6) — Unit A ✅
 - [ ] Benchmark no regresivo — FAIL (+97.4 % warm retry 520.9 ms vs §0 baseline 263.8 ms; Gap D: baseline-context mismatch orquestador vs subagente)
-- [ ] 0 vulnerabilidades nuevas — FAIL provisional (H2 HIGH, fix pendiente Cycle #2 → ADR-008)
-- [x] ADR escrito — `docs/adr/008-auto-sub-permission-merge-safety.md` (Proposed)
+- [ ] 0 vulnerabilidades nuevas — FAIL provisional (H2 HIGH, fix pendiente Cycle #2 → ADR-024)
+- [x] ADR escrito — `adr/ADR-024-auto-sub-permission-merge-safety.md` (Proposed)
 - [ ] Commits taggeados + scope — N/A (0 commits; test-only)
 **Hallazgo crítico H2**: `extraPermKeys:{task:{"*":"allow"}}` elude el guard hardcodeado (L163) y `Object.assign` shallow (L169) sobrescribe `task:{"*":"deny"}` del template `auto-sub`/`readonly` → escalada de delegación. Estado: LATENTE (overrides vivos son adds puros deny+allowlist). Fix propuesto (Cycle #2): guard dinámico `Object.keys(template)` + test de regresión colisión `task`.
 **Breaker/QA**: Unit B (adversarial) 4 vectores de evasión (H1-H4); H2 confirmado por Unit D a nivel de código (líneas exactas) + verificación de que el SSoT actual no lo explota.
