@@ -163,3 +163,5 @@
 2026-07-05 - Agent optimization analysis saved to docs/optimizaciones/agent-optimization-analysis.md (pending Cycle 20)
 
 2026-08-01 - [audit] subagent twins fix: self=NA audit=5/7/5/5/6/5 gaps=NA (no self-scores) — issue2 tabla FIXED+re-audited, issue1 node-deny bloquea regen (manual), issue3 validate-en-CI pendiente
+
+2026-08-13 - Plan Auto-Mejora v3 completado (3 ciclos): G1 json-utils fix (a378b36d, 8/8 tests), G3 agent sync 50 agents (a35fb543), G2 CI quality gate (0d80b1a3). ADRs 027/028/029/030 + rollback-map escritos. main untouched (0d88467c). Checkpoint humano G3 AWAITING approval. Incidente: tree mutation concurrente resuelto (sesiones duplicadas cerradas).
