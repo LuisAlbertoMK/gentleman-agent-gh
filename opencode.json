@@ -2293,6 +2293,60 @@
         "engram*": true,
         "codebase-memory*": true
       }
+    },
+    "gentle-orchestrator": {
+      "description": "Global gentle-orchestrator - bridges gentleman-agent-gh with native SDD review, receipt-driven authority, lossless prompts",
+      "model": "claude-sonnet-4-6",
+      "mode": "primary",
+      "permission": {
+        "bash": {
+          "*": "ask"
+        },
+        "delegate": "allow",
+        "delegation_list": "allow",
+        "delegation_read": "allow",
+        "edit": {
+          "*": "allow"
+        },
+        "read": "allow",
+        "write": {
+          "*": "allow"
+        },
+        "task": {
+          "sdd-verify": "allow",
+          "sdd-apply": "allow",
+          "gentleman-implementer-sub": "allow",
+          "*": "deny",
+          "gentleman-frontend-sub": "allow",
+          "sdd-spec": "allow",
+          "gentleman-datascience-sub": "allow",
+          "gentleman-deep-sub": "allow",
+          "sdd-propose": "allow",
+          "gentleman-quick-sub-auto": "allow",
+          "gentleman-implementer-sub-auto": "allow",
+          "gentleman-deep-sub-auto": "allow",
+          "gentleman-seo-sub": "allow",
+          "gentleman-quick-sub": "allow",
+          "sdd-tasks": "allow",
+          "sdd-archive": "allow",
+          "gentleman-docs-sub": "allow",
+          "sdd-design": "allow",
+          "sdd-explore": "allow",
+          "gentleman-performance-sub": "allow",
+          "explore": "allow",
+          "gentleman-codex-sub": "allow",
+          "gentleman-security-sub": "allow",
+          "sdd-init": "allow",
+          "gentleman-infra-sub": "allow",
+          "gentleman-codex-sub-auto": "allow",
+          "general": "allow"
+        }
+      },
+      "prompt": "{file:prompts/gentle-orchestrator.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "tools": {
+        "engram*": true,
+        "codebase-memory*": true
+      }
     }
   },
   "plugin": [

@@ -676,6 +676,16 @@
         "engram*": true,
         "codebase-memory*": true
       }
+    },
+    "gentle-orchestrator": {
+      "description": "Global gentle-orchestrator - bridges gentleman-agent-gh with native SDD review, receipt-driven authority, lossless prompts",
+      "model": "claude-sonnet-4-6",
+      "tools": {
+        "engram*": true,
+        "codebase-memory*": true
+      },
+      "prompt": "{file:prompts/gentle-orchestrator.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "mode": "primary"
     }
   },
   "plugin": [
