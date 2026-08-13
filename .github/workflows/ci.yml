@@ -1,0 +1,78 @@
+name: CI quality gate (ConfigValidator)
+
+# Cycle 3 — G2: validate opencode.json schema before deploy.
+# Enfoque A (Minimal) from plan-auto-mejora-v3-2026-08-13 §3: ConfigValidator.psm1
+# guards G1 (skills.paths array unwrapping) + G3 (50-agent completeness) + prompt
+# ref integrity. Complements .github/workflows/quality-gate.yml (lint/security/tests)
+# — this workflow is the fail-fast config gate: quality → tests → validate.
+#
+# PowerShell Core ONLY: every step uses `shell: pwsh` (never Windows PowerShell).
+# Relative paths only — runner is ubuntu-latest, no D:\... paths exist there.
+
+on:
+  push:
+    branches: [ master, main, 'experimento/**' ]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cfg-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Quality — ConfigValidator
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate opencode.json schema (ConfigValidator)
+        # Fail fast: any check (skills.paths array, prompt refs, agent completeness)
+        # failing aborts the pipeline before tests/validate run.
+        run: |
+          Import-Module ./scripts/lib/ConfigValidator.psm1 -Force
+          $code = Test-OpencodeConfig -Path ./opencode.json
+          if ($code -ne 0) { Write-Error "opencode.json failed ConfigValidator"; exit $code }
+          Write-Output "OK: opencode.json passes ConfigValidator"
+
+  tests:
+    name: Tests — ConfigValidator Pester
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: quality
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run config-validator tests
+        run: |
+          $results = Invoke-Pester -Path ./scripts/tests/config-validator.Tests.ps1 -PassThru
+          if ($results.FailedCount -gt 0) { Write-Error "ConfigValidator tests: $($results.FailedCount) failed"; exit 1 }
+          Write-Output "OK: $($results.PassedCount)/$($results.TotalCount) config-validator tests passed"
+
+  validate:
+    name: Validate — SSoT in sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: tests
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check opencode.json matches SSoT
+        # Regenerate pipeline: opencode-base.json + generator + agent-overrides.json
+        # must produce exactly the committed opencode.json. Exit 1 on mismatch.
+        run: |
+          node ./scripts/lib/generate-opencode-config.js --validate
+          if ($LASTEXITCODE -ne 0) { Write-Error "opencode.json stale vs SSoT — run scripts/regenerate-opencode.ps1 -Yes"; exit 1 }
+          Write-Output "OK: opencode.json in sync with SSoT"
