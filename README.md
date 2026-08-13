@@ -65,7 +65,7 @@ Switch modes:
 ## Features
 
 ### Multi-Agent Architecture
-49 agents total: main orchestrator (`gentleman-vMK`) + 12 specialists + 12 subagent twins + 10 SDD pipeline agents + 5 auto-mode + 5 semi-mode variants + 4 subagent auto variants (`sdd-orchestrator` orchestrates the SDD phases over the 9 phase subagents):
+50 agents total: main orchestrator (`gentleman-vMK`) + 12 specialists + 12 subagent twins + 10 SDD pipeline agents + 5 auto-mode + 5 semi-mode variants + 4 subagent auto variants + 1 global orchestrator bridge (`gentle-orchestrator`):
 
 | Agent | Model | Specialty |
 |-------|-------|-----------|
@@ -95,6 +95,7 @@ Switch modes:
 | `gentleman-docs-sub` | big-pickle | Documentation subagent (read-only) — delegable via Task tool |
 | `gentleman-reviewer-sub` | claude-sonnet-4-6 | Code review subagent — 4R (Risk/Readability/Reliability/Resilience) |
 | `sdd-orchestrator` | claude-sonnet-4-6 | SDD pipeline orchestration |
+| `gentle-orchestrator` | claude-sonnet-4-6 | Bridge to global gentle-orchestrator for native review + SDD native |
 | `gentleman-deep-auto` | nemotron-3-ultra-free | — AUTO mode (same model, `*: allow`) |
 | `gentleman-quick-auto` | mimo-v2.5-free | — AUTO mode (same model, `*: allow`) |
 | `gentleman-codex-auto` | deepseek-v4-flash-free | — AUTO mode (same model, `*: allow`) |
