@@ -24,12 +24,13 @@
 | 2026-07-28 | [`orchestrator-self-analysis`](2026-07-28-orchestrator-self-analysis.md) | Meta-Architecture | Pre-Answer Evidence Gate + Confidence Calibration. 7/8 findings implemented in `6270c57e`. | ✅ 7/8 completed |
 | 2026-07-28 | [`permission-modes`](2026-07-28-permission-modes-analysis.md) | Permissions | 3 permission modes (manual/semi/auto). switch-mode.ps1 + permission-gate.ps1 + .gentleman-mode created. | ✅ completed |
 | 2026-07-24 | [`execution-report`](2026-07-24-gentleman-agent-gh-ejecucion.md) | Execution | 12/15 findings implemented across 12 files. 3 skipped. Pipeline `!ejecutar` v1.1. | ✅ completed |
+| 2026-08-14 | [`2026-08-14-resource-optimization-investigation`](2026-08-14-resource-optimization-investigation.md) | Resource Optimization | 5-pass research (25+ sources): 3 root causes, tiered config profiles, CPU/RAM monitoring scripts, PS 5.1/7 syntax validation. Implemented in `f4d4ec84`. | ✅ completed |
 | — | [`PERFORMANCE-PLAN`](PERFORMANCE-PLAN.md) | Performance | `!ship` ~46s→32s. P0-1 (incremental PSSA), P0-2 (ThreadJob), P0-3/P1/P2 items. Todos completados (P0-1..3, P1-1..3, P2-1..3). | ✅ completed (9/9) |
 
 ## Trend Summary
 
-- **Total documents**: 19 (18 analyses + 1 performance plan, all indexed above)
-- **Completed**: 5 (tdd-testing, orchestrator, permission-modes, execution-report, PERFORMANCE-PLAN 9/9)
+- **Total documents**: 20 (19 analyses + 1 performance plan, all indexed above)
+- **Completed**: 6 (tdd-testing, orchestrator, permission-modes, execution-report, PERFORMANCE-PLAN 9/9, resource-optimization)
 - **Current**: 2026-08-04 analysis — R1-R5 completed (commit 92f848aa, gate 16/16); R10 docs cleanup in progress
 
 ## Quick Reference
