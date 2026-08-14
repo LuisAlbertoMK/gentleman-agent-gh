@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Health check for Gentleman Agent system.

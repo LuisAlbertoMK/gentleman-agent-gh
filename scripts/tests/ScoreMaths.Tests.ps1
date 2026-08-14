@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
   Pester 6 tests for pure scoring math from score-dims.ps1 (sourced by score-auto.ps1)

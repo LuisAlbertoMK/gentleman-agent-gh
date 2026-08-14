@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Tests for C4d: 4-field return contract validation in check-subagent-output.ps1.

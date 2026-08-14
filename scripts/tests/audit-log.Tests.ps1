@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Tests for audit-log CSV formula-injection hardening (Gap 1, C3a security subset).

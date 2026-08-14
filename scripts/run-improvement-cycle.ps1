@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
   Continuous Improvement Cycle — measure, compress, validate, log, repeat.

@@ -69,10 +69,39 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check opencode.json matches SSoT
+        - name: Check opencode.json matches SSoT
         # Regenerate pipeline: opencode-base.json + generator + agent-overrides.json
         # must produce exactly the committed opencode.json. Exit 1 on mismatch.
         run: |
           node ./scripts/lib/generate-opencode-config.js --validate
           if ($LASTEXITCODE -ne 0) { Write-Error "opencode.json stale vs SSoT — run scripts/regenerate-opencode.ps1 -Yes"; exit 1 }
           Write-Output "OK: opencode.json in sync with SSoT"
+
+  pssa-lint:
+    name: Linter — PSScriptAnalyzer
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: quality
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PSScriptAnalyzer
+        run: |
+          if (-not (Get-Module -ListAvailable -Name PSScriptAnalyzer)) {
+            Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser -AllowClobber
+          }
+
+      - name: Run PSScriptAnalyzer (security + correctness)
+        # Only security/correctness rules — style rules deferred to quality-gate.yml
+        run: |
+          $rules = @('PSAvoidUsingInvokeExpression', 'PSAvoidUsingWriteHost', 'PSAvoidUsingPlainTextForPassword', 'PSAvoidUsingUsernameAuthentically')
+          $results = Invoke-ScriptAnalyzer -Path ./scripts -Recurse -IncludeRule $rules -PassThru
+          if ($results.Count -gt 0) {
+            Write-Error "PSScriptAnalyzer: $($results.Count) issues found"
+            $results | Format-Table -Property RuleName, Line, Message -AutoSize
+            exit 1
+          }
+          Write-Output "OK: PSScriptAnalyzer passed (security + correctness)"

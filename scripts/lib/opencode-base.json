@@ -224,6 +224,7 @@
     }
   },
   "default_agent": "gentleman-vMK",
+  "model": "opencode/big-pickle",
   "experimental": {
     "mcp_timeout": 60000
   },
@@ -571,7 +572,7 @@
     },
     "sdd-orchestrator": {
       "description": "SDD Orchestrator - coordinates sub-agents, never does work inline",
-      "model": "claude-sonnet-4-6",
+      "model": "opencode/nemotron-3-ultra-free",
       "mode": "primary",
       "prompt": "{file:prompts/sdd/sdd-orchestrator.md}"
     },
@@ -659,7 +660,7 @@
     },
     "gentleman-reviewer": {
       "description": "Code review specialist — 4R framework, independent evaluator, adversarial verification (STRONG model)",
-      "model": "claude-sonnet-4-6",
+      "model": "opencode/nemotron-3-ultra-free",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-reviewer.md}\n\n{file:prompts/shared/_return-contract.md}",
       "tools": {
@@ -669,7 +670,7 @@
     },
     "gentleman-reviewer-sub": {
       "description": "Code review subagent — 4R framework, independent evaluator, adversarial verification (delegable via Task tool, read-only)",
-      "model": "claude-sonnet-4-6",
+      "model": "opencode/nemotron-3-ultra-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-reviewer.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -680,7 +681,7 @@
     },
     "gentle-orchestrator": {
       "description": "Global gentle-orchestrator - bridges gentleman-agent-gh with native SDD review, receipt-driven authority, lossless prompts",
-      "model": "claude-sonnet-4-6",
+      "model": "opencode/big-pickle",
       "tools": {
         "engram*": true,
         "codebase-memory*": true

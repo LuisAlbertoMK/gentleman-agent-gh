@@ -30,7 +30,7 @@
 .EXAMPLE
   .\scripts\audit-log.ps1 session -since "2026-07-29"
 #>
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess=$true)]
 param(
     [Parameter(Position=0, Mandatory)]
     [ValidateSet('append','read','session')]

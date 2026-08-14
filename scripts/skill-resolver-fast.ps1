@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Fast skill resolver — matches tasks to skills from pre-built registry JSON via keyword scoring.

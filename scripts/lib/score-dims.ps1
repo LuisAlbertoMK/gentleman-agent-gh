@@ -1,3 +1,4 @@
+[CmdletBinding(SupportsShouldProcess=$true)]
 ﻿#requires -Version 7
 
 <#

@@ -1,16 +1,12 @@
 ---
-name: sdd-archive
 description: "Archive completed SDD change by syncing delta specs. Trigger: orchestrator launches archive after implement+verify."
 triggers: "SDD archive, archive SDD, close SDD, persist artifacts"
-delegate_only: true
 ---
 
 > **ORCHESTRATOR GATE**: `skill()` → STOP. Delegate to `sdd-archive` sub-agent.
 
-## Inputs
 Change name, mode (`engram|openspec|hybrid|none`), status per `sdd-status-contract.md`, optional override.
 
-## Persistence (per `sdd-phase-common.md` §B+C)
 | Mode | Action |
 |---|---|
 | **engram** | Read artifacts + review topics; save `sdd/{change}/archive-report` |
@@ -18,13 +14,11 @@ Change name, mode (`engram|openspec|hybrid|none`), status per `sdd-status-contra
 | **hybrid** | Both |
 | **none** | Closure summary only |
 
-## Gates
 - **Review Receipt**: Require `reviewGate.result: allow`. Read transaction, ledger, receipt, gate context. Missing/pending/malformed/scope-changed/invalidated/escalated → block.
 - **Task Completion**: Validate final state. Unchecked `- [ ]` → STOP, return `blocked`. Proceed only with orchestrator-approved reconciliation + proof.
 - **Strict Policy**: CRITICAL verify-report issues ALWAYS block. Incomplete tasks block (unless stale+proof). Missing artifacts: report, continue only on explicit user partial archive.
 - **Action Context**: `workspace-planning` → STOP. `allowedEditRoots` → stay inside.
 
-## Steps
 1. **Load Skills** → §A of `sdd-phase-common.md`
 2. **Sync Delta Specs** (gate must pass first)
    - engram/none: skip
@@ -41,7 +35,7 @@ Change name, mode (`engram|openspec|hybrid|none`), status per `sdd-status-contra
 5. **Persist Archive Report** — §C of `sdd-phase-common.md`: artifact `archive-report`, topic_key `sdd/{change}/archive-report`, type `architecture`
 6. **Return Summary**
 ```markdown
-## Change Archived
+
 **Change**: {change-name}
 **Archived to**: `openspec/changes/archive/YYYY-MM-DD-{change}/` | Engram | inline
 ### Specs Synced
@@ -53,7 +47,6 @@ proposal.md �� | specs/ �� | design.md �� | tasks.md �� ({N}/{N}
 SDD Cycle Complete — Ready for next change.
 ```
 
-## Rules
 - NEVER archive CRITICAL verify-report issues or stale unchecked tasks
 - Sync delta specs BEFORE archive move; Preserve non-delta requirements
 - ISO date prefix (YYYY-MM-DD); WARN before destructive merges

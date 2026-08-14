@@ -1,21 +1,16 @@
 ---
-name: sdd-apply
 description: "Implement SDD tasks from specs and design. Trigger: orchestrator launches apply for change tasks."
 triggers: "SDD apply, implement SDD, code change, SDD implementation, apply tasks"
-delegate_only: true
 ---
 
 > **ORCHESTRATOR GATE**: ORCHESTRATOR → STOP, delegate to `sdd-apply` sub-agent. Executor: execute directly.
 
-## Input
 Change name, task(s), store (`engram|openspec|hybrid|none`), status (`sdd-status-contract.md`), delivery (`ask-on-risk|auto-chain|single-pr|exception-ok`), PR slice / `size:exception`.
 
-## Persistence (per `sdd-phase-common.md` §B+C)
 - **engram**: read `sdd/{change}/proposal\|spec\|design\|tasks`; mark via `mem_update`; save `apply-progress`
 - **openspec**: `openspec-convention.md`; mark `[x]` in `tasks.md`
 - **hybrid**: both. **none**: progress only.
 
-## Status Guard
 | State | Action |
 |---|---|
 | `blocked` | STOP + return `blocked` + missing artifacts |
@@ -25,7 +20,6 @@ Change name, task(s), store (`engram|openspec|hybrid|none`), status (`sdd-status
 - `workspace-planning` + empty `allowedEditRoots` → STOP (read-only).
 - `allowedEditRoots` present → edit only under roots.
 
-## Steps
 ### 1: Load Skills — §A of `sdd-phase-common.md`
 ### 2: Read Context — `applyState: ready`; read `contextFiles`, specs (WHAT), design (HOW), code (patterns), `config.yaml` (conventions)
 #### 2a: Enforce Review Workload
@@ -43,7 +37,4 @@ Change name, task(s), store (`engram|openspec|hybrid|none`), status (`sdd-status
 
 ### 5: Persist + Return — §C of `sdd-phase-common.md`; save `apply-progress` (topic_key: `sdd/{change}/apply-progress`); re-read tasks, confirm `[x]`. Return per §D: Completed, Files Changed, TDD Evidence (strict), Deviations, Issues, Remaining, Workload/PR Boundary, Status
 
-## Rules
-- Artifacts: English; specs = acceptance criteria, read before coding; follow design (freelancing → deviation); match patterns; structured status, never infer from conversation
-- STOP on: `blocked`, unsafe `actionContext`, outside `allowedEditRoots`, no workload decision
-- `openspec`: mark `[x]` as you go (todos != completion); chained/stacked → one deliverable; never unassigned tasks; follow loaded skills; apply `rules.apply` from `config.yaml`
+- Artifacts: English; specs = acceptance criteria, read before coding; follow design (freelancing → deviation); match patterns; s

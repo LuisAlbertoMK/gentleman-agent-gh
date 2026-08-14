@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Mode Gate — pre-delegation validation. Verifies agent suffix matches current mode.

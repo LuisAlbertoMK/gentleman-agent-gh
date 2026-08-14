@@ -1,16 +1,12 @@
 ---
-name: sdd-tasks
 description: "Break SDD change into implementation tasks. Trigger: orchestrator launches task planning."
 triggers: "SDD tasks, task planning, implementation tasks, work breakdown"
-delegate_only: true
 ---
 
 > **ORCHESTRATOR GATE**: `skill()` → STOP. Delegate to `sdd-tasks` sub-agent.
 
-## Inputs
 Change name, artifact store (`engram|openspec|hybrid|none`), delivery strategy (`ask-on-risk|auto-chain|single-pr|exception-ok`).
 
-## Persistence (per `sdd-phase-common.md` §B+C)
 | Mode | Read | Save |
 |---|---|---|
 | engram | `sdd/{change}/proposal\|spec\|design` | `sdd/{change}/tasks` |
@@ -18,7 +14,6 @@ Change name, artifact store (`engram|openspec|hybrid|none`), delivery strategy (
 | hybrid | Engram primary, fs fallback | Both |
 | none | — | Return only |
 
-## Steps
 1. **Load Skills** → §A of `sdd-phase-common.md`
 2. **Analyze Design**: Identify files to create/modify/delete, dependency order, testing per component, every threat-matrix case + RED test (skip `N/A`).
 3. **Write tasks.md**
@@ -62,5 +57,4 @@ Chain strategy: stacked-to-main|feature-branch-chain|size-exception|pending
 4. Testing — unit, integration, e2e; spec scenarios
 5. Cleanup — docs, dead code, polish
 
-4. **Persist** — §C of `sdd-phase-common.md`: artifact `tasks`, topic_key `sdd/{change}/tasks`, type `architecture`
-5. **Return Summary**: change name, location, phase breakdown, workload forecast, next step (ready for sdd-apply or ask about chained PRs).
+4. **Persist** — §C of `sdd-

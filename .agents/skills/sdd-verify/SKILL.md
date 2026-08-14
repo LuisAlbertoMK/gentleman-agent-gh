@@ -7,13 +7,10 @@ delegate_only: true
 
 > **ORCHESTRATOR GATE**: `skill()` → ORCHESTRATOR STOP. Delegate to `sdd-verify` sub-agent. Executors skip gate.
 
-## Language
 Artifacts default to English; Spanish neutral/professional if requested. Comments follow target context.
 
-## Activation
 Run when orchestrator launches verification. Prove completion via source inspection + real execution. Use status from `sdd-status-contract.md`.
 
-## Hard Rules
 - Read all `contextFiles` before judging. Full: proposal + specs + design + tasks. Partial degrades.
 - All tasks must be complete before full verification. Pending → `blocked`.
 - Tests required. Static analysis alone �� verification. Runtime pass required for spec compliance.
@@ -27,7 +24,6 @@ Run when orchestrator launches verification. Prove completion via source inspect
 - Final independent verification. Contradiction/failing → FAIL/escalation. No 4R, Judgment Day, refuter, correction.
 - Use exact artifacts from status (`reviews/transaction.json`, `ledger.json`, `receipt.json`, `gate-context.json`, Engram topics). Never prompt-only.
 
-## Decision Gates
 | Condition | Action |
 |---|---|
 | `STRICT TDD MODE IS ACTIVE` / `strict_tdd: true` | Strict TDD; load module |
@@ -43,7 +39,6 @@ Run when orchestrator launches verification. Prove completion via source inspect
 | No runtime evidence (tasks only) | `PASS WITH WARNINGS` |
 | Missing covering tests (required) | CRITICAL (unless manual OK by config) |
 
-## Execution
 1. Load skills (§A). Retrieve artifacts (§B) or read `contextFiles`.
 2. Resolve TDD mode. Count completed/incomplete tasks.
 3. Map spec requirements/scenarios → evidence + tests.
@@ -52,10 +47,4 @@ Run when orchestrator launches verification. Prove completion via source inspect
 6. Build compliance matrix from test results.
 7. Persist report with skipped dimensions.
 
-## Output
 Return `## Verification Report`: change, mode, completeness table, build/test/coverage evidence, compliance matrix, correctness table, design coherence, issues (CRITICAL/WARNING/SUGGESTION), verdict (`PASS` / `PASS WITH WARNINGS` / `FAIL`).
-
-## References
-- `references/report-format.md` — report template, compliance statuses
-- `strict-tdd-verify.md` — load only when Strict TDD active
-- `../_shared/sdd-phase-common.md` — loading, retrieval, persistence, envelope

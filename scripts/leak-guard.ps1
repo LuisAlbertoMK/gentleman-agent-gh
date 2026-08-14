@@ -10,7 +10,7 @@
 .EXAMPLE
   & scripts/leak-guard.ps1
 #>
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess=$true)]
 param([switch]$Quiet)
 
 $ErrorActionPreference = 'Stop'

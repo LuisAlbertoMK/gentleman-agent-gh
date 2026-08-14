@@ -18,7 +18,7 @@
     Measure-only by default (prints findings, exit 0).
     Pass -FailOnDead to promote to a build breaker once baseline is clean.
 #>
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess=$true)]
 param(
     [string[]]$ScanPaths = @('scripts', '.github'),
     [switch]$FailOnDead

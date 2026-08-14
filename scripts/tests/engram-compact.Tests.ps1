@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Tests for scripts/engram-compact.ps1 — uses a THROWAWAY temp DB,

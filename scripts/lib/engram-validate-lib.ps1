@@ -23,7 +23,7 @@ function Write-ErrorMsg { param([string]$Msg) $script:exitCode = 2; if (-not $sc
 function Write-WarnMsg  { param([string]$Msg) if ($script:exitCode -lt 1) { $script:exitCode = 1 }; if (-not $script:engramQuiet) { Write-Warning "WARN: $Msg" } }
 
 function Test-EngramContent {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(ValueFromPipeline = $true)]
         [object]$Content,

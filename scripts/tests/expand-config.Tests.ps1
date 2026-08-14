@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Tests for scripts/opencode-config/expand-config.ps1 — runs against a THROWAWAY

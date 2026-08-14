@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Pester tests for close-session.ps1 — audit gate, bloat detection, compact prompt, session-miner integration.

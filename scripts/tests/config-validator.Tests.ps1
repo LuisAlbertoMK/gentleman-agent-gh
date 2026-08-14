@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Pester tests for ConfigValidator.psm1 (Cycle 3 — G2 CI quality gate).

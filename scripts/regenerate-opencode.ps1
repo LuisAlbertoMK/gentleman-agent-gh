@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
   Regenerate opencode.json from the SSoT (scripts/lib/*) via the node generator, then verify the result.

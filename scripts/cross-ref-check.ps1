@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
   Validate internal refs (skills, SKILLS-INDEX, junctions, shared, README models).

@@ -13,7 +13,7 @@
 .EXAMPLE
   .\scripts\opencode-config\expand-config.ps1
 #>
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess=$true)]
 param(
     [switch]$Quiet
 )

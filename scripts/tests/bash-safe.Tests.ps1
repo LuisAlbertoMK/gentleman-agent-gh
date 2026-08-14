@@ -29,7 +29,7 @@ BeforeAll {
 
     # Replicate Test-IsServerCommand
     function Test-IsServerCommand {
-        [CmdletBinding()]
+        [CmdletBinding(SupportsShouldProcess=$true)]
         param([Parameter(Mandatory)][string]$Command)
         foreach ($pattern in $serverPatterns) { if ($Command -match $pattern) { return $true } }
         return $false
@@ -37,7 +37,7 @@ BeforeAll {
 
     # Replicate Get-ServerPort
     function Get-ServerPort {
-        [CmdletBinding()]
+        [CmdletBinding(SupportsShouldProcess=$true)]
         param([Parameter(Mandatory)][string]$Command)
         if ($Command -match '--port[= ](\d+)') { return [int]$Matches[1] }
         if ($Command -match '(?:^|\s)-p\s+(\d+)') { return [int]$Matches[1] }
@@ -49,7 +49,7 @@ BeforeAll {
 
     # Replicate Test-SafeCommand — security validation
     function Test-SafeCommand {
-        [CmdletBinding()]
+        [CmdletBinding(SupportsShouldProcess=$true)]
         param([Parameter(Mandatory)][string]$Command)
 
         # $() subshell expansion

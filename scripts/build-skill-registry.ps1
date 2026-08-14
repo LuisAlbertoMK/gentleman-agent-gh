@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Build skill registry — generates skill-registry.json from SKILL.md frontmatter. Idempotent.

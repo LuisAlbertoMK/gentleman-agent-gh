@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
   Leave a repository clean: untracked files, backup/temp junk, stale junctions, and optional git gc.

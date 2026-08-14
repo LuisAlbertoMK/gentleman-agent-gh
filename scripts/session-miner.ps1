@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <# .SYNOPSIS Mine session histories for error patterns and propose corrections #>
 param([ValidateSet('scan','apply','check','populate')][string]$Mode='scan',[switch]$Json,[switch]$Quiet,[int]$Threshold=2,[string[]]$PatternKeys,[string[]]$ErrorEntries,[string]$Root='')
 if($Quiet){$Json=$true}

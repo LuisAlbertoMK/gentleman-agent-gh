@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 # Enforces PS version declaration matches reality (dot-sources must not pull PS7-only libs)
 $repoScripts = Get-ChildItem (Join-Path (Split-Path $PSScriptRoot -Parent) '*.ps1') -File
 $repoLibs    = Get-ChildItem (Join-Path (Split-Path $PSScriptRoot -Parent) 'lib\*.ps1') -File

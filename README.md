@@ -81,7 +81,7 @@ Switch modes:
 | `gentleman-datascience` | mimo-v2.5-free | Pandas, SQL, stats (FREE TIER) |
 | `gentleman-docs` | big-pickle | Technical writing, docs (FREE TIER) |
 | `gentleman-implementer` | deepseek-v4-flash-free | Plan executor (FREE TIER) |
-| `gentleman-reviewer` | claude-sonnet-4-6 | Code review — 4R (Risk/Readability/Reliability/Resilience) |
+| `gentleman-reviewer` | nemotron-3-ultra-free | Code review — 4R (Risk/Readability/Reliability/Resilience) |
 | `gentleman-deep-sub` | nemotron-3-ultra-free | Deep reasoning subagent — delegable via Task tool |
 | `gentleman-codex-sub` | deepseek-v4-flash-free | Code generation subagent — delegable via Task tool |
 | `gentleman-quick-sub` | mimo-v2.5-free | Fast executor subagent — delegable via Task tool |
@@ -93,9 +93,9 @@ Switch modes:
 | `gentleman-performance-sub` | nemotron-3-ultra-free | Performance subagent (read-only) — delegable via Task tool |
 | `gentleman-datascience-sub` | mimo-v2.5-free | Data science subagent (read-only) — delegable via Task tool |
 | `gentleman-docs-sub` | big-pickle | Documentation subagent (read-only) — delegable via Task tool |
-| `gentleman-reviewer-sub` | claude-sonnet-4-6 | Code review subagent — 4R (Risk/Readability/Reliability/Resilience) |
-| `sdd-orchestrator` | claude-sonnet-4-6 | SDD pipeline orchestration |
-| `gentle-orchestrator` | claude-sonnet-4-6 | Bridge to global gentle-orchestrator for native review + SDD native |
+| `gentleman-reviewer-sub` | nemotron-3-ultra-free | Code review subagent — 4R (Risk/Readability/Reliability/Resilience) |
+| `sdd-orchestrator` | nemotron-3-ultra-free | SDD pipeline orchestration |
+| `gentle-orchestrator` | big-pickle | Bridge to global gentle-orchestrator for native review + SDD native |
 | `gentleman-deep-auto` | nemotron-3-ultra-free | — AUTO mode (same model, `*: allow`) |
 | `gentleman-quick-auto` | mimo-v2.5-free | — AUTO mode (same model, `*: allow`) |
 | `gentleman-codex-auto` | deepseek-v4-flash-free | — AUTO mode (same model, `*: allow`) |
@@ -114,7 +114,7 @@ Switch modes:
 > **Auto/Semi modes**: Activated when `.gentleman-mode` is `auto` or `semi`. See [PROTOCOL.md](PROTOCOL.md) for mode behavior. Read-only specialists have no `-auto` or `-semi` variant.
 
 #### SDD Pipeline Agents (subagents)
-9 agents executing SDD pipeline phases. **Inherit orchestrator model** (`claude-sonnet-4-6`, paid) unless they have explicit `model` in `opencode.json`. All have full permissions (`bash: allow, edit: allow, write: allow`).
+9 agents executing SDD pipeline phases. **Inherit orchestrator model** (`nemotron-3-ultra-free`, free) unless they have explicit `model` in `opencode.json`. All have full permissions (`bash: allow, edit: allow, write: allow`).
 
 | Agent | Phase | Model | Description |
 |-------|-------|-------|-------------|
@@ -128,7 +128,7 @@ Switch modes:
 | `sdd-verify` | Verify | inherits orchestrator | Validate implementation against specs |
 | `sdd-archive` | Archive | inherits orchestrator | Archive completed change artifacts |
 
-> **Cost**: `sdd-orchestrator` + 9 sub-agents = 10 agents using `claude-sonnet-4-6`. This is intentional — SDD pipeline is high-risk and benefits from a capable model. To reduce cost, add `"model": "opencode/nemotron-3-ultra-free"` to individual SDD agents in `opencode.json`.
+> **Cost**: All 10 SDD agents now use free-tier OpenCode models. The orchestrator uses `nemotron-3-ultra-free`; sub-agents have explicit free models (`deepseek-v4-flash-free`, `nemotron-3-ultra-free`, `big-pickle`) set in `opencode.json`.
 
 ### Self-Improvement Cycle
 The project runs continuous improvement cycles (CYCLE.md):

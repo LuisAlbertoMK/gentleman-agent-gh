@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
   Cuenta tokens aproximados en archivos (default: 3.5 chars = 1 token)

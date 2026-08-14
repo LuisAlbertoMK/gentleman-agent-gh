@@ -43,7 +43,7 @@ $script:ServerDefaultPorts = @(
 
 # Detect if command matches known server patterns
 function Test-IsServerCommand {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param([Parameter(Mandatory)][string]$Command)
     foreach ($pattern in $script:ServerPatterns) { if ($Command -match $pattern) { return $true } }
     return $false
@@ -51,7 +51,7 @@ function Test-IsServerCommand {
 
 # Extract port from server command, or return default
 function Get-ServerPort {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param([Parameter(Mandatory)][string]$Command)
     if ($Command -match '--port[= ](\d+)') { return [int]$Matches[1] }
     if ($Command -match '(?:^|\s)-p\s+(\d+)') { return [int]$Matches[1] }
@@ -63,7 +63,7 @@ function Get-ServerPort {
 
 # Check if TCP port is in use on localhost (uses TcpClient, no module dependency)
 function Test-PortInUse {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param([Parameter(Mandatory)][int]$Port)
     try {
         $client = [System.Net.Sockets.TcpClient]::new()
@@ -81,7 +81,7 @@ function Test-PortInUse {
 # NOTE: quotes (single/double) are normal bash syntax and are NOT rejected.
 # The background path escapes " to \" to prevent quote-breaking.
 function Test-SafeCommand {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param([Parameter(Mandatory)][string]$Command)
 
     # Reject $() subshell expansion — executes arbitrary code inside bash.
@@ -165,7 +165,7 @@ function Test-SafeCommand {
 #   - Callers MUST NOT interpolate user input into $Command. Always use
 #     string literals or pre-validated strings.
 function Invoke-Bash {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory, Position=0)][string]$Command,
         [switch]$CaptureOutput,

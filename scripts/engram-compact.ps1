@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
   Compact the Engram memory DB without losing information: backup, dedupe, purge stale sync mutations, VACUUM.

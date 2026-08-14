@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
   Unified session close — BITACORA + git status + protected files + external auditor gate + mem_session_summary template.

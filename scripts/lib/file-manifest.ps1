@@ -14,7 +14,7 @@
 #>
 
 function Get-FileManifest {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Alias('Root')]
         [string]$Path = (Get-Location).Path,

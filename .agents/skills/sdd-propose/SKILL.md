@@ -1,16 +1,12 @@
 ---
-name: sdd-propose
 description: "Create SDD change proposal with intent, scope, approach. Trigger: orchestrator launches proposal work."
 triggers: "SDD propose, proposal, intent, approach, change proposal"
-delegate_only: true
 ---
 
 > **ORCHESTRATOR GATE**: `skill()` → ORCHESTRATOR STOP. Delegate to `sdd-propose` sub-agent. Executor: execute directly.
 
-## Inputs
 Change name, exploration analysis OR user description, store mode (`engram|openspec|hybrid|none`).
 
-## Persistence (per `sdd-phase-common.md` §B+C)
 | Mode | Behavior |
 |---|---|
 | `engram` | Read `sdd/{change}/explore` + `sdd-init/{project}` (opt); save as `sdd/{change}/proposal` |
@@ -19,7 +15,6 @@ Change name, exploration analysis OR user description, store mode (`engram|opens
 | `none` | Return only |
 Never force `openspec/` unless requested or `hybrid`.
 
-## Steps
 ### 0: Interactive Proposal Shaping
 Offer question round before finalizing (3-5 questions/round). Cover:
 1. Business problem — why now
@@ -42,30 +37,30 @@ Summarize assumptions. Offer corrections or round 2. If blocked from asking, wri
 ### 4: Write proposal.md
 ```markdown
 # Proposal: {Change Title}
-## Intent
+
 {Problem. Why now. User need or tech debt.}
-## Scope
+
 ### In Scope - {Deliverable}
 ### Out of Scope - {Excluded / deferred}
-## Capabilities
+
 > Contract with sdd-spec. Research `openspec/specs/` first.
 ### New Capabilities - `<name>`: <description>
 ### Modified Capabilities - `<name>`: <what changes>
-## Approach
+
 {Technical approach. Reference exploration if available.}
-## Affected Areas
+
 | Area | Impact | Description |
 |---|---|---|
 | `path` | New/Mod/Removed | {What changes} |
-## Risks
+
 | Risk | Likelihood | Mitigation |
 |---|---|---|
 | {Risk} | Low/Med/High | {Mitigation} |
-## Rollback Plan
+
 {Specific revert steps.}
-## Dependencies
+
 - {Deps if any}
-## Success Criteria
+
 - [ ] {Measurable outcome}
 ```
 **Budget**: <450 words. Bullets/tables over prose. If no spec changes, write "None" in both Capabilities subsections.
@@ -74,7 +69,7 @@ Summarize assumptions. Offer corrections or round 2. If blocked from asking, wri
 
 ### 6: Return
 ```markdown
-## Proposal Created
+
 **Change**: {name}
 **Location**: `openspec/changes/{name}/proposal.md` | Engram `sdd/{name}/proposal` | inline
 - **Intent**: {one-liner} | **Scope**: {N in, M deferred}
@@ -82,8 +77,5 @@ Summarize assumptions. Offer corrections or round 2. If blocked from asking, wri
 Ready for sdd-spec or sdd-design.
 ```
 
-## Rules
 - `openspec` mode: always create `proposal.md`; Exists already: read → update
 - Every proposal: rollback plan + success criteria; Concrete file paths in Affected Areas
-- Apply `rules.proposal` from `openspec/config.yaml`; Always fill Capabilities section — contract with sdd-spec
-- Return envelope per §D of `sdd-phase-common.md`

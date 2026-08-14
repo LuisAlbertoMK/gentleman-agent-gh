@@ -254,7 +254,7 @@ console.log(`  Reviewer:         ${stats.reviewer} agent(s)`);
 
 // --- Serialize ---
 console.log('[3/5] Serializing output...');
-const output = JSON.stringify(base, null, 2);
+const output = JSON.stringify(base);
 
 // --- Validate or write ---
 if (VALIDATE) {

@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Pester tests for token-count.ps1 — unified chars/3.5 heuristic divisor (R7).

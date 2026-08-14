@@ -18,7 +18,7 @@
 .NOTES
   Excludes: setup-install.ps1, install.sh, README.md, .env.example (local customizations).
 #>
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess=$true)]
 param(
     [switch]$Quiet,
   [Parameter(Position = 0)]

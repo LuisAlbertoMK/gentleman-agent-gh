@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Contract tests for scripts/lib/template-detection.ps1 — Detect-Template() function,
