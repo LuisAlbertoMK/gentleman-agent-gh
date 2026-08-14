@@ -4,18 +4,26 @@
     "auto": true,
     "prune": true,
     "reserved": 8000,
-    "keep": { "tokens": 15000 }
+    "keep": {
+      "tokens": 15000
+    }
   },
   "model": "opencode/big-pickle",
   "small_model": "opencode/free",
   "agent": {
-    "default": { "depth": 3 }
+    "default": {
+      "depth": 3
+    }
   },
   "watcher": {
     "enabled": true,
-    "ignore": ["node_modules", ".git", "dist"]
+    "ignore": [
+      "node_modules",
+      ".git",
+      "dist"
+    ]
   },
-  "snapshot": { "enabled": true },
+  "snapshot": false,
   "tools": {
     "file": {
       "maxBytes": 262144,

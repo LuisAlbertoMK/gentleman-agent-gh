@@ -51,6 +51,12 @@ if (Test-Path $denyRulesPath) {
             Where-Object { $_.Value -eq 'deny' -and $destructiveGlobs -notcontains $_.Name } |
             ForEach-Object { Convert-FromDenyGlob $_.Name } |
             Sort-Object -Unique)
+        # C4b: Load "ask" patterns (commands that prompt for approval instead of
+        # being hard-denied). Merged into autoAskPatterns below.
+        $script:askPatterns = @($denyRules.PSObject.Properties |
+            Where-Object { $_.Value -eq 'ask' } |
+            ForEach-Object { Convert-FromDenyGlob $_.Name } |
+            Sort-Object -Unique)
     } catch {
         Write-Debug "permission-gate-lib: shared-deny-rules.json load failed: $($_.Exception.Message)"
     }
@@ -66,7 +72,7 @@ if ($script:denyPatterns.Count -eq 0) {
         '^irm\s', '^iwr\s', '^iex\s', '^icm\s', '^Invoke-Expression', '^wsl\s', '^Start-BitsTransfer',
         '^ssh\s', '^docker\s', '^docker-compose\s', '^docker compose',
         '^telnet\s', '^ncat\s', '^nc\s', '^Test-NetConnection',
-        '^python\s', '^python3\s', '^node\s', '^ruby\s', '^perl\s', '^php\s', '^npx\s',
+        '^python\s', '^python3\s', '^ruby\s', '^perl\s', '^php\s',
         '^certutil\s', '^bitsadmin\s', '^schtasks\s', '^reg\s', '^sc\s', '^icacls\s',
         '^cmd /c', '^cmd\.exe', '^powershell\s-c\s', '^powershell\s-command\s',
         '^powershell\s-enc\s', '^powershell\s-File\s', '^powershell\.exe',
@@ -76,11 +82,18 @@ if ($script:denyPatterns.Count -eq 0) {
         '^Add-MpPreference', '^Set-MpPreference',
         '^saps\s', '^start\s',
         '^git push --force', '^git push -f',
-        '^npm\sexec\s', '^npm\sinstall\s', '^npm\si\s', '^npm\sadd\s',
+        '^npm\sexec\s',
         '^npm\suninstall\s', '^npm\sremove\s', '^npm\supdate\s', '^npm\spublish\s',
         '^pip\sinstall\s', '^pip3\sinstall\s',
         '^yarn\s(install|add)\s', '^pnpm\s(install|add|i)\s', '^bun\s(install|add)\s'
     )
+    # C4b: Fallback ask patterns (commands that prompt for approval instead of deny)
+    if (-not $script:askPatterns) {
+        $script:askPatterns = @(
+            '^node\s', '^npx\s',
+            '^npm\s+install\b', '^npm\si\b', '^npm\sadd\b'
+        )
+    }
 }
 
 # Destructive filesystem — DENY in manual/semi, ASK in auto (user confirms deletes)
@@ -119,6 +132,11 @@ $script:autoAskPatterns = @(
     '^git stash drop', # stash deletion
     '^git reset' # destructive reset (--hard deletes working tree changes)
 )
+# C4b: Merge "ask" patterns (from shared-deny-rules.json or fallback) into autoAskPatterns
+# so that these commands prompt for approval in auto mode instead of being hard-denied
+if ($script:askPatterns) {
+    $script:autoAskPatterns = $script:autoAskPatterns + $script:askPatterns | Sort-Object -Unique
+}
 
 # ===== CLASSIFY =====
 function Get-CommandClass {

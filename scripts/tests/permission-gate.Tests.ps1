@@ -173,9 +173,9 @@ Describe "Semi mode — ask (not in allowlist)" {
         $r = Invoke-Gate -Command "pip install requests" -Mode semi
         $r.verdict | Should -Be "deny"
     }
-    It "DENIES npm install [supply chain]" {
+    It "ASKS for npm install [supply chain — now ask not deny per C3b+Option-A]" {
         $r = Invoke-Gate -Command "npm install lodash" -Mode semi
-        $r.verdict | Should -Be "deny"
+        $r.verdict | Should -Be "ask"
     }
     It "DENIES npm uninstall [supply chain]" {
         $r = Invoke-Gate -Command "npm uninstall lodash" -Mode semi
@@ -413,10 +413,10 @@ Describe "Unicode whitespace normalization — no pattern evasion" {
         $r.verdict | Should -Not -Be "allow"
         $r.verdict | Should -Be "ask"
     }
-    It "DENIES npm install with no-break space U+00A0 [semi — supply chain]" {
+    It "ASKS for npm install with no-break space U+00A0 [semi — whitespace evasion blocked, not allowed]" {
         $r = Invoke-Gate -Command ('npm' + [char]0x00A0 + 'install lodash') -Mode semi
         $r.verdict | Should -Not -Be "allow"
-        $r.verdict | Should -Be "deny"
+        $r.verdict | Should -Be "ask"
     }
     It "DENIES git clean with narrow no-break space U+202F [manual]" {
         $r = Invoke-Gate -Command ('git' + [char]0x202F + 'clean -fdx') -Mode manual
@@ -474,11 +474,11 @@ Describe "SSoT supply-chain deny floor (permission-templates.json)" {
         }
     }
 
-    It "DENIES npm install in auto [supply chain]" {
-        Get-SSoTRule auto "npm install evil-pkg" | Should -Be "deny"
+    It "ASKS for npm install in auto [supply chain — now ask not deny per C3b+Option-A]" {
+        Get-SSoTRule auto "npm install evil-pkg" | Should -Be "ask"
     }
-    It "DENIES npm i -g in auto [supply chain]" {
-        Get-SSoTRule auto "npm i -g evil" | Should -Be "deny"
+    It "ASKS for npm i -g in auto [supply chain — now ask not deny per C3b+Option-A]" {
+        Get-SSoTRule auto "npm i -g evil" | Should -Be "ask"
     }
     It "DENIES pip install in auto [supply chain]" {
         Get-SSoTRule auto "pip install numpy" | Should -Be "deny"
@@ -492,8 +492,15 @@ Describe "SSoT supply-chain deny floor (permission-templates.json)" {
     It "DENIES bun install in auto [supply chain]" {
         Get-SSoTRule auto "bun install evil" | Should -Be "deny"
     }
-    It "DENIES npx in auto [supply chain]" {
-        Get-SSoTRule auto "npx evil" | Should -Be "deny"
+    It "ASKS for npx in auto [supply chain — now ask not deny per C3b+Option-A]" {
+        Get-SSoTRule auto "npx evil" | Should -Be "ask"
+    }
+    It "ASKS for node in auto [RCE — now ask not deny per C3b+Option-A]" {
+        Get-SSoTRule auto "node --version" | Should -Be "ask"
+        Get-SSoTRule auto "node evil.js" | Should -Be "ask"
+    }
+    It "ASKS for npm add in auto [supply chain — now ask not deny per C3b+Option-A]" {
+        Get-SSoTRule auto "npm add evil-pkg" | Should -Be "ask"
     }
     It "DENIES npm exec in auto [supply chain - arbitrary code]" {
         Get-SSoTRule auto "npm exec -y evil" | Should -Be "deny"
@@ -507,8 +514,8 @@ Describe "SSoT supply-chain deny floor (permission-templates.json)" {
     It "ALLOWS npm ci in auto [legitimate lockfile install]" {
         Get-SSoTRule auto "npm ci" | Should -Be "allow"
     }
-    It "DENIES npm install in semi [supply chain]" {
-        Get-SSoTRule semi "npm install evil-pkg" | Should -Be "deny"
+    It "ASKS for npm install in semi [supply chain — now ask not deny per C3b+Option-A]" {
+        Get-SSoTRule semi "npm install evil-pkg" | Should -Be "ask"
     }
     It "DENIES npm ci in semi [C3b gap fix]" {
         Get-SSoTRule semi "npm ci" | Should -Be "deny"
@@ -546,8 +553,20 @@ Describe 'C4b: Permission model consolidation (shared-deny-rules.json single sou
         Get-CommandClass 'git clean -fdx' 'manual'  | Should -Be 'deny'
     }
 
-    It 'denies npm install from loaded JSON patterns [supply chain]' {
-        Get-CommandClass 'npm install evil-pkg' 'auto' | Should -Be 'deny'
+    It 'asks for npm install from loaded JSON patterns [supply chain — now ask not deny per C3b+Option-A]' {
+        Get-CommandClass 'npm install evil-pkg' 'auto' | Should -Be 'ask'
+    }
+
+    It 'asks for npx from loaded JSON patterns [supply chain — now ask not deny per C3b+Option-A]' {
+        Get-CommandClass 'npx create-next-app' 'auto' | Should -Be 'ask'
+    }
+
+    It 'asks for node from loaded JSON patterns [RCE — now ask not deny per C3b+Option-A]' {
+        Get-CommandClass 'node --version' 'auto' | Should -Be 'ask'
+    }
+
+    It 'asks for npm install in semi from runtime gate [supply chain — now ask not deny]' {
+        Get-CommandClass 'npm install lodash' 'semi' | Should -Be 'ask'
     }
 
     It 'allows npm ci from mode-specific allowlist [legitimate]' {
