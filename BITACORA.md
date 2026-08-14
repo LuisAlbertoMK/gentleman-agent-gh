@@ -1,3 +1,4 @@
+2026-08-14 - Eliminadas ramas experimentales (local+origin), master eliminada de origin, HEAD de GitHub cambiado a main. sync-all OK (error benigno global-setup). !ship verificado: working tree clean, solo main.
 2026-08-14 - Resource optimization complete: 5-pass research (25+ sources) identified 3 root causes (depth=3 fan-out, compaction.reserved=8000, watcher+snapshot I/O). Implemented tiered config profiles (low/medium/high) in scripts/opencode-configs/, 3 monitoring scripts (monitor-opencode.ps1, heap-snapshot.ps1, hardware-profile.ps1), updated opencode.json (small_model=opencode/free, depth:2→6000, watcher+snapshot disabled), 17/17 validation checks pass (config+profiles+scripts+syntax; 6 PS7 exec tests skipped). Research documented in docs/mejoras/2026-08-14-resource-optimization-investigation.md. Committed in f4d4ec84.
 
 2026-08-11 - Session close
