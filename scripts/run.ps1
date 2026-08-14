@@ -1,5 +1,6 @@
 #!/usr/bin/env pwsh
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 Set-StrictMode -Version Latest
 param([switch]$Quiet,[string[]]$Args)
 $ErrorActionPreference = 'Continue'

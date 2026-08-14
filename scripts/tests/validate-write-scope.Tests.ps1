@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 
 BeforeAll {
     # Standalone reimplementation of the script's core glob-to-regex conversion

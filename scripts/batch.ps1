@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
   Create a new auto-incremented batch entry - log to BITACORA.md, increment inter-track.

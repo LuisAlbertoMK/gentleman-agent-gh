@@ -1,0 +1,18 @@
+# ADR-029: sync-vmk full agent sync — decisión de enfoque (G3)
+
+- **Status**: Accepted (pendiente checkpoint humano) · **Date**: 2026-08-13 · **Type**: process/config
+- **Context**: G3 — `sync-vmk.ps1` no propagaba los agents `sdd-*` (10) ni `gentle-orchestrator` (1) a los targets globales. Global config tenía 39 agents (0 sdd-*, 0 gentle-orchestrator) vs. 50 en repo. `gentle-orchestrator` estaba referenciado por `rules.routing.delegate_to_agent` + `commands/sdd-*.md` (`agent: gentle-orchestrator`) pero no existía como definición. Blast Radius **Alto** (el contrato de routing afecta todos los SDD commands) → **checkpoint humano obligatorio antes de merge**. ICE = 9×9×7 = **567**.
+- **Decision**: **Enfoque A (Full replace)** — `$target.agent = $canonical.agent`. El SSoT es la única fuente de verdad para la sección agent; el target se reemplaza completo, garantizando paridad exacta (sin drift, sin agentes fantasma). Ya aplicado en `sync-vmk.ps1:120` en sesión previa.
+- **Alternatives evaluadas**:
+  - **A (Full replace)** — `$target.agent = $canonical.agent`. Simple, SSoT garantizado, sin drift acumulado. Costo: borra custom overrides del target (ninguno detectado; el SSoT es el lugar correcto para overrides legítimos). **GANADOR**.
+  - **B (Merge por-key)** — preserva agents existentes y añade los nuevos. Permite custom overrides pero permite drift y resolución ambigua ante cambios de shape en SSoT. Rechazado.
+  - **C (Diff — solo agentes faltantes)** — diff mínimo, no detecta config drift existente. Rechazado: el objetivo es paridad total, no parche.
+- **Cadena SSoT (verificada, 50 agents: 39 gentleman + 10 sdd + 1 gentle-orchestrator)**:
+  `scripts/lib/opencode-base.json` (definiciones sin permission) → `generate-opencode-config.js` (TEMPLATE_MAP: `gentle-orchestrator` → `sddorchestrator` + SDD_ORCH_PERM_ORDER; `agent-overrides.json` con extraPermKeys delegate/delegation_list/delegation_read + task whitelist) → `opencode.json` (regenerado, post-write-validate en sync) → `sync-vmk.ps1` (L120 full-replace vía `ConvertTo-JsonSafe` de Cycle 1) → targets (global config). Verificado: SSoT=50, `opencode.json`=50, global=50.
+- **El fix se aplicó en DOS partes**:
+  1. **SSoT additions (este ciclo, commit `a35fb543`)**: entrada `gentle-orchestrator` en `opencode-base.json` + mapeo de template + overrides + `prompts/gentle-orchestrator.md` + regeneración de `opencode.json` + fix `.gentleman-mode` CRLF→LF.
+  2. **`sync-vmk.ps1:120` (sesión previa, ya en línea base)**: `$target.agent = $canonical.agent` (full replace) + `ConvertTo-JsonSafe` (Cycle 1) para preservar single-element arrays.
+- **Cobertura**: `scripts/tests/sync-vmk-full-agents.Tests.ps1` — 3/3 (incluye gentle-orchestrator, incluye 10 sdd-*, full-replace preserva count). Commit: `test(sync): add full-agent sync tests + ADR-029`.
+- **Consequences**: Cualquier agente futuro se registra en el SSoT (base + template map) y sync lo propaga automáticamente a global. El full-replace elimina drift histórico. Riesgo residual: un agente custom añadido DIRECTAMENTE en global config se pierde en el próximo sync — mitigado porque el SSoT es el punto de registro documentado.
+- **Checkpoint humano**: Blast Radius Alto → **requiere aprobación explícita antes de merge a main** (independiente del merge del resto del ciclo).
+- **Refs**: ADR-027 (kickoff); `docs/mejoras/plan-auto-mejora-v3-2026-08-13.md` §2; commits `a35fb543` (SSoT) + `a378b36d` (Cycle 1); `scripts/sync-vmk.ps1`.

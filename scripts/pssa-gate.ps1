@@ -4,7 +4,7 @@
 .SYNOPSIS Self-Healing PSSA Gate.
 .DESCRIPTION Check: scan+report. Fix: auto-fix BOM+switch defaults. Trend: compare vs baseline.
 #>
-[CmdletBinding()]param(
+[CmdletBinding(SupportsShouldProcess=$true)]param(
 [Parameter(Position=0)][ValidateSet('Check','Fix','Trend','Incremental')][string]$Mode='Check',
 [string]$Path=(Get-Location).Path,[switch]$Quiet,
 [string]$BaselineFile=(Join-Path $Path 'docs/metricas/pssa-baseline.json'))

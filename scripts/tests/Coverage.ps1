@@ -14,7 +14,7 @@
     Addresses AUDIT-gentleman-agent-gh.md Section 5.2 gap:
     "Coverage tracking (-coverprofile) -- ABSENT".
 #>
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess=$true)]
 param(
     [string]$TestPath = './scripts/tests/*.Tests.ps1',
     [string]$CoverageRootPath = './scripts',

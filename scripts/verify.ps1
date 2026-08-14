@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Unified verify profiles E1/E2/E3 -- runnable checks for triple-verify gates.

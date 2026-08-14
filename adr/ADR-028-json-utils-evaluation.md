@@ -1,0 +1,13 @@
+# ADR-028: json-utils — evaluación y elección de enfoque (G1)
+
+- **Status**: Accepted · **Date**: 2026-08-13 · **Type**: bugfix/PS-semantics
+- **Context**: G1 — PowerShell `ConvertTo-Json` desenvuelve arrays de 1 elemento a string (`skills.paths: [".agents/skills"]` → `"paths": ".agents/skills"`), rompiendo la serialización de config en `sync-vmk.ps1:157` y el deep-clone en `use-gentleman.ps1:106`. ADR-003 documenta el array unwrapping SOLO para `function returns` (fix con `@(...)` en call-sites), NO para serialización `ConvertTo-Json`.
+- **Decision**: **Enfoque A (Minimal)** — extraer `Get-DeepClone` (PSSerializer `Serialize`/`Deserialize`, conserva arrays) + `ConvertTo-JsonSafe` (regex `[regex]::Replace` para `"paths"`) a `scripts/lib/json-utils.ps1`; importar en `sync-vmk.ps1` y `use-gentleman.ps1`.
+- **Alternatives evaluadas**:
+  - **A (Minimal)** — +15 líneas, bajo riesgo, testeable aislado. Solo fixa `skills.paths`, no generaliza. **GANADOR** por metric hierarchy (correctness Bajo) y como dependencia de G2/G3.
+  - **B (Module)** — clase `[JsonConfig]` con `.Clone()/.ToJson()/.Validate()`, reemplazo grep-all. +200 líneas, mayor surface area. Rechazado: overkill para 2 call-sites.
+  - **C (Defensive)** — `ConvertFrom-JsonStrict` con type assertions post-deserialize. Máxima prevención pero overhead en cada load. Rechazado: validación se delega a G2 (ConfigValidator).
+- **Benchmark (§0.7, commit `a378b36d`)**: 10 runs `Measure-Command { sync-vmk.ps1 -DryRun }`. Correctness 0/10 → **10/10 arrays preservados**. Mediana 7.3ms → 8.6ms (overhead ~1.3ms, aceptable). Baseline estadístico persistido en `benchmark-baseline.json` (`2e966e0b`, Count=10, Median=139.7ms, IQR=40.7 — baseline del sync completo, no solo del fix).
+- **Tests**: `scripts/tests/json-utils.Tests.ps1` — **8 tests, 8/8 PASS** (verificado ejecutando Pester 2026-08-13). *Nota de trazabilidad: el mensaje del commit `a378b36d` declara "10 tests"; el archivo real contiene 8 bloques `It` — el conteo verificado es 8.*
+- **Consequences**: `sync-vmk.ps1` y `use-gentleman.ps1` consumen `ConvertTo-JsonSafe`/`Get-DeepClone`; single-element arrays preservados en salida. G2 (ADR Ciclo 3) añadirá `Test-SkillsPaths` para prevenir regresión a nivel config. Sin cambios de API pública (funciones nuevas, aditivo).
+- **Refs**: ADR-003 (array unwrapping en returns); `scripts/lib/json-utils.ps1`; `scripts/tests/json-utils.Tests.ps1`; commits `a378b36d` + `2e966e0b`.

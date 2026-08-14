@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
   Downstream validation of CYCLE-3 skills: delivery-harness, chained-pr, subagent-isolation.

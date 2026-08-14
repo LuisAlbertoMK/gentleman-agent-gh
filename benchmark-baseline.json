@@ -21,6 +21,13 @@
     "WhenToUsePct": 98.7,
     "TotalSkillLines": 4576
   },
-  "commit": "61ef3513",
-  "timestamp": "2026-08-04T11:35:33.9535675-06:00"
+  "stats": {
+    "Count": 10,
+    "Median": 139.7,
+    "Q1": 122.6,
+    "Q3": 163.3,
+    "IQR": 40.7
+  },
+  "commit": "a378b36d",
+  "timestamp": "2026-08-13T15:43:35.2503727-06:00"
 }

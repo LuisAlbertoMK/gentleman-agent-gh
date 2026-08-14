@@ -34,7 +34,7 @@
     .\e2e-test.ps1 -Url "http://localhost:3000" -Actions "click:#login" -Headed
 #>
 
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess=$true)]
 param(
     [Parameter(Mandatory = $true)]
     [string]$Url,

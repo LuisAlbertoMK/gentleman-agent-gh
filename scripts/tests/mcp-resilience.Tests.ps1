@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 # Tests for mcp-resilience.ps1 (Invoke-McpWithRetry timeout + circuit-breaker)
 # Dot-sourced (lib has no entrypoint) — resolve from repo scripts/lib via tests' parent dir
 . (Join-Path (Split-Path $PSScriptRoot -Parent) 'lib\mcp-resilience.ps1')

@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
   Smoke test: validates JsonFast.psm1 loads, handles all types, matches ConvertTo-Json output.

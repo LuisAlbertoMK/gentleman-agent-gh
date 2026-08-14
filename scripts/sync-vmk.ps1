@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
   Sync canonical config from gentleman-agent-gh to opencode-global.
@@ -26,6 +27,7 @@ $ErrorActionPreference = 'Stop'
 
 # ── Cross-platform helpers ──────────────────────────────────────────────
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
+. (Join-Path $PSScriptRoot 'lib' 'json-utils.ps1')
 
 $gentlemanRoot = Get-GentlemanRoot
 
@@ -59,7 +61,7 @@ function Sync-Config {
   # permission (from canonical)
   if ($canonical.permission) {
     $canonicalPerm = $canonical.permission | ConvertTo-Json -Depth 10 -Compress
-    $targetPerm = $target.permission | ConvertTo-Json -Depth 10 -Compress
+    $targetPerm = if ($target.PSObject.Properties['permission']) { $target.permission | ConvertTo-Json -Depth 10 -Compress } else { "null" }
     if ($canonicalPerm -ne $targetPerm) { $changes += "permission" }
   }
   # skills paths (from canonical, adjust for target)
@@ -117,7 +119,10 @@ function Sync-Config {
 
   # Apply changes (use Add-Member for properties that may not exist yet)
   if ($changes -contains "agent")      { $target.agent = $canonical.agent }
-  if ($changes -contains "permission") { $target.permission = $canonical.permission }
+  if ($changes -contains "permission") {
+    if ($target.PSObject.Properties['permission']) { $target.permission = $canonical.permission }
+    else { $target | Add-Member -Name "permission" -Value $canonical.permission -MemberType NoteProperty -Force }
+  }
   if ($changes -contains "skills")     {
     if ($target.PSObject.Properties['skills']) { $target.skills = $canonical.skills }
     else { $target | Add-Member -Name "skills" -Value $canonical.skills -MemberType NoteProperty }
@@ -154,8 +159,9 @@ function Sync-Config {
     $target | Add-Member -Name "mcp" -Value $canonical.mcp -MemberType NoteProperty -Force
   }
 
-  $target | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $TargetPath -Encoding UTF8
-  $results.Add(@{target=$Label; status="SYNCED"; detail="Updated: $($changes -join ', ')"})
+   $jsonStr = ConvertTo-JsonSafe -InputObject $target -Depth 10
+   $jsonStr | Set-Content -LiteralPath $TargetPath -Encoding UTF8
+   $results.Add(@{target=$Label; status="SYNCED"; detail="Updated: $($changes -join ', ')"})
 }
 
 # ── Execute ──────────────────────────────────────────────────────────────

@@ -68,7 +68,7 @@ Fusionar lo mejor de **gentleman-agent-gh** (framework multi-agente completo con
 │  │  + Native Review Authority (receipt, bounded)         │   │
 │  │  + Judgment Day (dual adversarial)                    │   │
 │  │                                                       │   │
-│  │  Modelo: claude-sonnet-4-6 (pago, intencional)        │   │
+│  │  Modelo: nemotron-3-ultra-free (gratis)               │   │
 │  └──────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -89,8 +89,8 @@ Fusionar lo mejor de **gentleman-agent-gh** (framework multi-agente completo con
 | `gentle-datascience` | mimo-v2.5-free | GH | bash: deny[17], edit: deny, write: deny | Pandas, SQL, estadisticas (read-only) |
 | `gentle-docs` | big-pickle | GH | bash: deny[17], edit: allow, write: allow | Documentacion tecnica |
 | `gentle-implementer` | deepseek-v4-flash-free | GH | bash: deny[17], edit: allow, write: allow | Ejecutor de planes |
-| `gentle-reviewer` | claude-sonnet-4-6 | GH+Orch | bash: ask, edit: deny, write: deny | Code review 4R + Native Authority |
-| `sdd-orchestrator` | claude-sonnet-4-6 | Orch | bash: deny[17], edit: allow, write: allow | Orquestacion pipeline SDD |
+| `gentle-reviewer` | nemotron-3-ultra-free | GH+Orch | bash: ask, edit: deny, write: deny | Code review 4R + Native Authority |
+| `sdd-orchestrator` | nemotron-3-ultra-free | Orch | bash: deny[17], edit: allow, write: allow | Orquestacion pipeline SDD |
 
 **Subagentes** (delegables via Task, read-only):
 - `gentle-deep-sub`, `gentle-codex-sub`, `gentle-quick-sub`, `gentle-implementer-sub`
@@ -470,7 +470,7 @@ gentle-agent-fused/
     },
     "gentle-reviewer": {
       "description": "Code review 4R + Native Authority (STRONG)",
-      "model": "claude-sonnet-4-6",
+      "model": "opencode/nemotron-3-ultra-free",
       "mode": "primary",
       "prompt": "{file:prompts/gentle-reviewer.md}\n\n{file:prompts/shared/_return-contract.md}",
       "permission": {
@@ -485,7 +485,7 @@ gentle-agent-fused/
     },
     "sdd-orchestrator": {
       "description": "Orquestacion pipeline SDD",
-      "model": "claude-sonnet-4-6",
+      "model": "opencode/nemotron-3-ultra-free",
       "mode": "primary",
       "prompt": "{file:prompts/sdd-orchestrator.md}",
       "permission": {

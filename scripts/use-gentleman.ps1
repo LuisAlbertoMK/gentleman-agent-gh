@@ -1,3 +1,4 @@
+[CmdletBinding(SupportsShouldProcess=$true)]
 ﻿#requires -Version 7
 <#
 .SYNOPSIS
@@ -103,12 +104,6 @@ function Out-Message($msg, $color) {
     if (-not $Json) { Write-Host $msg -ForegroundColor $color }
 }
 
-function Get-DeepClone {
-    param($InputObject)
-    if ($null -eq $InputObject) { return $null }
-    $InputObject | ConvertTo-Json -Depth 100 | ConvertFrom-Json
-}
-
 function Merge-ProjectSection {
     param($ChainSection, $ProjectSection)
     $merged = [ordered]@{}
@@ -123,6 +118,7 @@ function Merge-ProjectSection {
 
 # ── Template detection (shared module — SSoT mirror of generate-opencode-config.js) ──
 . (Join-Path (Join-Path $PSScriptRoot 'lib') 'template-detection.ps1')
+. (Join-Path $PSScriptRoot 'lib' 'json-utils.ps1')
 
 # ── Chain generation: opencode-base.json + permission-templates.json + agent-overrides.json ──
 function Convert-FileRefsToAbsolute {

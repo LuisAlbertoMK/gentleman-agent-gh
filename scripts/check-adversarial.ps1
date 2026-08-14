@@ -1,5 +1,6 @@
 #!/usr/bin/env pwsh
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
   Lightweight adversarial-breaker profile scan — commit-time gate.

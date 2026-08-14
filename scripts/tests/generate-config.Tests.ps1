@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+#requires -Version 7
 <#
 .SYNOPSIS
     Contract tests for scripts/lib/generate-opencode-config.js — TEMPLATE_MAP resolution,

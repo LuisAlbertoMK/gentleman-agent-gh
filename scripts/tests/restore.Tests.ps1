@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 
 BeforeAll {
     $scriptsRoot = Resolve-Path "$PSScriptRoot/.."

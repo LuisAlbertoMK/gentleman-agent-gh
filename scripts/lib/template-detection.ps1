@@ -117,7 +117,7 @@ $RoleKeywords = @{
 #>
 function Detect-Template {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseApprovedVerbs', '', Justification='Detect-Template mirrors detectTemplate() in generate-opencode-config.js for cross-file parity')]
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]

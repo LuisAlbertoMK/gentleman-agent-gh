@@ -75,6 +75,7 @@ function detectTemplate(agentName) {
 const TEMPLATE_MAP = {
   // Orchestrator — full bash allow + extra language denials
   'gentleman-vMK': 'orchestrator',
+  'gentle-orchestrator': 'sddorchestrator',
 
   // Read-only specialists — bash deny, no write/edit
   'gentleman-security': 'readonly',
@@ -162,7 +163,7 @@ try {
 // --- Deep clone and sort keys in permission objects ---
 function sortPermKeys(perm, agentName) {
   // Use agent-specific key order if available, otherwise standard
-  const keyOrder = agentName === 'sdd-orchestrator' ? SDD_ORCH_PERM_ORDER : STANDARD_PERM_ORDER;
+  const keyOrder = (agentName === 'sdd-orchestrator' || agentName === 'gentle-orchestrator') ? SDD_ORCH_PERM_ORDER : STANDARD_PERM_ORDER;
   const sorted = {};
   for (const key of keyOrder) {
     if (perm[key] !== undefined) sorted[key] = perm[key];
@@ -219,6 +220,8 @@ for (const [agentName, agentDef] of Object.entries(base.agent)) {
   let keyOrder;
   if (agentName === 'sdd-orchestrator') {
     keyOrder = ['description', 'model', 'mode', 'permission', 'prompt'];
+  } else if (agentName === 'gentle-orchestrator') {
+    keyOrder = ['description', 'model', 'mode', 'permission', 'prompt', 'tools'];
   } else {
     keyOrder = ['description', 'model', 'hidden', 'mode', 'prompt', 'permission', 'tools'];
   }
@@ -251,7 +254,7 @@ console.log(`  Reviewer:         ${stats.reviewer} agent(s)`);
 
 // --- Serialize ---
 console.log('[3/5] Serializing output...');
-const output = JSON.stringify(base, null, 2);
+const output = JSON.stringify(base);
 
 // --- Validate or write ---
 if (VALIDATE) {

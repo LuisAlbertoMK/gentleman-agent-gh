@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 # Pester 5 tests for scripts/check-backlog-integrity.ps1
 #
 # Hermetic strategy: each test builds a crafted CYCLE.md inside a scratch

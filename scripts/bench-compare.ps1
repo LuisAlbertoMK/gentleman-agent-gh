@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Benchmark trend — time-series aggregation of benchmarks/*.json + pinned baseline.
