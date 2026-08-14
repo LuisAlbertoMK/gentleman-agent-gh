@@ -1,7 +1,7 @@
 ---
 name: analysis-mode
-description: "Trigger: !analisis, !analysis, multi-agent analysis. Read-only 4-phase pipeline."
-triggers: "!analisis, !analysis, analysis mode, multi-agent analysis, smart analysis"
+description: "Trigger: !analisis, !analysis, multi-agent analysis. Read-only 4-phase pipeline. Supports --meta for process/workflow analysis (bypasses scope guard)."
+triggers: "!analisis, !analysis, !analisis --meta, analysis mode, multi-agent analysis, smart analysis, process analysis"
 ---
 
 ## When to Use
@@ -11,7 +11,8 @@ Trigger: !analisis, !analysis, multi-agent analysis. Read-on
 
 **Loading**: `skill(name="analysis-mode")`. Fail→`Read` this file(project→global). External: copy to `<project>/.agents/skills/analysis-mode/`.
 
-**SCOPE GUARD**: `git diff --name-only HEAD~1|Measure-Object -Line`. <10 files→HALT→load `code-review-agent`. Do NOT continue.
+**SCOPE GUARD**: `git diff --name-only HEAD~1|Measure-Object -Line`. <10 files→HALT→load `code-review-agent`.
+- **EXCEPTION**: If `--meta` flag is passed (`!analisis --meta`), bypass scope guard — analysis is about WORK PROCESS, not code changes. Skip file-count check, focus on workflow efficiency, communication, tooling, and protocol adherence.
 
 **GATE**: Forbidden: `ctx_execute`/`Write`/`Edit`/`Bash`(except git status/diff/log)/`skill`(except project-mapper). Allowed: `Read`/`Grep`/`Glob`/`webfetch`/`websearch`/`project-mapper`. Output→`docs/mejoras/**`. Forbidden→log `BLOCKED:[tool][reason]`, continue.
 

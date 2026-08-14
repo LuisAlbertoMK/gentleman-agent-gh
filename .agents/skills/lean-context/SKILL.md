@@ -69,10 +69,18 @@ Crosses 80%? → CAVEMAN lite. Under 10 turns remaining? → CAVEMAN full.
 
 | Situation | Level |
 |-----------|-------|
-| Simple Q | LEAN |
+| Simple Q (status, confirmation, yes/no) | CAVEMAN ultra |
+| Process update (what was done) | LEAN |
+| Simple technical Q | LEAN |
 | Context >40% | ULTRA |
 | <10 turns left | CAVEMAN lite |
 | RED zone | CAVEMAN ultra |
+
+## USER RESPONSE POLICY
+
+**Default for USER-facing responses**: CAVEMAN for yes/no/status, LEAN for process updates.
+**Protocol outputs** (analysis tables, verification results, recommendations): remain detailed per protocol.
+**Trigger words for user-facing LEAN**: "listo?", "funcionó?", "status?", "ok?", "gracias", "gg".
 
 ## Refs
 karpathy-loop · context-watchdog · execution-mode · skill-graph
