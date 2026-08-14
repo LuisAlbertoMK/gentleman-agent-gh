@@ -1,5 +1,4 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
 
 BeforeAll {
     $scriptsRoot = Resolve-Path "$PSScriptRoot/.."
@@ -132,3 +131,4 @@ Describe "forge-rollback - Error handling" {
             Should -Throw
     }
 }
+

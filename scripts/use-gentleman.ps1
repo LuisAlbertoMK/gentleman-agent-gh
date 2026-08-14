@@ -1,4 +1,3 @@
-[CmdletBinding(SupportsShouldProcess=$true)]
 ﻿#requires -Version 7
 <#
 .SYNOPSIS
@@ -510,3 +509,4 @@ if ($Json) {
     Write-Host "  Secure : shared-deny-rules.json re-asserted (global + per-agent) + write-deny ~/.config/opencode/**" -ForegroundColor DarkGray
     Write-Host "═══════════════════════════════════════════════" -ForegroundColor Cyan
 }
+

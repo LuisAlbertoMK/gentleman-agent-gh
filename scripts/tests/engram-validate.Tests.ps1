@@ -1,5 +1,4 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Tests for Engram content validation — runs IN-PROCESS against
@@ -156,3 +155,4 @@ Describe 'engram-validate.ps1 — Pipeline mode' {
         $result | Should -Be $null
     }
 }
+

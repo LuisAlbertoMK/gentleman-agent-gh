@@ -1,5 +1,4 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Integration tests for validate-write-scope.ps1 — tests the ACTUAL script against temp git repos.
@@ -127,3 +126,4 @@ Describe "Parameter validation" {
         $result.status | Should -Match "CLEAN|error"
     }
 }
+

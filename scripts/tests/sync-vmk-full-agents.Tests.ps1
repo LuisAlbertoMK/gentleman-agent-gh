@@ -1,5 +1,4 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Pester tests for sync-vmk.ps1 — G3 full agent sync.

@@ -1,5 +1,4 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Tests for scripts/verify.ps1 (E1/E2/E3 profiles) — uses THROWAWAY temp repos,
@@ -98,3 +97,4 @@ Describe 'verify.ps1 — JSON contract' {
         $r.allPassed | Should -BeOfType [bool]
     }
 }
+

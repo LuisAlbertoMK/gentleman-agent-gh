@@ -1,5 +1,5 @@
-[CmdletBinding(SupportsShouldProcess=$true)]
 ﻿#requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Learning statistics — pattern occurrences and trends over time.
@@ -208,3 +208,4 @@ if ($Json) {
 $learningEntries = $errorEntries = $null
 $sectionCounts = $dateTrend = $patternCounts = $null
 [GC]::Collect()
+

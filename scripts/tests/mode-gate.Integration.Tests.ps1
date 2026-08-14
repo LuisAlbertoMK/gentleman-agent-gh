@@ -1,5 +1,4 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Integration tests for mode-gate.ps1 — tests the ACTUAL script.
@@ -199,3 +198,4 @@ Describe "Mode gate — edge cases" {
         }
     }
 }
+

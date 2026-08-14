@@ -1,5 +1,4 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
 
 BeforeAll {
     # Standalone reimplementation of the script's core glob-to-regex conversion
@@ -153,3 +152,4 @@ Describe 'Parameter validation logic' {
         $p = ''; (-not $p -or $p.Trim() -eq '') | Should -BeTrue
     }
 }
+

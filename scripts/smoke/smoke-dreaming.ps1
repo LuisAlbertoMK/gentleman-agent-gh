@@ -1,5 +1,5 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
+
 
 <#
 .SYNOPSIS
@@ -24,3 +24,4 @@ if (Test-Path $Target) {
     Write-Host "  -> not found: $Target" -ForegroundColor DarkGray
     exit 1
 }
+

@@ -1,5 +1,4 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Tests for scripts/opencode-config/expand-config.ps1 — runs against a THROWAWAY
@@ -113,3 +112,4 @@ Describe 'expand-config.ps1 — edge cases' {
             Should -Throw -ExpectedMessage '*opencode.json not found*'
     }
 }
+

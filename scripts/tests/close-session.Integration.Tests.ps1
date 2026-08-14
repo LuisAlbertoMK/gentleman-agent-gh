@@ -1,5 +1,5 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
+
 <#
 .SYNOPSIS
     Non-destructive integration tests for close-session.ps1.
@@ -125,3 +125,4 @@ Describe "close-session — Integration: non-Quiet output format" {
         $jsonOut.goal | Should -Be "TestBranchGoal"
     }
 }
+

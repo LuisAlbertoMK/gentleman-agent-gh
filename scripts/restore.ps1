@@ -1,5 +1,5 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
+
 
 <#
 .SYNOPSIS
@@ -41,3 +41,4 @@ Push-Location $cfg;try{
     git checkout "$resolved" -- . 2>$null
     if($?){Write-Host "[ok] Restored" -ForegroundColor Green}else{Write-Host "[err] Failed" -ForegroundColor Red}
 }finally{Pop-Location}
+

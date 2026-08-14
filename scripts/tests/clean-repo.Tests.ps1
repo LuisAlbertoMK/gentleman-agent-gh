@@ -1,5 +1,5 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
+
 <#
 .SYNOPSIS
     Tests for scripts/clean-repo.ps1 — uses a THROWAWAY temp git repo,
@@ -68,3 +68,4 @@ Describe 'clean-repo.ps1 — apply path' {
         (Test-Path -LiteralPath (Join-Path $script:repoDir 'tracked.txt')) | Should -Be $true
     }
 }
+

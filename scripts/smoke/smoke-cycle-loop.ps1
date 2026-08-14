@@ -1,5 +1,5 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
+
 
 <#
 .SYNOPSIS
@@ -33,3 +33,4 @@ if ($hasFreshness) {
     Write-Host '  -> "freshness" not found in CYCLE.md' -ForegroundColor DarkGray
     exit 1
 }
+

@@ -1,5 +1,5 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
+
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
@@ -187,3 +187,4 @@ if ($Audit) {
         $findings.PSForEach({ Write-Host "  • $_" })
     }
 }
+

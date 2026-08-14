@@ -1,5 +1,5 @@
-[CmdletBinding(SupportsShouldProcess=$true)]
 ﻿#requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Mode-aware agent routing — resolves the correct agent variant for delegation.
@@ -118,3 +118,4 @@ if ($Json) {
 Write-Output "🔀 → $TargetAgent | $note"
 
     return $TargetAgent
+

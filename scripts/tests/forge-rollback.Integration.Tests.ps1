@@ -1,5 +1,4 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Integration tests for forge-rollback.ps1 — tests the ACTUAL script with temp fixture data.
@@ -87,3 +86,4 @@ Describe "forge-rollback — Integration: error handling" {
             Should -Throw
     }
 }
+

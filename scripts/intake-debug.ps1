@@ -1,5 +1,5 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
+
 Set-StrictMode -Version Latest
 <#
 .SYNOPSIS
@@ -29,3 +29,4 @@ Set-StrictMode -Version Latest
         $host.SetShouldExit(1)
     }
 } 2>&1
+

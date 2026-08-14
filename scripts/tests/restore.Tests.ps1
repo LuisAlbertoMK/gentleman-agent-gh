@@ -1,5 +1,4 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
 
 BeforeAll {
     $scriptsRoot = Resolve-Path "$PSScriptRoot/.."
@@ -141,3 +140,4 @@ Describe "restore.ps1 - Checkout uses resolved hash" {
         $global:checkoutTarget | Should -Match '^[a-f0-9]{40}$'
     }
 }
+

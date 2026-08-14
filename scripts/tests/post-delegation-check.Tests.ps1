@@ -1,5 +1,4 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Tests for C7: post-delegation-check.ps1 — combines git-diff + write-scope + empty-output detection.
@@ -28,3 +27,4 @@ Describe "post-delegation-check.ps1 — basic validation (C7)" {
         $json.PSObject.Properties.Name -contains 'checks' | Should -BeTrue
     }
 }
+

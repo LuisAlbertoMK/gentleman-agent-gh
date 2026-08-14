@@ -21,6 +21,7 @@
 $TemplateMap = @{
     # Orchestrator
     'gentleman-vMK' = 'orchestrator'
+    'gentle-orchestrator' = 'sddorchestrator'
     'gentleman-vMK-semi' = 'semi'
 
     # Read-only specialists

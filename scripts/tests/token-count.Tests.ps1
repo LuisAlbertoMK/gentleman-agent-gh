@@ -1,5 +1,4 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Pester tests for token-count.ps1 — unified chars/3.5 heuristic divisor (R7).
@@ -33,3 +32,4 @@ Describe 'R7: heuristic divisor defaults to chars/3.5' {
         @($out)[0] | Should -Be 10
     }
 }
+

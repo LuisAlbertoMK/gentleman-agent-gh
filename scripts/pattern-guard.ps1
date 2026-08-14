@@ -1,5 +1,5 @@
-[CmdletBinding(SupportsShouldProcess=$true)]
 ﻿#requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     LAZY detection: check current code for cross-project pattern matches.
@@ -177,3 +177,4 @@ if ($Json) {
         Write-Host "[CLEAN] No pattern matches detected" -ForegroundColor Green
     }
 }
+

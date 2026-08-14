@@ -1,5 +1,5 @@
-[CmdletBinding(SupportsShouldProcess=$true)]
-﻿#requires -Version 7
+#requires -Version 7
+
 
 <#
 .SYNOPSIS
@@ -740,3 +740,5 @@ Add-Dimension "SG" $sgScore @{
     days_old = $sgDaysOld
     last_updated = $sgLastUpdated
 } "SSoT age: ${sgDaysOld}d"
+
+

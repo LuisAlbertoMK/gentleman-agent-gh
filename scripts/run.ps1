@@ -1,6 +1,6 @@
-#!/usr/bin/env pwsh
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
+#!/usr/bin/env pwsh
+
 Set-StrictMode -Version Latest
 param([switch]$Quiet,[string[]]$Args)
 $ErrorActionPreference = 'Continue'
@@ -51,3 +51,5 @@ try {
     Write-Error "Script execution failed: $_"
     exit 1
 }
+
+

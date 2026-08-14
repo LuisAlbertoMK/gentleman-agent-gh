@@ -1,5 +1,4 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
 
 function Get-DeepClone {
     param($InputObject)
@@ -16,3 +15,4 @@ function ConvertTo-JsonSafe {
     $json = [regex]::Replace($json, '"paths"\s*:\s*"([^"]+)"', '"paths": ["$1"]')
     $json
 }
+

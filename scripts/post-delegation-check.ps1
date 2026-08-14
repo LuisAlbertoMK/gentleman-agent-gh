@@ -1,5 +1,5 @@
-[CmdletBinding(SupportsShouldProcess=$true)]
 ﻿#requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Post-delegation verification — combines git-diff + write-scope + empty-output
@@ -180,3 +180,4 @@ if ($Quiet) {
 
 $ec = if ($results.passed) { 0 } else { 1 }
 exit $ec
+

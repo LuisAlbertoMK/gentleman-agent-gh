@@ -1,5 +1,5 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
+
 <#
 .SYNOPSIS
     Gentleman-ize a project — alias for use-gentleman.ps1.
@@ -15,3 +15,4 @@
     gentleman-init -TargetDir ..\my-api -DefaultAgent gentleman-quick -Json -Yes
 #>
 & (Join-Path $PSScriptRoot 'use-gentleman.ps1') @args
+

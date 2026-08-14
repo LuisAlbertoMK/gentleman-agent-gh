@@ -1,5 +1,5 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
+
 <#
 .SYNOPSIS
     Tests for C8: ctx-watchdog.ps1 — context-window zone detection + compression recommendation.
@@ -60,3 +60,4 @@ Describe "ctx-watchdog.ps1 — script execution (C8)" {
         $json.level | Should -Be 'L2'
     }
 }
+

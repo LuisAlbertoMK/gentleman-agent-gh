@@ -1,5 +1,5 @@
-[CmdletBinding(SupportsShouldProcess=$true)]
 ﻿#requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
   One-click global setup for opencode. Applies all assets, configures MCPs, ensures skills are synced.
@@ -171,3 +171,4 @@ if($Json){
     Write-Output "Synced: $($s['SYNCED']) | OK: $($s['OK']) | Failed: $($s['FAIL'])"
     Write-Output "═══════════════════════════════════════"
 }
+

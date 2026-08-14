@@ -1,5 +1,4 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
 param([switch]$Quiet)
 
 BeforeAll {
@@ -90,3 +89,4 @@ Describe 'ConvertTo-JsonSafe' {
         }
     }
 }
+
