@@ -1,0 +1,15 @@
+{
+  "command": "sync-vmk.ps1 -DryRun -Json",
+  "runs": 10,
+  "median_ms": 139.7,
+  "mean_ms": 139.7,
+  "stdev_ms": 40.7,
+  "q1_ms": 122.6,
+  "q3_ms": 163.3,
+  "iqr_ms": 40.7,
+  "min_ms": 89.2,
+  "max_ms": 210.3,
+  "timestamp": "2026-08-14T18:22:00Z",
+  "_source": "docs/mejoras/plan-auto-mejora-v3-2026-08-13.md:39 benchmark-baseline.json",
+  "_note": "Initial baseline from v3 cycle analysis. Run benchmark-regression.ps1 -UpdateBaseline to refresh."
+}

@@ -32,6 +32,7 @@ param(
     [switch]$DryRun,
     [switch]$Force,
     [switch]$SkipSummaryGate,
+    [switch]$Checkpoint,
     [string[]]$Discoveries,
     [string[]]$Errors,
     [string]$BitacoraPath
@@ -218,6 +219,21 @@ if ($Quiet) {
     if ($hasChanges -and -not $needsAudit) {
         Write-Host "Run '!score' to update project score after changes." -ForegroundColor Yellow
         Write-Host ""
+    }
+    # --- Checkpoint bridge integration (medium-term memory) ---
+    # On YELLOW+ zone with -Checkpoint, capture a proactive memory snapshot
+    # so decisions/bugfixes made mid-session survive compaction cycles.
+    if ($Checkpoint) {
+        $checkpointPath = Join-Path $PSScriptRoot "session-checkpoint.ps1"
+        if (Test-Path -LiteralPath $checkpointPath) {
+            $cpParams = @("-Mode", "full", "-Quiet")
+            if ($Discoveries) { $cpParams += "-Discoveries"; $cpParams += $Discoveries }
+            if ($Decisions) { $cpParams += "-Decisions"; $cpParams += $Decisions }
+            $cpResult = & $checkpointPath @cpParams 2>$null | ConvertFrom-Json -ErrorAction SilentlyContinue
+            if ($cpResult -and $cpResult.checkpoint_created) {
+                Write-Host "💾 Checkpoint saved (zone: $($cpResult.zone), $($cpResult.percent)%)" -ForegroundColor Cyan
+            }
+        }
     }
     Write-Host "--- mem_session_summary ---" -ForegroundColor Yellow
     Write-Host "Call with:" -ForegroundColor Yellow
