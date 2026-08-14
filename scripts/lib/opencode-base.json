@@ -228,6 +228,7 @@
     "mcp_timeout": 60000
   },
   "compaction": {
+    "auto": true,
     "prune": true,
     "reserved": 8000
   },
@@ -691,7 +692,8 @@
   "plugin": [
     "context-mode",
     "opencode-ralph-loop",
-    "opencode-personality"
+    "opencode-personality",
+    "opencode-token-optimizer"
   ],
   "tool_output": {
     "max_bytes": 4096,
