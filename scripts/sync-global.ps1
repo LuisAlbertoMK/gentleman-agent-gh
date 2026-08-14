@@ -18,7 +18,13 @@ $srcSkills = Resolve-Path "$PSScriptRoot\..\.agents\skills" -EA Stop
 $dstSkills = Join-Path (Get-GlobalConfigDir) "skills"
 $srcScripts = Resolve-Path "$PSScriptRoot" -EA Stop
 $dstScripts = Join-Path (Get-GlobalConfigDir) "scripts"
-$globalCfg = Join-Path (Get-GlobalConfigDir) "opencode.jsonc"
+$globalDir = Get-GlobalConfigDir
+$globalJsonc = Join-Path $globalDir "opencode.jsonc"
+$globalJson  = Join-Path $globalDir "opencode.json"
+# Prefer existing global config file — detect .json or .jsonc
+if (Test-Path $globalJson) { $globalCfg = $globalJson }
+elseif (Test-Path $globalJsonc) { $globalCfg = $globalJsonc }
+else { $globalCfg = $globalJson }
 $projectCfg = Resolve-Path "$PSScriptRoot\..\opencode.json" -EA Stop
 $report = @{timestamp=(Get-Date -Format "o");steps=@{};errors=@();warnings=@()}
 
@@ -79,7 +85,7 @@ Write-Step "Global config" {
 if(-not $NoAgentSync){Write-Step "Agent sync" {
     if(-not(Test-Path $globalCfg)){throw "Global config not found -- run step 3 first"}
     try{$proj=Get-Content $projectCfg -Raw|ConvertFrom-Json;$glob=Get-Content $globalCfg -Raw|ConvertFrom-Json}catch{throw "Parse error: $_"}
-    $agentNames=@($proj.agent.PSObject.Properties.Name | Where-Object { $_ -like 'gentleman-*' })
+    $agentNames=@($proj.agent.PSObject.Properties.Name | Where-Object { $_ -like 'gentleman-*' -or $_ -like 'gentle-*' -or $_ -like 'sdd-*' })
     if($glob.PSObject.Properties.Match('agent').Count-eq 0){$glob|Add-Member -Name agent -Value @{} -MemberType NoteProperty -Force}
     if($proj.PSObject.Properties.Match('agent').Count-eq 0){Write-Warning "  No project agents";$report.steps["agent_sync"]=@{added=0;note="no project agents"}}
     else{$added=0;$updated=0; foreach($n in $agentNames){$sp=$proj.agent.PSObject.Properties[$n]; if($null-eq$sp){continue};$gh=$glob.agent.PSObject.Properties.Match($n).Count-gt 0;$glob.agent|Add-Member -Name $n -Value $sp.Value -MemberType NoteProperty -Force;if($gh){$updated++}else{$added++}}
