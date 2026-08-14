@@ -1,4 +1,5 @@
 {
+  "model": "opencodec/big-pickle",
   "skills": {
     "paths": [
       ".agents/skills"
