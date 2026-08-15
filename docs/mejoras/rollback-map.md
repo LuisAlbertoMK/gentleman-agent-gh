@@ -72,4 +72,26 @@ del HEAD.async-result.json
 
 ---
 
+## Branch: experimento/mini-orchestrator-loop (Phases 2-3)
+
+- **Base**: commit Phase 1 `256d338c` en `experimento/mini-orchestrator-async`
+- **Scope**: BabyAGI loop + self-improvement trigger (supercedes Phase 1 branch)
+- **Files**: `scripts/babyagi-loop.ps1` (new), `tests/babyagi-loop.Tests.ps1` (new), `scripts/auto-improve.ps1` (new), `tests/auto-improve.Tests.ps1` (new), `SKILL.md` (modified, v1.1->1.2), `mejora-log.md` (Phase 2+3 entries)
+
+### Commits
+| Commit | Mensaje | Rollback |
+|--------|---------|----------|
+| `ae22138c` | feat(mini-orchestrator): async + babyagi loop (Phase 1+2 combined) | `git revert ae22138c` |
+| `127eec5b` | feat(auto-improve): self-improvement trigger (Phase 3) | `git revert 127eec5b` |
+
+### Rollback completo
+```bash
+git reset --hard main  # main is at b90458fb; this branch has 2 commits ahead
+# OR surgical:
+git revert 127eec5b  # Phase 3 only
+git revert ae22138c  # Phase 1+2 only
+```
+
+---
+
 *Generated: 2026-08-13 · Protocol: plan-auto-mejora-v3 §4 (rollback map)*
