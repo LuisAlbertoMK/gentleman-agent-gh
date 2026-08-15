@@ -2,7 +2,7 @@
 name: mini-orchestrator
 description: "BabyAGI-style loop (Execution→Task Creation→Prioritization) with async fire-and-forget handoff"
 author: Gentle AI
-version: 1.1.0
+version: 1.2.0
 mode: primary
 delegate_only: false
 priority: standard
@@ -53,6 +53,18 @@ if (-not $r.passed) { # FAIL — review before proceeding }
 ```
 
 `monitor-subagent.ps1` polls (15s default) running check-subagent-output + validate-write-scope. Writes result when git status stable (2 identical polls) or 300s deadline.
+
+## Implementation
+
+| Script | Phase | Purpose |
+|---|---|---|
+| `scripts/post-delegation-check.ps1` | Phase 1 | `-Async` switch + fail-closed + Launch-AsyncMonitor |
+| `scripts/monitor-subagent.ps1` | Phase 1 | Background polling monitor with convergence detection |
+| `scripts/babyagi-loop.ps1` | Phase 2 | BabyAGI loop: New-InitialTasks, Sort-TaskQueue, Invoke-TaskAsync, New-TasksFromResult |
+| `scripts/auto-improve.ps1` | Phase 3 | Self-improvement trigger: scan → task create → loop → verify |
+| `tests/babyagi-loop.Tests.ps1` | Phase 2 | 9 Pester tests (T1-T6 + fail-closed) |
+| `tests/post-delegation-async.Tests.ps1` | Phase 1 | 5 Pester tests (T1-T5) |
+| `adr/ADR-031-*` | Phase 1 | Decision record + E2E verification |
 
 ## Refs
 

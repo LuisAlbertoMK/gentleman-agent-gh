@@ -210,3 +210,33 @@ ALL CLEAR — 22/22 checks passed
 ### Pendiente
 - Fase 3: Self-improvement auto-trigger (score→diagnose→fix→verify loop)
 - Integrar con delivery-harness para multi-agent orchestration real
+
+---
+
+## Mini-Orchestrator — Self-Improvement Trigger (Phase 3)
+
+> **Rama**: `experimento/mini-orchestrator-loop` · **Fecha**: 2026-08-15
+
+**Objective**: Auto-trigger the BabyAGI loop when quality issues are detected. Implements score → diagnose → fix → verify.
+
+### Implementación
+
+| Archivo | Acción | Verificación |
+|---|---|---|
+| `scripts/auto-improve.ps1` | CREATE: Scan-Issues, New-ImprovementGoal, Start-AutoImprove | 4/4 tests pass |
+| `tests/auto-improve.Tests.ps1` | CREATE: 4 Pester tests (T1-T4) | ✅ 4/4 PASS |
+| `.jd-cleared/scripts_auto-improve.ps1` | CREATE: JD marker | ✅ PS-CI-03 compliant |
+| `.breaker-cleared/scripts_auto-improve.ps1` | CREATE: Breaker marker | ✅ allClean |
+
+### How it works
+1. **Score**: `Scan-Issues` scans for TODO/FIXME tags, long files (>200 lines)
+2. **Diagnose**: `New-ImprovementGoal` creates a goal string from issues
+3. **Fix**: `Start-AutoImprove` delegates to `babyagi-loop.ps1`
+4. **Verify**: BabyAGI loop + Phase 1 async result JSON
+
+### Guardrails
+- `#requires -Version 5.1`
+- Fail-closed: `-AllowedPaths` required
+- Test mode guard: `$env:BABYAGI_TEST_MODE`
+- Inherits all BabyAGI deny floor guards
+- No direct Start-Process/git/network calls
