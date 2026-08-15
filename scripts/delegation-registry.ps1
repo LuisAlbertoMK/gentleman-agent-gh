@@ -70,9 +70,17 @@ param(
     [string]$BaseRef = "HEAD",
     [string]$NewPrompt = "",
     [int]$TtlMinutes = 60,
+    [int]$TimeoutSeconds = 60,
+    [int]$MaxToolCalls = 25,
+    [string]$SubagentOutputFile = "",
     [string]$RepoRoot = "",
     [switch]$Quiet
 )
+
+# Document new params in header (inline, since .SYNOPSIS block is already written)
+if ($SubagentOutputFile -and -not $Quiet) {
+    Write-Debug "delegation-registry: -SubagentOutputFile '$SubagentOutputFile' stored"
+}
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
@@ -187,14 +195,17 @@ switch ($Action) {
         }
 
         $reg[$TaskId] = @{
-            registered    = (Get-Date -Format "o")
-            task_id       = $TaskId
-            base_ref      = $BaseRef
-            allowed_paths = @($AllowedPaths)
-            expected_files = @($ExpectedFiles)
-            status        = "pending"
-            prompt        = ""
-            re_prompts    = @()
+            registered         = (Get-Date -Format "o")
+            task_id            = $TaskId
+            base_ref           = $BaseRef
+            allowed_paths      = @($AllowedPaths)
+            expected_files     = @($ExpectedFiles)
+            timeout_seconds    = $TimeoutSeconds
+            max_tool_calls     = $MaxToolCalls
+            subagent_output    = $SubagentOutputFile
+            status             = "pending"
+            prompt             = ""
+            re_prompts         = @()
         }
         Set-RegistryData $reg
 
@@ -219,10 +230,24 @@ switch ($Action) {
             $reg[$TaskId] = $entry
             Set-RegistryData $reg
         }
+        # Compute budget tracking
+        $registered = if ($entry.registered) { [DateTime]$entry.registered } else { Get-Date }
+        $elapsedSeconds = (Get-Date) - $registered | Select-Object -ExpandProperty TotalSeconds
+        $timeoutSeconds = if ($entry.timeout_seconds) { $entry.timeout_seconds } else { 300 }
+        $budgetExceeded = $elapsedSeconds -gt $timeoutSeconds
+        $effectiveStatus = if ($budgetExceeded) { "timeout" } else { $entry.status }
         if ($Quiet) {
-            @{ status = $entry.status; task_id = $TaskId; registered = $entry.registered } | ConvertTo-Json -Compress
+            @{
+                status           = $effectiveStatus
+                task_id          = $TaskId
+                registered       = $entry.registered
+                budget_exceeded  = $budgetExceeded
+                elapsed_seconds  = [math]::Round($elapsedSeconds, 1)
+                timeout_seconds  = $timeoutSeconds
+            } | ConvertTo-Json -Compress
         } else {
-            Write-Output "[delegation-registry] $($TaskId): $($entry.status) (since $($entry.registered))"
+            $icon = if ($budgetExceeded) { "TIMEOUT" } else { "OK   " }
+            Write-Output "[$icon] budget-guard: $($TaskId) elapsed=$([math]::Round($elapsedSeconds,1))s / limit=$($timeoutSeconds)s"
         }
     }
 
@@ -235,32 +260,80 @@ switch ($Action) {
         }
         $entry = $reg[$TaskId]
 
-        # Run post-delegation-check with stored params (command-string approach
-        # mirrors the pattern used elsewhere — allows pwsh -Command with quoted args)
+        # Run post-delegation-check in a subprocess — it uses exit which would
+        # kill our process if invoked with & directly
         $pdcScript = Join-Path $RepoRoot 'scripts\post-delegation-check.ps1'
-        $cmd = "& '$pdcScript' -BaseRef '$($entry.base_ref)' -RepoRoot '$RepoRoot' -Quiet"
+        $resolveTimeout = if ($entry.timeout_seconds) { $entry.timeout_seconds } else { 30 }
+        $pwshExe = Join-Path $PSHOME 'pwsh'
+        if (-not (Test-Path $pwshExe)) { $pwshExe = "pwsh" }
+        $pdcArgs = "-NoProfile -File `"$pdcScript`" -BaseRef `"$($entry.base_ref)`" -RepoRoot `"$RepoRoot`" -Quiet -TimeoutSeconds $resolveTimeout"
         if ($entry.allowed_paths) {
-            $paths = ($entry.allowed_paths | ForEach-Object { "'" + ($_ -replace "'","''") + "'" }) -join ' '
-            $cmd += " -AllowedPaths $paths"
+            foreach ($p in @($entry.allowed_paths)) { $pdcArgs += " -AllowedPaths `"$p`"" }
         }
         if ($entry.expected_files) {
-            $files = ($entry.expected_files | ForEach-Object { "'" + ($_ -replace "'","''") + "'" }) -join ' '
-            $cmd += " -ExpectedFiles $files"
+            foreach ($f in @($entry.expected_files)) { $pdcArgs += " -ExpectedFiles `"$f`"" }
         }
-        $cmd += " -TimeoutSeconds 30"
+        if ($entry.subagent_output) {
+            $pdcArgs += " -SubagentOutputFile `"$($entry.subagent_output -replace '"','\"')`""
+        }
 
-        $result = & pwsh -NoProfile -Command $cmd 2>&1
+        $resolveStart = Get-Date
+        $result = try {
+            $psi = [System.Diagnostics.ProcessStartInfo]::new($pwshExe, $pdcArgs)
+            $psi.RedirectStandardOutput = $true
+            $psi.RedirectStandardError  = $true
+            $psi.UseShellExecute = $false
+            $psi.WorkingDirectory = $RepoRoot
+            $proc = [System.Diagnostics.Process]::Start($psi)
+            $completed = $proc.WaitForExit($resolveTimeout * 1000)
+            if (-not $completed) { $proc.Kill(); @("TIMEOUT after $resolveTimeout s") }
+            else {
+                $out = @()
+                $stdout = $proc.StandardOutput.ReadToEnd()
+                $stderr = $proc.StandardError.ReadToEnd()
+                if ($stdout) { $out += ($stdout -split "`n") }
+                if ($stderr)  { $out += ($stderr  -split "`n") }
+                $out
+            }
+        } catch {
+            @($_ | Out-String)
+        }
         $jsonLine = $result | Where-Object { $_ -match '^\{' } | Select-Object -First 1
         $json = $jsonLine | ConvertFrom-Json -ErrorAction SilentlyContinue
 
-        # Update entry status using direct hashtable assignment (not Add-Member)
+        # If still no JSON, the subprocess failed — build a fallback quality object
+        if (-not $json) {
+            $json = [PSCustomObject]@{
+                passed          = $false
+                contract_valid  = $false
+                file_count      = 0
+                checks          = @([PSCustomObject]@{ name = "post_deployment"; passed = $false; detail = "resolve: no JSON from pdc" })
+                changed_files   = @()
+            }
+        }
+
+        # Update entry status
         $entry.status = if ($json -and $json.passed) { "resolved" } else { "failed" }
         $entry.resolved = (Get-Date -Format "o")
         $reg[$TaskId] = $entry
         Set-RegistryData $reg
 
+        # Compute budget tracking
+        $registered = if ($entry.registered) { [DateTime]$entry.registered } else { Get-Date }
+        $elapsedSeconds = (Get-Date) - $registered | Select-Object -ExpandProperty TotalSeconds
+        $budgetExceeded = $elapsedSeconds -gt $resolveTimeout
+
         if ($Quiet) {
-            @{ status = $entry.status; task_id = $TaskId; passed = if ($json) { $json.passed } else { $false } } | ConvertTo-Json -Compress
+            # Build quality object from post-delegation-check + budget tracking
+            $quality = if ($json) { $json } else { [PSCustomObject]@{ passed = $false } }
+            $quality | Add-Member -NotePropertyName budget_exceeded -NotePropertyValue $budgetExceeded -ErrorAction SilentlyContinue
+            $quality | Add-Member -NotePropertyName resolve_duration_s -NotePropertyValue ([math]::Round(((Get-Date) - $resolveStart).TotalSeconds, 1)) -ErrorAction SilentlyContinue
+            @{
+                status    = $entry.status
+                task_id   = $TaskId
+                passed    = if ($json) { $json.passed } else { $false }
+                quality   = $quality
+            } | ConvertTo-Json -Compress -Depth 5
         } else {
             $icon = if ($entry.status -eq "resolved") { "OK  " } else { "FAIL" }
             Write-Output "[$icon] delegation-registry: $TaskId resolved -> $($entry.status)"
