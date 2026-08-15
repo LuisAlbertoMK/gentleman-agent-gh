@@ -47,4 +47,29 @@ git merge-base --is-ancestor 0d88467c main && echo "main clean"
 
 ---
 
+## Branch: `experimento/mini-orchestrator-async`
+
+- **Base**: main HEAD `b90458fb`
+- **Scope**: async fire-and-forget delegation (BabyAGI pattern foundation)
+- **Files**: `scripts/post-delegation-check.ps1` (modify), `scripts/monitor-subagent.ps1` (new), `tests/post-delegation-async.Tests.ps1` (new), `.agents/skills/mini-orchestrator/SKILL.md` (new), `adr/ADR-031-*` (new), `SKILLS-INDEX.md` (count 88→89)
+
+### Commits
+| Commit | Mensaje | Rollback |
+|--------|---------|----------|
+| (pending) | feat(mini-orchestrator): async fire-and-forget delegation | `git checkout -- scripts/post-delegation-check.ps1` (reverts mod) + `git rm -f scripts/monitor-subagent.ps1 tests/post-delegation-async.Tests.ps1 .agents/skills/mini-orchestrator/SKILL.md adr/ADR-031-mini-orchestrator-async-delegation.md` + restore SKILLS-INDEX.md to 88 |
+
+### Rollback completo (surgical, no afecta otros branches)
+```bash
+git checkout -- scripts/post-delegation-check.ps1 SKILLS-INDEX.md
+git rm -f scripts/monitor-subagent.ps1 tests/post-delegation-async.Tests.ps1
+git rm -f .agents/skills/mini-orchestrator/SKILL.md
+git rm -f adr/ADR-031-mini-orchestrator-async-delegation.md
+# Remove global junction
+rm /d "%USERPROFILE%\.config\opencode\skills\mini-orchestrator"
+# Remove async-result.json artifacts
+del HEAD.async-result.json
+```
+
+---
+
 *Generated: 2026-08-13 · Protocol: plan-auto-mejora-v3 §4 (rollback map)*
