@@ -47,4 +47,51 @@ git merge-base --is-ancestor 0d88467c main && echo "main clean"
 
 ---
 
+## Branch: `experimento/mini-orchestrator-async`
+
+- **Base**: main HEAD `b90458fb`
+- **Scope**: async fire-and-forget delegation (BabyAGI pattern foundation)
+- **Files**: `scripts/post-delegation-check.ps1` (modify), `scripts/monitor-subagent.ps1` (new), `tests/post-delegation-async.Tests.ps1` (new), `.agents/skills/mini-orchestrator/SKILL.md` (new), `adr/ADR-031-*` (new), `SKILLS-INDEX.md` (count 88→89)
+
+### Commits
+| Commit | Mensaje | Rollback |
+|--------|---------|----------|
+| (pending) | feat(mini-orchestrator): async fire-and-forget delegation | `git checkout -- scripts/post-delegation-check.ps1` (reverts mod) + `git rm -f scripts/monitor-subagent.ps1 tests/post-delegation-async.Tests.ps1 .agents/skills/mini-orchestrator/SKILL.md adr/ADR-031-mini-orchestrator-async-delegation.md` + restore SKILLS-INDEX.md to 88 |
+
+### Rollback completo (surgical, no afecta otros branches)
+```bash
+git checkout -- scripts/post-delegation-check.ps1 SKILLS-INDEX.md
+git rm -f scripts/monitor-subagent.ps1 tests/post-delegation-async.Tests.ps1
+git rm -f .agents/skills/mini-orchestrator/SKILL.md
+git rm -f adr/ADR-031-mini-orchestrator-async-delegation.md
+# Remove global junction
+rm /d "%USERPROFILE%\.config\opencode\skills\mini-orchestrator"
+# Remove async-result.json artifacts
+del HEAD.async-result.json
+```
+
+---
+
+## Branch: experimento/mini-orchestrator-loop (Phases 2-3)
+
+- **Base**: commit Phase 1 `256d338c` en `experimento/mini-orchestrator-async`
+- **Scope**: BabyAGI loop + self-improvement trigger (supercedes Phase 1 branch)
+- **Files**: `scripts/babyagi-loop.ps1` (new), `tests/babyagi-loop.Tests.ps1` (new), `scripts/auto-improve.ps1` (new), `tests/auto-improve.Tests.ps1` (new), `SKILL.md` (modified, v1.1->1.2), `mejora-log.md` (Phase 2+3 entries)
+
+### Commits
+| Commit | Mensaje | Rollback |
+|--------|---------|----------|
+| `ae22138c` | feat(mini-orchestrator): async + babyagi loop (Phase 1+2 combined) | `git revert ae22138c` |
+| `127eec5b` | feat(auto-improve): self-improvement trigger (Phase 3) | `git revert 127eec5b` |
+
+### Rollback completo
+```bash
+git reset --hard main  # main is at b90458fb; this branch has 2 commits ahead
+# OR surgical:
+git revert 127eec5b  # Phase 3 only
+git revert ae22138c  # Phase 1+2 only
+```
+
+---
+
 *Generated: 2026-08-13 · Protocol: plan-auto-mejora-v3 §4 (rollback map)*

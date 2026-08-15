@@ -145,3 +145,98 @@ ALL CLEAR — 22/22 checks passed
 - [ ] PR → `main` (G3 checkpoint)
 - [ ] Ciclo 4: auto-mejora-analyzer skill + analyze-automejora.ps1
 - [ ] Ciclo 5: plan-execution integration + rollback-map.md
+
+---
+
+## Mini-Orchestrator — Async Delegation (separate initiative)
+
+> **Rama**: `experimento/mini-orchestrator-async` · **Base**: main HEAD `b90458fb` · **Fecha**: 2026-08-15
+
+**Objective**: Mini agente autónomo para tareas mecánicas/repetitivas y delegated-work que el orquestador no puede hacer directamente, de forma controlada (BabyAGI pattern sobre la base existente de `auto-sub` deny floor).
+
+### Contexto
+- Evidence gate: `docs/mejoras/2026-08-08-gentleman-agent-gh-analisis.md` ya identificó el gap (delegación síncrona, no hay self-improvement loop autónomo, `-sub-auto` no puede delegar further).
+- Web research: BabyAGI pattern (Execution→Task Creation→Prioritization loop + iteration/token caps), AutoGPT pattern (goal→plan→execute→reflect), Agent Guardrails (tiered approval, circuit breakers, deny-by-default).
+
+### Implementación (Phase 1: Async Delegation)
+
+| Archivo | Acción | Bytes |
+|---|---|---|
+| `scripts/post-delegation-check.ps1` | MODIFY: +`-Async` switch, `Launch-AsyncMonitor()`, async branch (fail-closed) | +95 lines |
+| `scripts/monitor-subagent.ps1` | CREATE: background monitor (poll + convergence + JSON result) | 223 lines |
+| `tests/post-delegation-async.Tests.ps1` | CREATE: 5 Pester tests (T1-T5) | 102 lines |
+| `.agents/skills/mini-orchestrator/SKILL.md` | CREATE: BabyAGI loop stub (compressed <3KB) | 3067B |
+| `adr/ADR-031-*` | CREATE: decision record + E2E verification | 3470B |
+
+### E2E Verification
+- **Pester**: 5/5 pass (T1: -Async switch, T2: fail-closed, T3: monitor params, T4: JSON schema, T5: naming convention)
+- **Regression**: synchronous path unchanged (0 parse errors, all params present, 3/3 checks run)
+- **Benchmark**: async=2.8s vs sync=9.2s → **3.2x speedup** (async unblocks orchestrator immediately)
+- **Quality gate**: 22/22 ALL CLEAR (cross-ref ✅, breaker ✅, JD review ✅, write-scope ✅)
+
+### Guardrails
+- Hereda `auto-sub` deny floor: network, git push --force, supply chain, destructive, zero-width
+- Fail-closed: `-Async` sin `-AllowedPaths` → exit 1 (v3 Perm-4)
+- Convergence: 2 consecutive identical git-status polls → stop
+- Hard deadline: 300s (default)
+
+### Pending / Phases 2-3
+- Fase 2: Implementar el BabyAGI loop (Execution→Task Creation→Prioritization) como skill activa
+- Fase 3: Self-improvement auto-trigger (Approach A del Aug 8: score → diagnose → fix → verify loop)
+- Concurrent edit conflict: `prompts/gentleman-vMK.md` + `scripts/delegation-registry.ps1` from parallel feature C4d coexist but NOT committed (separate concern)
+
+---
+
+## Mini-Orchestrator — BabyAGI Loop (Phase 2)
+
+> **Rama**: `experimento/mini-orchestrator-loop` · **Base**: commit Phase 1 `256d338c` · **Fecha**: 2026-08-15
+
+**Objective**: Implementar el loop BabyAGI activo (Execution→Task Creation→Prioritization) consumiendo el async handoff de Phase 1.
+
+### Implementación
+
+| Archivo | Acción | Verificación |
+|---|---|---|
+| `scripts/babyagi-loop.ps1` | CREATE: BabyAGI loop body (New-InitialTasks, Sort-TaskQueue, Invoke-TaskAsync, New-TasksFromResult, Start-BabyAGILoop) | 9/9 tests pass |
+| `tests/babyagi-loop.Tests.ps1` | CREATE: 9 Pester tests (T1-T6) | ✅ 9/9 PASS |
+| `.jd-cleared/scripts_babyagi-loop.ps1` | CREATE: JD review marker | ✅ PS-CI-03 compliant |
+| `.breaker-cleared/scripts_babyagi-loop.ps1` | CREATE: Breaker cleared marker | ✅ allClean |
+
+### E2E Verification
+- **Pester**: 9/9 PASS (T1: single goal creates task, T2: multi-part creates multiple, T3: complexity priority, T4: sort by priority, T5: retry on timeout, T6: fix on failure, T7: no new tasks on success, T8: fail-closed guard, T9: no tasks on success)
+- **Quality gate**: cross-ref INDEX check + breaker markers ✅
+- **Guardrails**: Inherits Phase 1 fail-closed + deny floor. New guard: no direct Start-Process/git/network calls (delegates to Phase 1).
+
+### Pendiente
+- Fase 3: Self-improvement auto-trigger (score→diagnose→fix→verify loop)
+- Integrar con delivery-harness para multi-agent orchestration real
+
+---
+
+## Mini-Orchestrator — Self-Improvement Trigger (Phase 3)
+
+> **Rama**: `experimento/mini-orchestrator-loop` · **Fecha**: 2026-08-15
+
+**Objective**: Auto-trigger the BabyAGI loop when quality issues are detected. Implements score → diagnose → fix → verify.
+
+### Implementación
+
+| Archivo | Acción | Verificación |
+|---|---|---|
+| `scripts/auto-improve.ps1` | CREATE: Scan-Issues, New-ImprovementGoal, Start-AutoImprove | 4/4 tests pass |
+| `tests/auto-improve.Tests.ps1` | CREATE: 4 Pester tests (T1-T4) | ✅ 4/4 PASS |
+| `.jd-cleared/scripts_auto-improve.ps1` | CREATE: JD marker | ✅ PS-CI-03 compliant |
+| `.breaker-cleared/scripts_auto-improve.ps1` | CREATE: Breaker marker | ✅ allClean |
+
+### How it works
+1. **Score**: `Scan-Issues` scans for TODO/FIXME tags, long files (>200 lines)
+2. **Diagnose**: `New-ImprovementGoal` creates a goal string from issues
+3. **Fix**: `Start-AutoImprove` delegates to `babyagi-loop.ps1`
+4. **Verify**: BabyAGI loop + Phase 1 async result JSON
+
+### Guardrails
+- `#requires -Version 5.1`
+- Fail-closed: `-AllowedPaths` required
+- Test mode guard: `$env:BABYAGI_TEST_MODE`
+- Inherits all BabyAGI deny floor guards
+- No direct Start-Process/git/network calls
