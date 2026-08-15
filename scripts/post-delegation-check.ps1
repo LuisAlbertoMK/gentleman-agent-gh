@@ -29,6 +29,17 @@
 .PARAMETER ExpectedFiles
     Filenames that SHOULD appear in the diff (passed to check-subagent-output).
 
+.PARAMETER SubagentOutput
+    The subagent's text output (stdout). When provided, the 4-field return contract
+    (Decision Taken | Files Changed | Key Findings | Nuance) is validated against
+    _return-contract.md. When omitted, contract validation is skipped (not a failure).
+    For multi-line content, prefer -SubagentOutputFile to avoid command-string escaping issues.
+
+.PARAMETER SubagentOutputFile
+    Path to a file containing the subagent's text output. Read with Get-Content -Raw.
+    Use this instead of -SubagentOutput when the content contains newlines or special
+    characters that would break the command-string transport.
+
 .PARAMETER RepoRoot
     Repository root (default: parent of script dir).
 
@@ -38,17 +49,30 @@
 .PARAMETER Quiet
     JSON summary on stdout.
 
+.PARAMETER Async
+    Fire-and-forget mode: launch monitor-subagent.ps1 as a background process and
+    return immediately (exit 0). The monitor polls for subagent completion and
+    writes final results to {BaseRef}.async-result.json in RepoRoot.
+    Requires -AllowedPaths — without it the check FAILS closed (v3 Perm-4).
+    All synchronous behavior is preserved when -Async is NOT set.
+
 .EXAMPLE
     scripts\post-delegation-check.ps1                           # git diff + empty + scope
     scripts\post-delegation-check.ps1 -AllowedPaths "src/*" -ExpectedFiles "src/utils.ts"
+    scripts\post-delegation-check.ps1 -AllowedPaths "src/*" -SubagentOutputFile $tmpFile
+    scripts\post-delegation-check.ps1 -AllowedPaths "src/*" -SubagentOutput $output
+    scripts\post-delegation-check.ps1 -AllowedPaths "src/*" -Async   # background monitor
 #>
 param(
     [string]$BaseRef        = "HEAD",
     [string[]]$AllowedPaths = @(),
     [string[]]$ExpectedFiles = @(),
+    [string]$SubagentOutput = "",
+    [string]$SubagentOutputFile = "",
     [string]$RepoRoot       = $(Split-Path -Parent $PSScriptRoot),
     [int]$TimeoutSeconds    = 30,
-    [switch]$Quiet
+    [switch]$Quiet,
+    [switch]$Async
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -84,10 +108,62 @@ function Invoke-SubprocessWithTimeout {
     }
 }
 
+# --- Async mode: fire-and-forget background monitor ---
+function Launch-AsyncMonitor {
+    param(
+        [string]$BaseRef,
+        [string[]]$AllowedPaths,
+        [string[]]$ExpectedFiles,
+        [string]$RepoRoot
+    )
+    $monitorScript = Join-Path $RepoRoot 'scripts\monitor-subagent.ps1'
+    if (-not (Test-Path $monitorScript)) { $monitorScript = Join-Path $PSScriptRoot 'monitor-subagent.ps1' }
+    if (-not (Test-Path $monitorScript)) {
+        throw "monitor-subagent.ps1 not found at $monitorScript — cannot start async monitor"
+    }
+    $escapedMonitor = ConvertTo-SqlLiteral $monitorScript
+    $escapedBase    = ConvertTo-SqlLiteral $BaseRef
+    $escapedRoot    = ConvertTo-SqlLiteral $RepoRoot
+    $cmd = "& '$escapedMonitor' -BaseRef '$escapedBase' -RepoRoot '$escapedRoot'"
+    if ($AllowedPaths) {
+        $cmd += " -AllowedPaths '" + (ConvertTo-SqlLiteral ($AllowedPaths -join ',')) + "'"
+    }
+    if ($ExpectedFiles) {
+        $escapedFiles = ($ExpectedFiles | ForEach-Object { "'" + (ConvertTo-SqlLiteral $_) + "'" }) -join ' '
+        $cmd += " -ExpectedFiles $escapedFiles"
+    }
+    $argLine = "-NoProfile -NoLogo -Command `"$cmd`""
+    Start-Process -FilePath "pwsh" -ArgumentList $argLine -WindowStyle Hidden | Out-Null
+}
+
+# --- Resolve subagent output (string or file) ---
+if ($SubagentOutputFile) {
+    if (Test-Path $SubagentOutputFile) {
+        $SubagentOutput = Get-Content -Raw -Path $SubagentOutputFile
+    } else {
+        Write-Warning "SubagentOutputFile not found: $SubagentOutputFile — contract validation skipped"
+    }
+}
+
 $results = @{
     baseRef      = $BaseRef
     passed       = $true
     checks       = @()
+}
+
+# --- 0. Async mode: launch monitor and return immediately ---
+if ($Async) {
+    if (-not $AllowedPaths) {
+        $results.checks += [PSCustomObject]@{ name = "write_scope"; passed = $false; detail = "FAIL-CLOSED: AllowedPaths not provided — write-scope mandatory for all subagent delegations (v3 Perm-4)" }
+        $results.passed = $false
+        if ($Quiet) { $results | ConvertTo-Json -Compress }
+        else { Write-Output "FAIL Async monitor NOT started — AllowedPaths required (fail-closed per v3 Perm-4)" }
+        exit 1
+    }
+    Launch-AsyncMonitor -BaseRef $BaseRef -AllowedPaths $AllowedPaths -ExpectedFiles $ExpectedFiles -RepoRoot $RepoRoot
+    $resultFile = Join-Path $RepoRoot (($BaseRef -replace '[/\\:*?"<>|]', '_') + '.async-result.json')
+    Write-Output "Async monitor started — result file: $resultFile"
+    exit 0
 }
 
 # --- 1. Empty-output detection ---
@@ -96,6 +172,11 @@ if (Test-Path $csoScript) {
     $escapedBase = ConvertTo-SqlLiteral $BaseRef
     $escapedRoot = ConvertTo-SqlLiteral $RepoRoot
     $csoCmd = "& '$csoScript' -BaseRef '$escapedBase' -RepoRoot '$escapedRoot' -Quiet"
+    if ($SubagentOutput) {
+        # C4d: pass subagent text output so Validate-AgentReturnContract runs
+        $escapedOutput = ConvertTo-SqlLiteral $SubagentOutput
+        $csoCmd += " -AgentOutput '$escapedOutput'"
+    }
     if ($ExpectedFiles) {
         $escapedFiles = ($ExpectedFiles | ForEach-Object { "'" + (ConvertTo-SqlLiteral $_) + "'" }) -join ' '
         $csoCmd += " -ExpectedFiles " + $escapedFiles
@@ -115,6 +196,18 @@ if (Test-Path $csoScript) {
                  elseif ($csoResult) { $csoResult.status } else { "no JSON returned" }
     }
     if (-not $csoOk) { $results.passed = $false }
+
+    # C4d: Extract contract validation result from check-subagent-output
+    if ($SubagentOutput -and $csoResult) {
+        $contractOk = $csoResult.contract_valid -ne $false
+        $contractDetail = if ($csoResult.contract_detail) { $csoResult.contract_detail } else { "pass" }
+        $results.checks += [PSCustomObject]@{
+            name   = "contract_validation"
+            passed = $contractOk
+            detail = $contractDetail
+        }
+        if (-not $contractOk) { $results.passed = $false }
+    }
 } else {
     Write-Warning "check-subagent-output.ps1 not found at $csoScript — empty-output check skipped"
 }
