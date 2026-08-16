@@ -1,8 +1,8 @@
 # SKILLS INDEX (Compact)
 
-> Top-20 daily-use skills. Full table: all 89 skills — use `skill` tool or read this file for complete list.
+> Top-20 daily-use skills. Full table: all 90 skills — use `skill` tool or read this file for complete list.
 >
-> **Version**: 5.4 | **Changelog**: 5.4 (2026-08-13: count 87→88 per new automejora-analyzer skill); 5.3 (2026-08-12: count 78→87 per filesystem audit; README.md synced to current counts) 5.2 (archived 3 dead: cognitive-doc-design, prompt-engineering, senior-engineer → .archive/skills; count 81→78 per cross-ref-check; global discoverable 93→165 per FS scan: 78 project + 87 global, excl. _shared); 5.1 (sync count 93→81 per filesystem audit); 5.0 (compact top-20 table for token reduction); 4.7 (+1 new: adversarial-breaker; count 92→93); 4.6 (count corrected 80→92 per filesystem audit)
+> **Version**: 5.5 | **Changelog**: 5.5 (2026-08-16: C28 auto-improvement cycle added depth to 90 skills; +2 new skills image-pipeline, customize-opencodec; count 89→90); 5.4 (2026-08-13: count 87→88 per new automejora-analyzer skill); 5.3 (2026-08-12: count 78→87 per filesystem audit; README.md synced to current counts) 5.2 (archived 3 dead: cognitive-doc-design, prompt-engineering, senior-engineer → .archive/skills; count 81→78 per cross-ref-check; global discoverable 93→165 per FS scan: 78 project + 87 global, excl. _shared); 5.1 (sync count 93→81 per filesystem audit); 5.0 (compact top-20 table for token reduction); 4.7 (+1 new: adversarial-breaker; count 92→93); 4.6 (count corrected 80→92 per filesystem audit)
 
 ## Top 20 Daily-Use Skills
 
@@ -40,7 +40,7 @@
 | Analysis | analysis-mode, deep-debugging |
 | Memory | session-resume, engram-protocol, dreaming, bitacora |
 | Skills meta | opencode-skill-creator, skill-registry, skill-graph |
-| Engineering | plan-execution, infra-audit, perf-profiling |
+| Engineering | plan-execution, infra-audit, perf-profiling, customize-opencodec |
 | UI/Docs | baseline-ui, ui-engine, accessibility, seo, docs-audit |
 | Testing | visual-testing, e2e-testing, api-testing, image-pipeline, pdf-utils |
 | Communication | comment-writer |
