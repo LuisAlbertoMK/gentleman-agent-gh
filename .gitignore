@@ -152,3 +152,4 @@ TestResults.xml
 # (path separators become underscores; scripts/foo.ps1 -> .breaker-cleared/scripts_foo.ps1)
 .breaker-cleared/*
 !.breaker-cleared/.gitkeep
+docs/ciclos/c28-w2-backup/
