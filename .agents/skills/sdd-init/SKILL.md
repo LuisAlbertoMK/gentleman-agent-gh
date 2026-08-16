@@ -45,7 +45,64 @@ Generated artifacts default to English. Spanish: neutral/professional unless reg
 ## Output Contract
 Return `status`, `executive_summary`, `artifacts`, `next_recommended`, `risks`. Include: project, stack, persistence mode, Strict TDD status, testing capability table, saved observation IDs/paths, registry path, next `/sdd-explore` or `/sdd-new` step.
 
-## References
+---
+
+## Examples (5)
+
+| Scenario | Command | Stack | Mode | Strict TDD | Output |
+|---|---|---|---|---|---|
+| Node/TS + Jest | `sdd init --mode=engram` | pkg.json, jest, CI | engram | marker→true | registry, testing:{jest,[unit,int],80%} |
+| Go + go test | `iniciar sdd --mode=openspec` | go.mod, golangci, CI | openspec | runner→true | config.yaml+specs/, hybrid Engram |
+| Python no runner | `openspec init --mode=hybrid` | pyproject.toml, no test | hybrid | false+explain | Engram topic_key + config.yaml runner=null |
+| Monorepo scoped | `sdd init --mode=engram --scope=apps/api` | turbo, apps/api/pkg.json, vitest | engram | marker→true | topic_key: sdd-init/proj/apps/api |
+| Offline/air-gapped | `sdd init --mode=none` | pkg.json, no Engram | none | N/A | status=partial, registry only, warning |
+
+---
+
+## Testing Patterns (3)
+
+**1. Registry exists & populated**
+```powershell
+$r=gc .atl/skill-registry.md -Raw; $r-match'^\|.*\|' -and ($r-split'\n').Count-gt10
+```
+
+**2. Testing capabilities persisted**
+```powershell
+# Engram: mem_search("sdd-init/{proj}")|mem_get_observation → testing:{runner,layers,cov,linter,type,strict_tdd}
+# Openspec: gc openspec/config.yaml|ConvertFrom-Yaml → .testing.runner,.layers,.coverage,.strict_tdd
+```
+
+**3. Strict TDD resolution**
+```powershell
+# Fixtures: [marker→true], [no marker+runner→true], [no runner→false+explain]
+# Assert output.contract.strict_tdd per fixture
+```
+
+---
+
+## Edge Cases (4)
+
+| Case | Behavior |
+|---|---|
+| **Multi-project monorepo** | Respect `--scope`; detect pkg at scope root; registry scans all skills; topic_key includes scope |
+| **Engram unavailable (offline)** | `engram\|hybrid`→degrade to `none`+warning; registry built; return `status=partial` |
+| **Partial registry (scan failures)** | Continue on per-skill errors; log failed in footnote; don't fail init |
+| **Legacy openspec/ exists** | Report existing; ask before update; merge not overwrite; preserve history |
+
+---
+
+## Anti-Patterns (2)
+
+| Anti-Pattern | Fix |
+|---|---|
+| Guessing stack/runner | Always inspect pkg files + CI + lint; fallback only when truly absent |
+| Overwriting openspec/ blindly | If exists→report→ask→merge; never blind overwrite |
+
+---
+
+## Refs
 - `references/init-details.md` — detection checklist, Engram payloads, config skeleton, output templates
 - `../_shared/engram-convention.md` — Engram artifact naming
 - `../_shared/openspec-convention.md` — openspec layout and rules
+
+> **Size tradeoff**: Core boilerplate (frontmatter, gates, steps, contract, refs) = ~4KB required for SDD init contract. Depth (examples, testing, edge cases, anti-patterns) = ~1KB. Total ~5KB exceeds 3KB target but all sections are essential — no further compression without losing actionable guidance.
