@@ -1,4 +1,4 @@
-﻿---
+---
 name: quick-executor
 description: "Trigger: quick edit, single file, atomic edit, fast fix, one-line fix. Single-file low-risk changes."
 triggers: "quick edit, single file, atomic edit, fast fix, one-line fix, small change, quick fix"
@@ -55,7 +55,7 @@ Multi-file scope creep · Refactor adjacent code · Add dependencies · Skip ver
 # Before
 raise ValueError("Invlid input")  # typo
 
-# After  
+# After
 raise ValueError("Invalid input")
 ```
 - File: `src/validators.py` line 42
