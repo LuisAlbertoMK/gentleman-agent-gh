@@ -1,4 +1,4 @@
-﻿---
+---
 name: sdd-spec
 description: "Write SDD delta specs with requirements and scenarios. Trigger: orchestrator launches spec work."
 triggers: "SDD spec, specification, given when then, requisitos, spec writing"
@@ -170,7 +170,7 @@ pcregrep -M '### GIVEN .* WHEN .* THEN .*' openspec/changes/*/specs/*/spec.md
 # Example mapping:
 # GIVEN valid name WHEN PUT /profile/name THEN 200
 # → test("updates profile name with valid input", async () => { ... })
-# 
+#
 # CI gate: spec scenario count == test count (enforced in sdd-verify)
 ```
 
@@ -180,7 +180,7 @@ pcregrep -M '### GIVEN .* WHEN .* THEN .*' openspec/changes/*/specs/*/spec.md
 # Example:
 # @spec REQ-PROFILE-001 valid-length
 # test("updates profile name with valid input", ...)
-# 
+#
 # Verification: grep -r "@spec" tests/ | wc -l matches spec scenario count
 ```
 
