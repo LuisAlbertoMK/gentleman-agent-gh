@@ -6,34 +6,52 @@ changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use
-API endpoint testing — REST + GraphQL contract validation, schema assertion, collection testing, response validation, auth flows, mock integration.
-
-**Scope**: API endpoint behavior—request/response contracts, not UI/infra.
-**Mode**: READ-ONLY analysis or test-gen. NEVER call production.
-**Output**: Test plan/collection with assertions, not raw curl.
+API endpoint testing — REST+GraphQL contract validation, schema assertion, response validation, auth flows, mock integration. READ-ONLY/test-gen only—NEVER production. Output: plan/collection w/ assertions.
 
 ## Rules
 1.NEVER production/unknown—mock/localhost only. 2.NEVER real credentials—env vars. 3.Format:`.bru`(Bruno)>JSON(Postman)>.ps1 4.Schema:JSON Schema Draft2020-12/OpenAPI3.1 5.Auth:mocked tokens—never real OAuth.
 
 ## Workflow
-1.Discover:OpenAPI→paths/methods/schemas|source→grep routes|collections→coverage gaps
-2.Validate:```powershell
-$schema=Get-Content schema.json|ConvertFrom-Json;$r=Invoke-RestMethod http://localhost:3000/api/health;$r|ConvertTo-Json|Test-Json -Schema(Get-Content schema.json -Raw)
-```
-3.Test plan:
-P0:Happy path 200/201|Auth 401/403|P1:Validation 400/missing/edge|P2:Error 404/409/422/429/500|Pagination limit/offset|P3:Perf <threshold
-4.Collection:REST→`.bru`|GraphQL→`.graphql`+variables|PS→Pester
-5.Auth:JWT(expiry/sig/claims)|Key(header vs query)|OAuth2(mock)|Session(cookie/CSRF)
-6.Contract:Consumer-driven|Provider-driven|Breaking change diff
+1.Discover(OpenAPI→paths|grep routes|collections→gaps) 2.Validate 3.Plan(P0 happy/auth 401/403|P1 400/edge|P2 404/409/422/429/500|P3 perf) 4.Output(.bru/.graphql/Pester)
 
-## Output
+## Examples
+**REST contract (schema+response)**
+```powershell
+$s=Get-Content schema.json -Raw;$r=Invoke-RestMethod http://localhost:3000/api/users
+$r|ConvertTo-Json -Depth 5|Test-Json -Schema $s
+$r[0].id -ne $null -and $r.Count -gt 0
 ```
----
-name:GET/api/users method:GET url:{{baseUrl}}/api/users
-headers:Authorization:Bearer{{token}}
----
-assert:res.status==200|res.body|length>0|res.body[0].id!=null
+**GraphQL (query+mutation)**
+```powershell
+$q=@{query='query{user(id:1){id name}}'}|ConvertTo-Json
+$r=Invoke-RestMethod http://localhost:3000/graphql -Method Post -ContentType 'application/json' -Body $q
+$r.data.user.id -eq 1
+$m=@{query='mutation($n:String!){createUser(name:$n){id}}';variables=@{n='x'}}|ConvertTo-Json
 ```
+**Auth flow (Bearer+refresh)**
+```powershell
+$h=@{Authorization="Bearer $((Invoke-RestMethod http://localhost:3000/token -Method Post -Body @{u='t';p='p'}).access_token)"}
+Invoke-RestMethod http://localhost:3000/me -Headers $h
+# 401->refresh,retry
+$h=@{Authorization="Bearer $((Invoke-RestMethod http://localhost:3000/refresh -Method Post -Headers $h).refresh_token)"}
+Invoke-RestMethod http://localhost:3000/me -Headers $h
+```
+**Pagination (cursor loop)**
+```powershell
+$c=$null;$i=0;do{$r=Invoke-RestMethod "http://localhost:3000/users?cursor=$c";$c=$r.next_cursor;$i++}while($c -and $i -lt 5)
+```
+
+## Patterns
+**Mock server (WireMock/MSW)**—stub then assert:
+```java
+stubFor(get(urlEqualTo("/api/users")).willReturn(okJson("[{\"id\":1}]")));
+verify(getRequestedFor(urlEqualTo("/api/users")));
+```
+**Collection/run**—`.bru` per endpoint + env; run `newman run col.json -e env.json`; assert `pm.response.code==200`.
+**Property-based**—gen valid+invalid payloads; assert valid pass Test-Json, invalid fail.
+
+## Edge Cases
+1.Flaky→retry 3x w/ backoff (GET/idempotent only). 2.Token expiry mid-test→catch 401→refresh→retry once. 3.Cursor→loop while next_cursor, cap iterations. 4.429→honor Retry-After, backoff, fail after N.
 
 ## Dependencies: e2e-testing·quality-gate·Invoke-RestMethod·Bruno(bru)·Newman
 

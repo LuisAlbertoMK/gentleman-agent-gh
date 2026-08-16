@@ -1,13 +1,5 @@
 {
   "dimensions_detail": {
-    "BP": {
-      "e": {
-        "trycatch": 83,
-        "param_cov": 102
-      },
-      "s": 9.8,
-      "r": "P:102/104 T:83/104"
-    },
     "BI2": {
       "e": {
         "passed": 6,
@@ -16,24 +8,24 @@
       "s": 10.0,
       "r": "6/6 items"
     },
-    "PA": {
+    "Me": {
       "e": {
-        "cross_ref": true,
-        "project_json": true,
-        "readme": true,
-        "skills": 89
+        "ej": true,
+        "md": true,
+        "ed": true,
+        "rp": true
       },
       "s": 10.0,
-      "r": "X-ref True, 89 skills"
+      "r": "MD:True EJ:True"
     },
-    "DC": {
+    "SP": {
       "e": {
-        "commented_out": 0,
-        "dead_junctions": 0,
-        "orphans": 0
+        "huge": 0,
+        "avg": 6.9,
+        "sc": 104
       },
-      "s": 10.0,
-      "r": "Orphans: 0, dead junctions: 0"
+      "s": 9.0,
+      "r": "S:104 avg:6.9KB"
     },
     "CA": {
       "e": {
@@ -50,30 +42,20 @@
       "s": 8.4,
       "r": "Depth: 42 sub-dims: 8.4/10"
     },
-    "Or": {
+    "SE": {
       "e": {
-        "corrupted": 0,
-        "scanned": 90
+        "cmdO3": 3,
+        "avg": 2.6,
+        "total": 89,
+        "o5": 0,
+        "o3": 3,
+        "bytes": 236448.0,
+        "prO3": 3,
+        "cmdO5": 0,
+        "prO5": 0
       },
-      "s": 10.0,
-      "r": "Corruption: 0/90"
-    },
-    "SP": {
-      "e": {
-        "sc": 104,
-        "huge": 0,
-        "avg": 6.9
-      },
-      "s": 9.0,
-      "r": "S:104 avg:6.9KB"
-    },
-    "Sec": {
-      "e": {
-        "weak_crypto": false,
-        "secrets": false
-      },
-      "s": 10.0,
-      "r": "Weak crypto: False, secrets: False"
+      "s": 8.0,
+      "r": "T:89 >3:3 >5:0 avg:2.6KB cmdO3:3 cmdO5:0 prO3:3 prO5:0"
     },
     "Bi": {
       "e": {
@@ -83,68 +65,86 @@
       "s": 10.0,
       "r": "BI: True"
     },
-    "Me": {
-      "e": {
-        "rp": true,
-        "ed": true,
-        "ej": true,
-        "md": true
-      },
-      "s": 10.0,
-      "r": "MD:True EJ:True"
-    },
-    "SE": {
-      "e": {
-        "total": 89,
-        "prO5": 0,
-        "o3": 2,
-        "cmdO5": 0,
-        "o5": 0,
-        "prO3": 3,
-        "bytes": 234031.0,
-        "avg": 2.6,
-        "cmdO3": 3
-      },
-      "s": 8.0,
-      "r": "T:89 >3:2 >5:0 avg:2.6KB cmdO3:3 cmdO5:0 prO3:3 prO5:0"
-    },
     "SG": {
       "e": {
-        "days_old": 1,
-        "last_updated": "2026-08-15"
+        "last_updated": "2026-08-15",
+        "days_old": 1
       },
       "s": 10.0,
       "r": "SSoT age: 1d"
     },
+    "Sec": {
+      "e": {
+        "secrets": false,
+        "weak_crypto": false
+      },
+      "s": 10.0,
+      "r": "Weak crypto: False, secrets: False"
+    },
+    "Or": {
+      "e": {
+        "corrupted": 0,
+        "scanned": 90
+      },
+      "s": 10.0,
+      "r": "Corruption: 0/90"
+    },
     "CC": {
       "e": {
-        "with_params": 102,
-        "total_scripts": 104,
         "with_help": 104,
-        "with_strictmode": 98
+        "total_scripts": 104,
+        "with_strictmode": 98,
+        "with_params": 102
       },
       "s": 9.7,
       "r": "S:104 H:104 P:102 S:98"
+    },
+    "BP": {
+      "e": {
+        "param_cov": 102,
+        "trycatch": 83
+      },
+      "s": 9.8,
+      "r": "P:102/104 T:83/104"
+    },
+    "PA": {
+      "e": {
+        "readme": true,
+        "project_json": true,
+        "cross_ref": true,
+        "skills": 89
+      },
+      "s": 10.0,
+      "r": "X-ref True, 89 skills"
+    },
+    "DC": {
+      "e": {
+        "dead_junctions": 0,
+        "orphans": 0,
+        "commented_out": 0
+      },
+      "s": 10.0,
+      "r": "Orphans: 0, dead junctions: 0"
     }
   },
   "score": {
-    "trend": "stable",
     "current": 9.1,
+    "trend": "stable",
+    "last_updated": "2026-08-15",
     "dimensions": {
+      "Bitacora": 10.0,
+      "Score Depth": 8.4,
+      "Script Performance": 9.0,
       "Orthography": 10.0,
+      "Dead Code": 10.0,
+      "Cycle Activity": 3.0,
+      "Metrics": 10.0,
       "Skill Effectiveness": 8.0,
+      "Best Practices": 9.8,
+      "Project Artifacts": 10.0,
       "Backlog Integrity": 10.0,
       "Clean Code": 9.7,
-      "Project Artifacts": 10.0,
-      "Cycle Activity": 3.0,
-      "Score Depth": 8.4,
-      "Security": 10.0,
-      "Dead Code": 10.0,
-      "Metrics": 10.0,
-      "Script Performance": 9.0,
-      "Bitacora": 10.0,
-      "Best Practices": 9.8
-    },
-    "last_updated": "2026-08-15"
+      "Security": 10.0
+    }
   }
 }
