@@ -101,7 +101,7 @@ if (-not (Test-Path $registryDir)) {
 
 # --- Concurrency control: named mutex prevents race condition on registry file ---
 # Named "Global\..." so it works across PowerShell processes (pwsh subprocess invocations).
-$repoId = ([System.Security.Cryptography.MD5]::Create().ComputeHash([System.Text.Encoding]::UTF8.GetBytes($RepoRoot)) | ForEach-Object { $_.ToString("x2") }) -join ''
+$repoId = ([System.Security.Cryptography.SHA256]::Create().ComputeHash([System.Text.Encoding]::UTF8.GetBytes($RepoRoot)) | ForEach-Object { $_.ToString("x2") }) -join ''
 $mutexName = "Global\GentlemanDelegationRegistry-$repoId"
 $mutex = New-Object System.Threading.Mutex($false, $mutexName)
 $mutexAcquired = $false

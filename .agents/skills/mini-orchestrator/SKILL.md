@@ -11,73 +11,55 @@ triggers: "mini-orchestrator, BabyAGI, task loop, async delegation, fire-and-for
 
 # mini-orchestrator
 
-BabyAGI-style delegation loop for multi-step subagent work: **EXECUTION → TASK CREATION → PRIORITIZATION**, with an async fire-and-forget handoff so the orchestrator never blocks.
+BabyAGI delegation loop: **EXECUTION → TASK CREATION → PRIORITIZATION**, async fire-and-forget.
 
 ## When to use
-
-- Long-running multi-step work where blocking is unacceptable
-- Chains of dependent subagent tasks (task N+1 depends on N's output)
-- Background improvement/refactor/analysis with a bounded horizon
+Blocking-unacceptable multi-step work · dependent chains (N+1 needs N's output) · bounded-horizon background work.
 
 ## Workflow
+1. **EXECUTION** — run task. Delegate per `opencode-model-router` (routing + security gate).
+2. **TASK CREATION** — derive next tasks from outcome (4-field contract).
+3. **PRIORITIZATION** — rank (impact×effort×risk); pick top-1.
+4. Repeat until `convergence_check` or `max_iterations`.
 
-1. **EXECUTION** — run current task. Delegate per `opencode-model-router` (routing table + security gate).
-2. **TASK CREATION** — analyze result; derive next tasks from outcome. Use 4-field return contract as source.
-3. **PRIORITIZATION** — rank new tasks (impact × effort × risk); pick top-1 as next step.
-4. Repeat until `convergence_check` passes or `max_iterations` reached.
-
-## Guardrails (hard caps)
-
+## Guardrails (caps)
 | Cap | Default | Purpose |
 |---|---|---|
-| `max_iterations` | 10 | Hard loop cap — exhaust → stop, do NOT continue |
-| `max_tokens` | per-step budget | Per-task cap; delegate rest to subagent |
-| `convergence_check` | result-delta < threshold OR queue empty | Stop on convergence; never loop on identical output |
-| `dedup` | task id = hash(prompt) | Skip already-executed/queued tasks |
+| `max_iterations` | 10 | Hard cap — exhaust → stop |
+| `max_tokens` | per-step | Per-task cap; delegate rest to subagent |
+| `convergence_check` | result-delta < threshold OR queue empty | Stop on convergence |
+| `dedup` | task id = hash(prompt) | Skip executed/queued tasks |
 
-## Tiered approval (over `auto-sub` deny floor)
-
-- **AUTO**: execute without approval — `auto-sub` template (deny floor + `task: deny`). Zero `ask`.
+## Approval tiers (over `auto-sub` deny floor)
+- **AUTO**: `auto-sub` template (deny floor + `task: deny`), no approval, zero `ask`.
 - **LOG**: execute + log to `audit-log.psl`.
 - **CONFIRM**: pause → human approval required.
 
-Escalate when touching: credentials, network egress, package installs, `git push --force`, or any destructive op.
+Escalate on: credentials, network egress, package installs, `git push --force`, destructive ops.
 
 ## Async handoff (fire-and-forget)
-
 ```powershell
 scripts\post-delegation-check.ps1 -BaseRef HEAD -AllowedPaths "src/*" -Async
-# returns immediately; monitor writes {BaseRef}.async-result.json
+# returns immediately; writes {BaseRef}.async-result.json
 $r = Get-Content HEAD.async-result.json -Raw | ConvertFrom-Json
 if (-not $r.passed) { # FAIL — review before proceeding }
 ```
 
-`monitor-subagent.ps1` polls (15s default) running check-subagent-output + validate-write-scope. Writes result when git status stable (2 identical polls) or 300s deadline.
+`monitor-subagent.ps1` polls (15s) check-subagent-output + validate-write-scope; writes when git stable (2 identical polls) or 300s.
 
 ## Implementation
-
 | Script | Phase | Purpose |
 |---|---|---|
-| `scripts/post-delegation-check.ps1` | Phase 1 | `-Async` switch + fail-closed + Launch-AsyncMonitor |
-| `scripts/monitor-subagent.ps1` | Phase 1 | Background polling monitor with convergence detection |
-| `scripts/babyagi-loop.ps1` | Phase 2 | BabyAGI loop: New-InitialTasks, Sort-TaskQueue, Invoke-TaskAsync, New-TasksFromResult |
-| `scripts/auto-improve.ps1` | Phase 3 | Self-improvement trigger: scan → task create → loop → verify |
-| `tests/babyagi-loop.Tests.ps1` | Phase 2 | 9 Pester tests (T1-T6 + fail-closed) |
-| `tests/post-delegation-async.Tests.ps1` | Phase 1 | 5 Pester tests (T1-T5) |
-| `adr/ADR-031-*` | Phase 1 | Decision record + E2E verification |
+| `scripts/post-delegation-check.ps1` | 1 | `-Async` + fail-closed + Launch-AsyncMonitor |
+| `scripts/monitor-subagent.ps1` | 1 | Polling + convergence detection |
+| `scripts/babyagi-loop.ps1` | 2 | Loop: New-InitialTasks, Sort-TaskQueue, Invoke-TaskAsync, New-TasksFromResult |
+| `scripts/auto-improve.ps1` | 3 | Self-improvement: scan→create→loop→verify |
+| `tests/babyagi-loop.Tests.ps1` | 2 | 9 Pester (T1-T6 + fail-closed) |
+| `tests/post-delegation-async.Tests.ps1` | 1 | 5 Pester (T1-T5) |
+| `adr/ADR-031-*` | 1 | ADR + E2E verification |
 
 ## Refs
-
-- `adr/ADR-022`, `adr/ADR-024` — auto-sub deny floor
-- `adr/ADR-031` — async delegation decision record
-- `delivery-harness` — multi-agent orchestration (fan-out, not loops)
-- `ralph-loop` — auto-continue for a SINGLE task
-- `opencode-model-router` — delegation targets + fallback chain
+`adr/ADR-022`,`adr/ADR-024` deny floor · `adr/ADR-031` async delegation · `delivery-harness` fan-out · `ralph-loop` single-task · `opencode-model-router` targets/fallback
 
 ## Anti-Patterns
-
-- Blocking on a subagent when async handoff is available
-- Ignoring `convergence_check` → unbounded loops
-- Trusting delegation without reading `{BaseRef}.async-result.json`
-- Delegating sensitive data to subagents (security gate: DIRECT)
-- Looping past `max_iterations`
+Blocking when async handoff available · ignoring `convergence_check` · not reading `{BaseRef}.async-result.json` · delegating sensitive data (security: DIRECT) · looping past `max_iterations`.
