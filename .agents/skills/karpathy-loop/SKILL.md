@@ -1,4 +1,4 @@
-﻿---
+---
 name: karpathy-loop
 description: "Iterative prompt optimization — write, measure, cut, repeat with progressive compression"
 triggers: "Karpathy loop, optimize prompt, measure tokens"
@@ -6,6 +6,10 @@ changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use
+- Prompt feels bloated, slow, or expensive
+- Need consistent output quality at lower token cost
+- Preparing prompts for production/automation
+- Skill authoring — every skill prompt should pass karpathy-loop
 
 ## STYLE (5 Rules)
 1. **ID+TASK=ENOUGH** — identity+task = enough
@@ -88,6 +92,24 @@ lean-context · skill-improver · metricas · code-review-agent
 **T2** (480/120): "Refactor: smell→priority(impact)→steps→risk(1-5)→rollback. Top 3 only." → 7.2 ✓
 **T3** (350/88): "Refactor: smell→pri→steps→risk→rb. Top3." → 4.5 ✗ → **REVERT to T2**. Final: 480/120, 7.2
 
+### Example 6: SQL Query Optimizer
+**T0** (890/222): "You are a database expert. Analyze this slow query. Identify missing indexes, rewrite for performance, explain the execution plan, suggest schema changes." → 5.9
+**T1** (560/140): "DB expert. Slow query analysis: missing indexes, rewrite, explain plan, schema fixes." → 7.1 ✓
+**T2** (380/95): "Slow SQL: indexes→rewrite→explain→schema. Output: original→optimized→why." → 7.4 ✓
+**T3** (260/65): "SQL opt: idx→rewrite→plan→schema. orig→opt→why." → 4.9 ✗ → **REVERT to T2**. Final: 380/95, 7.4
+
+### Example 7: Security Audit Prompt
+**T0** (1050/262): "You are a security auditor. Review this code for vulnerabilities: injection, XSS, auth bypass, crypto misuse, secrets exposure, path traversal. Rate severity CVSS." → 5.4
+**T1** (680/170): "Security audit. Check: injection/XSS/auth bypass/crypto/secrets/path-traversal. CVSS rate." → 7.0 ✓
+**T2** (440/110): "Sec audit: inj/XSS/auth/crypto/secret/path. file:ln→vuln→CVSS→fix." → 7.3 ✓
+**T3** (300/75): "Sec: inj/XSS/auth/crypto/sec/path. ln→vuln→CVSS→fix." → 5.2 ✗ → **REVERT to T2**. Final: 440/110, 7.3
+
+### Example 8: Documentation Generator
+**T0** (780/195): "Write comprehensive documentation for this API endpoint. Include description, parameters, request/response examples, error codes, authentication, rate limits." → 5.7
+**T1** (500/125): "API doc: desc, params, req/resp examples, errors, auth, rate limits. Markdown." → 7.2 ✓
+**T2** (340/85): "Doc endpoint: desc→params→req/resp→errors→auth→limits. MD table." → 7.5 ✓
+**T3** (220/55): "API doc: desc/params/req/resp/err/auth/limit. MD." → 4.6 ✗ → **REVERT to T2**. Final: 340/85, 7.5
+
 ## Testing Patterns
 
 ### Pattern 1: Golden Output Comparison
@@ -108,6 +130,24 @@ lean-context · skill-improver · metricas · code-review-agent
 - Detect: "this prompt type stalls at T1" or "T3 consistently reverts"
 - Use to tune per-type T-targets (e.g., reviews tolerate T3, specs need T2)
 
+### Pattern 4: Token-Quality Pareto Frontier
+- Plot (tokens, avg_score) for each T-level across all test inputs
+- Identify knee point: max score per token
+- Set that T-level as default for the prompt type
+- Re-evaluate quarterly or when model changes
+
+### Pattern 5: Adversarial Stress Test
+- Feed adversarial inputs: empty, huge, malformed, ambiguous, contradictory
+- Verify prompt doesn't hallucinate, crash, or leak
+- Score robustness dimension separately on adversarial set
+- Threshold: adversarial score ≥ nominal score - 1.0
+
+### Pattern 6: Cross-Model Portability
+- Run optimized prompt on 2+ models (e.g., GPT-4, Claude, local)
+- Compare score delta. If >1.5, prompt is model-specific
+- Add model-agnostic constraints or create model-specific variants
+- Document model sensitivity in prompt metadata
+
 ## Edge Cases
 
 ### Edge 1: Implicit Context Dependencies
@@ -122,7 +162,29 @@ Single prompt does 3 things (analyze + decide + format). Cutting breaks one. Fix
 ### Edge 4: Domain Jargon Compression
 T3 abbreviates terms evaluator doesn't recognize ("4R" → "Risk/Read/Reliab/Resil" fails). Fix: keep domain acronyms expanded at T2; only compress at T3 if evaluator knows them.
 
+### Edge 5: Conditional Logic Collapse
+Prompt has "if X then A else B". Compression merges branches → wrong output for one path. Fix: keep conditional structure explicit until T2; test both branches at each level.
+
+### Edge 6: Example-Dependent Behavior
+Prompt relies on few-shot examples for format. Cutting examples breaks format adherence. Fix: keep 1 minimal example at T2; only remove at T3 if format constraint is explicit.
+
+### Edge 7: Numeric Precision Loss
+Financial/scientific prompts lose decimal places or significant figures in compression. Fix: add "preserve numeric precision" constraint at T1; verify with known-value tests.
+
+### Edge 8: Cultural/Linguistic Assumptions
+Prompt assumes US date format, English idioms, Western business context. Compression amplifies bias. Fix: add locale/context constraints at T1; test with non-US inputs.
+
 ## Anti-Patterns
 Over-optimize before measuring · Cut context before identity · Sacrifice correctness · Stop at T1 when T2 possible · Apply T3 to underspecified prompts · Score subjectively without criteria
+
 **Over-constraint early** — Adding "code only" or "<50 tokens" at T0 starves the model of reasoning space; constrain at T2+ only.
+
 **Skip regression test** — Optimizing one prompt without verifying 5+ variants causes silent regressions on unseen inputs.
+
+**Chase tokens over quality** — Token count is a proxy, not the goal. A 40-token prompt that fails is worse than a 120-token prompt that works.
+
+**Ignore score variance** — Single-run scores have ±1.5 noise. Always run 3x and average before deciding.
+
+**Compress identity** — "Senior engineer" → "Expert" → "" loses authority signaling. Keep minimal identity (role) until T3.
+
+**Blind template reuse** — Applying T3 pattern from code-review to spec-writing fails. Each prompt type has different compressibility.
