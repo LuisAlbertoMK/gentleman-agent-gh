@@ -26,6 +26,8 @@ After session end: prepend new entry to `BITACORA.md`.
 | `bitacora` | show full log |
 | `bitacora --search "Karpathy"` | grep for keyword |
 | `bitacora --since 2026-06-01` | entries after date |
+| `bitacora --append "Fix auth middleware"` | manual append |
+| `bitacora --stats` | entry count, date range, top keywords |
 
 ### Search example
 User: `bitacora --search "auth"` → entries matching "auth". No matches→`"No entries matching 'auth' in BITACORA.md"`.
@@ -45,6 +47,8 @@ User: `bitacora --search "auth"` → entries matching "auth". No matches→`"No 
 4. BITACORA.md missing→create with `# Bitácora` header + first entry.
 5. Empty BITACORA.md (0 bytes)→treat as missing, create fresh.
 6. `--since` with date before first entry→show all. Future date→"No entries after YYYY-MM-DD".
+7. **C28**: Idempotent append — check last entry date+description similarity (>80%) before writing to prevent duplicates across concurrent sessions.
+8. **C28**: Archive suggestion at >100 entries — `mv BITACORA.md BITACORA.archive.md` + fresh header.
 
 ## Examples
 
@@ -96,6 +100,32 @@ User: bitacora --append "Initial project setup"
 2026-08-16 — Initial project setup
 ```
 
+### Example 6: C28 — Parallel subagent session logging
+```
+# Cycle 28: 3 parallel subagents (Security, Skill Compression, Branch Hygiene)
+# Each subagent session logs independently
+Session A (Security): bitacora --append "C28: Replace MD5 with SHA256 in delegation-registry"
+Session B (Compression): bitacora --append "C28: Karpathy compress lean-context 3225→2658B"
+Session C (Branches): bitacora --append "C28: Classify 3 stale branches, delete 2, keep 1"
+
+# BITACORA.md after all three (same day, deduplicated by similarity check):
+2026-08-15 — C28: Classify 3 stale branches, delete 2, keep 1
+2026-08-15 — C28: Karpathy compress lean-context 3225→2658B
+2026-08-15 — C28: Replace MD5 with SHA256 in delegation-registry
+# Note: Similarity check prevents duplicate "C28:" prefix entries on same day
+```
+
+### Example 7: C28 — Score dimension recovery tracking
+```
+# Tracking score recovery across cycles
+User: bitacora --search "Security" --since 2026-08-01
+Output:
+2026-08-15 — C28: Security 8.0→10.0 (weak_crypto MD5→SHA256)
+2026-08-10 — C27: Security audit - weak_crypto detected
+2026-08-05 — C26: Add crypto scanner to pre-commit
+See mem_search('Security score') for full context
+```
+
 ## Testing Patterns
 
 ### Pattern 1: Append & Verify (Golden Path)
@@ -122,6 +152,26 @@ User: bitacora --append "Initial project setup"
 # When: bitacora --since 2026-09-01 (future)
 # Then: "No entries after 2026-09-01"
 # Verify: boundary inclusive on --since date
+```
+
+### Pattern 4: C28 — Concurrent Session Idempotency
+```
+# Given: BITACORA.md last entry "2026-08-15 — C28: Security fix"
+# When: Session A appends "C28: Security hardening" at 10:00
+# And: Session B appends "C28: Security fix applied" at 10:05
+# Then: Only ONE entry added (similarity >80% on same date)
+# Verify: grep -c "2026-08-15" BITACORA.md increases by 1 only
+# Verify: stderr contains "Duplicate suppressed: similar entry exists for 2026-08-15"
+```
+
+### Pattern 5: C28 — Archive Threshold Trigger
+```
+# Given: BITACORA.md has 100 entries
+# When: bitacora --append "Entry 101"
+# Then: Entry appended + suggestion shown
+# Verify: "Bitácora has 101 entries. Consider archiving to BITACORA.archive.md"
+# Verify: mv BITACORA.md BITACORA.archive.md creates archive with all 101 entries
+# Verify: New BITACORA.md has only "# Bitácora" header
 ```
 
 ## Edge Cases
@@ -170,6 +220,22 @@ User: bitacora --since "august 1 2026"
 # Do not preserve empty file
 ```
 
+### Edge Case 7: C28 — Cross-repo bitacora merge
+```
+# User works in two repos: gentleman-agent-gh + gentle-orchestrator
+# Both have BITACORA.md
+# bitacora --search "C28" searches current project only
+# For cross-repo: bitacora --search "C28" --all-projects (future)
+# Current workaround: mem_search("C28") searches Engram cross-project
+```
+
+### Edge Case 8: C28 — Unicode/emoji in description
+```
+User: bitacora --append "Fix auth 🔒 rate limiting"
+# Then: Stored as-is (UTF-8), search works: bitacora --search "🔒"
+# grep -P requires -a flag for binary detection — use ripgrep (rg) instead
+```
+
 ## Anti-Patterns
 
 1. **Write novel-length entries** — One line max. Detail goes to Engram via `mem_save_prompt`.
@@ -178,6 +244,8 @@ User: bitacora --since "august 1 2026"
 4. **Use bitacora for debug logs** — It's for user requests only. Debug→application logs.
 5. **Duplicate entries on re-run** — Idempotent append: check last entry date+desc before writing.
 6. **Rely ONLY on bitacora for cross-session context** — BITACORA.md is per-project summary. Cross-session uses Engram (`mem_search`).
+7. **C28: Skip verification after parallel subagent work** — Each subagent must append; orchestrator must verify all 3 entries present (Cycle 28 had 3 parallel subagents).
+8. **C28: Treat archive as deletion** — Archive preserves history. `BITACORA.archive.md` is queryable with `bitacora --file BITACORA.archive.md --search "..."`.
 
 ## Refs
 dreaming · session-resume · immune-system · auto-metrics · bitacora · engram
