@@ -232,7 +232,10 @@
   "compaction": {
     "auto": true,
     "prune": true,
-    "reserved": 8000
+    "reserved": 6000,
+    "keep": {
+      "tokens": 12000
+    }
   },
   "tools": {
     "codebase-memory*": false,

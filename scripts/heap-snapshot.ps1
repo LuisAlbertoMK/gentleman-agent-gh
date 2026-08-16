@@ -20,7 +20,7 @@
 .PARAMETER Action
     "snapshot" (trigger), "status" (check memory), "kill-if-exceeded" (kill).
 
-.PARAMETER Pid
+.PARAMETER SessionId
     Target OpenCode process PID. If omitted, auto-detects.
 
 .PARAMETER OutputDir
@@ -41,7 +41,7 @@ param(
     [ValidateSet("snapshot","status","kill-if-exceeded")]
     [string]$Action = "snapshot",
 
-    [int]$Pid = 0,
+    [int]$SessionId = 0,
 
     [string]$OutputDir = "",
 
@@ -54,20 +54,26 @@ $ErrorActionPreference = "Stop"
 
 $ByteMB = 1048576
 $ByteGB = 1073741824
-$isLinux = $IsLinux -or ($env:OS -ne 'Windows_NT' -and $PSVersionTable.Platform -ne 'Win32NT')
+$isLinuxHost = $IsLinux -or ($env:OS -ne 'Windows_NT' -and $PSVersionTable.Platform -ne 'Win32NT')
 
 # --- Accurate RSS via /proc/<pid>/statm (Linux, Bun bmalloc workaround) ---
 function Get-AccurateRSS {
     param([int]$ProcessId)
-    if ($isLinux -and $ProcessId -gt 0) {
+    if ($isLinuxHost -and $ProcessId -gt 0) {
         $statmPath = "/proc/$ProcessId/statm"
         if (Test-Path $statmPath) {
             $statm = [System.IO.File]::ReadAllText($statmPath).Trim().Split(" ")
             return [int64]$statm[1] * 4096
         }
     }
-    $result = ps -o rss= -p $ProcessId 2>$null
-    if ($result) { return [int64]$result.Trim() * 1024 }
+    if ($IsMacOS) {
+        $result = ps -o rss= -p $ProcessId 2>$null
+        if ($result) { return [int64]$result.Trim() * 1024 }
+    }
+
+    # Windows fallback
+    $proc = Get-Process -Id $ProcessId -ErrorAction SilentlyContinue
+    if ($proc) { return [int64]$proc.WorkingSet64 }
     return 0
 }
 
@@ -77,15 +83,17 @@ function Get-TotalMemory {
         $match = [regex]::Match($meminfo, "MemTotal:\s+(\d+)")
         if ($match.Success) { return [int64]$match.Groups[1].Value * 1024 }
     }
-    $result = sysctl -n hw.memsize 2>$null
-    if ($result) { return [int64]$result }
+    if ($IsMacOS) {
+        $result = sysctl -n hw.memsize 2>$null
+        if ($result) { return [int64]$result }
+    }
     $cs = Get-CimInstance Win32_ComputerSystem -ErrorAction SilentlyContinue
     if ($cs) { return [int64]$cs.TotalPhysicalMemory }
     return 0
 }
 
 function Find-OpenCodePids {
-    if ($isLinux) {
+    if ($isLinuxHost) {
         $lines = ps aux 2>$null | Select-String "opencode" | Where-Object { $_ -notmatch "grep" }
         return @($lines | % {
             $parts = $_ -split '\s+'
@@ -97,7 +105,7 @@ function Find-OpenCodePids {
 
 # --- Determine output directory ---
 if (-not $OutputDir) {
-    if ($isLinux -and (Test-Path "$env:HOME/.local/share/opencode/diagnostics")) {
+    if ($isLinuxHost -and (Test-Path "$env:HOME/.local/share/opencode/diagnostics")) {
         $OutputDir = "$env:HOME/.local/share/opencode/diagnostics"
     }
     elseif ($env:LOCALAPPDATA -and (Test-Path "$env:LOCALAPPDATA/opencode/logs")) {
@@ -110,16 +118,16 @@ if (-not $OutputDir) {
 }
 
 # --- Find target PID ---
-if ($Pid -eq 0) {
-    $pids = Find-OpenCodePids
+if ($SessionId -eq 0) {
+    $pids = @(Find-OpenCodePids | Where-Object { $_ })
     if ($pids.Count -eq 0) {
         if ($Json) {
             [PSCustomObject]@{ status = "no_opencode_process_found"; pids = @() } | ConvertTo-Json -Compress
         }
         else { Write-Warning "No OpenCode process found" }
-        exit 1
+        exit 0
     }
-    $Pid = $pids[0]
+    $SessionId = $pids[0]
 }
 
 # --- Total system memory + kill threshold ---
@@ -128,13 +136,13 @@ $killThreshold = if ($MemoryLimitGB -gt 0) { $MemoryLimitGB * $ByteGB } else { [
 
 # --- Execute action ---
 if ($Action -eq "status") {
-    $rss = Get-AccurateRSS -ProcessId $Pid
+    $rss = Get-AccurateRSS -ProcessId $SessionId
     $rssGB = $rss / $ByteGB
     $pct = if ($totalMem -gt 0) { ($rss / $totalMem) * 100 } else { 0 }
 
     if ($Json) {
         [PSCustomObject]@{
-            pid      = $Pid
+            pid      = $SessionId
             rss_bytes = $rss
             rss_mb   = [math]::Round($rss / $ByteMB, 1)
             rss_gb   = [math]::Round($rssGB, 2)
@@ -147,7 +155,7 @@ if ($Action -eq "status") {
         } | ConvertTo-Json -Compress
     }
     else {
-        Write-Output "PID: $Pid"
+        Write-Output "PID: $SessionId"
         Write-Output ("RSS: {0:N0} MB ({1:N2} GB)" -f ($rss / $ByteMB), $rssGB)
         Write-Output ("System Total: {0:N2} GB" -f ($totalMem / $ByteGB))
         Write-Output ("Usage: {0:N1}%" -f $pct)
@@ -162,31 +170,31 @@ if ($Action -eq "status") {
 }
 
 if ($Action -eq "kill-if-exceeded") {
-    $rss = Get-AccurateRSS -ProcessId $Pid
+    $rss = Get-AccurateRSS -ProcessId $SessionId
     if ($rss -gt $killThreshold) {
         if ($Json) {
             [PSCustomObject]@{
-                pid    = $Pid
+                pid    = $SessionId
                 rss_gb = [math]::Round($rss / $ByteGB, 2)
                 threshold_gb = [math]::Round($killThreshold / $ByteGB, 2)
                 action = "killing"
             } | ConvertTo-Json -Compress
         }
-        Write-Warning ("{0:N2}GB RSS exceeds threshold ({1:N2}GB) - killing PID {2}" -f ($rss / $ByteGB), ($killThreshold / $ByteGB), $Pid)
-        if ($isLinux) {
-            & kill -TERM $Pid 2>$null
+        Write-Warning ("{0:N2}GB RSS exceeds threshold ({1:N2}GB) - killing PID {2}" -f ($rss / $ByteGB), ($killThreshold / $ByteGB), $SessionId)
+        if ($isLinuxHost) {
+            & kill -TERM $SessionId 2>$null
             Start-Sleep -Seconds 2
-            $alive = & kill -0 $Pid 2>$null
-            if ($alive) { & kill -KILL $Pid 2>$null }
+            $alive = & kill -0 $SessionId 2>$null
+            if ($alive) { & kill -KILL $SessionId 2>$null }
         }
         else {
-            Stop-Process -Id $Pid -Force
+            Stop-Process -Id $SessionId -Force
         }
     }
     else {
         if ($Json) {
             [PSCustomObject]@{
-                pid = $Pid
+                pid = $SessionId
                 rss_gb = [math]::Round($rss / $ByteGB, 2)
                 threshold_gb = [math]::Round($killThreshold / $ByteGB, 2)
                 action = "within_limits"
@@ -198,14 +206,14 @@ if ($Action -eq "kill-if-exceeded") {
 
 if ($Action -eq "snapshot") {
     # Method 1: SIGUSR1 (Linux/macOS with diagnostics)
-    if ($isLinux) {
+    if ($isLinuxHost) {
         try {
-            & kill -USR1 $Pid 2>$null
+            & kill -USR1 $SessionId 2>$null
             if ($LASTEXITCODE -eq 0) {
                 if ($Json) {
-                    [PSCustomObject]@{ action="snapshot_triggered"; method="SIGUSR1"; pid=$Pid; output_dir=$OutputDir } | ConvertTo-Json -Compress
+                    [PSCustomObject]@{ action="snapshot_triggered"; method="SIGUSR1"; pid=$SessionId; output_dir=$OutputDir } | ConvertTo-Json -Compress
                 }
-                else { Write-Output "Sent SIGUSR1 to PID $Pid - snapshot should appear in $OutputDir" }
+                else { Write-Output "Sent SIGUSR1 to PID $SessionId - snapshot should appear in $OutputDir" }
                 exit 0
             }
         }
@@ -217,7 +225,7 @@ if ($Action -eq "snapshot") {
         Write-Output "OPENCODE_AUTO_HEAP_SNAPSHOT=1 is set - OpenCode auto-snapshots at 2GB RSS"
         Write-Output "Output directory: $OutputDir"
         if ($Json) {
-            [PSCustomObject]@{ action="auto_snapshot_configured"; method="OPENCODE_AUTO_HEAP_SNAPSHOT"; pid=$Pid; output_dir=$OutputDir } | ConvertTo-Json -Compress
+            [PSCustomObject]@{ action="auto_snapshot_configured"; method="OPENCODE_AUTO_HEAP_SNAPSHOT"; pid=$SessionId; output_dir=$OutputDir } | ConvertTo-Json -Compress
         }
         exit 0
     }
@@ -228,7 +236,7 @@ if ($Action -eq "snapshot") {
     $snapshotScript | Set-Content -Path $scriptPath -Encoding utf8
 
     if ($Json) {
-        [PSCustomObject]@{ action="manual_snapshot_ready"; method="bun_script"; script=$scriptPath; pid=$Pid } | ConvertTo-Json -Compress
+        [PSCustomObject]@{ action="manual_snapshot_ready"; method="bun_script"; script=$scriptPath; pid=$SessionId } | ConvertTo-Json -Compress
     }
     else {
         Write-Output "Manual snapshot script written to: $scriptPath"

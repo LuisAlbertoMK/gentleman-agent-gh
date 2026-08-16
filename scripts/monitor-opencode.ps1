@@ -49,16 +49,16 @@ $ByteMB = 1048576
 $ByteGB = 1073741824
 
 # --- Platform detection ---
-$isLinux = $IsLinux -or ($env:OS -ne 'Windows_NT' -and $PSVersionTable.Platform -ne 'Win32NT')
-$isMacOS = $IsMacOS -or ($PSVersionTable.Platform -eq 'Unix' -and (uname -s) -eq 'Darwin')
-$isWindows = $IsWindows -or ($env:OS -eq 'Windows_NT')
+$isLinuxHost = $IsLinux -or ($env:OS -ne 'Windows_NT' -and $PSVersionTable.Platform -ne 'Win32NT')
+$isMacOSHost = $IsMacOS -or ($PSVersionTable.Platform -eq 'Unix' -and (uname -s) -eq 'Darwin')
+$isWindowsHost = $IsWindows -or ($env:OS -eq 'Windows_NT')
 
 # --- Accurate RSS via /proc/<pid>/statm (Linux only, Bun bmalloc workaround) ---
 function Get-AccurateRSS {
-    param([int]$Pid)
+    param([int]$SessionId)
 
-    if ($isLinux) {
-        $statmPath = "/proc/$Pid/statm"
+    if ($isLinuxHost) {
+        $statmPath = "/proc/$SessionId/statm"
         if (Test-Path $statmPath) {
             $statm = [System.IO.File]::ReadAllText($statmPath).Trim().Split(" ")
             # Page 2 (index 1) = RSS in pages, multiply by 4096 (standard page size)
@@ -67,14 +67,14 @@ function Get-AccurateRSS {
     }
 
     # macOS fallback
-    if ($isMacOS) {
-        $result = ps -o rss= -p $Pid 2>$null
+    if ($isMacOSHost) {
+        $result = ps -o rss= -p $SessionId 2>$null
         if ($result) { return [int64]$result.Trim() * 1024 }
     }
 
     # Windows fallback
-    if ($isWindows) {
-        $proc = Get-Process -Id $Pid -ErrorAction SilentlyContinue
+    if ($isWindowsHost) {
+        $proc = Get-Process -Id $SessionId -ErrorAction SilentlyContinue
         if ($proc) { return [int64]$proc.WorkingSet64 }
     }
 
@@ -83,12 +83,12 @@ function Get-AccurateRSS {
 
 # --- Get total system memory ---
 function Get-TotalMemory {
-    if ($isLinux -and (Test-Path "/proc/meminfo")) {
+    if ($isLinuxHost -and (Test-Path "/proc/meminfo")) {
         $meminfo = [System.IO.File]::ReadAllText("/proc/meminfo")
         $match = [regex]::Match($meminfo, "MemTotal:\s+(\d+)")
         if ($match.Success) { return [int64]$match.Groups[1].Value * 1024 }
     }
-    if ($isMacOS) {
+    if ($isMacOSHost) {
         $result = sysctl -n hw.memsize 2>$null
         if ($result) { return [int64]$result }
     }
@@ -101,7 +101,7 @@ function Get-TotalMemory {
 function Get-OpenCodeProcesses {
     $procs = @()
 
-    if ($isLinux -or $isMacOS) {
+    if ($isLinuxHost -or $isMacOSHost) {
         $raw = ps aux 2>$null | Select-String "opencode" | Where-Object { $_ -notmatch "grep" }
         foreach ($line in $raw) {
             $parts = $line -split '\s+'
@@ -135,7 +135,7 @@ function Get-OpenCodeProcesses {
 
 # --- Trigger heap snapshot ---
 function Invoke-HeapSnapshot {
-    param([int]$Pid, [string]$LogDir)
+    param([int]$SessionId, [string]$LogDir)
 
     if ($env:OPENCODE_AUTO_HEAP_SNAPSHOT -eq "1") {
         Write-Warning "OPENCODE_AUTO_HEAP_SNAPSHOT=1 set - OpenCode handles snapshots internally"
@@ -144,10 +144,10 @@ function Invoke-HeapSnapshot {
 
     if ($env:OPENCODE_DIAGNOSTICS -eq "1") {
         # Send SIGUSR1 to trigger diagnostic capture
-        if ($isLinux -or $isMacOS) {
+        if ($isLinuxHost -or $isMacOSHost) {
             try {
-                & kill -USR1 $Pid 2>$null
-                Write-Output "Sent SIGUSR1 to PID $Pid for heap snapshot capture"
+                & kill -USR1 $SessionId 2>$null
+                Write-Output "Sent SIGUSR1 to PID $SessionId for heap snapshot capture"
             } catch {
                 Write-Warning "Could not send SIGUSR1: $_"
             }
@@ -185,7 +185,7 @@ while ($true) {
 
     # Recalculate RSS using accurate method
     foreach ($p in $procs) {
-        $p.Rss = Get-AccurateRSS -Pid $p.Pid
+        $p.Rss = Get-AccurateRSS -SessionId $p.Pid
         $p.MemPct = if ($totalMem -gt 0) { [math]::Round(($p.Rss / $totalMem) * 100, 1) } else { 0 }
     }
 
@@ -232,7 +232,7 @@ while ($true) {
     if ($HeapSnapshotMb -gt 0 -and ($procs | Measure-Object -Property Rss -Maximum).Maximum -gt ($HeapSnapshotMb * $ByteMB)) {
         $logDir = Join-Path $env:LOCALAPPDATA "opencode\logs"
         if (-not (Test-Path $logDir)) { $logDir = $env:TEMP }
-        Invoke-HeapSnapshot -Pid $procs[0].Pid -LogDir $logDir
+        Invoke-HeapSnapshot -SessionId $procs[0].Pid -LogDir $logDir
     }
 
     Start-Sleep -Seconds $Interval

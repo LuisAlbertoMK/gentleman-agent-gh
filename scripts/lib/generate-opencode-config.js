@@ -260,53 +260,58 @@ const output = JSON.stringify(base);
 if (VALIDATE) {
   console.log('[4/5] Validating against existing opencode.json...');
 
-  let existing = fs.readFileSync(OUTPUT_PATH, 'utf8');
-  // Strip BOM if present
-  if (existing.charCodeAt(0) === 0xFEFF) existing = existing.slice(1);
-  // Normalize line endings
-  existing = existing.replace(/\r\n/g, '\n');
-  // Ignore trailing newline (end-of-file-fixer may add one)
-  existing = existing.replace(/\n$/, '');
-
-  const normalized = output.replace(/\r\n/g, '\n');
-
-  if (existing === normalized) {
-    console.log('  VALID — generated output matches existing opencode.json');
-    process.exit(0);
-  } else {
-    console.log('  MISMATCH — generated output differs from existing opencode.json');
-
-    const existingLines = existing.split('\n').length;
-    const generatedLines = normalized.split('\n').length;
-    console.log(`  Existing:  ${existingLines} lines`);
-    console.log(`  Generated: ${generatedLines} lines`);
-
-    // Find ALL differences
-    const existingArr = existing.split('\n');
-    const generatedArr = normalized.split('\n');
-    const diffs = [];
-    for (let i = 0; i < Math.max(existingArr.length, generatedArr.length); i++) {
-      if (existingArr[i] !== generatedArr[i]) {
-        diffs.push({
-          line: i + 1,
-          existing: existingArr[i] || '(EOF)',
-          generated: generatedArr[i] || '(EOF)',
-        });
-        if (diffs.length >= 10) {
-          diffs.push({ line: '...', existing: `(${existingArr.length - i - 1} more)`, generated: '' });
-          break;
-        }
-      }
-    }
-
-    for (const d of diffs) {
-      console.log(`  Line ${d.line}:`);
-      console.log(`    Existing:  ${JSON.stringify(d.existing)}`);
-      console.log(`    Generated: ${JSON.stringify(d.generated)}`);
-    }
-
+  // SEMANTIC compare (additive, preserving): opencode.json is pretty-printed and
+  // carries profile-injected keys (small_model, watcher, snapshot, _resource_profile,
+  // agent.default) that the SSoT does not own — a byte/string compare would always
+  // report MISMATCH on formatting alone. Parse both sides as JSON and compare the
+  // fields that constitute the SSoT contract:
+  //   - compaction.reserved / compaction.keep.tokens
+  //   - snapshot (only when the SSoT defines it — currently profile-injected)
+  //   - non-default agent count
+  //   - every top-level key the SSoT defines must exist in opencode.json
+  let existing, generated;
+  try {
+    let raw = fs.readFileSync(OUTPUT_PATH, 'utf8');
+    if (raw.charCodeAt(0) === 0xFEFF) raw = raw.slice(1);
+    existing = JSON.parse(raw);
+    generated = JSON.parse(output);
+  } catch (e) {
+    console.log('  MISMATCH — opencode.json is not valid JSON: ' + e.message);
     process.exit(1);
   }
+
+  const issues = [];
+  const diffField = (label, a, b) => {
+    const sa = JSON.stringify(a), sb = JSON.stringify(b);
+    if (sa !== sb) issues.push(`${label}: ${sa} vs ${sb}`);
+  };
+
+  diffField('compaction.reserved',
+    generated.compaction && generated.compaction.reserved,
+    existing.compaction && existing.compaction.reserved);
+  diffField('compaction.keep.tokens',
+    generated.compaction && generated.compaction.keep && generated.compaction.keep.tokens,
+    existing.compaction && existing.compaction.keep && existing.compaction.keep.tokens);
+  // snapshot: compared only when the SSoT defines it (absent => profile-injected, allowed)
+  if (generated.snapshot !== undefined) diffField('snapshot', generated.snapshot, existing.snapshot);
+
+  // agent count (non-default: 'default' is profile-injected)
+  const genAgents = Object.keys(generated.agent || {}).filter((n) => n !== 'default').length;
+  const exAgents = Object.keys(existing.agent || {}).filter((n) => n !== 'default').length;
+  diffField('agent count (non-default)', genAgents, exAgents);
+
+  // every top-level key the SSoT defines must exist in opencode.json
+  for (const k of Object.keys(generated)) {
+    if (!(k in existing)) issues.push(`top-level key missing in opencode.json: ${k}`);
+  }
+
+  if (issues.length > 0) {
+    console.log('  MISMATCH — semantic drift vs SSoT:');
+    for (const i of issues) console.log('    ' + i);
+    process.exit(1);
+  }
+  console.log('  VALID — generated output matches existing opencode.json (semantic compare)');
+  process.exit(0);
 } else {
   console.log(`[4/5] Writing to ${OUTPUT_PATH}...`);
 

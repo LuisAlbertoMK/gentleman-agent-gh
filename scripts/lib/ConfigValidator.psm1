@@ -85,8 +85,8 @@ function Test-PromptRefs {
         if ($agent.description) { $texts += $agent.description }
         foreach ($t in $texts) {
             # Match {file:relative/path.md} — possibly with trailing modifiers
-            $matches = [regex]::Matches([string]$t, '\{file:([^}]+)\}')
-            foreach ($m in $matches) {
+            $matchResults = [regex]::Matches([string]$t, '\{file:([^}]+)\}')
+            foreach ($m in $matchResults) {
                 $ref = $m.Groups[1].Value.Trim()
                 if ([string]::IsNullOrWhiteSpace($ref)) { continue }
                 $refPath = if ([System.IO.Path]::IsPathRooted($ref)) { $ref } else { Join-Path $configDir $ref }

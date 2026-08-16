@@ -24,7 +24,9 @@
       "temp"
     ]
   },
-  "snapshot": false,
+  "snapshot": {
+    "enabled": true
+  },
   "tools": {
     "file": {
       "maxBytes": 131072,

@@ -266,8 +266,8 @@ if ($OutputProfile -eq "all") {
 }
 
 # Single profile output
-$profile = $profiles[$OutputProfile]
-if (-not $profile) {
+$activeProfile = $profiles[$OutputProfile]
+if (-not $activeProfile) {
     Write-Error "Unknown profile: $OutputProfile. Available: low, medium, high, all, detect"
     exit 1
 }
@@ -276,39 +276,39 @@ if ($WriteProfile) {
     $configDir = Join-Path $PSScriptRoot "opencode-configs"
     if (-not (Test-Path $configDir)) { New-Item -ItemType Directory -Path $configDir -Force | Out-Null }
     $profilePath = Join-Path $configDir "$OutputProfile-resource.json"
-    $profile | ConvertTo-Json -Depth 10 | Set-Content -Path $profilePath -Encoding utf8
+    $activeProfile | ConvertTo-Json -Depth 10 | Set-Content -Path $profilePath -Encoding utf8
     if (-not $Json) { Write-Output "Profile written to: $profilePath" }
 }
 
 if ($Json) {
-    $profile | ConvertTo-Json -Depth 10 -Compress
+    $activeProfile | ConvertTo-Json -Depth 10 -Compress
 }
 else {
-    Write-Output "=== Profile: $($profile.name) ==="
-    Write-Output "Description: $($profile.description)"
+    Write-Output "=== Profile: $($activeProfile.name) ==="
+    Write-Output "Description: $($activeProfile.description)"
     Write-Output ""
     Write-Output "Compaction:"
-    Write-Output "  auto: $($profile.compaction.auto)"
-    Write-Output "  prune: $($profile.compaction.prune)"
-    Write-Output "  reserved: $($profile.compaction.reserved)"
-    Write-Output "  keep.tokens: $($profile.compaction.keep.tokens)"
+    Write-Output "  auto: $($activeProfile.compaction.auto)"
+    Write-Output "  prune: $($activeProfile.compaction.prune)"
+    Write-Output "  reserved: $($activeProfile.compaction.reserved)"
+    Write-Output "  keep.tokens: $($activeProfile.compaction.keep.tokens)"
     Write-Output ""
     Write-Output "Agent:"
-    Write-Output "  subagent_depth: $($profile.agent.subagent_depth)"
-    Write-Output "  small_model: $($profile.model.small_model)"
+    Write-Output "  subagent_depth: $($activeProfile.agent.subagent_depth)"
+    Write-Output "  small_model: $($activeProfile.model.small_model)"
     Write-Output ""
     Write-Output "Watcher:"
-    Write-Output "  enabled: $($profile.watcher.enabled)"
+    Write-Output "  enabled: $($activeProfile.watcher.enabled)"
     Write-Output ""
     Write-Output "Tools:"
-    Write-Output "  file.maxBytes: $($profile.tools.file.maxBytes)"
-    Write-Output "  file.maxLines: $($profile.tools.file.maxLines)"
+    Write-Output "  file.maxBytes: $($activeProfile.tools.file.maxBytes)"
+    Write-Output "  file.maxLines: $($activeProfile.tools.file.maxLines)"
     Write-Output ""
     Write-Output "Monitoring:"
-    Write-Output "  diagnostics: $($profile.memory_monitoring.OPENCODE_DIAGNOSTICS)"
-    Write-Output "  snapshot: $($profile.snapshot.enabled)"
+    Write-Output "  diagnostics: $($activeProfile.memory_monitoring.OPENCODE_DIAGNOSTICS)"
+    Write-Output "  snapshot: $($activeProfile.snapshot.enabled)"
     Write-Output ""
     Write-Output "Notes:"
-    $profile.notes | % { Write-Output "  $_" }
+    $activeProfile.notes | % { Write-Output "  $_" }
 }
 exit 0

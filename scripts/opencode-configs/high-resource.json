@@ -23,7 +23,9 @@
       "dist"
     ]
   },
-  "snapshot": false,
+  "snapshot": {
+    "enabled": true
+  },
   "tools": {
     "file": {
       "maxBytes": 262144,
