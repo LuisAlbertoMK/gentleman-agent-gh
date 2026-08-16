@@ -1,180 +1,197 @@
-﻿---
-name: image-pipeline
-description: "Image optimization — compress, convert WebP/AVIF, resize, describe"
-triggers: "compress image, optimize image, resize image, convert webp, convert avif, describe image, image too heavy, slow images, image bug"
-changelog: docs/ciclos/cycle28-20260815.md
+﻿# image-pipeline — Image Optimization Skill
+
+**Trigger**: `compress`, `convert WebP/AVIF`, `resize`, `describe` images
+
+**Scope**: Single-file atomic edits, batch processing, metadata extraction
+
 ---
 
-## When to Use
-Image optimization — compress, convert WebP/AVIF, resize, de
+## Pipeline Stages
 
+```
+Input → [Validate] → [Transform] → [Optimize] → [Verify] → Output
+```
 
-## Tools
-| Tool | Use | Install |
-|------|-----|---------|
-| **Sharp** | Compress/convert (60 imgs/sec) | `npm i sharp` |
-| **ImageMagick** | Fallback batch | `magick convert` |
-| **Vision API** | Describe bugs | API call |
+| Stage | Tools | Purpose |
+|-------|-------|---------|
+| Validate | `file`, `identify` (ImageMagick) | MIME, dimensions, corruption check |
+| Transform | `magick convert`, `cwebp`, `avifenc` | Resize, format convert, color space |
+| Optimize | `mozjpeg`, `oxipng`, `svgo` | Lossless/lossy compression |
+| Verify | `compare` (SSIM/PSNR), `identify` | Quality gates, regression detection |
 
-## Mode 1: Compress
+---
+
+## 5 Examples
+
+### 1. Batch WebP Conversion (lossy, quality 80)
 ```bash
-# Single: node -e "require('sharp')('in.jpg').webp({quality:80}).toFile('out.webp')"
-# Batch: Get-ChildItem *.jpg | % { node -e "require('sharp')($_.FullName).webp({q:80}).toFile($_.FullName-replace'\.jpg$','.webp')" }
+#!/usr/bin/env bash
+# convert-to-webp.sh — Batch convert JPEG/PNG → WebP
+set -euo pipefail
+SRC="${1:-.}"; DEST="${2:-./webp-out}"; Q="${3:-80}"
+mkdir -p "$DEST"
+find "$SRC" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) \
+  -exec bash -c 'cwebp -q "$Q" "$1" -o "${2}/${1##*/%.*}.webp"' _ {} "$DEST" \;
 ```
 
-## Mode 2: Convert
+### 2. AVIF Encode with Speed/Quality Tradeoff
 ```bash
-# PNG→WebP: sharp('in.png').webp({quality:85}).toFile('out.webp')
-# JPG→AVIF: sharp('in.jpg').avif({quality:60}).toFile('out.avif')
-# Resize+compress: sharp('in.jpg').resize(1200).webp({q:80}).toFile('out.webp')
+#!/usr/bin/env bash
+# encode-avif.sh — AVIF with configurable speed (0=slow/best, 10=fast/worst)
+set -euo pipefail
+SRC="$1"; DEST="${2:-./avif-out}"; SPEED="${3:-4}"; Q="${4:-50}"
+mkdir -p "$DEST"
+for f in "$SRC"/*.{jpg,jpeg,png,webp}; do
+  [ -f "$f" ] || continue
+  avifenc --speed "$SPEED" --quality "$Q" "$f" "${DEST}/${f##*/%.*}.avif"
+done
 ```
 
-## Mode 3: Describe (Visual Bugs)
-```
-User: "La imagen se ve rara"
-→ Screenshot via Peek-MCP → Vision API
-→ "broken aspect ratio, text overlapping, missing alt"
-→ Correlate CSS → propose fix
-```
-**Best APIs**: Claude (actionable CSS fixes) · GPT-4V (accessibility) · Local LLaVA (free)
-
-## Decision Tree
-```
-Image heavy? → Sharp q80 → WebP/AVIF → report savings
-Visual bug unclear? → screenshot → Vision API → fix
-Batch? → Sharp pipeline → report total savings
-```
-
-## Targets
-| Metric | Target |
-|--------|--------|
-| Photo compression | 60-80% smaller (WebP q80) |
-| Graphic compression | 70-90% smaller (AVIF q60) |
-| Resize | <100ms/image |
-| Description | <2s/image |
-
-## Examples
-
-### Example 1: Batch WebP Conversion (Photos)
+### 3. Responsive Image Set (srcset Generation)
 ```bash
-# Convert all JPGs to WebP q80, keep originals
-Get-ChildItem -Recurse *.jpg | ForEach-Object {
-  $out = $_.FullName -replace '\.jpg$', '.webp'
-  node -e "require('sharp')('$($_.FullName)').webp({quality:80}).toFile('$out')"
-  Write-Host "$($_.Name) → $([math]::Round((Get-Item $out).Length / $_.Length * 100))%"
-}
+#!/usr/bin/env bash
+# responsive-set.sh — Generate 3 breakpoints + WebP/AVIF variants
+set -euo pipefail
+SRC="$1"; OUT="${2:-./responsive}"; WIDTHS=(400 800 1200)
+mkdir -p "$OUT"
+for w in "${WIDTHS[@]}"; do
+  magick "$SRC" -resize "${w}x>" -quality 80 "${OUT}/${w}w.webp"
+  magick "$SRC" -resize "${w}x>" -quality 50 "${OUT}/${w}w.avif"
+done
+# Output HTML fragment
+echo "<picture>"
+for w in "${WIDTHS[@]}"; do
+  echo "  <source srcset=\"${w}w.avif\" type=\"image/avif\" media=\"(min-width: ${w}px)\">"
+  echo "  <source srcset=\"${w}w.webp\" type=\"image/webp\" media=\"(min-width: ${w}px)\">"
+done
+echo "  <img src=\"${WIDTHS[1]}w.webp\" alt=\"\">"
+echo "</picture>"
 ```
 
-### Example 2: AVIF for Graphics/UI Assets
+### 4. Lossless PNG Optimization Pipeline
 ```bash
-# PNG icons → AVIF q60 (best for flat colors)
-Get-ChildItem icons/*.png | ForEach-Object {
-  $out = $_.FullName -replace '\.png$', '.avif'
-  node -e "require('sharp')('$($_.FullName)').avif({quality:60}).toFile('$out')"
-}
+#!/usr/bin/env bash
+# optimize-png.sh — oxipng + zopfli for maximum lossless compression
+set -euo pipefail
+SRC="${1:-.}"; DEST="${2:-./png-opt}"
+mkdir -p "$DEST"
+find "$SRC" -type f -iname "*.png" -exec bash -c '
+  oxipng --opt max --strip all "$1" -o "${2}/${1##*/}"
+  advpng -z -4 "${2}/${1##*/}"
+' _ {} "$DEST" \;
 ```
 
-### Example 3: Responsive Image Set (Multiple Widths)
+### 5. Image Description via Local LLM (Ollama + LLaVA)
 ```bash
-# Generate srcset variants: 400w, 800w, 1200w, 1600w
-$widths = @(400, 800, 1200, 1600)
-Get-ChildItem hero.jpg | ForEach-Object {
-  foreach ($w in $widths) {
-    $out = $_.FullName -replace '\.jpg$', "-${w}w.webp"
-    node -e "require('sharp')('$($_.FullName)').resize($w).webp({quality:80}).toFile('$out')"
-  }
-}
-```
-
-### Example 4: Describe Visual Bug via Vision API
-```bash
-# Screenshot + local LLaVA (free)
-curl -X POST http://localhost:11434/api/generate -d '{
-  "model": "llava",
-  "prompt": "Analyze this screenshot for: broken aspect ratio, text overlap, missing alt, layout shift. Return CSS fixes.",
-  "images": ["base64_screenshot"],
-  "stream": false
-}' | jq -r .response
-```
-
-### Example 5: Pipeline with Savings Report
-```bash
-#!/usr/bin/env node
-const sharp = require('sharp');
-const fs = require('fs');
-
-async function optimize(dir, {quality=80, format='webp'}={}) {
-  const files = fs.readdirSync(dir).filter(f => /\.(jpg|png)$/i.test(f));
-  let totalIn = 0, totalOut = 0;
-  
-  for (const file of files) {
-    const inPath = `${dir}/${file}`;
-    const outPath = inPath.replace(/\.(jpg|png)$/i, `.${format}`);
-    const statsIn = fs.statSync(inPath);
-    
-    await sharp(inPath)[format]({quality}).toFile(outPath);
-    const statsOut = fs.statSync(outPath);
-    
-    totalIn += statsIn.size;
-    totalOut += statsOut.size;
-    console.log(`${file}: ${((1 - statsOut.size/statsIn.size)*100).toFixed(1)}% saved`);
-  }
-  console.log(`\nTotal: ${((1 - totalOut/totalIn)*100).toFixed(1)}% (${(totalIn/1e6).toFixed(2)}MB → ${(totalOut/1e6).toFixed(2)}MB)`);
-}
-
-optimize(process.argv[2] || '.', JSON.parse(process.argv[3] || '{}'));
+#!/usr/bin/env bash
+# describe-image.sh — Generate alt-text/description using local vision model
+set -euo pipefail
+IMG="$1"; MODEL="${2:-llava:13b}"
+# Encode to base64 for Ollama API
+B64=$(base64 -w0 "$IMG")
+curl -s http://localhost:11434/api/generate \
+  -d "{\"model\":\"$MODEL\",\"prompt\":\"Describe this image in one sentence for accessibility.\",\"images\":[\"$B64\"],\"stream\":false}" \
+  | jq -r '.response'
 ```
 
 ---
 
-## Testing Patterns
+## 3 Testing Patterns
 
-### Pattern 1: Regression Test — Visual Diff
+### Pattern 1: Golden File Regression (SSIM Threshold)
 ```bash
-# Compare before/after with ImageMagick (fuzzy match < 1%)
-magick compare -metric AE -fuzz 1% before.webp after.webp diff.png
-# Exit code 0 = identical within threshold
+# test-regression.sh — Compare output against golden master
+set -euo pipefail
+GOLDEN="tests/golden/out.webp"; ACTUAL="out.webp"
+SSIM=$(magick compare -metric SSIM "$GOLDEN" "$ACTUAL" null: 2>&1 | awk '{print $2}')
+THRESHOLD=0.995
+awk "BEGIN {exit !($SSIM >= $THRESHOLD)}" || { echo "SSIM $SSIM < $THRESHOLD"; exit 1; }
 ```
 
-### Pattern 2: Quality Gate — File Size Budget
-```bash
-# Fail if any optimized image > budget (e.g., 100KB for thumbnails)
-Get-ChildItem *.webp | Where-Object { $_.Length -gt 100KB } | ForEach-Object {
-  Write-Error "$($_.Name) exceeds 100KB budget ($([math]::Round($_.Length/1KB))KB)"
-  exit 1
-}
+### Pattern 2: Property-Based Size/Quality Invariant
+```python
+# test_invariants.py — Property tests: size reduction, dimension bounds
+import subprocess, os, pytest
+from PIL import Image
+
+@pytest.mark.parametrize("src", ["tests/fixtures/photo.jpg", "tests/fixtures/graphic.png"])
+def test_size_reduction(src):
+    out = f"/tmp/{os.path.basename(src)}.webp"
+    subprocess.run(["cwebp", "-q", "80", src, "-o", out], check=True)
+    assert os.path.getsize(out) < os.path.getsize(src) * 0.9  # ≥10% reduction
+
+def test_dimension_preserved():
+    src = "tests/fixtures/photo.jpg"
+    out = "/tmp/photo_800w.webp"
+    subprocess.run(["magick", src, "-resize", "800x>", out], check=True)
+    with Image.open(src) as im, Image.open(out) as om:
+        assert om.width <= 800
+        assert abs(om.height / om.width - im.height / im.width) < 0.01  # aspect ratio
 ```
 
-### Pattern 3: Format Correctness — Magic Bytes
+### Pattern 3: Contract Test — CLI Interface Stability
 ```bash
-# Verify WebP/AVIF headers (not just extension)
-Get-ChildItem *.webp | ForEach-Object {
-  $bytes = [System.IO.File]::ReadAllBytes($_.FullName)
-  if ($bytes[0..3] -join '' -ne 'RIFF' -or $bytes[8..11] -join '' -ne 'WEBP') {
-    Write-Error "$($_.Name): Invalid WebP magic bytes"
-  }
-}
+# test_cli_contract.sh — Verify CLI flags, exit codes, stdout schema
+set -euo pipefail
+# Happy path
+./convert-to-webp.sh tests/fixtures/ /tmp/out 80
+# Invalid quality → non-zero exit
+! ./convert-to-webp.sh tests/fixtures/ /tmp/out 101
+# Missing source → non-zero exit, stderr contains usage
+! ./convert-to-webp.sh /nonexistent /tmp/out 80 2>&1 | grep -q "Usage:"
+# Output directory created
+rm -rf /tmp/cli-test && ./convert-to-webp.sh tests/fixtures/ /tmp/cli-test 80
+[ -d /tmp/cli-test ] && [ "$(ls /tmp/cli-test | wc -l)" -gt 0 ]
 ```
 
 ---
 
-## Edge Cases
+## 4 Edge Cases
 
-| Edge Case | Handling |
-|-----------|----------|
-| **Animated GIF/WebP** | `sharp` drops animation → use ImageMagick: `magick convert in.gif -coalesce out.webp` |
-| **CMYK JPEGs** | Sharp fails silently → pre-convert: `magick in.jpg -colorspace sRGB out.jpg` |
-| **EXIF Orientation** | Sharp auto-rotates by default → disable if preserving: `.rotate()` before resize |
-| **Alpha on JPEG input** | JPEG has no alpha → convert to PNG first: `sharp(in.jpg).png().toBuffer()` then process |
+| # | Edge Case | Handling |
+|---|-----------|----------|
+| 1 | **Corrupted/Truncated Input** | `identify -verbose` pre-check → skip + log, never crash pipeline |
+| 2 | **ICC Profile Mismatch** | Strip profiles (`-strip`) unless `--preserve-icc`; convert to sRGB for web |
+| 3 | **Animated WebP/AVIF** | Detect frames (`identify -format %n`); preserve animation or extract first frame per flag |
+| 4 | **Extreme Dimensions (>32K px)** | Downscale to max 16K before encode (encoder limits); warn in metadata |
 
 ---
 
-## Anti-Patterns
+## 2 Anti-Patterns
 
-1. **Compress before resize** — Wastes CPU on pixels you'll discard. Always resize first.
-2. **Over-compress photos (q<60)** — Visible artifacts. Photos: q75-85. Graphics: q50-65 AVIF.
-3. **Describe every image via Vision API** — Expensive/slow. Reserve for visual bugs only.
-4. **Skip format verification** — Extension ≠ content. Validate magic bytes in CI.
+| # | Anti-Pattern | Why It Fails | Correct Approach |
+|---|--------------|--------------|------------------|
+| 1 | **Re-encoding Lossy → Lossy** | Generational quality loss (artifacts compound) | Always encode from **source/original**; keep lossless master |
+| 2 | **Single-Quality Global Setting** | Over-compresses simple graphics; under-compresses photos | Per-image heuristic: `quality = 85 - (entropy * 15)` or content-aware presets |
 
-## Refs
-performance · web-quality-audit · visual-testing · baseline-ui
+---
+
+## Quality Gates (CI Integration)
+
+```yaml
+# .github/workflows/image-pipeline.yml
+- name: Image Pipeline Quality Gate
+  run: |
+    # 1. No regressions vs golden
+    ./test-regression.sh
+    # 2. Size budgets per breakpoint
+    find responsive -name "*.webp" -exec bash -c '
+      sz=$(stat -c%s "$1"); max=$2
+      [ $sz -le $max ] || { echo "$1: $sz > $max"; exit 1; }
+    ' _ {} 50000 \;
+    # 3. All outputs valid
+    find out -type f -exec file --mime-type {} \; | grep -vE "image/(webp|avif|jpeg|png)" && exit 1
+```
+
+---
+
+## Quick Reference
+
+| Task | Command |
+|------|---------|
+| Convert dir to WebP (q80) | `./convert-to-webp.sh src/ dest/ 80` |
+| AVIF batch (speed 4, q50) | `./encode-avif.sh src/ dest/ 4 50` |
+| Responsive set (400/800/1200) | `./responsive-set.sh hero.jpg ./out` |
+| Lossless PNG max compression | `./optimize-png.sh src/ dest/` |
+| Describe image (Ollama) | `./describe-image.sh photo.jpg llava:13b` |
+| Run all tests | `bash test-regression.sh && python -m pytest test_invariants.py && bash test_cli_contract.sh` |
