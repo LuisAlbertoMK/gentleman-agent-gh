@@ -40,7 +40,7 @@
 | Analysis | analysis-mode, deep-debugging |
 | Memory | session-resume, engram-protocol, dreaming, bitacora |
 | Skills meta | opencode-skill-creator, skill-registry, skill-graph |
-| Engineering | plan-execution, infra-audit, perf-profiling, customize-opencodec |
+| Engineering | plan-execution, infra-audit, perf-profiling, customize-opencode |
 | UI/Docs | baseline-ui, ui-engine, accessibility, seo, docs-audit |
 | Testing | visual-testing, e2e-testing, api-testing, image-pipeline, pdf-utils |
 | Communication | comment-writer |
