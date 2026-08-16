@@ -4,41 +4,39 @@ description: "Trigger: auth, JWT, OAuth, RBAC, CSRF, session, login, password ha
 triggers: "auth, authentication, authorization, JWT, OAuth, RBAC, CSRF, session, login, password hashing, token, cookie"
 changelog: docs/ciclos/cycle28-20260815.md
 ---
+
 ## When to Use
 Review auth flows, login, tokens, RBAC — "is this auth secure?"
-## SCAN DIMENSIONS
 
-**JWT**: `grep -rn "jwt\|jsonwebtoken\|jose" --include="*.{ts,js,py,go}"` → alg (none/HS256=WEAK, prefer RS256/ES256), expiry, audience, rotation
-- Alg: `grep -rn "algorithm.*[\"']none[\"']" --include="*.{ts,js,py,go}"`
-- Secret: `grep -rn "secret\s*=\s*[\"'][^\"']+[\"']" --include="*.{ts,js,py,go}" | grep -v "process\.env\|env\.\|os\.environ"`
-- Refresh: rotation, expiry, reuse detection, revocation
-**OAuth**: `grep -rn "oauth\|oidc\|pkce\|redirect_uri\|authorization_code" --include="*.{ts,js,py,yaml,yml}"` → PKCE, exact redirect URI, state param
-**RBAC**: `grep -rn "authorize\|canAccess\|isAllowed\|checkPermission\|requireRole" --include="*.{ts,js,py,go}"` → checks BEFORE data access, no client-side-only
-**CSRF**: `grep -rn "csrf\|xsrf\|SameSite\|csrfToken" --include="*.{ts,js,py,yaml,yml}"` → SameSite=Strict/Lax, token on state-changing
+## EXAMPLES (6 real grep commands)
+JWT alg=none: `grep -rn "algorithm.*['\"]none['\"]" --include="*.ts"`
+Hardcoded secret: `grep -rn "secret\s*=\s*['\"][^'\"]+['\"]" --include="*.ts" | grep -v process.env`
+OAuth no PKCE: `grep -rn "authorization_code" --include="*.ts" | grep -v code_verifier`
+Role after fetch: `grep -B3 "find.*User" --include="*.ts" | grep -v "authorize\|canAccess"`
+No HttpOnly: `grep -rn "cookie.*httpOnly.*false" --include="*.ts"`
+Weak hashing: `grep -rn "md5\|sha1" --include="*.ts" | grep -v "_test\|checksum"`
 
-**Sessions**: `grep -rn "session\|cookie\|express-session" --include="*.{ts,js,py,yaml,yml}"` → HttpOnly+Secure+SameSite, fixation (regenerate on login)
-**Passwords**: `grep -rn "bcrypt\|argon2\|scrypt\|pbkdf2" --include="*.{ts,js,py,go}"` → OK | `grep -rn "md5\|sha1" --include="*.{ts,js,py,go}" | grep -v "_test\|checksum\|etag"` → CRITICAL
+## TESTING (3 patterns)
+Auth integration: test DB → `POST /login` → 200 + `Set-Cookie: session=...; HttpOnly; Secure; SameSite=Lax`
+Token validation: expired JWT→401; `alg=none`→401; wrong aud→403
+RBAC matrix: parametrize roles×endpoints → 200 allowed, 403 denied, no 500s
 
-## CHECKLIST
+## EDGE CASES (4)
+MFA bypass: backup codes / recovery often skip rate limits → audit separately
+CORS + auth: `Access-Control-Allow-Origin: *` + credentials → browser rejects; must echo origin
+Refresh reuse: same token accepted twice → revoke ALL sessions on reuse
+When NOT: stateless APIs→no sessions; serverless cold starts→avoid DB sessions; high-throughput internal→prefer mTLS over JWT
 
-| Check | Sev | Pattern |
-|-------|-----|---------|
-| JWT alg=none | CRIT | `algorithm.*["']none["']` or missing `algorithms` param |
-| Hardcoded JWT secret | CRIT | `secret\s*=\s*["'][^"']+["']` excl env |
-| MD5/SHA1 password | CRIT | `md5\|sha1` in password context |
-| No CSRF on POST | HIGH | POST without CSRF middleware |
-| OAuth no PKCE | HIGH | auth_code without code_verifier |
-| Session no HttpOnly | HIGH | `httpOnly.*false` or missing |
-| JWT no expiry | HIGH | `expiresIn` missing or >24h |
-| Role check after fetch | HIGH | SELECT/GET before authorize |
-| No refresh rotation | HIGH | Same refresh token reusable |
-| Session fixation | MED | Login doesn't regenerate ID |
+## CHECKLIST (sev: pattern)
+CRIT: JWT alg=none `algorithm.*["']none["']` | Hardcoded secret `secret\s*=\s*["'][^"']+["']` excl env | MD5/SHA1 password `md5\|sha1`
+HIGH: No CSRF on POST | OAuth no PKCE `auth_code` w/o `code_verifier` | No HttpOnly `httpOnly.*false` | JWT no expiry `expiresIn` missing/>24h | Role after fetch | No refresh rotation
+MED: Session fixation (login doesn't regenerate ID)
 
 ## OUTPUT
 ```
 ## Auth Hardening: {scope}
 ### Summary
-- JWT: {N} | OAuth: {N} | RBAC: {N} | CSRF: {N} | Sessions: {N} | Passwords: {N}
+- JWT:{N} OAuth:{N} RBAC:{N} CSRF:{N} Sessions:{N} Passwords:{N}
 ### Issues
 # CRITICAL: {type} in {file:line}
 - Pattern: `{found}` → Fix: `{fix}`
@@ -50,5 +48,5 @@ Review auth flows, login, tokens, RBAC — "is this auth secure?"
 ## Refs
 security-scanner · best-practices · quality-gate · code-review-agent
 
-## Anti-Patterns
-Flag bcrypt as weak · Skip JWT alg · Happy path only · Ignore refresh tokens · Client-side-only roles · Flag env vars as hardcoded
+## Anti-Patterns (8)
+Flag bcrypt weak · Skip JWT alg · Happy path only · Ignore refresh tokens · Client-side-only roles · Flag env vars hardcoded · Use `alg: none` for testing · Store JWT in localStorage
