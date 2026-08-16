@@ -81,3 +81,25 @@ Ready for sdd-spec or sdd-design.
 
 - `openspec` mode: always create `proposal.md`; Exists already: read → update
 - Every proposal: rollback plan + success criteria; Concrete file paths in Affected Areas
+
+## Examples
+- **Feature (openspec)**: JWT refresh rotation — In/Out scope, Affected Areas table, Risk\|Mitigation, revert env var, success criteria
+- **Tech debt (hybrid)**: Event bus → typed channels — compile-time contracts, migration adapters, feature-flag revert
+- **Bug (engram)**: Cache invalidation race — move invalidation past DB commit hook, idempotency keys
+- **Architectural (none)**: Feature flag framework — in-mem eval, centralized config, audit trail
+- **Migration (openspec)**: DB schema v2 zero-downtime — online schema change, batch 1000, row-count reconciliation
+
+## Testing Patterns
+- **Contract validation**: assert all sections present (In/Out Scope, Affected Areas, Risk table, Revert, success criteria); `<450 words`; tables > prose
+- **Mode verification**: openspec→`openspec/changes/{change}/proposal.md` exists; engram→`sdd/{change}/proposal` topic_key; none→returns inline, no persistence
+- **Interactive shaping**: 3-5 questions across 10 categories; writes `## Proposal question round` marker when blocked from asking
+
+## Edge Cases
+- Exploration missing/corrupted → continue with user description, log warning, note in proposal (exploration is optional)
+- Existing proposal (openspec) → read→merge, preserve `<!-- USER_EDIT -->` sections, add changelog entry
+- Spec conflict → detect during `openspec/specs/` research, add `## Spec Conflict Warning`, escalate to orchestrator (NO auto-resolve)
+- Pure deletion → In Scope lists removals, New Capabilities "None", Modified uses "→ Removed"
+
+## Anti-Patterns
+- **Over-specification**: no pseudo-code, signatures, or algorithms — proposal owns *what/why*, sdd-spec owns *how*; blocks design alternatives
+- **Vague scope**: In/Out of Scope must list concrete paths — "Improve auth" is unverifiable vs "JWT issuer, refresh flow, rate limiting"
