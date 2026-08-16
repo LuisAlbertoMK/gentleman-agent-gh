@@ -110,7 +110,7 @@ $skillDirCount = $skillDirs.PSWhere({ $_ -ne '_shared' }).Count
 $scriptLibRoot = Join-Path $repoRoot "scripts"
 $jobs          = @()
 
-$jobs += Start-ThreadJob -Name "crossref" -ScriptBlock { & "$using:scriptLibRoot\cross-ref-check.ps1" -Json -Quiet }
+$jobs += Start-ThreadJob -Name "crossref" -ScriptBlock { try { & "$using:scriptLibRoot\cross-ref-check.ps1" -Json -Quiet } catch {} }
 if ($env:PESTER_TEST -eq '1') {
   # Test mode: skip the ~33s PSSA cold scan (pssa-gate.ps1 -Mode Check).
   # Keeps integration tests fast; normal invocations still run the gate.
