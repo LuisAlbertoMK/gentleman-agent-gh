@@ -18,7 +18,7 @@
 | 2 | Integration tests for score-auto.ps1 | Medium | Low | 2 | 1h | ✅ Done | `ScoreIntegration.Tests.ps1` with 11+ tests all pass |
 | 3 | Fix pre-commit hook numbering consistency | Low | Low | 1 | 15m | ✅ Done | Hook prints [1/12]–[12/12] |
 | 4 | Fix e2e pipeline tests (hook + execution state) | Medium | Low | 2 | 15m | ✅ Done | `e2e_pipeline.Tests.ps1` 24/24 pass |
-| 5 | Skill compression (>3KB skills) | Medium | Medium | 1 | 3h | 🔴 Pending | 0 skills >3KB, avg <2.0KB |
+| 5 | Skill compression (>3KB skills) | Medium | Medium | 1 | 3h | ✅ Done | 0 skills >3KB (SE 8.0→10.0); avg 2.5KB |
 | 6 | Compress/merge non-junction skills | Low | Medium | 0.5 | 2h | 🔴 Pending | 0 non-junction skills |
 
 ## Pilares
