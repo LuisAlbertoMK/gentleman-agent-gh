@@ -1,18 +1,11 @@
 #!/usr/bin/env bash
-# Gentleman Agent — Linux/macOS one-shot machine setup
-# Port of scripts/setup-machine.ps1 for POSIX shells.
-# Creates global shortcuts, sets env vars, links skills, verifies.
-#
-# Usage:
-#   ./scripts/setup-machine.sh                           # interactive
-#   ./scripts/setup-machine.sh --repo-dir /path/to/repo  # from anywhere
-#   ./scripts/setup-machine.sh --skip-env-var            # CI/containers
-#   ./scripts/setup-machine.sh --skip-shortcuts          # no shell wrappers
+# Gentleman Agent — Linux/macOS one-shot machine setup (port of setup-machine.ps1).
+# Usage: ./scripts/setup-machine.sh [--repo-dir PATH] [--skip-env-var] [--skip-shortcuts]
 
 if (set -o pipefail 2>/dev/null); then set -euo pipefail; else set -eu; fi
 shopt -s nullglob 2>/dev/null || true
 
-# ── Colors ───────────────────────────────────────────────────────────
+# Colors
 GREEN='\033[0;32m'; CYAN='\033[0;36m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; DIM='\033[2m'; NC='\033[0m'
 info()  { printf '%s==>%s %s\n' "$CYAN" "$NC" "$*"; }
 ok()    { printf '%s[ok]%s %s\n' "$GREEN" "$NC" "$*"; }
@@ -20,7 +13,7 @@ warn()  { printf '%s[warn]%s %s\n' "$YELLOW" "$NC" "$*"; }
 err()   { printf '%s[err]%s %s\n' "$RED" "$NC" "$*"; exit 1; }
 skip()  { printf '%s[skip]%s %s\n' "$DIM" "$NC" "$*"; }
 
-# ── Args ─────────────────────────────────────────────────────────────
+# Args
 REPO_DIR=""
 SKIP_ENV_VAR=false
 SKIP_SHORTCUTS=false
@@ -39,7 +32,7 @@ if [ -z "$REPO_DIR" ]; then
     REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 fi
 
-# ── Validate repo ───────────────────────────────────────────────────
+# Validate repo
 info "Validating repo at ${REPO_DIR}"
 for f in "opencode.json" "AGENTS.md" ".agents/skills"; do
     if [ ! -e "${REPO_DIR}/${f}" ]; then
@@ -48,7 +41,7 @@ for f in "opencode.json" "AGENTS.md" ".agents/skills"; do
 done
 ok "Repo structure validated"
 
-# ── Step 1: GENTLEMAN_AGENT_ROOT ────────────────────────────────────
+# Step 1: GENTLEMAN_AGENT_ROOT
 _upsert_env_var() {
     local name="$1" value="$2"
     # Already set in this shell?
@@ -84,10 +77,8 @@ else
     skip "GENTLEMAN_AGENT_ROOT (via --skip-env-var)"
 fi
 
-# ── Step 2: OpenCode env vars ───────────────────────────────────────
-# NOTE: Do NOT set OPENCODE_CONFIG_DIR/CACHE_DIR/DB here — those would
-# override ~/.config/opencode/ and break the global install. OpenCode
-# uses its defaults (global config dir) automatically.
+# Step 2: OpenCode env vars
+# NOTE: do NOT set OPENCODE_CONFIG_DIR/CACHE_DIR/DB — would break the global install.
 if [ "$SKIP_ENV_VAR" = false ]; then
     info "Setting OpenCode environment variables"
     declare -A OC_VARS
@@ -106,7 +97,7 @@ else
     skip "OpenCode env vars (via --skip-env-var)"
 fi
 
-# ── Step 3: Global shortcuts ────────────────────────────────────────
+# Step 3: Global shortcuts
 if [ "$SKIP_SHORTCUTS" = false ]; then
     info "Creating global shell shortcuts"
     BIN_DIR="${HOME}/.local/bin"
@@ -135,7 +126,7 @@ else
     skip "Global shortcuts (via --skip-shortcuts)"
 fi
 
-# ── Step 4: Global opencode config ──────────────────────────────────
+# Step 4: Global opencode config
 info "Syncing global opencode config from repo"
 GLOBAL_CONFIG="${HOME}/.config/opencode/opencode.json"
 REPO_CONFIG="${REPO_DIR}/opencode.json"
@@ -176,7 +167,7 @@ else
     warn "Global or repo config not found — sync manually"
 fi
 
-# ── Step 5: Global skill config (symlinks) ──────────────────────────
+# Step 5: Global skill config (symlinks)
 info "Setting up global skill config"
 SKILL_DEST="${HOME}/.config/opencode/skills"
 SKILL_SRC="${REPO_DIR}/.agents/skills"
@@ -206,10 +197,8 @@ else
     skip "Skills already configured"
 fi
 
-# ── Step 6: Global prompts symlink ────────────────────────────────
-# The global config may contain {file:prompts/sdd/*.md} references from agent
-# definitions synced in Step 4. Those resolve relative to the global config dir,
-# so we need the prompts directory there too.
+# Step 6: Global prompts symlink
+# Global config may contain {file:prompts/sdd/*.md} refs resolved relative to global config dir.
 info "Setting up global prompts symlink"
 GLOBAL_PROMPTS_DIR="${HOME}/.config/opencode/prompts"
 REPO_SDD_DIR="${REPO_DIR}/prompts/sdd"
@@ -227,7 +216,7 @@ else
     warn "Repo prompts/sdd not found at ${REPO_SDD_DIR}"
 fi
 
-# ── Step 7: Global AGENTS.md ──────────────────────────────────────
+# Step 7: Global AGENTS.md
 # {file:AGENTS.md} in gentleman-vMK agent prompt resolves relative to global config
 info "Copying AGENTS.md to global config"
 GLOBAL_AGENTS_MD="${HOME}/.config/opencode/AGENTS.md"
@@ -244,9 +233,8 @@ else
     warn "Repo AGENTS.md not found at ${REPO_AGENTS_MD}"
 fi
 
-# ── Step 8: Install MCP server binaries ─────────────────────────
-# These binaries back the MCP servers configured in opencode.json.
-# Without them, OpenCode can load the config but the MCPs won't start.
+# Step 8: Install MCP server binaries
+# These binaries back the MCP servers in opencode.json; without them MCPs won't start.
 info "Installing MCP server binaries"
 
 # 8a. codebase-memory-mcp — npm global
@@ -326,7 +314,7 @@ else
     trap - EXIT
 fi
 
-# ── Step 9: Verify ──────────────────────────────────────────────────
+# Step 9: Verify
 info "Verifying setup"
 all_ok=true
 

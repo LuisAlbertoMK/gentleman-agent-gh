@@ -30,9 +30,9 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-# ============================================================================
+
 # Registry — compact array format [name, triggers, category, effort, deps, related, desc]
-# ============================================================================
+
 $registryCsv = Join-Path (Split-Path $PSScriptRoot -Parent) 'data/skills-registry.csv'
 $cacheDir = Join-Path (Split-Path $PSScriptRoot -Parent) '.learnings'
 $cacheFile = Join-Path $cacheDir 'skill-graph-cache.json'
@@ -64,11 +64,9 @@ function Get-SkillRegistry {
     .SYNOPSIS
         Parse skills-registry.csv with persistent caching.
     .DESCRIPTION
-        Cold path parses the pipe-delimited CSV and persists the parsed registry
-        to $CachePath keyed by a SHA256 hash of the CSV content. Warm path loads
-        the cache when: hash matches current CSV content, cache mtime is within
-        $TtlMinutes, and the cache parses as valid JSON. Any mismatch, staleness,
-        corruption, or -NoCache forces a cold re-parse (which overwrites the cache).
+        Cold: parse pipe-delimited CSV, persist to $CachePath keyed by CSV SHA256.
+        Warm: load cache when hash matches, mtime fresh (< $TtlMinutes), valid JSON.
+        Mismatch/stale/corrupt/-NoCache → cold re-parse (overwrites cache).
     #>
     [CmdletBinding()]
     param(
@@ -81,7 +79,7 @@ function Get-SkillRegistry {
     $csvRaw = Get-Content $CsvPath -Raw
     $csvHash = Get-FileSha256 $csvRaw
 
-    # --- Cache hit: load persisted registry when hash matches and cache is fresh ---
+    # Cache hit: load persisted registry when hash matches and cache is fresh
     if (-not $NoCache -and (Test-Path $CachePath)) {
         try {
             $cached = Get-Content $CachePath -Raw | ConvertFrom-Json
@@ -104,7 +102,7 @@ function Get-SkillRegistry {
         }
     }
 
-    # --- Cold parse (original pipe-delimited parsing) ---
+    # Cold parse (original pipe-delimited parsing)
     $registry = foreach ($line in (Get-Content $CsvPath | Select-Object -Skip 1 | Where-Object { $_.Trim() })) {
         $parts = $line.Split('|')
         $name = $parts[0]
@@ -132,9 +130,7 @@ function Get-SkillRegistry {
         # Triggers = fields between Name and Category (positions 1..catIdx-1)
         $triggers = if ($catIdx -gt 1) { ($parts[1..($catIdx-1)] -join '|') } else { '' }
 
-        # DependsOn = non-empty fields between Effort and Description
-        # NOTE: Related cannot be distinguished from DependsOn in pipe-delimited format
-        # (both can contain pipes). All mid-fields go into DependsOn.
+        # DependsOn = non-empty mid-fields (Related indistinguishable from DependsOn — both can contain pipes)
         $midFields = @()
         if ($effIdx -gt 0) {
             for ($i = $effIdx + 1; $i -lt $descIdx; $i++) {
@@ -153,7 +149,7 @@ function Get-SkillRegistry {
         }
     }
 
-    # --- Persist cache keyed by CSV content hash (non-fatal on failure) ---
+    # Persist cache keyed by CSV content hash (non-fatal on failure)
     try {
         $cacheParent = Split-Path $CachePath -Parent
         if (-not (Test-Path $cacheParent)) { New-Item -ItemType Directory -Path $cacheParent -Force | Out-Null }
@@ -169,9 +165,9 @@ function Get-SkillRegistry {
 
 $skillRegistry = @(Get-SkillRegistry -CsvPath $registryCsv -CachePath $cacheFile -NoCache:$NoCache)
 
-# ============================================================================
+
 # Graph — build adjacency graph from registry
-# ============================================================================
+
 function New-Graph {
     [CmdletBinding(SupportsShouldProcess)]
     param()
@@ -188,8 +184,7 @@ function New-Graph {
                 $graph.AdjList[$skill.Name].from[$dep] = "depended_by"
             }
         }
-        # NOTE: Related field is always empty in pipe-delimited format
-        # (cannot distinguish deps from related when both contain pipes)
+        # Related is always empty in pipe-delimited format (deps/related indistinguishable)
     }
     if ($PSCmdlet.ShouldProcess('skill dependency graph', 'Build graph')) {
         return $graph
@@ -197,9 +192,9 @@ function New-Graph {
     return $null
 }
 
-# ============================================================================
+
 # Resolver — BFS graph resolution from task text
-# ============================================================================
+
 function Resolve-Skill {
     param([string]$TaskText, [int]$MaxDepth = 1)
     $Tokens = $TaskText.ToLowerInvariant() -split '\s+|[-_/.,!?;:()]' |
@@ -257,9 +252,9 @@ function Resolve-Skill {
     } | Sort-Object Depth, { -$_.Score }
 }
 
-# ============================================================================
+
 # Agent Recommender — regex pattern matching
-# ============================================================================
+
 $agentRecommendations = @(
     @{ P = '(?i)(?:review|audit|check|quality|verify|validate)\s.*(?:code|security|skill|\bprs?\b)'; S = @('code-review-agent', 'security-scanner', 'quality-gate', 'triple-verify') }
     @{ P = '(?i)(?:fix|bug|error|crash|issue|problem|broken|not\s+working)'; S = @('recovery-protocol', 'immune-system', 'triple-verify') }
@@ -296,9 +291,9 @@ function Get-AgentRecommendation {
     return @($recommended)
 }
 
-# ============================================================================
+
 # Patterns — load external patterns from dreaming feed
-# ============================================================================
+
 $externalPatterns = @()
 if ($PatternsFile -and (Test-Path $PatternsFile)) {
     try {
@@ -307,9 +302,9 @@ if ($PatternsFile -and (Test-Path $PatternsFile)) {
     } catch { Write-Debug "skill-graph: $($_.Exception.Message)" }
 }
 
-# ============================================================================
+
 # Output
-# ============================================================================
+
 if ($ListAll) {
     $grouped = $skillRegistry | Group-Object Category
     if ($Format -eq "Json") {

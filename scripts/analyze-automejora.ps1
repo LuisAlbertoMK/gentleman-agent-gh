@@ -3,34 +3,23 @@
 <#
 .SYNOPSIS
   Project Complexity Index (PCI) + capability probe for automejora-analyzer (read-only).
-
 .DESCRIPTION
   Scans a project root and emits: complexity tier (T1-T4), language diversity, test/coverage
-  presence, CI/CD presence, dependency manifests, and a capability matrix (available tools per
-  capability dimension). Never mutates anything - pure observation. PowerShell 5.1 compatible
-  (no ??, ||, &&, ternary, or ::new()).
-
+  presence, CI/CD presence, dependency manifests, and a capability matrix. Never mutates
+  anything - pure observation. PowerShell 5.1 compatible (no ??, ||, &&, ternary, or ::new()).
   Thresholds mirror .agents/skills/automejora-analyzer/SKILL.md section A (5-signal triage).
-
 .PARAMETER Path
   Target project root. Default: script parent's parent (repo root when run from scripts/).
-
 .PARAMETER Json
-  Output JSON to stdout only (machine readable). Arrays are wrapped with @(...) per ADR-003
-  so single-element arrays survive ConvertTo-Json serialization.
-
+  Output JSON to stdout only. Arrays wrapped with @(...) per ADR-003 so single-element
+  arrays survive ConvertTo-Json serialization.
 .PARAMETER WhatIf
-  Dry run - print what would be scanned and exit without scanning.
-
+  Dry run - print what would be scanned and exit.
 .EXAMPLE
-  .\scripts\analyze-automejora.ps1 -Path ..\other-project
-  .\scripts\analyze-automejora.ps1 -Path ..\other-project -Json
-  .\scripts\analyze-automejora.ps1 -WhatIf
-
+  .\scripts\analyze-automejora.ps1 -Path ..\other-project [-Json | -WhatIf]
 .NOTES
-  Read-only by design - part of the automejora-analyzer skill. No git mutation, no installs,
-  no builds. Best-effort .gitignore support: built-in exclusions plus simple patterns
-  (directory names and wildcard patterns); negation (!) rules are ignored.
+  Read-only by design - part of automejora-analyzer skill. No git mutation, no installs,
+  no builds. Best-effort .gitignore: built-in exclusions + simple patterns; negation (!) ignored.
 #>
 param(
     [string]$Path = "",
@@ -41,7 +30,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-# --- resolve root ----------------------------------------------------------
+# resolve root
 if (-not $Path) { $Path = Split-Path $PSScriptRoot -Parent }
 try { $resolved = (Resolve-Path -LiteralPath $Path -ErrorAction Stop).Path }
 catch { Write-Error "Path not found: $Path"; exit 2 }
@@ -56,7 +45,7 @@ if ($WhatIf) {
     exit 0
 }
 
-# --- helpers ---------------------------------------------------------------
+# helpers
 $script:AlwaysExcluded = @(
     '.git', 'node_modules', '.venv', 'venv', '__pycache__', '.pytest_cache',
     '.codegraph', '.codebase-memory', '.idea', '.vscode', 'bin', 'obj',
@@ -84,8 +73,7 @@ function Get-IgnoreRules {
             }
         }
     }
-    # NOTE: @($list) over List[object] throws "Argument types do not match" under
-    # StrictMode Latest (verified empirically) - ToArray() is safe.
+    # NOTE: @($list) over List[object] throws under StrictMode Latest - ToArray() is safe.
     return @($rules.ToArray())
 }
 
@@ -220,7 +208,7 @@ function Get-Capabilities {
     return $cap
 }
 
-# --- scan -------------------------------------------------------------------
+# scan
 $rules = @(Get-IgnoreRules -Root $root)
 $sourceFiles = @(Get-SourceFiles -Root $root -Rules $rules)
 $fileCount = $sourceFiles.Count
@@ -278,7 +266,7 @@ $evidence += $ciIndicators
 $evidence += @($testDirs | ForEach-Object { $_.Name })
 $evidence += $coverageDirHits
 
-# --- scoring ----------------------------------------------------------------
+# scoring
 $testScore = if (-not $hasTests) { 1 } elseif (-not $hasCoverage) { 2 } elseif ($workflowCount -lt 1) { 3 } else { 4 }
 $ciScore = if ($ciIndicators.Count -eq 0) { 1 }
            elseif ($workflowCount -ge 2) { 4 }

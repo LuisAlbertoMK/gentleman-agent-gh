@@ -4,29 +4,23 @@
 .SYNOPSIS
     Gentleman Agent — One-shot machine setup for portability
 .DESCRIPTION
-    Sets up a new machine after cloning gentleman-agent-gh:
-    - Creates global shell shortcuts (gentleman-vmk)
-    - Sets GENTLEMAN_AGENT_ROOT environment variable
-    - Configures OpenCode env vars
-    - Installs MCP server binaries (codebase-memory-mcp, engram, headroom)
-    - Installs Ollama + moondream model for vision analysis
-    - Creates skill junction in global config
-    - Verifies everything works
+    Sets up a new machine after cloning gentleman-agent-gh: global shortcuts
+    (gentleman-vmk), GENTLEMAN_AGENT_ROOT + OpenCode env vars, MCP binaries
+    (codebase-memory-mcp, engram, headroom), Ollama + moondream, skill junction.
 .PARAMETER RepoDir
     Path to the cloned gentleman-agent-gh repo (default: current dir)
 .PARAMETER SkipEnvVar
-    Skip persistent env var registration (for containers/CI)
+    Skip persistent env var registration (containers/CI)
 .PARAMETER SkipShortcuts
     Skip global shell shortcut creation
 .PARAMETER SkipMcp
     Skip MCP server binary installation
 .PARAMETER DryRun
-    Report what would change without applying anything (no installs, no writes)
+    Report what would change without applying anything
 .PARAMETER Force
-    Re-apply steps that are already in place (overrides 'already exists' skips)
+    Re-apply steps already in place (overrides 'already exists' skips)
 .EXAMPLE
-    .\scripts\setup-machine.ps1
-    .\scripts\setup-machine.ps1 -RepoDir D:\gentleman-agent-gh
+    .\scripts\setup-machine.ps1 [-RepoDir D:\gentleman-agent-gh]
 #>
 param(
     [string]$RepoDir = (Get-Location).Path,

@@ -1,62 +1,35 @@
 ﻿#requires -Version 7
 <#
 .SYNOPSIS
-    Async delegation registry — manages state for non-blocking subagent delegations.
-
+    Async delegation registry — state for non-blocking subagent delegations.
 .DESCRIPTION
-    Tracks pending, running, and completed subagent delegations so the orchestrator
-    can continue working while subagents run in the background. Supports:
-      - register:  Store delegation metadata (task_id, scope, base_ref)
-      - poll:      Check if a delegation is still pending
-      - resolve:   Run post-delegation-check for a completed delegation
-      - re-prompt: Re-inject instructions into a running subagent (dynamic modification)
-      - list:      List all delegations with status
-
-    State is persisted in .learnings/delegation-registry.json (atomic reads/writes).
-    Each entry has a TTL (default 60 min) after which it's auto-purged.
-    Thread-safe via named mutex — concurrent invocations serialize safely.
-
+    Tracks pending/running/completed subagent delegations so the orchestrator keeps
+    working while subagents run in background. Actions: register, poll, resolve,
+    re-prompt, list. State persisted in .learnings/delegation-registry.json (atomic),
+    TTL auto-purge (default 60 min), thread-safe via named mutex.
 .PARAMETER Action
-    The registry operation to perform.
-
+    Registry operation to perform.
 .PARAMETER TaskId
-    The Task-tool ID (for poll/resolve/re-prompt).
-
+    Task-tool ID (for poll/resolve/re-prompt).
 .PARAMETER AllowedPaths
-    Regex pattern(s) for write-scope validation (for register).
-
+    Regex pattern(s) for write-scope validation (register).
 .PARAMETER ExpectedFiles
-    Filenames expected in the diff (for register).
-
+    Filenames expected in the diff (register).
 .PARAMETER BaseRef
-    Git reference to diff against (for register, default HEAD).
-
+    Git reference to diff against (register, default HEAD).
 .PARAMETER NewPrompt
-    New instructions for re-prompt (for re-prompt).
-
+    New instructions for re-prompt.
 .PARAMETER TtlMinutes
-    Time-to-live for registry entries (default 60).
-
+    TTL for registry entries (default 60).
 .PARAMETER RepoRoot
     Repository root (default: parent of script dir).
-
 .PARAMETER Quiet
     JSON-only output on stdout.
-
 .EXAMPLE
-    # Register an async delegation
     scripts/delegation-registry.ps1 -Action register -TaskId "abc-123" -AllowedPaths "src/*"
-
-    # Poll status (returns pending/running/done)
     scripts/delegation-registry.ps1 -Action poll -TaskId "abc-123"
-
-    # Resolve (run post-delegation-check on completed work)
     scripts/delegation-registry.ps1 -Action resolve -TaskId "abc-123"
-
-    # Re-prompt a running subagent
     scripts/delegation-registry.ps1 -Action re-prompt -TaskId "abc-123" -NewPrompt "Focus on error handling"
-
-    # List all delegations
     scripts/delegation-registry.ps1 -Action list
 #>
 param(
@@ -77,7 +50,7 @@ param(
     [switch]$Quiet
 )
 
-# Document new params in header (inline, since .SYNOPSIS block is already written)
+# New params documented in header
 if ($SubagentOutputFile -and -not $Quiet) {
     Write-Debug "delegation-registry: -SubagentOutputFile '$SubagentOutputFile' stored"
 }
@@ -99,8 +72,8 @@ if (-not (Test-Path $registryDir)) {
     New-Item -ItemType Directory -Path $registryDir -Force | Out-Null
 }
 
-# --- Concurrency control: named mutex prevents race condition on registry file ---
-# Named "Global\..." so it works across PowerShell processes (pwsh subprocess invocations).
+# Concurrency control: named mutex prevents race on registry file
+# Named "Global\..." so it works across pwsh subprocess invocations.
 $repoId = ([System.Security.Cryptography.SHA256]::Create().ComputeHash([System.Text.Encoding]::UTF8.GetBytes($RepoRoot)) | ForEach-Object { $_.ToString("x2") }) -join ''
 $mutexName = "Global\GentlemanDelegationRegistry-$repoId"
 $mutex = New-Object System.Threading.Mutex($false, $mutexName)
@@ -111,7 +84,7 @@ try {
         throw "delegation-registry: could not acquire lock within 10s (another instance may be stuck)"
     }
 
-# --- Load registry ---
+# Load registry
 function Get-RegistryData {
     if (-not (Test-Path $registryFile)) { return @{} }
     try {
@@ -130,7 +103,7 @@ function Get-RegistryData {
     }
 }
 
-# --- Save registry (atomic write: write .tmp → Move-Item) ---
+# Save registry (atomic: write .tmp → Move-Item)
 function Set-RegistryData {
     [CmdletBinding(SupportsShouldProcess)]
     param([hashtable]$Registry)
@@ -141,7 +114,7 @@ function Set-RegistryData {
     }
 }
 
-# --- Prune expired entries ---
+# Prune expired entries
 function Clear-RegistryExpired {
     [CmdletBinding(SupportsShouldProcess)]
     param([hashtable]$Registry, [int]$MaxAgeMinutes)
@@ -163,7 +136,7 @@ function Clear-RegistryExpired {
     return $Registry
 }
 
-# --- TTL pruning throttle: skip if pruned within the last minute ---
+# TTL pruning throttle: skip if pruned within the last minute
 $pruneMarker = Join-Path $registryDir '.last-prune'
 $shouldPrune = $true
 if (Test-Path $pruneMarker) {
@@ -177,7 +150,7 @@ if (Test-Path $pruneMarker) {
     }
 }
 
-# --- Main: load + prune, then dispatch ---
+# Main: load + prune, then dispatch
 if ($shouldPrune) {
     $reg = Clear-RegistryExpired (Get-RegistryData) $TtlMinutes
     Set-Content $pruneMarker -Value (Get-Date -Format "o") -NoNewline -Encoding UTF8
@@ -260,8 +233,7 @@ switch ($Action) {
         }
         $entry = $reg[$TaskId]
 
-        # Run post-delegation-check in a subprocess — it uses exit which would
-        # kill our process if invoked with & directly
+        # Run post-delegation-check in a subprocess — it uses exit which would kill us via &
         $pdcScript = Join-Path $RepoRoot 'scripts\post-delegation-check.ps1'
         $resolveTimeout = if ($entry.timeout_seconds) { $entry.timeout_seconds } else { 30 }
         $pwshExe = Join-Path $PSHOME 'pwsh'
@@ -301,7 +273,7 @@ switch ($Action) {
         $jsonLine = $result | Where-Object { $_ -match '^\{' } | Select-Object -First 1
         $json = $jsonLine | ConvertFrom-Json -ErrorAction SilentlyContinue
 
-        # If still no JSON, the subprocess failed — build a fallback quality object
+        # No JSON from subprocess → fallback quality object
         if (-not $json) {
             $json = [PSCustomObject]@{
                 passed          = $false
@@ -324,7 +296,7 @@ switch ($Action) {
         $budgetExceeded = $elapsedSeconds -gt $resolveTimeout
 
         if ($Quiet) {
-            # Build quality object from post-delegation-check + budget tracking
+            # Quality object from post-delegation-check + budget tracking
             $quality = if ($json) { $json } else { [PSCustomObject]@{ passed = $false } }
             $quality | Add-Member -NotePropertyName budget_exceeded -NotePropertyValue $budgetExceeded -ErrorAction SilentlyContinue
             $quality | Add-Member -NotePropertyName resolve_duration_s -NotePropertyValue ([math]::Round(((Get-Date) - $resolveStart).TotalSeconds, 1)) -ErrorAction SilentlyContinue
@@ -355,8 +327,7 @@ switch ($Action) {
         $reg[$TaskId] = $entry
         Set-RegistryData $reg
 
-        # Write the re-prompt instructions to a temp file that the orchestrator
-        # can pick up before calling task() with the same task_id
+        # Write re-prompt instructions to a temp file the orchestrator picks up before task()
         $promptFile = Join-Path $RepoRoot ".learnings\delegation-$TaskId-re-prompt.md"
         $NewPrompt | Set-Content $promptFile -Encoding UTF8
 

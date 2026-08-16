@@ -4,7 +4,7 @@
 .SYNOPSIS
   Validate internal refs (skills, SKILLS-INDEX, junctions, shared, README models).
 .DESCRIPTION
-  Checks cross-references, anti-pattern refs, config refs, review-rules, and agent consistency.
+  Checks cross-refs, anti-pattern refs, config refs, review-rules, agent consistency.
 .PARAMETER RepoRoot
   Root of the repository. Defaults to parent of scripts/.
 .PARAMETER Json
@@ -58,7 +58,7 @@ function Get-SkillRef {
     return @()
 }
 
-# --- [1/9] APC check ---
+# [1/9] APC check
 if (-not $Quiet) { Write-Host "[1/9] APC..." -N }
 $apcPath = Join-Path $RepoRoot "ANTI-PATTERN-CATALOG.md"
 if (Test-Path $apcPath) {
@@ -68,7 +68,7 @@ if (Test-Path $apcPath) {
     if (-not $Quiet) { Write-Host " FAIL" }
 }
 
-# --- [2/9] SKILL.md presence ---
+# [2/9] SKILL.md presence
 if (-not $Quiet) { Write-Host "[2/9] SKILL.md..." -N }
 $missingSkills = [System.Collections.Generic.List[string]]::new()
 $skillDirs = Get-SkillDir $skillsDir
@@ -84,7 +84,7 @@ if ($missingSkills.Count -eq 0) {
     if (-not $Quiet) { Write-Host " WARN" }
 }
 
-# --- [3/9] INDEX count ---
+# [3/9] INDEX count
 if (-not $Quiet) { Write-Host "[3/9] INDEX count..." -N }
 $actualCount = $skillDirs.Count
 $indexLine = Select-String -Path (Join-Path $RepoRoot "SKILLS-INDEX.md") -Pattern "all \d+ skills"
@@ -101,7 +101,7 @@ if ($indexLine -match "all (\d+) skills") {
     if (-not $Quiet) { Write-Host " WARN" }
 }
 
-# --- [4/9] Junctions ---
+# [4/9] Junctions
 if (-not $Quiet) { Write-Host "[4/9] junctions..." -N }
 $missingJunctions = [System.Collections.Generic.List[string]]::new()
 if (Test-Path $globalSkills) {
@@ -119,7 +119,7 @@ if ($missingJunctions.Count -eq 0) {
     if (-not $Quiet) { Write-Host " WARN" }
 }
 
-# --- [5/9] _shared files ---
+# [5/9] _shared files
 if (-not $Quiet) { Write-Host "[5/9] _shared..." -N }
 $requiredShared = @{
     'skill-resolver.md'     = Test-Path (Join-Path $skillsDir "_shared\skill-resolver.md")
@@ -135,7 +135,7 @@ if ($missingShared.Count -eq 0) {
     if (-not $Quiet) { Write-Host " FAIL" }
 }
 
-# --- [6/9] Cross-refs ---
+# [6/9] Cross-refs
 if (-not $Quiet) { Write-Host "[6/9] cross-refs..." -N }
 $allSkillNames = @($skillDirs.ForEach({ $_.Name.ToLower() }))
 $brokenRefs = [System.Collections.Generic.List[string]]::new()
@@ -170,7 +170,7 @@ if ($brokenRefs.Count -eq 0) {
     if (-not $Quiet) { Write-Host " FAIL ($($brokenRefs.Count))" }
 }
 
-# --- [7/9] Config refs ---
+# [7/9] Config refs
 if (-not $Quiet) { Write-Host "[7/9] config_refs..." -N }
 $missingConfigRefs = [System.Collections.Generic.List[string]]::new()
 
@@ -194,7 +194,7 @@ if ($missingConfigRefs.Count -eq 0) {
     if (-not $Quiet) { Write-Host " FAIL ($($missingConfigRefs.Count))" }
 }
 
-# --- [8/9] review-rules.jsonc ---
+# [8/9] review-rules.jsonc
 if (-not $Quiet) { Write-Host "[8/9] review-rules.jsonc..." -N }
 $rulesPath = Join-Path $RepoRoot "review-rules.jsonc"
 
@@ -236,7 +236,7 @@ if (Test-Path $rulesPath) {
     if (-not $Quiet) { Write-Host " WARN" }
 }
 
-# --- [9/9] README vs opencode.json agents ---
+# [9/9] README vs opencode.json agents
 if (-not $Quiet) { Write-Host "[9/9] README agents..." -N }
 try {
     $oc = Get-Content (Join-Path $RepoRoot "opencode.json") -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -260,7 +260,7 @@ try {
     if (-not $Quiet) { Write-Host " WARN (parse: $($_.Exception.Message))" }
 }
 
-# --- [10/9] semi-agents.json vs permission-gate.ps1 allowlist ---
+# [10/9] semi-agents.json vs permission-gate.ps1 allowlist
 if (-not $Quiet) { Write-Host "[10/9] semi allowlist sync..." -N }
 try {
     $semiPath = Join-Path $RepoRoot "scripts\opencode-config\semi-agents.json"
@@ -270,21 +270,19 @@ try {
         $semiContent = Get-Content $semiPath -Raw -Encoding UTF8
         $gateContent = Get-Content $gatePath -Raw -Encoding UTF8
 
-        # Extract semi-agent allow commands:
-        #   "xxx *": "allow"  — capture "xxx" (single or multi-word before " *")
-        #   "exact": "allow"  — capture exact command (no asterisk, e.g. "git stash list")
+        # Extract semi-agent allows: "xxx *" → xxx; "exact": "allow" → exact command
         $semiAllow = @(
             [regex]::Matches($semiContent, '"((?:\w+[ -]?)+) \*":\s*"allow"') | ForEach-Object { $_.Groups[1].Value }
             [regex]::Matches($semiContent, '"((?:\w+[ -]?)+)":\s*"allow"')   | ForEach-Object { $_.Groups[1].Value }
         )
-        # Extract gate patterns: capture command name after '^ (word chars, dots, hyphens)
+        # Extract gate patterns: command name after '^ (word chars, dots, hyphens)
         $gatePatterns = [regex]::Matches($gateContent, "'\^([a-zA-Z][a-zA-Z0-9._-]+)") | ForEach-Object { $_.Groups[1].Value }
 
-        # Normalize: add test runners that use spaces in the name
+        # Normalize: add test runners using spaces in the name
         $gateCommands = @($gatePatterns | Where-Object { $_ -ne '' } | ForEach-Object { $_.ToLower() } | Sort-Object)
         $semiCommands = @($semiAllow | ForEach-Object { $_.ToLower() } | Sort-Object)
 
-        # Check: every semi allow should exist in gate patterns (or be a superset)
+        # Check: every semi allow must exist in gate patterns (or be a superset)
         $missingInGate = @()
         $checked = @{}  # deduplicate
         foreach ($cmd in $semiCommands) {
@@ -308,7 +306,7 @@ try {
     if (-not $Quiet) { Write-Host " WARN (check: $($_.Exception.Message))" }
 }
 
-# --- Output ---
+# Output
 $result = @{
     timestamp        = (Get-Date -Format "o")
     canonicalSkills  = $actualCount

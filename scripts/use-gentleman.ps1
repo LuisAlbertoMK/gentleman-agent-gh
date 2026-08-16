@@ -1,46 +1,33 @@
 ﻿#requires -Version 7
 <#
 .SYNOPSIS
-    Gentleman-ize any project — bootstrap opencode.json from the generation chain
-    (opencode-base.json + permission-templates.json), NOT from the global config.
+    Gentleman-ize any project — generate opencode.json from the SSoT chain
+    (opencode-base.json + permission-templates.json), not the global config.
 
 .DESCRIPTION
-    Bootstraps a project directory with gentleman-vMK as default agent.
-    The project's opencode.json is generated from the SSoT chain:
-      scripts/lib/opencode-base.json          (agents, mcp, schema, base permissions)
-      scripts/lib/permission-templates.json   (per-mode permission blocks)
-      scripts/lib/agent-overrides.json        (hidden flags, extra perm keys)
-      scripts/opencode-config/shared-deny-rules.json  (security deny floor)
-    The generated config re-asserts the shared deny rules (security never degrades)
-    and adds a write-deny to ~/.config/opencode/**.
-    .gentleman-mode is written as 'manual' by default (never inherited from the
-    gentleman repo); an existing .gentleman-mode is respected unless -Force.
-
-    Call from any project directory:
-      .\scripts\use-gentleman.ps1
-      .\scripts\use-gentleman.ps1 -TargetDir ..\my-other-project -DefaultAgent gentleman-quick
+    Bootstraps a project dir with gentleman-vMK as default agent. Config is generated
+    from the chain (scripts/lib/{opencode-base,permission-templates,agent-overrides}.json
+    + scripts/opencode-config/shared-deny-rules.json). Re-asserts the shared deny floor
+    and adds a write-deny to ~/.config/opencode/**. .gentleman-mode defaults to 'manual'
+    (existing file respected unless -Force).
 
 .PARAMETER TargetDir
-    Project directory to gentleman-ize. Defaults to the current project's git root
-    (walk-up from cwd), or the current directory when no .git is found.
+    Project dir to gentleman-ize. Default: current project's git root (walk-up), else cwd.
 
 .PARAMETER DefaultAgent
-    Agent to set as default. Default: gentleman-vMK. Options: gentleman-vMK, gentleman-deep,
-    gentleman-codex, gentleman-quick.
+    Agent to set as default (gentleman-vMK/deep/codex/quick). Default: gentleman-vMK.
 
 .PARAMETER Json
-    Output JSON report instead of human-readable text.
+    Output JSON report instead of text.
 
 .PARAMETER Yes
     Non-interactive — skip confirmation prompts.
 
 .PARAMETER Force
-    Overwrite an existing .gentleman-mode (set it back to 'manual'). Without this,
-    an existing mode file is respected.
+    Overwrite existing .gentleman-mode to 'manual'.
 
 .PARAMETER DryRun
-    Report what would be written without writing any files (opencode.json and
-    .gentleman-mode are not created or modified).
+    Report what would be written without writing any files.
 
 .EXAMPLE
     .\scripts\use-gentleman.ps1
@@ -68,28 +55,25 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 
-# ── Load GENTLEMAN_AGENT_ROOT from User env if not in session ────────
+# Load GENTLEMAN_AGENT_ROOT from User env if not in session
 if (-not $env:GENTLEMAN_AGENT_ROOT) {
     $userRoot = [Environment]::GetEnvironmentVariable("GENTLEMAN_AGENT_ROOT", "User")
     if ($userRoot) { $env:GENTLEMAN_AGENT_ROOT = $userRoot }
 }
 
-# FIX 3: default target = git project root (same root switch-mode/mode-gate resolve),
-# not cwd — otherwise opencode.json/.gentleman-mode land in a subdir while the mode
-# gate walks up to the .git root. Explicit -TargetDir always wins.
+# FIX 3: default target = git project root (same as switch-mode/mode-gate resolve).
 if (-not $PSBoundParameters.ContainsKey('TargetDir')) {
     $TargetDir = Get-GentlemanProjectRoot
 }
 
-# ── Paths ────────────────────────────────────────────────────────────
+# Paths
 $globalCfgDir   = Get-GlobalConfigDir
 $globalCfgFile  = "$globalCfgDir\opencode.json"
 $globalSkills   = "$globalCfgDir\skills"
 $projectCfgFile = "$TargetDir\opencode.json"
 $repoRoot       = Split-Path -Path $PSScriptRoot -Parent
 
-# Chain SSoT files live in the repo. Resolve robustly: prefer GENTLEMAN_AGENT_ROOT
-# (works even when this script is executed from the global scripts copy).
+# Chain SSoT files live in the repo; prefer GENTLEMAN_AGENT_ROOT (works from global copy).
 $chainRoot = $repoRoot
 if ($env:GENTLEMAN_AGENT_ROOT -and (Test-Path (Join-Path $env:GENTLEMAN_AGENT_ROOT 'scripts/lib/opencode-base.json'))) {
     $chainRoot = $env:GENTLEMAN_AGENT_ROOT
@@ -115,11 +99,11 @@ function Merge-ProjectSection {
     [pscustomobject]$merged
 }
 
-# ── Template detection (shared module — SSoT mirror of generate-opencode-config.js) ──
+# Template detection (SSoT mirror of generate-opencode-config.js)
 . (Join-Path (Join-Path $PSScriptRoot 'lib') 'template-detection.ps1')
 . (Join-Path $PSScriptRoot 'lib' 'json-utils.ps1')
 
-# ── Chain generation: opencode-base.json + permission-templates.json + agent-overrides.json ──
+# Chain generation: opencode-base.json + permission-templates.json + agent-overrides.json
 function Convert-FileRefsToAbsolute {
     <#
     .SYNOPSIS
@@ -135,9 +119,7 @@ function Convert-FileRefsToAbsolute {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("PSReviewUnusedParameter", "Root", Justification="Used inside the -replace script-block closure (Join-Path `$Root) which PSSA does not trace")]
         [string]$Root
     )
-    # PSEA PSReviewUnusedParameter: $Root is also referenced inside the -replace closure
-    # below (Join-Path $Root), which PSEA does not trace. This top-level condition makes
-    # the parameter statically counted as used without changing behavior.
+    # PSEA: $Root used inside the -replace closure; this no-op makes it statically counted.
     if ($null -ne $Root) { }
     [regex]::Replace($Text, '\{file:([^}]+)\}', {
         param($m)
@@ -157,7 +139,7 @@ function Convert-ConfigFileRef {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("PSReviewUnusedParameter", "Root", Justification="Forwarded to Convert-FileRefsToAbsolute; PSSA false-positive on forward-only/forwarded parameter")]
         [string]$Root
     )
-    # $Root is read in the boolean condition below AND forwarded to Convert-FileRefsToAbsolute.
+    # $Root is read in the condition below AND forwarded to Convert-FileRefsToAbsolute.
     if ($Value -is [string] -and $Root) {
         return Convert-FileRefsToAbsolute $Value $Root
     }
@@ -172,7 +154,7 @@ function Convert-ConfigFileRef {
     return $Value
 }
 
-# ── Chain generation: opencode-base.json + permission-templates.json + agent-overrides.json ──
+# Chain generation: opencode-base.json + permission-templates.json + agent-overrides.json
 function Get-ChainConfig {
     param([string]$ChainRoot, [string]$TargetDir = '')
     $basePath = Join-Path $ChainRoot 'scripts/lib/opencode-base.json'
@@ -185,8 +167,7 @@ function Get-ChainConfig {
     $templates = Get-Content $tplPath  -Raw | ConvertFrom-Json
     $overrides = if (Test-Path $ovrPath) { Get-Content $ovrPath -Raw | ConvertFrom-Json } else { $null }
 
-    # templateMap SSoT guard — every agent in opencode-base.json must resolve to a template
-    # and every referenced template must exist. Fail-fast with a clear message.
+    # templateMap SSoT guard: every agent must resolve to an existing template. Fail-fast.
     foreach ($name in $base.agent.PSObject.Properties.Name) {
         $mapped = Detect-Template -AgentName $name
         if (-not $mapped) {
@@ -241,7 +222,7 @@ function Get-ChainConfig {
     $config
 }
 
-# ── Security deny floor: shared-deny-rules.json can never be removed by project overrides ──
+# Security deny floor: shared-deny-rules.json can never be removed by project overrides
 function Assert-SecurityFloor {
     param($Config, [string]$DenyPath)
     if (-not (Test-Path $DenyPath)) { throw "Shared deny rules not found: $DenyPath" }
@@ -268,9 +249,7 @@ function Assert-SecurityFloor {
     }
 
     # FIX 2: per-agent floor — a project's agent.<name>.permission overrides the chain
-    # template WHOLESALE on merge, so the global floor alone can be silently bypassed
-    # per agent. Re-assert the same denies on every agent that carries its own permission
-    # (never invent permissions for agents that don't have them — opencode defaults apply).
+    # template WHOLESALE, so re-assert the same denies on every agent that has permissions.
     if ($Config.PSObject.Properties['agent'] -and $Config.agent -and $Config.agent -is [psobject]) {
         foreach ($ap in $Config.agent.PSObject.Properties) {
             $agent = $ap.Value
@@ -291,7 +270,7 @@ function Assert-SecurityFloor {
     }
 }
 
-# ── Resolve target dir ───────────────────────────────────────────────
+# Resolve target dir
 $TargetDir = [System.IO.Path]::GetFullPath($TargetDir)
 if (-not (Test-Path $TargetDir -PathType Container)) {
     if (-not $Yes) {
@@ -302,7 +281,7 @@ if (-not (Test-Path $TargetDir -PathType Container)) {
     Out-Message "  Created $TargetDir" -color Green
 }
 
-# ── 1. Verify global config (runtime readiness — skills junction, agents) ──
+# 1. Verify global config (runtime readiness — skills junction, agents)
 Out-Message "==> Gentleman Portability — $TargetDir" -color Cyan
 
 $globalOk = $true
@@ -345,7 +324,7 @@ if (-not $globalOk) {
     }
 }
 
-# ── 2. Generate project config FROM THE CHAIN (SSoT), then merge project overrides ──
+# 2. Generate project config from chain (SSoT), then merge project overrides
 $projectCfg = Get-ChainConfig -ChainRoot $chainRoot -TargetDir $TargetDir
 
 if (Test-Path $projectCfgFile -PathType Leaf) {
@@ -370,14 +349,11 @@ if (-not $projectCfg.PSObject.Properties['$schema']) {
     $projectCfg | Add-Member -NotePropertyName '$schema' -NotePropertyValue 'https://opencode.ai/config.json' -Force
 }
 
-# Security floor — project can add/override rules but shared deny rules stay denied
+# Security floor: project can add/override rules but shared denies stay denied
 Assert-SecurityFloor -Config $projectCfg -DenyPath (Join-Path $chainRoot 'scripts/opencode-config/shared-deny-rules.json')
 
-# FIX 5: CBM scope — the chain base ships CBM_ALLOWED_ROOT={env:GENTLEMAN_AGENT_ROOT},
-# which is only right when the target IS the gentleman repo. External projects get the
-# project dir as CBM_ALLOWED_ROOT (codebase-memory-mcp then indexes the local project —
-# matches the "full bootstrap" intent) instead of inheriting the gentleman repo scope or
-# an empty "" when the env var is unset. Enabled stays true either way.
+# FIX 5: CBM scope — external projects get CBM_ALLOWED_ROOT=$TargetDir (codebase-memory
+    # indexes the local project) instead of inheriting the gentleman repo scope or "".
 $chainRootFull = [System.IO.Path]::GetFullPath($chainRoot).TrimEnd('\', '/')
 $targetFull    = [System.IO.Path]::GetFullPath($TargetDir).TrimEnd('\', '/')
 $targetIsChainRepo = ($targetFull -ieq $chainRootFull)
@@ -400,7 +376,7 @@ if ($DryRun) {
 Out-Message "    default_agent: $DefaultAgent" -color DarkGray
 Out-Message "    generated from chain (opencode-base.json + permission-templates.json)" -color DarkGray
 
-# ── 2b. .gentleman-mode: 'manual' by default, existing file respected unless -Force ──
+# 2b. .gentleman-mode: 'manual' default, existing respected unless -Force
 $modeDst = Join-Path $TargetDir ".gentleman-mode"
 if (Test-Path $modeDst -PathType Leaf) {
     $existingMode = (Get-Content -LiteralPath $modeDst -Raw).Trim()
@@ -423,15 +399,14 @@ if (Test-Path $modeDst -PathType Leaf) {
     }
 }
 
-# ── 3. Verify end-to-end ─────────────────────────────────────────────
+# 3. Verify end-to-end
 $verifyOk = $true
 $verifyNotes = [System.Collections.Generic.List[string]]::new()
 try {
     $check = if ($DryRun) { $projectCfg } else { Get-Content $projectCfgFile -Raw | ConvertFrom-Json }
     if ($check.default_agent -ne $DefaultAgent) { throw "default_agent mismatch" }
 
-    # Security denies must be present — derived at runtime from shared-deny-rules.json
-    # (the SSoT), so new deny rules are always covered instead of a hardcoded subset.
+    # Security denies must be present — derived at runtime from shared-deny-rules.json (SSoT).
     $denyRules = Get-Content (Join-Path $chainRoot 'scripts/opencode-config/shared-deny-rules.json') -Raw | ConvertFrom-Json
     $requiredDenies = @($denyRules.PSObject.Properties.Name)
     foreach ($rule in $requiredDenies) {
@@ -476,7 +451,7 @@ if (-not $allMcpOk) {
     Out-Message "  → Install missing MCPs: npm i -g @upstash/context7-mcp engram headroom" -color DarkGray
 }
 
-# ── Report ───────────────────────────────────────────────────────────
+# Report
 $report = @{
     status         = if ($verifyOk) { "ok" } else { "fail" }
     target_dir     = $TargetDir
@@ -496,9 +471,9 @@ if ($Json) {
     $report | ConvertTo-Json -Depth 3
 } else {
     Write-Host ""
-    Write-Host "═══════════════════════════════════════════════" -ForegroundColor Cyan
+    Write-Host "═══════════════════════════" -ForegroundColor Cyan
     Write-Host "  Gentleman Portability Report" -ForegroundColor Cyan
-    Write-Host "═══════════════════════════════════════════════" -ForegroundColor Cyan
+    Write-Host "═══════════════════════════" -ForegroundColor Cyan
     Write-Host "  Target  : $TargetDir" -ForegroundColor White
     Write-Host "  Agent   : $DefaultAgent" -ForegroundColor White
     Write-Host "  Status  : $(if($verifyOk){'✅ OK'}else{'❌ FAIL'})" -ForegroundColor $(if($verifyOk){'Green'}else{'Red'})
@@ -507,6 +482,6 @@ if ($Json) {
     Write-Host "  Skills : $globalSkills (junction, auto-synced)" -ForegroundColor DarkGray
     Write-Host "  Source : Generated from chain (not copied from global)" -ForegroundColor DarkGray
     Write-Host "  Secure : shared-deny-rules.json re-asserted (global + per-agent) + write-deny ~/.config/opencode/**" -ForegroundColor DarkGray
-    Write-Host "═══════════════════════════════════════════════" -ForegroundColor Cyan
+    Write-Host "═══════════════════════════" -ForegroundColor Cyan
 }
 
