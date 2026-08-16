@@ -1,7 +1,8 @@
----
+﻿---
 name: docs-audit
 description: "Trigger: documentation audit, README audit, API docs, onboarding docs, Diataxis. Audit docs quality and accuracy."
 triggers: "documentation audit, README audit, API docs, onboarding docs, Diátaxis, docs completeness, docs review, doc audit"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 ## When to Use
 Reviewing documentation quality, README files, API docs, onboarding. If no docs → report and stop.

@@ -1,7 +1,8 @@
----
+﻿---
 name: perf-profiling
 description: "Trigger: performance profiling, slow queries, N+1, memory leak, CPU hotspot, query optimization. Audit with measurement."
 triggers: "performance profiling, slow queries, N+1, memory leak, CPU hotspot, profiling, query optimization"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 ## When to Use
 Performance profiling, slow queries, memory leaks, CPU bottlenecks. If no performance issue → report and stop.

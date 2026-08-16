@@ -1,7 +1,8 @@
----
+﻿---
 name: code-review-agent
 description: "4R code review — Risk/Readability/Reliability/Resilience with evidence gates and actionable fixes"
 triggers: "Code review, CR, revisar código, criticar"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 4R: each R scored independently→verdict+fixes.
 

@@ -1,7 +1,8 @@
----
+﻿---
 name: baseline-ui
 description: "Anti-slop UI — layout, typography, responsive, animation, tokens. Use for cleanup or polish."
 triggers: "ui cleanup, polish interface, fix layout, ui slop, generic ui, design review, responsive, container query, flexbox, grid, ui audit"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

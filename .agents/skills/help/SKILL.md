@@ -1,7 +1,8 @@
----
+﻿---
 name: help
 description: "Explain Ralph Loop plugin and available commands"
 triggers: "help, ralph help, commands, available commands, what can you do, /help"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

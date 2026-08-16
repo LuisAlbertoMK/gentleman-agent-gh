@@ -1,8 +1,9 @@
----
+﻿---
 name: sdd-spec
 description: "Write SDD delta specs with requirements and scenarios. Trigger: orchestrator launches spec work."
 triggers: "SDD spec, specification, given when then, requisitos, spec writing"
 delegate_only: true
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 > **ORCHESTRATOR GATE**: `skill()` → STOP, delegate to `sdd-spec` sub-agent.

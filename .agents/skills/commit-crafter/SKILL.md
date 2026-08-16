@@ -1,7 +1,8 @@
----
+﻿---
 name: commit-crafter
 description: Craft conventional commit messages from diff analysis.
 triggers: "commit, mensaje, commit message, conventional commit, git commit, craft commit"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

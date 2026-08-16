@@ -1,7 +1,8 @@
----
+﻿---
 name: auth-hardening
 description: "Trigger: auth, JWT, OAuth, RBAC, CSRF, session, login, password hashing. Audit and harden auth flows."
 triggers: "auth, authentication, authorization, JWT, OAuth, RBAC, CSRF, session, login, password hashing, token, cookie"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 ## When to Use
 Review auth flows, login, tokens, RBAC — "is this auth secure?"

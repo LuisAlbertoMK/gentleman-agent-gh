@@ -1,7 +1,8 @@
----
+﻿---
 name: work-unit-commits
 description: "Plan commits as reviewable work units."
 triggers: "work unit, commit splitting, commit organization, reviewable commits, split commit, stacked PR, chained PR commits"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

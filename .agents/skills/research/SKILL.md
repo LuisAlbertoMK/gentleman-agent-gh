@@ -1,7 +1,8 @@
----
+﻿---
 name: research
 description: "Structured research workflow - define scope, gather evidence, synthesize findings, document decisions."
 triggers: "Research task, technical investigation, investigar, research, learn new tech, compare solutions, evaluate options"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 Structured research: scope, gather, synthesize, decide.

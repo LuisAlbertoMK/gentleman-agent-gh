@@ -1,7 +1,8 @@
----
+﻿---
 name: external-improvement
 description: "5-phase improvement cycle for external projects — 3+ subagents per phase."
 triggers: "improve external project, mejora proyecto, proyecto externo, 5-phase cycle, ciclo 5 fases, analizá este proyecto, corré el ciclo, revisame el proyecto, !5fases, !extimprove, aplicá las 5 fases"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

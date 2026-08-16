@@ -1,4 +1,4 @@
----
+﻿---
 name: sdd-design
 description: Create the SDD technical design and architecture approach. Trigger: orchestrator launches design for a change.
 author: Gentle AI
@@ -8,6 +8,7 @@ delegate_only: true
 priority: standard
 triggers: "SDD design, design phase, technical design, architecture design, sdd-design"
 allow_comments: true
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 # SDD — Design Phase

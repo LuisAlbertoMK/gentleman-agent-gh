@@ -1,7 +1,8 @@
----
+﻿---
 name: pdf-utils
 description: "PDF processing — extract text, parse tables, generate reports"
 triggers: "PDF, extract PDF, parse PDF, merge PDF, generate PDF, PDF table, PDF invoice, read PDF, PDF to text, PDF to markdown"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

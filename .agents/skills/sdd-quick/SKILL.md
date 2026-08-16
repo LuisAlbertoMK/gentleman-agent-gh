@@ -1,7 +1,8 @@
----
+﻿---
 name: sdd-quick
 description: "3-phase fast SDD for LOW-risk - Propose->Apply->Verify. Use when 1-3 files, known codebase, no schema/auth/API changes."
 triggers: "SDD quick, fast path, quick SDD, low risk SDD, simple change SDD"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 # SDD Quick — 3-Phase Fast Path

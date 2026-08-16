@@ -1,7 +1,8 @@
----
+﻿---
 name: engram-protocol
 description: "Persistent memory protocol — save, search, dreaming, session lifecycle via Engram MCP"
 triggers: "remember, recall, engram, mem_save, mem_search, session close, dreaming, memory, token budget, compression, L1 L2 L3, capture pipeline, project score, bias calibration"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

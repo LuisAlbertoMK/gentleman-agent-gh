@@ -1,7 +1,8 @@
----
+﻿---
 name: testing-strategy
 description: "Test strategy - pyramid analysis, coverage gaps, risk-based prioritization, test debt, ROI-driven investment."
 triggers: "testing strategy, test plan, test coverage, test pyramid, test debt, test gap, test priority, test audit, quality strategy, what to test, how to test"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

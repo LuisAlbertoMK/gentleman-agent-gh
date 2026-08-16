@@ -1,7 +1,8 @@
----
+﻿---
 name: code-generation
 description: "Trigger: new file, function, code generation, script, boilerplate, scaffold. Write code matching codebase patterns."
 triggers: "new file, new function, code generation, script, boilerplate, scaffold, create code, write code"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 ## When to Use
 New files, new functions, scripts, boilerplate. NOT for debugging (→ deep-debugging) or single-line fixes on existing files (→ quick-executor).

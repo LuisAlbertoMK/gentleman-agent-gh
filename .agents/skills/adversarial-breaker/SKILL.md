@@ -1,7 +1,8 @@
----
+﻿---
 name: adversarial-breaker
 description: "Adversarial verification — fixer→breaker chain. Independent offensive agent."
 triggers: "adversarial, breaker, !breaker, verify fix, romper, verificar fix, try to break, offensive verification"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

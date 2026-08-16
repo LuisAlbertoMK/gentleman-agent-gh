@@ -1,7 +1,8 @@
----
+﻿---
 name: sdd
 description: "Unified SDD pipeline — 9 phases from init through archive. Use sdd-quick for LOW-risk 3-phase fast path."
 triggers: "SDD pipeline, SDD phase, spec-driven development"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

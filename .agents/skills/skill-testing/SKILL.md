@@ -1,7 +1,8 @@
----
+﻿---
 name: skill-testing
 description: "Test and verify skill quality — syntax, coverage, integration, and token budget assessment before production use"
 triggers: "Test/verify skill, coverage"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 Trigger: After creating/modifying skill, before production use.

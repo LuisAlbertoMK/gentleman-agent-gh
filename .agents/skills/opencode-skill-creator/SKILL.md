@@ -1,7 +1,8 @@
----
+﻿---
 name: opencode-skill-creator
 description: "Create, test, evaluate, and iterate OpenCode skills with mandatory intake interview."
 triggers: "create skill, edit skill, opencode skill, skill eval, evaluate prompt, benchmark skill, iterate skill, skill testing, skill creation"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

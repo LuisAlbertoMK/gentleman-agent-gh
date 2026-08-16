@@ -1,4 +1,4 @@
----
+﻿---
 name: mini-orchestrator
 description: "BabyAGI-style loop (Execution→Task Creation→Prioritization) with async fire-and-forget handoff"
 author: Gentle AI
@@ -7,6 +7,7 @@ mode: primary
 delegate_only: false
 priority: standard
 triggers: "mini-orchestrator, BabyAGI, task loop, async delegation, fire-and-forget, background monitor, agent chain, dependent tasks"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 # mini-orchestrator

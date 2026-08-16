@@ -1,7 +1,8 @@
----
+﻿---
 name: opencode-model-router
 description: "Route tasks by model strength — specialized agents for analysis, implementer for execution"
 triggers: "model router, routing, delegate or direct, model decision, specialized agent, implementer"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## ⚠️ SECURITY GATE (always first)

@@ -1,7 +1,8 @@
----
+﻿---
 name: web-quality-audit
 description: "Comprehensive web audit: performance, a11y, SEO, responsive, animation, design tokens."
 triggers: "audit, review web quality, lighthouse, page quality, optimize website, design audit, ui audit, web audit, site review"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

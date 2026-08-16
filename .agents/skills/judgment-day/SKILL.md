@@ -1,7 +1,8 @@
----
+﻿---
 name: judgment-day
 description: "Dual adversarial review orchestrator — 2 profile-scoped code-review-agent instances, verdict synthesis"
 triggers: "Judgment day, JD, dual review, juzgar, adversarial review"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

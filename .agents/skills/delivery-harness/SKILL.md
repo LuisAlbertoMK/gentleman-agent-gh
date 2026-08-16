@@ -1,7 +1,8 @@
----
+﻿---
 name: delivery-harness
 description: "Orchestrate multi-agent work — break goals into work units, delegate with isolation, collect results, handle failures"
 triggers: "Coordinate, orchestrate, multi-agent, delegate work"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

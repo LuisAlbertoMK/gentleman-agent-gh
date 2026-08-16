@@ -1,7 +1,8 @@
----
+﻿---
 name: data-quality
 description: "Trigger: data audit, pipeline audit, schema validation, data governance, ETL. Audit data quality and reliability."
 triggers: "data audit, data pipeline audit, schema validation, data governance, ETL audit, data quality check, data review"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 ## When to Use
 Reviewing data pipelines, schemas, ETL processes, analytics. If no data layer → report and stop.

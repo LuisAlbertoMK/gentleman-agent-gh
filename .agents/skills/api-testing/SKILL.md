@@ -1,7 +1,8 @@
----
+﻿---
 name: api-testing
 description: "API endpoint testing - REST + GraphQL, contract/schema validation, collection & response testing, auth flows, mocks."
 triggers: "api testing, API test, REST test, GraphQL test, endpoint test, contract test, schema validation, response validation, auth test, API mock, collection test, Postman, Bruno, insomnia, OpenAPI validation"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

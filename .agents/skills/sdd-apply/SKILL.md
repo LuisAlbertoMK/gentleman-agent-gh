@@ -1,6 +1,8 @@
----
+﻿---
+name: sdd-apply
 description: "Implement SDD tasks from specs and design. Trigger: orchestrator launches apply for change tasks."
 triggers: "SDD apply, implement SDD, code change, SDD implementation, apply tasks"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 > **ORCHESTRATOR GATE**: ORCHESTRATOR → STOP, delegate to `sdd-apply` sub-agent. Executor: execute directly.

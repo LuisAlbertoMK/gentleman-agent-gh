@@ -1,7 +1,8 @@
----
+﻿---
 name: branch-pr
 description: "Create Gentle AI pull requests with issue-first checks. Trigger: creating, opening, or preparing PRs for review."
 triggers: "pull request, create PR, open PR, branch naming, PR creation, review PR, github pull request"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

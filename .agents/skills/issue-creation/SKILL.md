@@ -1,7 +1,8 @@
----
+﻿---
 name: issue-creation
 description: "Create Gentle AI issues with issue-first checks."
 triggers: "create issue, GitHub issue, bug report, feature request, open issue, issue creation, report bug"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 ## When to Use
 Bug in `gga`·Feature/enhancement·Gentleman-Programming/gentle-ai·Triaging

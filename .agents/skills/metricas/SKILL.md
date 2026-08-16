@@ -1,7 +1,8 @@
----
+﻿---
 name: metricas
 description: "Before/after delta + % comparison - git diff or bookmark mode, tokenization, multi-language. NOT self-evaluation."
 triggers: "Metricas, before/after, % improvement, tokenization, delta"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

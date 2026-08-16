@@ -1,7 +1,8 @@
----
+﻿---
 name: refactoring-planner
 description: "Plan refactoring with impact analysis, dependency mapping, and step-by-step migration with test baseline"
 triggers: "Refactor, refactoring, reestructurar, migrate"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

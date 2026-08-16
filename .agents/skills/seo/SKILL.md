@@ -1,7 +1,8 @@
----
+﻿---
 name: seo
 description: "Search engine visibility & ranking — technical SEO, on-page, structured data, E-E-A-T, AI Overviews"
 triggers: "seo, search engine, meta tags, structured data, sitemap, search optimization, ranking, schema, robots.txt, meta description, EEAT, E-E-A-T, AI Overview, SGE, AI Mode, generative search, AEO, GEO, INP, Google Core Update, GA4, topical authority, content cluster"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 ## When to Use
 SEO audit/meta/sitemap/Core Update/AI Overviews/E-E-A-T/CWV/INP. NOT:content writing/link building/PPC/social. Pre-reqs:GSC·PageSpeed·RichResultsTest

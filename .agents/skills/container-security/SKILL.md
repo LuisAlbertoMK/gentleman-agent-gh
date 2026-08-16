@@ -1,7 +1,8 @@
----
+﻿---
 name: container-security
 description: "Trigger: Dockerfile, docker-compose, Kubernetes, k8s, pod, deployment, helm. Audit container security hardening."
 triggers: "Dockerfile, docker-compose, container, image, Kubernetes, k8s, pod, deployment, helm, docker, orchestration"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 ## When to Use
 Reviewing Dockerfiles, docker-compose, K8s manifests, Helm charts, or "is this container secure"

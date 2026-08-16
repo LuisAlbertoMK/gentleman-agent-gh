@@ -1,6 +1,8 @@
----
+﻿---
+name: sdd-tasks
 description: "Break SDD change into implementation tasks. Trigger: orchestrator launches task planning."
 triggers: "SDD tasks, task planning, implementation tasks, work breakdown"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 > **ORCHESTRATOR GATE**: `skill()` → STOP. Delegate to `sdd-tasks` sub-agent.

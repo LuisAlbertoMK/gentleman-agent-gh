@@ -1,7 +1,8 @@
----
+﻿---
 name: cancel-ralph
 description: Cancel active Ralph Loop
 triggers: "cancel ralph, stop loop, cancel loop, ralph stop, end loop"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

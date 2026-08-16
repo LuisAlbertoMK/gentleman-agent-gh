@@ -1,7 +1,8 @@
----
+﻿---
 name: performance-tracker
 description: "Score and track app performance — 6 dims, continuous scoring, trend analysis"
 triggers: "performance score, mobile perf, desktop perf, rendimiento, app score, lighthouse, benchmark"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

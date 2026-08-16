@@ -1,7 +1,8 @@
----
+﻿---
 name: execution-mode
 description: "Auto-detect task execution mode - QUICK/THOROUGH/DRAFT - from scope/risk/familiarity. Not resource optimization."
 triggers: "Execution mode, quick/thorough/draft, resource adaptive, zone green/yellow/orange/red"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

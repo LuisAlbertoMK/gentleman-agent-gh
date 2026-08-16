@@ -1,8 +1,9 @@
----
+﻿---
 name: sdd-verify
 description: "Execute tests and prove implementation matches specs, design, and tasks. Trigger: SDD verification phase."
 triggers: "SDD verify, verification, test verification, verify change, SDD verification"
 delegate_only: true
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 > **ORCHESTRATOR GATE**: `skill()` → ORCHESTRATOR STOP. Delegate to `sdd-verify` sub-agent. Executors skip gate.

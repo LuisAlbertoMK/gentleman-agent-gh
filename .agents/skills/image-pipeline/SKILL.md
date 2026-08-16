@@ -1,7 +1,8 @@
----
+﻿---
 name: image-pipeline
 description: "Image optimization — compress, convert WebP/AVIF, resize, describe"
 triggers: "compress image, optimize image, resize image, convert webp, convert avif, describe image, image too heavy, slow images, image bug"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

@@ -1,6 +1,8 @@
----
+﻿---
+name: automejora-analyzer
 description: "Cross-project autonomous self-improvement analysis (read-only). T1-T4 scaling. Gap priority report with ICE + blast radius. NO implementation."
 triggers: "automejora, auto-mejora, self-improvement analysis, !automejora, project audit, improve this repo"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 Trigger `!automejora` or `!analisis automejora` in any project. NEVER writes code — output to `docs/mejoras/YYYY-MM-DD-<project>-automejora-analisis.md`. v3 protocol consumes as evidence.

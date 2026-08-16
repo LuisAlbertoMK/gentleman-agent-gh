@@ -1,6 +1,8 @@
----
+﻿---
+name: sdd-propose
 description: "Create SDD change proposal with intent, scope, approach. Trigger: orchestrator launches proposal work."
 triggers: "SDD propose, proposal, intent, approach, change proposal"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 > **ORCHESTRATOR GATE**: `skill()` → ORCHESTRATOR STOP. Delegate to `sdd-propose` sub-agent. Executor: execute directly.

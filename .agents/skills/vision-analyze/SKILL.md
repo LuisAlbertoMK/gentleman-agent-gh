@@ -1,7 +1,8 @@
----
+﻿---
 name: vision-analyze
 description: "Local vision analysis - screenshots, UI review, error detection via Ollama. 100% local. NOT visual regression."
 triggers: [screenshot, capture, vision, analyze-ui, visual-review, captura, analizar-imagen]
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

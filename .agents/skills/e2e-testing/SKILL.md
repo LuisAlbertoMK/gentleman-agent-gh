@@ -1,7 +1,8 @@
----
+﻿---
 name: e2e-testing
 description: "E2E testing - hybrid: e2t CLI smoke checks + Playwright for flows, assertions, visual regression, Ollama AI analysis."
 triggers: test, e2e, playwright, browser testing, interactive testing, form testing
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 # E2E Testing Skill

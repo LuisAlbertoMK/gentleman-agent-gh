@@ -1,7 +1,8 @@
----
+﻿---
 name: skill-registry
 description: "Build and maintain skill registry - scan skill dirs, deduplicate across sources, compact rules, persist to engram."
 triggers: "Skill registry, catalog"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

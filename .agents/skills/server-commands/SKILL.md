@@ -1,7 +1,8 @@
----
+﻿---
 name: server-commands
 description: "Run long-lived server processes safely — dev-server.ps1, port detection, background management"
 triggers: "server, ng serve, npm run dev, dotnet run, python -m http.server, dev server, background process, long-lived, !dev"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use

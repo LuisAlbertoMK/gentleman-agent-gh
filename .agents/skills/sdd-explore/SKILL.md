@@ -1,8 +1,9 @@
----
+﻿---
 name: sdd-explore
 description: "Explore SDD ideas before committing to a change. Trigger: orchestrator launches exploration or requirement clarification."
 triggers: "SDD explore, explore ideas, investigation, discovery, SDD exploration"
 delegate_only: true
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 > **ORCHESTRATOR GATE**: `skill()` → ORCHESTRATOR STOP. Delegate to `sdd-explore` sub-agent. Executors only.

@@ -1,7 +1,8 @@
----
+﻿---
 name: bitacora
 description: "Historical log of user requests per session — auto-append to BITACORA.md, search, date filtering"
 triggers: "Bitacora, historial, histórico, qué pedí, request log"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 Historical log of user requests per session. Auto-append on session end.

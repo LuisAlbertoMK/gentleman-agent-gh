@@ -1,7 +1,8 @@
----
+﻿---
 name: llm-security
 description: "Trigger: LLM, AI, prompt injection, RAG, OpenAI, Anthropic, Ollama, LangChain, agent, tool use, data exfiltration."
 triggers: "LLM, AI, prompt injection, RAG, OpenAI, Anthropic, Ollama, LangChain, agent, tool use, data exfiltration, model"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 ## When to Use
 Review LLM integrations, RAG pipelines, AI features — "is this secure?"

@@ -1,7 +1,8 @@
----
+﻿---
 name: recovery-protocol
 description: "Stop-diagnose-correct-learn protocol — handle agent errors and frustration systematically"
 triggers: "Recovery, 'no es eso', frustration, error correction"
+changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use
