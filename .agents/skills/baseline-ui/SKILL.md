@@ -6,46 +6,56 @@ changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use
-Anti-slop UI — layout, typography, responsive, animation, to
+Anti-slop audit&cleanup: layout·typography·responsive·animation·tokens
+**Stack**: CSS/Tailwind·`cn()`(clsx+tw-merge)·React·Audit→**ui-engine**
+**Flow**: Scan→❌→fix→verify→a11y→perf·Review:`/baseline-ui <file>`
 
-**Stack**: Existing CSS/Tailwind·`cn()`(clsx+tailwind-merge) React·No new approach unless project uses
-**Scope**: Audit&cleanup. For implementation→load **ui-engine** after.
-
-## Workflow
-1.Scan targets→violations(❌) 2.Classify 3.Fix 4.Verify:contrast/responsive/motion 5.Chain:a11y→perf
-
-## Layout
-`h-dvh`not`h-screen`·`safe-area-inset`·`size-*`over`w-*`+`h-*`·Components:CQ(`container-type:inline-size`)·Page:MQ
-❌`container-type:size`w/o`block-size`·❌`grid-auto-flow:dense`interactive
-Cards:`repeat(auto-fit,minmax(280px,1fr))`·Fluid:`cqi`(ONLY containers)·Subgrid·`aspect-ratio`
-Tree:1D→Flex|2D→Grid|Child→Subgrid|Parent→:has()|Unknown→auto-fit,minmax()
-```css
-/* ❌ */.card{width:300px;height:200px}
-/* ✅ */.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}
-.card{container-type:inline-size}
-```
+## Layout 10 Patterns
+1. **Sticky sidebar** `.pg{display:grid;grid-template-areas:"hd hd""sd mn";grid-template-columns:250px 1fr}.sd{position:sticky;top:1rem;align-self:start}`
+2. **Card grid** `.grid{display:grid;gap:1.5rem;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}`
+3. **Responsive nav** `.nav{display:flex;flex-wrap:wrap;gap:1rem}.nav>a{flex-shrink:0}`
+4. **Aspect media** `.media{width:100%;aspect-ratio:16/9;object-fit:cover}`❌`padding-top:56.25%`
+5. **Sticky footer** `body{display:grid;grid-template-rows:auto 1fr auto;min-height:100dvh}`
+6. **Fluid split** `.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}`
+7. **CQ card** `.card{container-type:inline-size}.card-inner{display:grid;gap:1rem}@container(min-width:400px){.card-inner{grid-template-columns:240px 1fr}}`
+8. **Hero** `.hero{min-height:100dvh;padding:max(1rem,env(safe-area-inset-top))}`
+9. **Subgrid rows** `.rows{display:grid}.rows>*{display:grid;grid-template-rows:subgrid;grid-row:span 2}`
+10. **Stack/center** `.stack{display:grid;gap:1rem}.center{place-items:center}`
+Tree:1D→Flex|2D→Grid|Child→Subgrid|Parent→:has()|?→auto-fit,minmax()
 
 ## Typography
-`text-balance`headings·`text-pretty`body·`tabular-nums`data·Fluid:page→`clamp(1rem,1.5vw+0.5rem,1.5rem)`, containers→`cqi`. No`letter-spacing`except labels
-```css
-/* ❌ */h1{font-size:2rem} /* ✅ */h1{font-size:clamp(1.5rem,3vw+0.5rem,2.5rem);text-wrap:balance}
-```
+`text-balance`h·`text-pretty`body·`tabular-nums`data·Page→`clamp(1rem,1.5vw+.5rem,1.5rem)`
 
-## Animation(audit only—see ui-engine)
-Props:`transform`+`opacity`✅. ❌`width/height/top/left/margin/padding`. Duration:120/200/300ms. ❌>500ms. <200ms/element.
-Reduced:`animation/transition-duration:0.01ms!important`on`*`at`prefers-reduced-motion:reduce`
-❌`transition:all`·✅Scroll-Driven CSS
+## Animation
+`transform`+`opacity`only·❌w/h/top/left/margin/padding·120/200/300ms·❌>500·<200ms/elem
+`@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}`
 
-## Tokens
-❌HSL/RGB→✅OKLCH·8pt·3-tier(Prim→Sem→Comp)·`light-dark()`·≥4.5:1 all text all themes
+## Tokens OKLCH→Var
+| Step | Action | Example |
+|---|---|---|
+|1|Pick OKLCH|oklch(55% .18 255)|
+|2|Primitive var|--blue-500:oklch(55% .18 255)|
+|3|Semantic var|--primary:var(--blue-500)|
+|4|Component var|--btn-bg:var(--primary)|
+|5|Theme|:root{color-scheme:light dark}|
+|6|Verify|≥4.5:1|
+
+## Responsive Test Matrix
+| Breakpoint | Simulate | Verify |
+|---|---|---|
+|<640|iPhone SE 320|1-col·nav collapse·44px|
+|640-1024|iPad 768|2-col sticky|
+|1024-1440|resize|3-col|
+|>1440|max win|grid caps|
+|CQ 400|DevTools|`cqi`flips|
+|Reduced|emulate|.01ms|
+|Dark|toggle|`light-dark()`|
 
 ## Design
-No gradients/multicolor·No glow·Empty:1primary·Accent:1/view·Errors next to action·Keyboard/focus·`aria-label`icons·No blocking paste
-
-## Review: `/baseline-ui <file>`→Violation→Why→Fix
+No gradients/glow/multicolor·1 primary·Errors next to action·No blocking paste
 
 ## Refs
-**ui-engine**(implementation)**accessibility**(focus/ARIA/EAA)**performance**(budget/CV)**web-quality-audit**(full audit)
+**ui-engine**(impl)**accessibility**(ARIA)**performance**(budget)**web-quality-audit**(full)
 
 ## Anti-Patterns
-Fixed width·h-screen·grid-auto-flow:dense interactive·Fixed font-size·transition:all·>500ms·No reduced-motion·HSL/RGB·No contrast·cqi outside container·letter-spacing body
+Fixed width·h-screen·dense interactive·Fixed font·transition:all·>500ms·No reduced-motion·HSL/RGB·No contrast·cqi outside container·letter-spacing body
