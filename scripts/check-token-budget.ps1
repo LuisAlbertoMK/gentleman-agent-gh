@@ -47,12 +47,12 @@ $stats = @{}
     }
     if ($skillFiles.Count -gt 0) {
     $avgSkill = [math]::Round(($skillFiles | Measure-Object -Property Length -Average).Average, 0)
-    $overBudget = $skillFiles | Where-Object { $_.Length -gt $BudgetBytes }
+    $overBudget = @($skillFiles | Where-Object { $_.Length -gt $BudgetBytes })
     $stats.skills = [PSCustomObject]@{
         count      = $skillFiles.Count
         average    = $avgSkill
         budget     = $BudgetBytes
-        underBudget = ($skillFiles | Where-Object { $_.Length -le $BudgetBytes }).Count
+        underBudget = (@($skillFiles | Where-Object { $_.Length -le $BudgetBytes })).Count
         overBudgetFiles = $overBudget.Count
         passed     = $avgSkill -le $BudgetBytes
     }
@@ -68,7 +68,7 @@ if (Test-Path $PromptsPath) {
 }
 if ($promptFiles.Count -gt 0) {
     $avgPrompt = [math]::Round(($promptFiles | Measure-Object -Property Length -Average).Average, 0)
-    $overBudgetPrompt = $promptFiles | Where-Object { $_.Length -gt $BudgetBytes }
+    $overBudgetPrompt = @($promptFiles | Where-Object { $_.Length -gt $BudgetBytes })
     $stats.prompts = [PSCustomObject]@{
         count      = $promptFiles.Count
         average    = $avgPrompt
