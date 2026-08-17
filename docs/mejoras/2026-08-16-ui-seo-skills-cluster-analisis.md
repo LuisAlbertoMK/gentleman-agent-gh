@@ -184,5 +184,5 @@ trigger collisions:        0 (R1's 8) + 1 more found+fixed (screenshot) = 0
 
 ### Remaining (deferred)
 
-- R2-note: `## Cross-Refs` header (standardized name) still not used — skills use `## Refs` (compatible, cross-ref-check passes)
+- R2-note: ✅ **RESOLVED post-commit (2026-08-16)** — cross-ref validation was running VACUOUSLY: `cross-ref-check.ps1:150` matched only `Cross-Refs:` but 0/90 skills used it (67 used `## Refs`). Fix: `Get-SkillRef` now accepts both headers, the middot `·` separator, `**skill**(ctx)` bold tokens, and next-line values; `score-dims.ps1:651` counts both headers; `skill-coverage-e2e` + `CrossRefPatterns` tests updated. The now-real validation **found and fixed 5 latent data bugs**: bitacora (`engram`→`engram-protocol`), external-improvement + pdf-utils (`codebase-memory` MCP → dropped), help (`runbook` → dropped), self-improvement (4 scripts → dropped, kept skills only). Cluster headers standardized to `## Cross-Refs:` (vision-analyze gained one; accessibility URLs preserved as `**Standards**` line). refsScore 7.4→7.5. 30/30 tests + gate 22/22.
 - R3 runtime harness: static gate proves suite integrity; runtime LOAD→APPLY→VERIFY requires opencode runtime (documented in tests/prompts/README.md)

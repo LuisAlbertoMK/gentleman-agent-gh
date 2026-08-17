@@ -67,8 +67,8 @@ No gradients/glow/multicolor·1 primary·Errors next to action·No blocking past
 ## Output
 `UI-CLEANUP:<file>—<date> CRITICAL:[a11y|contrast]<issue>→<fix> HIGH:[layout|responsive]<issue>→<fix> MEDIUM:[tokens|anim]<issue>→<fix> VERIFY:[a11y|perf]→<pass/fail>`
 
-## Refs
-**ui-engine**(impl)**accessibility**(ARIA)**performance**(budget)**web-quality-audit**(full)
+## Cross-Refs: ui-engine | accessibility | performance | web-quality-audit
+
 
 ## Anti-Patterns
 Fixed width·h-screen·dense interactive·Fixed font·transition:all·>500ms·No reduced-motion·HSL/RGB·No contrast·cqi outside container·letter-spacing body

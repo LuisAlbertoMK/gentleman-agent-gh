@@ -55,8 +55,8 @@ Text overflow:screenshot diff|Alignment:pixel|Z-index:element|Responsive:multi-v
 ## Anti-Patterns
 No baseline·Threshold too strict(flaky)·No viewport reset·Skip anim freeze·No CI artifacts·Ignore theme·Mask nothing dynamic·Increase threshold instead of fix
 
-## Refs
-quality-gate·performance·baseline-ui·accessibility·ui-engine
+## Cross-Refs: quality-gate | performance | baseline-ui | accessibility | ui-engine
+
 
 ---
 

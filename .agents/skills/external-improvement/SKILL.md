@@ -49,8 +49,8 @@ docs/external/<project>/
 | 3 consecutive SKIP | Abort cycle, write partial report |
 | Human needed | `conflict` file + escalation |
 
-## Refs
-delivery-harness · project-mapper · gap-analysis · sdd-propose/verify · triple-verify · codebase-memory · bitacora · commit-crafter · CYCLE.md (§5-Phase Cycle Loop)
+## Cross-Refs: delivery-harness | project-mapper | gap-analysis | sdd-propose | sdd-verify | triple-verify | bitacora | commit-crafter
+
 
 ## Anti-Patterns
 Skip P1/P2 (explore/diagnose) · Parallelize dependent phases · Ignore score drop threshold · Over-commit on SKIP · Mix internal/external checklist · Reuse internal agents for external work · Skip P5 learning extraction (loses compound knowledge)

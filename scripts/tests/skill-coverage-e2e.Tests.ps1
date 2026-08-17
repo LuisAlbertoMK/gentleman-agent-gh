@@ -51,12 +51,21 @@ Describe 'E2E: Skill Coverage (all 90 skills)' {
 
     It 'every declared Cross-Ref resolves to a real skill dir' {
         foreach ($s in $script:skillTable) {
-            $line = [regex]::Match($s.Content, '(?im)^Cross-Refs:\s*(.+)').Groups[1].Value
-            if (-not $line) { continue }  # no refs declared -> vacuously OK
-            ($line -split ',\s*|\s+') | Where-Object { $_ } | ForEach-Object {
-                $ref = $_.Trim().ToLower()
-                if (-not $ref) { continue }
-                $script:allDirs -contains $ref | Should -BeTrue -Because "$($s.Name): references unknown ref '$ref'"
+            $raw = [regex]::Match($s.Content, '(?im)^##\s*(?:Cross-)?Refs:?\s*([^\r\n]*)').Groups[1].Value.Trim()
+            if (-not $raw) { continue }  # no refs declared -> vacuously OK
+            # bold-token format: **skill-name**(context) — case-insensitive
+            $boldRefs = @([regex]::Matches($raw, '\*\*([a-z][a-z0-9_-]+)\*\*', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase) | ForEach-Object { $_.Groups[1].Value.ToLower() })
+            $hasBold = $boldRefs.Count -gt 0
+            $clean = [regex]::Replace($raw, '(?i)\*\*[a-z][a-z0-9_-]+\*\*(\s*\([^)]*\))?', ' ')
+            $splitRefs = @()
+            if ($clean -match '[·|,]' -or -not $hasBold) {
+                $splitRefs = @($clean -split '[·|,]+' |
+                    ForEach-Object { $_.Trim() } |
+                    Where-Object { $_ -cmatch '^[a-z][a-z0-9_-]+$' } |
+                    ForEach-Object { $_.ToLower() })
+            }
+            @($boldRefs + $splitRefs | Select-Object -Unique) | ForEach-Object {
+                $script:allDirs -contains $_ | Should -BeTrue -Because "$($s.Name): references unknown ref '$_'"
             }
         }
     }

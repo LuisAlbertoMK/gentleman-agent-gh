@@ -247,5 +247,4 @@ User: bitacora --append "Fix auth 🔒 rate limiting"
 7. **C28: Skip verification after parallel subagent work** — Each subagent must append; orchestrator must verify all 3 entries present (Cycle 28 had 3 parallel subagents).
 8. **C28: Treat archive as deletion** — Archive preserves history. `BITACORA.archive.md` is queryable with `bitacora --file BITACORA.archive.md --search "..."`.
 
-## Refs
-dreaming · session-resume · immune-system · auto-metrics · bitacora · engram
+## Cross-Refs: dreaming | session-resume | immune-system | auto-metrics | bitacora | engram-protocol

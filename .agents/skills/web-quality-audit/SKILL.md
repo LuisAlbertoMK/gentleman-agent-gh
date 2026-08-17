@@ -55,8 +55,8 @@ Where: PR job→block Critical/High|pre-deploy→CWV gate|nightly→full audit
 ## Anti-Patterns
 Lighthouse once·Skip a11y·No anim budget·Mix CQ/MQ without strategy·No token audit·No CI gate·Ignore theme a11y·Audit unreachable·Confuse Lighthouse/unlighthouse scales
 
-## Refs
-baseline-ui·accessibility·performance·seo·best-practices·ui-engine
+## Cross-Refs: baseline-ui | accessibility | performance | seo | best-practices | ui-engine
+
 
 ---
 

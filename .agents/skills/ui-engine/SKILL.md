@@ -52,4 +52,4 @@ color-scheme:light dark→native controls (Tokens). `:focus-visible{outline:2px 
 
 ## Anti-Patterns
 Flex2D·Grid1D·!important vs @layer·flex:1 w/o min-inline-size:0·container-type:size w/o block-size·grid-auto-flow:dense·MQ for components·Decorative·>500ms·transition:all·HSL/RGB·Fixed font·cqi outside container·Prop drill>3L·DerivedStateInUseEffect·Context high-freq·HOCs new·Redux default
-## Refs: baseline-ui·accessibility·performance
+## Cross-Refs: baseline-ui | accessibility | performance

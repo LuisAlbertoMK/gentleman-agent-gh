@@ -648,7 +648,7 @@ if ($hasSkills) {
         if ($sm.Directory.Name -ne '_shared' -and $content -match 'MERGED into|redirect') { $redirectSkills += $sm }
         if ($content -match 'changelog:') { $skillsWithChangelog++ }
         if ($content -match 'triggers:')  { $skillsWithTriggers++ }
-        if ($content -match '##\s*Refs')  { $skillsWithRefs++ }
+        if ($content -match '##\s*(?:Cross-)?Refs')  { $skillsWithRefs++ }
     }
 }
 

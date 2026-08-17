@@ -46,8 +46,8 @@ Explain Ralph Loop plugin and available commands
 - **Script parse**: replace `—` → `--`, `→` → `->`. ASCII only in `.ps1`
 - **Full**: `docs/operations/RUNBOOK.md`
 
-## Refs
-ralph-loop · cancel-ralph · opencode-model-router · context-watchdog · immune-system · session-resume · engram-protocol · runbook
+## Cross-Refs: ralph-loop | cancel-ralph | opencode-model-router | context-watchdog | immune-system | session-resume | engram-protocol
+
 
 ## Examples
 

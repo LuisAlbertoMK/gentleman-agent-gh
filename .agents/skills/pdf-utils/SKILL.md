@@ -265,5 +265,5 @@ Batch >10? → script wrapper
 3. No validation after extraction (silent data corruption)
 4. Process huge PDFs in one go (OOM crash)
 
-## Refs
-codebase-memory · command-wrapper · research
+## Cross-Refs: command-wrapper | research
+

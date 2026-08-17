@@ -1,4 +1,4 @@
-﻿---
+---
 name: self-improvement
 description: "Continuous improvement cycle - macro + micro, self-reflection merge, inter(30) minimum, SkillOpt gated validation."
 triggers: "Self-improvement, improvement cycle, auto-mejora, ciclo de mejora, comienza ciclo, self-reflection, Hermes, reflexioná"
@@ -23,7 +23,7 @@ Template: `reflection/{date}` with Outcome/Root cause/Score/What changed.
 Frustration signals → `recovery-protocol`.
 ## Buffer Formats
 Schemas: `.learnings/rejected-edits.json` (id/timestamp/target/edit/reason/delta) and `accepted-edits.json` (id/timestamp/target/edit/delta/pattern).
-## Refs: CYCLE.md · inter-track · extract-skill · run-improvement-cycle · score-auto · SkillOpt arXiv:2605.23904 · SkillSpector · recovery-protocol · external-improvement (5-phase cycle for external projects)
+## Cross-Refs: recovery-protocol | external-improvement | immune-system | auto-metrics | security-scanner | quality-gate | external-auditor | opencode-skill-creator
 
 ## Examples
 User: "comienza ciclo de auto-mejora"

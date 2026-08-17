@@ -1,4 +1,4 @@
-﻿---
+---
 name: image-pipeline
 description: "Image optimization — compress, convert WebP/AVIF, resize, describe. Single-file atomic edits, batch processing, metadata extraction."
 triggers: "compress, convert WebP/AVIF, resize, describe"
@@ -211,5 +211,5 @@ rm -rf /tmp/cli-test && ./convert-to-webp.sh tests/fixtures/ /tmp/cli-test 80
 | Describe image (Ollama) | `./describe-image.sh photo.jpg llava:13b` |
 | Run all tests | `bash test-regression.sh && python -m pytest test_invariants.py && bash test_cli_contract.sh` |
 
-## Refs
-performance (LCP/media budgets) · accessibility (alt-text) · web-quality-audit (full audit) · visual-testing (regression)
+## Cross-Refs: performance | accessibility | web-quality-audit | visual-testing | vision-analyze
+

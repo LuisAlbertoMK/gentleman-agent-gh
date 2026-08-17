@@ -195,5 +195,5 @@ No yields = input delay + processing + presentation all in one frame = INP failu
 ## Output
 `PERF:<page>—<date> BUDGET:[LCP|INP|CLS|TBT]<value>vs<target>→PASS/FAIL FIX:<issue>→<change> VERIFY:[lhci|test]→<pass/fail>`
 
-## Refs
-web.dev CWV · MDN INP · ui-engine · baseline-ui
+## Cross-Refs: web-quality-audit | ui-engine | baseline-ui
+

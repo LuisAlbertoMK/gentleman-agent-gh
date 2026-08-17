@@ -47,13 +47,53 @@ function Read-SkillContent {
     try { return [IO.File]::ReadAllText($md) } catch { return $null }
 }
 
-# --- Helper: Parse comma/pipe separated refs from SKILL.md ---
+# --- Helper: Parse comma/pipe/middot separated refs from SKILL.md ---
+# Handles both ## Cross-Refs and ## Refs headers, inline or next-line values,
+# and **skill**(context) bold-token format. Non-skill tokens (URLs, prose) are
+# filtered by the strict skill-name regex. Bold tokens are matched
+# case-insensitively and lower-cased to match the canonical skill-name set.
 function Get-SkillRef {
     param([string]$Content, [string]$Pattern)
     if ($Content -match $Pattern) {
-        return ($Matches[1] -split '\s*[\|,]\s*' |
+        $raw = $Matches[1]
+        # multi-line format: refs live on the line AFTER a trailing-colon header.
+        # Only fall back when the header itself ended with ':' — otherwise a bare
+        # header (no value) must NOT swallow the next body line.
+        if ([string]::IsNullOrWhiteSpace($raw) -and $Matches[0] -match ':\s*$') {
+            $afterHeader = $Content.Substring($Matches[0].Length)
+            $nextLine = ($afterHeader -split "`r?`n" | Where-Object { $_.Trim() } | Select-Object -First 1)
+            $raw = $nextLine
+        }
+        # bold-token format: **skill-name**(context) — case-insensitive, lower-cased
+        $boldTokens = @([regex]::Matches($raw, '\*\*([a-z][a-z0-9_-]+)\*\*', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase) |
+            ForEach-Object { $_.Groups[1].Value.ToLower() })
+        $hasBold = $boldTokens.Count -gt 0
+        # strip bold tokens + their optional (context) — case-insensitively to match extraction
+        $clean = [regex]::Replace($raw, '(?i)\*\*[a-z][a-z0-9_-]+\*\*(\s*\([^)]*\))?', ' ')
+        $splitTokens = @()
+        # In bold format the residual text must be separator-delimited; a lone
+        # trailing word (e.g. "context") is prose, not a ref. In plain format a
+        # single unseparated token is a valid inline ref.
+        if ($clean -match '[·|,]' -or -not $hasBold) {
+            $splitTokens = @($clean -split '\s*[·|,]\s*' |
+                ForEach-Object { $_.Trim() } |
+                Where-Object { $_ -cmatch '^[a-z][a-z0-9_-]+$' } |
+                ForEach-Object { $_.ToLower() })
+        }
+        return @($boldTokens + $splitTokens | Select-Object -Unique)
+    }
+    return @()
+}
+
+# --- Helper: Parse config_refs (file paths, NOT skill names) ---
+# config_refs are repo-relative paths (e.g. .opencode/skills/foo/SKILL.md),
+# so the strict skill-name filter must NOT apply. Split, trim, drop empties.
+function Get-ConfigRef {
+    param([string]$Content, [string]$Pattern)
+    if ($Content -match $Pattern) {
+        return @($Matches[1] -split '\s*[·|,]\s*' |
             ForEach-Object { $_.Trim() } |
-            Where-Object { $_ -cmatch '^[a-z][a-z0-9_-]+$' })
+            Where-Object { $_ })
     }
     return @()
 }
@@ -146,8 +186,8 @@ foreach ($skill in $skillDirs) {
     if (-not $content) { continue }
     $skillContentCache[$skill.Name] = $content
 
-    # Check Cross-Refs
-    $crossRefs = Get-SkillRef $content 'Cross-Refs:\s*(.+)'
+    # Check Cross-Refs (accepts ## Cross-Refs and ## Refs, inline or next-line)
+    $crossRefs = Get-SkillRef $content '(?im)^##\s*(?:Cross-)?Refs:?\s*(.*)$'
     foreach ($ref in $crossRefs) {
         if ($allSkillNames -notcontains $ref) {
             $brokenRefs.Add("$($skill.Name) cross-refs '$ref' missing")
@@ -178,7 +218,7 @@ foreach ($skill in $skillDirs) {
     $content = $skillContentCache[$skill.Name]
     if (-not $content) { continue }
 
-    $configRefs = Get-SkillRef $content 'config_refs:\s*(.+)'
+    $configRefs = Get-ConfigRef $content 'config_refs:\s*(.+)'
     foreach ($ref in $configRefs) {
         $refPath = Join-Path $RepoRoot $ref
         if (-not (Test-Path $refPath)) {

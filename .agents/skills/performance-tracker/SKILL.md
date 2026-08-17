@@ -383,5 +383,5 @@ mem_save -title "perf-score:myapp-web" -content "...|**Platform**:web|**Avg**:5.
 
 ---
 
-## Refs
-auto-metrics · gap-analysis · web-quality-audit · performance · metricas
+## Cross-Refs: auto-metrics | gap-analysis | web-quality-audit | performance | metricas
+

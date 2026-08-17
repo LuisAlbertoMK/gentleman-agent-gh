@@ -1,4 +1,4 @@
-﻿---
+---
 name: vision-analyze
 description: "Local vision analysis - screenshots, UI review, error detection via Ollama. 100% local. NOT visual regression."
 triggers: [capture, vision, analyze-ui, visual-review, captura, analizar-imagen]
@@ -119,6 +119,8 @@ ap http://localhost:4200 -Mode ui
 3. **Capture-only path** — `ap http://localhost:4200 -NoAnalysis`
    Expected: `screenshot.png` created with NO Ollama call (no ~75-224s wait).
 
+
+## Cross-Refs: visual-testing | performance | accessibility | code-review-agent | self-improvement
 ## Anti-Patterns
 
 - **Use it for pixel diffing / visual regression** — that is `visual-testing`'s job (`toHaveScreenshot`); Ollama description is slow (~75-224s) and non-deterministic, not a diff.

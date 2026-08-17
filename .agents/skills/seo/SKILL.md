@@ -47,4 +47,4 @@ curl -sI https://example.com/ | grep -i "strict-transport"         # → HSTS pr
 ## Anti-Patterns
 Keyword-stuff·Dup titles·No schema·Skip mobile·Missing robots/sitemap·Article JSON-LD incomplete·Mass AI·No E-E-A-T·llms.txt for AI·Thin affiliate·No monitor·Rankings only·Fake schema
 
-## Refs:web-quality-audit·performance·baseline-ui·docs-audit
+## Cross-Refs: web-quality-audit | performance | baseline-ui | docs-audit
