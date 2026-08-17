@@ -3,6 +3,7 @@ name: web-quality-audit
 description: "Comprehensive web audit: performance, a11y, SEO, responsive, animation, design tokens."
 triggers: "audit, review web quality, lighthouse, page quality, optimize website, design audit, ui audit, web audit, site review"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1117
 ---
 
 ## When to Use
@@ -31,6 +32,14 @@ Best Practices(15%): HTTPS·`npm audit`·CSP·DOCTYPE·UTF-8·clean console·con
 ## Workflow
 1.Setup:`npx unlighthouse --site <url>`(site) or `npx lighthouse <page> --view`(page)
 2.Scan→scores 3.Analyze vs thresholds 4.Prioritize by severity 5.Report
+
+## Hard Rules
+- Target MUST be running + publicly reachable (no auth/CAPTCHA/WAF) before audit
+- Compare EVERY score vs Thresholds table: LCP<2500ms, CLS<0.1, INP<200ms, TTFB<800ms, contrast≥4.5:1, touch≥24×24
+- ANY Critical/High → block pre-deploy gate; NEVER ship with a11y failures
+- Report MUST use severity buckets (CRITICAL/HIGH/MEDIUM/LOW) + Output format; targets Perf≥90 A11y=100 BP≥95 SEO≥95
+- Never audit once — cadence pre-deploy/weekly/monthly; never skip a11y category
+- CQ uses `inline-size` (never `size`); MQ=page, CQ=components
 
 ## Output
 ```

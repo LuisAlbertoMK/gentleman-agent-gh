@@ -3,6 +3,7 @@ name: visual-testing
 description: "Visual verification - screenshots, visual regression, UI bug detection via Playwright. See vision-analyze for LLM."
 triggers: "screenshot, visual diff, visual bug, regression test, VRT, UI broken, text overflow, layout shift, responsive test, visual regression"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 883
 ---
 
 ## When to Use
@@ -47,6 +48,9 @@ Visual bug?→playwright open→screenshot→fix→verify|CI regression?→toHav
 
 ## Bugs
 Text overflow:screenshot diff|Alignment:pixel|Z-index:element|Responsive:multi-vp|Color contrast:a11y|Missing states:hover/focus/disabled
+
+## Output
+`VRT:<spec>—<date> RESULT:<pass|fail> DIFF:<pixel-ratio> BASELINE:<match|updated> VIEWPORTS:[375/768/1024/1440]`
 
 ## Anti-Patterns
 No baseline·Threshold too strict(flaky)·No viewport reset·Skip anim freeze·No CI artifacts·Ignore theme·Mask nothing dynamic·Increase threshold instead of fix

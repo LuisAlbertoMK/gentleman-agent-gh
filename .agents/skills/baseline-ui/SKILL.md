@@ -1,8 +1,9 @@
 ﻿---
 name: baseline-ui
 description: "Anti-slop UI — layout, typography, responsive, animation, tokens. Use for cleanup or polish."
-triggers: "ui cleanup, polish interface, fix layout, ui slop, generic ui, design review, responsive, container query, flexbox, grid, ui audit"
+triggers: "ui cleanup, polish interface, fix layout, ui slop, generic ui, design review, anti-slop, ui polish, polish ui"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1029
 ---
 
 ## When to Use
@@ -53,6 +54,18 @@ Tree:1D→Flex|2D→Grid|Child→Subgrid|Parent→:has()|?→auto-fit,minmax()
 
 ## Design
 No gradients/glow/multicolor·1 primary·Errors next to action·No blocking paste
+
+## Hard Rules
+- Animate `transform`+`opacity` only — NEVER w/h/top/left/margin/padding; 120/200/300ms, NEVER >500ms, <200ms/element
+- ALWAYS include `@media(prefers-reduced-motion:reduce)` → `.01ms` override
+- Colors: OKLCH only, 3-tier chain (primitive→semantic→component), contrast ≥4.5:1 — NEVER HSL/RGB hex
+- No fixed widths: `repeat(auto-fit,minmax())` + `clamp()` + `min-height:100dvh` (never `h-screen`/fixed px)
+- `cqi` ONLY inside a container (CQ `inline-size`); MQ=page, CQ=components
+- Design: 1 primary color, no gradients/glow/multicolor; errors adjacent to action; never block paste
+- Verify contrast, reduced-motion and dark mode (Responsive Test Matrix) before done
+
+## Output
+`UI-CLEANUP:<file>—<date> CRITICAL:[a11y|contrast]<issue>→<fix> HIGH:[layout|responsive]<issue>→<fix> MEDIUM:[tokens|anim]<issue>→<fix> VERIFY:[a11y|perf]→<pass/fail>`
 
 ## Refs
 **ui-engine**(impl)**accessibility**(ARIA)**performance**(budget)**web-quality-audit**(full)

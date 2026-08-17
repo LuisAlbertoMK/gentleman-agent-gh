@@ -3,6 +3,7 @@ name: ui-engine
 description: "UI system — Grid/Flexbox/@layer/:has(), container queries, compositor-only animation, OKLCH tokens, component patterns"
 triggers: "ui, layout, responsive, animation, design tokens, css, grid, flexbox, container query, dark mode, component layout, page layout, component patterns, hooks, compound components, state management"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1026
 ---
 ## When to Use
 UI: Grid/Flexbox/@layer/:has()·CQ·OKLCH·anim·patterns.
@@ -46,6 +47,9 @@ Card:`.card{container-type:inline-size}.card-body{display:grid;grid-template-col
 - Tab: focus ring visible at every stop
 ## A11y
 color-scheme:light dark→native controls (Tokens). `:focus-visible{outline:2px solid var(--pri);outline-offset:2px}` keyboard-only, never `outline:none`. Contrast≥4.5:1→accessibility.
+## Output
+`UI-IMPL:<component>—<date> PATTERN:[flex|grid|cq|tokens]<used> VERIFY:[a11y|contrast|reduced-motion|CQ]→<pass/fail> FALLBACK:[@supports]→<used/not-needed>`
+
 ## Anti-Patterns
 Flex2D·Grid1D·!important vs @layer·flex:1 w/o min-inline-size:0·container-type:size w/o block-size·grid-auto-flow:dense·MQ for components·Decorative·>500ms·transition:all·HSL/RGB·Fixed font·cqi outside container·Prop drill>3L·DerivedStateInUseEffect·Context high-freq·HOCs new·Redux default
 ## Refs: baseline-ui·accessibility·performance

@@ -1,8 +1,7 @@
 # SEO Audit Checklist
 
 ## Critical (must fix)
-- [ ] Page is indexable (no
-oindex, no blocked by robots.txt)
+- [ ] Page is indexable (no noindex, no blocked by robots.txt)
 - [ ] Unique <title> (50-60ch, keyword-first)
 - [ ] Unique <meta name="description"> (150-160ch with CTA)
 - [ ] One <h1> per page, primary keyword
@@ -12,7 +11,7 @@ oindex, no blocked by robots.txt)
 
 ## High (should fix)
 - [ ] XML sitemap submitted to Search Console
-- [ ] obots.txt allows important pages
+- [ ] robots.txt allows important pages
 - [ ] Alt text on all images (descriptive)
 - [ ] Internal links use descriptive, entity-rich anchor text
 - [ ] Clean URLs (no query params for content)

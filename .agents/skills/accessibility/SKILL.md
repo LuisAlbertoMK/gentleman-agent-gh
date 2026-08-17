@@ -3,6 +3,7 @@ name: accessibility
 description: "WCAG 2.2 + EAA 2025 — audit and improve web accessibility."
 triggers: "a11y, accessibility, WCAG, screen reader, keyboard navigation, EAA, European Accessibility Act, contrast, focus, touch target"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 2431
 ---
 
 ## When to Use
@@ -10,10 +11,10 @@ WCAG 2.2 + EAA 2025 — audit and improve web accessibility.
 
 
 ## POUR — Perceivable | Operable | Understandable | Robust
-**Perceivable**: 1.1.1 img→alt (deco→lt="", icon→ria-label, complex→ria-describedby) · 1.4.3/1.4.6 Contrast: normal 4.5:1(AA)/7:1(AAA), large 3:1(AA)/4.5:1(AAA), UI/focus 3:1 · 1.2 Media: captions+desc
+**Perceivable**: 1.1.1 img→alt (deco→alt="", icon→aria-label, complex→aria-describedby) · 1.4.3/1.4.6 Contrast: normal 4.5:1(AA)/7:1(AAA), large 3:1(AA)/4.5:1(AAA), UI/focus 3:1 · 1.2 Media: captions+desc
 **Operable**: 2.1.1 Keyboard: prefer native · **2.4.13 Focus**: min 2px solid outline+outline-offset:2px on :focus-visible, never outline:none · 2.4.1 Skip links → #main-content · **2.5.8 AA Targets**: ≥24×24px, **enhanced 44×44px** touch-first · 2.5.7 Dragging: single-pointer alt · 2.3 Motion: @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
-**Understandable**: 3.1.1 html lang · 3.3 Forms: each input→label/aria-label, errors→ria-invalid+ria-describedby+ole="alert" · 3.3.8 Auth: no cognitive test unless copy-paste/autofill/SSO
-**Robust**: 4.1.2 Prefer native semantic HTML · 4.1.3 Dynamic→ria-live="polite", errors→ole="alert"
+**Understandable**: 3.1.1 html lang · 3.3 Forms: each input→label/aria-label, errors→aria-invalid+aria-describedby+role="alert" · 3.3.8 Auth: no cognitive test unless copy-paste/autofill/SSO
+**Robust**: 4.1.2 Prefer native semantic HTML · 4.1.3 Dynamic→aria-live="polite", errors→role="alert"
 ## EAA 2025 (June 2025)
 - All EU-market web products: WCAG 2.2 AA minimum
 - **Every theme** independently tested for contrast
@@ -36,7 +37,7 @@ min-width+min-height (not padding) · 44px default, 24px fallback for dense tabl
 ## Actionable Examples (4-5)
 
 ### 1. axe-core Automated Audit (CI + Local)
-`ash
+`bash
 # Install
 npm i -D @axe-core/playwright @axe-core/cli
 
@@ -67,11 +68,11 @@ console.log(getContrastRatio(fg, bg)); // Must be ≥4.5:1 (AA) / ≥7:1 (AAA)
 `
 
 ### 3. Screen Reader Testing Protocol (NVDA/VoiceOver)
-`ash
+`bash
 # NVDA (Windows) - Test checklist
 1. Install NVDA + speech viewer (Tools → Speech Viewer)
 2. Navigate: Tab / Shift+Tab / Arrow keys / H (headings) / K (links)
-3. Verify: landmarks announced, form labels read, errors in ole="alert", dynamic updates via ria-live
+3. Verify: landmarks announced, form labels read, errors in role="alert", dynamic updates via aria-live
 
 # VoiceOver (macOS/iOS)
 # Cmd+F5 to start → Control+Option+Arrow to navigate
@@ -79,7 +80,7 @@ console.log(getContrastRatio(fg, bg)); // Must be ≥4.5:1 (AA) / ≥7:1 (AAA)
 `
 
 ### 4. Focus Trap Modal (Reusable Pattern)
-`	ypescript
+`typescript
 // focus-trap.ts — minimal, no deps
 export function trapFocus(element: HTMLElement): () => void {
   const focusables = element.querySelectorAll<HTMLElement>(
@@ -127,9 +128,9 @@ export function trapFocus(element: HTMLElement): () => void {
 - **Threshold**: AA = 4.5:1 (normal), 3:1 (large/UI); AAA = 7:1 / 4.5:1
 
 ### 2. ARIA & Semantic Structure — Lint + Screen Reader
-- **Lint**: slint-plugin-jsx-a11y + xe-core (rules: ria-*, ole, scope, landmark)
+- **Lint**: eslint-plugin-jsx-a11y + axe-core (rules: aria-*, role, scope, landmark)
 - **Screen reader**: NVDA/VoiceOver walk-through — verify landmark announcements, form label association, live region behavior
-- **Check**: No duplicate IDs, ria-describedby points to existing element, ria-live not overused
+- **Check**: No duplicate IDs, aria-describedby points to existing element, aria-live not overused
 
 ### 3. Keyboard Navigation — Tab Flow + Focus Visible
 - **Automated**: Playwright page.keyboard.press('Tab') loop → screenshot each focus state
@@ -147,19 +148,19 @@ export function trapFocus(element: HTMLElement): () => void {
 
 ### 2. Cognitive Disabilities (WCAG 2.2 3.3.8 + 2.3.3)
 - **Auth**: No puzzle CAPTCHAs — allow copy-paste, autofill, WebAuthn/passkeys, magic links
-- **Timeouts**: Extendable (ria-live warning + extend button) — no auto-logout without notice
+- **Timeouts**: Extendable (aria-live warning + extend button) — no auto-logout without notice
 - **Language**: Simple, consistent terminology; avoid jargon; provide glossary for complex flows
 
 ### 3. Dynamic Content & Live Regions
-- **Polite vs Assertive**: ria-live="polite" for updates (toast, cart count); ole="alert" (assertive) for errors only
-- **Atomic updates**: Wrap changed region in ria-atomic="true" to prevent full re-read
+- **Polite vs Assertive**: aria-live="polite" for updates (toast, cart count); role="alert" (assertive) for errors only
+- **Atomic updates**: Wrap changed region in aria-atomic="true" to prevent full re-read
 - **Race conditions**: Debounce rapid updates — batch into single announcement
 
 ### 4. Internationalization & RTL
 - **lang attribute**: html lang="es-AR" + per-section lang changes
 - **RTL focus order**: Logical (DOM) order must match visual RTL — test keyboard tab in RTL mode
 - **Number/date formats**: Screen readers announce per locale — test with NVDA Spanish, VoiceOver Arabic
-- **Font scaling**: Support em + @media (prefers-reduced-motion) — no fixed px on text containers
+- **Font scaling**: Support rem + @media (prefers-reduced-motion) — no fixed px on text containers
 
 ---
 
@@ -186,6 +187,9 @@ button:focus:not(:focus-visible) { outline: none; } /* mouse click = no ring */
 `
 
 ---
+
+## Output
+`A11Y:<page>—<date> CRITICAL:[wcag-2.x]<violation>→<fix> HIGH:... MEDIUM:... VERIFY:[axe|nvda|tab]→<pass/fail>`
 
 ## Quick Reference Card
 

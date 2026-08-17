@@ -3,7 +3,12 @@ name: image-pipeline
 description: "Image optimization — compress, convert WebP/AVIF, resize, describe. Single-file atomic edits, batch processing, metadata extraction."
 triggers: "compress, convert WebP/AVIF, resize, describe"
 changelog: docs/ciclos/cycle28-20260816.md
+token_budget: 1782
 ---
+
+## When to Use
+Image optimization — compress, convert WebP/AVIF, resize, describe. Single-file atomic edits, batch processing, metadata extraction.
+**NOT**: visual regression (`visual-testing`) · LLM image description of UI screens (`vision-analyze`) · page screenshot capture (`visual-testing`).
 
 ## Pipeline Stages
 
@@ -156,7 +161,7 @@ rm -rf /tmp/cli-test && ./convert-to-webp.sh tests/fixtures/ /tmp/cli-test 80
 
 ---
 
-## 2 Anti-Patterns
+## Anti-Patterns
 
 | # | Anti-Pattern | Why It Fails | Correct Approach |
 |---|--------------|--------------|------------------|
@@ -184,6 +189,17 @@ rm -rf /tmp/cli-test && ./convert-to-webp.sh tests/fixtures/ /tmp/cli-test 80
 
 ---
 
+## Hard Rules
+- ALWAYS encode from source/original or lossless master — NEVER re-encode lossy→lossy (generational quality loss)
+- Validate input first (`identify`) — corrupted/truncated → skip + log, never crash the pipeline
+- Per-image quality heuristic (`quality = 85 − entropy×15`) — never one global setting
+- Strip ICC unless `--preserve-icc`; convert to sRGB for web
+- Downscale >32K px to ≤16K before encode (encoder limits); animated formats → preserve or extract first frame per flag
+- Verify every output: SSIM ≥0.995 vs golden + valid MIME + size budget (Quality Gates)
+
+## Output
+`IMG-PIPE:<input>—<date> STAGE:[validate|transform|optimize|verify] OUT:<format> SIZE:<B→B> REDUCTION:<%> SSIM:<n> VERIFY:[tests|file-mime]→<pass/fail>`
+
 ## Quick Reference
 
 | Task | Command |
@@ -194,3 +210,6 @@ rm -rf /tmp/cli-test && ./convert-to-webp.sh tests/fixtures/ /tmp/cli-test 80
 | Lossless PNG max compression | `./optimize-png.sh src/ dest/` |
 | Describe image (Ollama) | `./describe-image.sh photo.jpg llava:13b` |
 | Run all tests | `bash test-regression.sh && python -m pytest test_invariants.py && bash test_cli_contract.sh` |
+
+## Refs
+performance (LCP/media budgets) · accessibility (alt-text) · web-quality-audit (full audit) · visual-testing (regression)

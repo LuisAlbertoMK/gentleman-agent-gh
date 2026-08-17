@@ -3,6 +3,7 @@ name: performance
 description: "Web performance — CWV/INP, compositor animation, scroll-driven, content-visibility."
 triggers: "performance, speed up, load time, slow loading, page speed, performance audit, INP, animation performance, scroll performance, compositor"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1916
 ---
 
 ## When to Use
@@ -190,6 +191,9 @@ function onClick() { heavyWork(); updateUI(); sendAnalytics(); }
 async function onClick() { updateUI(); await scheduler.yield(); heavyWork(); await scheduler.yield(); sendAnalytics(); }
 ```
 No yields = input delay + processing + presentation all in one frame = INP failure.
+
+## Output
+`PERF:<page>—<date> BUDGET:[LCP|INP|CLS|TBT]<value>vs<target>→PASS/FAIL FIX:<issue>→<change> VERIFY:[lhci|test]→<pass/fail>`
 
 ## Refs
 web.dev CWV · MDN INP · ui-engine · baseline-ui

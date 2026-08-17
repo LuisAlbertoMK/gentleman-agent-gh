@@ -1,8 +1,9 @@
 ﻿---
 name: performance-tracker
 description: "Score and track app performance — 6 dims, continuous scoring, trend analysis"
-triggers: "performance score, mobile perf, desktop perf, rendimiento, app score, lighthouse, benchmark"
+triggers: "performance score, mobile perf, desktop perf, rendimiento, app score, benchmark, perf tracking, performance trend"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 4054
 ---
 
 ## When to Use
@@ -34,6 +35,17 @@ Trend (every 10 or session end): `mem_search(query="perf-score:", limit=20)` →
 
 ## Action by Avg
 ≥8 Maintain · 6-7.9 Light review + profile · 4-5.9 gap-analysis + fix · <4 Critical perf sprint
+
+## Hard Rules
+- Score EVERY dimension from real measurement — NEVER guess ("feels fast") or placeholder without annotation
+- Platform goes in mem_save title (`perf-score:{app}-{platform}`); NEVER mix platforms in one trend (false regression alerts)
+- NEVER skip a dimension — unavailable → neutral 7 + annotate in content (Edge Case 1)
+- Trend check only at N≥5 scores; regression = drop >0.5 (prev 5 vs recent 5) → gap-analysis; >0.2 → light review
+- CI: median-of-3 lighthouse runs (not mean) to kill flakiness; never crash on missing process — degrade to static-only scoring
+- Scope: app performance only — agent perf goes to `auto-metrics`
+
+## Output
+`PERF-SCORE:<app>—<date> DIMS:[Load|Render|Memory|Network|Bundle|Energy]=<1-10> AVG=<n.n> PLATFORM:<mob|desk|web> TREND:<delta>→<stable|drift|regression>`
 
 ## Anti-Patterns: Score without real data · cross-platform in same trend · skip bundle/cache · score once
 
