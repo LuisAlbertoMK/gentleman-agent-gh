@@ -70,3 +70,47 @@ ap http://localhost:4200 -NoAnalysis  # capture only
 
 ## Security
 100% local via 127.0.0.1:11434. No external API calls.
+
+---
+
+## Examples
+
+### Example 1: UI Review of a Local App
+
+**Trigger**: `analyze-ui` (frontmatter triggers: screenshot, analyze-ui, visual-review, captura, analizar-imagen)
+
+```powershell
+# Alias `ap` = Playwright capture + Ollama analysis (Setup step 5)
+ap http://localhost:4200 -Mode ui
+# RAM-aware auto-select: moondream (≥2GB free) / llava:7b (≥8GB free)
+```
+
+**Expected output**:
+
+```
+[playwright] captured http://localhost:4200 (1440x900) 1.2s
+[ollama] model=moondream:latest 92s
+[vision] ui: layout OK · contrast OK · 1 issue: hero carousel broken
+```
+
+**Result**: issue fed to `code-review-agent` (Integration) — 100% local, no external API (Security).
+
+## Testing
+
+1. **Server up** — before any run:
+   ```powershell
+   Invoke-RestMethod -Uri "http://127.0.0.1:11434/api/version"
+   ```
+   Expected: `{"version":"0.x.x"}` JSON, no error.
+
+2. **Models present** — `& "$env:USERPROFILE\scoop\apps\ollama\current\ollama.exe" list`
+   Expected: `moondream:latest` and `llava:7b` listed.
+
+3. **Capture-only path** — `ap http://localhost:4200 -NoAnalysis`
+   Expected: `screenshot.png` created with NO Ollama call (no ~75-224s wait).
+
+## Anti-Patterns
+
+- **Use it for pixel diffing / visual regression** — that is `visual-testing`'s job (`toHaveScreenshot`); Ollama description is slow (~75-224s) and non-deterministic, not a diff.
+- **Force `--model llava:7b` with <8GB free RAM** — model selection is RAM-aware by design; forcing an oversized model OOMs the analysis.
+- **Route screenshots through external APIs** — the skill is 100% local (127.0.0.1:11434); external calls leak UI/product data for zero benefit.

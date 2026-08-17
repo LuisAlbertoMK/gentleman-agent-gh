@@ -47,3 +47,16 @@ Projects:`.agents/attack-surface.{project}.md`+`.agents/breaker-profiles/{projec
 
 ## Anti-Patterns
 Breaker trusts fixer·No attempts·3+r·Before QG·4R review·Happy path·Non-code/tiny diffs·No pre-reg·No test cases·Generic surface
+
+## Examples
+Trigger `!breaker <target>` after fixer R2 (any of: breaker, verify fix, try to break):
+```bash
+!breaker auth-refactor   # bundle: diff + fixer_claims + test_results + zone
+```
+Expected: `AB-auth-refactor|R:1/2|A:3|SAFE|V:APPROVED` (all P1-P7 pass, calibration ≥8)
+Break path: `AB-auth-refactor|R:1/2|A:3|BROKEN|V:BLOCK` → fixer gets `##R2—Focus:{R1}` → re-run
+
+## Testing
+1. Pre-reg round-trip: dirty tree → `git stash` → skill tests → `git stash pop` → `git diff` must be empty after pop (stash restores byte-identical, no lost work).
+2. Verdict parser: feed a response missing the `V:` line → must yield FAIL, never APPROVED (Verdicts: <3/malformed→FAIL).
+3. Engram record: after a round, `mem_search("breaker/{target}",topic_key:"breaker/{target}")` must return the `## Past Attack Context` block with `Broken{N}x:` entries (step 12 Record).

@@ -62,5 +62,20 @@ if (-not $r.passed) { # FAIL — review before proceeding }
 ## Refs
 `adr/ADR-022`,`adr/ADR-024` deny floor · `adr/ADR-031` async delegation · `delivery-harness` fan-out · `ralph-loop` single-task · `opencode-model-router` targets/fallback
 
+## Examples
+User: "mini-orchestrator: audit security + apply fixes, max 6 iterations"
+```powershell
+& .\scripts\babyagi-loop.ps1 -InitialTask "security audit" -MaxIterations 6
+# → T1 → gentleman-security-sub (fire-and-forget)
+# → New-TasksFromResult → Sort-TaskQueue → Invoke-TaskAsync
+# → convergence: result-delta < threshold → "Converged after 4 iterations"
+# → monitor-subagent.ps1 polls 15s until git stable (2 identical polls) or 300s
+```
+
+## Testing
+1. `Invoke-Pester tests\babyagi-loop.Tests.ps1` → 9/9 pass (T1-T6 + fail-closed)
+2. `Invoke-Pester tests\post-delegation-async.Tests.ps1` → 5/5 pass (T1-T5)
+3. Async smoke: `scripts\post-delegation-check.ps1 -BaseRef HEAD -AllowedPaths "src/*" -Async` → returns immediately; assert `(Get-Content HEAD.async-result.json -Raw | ConvertFrom-Json).passed`
+
 ## Anti-Patterns
 Blocking when async handoff available · ignoring `convergence_check` · not reading `{BaseRef}.async-result.json` · delegating sensitive data (security: DIRECT) · looping past `max_iterations`.

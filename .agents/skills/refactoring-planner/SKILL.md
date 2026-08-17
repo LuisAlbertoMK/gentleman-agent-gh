@@ -71,5 +71,21 @@ content: |
 ## Refs
 metricas · quality-gate · sdd · code-review-agent · triple-verify
 
+## Examples
+User: "refactoring: split main.go — behavior identical"
+```bash
+go test ./...                    # baseline GREEN (mandatory pre-step)
+git mv main.go types.go          # [SAFE] extract types
+go test ./...                    # → ok
+# extract db.go → go test ./... → ok, no import cycles
+# risky split into internal/* → full build + integration
+go test ./... && go build ./...  # acceptance: baseline perf
+```
+
+## Testing
+1. Baseline gate: `go test ./...` must pass BEFORE step 1 — no refactor without it
+2. Per-step: after EACH step `go test ./...`; failure → stop, analyze, fix or `git checkout <file>`
+3. Cycle scan: after each extract, `go list -deps ./...` → no import cycles
+
 ## Anti-Patterns
 Refactor without test baseline · Batch steps before testing · Skip impact analysis · No rollback plan · Change API in same refactor

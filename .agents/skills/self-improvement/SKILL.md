@@ -25,6 +25,19 @@ Frustration signals → `recovery-protocol`.
 Schemas: `.learnings/rejected-edits.json` (id/timestamp/target/edit/reason/delta) and `accepted-edits.json` (id/timestamp/target/edit/delta/pattern).
 ## Refs: CYCLE.md · inter-track · extract-skill · run-improvement-cycle · score-auto · SkillOpt arXiv:2605.23904 · SkillSpector · recovery-protocol · external-improvement (5-phase cycle for external projects)
 
+## Examples
+User: "comienza ciclo de auto-mejora"
+```powershell
+& .\scripts\run-improvement-cycle.ps1    # 1st: READ CYCLE.md
+# → Pre-Flight → Diagnose → SkillOpt Gate (per fix) → Verify → Learn → Propagate → Epoch Review
+# → exit: inter>=30 + no dim<9.0 → "SUCCESS" | 7d → "STOP" | score -0.5 → revert
+```
+
+## Testing
+1. `& .\scripts\score-auto.ps1 -Json` → composite BEFORE/AFTER: target delta ≥ +0.1, no dim ≤ -0.3
+2. SkillOpt gate per fix: SKILL.md lines ≤20% / size <3KB; `.ps1` parse via `[System.Management.Automation.Language.Parser]::ParseFile()` → 0 errors
+3. Protected-file touch (security-scanner/quality-gate/auto-metrics/external-auditor/immune-system/ANTI-PATTERN-CATALOG/.project.json)? → `!audit` MUST pass BEFORE commit — NOT optional
+
 ## Anti-Patterns
 Skip learning extraction · Bump score without data · Ignore CYCLE.md guardrails · Never prune unused skills · Same fix fails 3x without abort
 

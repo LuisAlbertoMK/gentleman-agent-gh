@@ -62,6 +62,20 @@ file created/deleted · >20 line change · discovery · important question · de
 ## Post-Check
 `mem_context` = resume. Git is safety gate.
 
+## Examples
+User: "dónde lo dejamos?"
+```powershell
+git status --porcelain            # → clean (no output) → no WARN
+git log @{u}.. --oneline 2>$null  # → empty → nothing unpushed
+mem_search(query="last session", limit=5)   # → top 3 injected as context
+# → both clean → silent resume: mem_context only, 0 questions
+```
+
+## Testing
+1. Dirty drill: 1 touched file → `git status --porcelain` → WARN + ask (commit/stash/continue), max 4 options
+2. Clean drill: empty status + no unpushed → silent resume, 0 questions
+3. Pre-load: `.\scripts\skill-graph.ps1 -Task "<keywords>" -Format Text` → 55 → 4-8 lines (assert ≤8)
+
 ## Anti-Patterns
 Auto-commit/push · mid-task runs · output >10 lines · skip "small project" · skip skill-graph
 

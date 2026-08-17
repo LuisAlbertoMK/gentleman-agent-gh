@@ -55,3 +55,18 @@ security-scanner · delivery-harness · subagent-isolation · recovery-protocol 
 
 ## Anti-Patterns
 Skip description · Ignore stderr · Parse output by eye · Use raw bash for destructive ops · No timeout
+
+## Examples
+Trigger: any bash command needing description + error handling + output validation
+```bash
+# Description: check Node version before build
+node --version
+# Error handling: exit code != 0 → "command not found" → install or report missing tool
+# Output validation: match ^v\d+\.\d+\.\d+$ — else report unexpected output
+```
+Expected: `v22.14.0` → regex PASS → proceed · exit 127 → ERROR HANDLING row 1 fires · malformed `2.14` → flagged unexpected output, never silently accepted
+
+## Testing
+1. Destructive guard: route `git push --force --dry-run` through the wrapper → must BLOCK and ask confirmation (SAFETY WRAPPERS), never execute raw.
+2. Error table drill: trigger each known pattern once — `ghostcmd` (command not found), locked-file read (permission denied), missing path (empty output) → mapped action fires per table.
+3. Output contract: pipe `gh issue list --json number,title` → parser extracts fields AND surfaces warnings (OUTPUT PARSING RULES: extract both, don't skip warnings).

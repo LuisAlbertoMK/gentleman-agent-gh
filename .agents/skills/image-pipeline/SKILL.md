@@ -1,9 +1,8 @@
-﻿# image-pipeline — Image Optimization Skill
-
-**Trigger**: `compress`, `convert WebP/AVIF`, `resize`, `describe` images
-
-**Scope**: Single-file atomic edits, batch processing, metadata extraction
-
+﻿---
+name: image-pipeline
+description: "Image optimization — compress, convert WebP/AVIF, resize, describe. Single-file atomic edits, batch processing, metadata extraction."
+triggers: "compress, convert WebP/AVIF, resize, describe"
+changelog: docs/ciclos/cycle28-20260816.md
 ---
 
 ## Pipeline Stages

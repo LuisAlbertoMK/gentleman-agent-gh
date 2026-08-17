@@ -28,6 +28,21 @@ Article:JSON-LD: headline+author(Person)+publisher(Org+logo)+datePublished+dateM
 
 ## Output:`SEO AUDIT:<url>—<date> CRITICAL:[tech]<issue>→<fix> HIGH:[EEAT|schema|AI]<issue>→<fix> MEDIUM:[clusters|links]<issue>→<fix> AI:Cited:Y/N·GA:<n>/<n>`
 
+## Examples
+User: "seo audit https://example.com"
+```bash
+curl -s https://example.com/robots.txt   # → Allow:/ Disallow:/admin/ /api/
+curl -s https://example.com/sitemap.xml | grep -c "<url>"          # → 42 (≤50K, has <lastmod>)
+curl -s https://example.com/ | grep -o '<title>[^<]*</title>'      # → 50-60ch keyword-first
+curl -sI https://example.com/ | grep -i "strict-transport"         # → HSTS present
+```
+→ Output: `SEO AUDIT:https://example.com—2026-08-16 CRITICAL:[tech]<issue>→<fix> HIGH:[EEAT|schema|AI]<issue>→<fix> AI:Cited:Y/N GA:<n>/<n>`
+
+## Testing
+1. RichResultsTest: paste Article JSON-LD → 0 errors (headline+author Person+publisher Org+logo+datePublished+dateModified+mainEntityOfPage+image)
+2. GSC: post-deploy → URL "Submitted and indexed" (not excluded); monthly: CTR↓ + impressions↑ = AI impact
+3. Sitemap: `grep -c "<lastmod>"` == `<url>` count; ≤50K URLs / ≤50MB
+
 ## Anti-Patterns
 Keyword-stuff·Dup titles·No schema·Skip mobile·Missing robots/sitemap·Article JSON-LD incomplete·Mass AI·No E-E-A-T·llms.txt for AI·Thin affiliate·No monitor·Rankings only·Fake schema
 

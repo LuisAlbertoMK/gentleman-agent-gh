@@ -59,3 +59,18 @@ No gradients/glow/multicolor·1 primary·Errors next to action·No blocking past
 
 ## Anti-Patterns
 Fixed width·h-screen·dense interactive·Fixed font·transition:all·>500ms·No reduced-motion·HSL/RGB·No contrast·cqi outside container·letter-spacing body
+
+## Examples
+Trigger `/baseline-ui <file>` on a slop component (ui cleanup, fix layout, ui audit):
+```bash
+/baseline-ui src/components/Card.tsx
+```
+Expected output — findings + fixes:
+- ❌ `max-w-md` fixed width → Pattern 2: `repeat(auto-fit,minmax(280px,1fr))`
+- ❌ `transition:all .6s` → `transform .2s` + reduced-motion `.01ms` override
+- ❌ `color:#666` → OKLCH token chain (primitive→semantic→component) at ≥4.5:1
+
+## Testing
+1. Pattern spot-check: apply 2 of the 10 Layout patterns (e.g. sticky sidebar, CQ card) to a throwaway component → verify at 320/768/1440 in DevTools responsive mode (Responsive Test Matrix).
+2. Token chain: pick `oklch(55% .18 255)` → walk the 6-step Tokens table to `--btn-bg` → confirm resolution + contrast ≥4.5:1.
+3. No regression: run `accessibility` audit before/after fixes → same or better contrast/focus results (Refs: accessibility).

@@ -42,3 +42,17 @@ Rolling from `.learnings/bias-calibration.json`:
 
 ## Refs
 auto-metrics · immune-system · bitacora · session-resume · quality-gate
+
+## EXAMPLES
+Trigger `!audit` (explicit, or required by close-session gate when `needsAudit=true`):
+```bash
+!audit
+```
+Expected output:
+`[audit] 2026-08-16 — PASSED: self=8.3 audit=7.9 gaps=0.4` → all gaps ≤1.5 → PASSED → gate clears
+Over-score: `self=8.3 audit=6.2 gaps=2.1` on 1 dim → immune-system · 2+ dims >1.5 → full stop
+
+## TESTING
+1. Parsing contract: feed a 6-dim audit response (Correctness/Tokens/ErrPrev/Skill/Speed/Breadth + evidence) → regex extracts all 6 · a 4-dim response → unparseable → retry once, abort 2nd (FLOW steps 3-4).
+2. Gate wiring: touch `.project.json` → `close-session.ps1` must report `needsAudit=true` → `!audit` → PASSED clears the gate (INTEGRATION).
+3. Bias calibration: with ≥2 samples in `.learnings/bias-calibration.json`, re-score → self-score offset-adjusted BEFORE thresholds; bitácora gets the `[audit]` line (BIAS CALIBRATION).

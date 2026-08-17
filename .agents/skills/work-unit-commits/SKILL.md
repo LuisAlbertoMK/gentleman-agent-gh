@@ -62,3 +62,42 @@ commit-crafter · chained-pr · branch-pr · sdd · quality-gate
 
 ## Anti-Patterns
 Commit by file type instead of work unit · Separate tests from code · >400 lines without chaining · Messages that list files · No SDD forecast check
+
+---
+
+## Examples
+
+### Example 1: Split a 340-Line Auth Change into Units
+
+**Trigger**: `split commit` (frontmatter: work unit, commit splitting, reviewable commits, split commit)
+
+```bash
+# 1. Measure the blast radius first (Commands)
+git diff --stat          # 6 files, 340 lines → <400, no chain needed (SDD guard)
+git log --oneline -5     # context: last commits
+
+# 2. Commit by work unit — tests with code (Rules)
+git add src/auth/token-validation.ts tests/auth/token-validation.test.ts
+git commit -m "feat(auth): add token validation model + tests"
+```
+
+**Expected output**:
+
+```
+1. feat(auth): add token validation model + tests      # tests with code ✓
+2. feat(auth): wire token validation into login flow   # repo works alone ✓
+3. feat(auth): document token validation in login flow # docs with change ✓
+```
+
+**Result**: each commit = candidate chained PR slice (Future PR-ready); 340 lines < 400 → no chain required (SDD guard).
+
+## Testing
+
+1. **Unit size guard** — per commit, `git diff --stat HEAD~1..HEAD`:
+   Expected: ≤400 lines (SDD guard; >400 → chain before implementing).
+
+2. **Tests with code** — `git show --stat HEAD`:
+   Expected: test file(s) in the same commit as the behavior they verify (Rules).
+
+3. **Message tells outcome** — `git log --oneline -5`:
+   Expected: outcome-style messages (`feat(auth): wire token validation into login flow`), not file-type lists (`add models`).

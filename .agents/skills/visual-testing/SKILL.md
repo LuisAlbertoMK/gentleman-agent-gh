@@ -53,3 +53,44 @@ No baseline·Threshold too strict(flaky)·No viewport reset·Skip anim freeze·N
 
 ## Refs
 quality-gate·performance·baseline-ui·accessibility·ui-engine
+
+---
+
+## Examples
+
+### Example 1: Catch a Layout Regression Before PR
+
+**Trigger**: `visual regression on dashboard` (frontmatter: visual regression, VRT, layout shift)
+
+```typescript
+// tests/visual/dashboard.spec.ts
+test('dashboard', async ({ page }) => {
+  await page.goto('/dashboard');
+  await expect(page).toHaveScreenshot('dashboard.png', {
+    mask: [page.locator('[data-testid=timestamp]')],   // dynamic → mask
+  });
+});
+```
+
+```bash
+npx playwright test tests/visual/ --project=chromium
+```
+
+**Expected output**:
+
+```
+✓ dashboard (chromium) — baseline match (maxDiffPixelRatio 0.01)
+```
+
+**Baseline**: `npx playwright test --update-snapshots` (create/update) → commit `tests/dashboard-snapshots/` (Baseline section).
+
+## Testing
+
+1. **Baseline workflow** — after a visual change, run `npx playwright test --update-snapshots`, then `git status --short`:
+   Expected: `tests/dashboard-snapshots/` files modified (baseline updated, committed).
+
+2. **Deterministic pass** — run the same spec twice with no changes:
+   Expected: both runs pass (no flake — animations disabled, dynamic content masked).
+
+3. **Regression caught** — introduce a real CSS change (e.g. padding), run the spec:
+   Expected: `✗` with pixel diff above threshold 0.01 — the change is caught.
