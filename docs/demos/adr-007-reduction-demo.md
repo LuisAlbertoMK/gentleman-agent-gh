@@ -172,9 +172,9 @@ in externalized documentation:
 
 | File | Line | Flagged | Resolution (content-preserving) |
 |------|-----:|--------:|---------------------------------|
-| `docs/skills/pdf-utils/reference.md` | 130 | `--password=YOUR_PASS` | `--password <YOUR_PASS>` |
-| `docs/skills/pdf-utils/reference.md` | 192 | `qpdf --password=...` | `qpdf --password <...>` |
-| `docs/skills/quality-gate/reference.md` | 25 | `API_KEY=sk_live_FAKE_EXAMPLE_DO_NOT_USE` | `API_KEY: sk_live_FAKE_EXAMPLE_DO_NOT_USE` |
+| `docs/skills/pdf-utils/reference.md` | 130 | `--password <YOUR_PASS>` (before fix: `--password` w/ value) | `--password <YOUR_PASS>` |
+| `docs/skills/pdf-utils/reference.md` | 192 | `qpdf --password <...>` (before fix: `--password` w/ value) | `qpdf --password <...>` |
+| `docs/skills/quality-gate/reference.md` | 25 | `API_KEY: sk_live_FAKE_EXAMPLE_DO_NOT_USE` (before fix: `API_KEY` w/ value) | `API_KEY: sk_live_FAKE_EXAMPLE_DO_NOT_USE` |
 
 `confidence: high` — all 3 values explicitly read as placeholders ("YOUR_PASS", "FAKE_EXAMPLE").
 The `=`→`:`/separator edit breaks the regex match while keeping the illustrative value visible.
