@@ -95,3 +95,40 @@ git revert ae22138c  # Phase 1+2 only
 ---
 
 *Generated: 2026-08-13 · Protocol: plan-auto-mejora-v3 §4 (rollback map)*
+
+---
+
+## Branch: `experimento/mejora-autonoma-2026-08-18` (CI Quality Hardening, v3)
+
+- **Base**: main HEAD `31134225`
+- **Scope**: G1-G3 del plan v3 — robust Pester runner, coverage gate, mutation smoke, adversarial review estructurado (ADR-032)
+- **Execution**: commits hechos en worktree aislado `C:\Users\MK\AppData\Local\Temp\opencode\gentleman-exp-2026-08-18` (sesión paralela `agente-aem-migration` en worktree principal — archivos ajenos NO tocados)
+- **Gate**: 22/22 ALL CLEAR en cada commit
+
+### Commits
+
+| Commit | Mensaje | Rollback |
+|--------|---------|----------|
+| `e3bec66b` | feat(ci): robust Pester runner (R3) + fix pre-existing babyagi-loop safety gaps | `git revert e3bec66b` — elimina `scripts/run-ci-tests.ps1`, `scripts/tests/ci-pester.Tests.ps1`; revierte `ci.yml` job tests, `babyagi-loop.ps1`, `benchmark-baseline.json` |
+| `c966c4bc` | feat(ci): coverage gate + mutation smoke (R2+R4, G2) | `git revert c966c4bc` — elimina `scripts/tests/Coverage.ps1`, `mutation-smoke.Tests.ps1`, `Coverage.Tests.ps1`; revierte `ci.yml` job coverage |
+| `2719837c` | feat(ci): structured adversarial review with severity (R1, G3) | `git revert 2719837c` — elimina `scripts/adversarial-review.ps1`, `scripts/tests/adversarial-review.Tests.ps1` |
+| `(HEAD — último commit de la branch, docs)` | docs(mejora): v3 deliverables — ADR-032, mejora-log, benchmarks, rollback-map | `git revert (HEAD — último commit de la branch, docs)` — revierte docs (ADR-032, mejora-log append, benchmarks, este archivo) |
+
+### Rollback completo (full)
+```bash
+git reset --hard 31134225  # main HEAD, base del experimento
+```
+
+### Rollback quirúrgico por ciclo
+```bash
+git revert (HEAD — último commit de la branch, docs)        # docs only (opcional — sin código)
+git revert 2719837c        # Ciclo 3 (adversarial review)
+git revert c966c4bc        # Ciclo 2 (coverage gate + mutation)
+git revert e3bec66b        # Ciclo 1 (Pester runner)
+```
+
+### Scope verification
+```bash
+git log --oneline 31134225..experimento/mejora-autonoma-2026-08-18  # 4 commits
+git merge-base --is-ancestor 31134225 main && echo "main clean"
+```

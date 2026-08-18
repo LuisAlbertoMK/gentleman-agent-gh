@@ -57,3 +57,39 @@
 - **Ciclo 5**: cleanup de root — análisis reveló clutter menor al reportado (logs ya ignorados); fix anti-recurrencia del archivo zombie `$null`.
 - **Rendimiento decreciente**: NO alcanzado — los 5 ciclos ganaron 100% de su gap respectivo.
 - **Condición de parada**: presupuesto agotado (5/5 ciclos, ~135/225 min). Protocolo completo.
+
+---
+
+## V3 — CI Quality Hardening (2026-08-18)
+
+**Branch**: `experimento/mejora-autonoma-2026-08-18` · Base: main HEAD `31134225`
+
+### Baseline (pinned en Ciclo 1, commit `e3bec66b`)
+
+| Métrica | Valor |
+|---------|-------|
+| Benchmark (sync-vmk -DryRun) | 1.414s (BenchmarkSeconds, baseline refrescado) |
+| Skills | 91 |
+| Pester en gate | solo tests staged (sin runner dedicado) |
+| Coverage | sin gate (0%, API rota en Pester 6) |
+| Adversarial review | sin severidad estructurada |
+
+### Final (medido post-Ciclo 3)
+
+| Métrica | Baseline | Final | Delta |
+|---------|----------|-------|-------|
+| Benchmark mediana (×5) | 1.414s | **0.135s** | −90% (no regresivo) |
+| Pester runner | ausente | `run-ci-tests.ps1` (pin 5.5.0, NUnit) | **nuevo** |
+| Coverage gate | sin gate (0%) | **26.63%** (769/0 fail, floor 20%) | **nuevo** |
+| Mutation smoke | ausente | `mutation-smoke.Tests.ps1` 4/4 | **nuevo** |
+| Adversarial severity | block/warn sin estructura | **critical/warning/suggestion** (R1) | **nuevo** |
+| Gate por commit | 22/22 | **22/22 ALL CLEAR ×3** | = |
+| Tests nuevos | — | ci-pester 4/4 + mutation 4/4 + coverage-contract 5/5 + adversarial 4/4 | **+17** |
+
+### Interpretación
+
+- **Ciclo 1**: runner dedicado + fix `#requires` L1 (gate [2/13] solo lee 3 líneas) + fix destructivo babyagi (220/220).
+- **Ciclo 2**: coverage gateaable y reproducible (Pester 5.5.0 pinneado); mutation smoke con input no-null (con `$null` la mutación `-eq`→`-ne` no es observable); smoke en proceso hijo (nested Invoke-Pester colisiona).
+- **Ciclo 3**: findings con taxonomía R1 + dedup; fixture staged una vez en BeforeAll (paralelismo Pester).
+- **Rendimiento**: NO regresivo — mediana final muy por debajo del baseline pinned.
+- **Condición de parada**: plan §4 cumplido (3/3 ciclos + entregables + rollback map con hashes reales). Pendiente solo PR a main (sin mergear sin orden explícita).
