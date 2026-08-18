@@ -1,5 +1,5 @@
 {
-  "model": "opencodec/big-pickle",
+  "model": "opencode/big-pickle",
   "skills": {
     "paths": [
       ".agents/skills"
@@ -233,8 +233,8 @@
     "auto": true,
     "prune": true,
     "reserved": 6000,
-    "keep": {
-      "tokens": 12000
+      "keep": {
+      "tokens": 8000
     }
   },
   "tools": {
@@ -678,6 +678,58 @@
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-reviewer.md}\n\n{file:prompts/shared/_return-contract.md}",
+      "tools": {
+        "engram*": true,
+        "codebase-memory*": true
+      }
+    },
+    "gentleman-aem": {
+      "description": "AEM Migration Specialist — end-to-end Adobe Experience Manager site migrations: assessment, content transfer, component/datasource/HTL/Sling-Models migration, Adobe Tags/Launch data-layer migration, debugging",
+      "model": "opencode/nemotron-3-ultra-free",
+      "mode": "primary",
+      "prompt": "{file:prompts/gentleman-aem.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "tools": {
+        "engram*": true,
+        "codebase-memory*": true
+      }
+    },
+    "gentleman-aem-auto": {
+      "description": "AEM Migration Specialist — AUTO mode (zero ask, bash.* allow except destructive/security-denied)",
+      "model": "opencode/nemotron-3-ultra-free",
+      "mode": "primary",
+      "prompt": "{file:prompts/gentleman-aem.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "tools": {
+        "engram*": true,
+        "codebase-memory*": true
+      }
+    },
+    "gentleman-aem-sub": {
+      "description": "AEM Migration Specialist subagent — full migration lifecycle (delegable via Task tool)",
+      "model": "opencode/nemotron-3-ultra-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-aem.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
+      "tools": {
+        "engram*": true,
+        "codebase-memory*": true
+      }
+    },
+    "gentleman-aem-sub-auto": {
+      "description": "AEM Migration Specialist subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
+      "model": "opencode/nemotron-3-ultra-free",
+      "hidden": true,
+      "mode": "subagent",
+      "prompt": "{file:prompts/gentleman-aem.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
+      "tools": {
+        "engram*": true,
+        "codebase-memory*": true
+      }
+    },
+    "gentleman-aem-semi": {
+      "description": "AEM Migration Specialist — SEMI mode (safe commands auto, writes/commits ask)",
+      "model": "opencode/nemotron-3-ultra-free",
+      "mode": "primary",
+      "prompt": "{file:prompts/gentleman-aem.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "tools": {
         "engram*": true,
         "codebase-memory*": true

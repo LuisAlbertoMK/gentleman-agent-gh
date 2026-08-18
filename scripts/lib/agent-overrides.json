@@ -61,7 +61,8 @@
         "sdd-propose": "allow",
         "sdd-spec": "allow",
         "sdd-tasks": "allow",
-        "sdd-verify": "allow"
+        "sdd-verify": "allow",
+        "gentleman-aem-sub-auto": "allow"
       }
     }
   },
@@ -95,7 +96,9 @@
         "sdd-init": "allow",
         "gentleman-infra-sub": "allow",
         "gentleman-codex-sub-auto": "allow",
-        "general": "allow"
+        "general": "allow",
+        "gentleman-aem-sub": "allow",
+        "gentleman-aem-sub-auto": "allow"
       },
       "delegation_read": "allow",
       "delegation_list": "allow"

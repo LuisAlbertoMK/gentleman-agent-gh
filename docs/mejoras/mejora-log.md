@@ -93,8 +93,9 @@ ConfigValidator (node-free) valida `opencode.json` schema en CI sin dependencia 
 | `agent.default.depth` | 3 | 2 | Reduce subagent fan-out |
 | `compaction.reserved` | 8000 | 6000 | Less reserved tokens for small contexts |
 | `watcher.enabled` | true | false | Disable file watching on slow I/O |
-| `snapshot.enabled` | unset (true) | false | Disable snapshot on memory-constrained |
+| `snapshot` | unset (true) | false | Disable snapshot on memory-constrained (boolean form, not `snapshot.enabled`) |
 | `watcher.ignore` | unset | node_modules, .git, dist, temp, .opencode | Noise filtering |
+| `compaction.keep.tokens` | 12000 | 8000 | Reduce post-compaction token retention (matches low-resource profile) |
 
 ### Hardware Profile Tiers
 
@@ -114,6 +115,37 @@ PASS: 3 script syntax checks (monitor, heap-snapshot, hardware-profile)
 PASS: 1 test file parse check
 SKIP: 6 PS7 execution tests (require pwsh 7)
 17/17 PASS — config + syntax only
+```
+
+---
+
+## Ciclo 4b — 2026-08-18 (Token Optimization Cleanup, unverified)
+
+**Trigger**: Revisión de problemas de token optimization — audit de configuración, schema drift y documentación.
+
+### Fixes aplicados
+
+| Field | Before | After | Rationale | File |
+|---|---|---|---|---|
+| `model` (root, base SSoT) | `opencodec/big-pickle` (typo) | `opencodec/big-pickle` | Extra 'c' en nombre de modelo — SSoT lo propagaría a todo `opencodec.json` si se regeneraba. Corregido en `scripts/lib/opencodec-base.json:2` | `scripts/lib/opencodec-base.json` |
+| `compaction.keep.tokens` | 12000 | 8000 | Reduce 4K tokens de overhead post-compaction. El perfil `low-resource` usa 8000; el proyecto usa `watcher.enabled=false` + `snapshot=false` (setup lightweight). Mejorado alineación perfil | `opencodec.json`, `scripts/lib/opencodec-base.json` |
+
+### Documentation drift corregido
+- Tabla `snapshot.enabled` → `snapshot`: el config usa `"snapshot": false` (boolean shorthand), no el objeto `{ "enabled": false }`. Corregido en tabla Ciclo 4.
+- Agregada fila `compaction.keep.tokens` (12000→8000) a la tabla Ciclo 4 que faltaba.
+
+### Pre-existing (no modificado — no es problema de token optimization)
+- **Deny rules duplicados en `opencodec.json`**: El `opencodec.json` (2,400 líneas) muestra deny rules replicados ×15 agentes. Esto es **EXPECTADO** — es el OUTPUT del `generate-opencodec-config.js` que expande plantillas DRY (`permission-templates.json`) a JSON plano (OpenCode no soporta inheritance). El SSoT (`permission-templates.json`) NO tiene duplicación.
+- **`gentleman-aem` agents**: Changes pre-existing en working dir (no commitidos) en `opencodec-base.json` + `generate-opencodec-config.js`. Separados de este ciclo.
+
+### Estado de verificación
+```
+--- Token Optimization Cleanup Gate ---
+PASS: typo fixed in SSoT (opencodec-base.json)
+PASS: compaction.keep.tokens 12000 → 8000 in both base + generated
+PASS: CRLF normalized (LF-only, matches committed format)
+PASS: doc drift corrected (snapshot table + keep.tokens row)
+WARN: generate-opencode-config.js --validate has residual drift (gentleman-aem additions + agent count) — pre-existing, NOT from these changes
 ```
 
 ## ROZA bypass

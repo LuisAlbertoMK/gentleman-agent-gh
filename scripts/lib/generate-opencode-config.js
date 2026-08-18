@@ -86,12 +86,13 @@ const TEMPLATE_MAP = {
   'gentleman-datascience': 'readonly',
   'gentleman-docs': 'readonly',
 
-  // Read/write agents — bash ask, full edit/write with deny rules
-  'gentleman-deep': 'readwrite',
-  'gentleman-quick': 'readwrite',
-  'gentleman-codex': 'readwrite',
-  'gentleman-implementer': 'readwrite',
-  'sdd-apply': 'readwrite',
+   // Read/write agents — bash ask, full edit/write with deny rules
+   'gentleman-deep': 'readwrite',
+   'gentleman-quick': 'readwrite',
+   'gentleman-codex': 'readwrite',
+   'gentleman-implementer': 'readwrite',
+   'gentleman-aem': 'readwrite',
+   'sdd-apply': 'readwrite',
   'sdd-archive': 'readwrite',
   'sdd-design': 'readwrite',
   'sdd-explore': 'readwrite',
@@ -102,12 +103,13 @@ const TEMPLATE_MAP = {
   'sdd-tasks': 'readwrite',
   'sdd-verify': 'readwrite',
 
-  // Subagent twins (mode: subagent, delegable via Task tool) — mirror primary templates
-  'gentleman-deep-sub': 'readwrite',
-  'gentleman-quick-sub': 'readwrite',
-  'gentleman-implementer-sub': 'readwrite',
-  'gentleman-codex-sub': 'readwrite',
-  'gentleman-security-sub': 'readonly',
+   // Subagent twins (mode: subagent, delegable via Task tool) — mirror primary templates
+   'gentleman-deep-sub': 'readwrite',
+   'gentleman-quick-sub': 'readwrite',
+   'gentleman-implementer-sub': 'readwrite',
+   'gentleman-codex-sub': 'readwrite',
+   'gentleman-security-sub': 'readonly',
+   'gentleman-aem-sub': 'readwrite',
 
   // Read-only specialist twins — delegable via Task tool (previously ⚠️ fallback to general)
   'gentleman-seo-sub': 'readonly',
@@ -315,9 +317,8 @@ if (VALIDATE) {
 } else {
   console.log(`[4/5] Writing to ${OUTPUT_PATH}...`);
 
-  // Write with BOM to match original file
-  const BOM = '\uFEFF';
-  fs.writeFileSync(OUTPUT_PATH, BOM + output, 'utf8');
+  // Write UTF-8 without BOM (BOM breaks PowerShell ConvertFrom-Json and Node require)
+  fs.writeFileSync(OUTPUT_PATH, output, 'utf8');
 
   console.log('[5/5] Verifying output...');
   const written = fs.readFileSync(OUTPUT_PATH, 'utf8').replace(/^\uFEFF/, '');
