@@ -67,6 +67,47 @@ jobs:
           path: ./test-results/testResults.xml
           if-no-files-found: warn
 
+  coverage:
+    name: Coverage — gate + JaCoCo publish (R2, G2)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: tests
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run coverage suite (stable unit subset, pinned Pester 5.5.0)
+        # G2 gate: measure-only unless the floor is crossed — Strict promotes the
+        # 20% floor to a hard gate. Excludes pre-existing broken suites
+        # (analyze-automejora WhatIf MetadataException, config-validator SSoT
+        # drift, readme-drift counts, permission-gate supply-chain floor) so the
+        # gate measures coverage of WORKING tests, not unrelated repo drift.
+        # Ratchets upward: raise -MinimumCoverage as lib coverage improves.
+        run: |
+          ./scripts/tests/Coverage.ps1 -TestPath ./scripts/tests `
+            -CoverageRootPath ./scripts/lib `
+            -Strict -MinimumCoverage 20 `
+            -ExcludePattern "e2e|Integration|session-checkpoint|skill-coverage|ui-specialist|subagent|analyze-automejora|config-validator|benchmark\.|permission-gate|readme-drift" `
+            -ReportDir ./test-results
+
+      - name: Publish JaCoCo coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-coverage
+          path: ./test-results/coverage.xml
+          if-no-files-found: warn
+
+      - name: Publish coverage summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-summary
+          path: ./test-results/summary.json
+          if-no-files-found: warn
+
   validate:
     name: Validate — SSoT in sync
     runs-on: ubuntu-latest
@@ -78,7 +119,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-        - name: Check opencode.json matches SSoT
+      - name: Check opencode.json matches SSoT
         # Regenerate pipeline: opencode-base.json + generator + agent-overrides.json
         # must produce exactly the committed opencode.json. Exit 1 on mismatch.
         run: |
