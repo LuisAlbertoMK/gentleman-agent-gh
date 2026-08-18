@@ -22,15 +22,33 @@ BeforeAll {
         throw "adversarial-review.ps1 not found at $script:review"
     }
     $script:fixture = Join-Path (Get-Location) 'scripts/tests/fixtures/adversarial-fixture.ps1'
-    # Stage the fixture once for the whole file (breaker scans git diff --cached)
+    if (-not (Test-Path -LiteralPath $script:fixture)) {
+        throw "fixture not found: $script:fixture"
+    }
+    # Snapshot original content so AfterAll can restore it byte-for-byte.
+    $script:fixtureBackup = Get-Content -LiteralPath $script:fixture -Raw
+    # The breaker scans `git diff --cached --diff-filter=ACM`. A cleanly committed,
+    # unchanged fixture does NOT appear in that diff -> breaker misses it. Force the
+    # fixture into the staged diff by applying a no-op timestamp line and re-adding,
+    # so the breaker reliably sees the iex violation and reports a critical finding.
+    # (Pester runs tests in parallel -> stage ONCE here to avoid add/restore races.)
+    $ts = '# test-run:' + (Get-Date -Format o)
+    $patched = "$ts`n" + $script:fixtureBackup
+    Set-Content -LiteralPath $script:fixture -Value $patched -Encoding UTF8
     git add -- $script:fixture
     if ($LASTEXITCODE -ne 0) { throw "could not stage fixture: $script:fixture" }
 }
 
 AfterAll {
-    # Unstage the fixture so it never leaks into a commit
-    git restore --staged -- $script:fixture 2>$null
-    git reset -q -- $script:fixture 2>$null
+    # Restore the fixture to its committed content and unstage it so it never
+    # leaks into a commit (the fixture is test-only scaffolding).
+    try { git reset -q HEAD -- $script:fixture 2>$null } catch {}
+    try { git restore --staged -- $script:fixture 2>$null } catch {}
+    try { git checkout -- $script:fixture 2>$null } catch {}
+    # If checkout failed (no staged change), rewrite from backup to be safe.
+    if ((Get-Content -LiteralPath $script:fixture -Raw) -ne $script:fixtureBackup) {
+        Set-Content -LiteralPath $script:fixture -Value $script:fixtureBackup -Encoding UTF8
+    }
 }
 
 Describe 'adversarial-review: severity taxonomy (R1)' {
