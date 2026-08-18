@@ -40,7 +40,11 @@ param(
     [Parameter(Mandatory=$true)]
     [string[]]$AllowedPaths,
 
-    [int]$PollIntervalSec = 15
+    [int]$PollIntervalSec = 15,
+
+    [switch]$DryRun,
+
+    [switch]$Force
 )
 
 # Guardrails — fail-closed
@@ -138,8 +142,22 @@ function Invoke-TaskAsync {
     $taskRef = "$($Task.id)_$BaseRef"
     $resultFile = "${taskRef}.async-result.json"
 
-    # Clean up any stale result file
-    if (Test-Path $resultFile) { Remove-Item -Path $resultFile -Force }
+    # Clean up any stale result file (guarded: dry-run / requires -Force for removal)
+    if (Test-Path $resultFile) {
+        if ($DryRun) {
+            Write-Host "[BabyAGI][DryRun] Would remove stale result: $resultFile"
+        } elseif (-not $Force) {
+            Write-Warning "[BabyAGI] Stale result file present: $resultFile. Pass -Force to clean (or -DryRun to preview)."
+            return $null
+        } else {
+            try {
+                Remove-Item -Path $resultFile -Force -ErrorAction Stop
+            } catch {
+                Write-Error "[BabyAGI] Failed to remove stale result: $($_.Exception.Message)"
+                return $null
+            }
+        }
+    }
 
     # Launch async delegation from Phase 1
     Write-Host "[BabyAGI] Executing: $($Task.description)" -ForegroundColor Cyan

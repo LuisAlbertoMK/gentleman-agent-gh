@@ -42,9 +42,9 @@ jobs:
           Write-Output "OK: opencode.json passes ConfigValidator"
 
   tests:
-    name: Tests — ConfigValidator Pester
+    name: Tests — Pester (robust runner, R3)
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     needs: quality
     defaults:
       run:
@@ -52,11 +52,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run config-validator tests
+      - name: Run Pester via run-ci-tests.ps1 (pinned 5.5.0, Run.Exit, NUnit)
+        # Thin pipeline (R3): central runner script pins Pester, sets Run.Exit=$true
+        # (non-zero exit on any failure), and emits NUnit XML for publishing below.
+        # Local and CI share the exact same invocation — no inline Pester config drift.
         run: |
-          $results = Invoke-Pester -Path ./scripts/tests/config-validator.Tests.ps1 -PassThru
-          if ($results.FailedCount -gt 0) { Write-Error "ConfigValidator tests: $($results.FailedCount) failed"; exit 1 }
-          Write-Output "OK: $($results.PassedCount)/$($results.TotalCount) config-validator tests passed"
+          ./scripts/run-ci-tests.ps1 -Path ./scripts/tests -OutputDir ./test-results
+
+      - name: Publish NUnit test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pester-nunit-results
+          path: ./test-results/testResults.xml
+          if-no-files-found: warn
 
   validate:
     name: Validate — SSoT in sync

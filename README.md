@@ -65,7 +65,7 @@ Switch modes:
 ## Features
 
 ### Multi-Agent Architecture
-50 agents total: main orchestrator (`gentleman-vMK`) + 12 specialists + 12 subagent twins + 10 SDD pipeline agents + 5 auto-mode + 5 semi-mode variants + 4 subagent auto variants + 1 global orchestrator bridge (`gentle-orchestrator`):
+55 agents total: main orchestrator (`gentleman-vMK`) + 12 specialists + 12 subagent twins + 10 SDD pipeline agents + 5 auto-mode + 5 semi-mode variants + 4 subagent auto variants + 1 global orchestrator bridge (`gentle-orchestrator`) + 5 AEM migration agents:
 
 | Agent | Model | Specialty |
 |-------|-------|-----------|
@@ -82,6 +82,7 @@ Switch modes:
 | `gentleman-docs` | big-pickle | Technical writing, docs (FREE TIER) |
 | `gentleman-implementer` | deepseek-v4-flash-free | Plan executor (FREE TIER) |
 | `gentleman-reviewer` | nemotron-3-ultra-free | Code review — 4R (Risk/Readability/Reliability/Resilience) |
+| `gentleman-aem` | nemotron-3-ultra-free | Adobe Experience Manager migration specialist |
 | `gentleman-deep-sub` | nemotron-3-ultra-free | Deep reasoning subagent — delegable via Task tool |
 | `gentleman-codex-sub` | deepseek-v4-flash-free | Code generation subagent — delegable via Task tool |
 | `gentleman-quick-sub` | mimo-v2.5-free | Fast executor subagent — delegable via Task tool |
@@ -94,6 +95,7 @@ Switch modes:
 | `gentleman-datascience-sub` | mimo-v2.5-free | Data science subagent (read-only) — delegable via Task tool |
 | `gentleman-docs-sub` | big-pickle | Documentation subagent (read-only) — delegable via Task tool |
 | `gentleman-reviewer-sub` | nemotron-3-ultra-free | Code review subagent — 4R (Risk/Readability/Reliability/Resilience) |
+| `gentleman-aem-sub` | nemotron-3-ultra-free | AEM migration subagent — delegable via Task tool |
 | `sdd-orchestrator` | nemotron-3-ultra-free | SDD pipeline orchestration |
 | `gentle-orchestrator` | big-pickle | Bridge to global gentle-orchestrator for native review + SDD native |
 | `gentleman-deep-auto` | nemotron-3-ultra-free | — AUTO mode (same model, `*: allow`) |
@@ -101,13 +103,16 @@ Switch modes:
 | `gentleman-codex-auto` | deepseek-v4-flash-free | — AUTO mode (same model, `*: allow`) |
 | `gentleman-implementer-auto` | deepseek-v4-flash-free | — AUTO mode (same model, `*: allow`) |
 | `gentleman-vMK-auto` | default | — AUTO mode (orchestrator, `*: allow`) |
+| `gentleman-aem-auto` | nemotron-3-ultra-free | — AUTO mode (Adobe Experience Manager migration) |
 | `gentleman-deep-sub-auto` | nemotron-3-ultra-free | — AUTO sub agent (same model, `*: allow`) |
 | `gentleman-quick-sub-auto` | mimo-v2.5-free | — AUTO sub agent (same model, `*: allow`) |
 | `gentleman-codex-sub-auto` | deepseek-v4-flash-free | — AUTO sub agent (same model, `*: allow`) |
 | `gentleman-implementer-sub-auto` | deepseek-v4-flash-free | — AUTO sub agent (same model, `*: allow`) |
+| `gentleman-aem-sub-auto` | nemotron-3-ultra-free | — AUTO sub agent (Adobe Experience Manager migration) |
 | `gentleman-deep-semi` | nemotron-3-ultra-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
 | `gentleman-quick-semi` | mimo-v2.5-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
 | `gentleman-codex-semi` | deepseek-v4-flash-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
+| `gentleman-aem-semi` | nemotron-3-ultra-free | — SEMI mode (Adobe Experience Manager migration) |
 | `gentleman-implementer-semi` | deepseek-v4-flash-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
 | `gentleman-vMK-semi` | default | — SEMI mode (orchestrator, `"*": ask` + safe commands allow) |
 

@@ -128,7 +128,7 @@ function Test-AgentDefinitions {
     if ($gentleman.Count -eq 0) { $failures.Add('no gentleman-* agents found') }
     if ($sdd.Count -eq 0)       { $failures.Add('no sdd-* agents found (G3 regression — expected 10)') }
     if ($orch.Count -eq 0)      { $failures.Add('gentle-orchestrator agent missing (G3 regression)') }
-    if ($names.Count -ne 50)    { $failures.Add("expected 50 agents, found $($names.Count)") }
+    if ($names.Count -ne 55)    { $failures.Add("expected 55 agents, found $($names.Count)") }
 
     return @($failures)
 }
@@ -177,7 +177,7 @@ function Test-OpencodeConfig {
         }
         return 1
     }
-    if (-not $Quiet) { Write-Output "ConfigValidator OK — opencode.json valid (skills.paths array, prompt refs resolve, 50 agents)" }
+    if (-not $Quiet) { Write-Output "ConfigValidator OK — opencode.json valid (skills.paths array, prompt refs resolve, 55 agents)" }
     return 0
 }
 

@@ -27,7 +27,8 @@
       "sdd-propose": "allow",
       "sdd-spec": "allow",
       "sdd-tasks": "allow",
-      "sdd-verify": "allow"
+      "sdd-verify": "allow",
+      "gentleman-aem-sub": "allow"
     }
   },
   "readwrite": {
@@ -173,12 +174,12 @@
       "*": "allow",
       "npm": "deny",
       "npm *": "deny",
-      "npm add *": "ask",
+      "npm add *": "deny",
       "npm ci": "allow",
       "npm ci *": "allow",
       "npm exec *": "deny",
-      "npm i *": "ask",
-      "npm install *": "ask",
+      "npm i *": "deny",
+      "npm install *": "deny",
       "npm publish *": "deny",
       "npm remove *": "deny",
       "npm run": "allow",

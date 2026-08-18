@@ -112,8 +112,8 @@ if ($sizeBytes -gt $MaxBytes) {
   Add-Check 'config-size-budget' $true "$sizeBytes B within budget $MaxBytes B"
 }
 
-$twins = @('gentleman-deep-sub', 'gentleman-quick-sub', 'gentleman-implementer-sub', 'gentleman-security-sub', 'gentleman-seo-sub', 'gentleman-infra-sub', 'gentleman-frontend-sub', 'gentleman-performance-sub', 'gentleman-datascience-sub', 'gentleman-docs-sub')
-$autoTwins = @('gentleman-deep-sub-auto', 'gentleman-quick-sub-auto', 'gentleman-codex-sub-auto', 'gentleman-implementer-sub-auto')
+$twins = @('gentleman-deep-sub', 'gentleman-quick-sub', 'gentleman-implementer-sub', 'gentleman-security-sub', 'gentleman-seo-sub', 'gentleman-infra-sub', 'gentleman-frontend-sub', 'gentleman-performance-sub', 'gentleman-datascience-sub', 'gentleman-docs-sub', 'gentleman-aem-sub')
+$autoTwins = @('gentleman-deep-sub-auto', 'gentleman-quick-sub-auto', 'gentleman-codex-sub-auto', 'gentleman-implementer-sub-auto', 'gentleman-aem-sub-auto')
 foreach ($t in $twins) {
   $a = $cfg.agent.$t
   if (-not $a) { Add-Check "twin-$t" $false 'missing from opencode.json' }
