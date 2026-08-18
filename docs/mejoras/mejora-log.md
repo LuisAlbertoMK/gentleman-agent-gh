@@ -240,3 +240,74 @@ ALL CLEAR — 22/22 checks passed
 - Test mode guard: `$env:BABYAGI_TEST_MODE`
 - Inherits all BabyAGI deny floor guards
 - No direct Start-Process/git/network calls
+
+---
+
+## CI Quality Hardening (v3 2026-08-18)
+
+> **Rama**: `experimento/mejora-autonoma-2026-08-18` · **Base**: main HEAD `31134225` · **Fecha**: 2026-08-18
+> **Objetivo**: G1-G3 del plan v3 — robustez del test runner, coverage gate, mutation smoke, adversarial review estructurado.
+
+### Resumen ejecutivo
+
+3 ciclos implementados, verificados y commiteados. Pre-commit gate: **22/22 ALL CLEAR** en cada commit.
+Ejecución en **worktree aislado** (`C:\Users\MK\AppData\Local\Temp\opencode\gentleman-exp-2026-08-18`) por sesión paralela `agente-aem-migration` en el worktree principal.
+
+## Ciclo 1 — Robust Pester runner + NUnit publish (G1) — `e3bec66b`
+
+**Bug**: gate [2/13] lee SOLO las primeras 3 líneas para `#requires -Version` — el `#requires` debe estar en la línea 1, no dentro de un comment block. Root-cause fix (se movió `#requires` a L1 en vez de marker).
+
+**Fix**: `scripts/run-ci-tests.ps1` — pin Pester 5.5.0 (Pester 6 rompe `-CodeCoverage` legacy), `Run.Exit`, NUnit XML, `-WithCoverage` (JaCoCo). Job `tests` reescrito en ci.yml + publish NUnit. Fix pre-existente en `scripts/babyagi-loop.ps1` (`-DryRun`/`-Force` + try/catch Remove-Item; destructive-scripts **220/220**). Baseline refrescado con `-SetBaseline` (estaba viejo: 196KB→354KB skills).
+
+| Entregable | Archivo | Tests | Commit |
+|---|---|---|---|
+| Runner | `scripts/run-ci-tests.ps1` | ✅ 4/4 (`ci-pester.Tests.ps1`) | `e3bec66b` |
+| CI workflow | `.github/workflows/ci.yml` (job tests) | | `e3bec66b` |
+| Fix destructivo | `scripts/babyagi-loop.ps1` | ✅ 220/220 | `e3bec66b` |
+| Baseline | `benchmark-baseline.json` | `-SetBaseline` | `e3bec66b` |
+| ADR | `adr/ADR-032-ci-quality-hardening-2026-08-18.md` | | `(HEAD — último commit de la branch, docs)` |
+
+## Ciclo 2 — Coverage gate + mutation smoke (G2, R2+R4) — `c966c4bc`
+
+**Bug**: coverage no gateada — regresiones invisibles; `Coverage.ps1` legacy usaba API Pester 6 rota.
+
+**Fix**: `scripts/tests/Coverage.ps1` reescrito — pin 5.5.0, `-ExcludePattern` (default `e2e|Integration|session-checkpoint|skill-coverage|ui-specialist|subagent`), `-Strict` + `-MinimumCoverage 20`, emite JaCoCo `coverage.xml` + `summary.json` + NUnit `testResults.xml`. Job `coverage` en ci.yml (publish JaCoCo + summary). `mutation-smoke.Tests.ps1` 4/4 (mutante delta-first: `-eq`→`-ne` sobre `Get-DeepClone`; con `$null` NO es observable → probar con input no-null `@{a=1}`). `Coverage.Tests.ps1` 5/5 (contrato + smoke en proceso hijo — `Invoke-Pester` anidado colisiona con runtime activo). Fix indentación YAML del job `validate`.
+
+| Entregable | Archivo | Tests | Commit |
+|---|---|---|---|
+| Coverage | `scripts/tests/Coverage.ps1` | | `c966c4bc` |
+| Mutation | `scripts/tests/mutation-smoke.Tests.ps1` | ✅ 4/4 | `c966c4bc` |
+| Contract | `scripts/tests/Coverage.Tests.ps1` | ✅ 5/5 | `c966c4bc` |
+| CI workflow | `.github/workflows/ci.yml` (job coverage) | | `c966c4bc` |
+
+**Números**: subset estable 769 tests / 0 fail / **26.63%** coverage → umbral **20%** (ratcheting). Suite completa: 997/29 fails pre-existentes (documentados, fuera de scope).
+
+## Ciclo 3 — Structured adversarial review (G3, R1) — `2719837c`
+
+**Bug**: breaker findings sin taxonomía de severidad consumible por CI.
+
+**Fix**: `scripts/adversarial-review.ps1` — wrapper de `check-adversarial.ps1`; normaliza `block`→`critical`, `warn`→`warning` (taxonomía R1 Cloudflare), dedup por (rule, file), PSScriptAnalyzer opcional, `-SeverityFilter`, exit 1 con criticals. Tests 4/4 — fixture staged UNA vez en `BeforeAll` (staging por test competía bajo ejecución paralela: `PropertyNotFoundException: Count`).
+
+| Entregable | Archivo | Tests | Commit |
+|---|---|---|---|
+| Review | `scripts/adversarial-review.ps1` | | `2719837c` |
+| Tests | `scripts/tests/adversarial-review.Tests.ps1` | ✅ 4/4 | `2719837c` |
+| Fixture | `scripts/tests/fixtures/adversarial-fixture.ps1` | untracked (intencional) | — |
+
+### Estado de verificación
+
+```
+--- Pre-commit gate ---
+✅ Ciclo 1: 22/22 ALL CLEAR (e3bec66b)
+✅ Ciclo 2: 22/22 ALL CLEAR (c966c4bc) — 9/9 Pester en gate
+✅ Ciclo 3: 22/22 ALL CLEAR (2719837c) — 4/4 Pester en gate
+✅ Benchmark: baseline 1.414s vs final mediana 0.135s (sync-vmk -DryRun ×5)
+✅ Coverage: 769/0 fail, 26.63% (floor 20%)
+✅ Rollback: docs/mejoras/rollback-map.md (hashes reales)
+ALL CLEAR
+```
+
+### Pendiente
+
+- [ ] PR → `main` (esperar orden explícita; no mergear) — branch `experimento/mejora-autonoma-2026-08-18`
+- [ ] Sesión paralela `agente-aem-migration`: archivos ajenos en worktree principal (NO tocados, des-stageados en Ciclo 1)
