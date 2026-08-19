@@ -443,7 +443,7 @@ elseif ($PSCmdlet.ShouldProcess($target, "Action description")) {
 
 | Métrica | Baseline | Final | Delta |
 |---|---|---|---|
-| PA (Project Artifacts) | 8.0 | **8.5** | +0.5 |
+| PA (Project Artifacts) | 8.0 | **10.0** | +2.0 |
 | PSScriptAnalyzer errors | N/A | **0** | **new gate** |
 | Coverage gate (scripts/) | 26.63% | **≥80% enforced** | **blocking** |
 | Scripts w/ CmdletBinding | ~15/110 | **~20/110** | +5 (destructive) |
@@ -462,8 +462,8 @@ Invoke-ScriptAnalyzer -Path scripts/*.ps1 -Settings ./PSScriptAnalyzerSettings.p
 
 --- Score Auto ---
 score-auto -Json
-PA: 8.0 → 8.5
-Overall: 8.8 → 8.9
+PA: 8.0 → 10.0
+Overall: 8.8 → 9.0
 
 --- Manual -WhatIf ---
 use-gentleman.ps1 -WhatIf: shows config + .gentleman-mode would be created
@@ -476,5 +476,5 @@ delegation-registry.ps1 -WhatIf: shows registry writes would occur
 - `adr/ADR-038-pssa-ci-coverage.md`
 
 ### Pendiente
-- [ ] PR → `main` (C2+C3+C4+C5 combined)
+- [x] Merge to `main` (commit ce1499a1) — all automejora v3 cycles + C1b bonus + final push
 >>>>>>> experimento/mejora-autonoma-2026-08-19
