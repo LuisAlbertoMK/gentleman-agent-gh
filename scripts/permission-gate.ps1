@@ -11,7 +11,7 @@
 
     Modes:
       manual → Everything asks (except built-in denials: network, interpreters, destructive)
-      semi   → Safe commands (read-only git, filesystem, search, test) auto-allow
+      semi   → [DEPRECATED, ADR-033] maps to 'auto' with warning
       auto   → Everything auto-allows except push + deletes (ask) + network (deny)
 
 .PARAMETER Command
@@ -34,7 +34,7 @@
 
 param(
     [string]$Command = "",
-    [ValidateSet('manual','semi','auto')][string]$Mode = "",
+    [string]$Mode = "",
     [switch]$ListModes,
     [switch]$Json,
     [switch]$Force,
@@ -51,6 +51,15 @@ $repoRoot = Split-Path -Path $PSScriptRoot -Parent
 
 # --- Resolve current mode (-Mode override wins; else read mode file) ---
 $Mode = Get-ConfiguredMode -Mode $Mode -ModeFilePath $ModeFilePath -RepoRoot $repoRoot
+# --- ADR-033: 'semi' mode is DEPRECATED → remap to 'auto' with warning ---
+if ($Mode -eq 'semi') {
+    Write-Warning "'semi' mode is DEPRECATED (ADR-033: simplified to manual|auto). Remapping to 'auto' — read-only allowlist is now covered by the behavioral gate deny-floor (curl/ssh/rm/python/node denied in auto too)."
+    $Mode = 'auto'
+}
+if ($Mode -and $Mode -notin 'manual','auto') {
+    Write-Error "Invalid mode '$Mode'. Valid modes: manual, auto. (semi is deprecated, maps to auto.)"
+    exit 1
+}
 
 # =====================================================================
 # CROSS-REFERENCE MIRROR — DO NOT EDIT THE PATTERNS HERE.
@@ -94,7 +103,7 @@ $Mode = Get-ConfiguredMode -Mode $Mode -ModeFilePath $ModeFilePath -RepoRoot $re
 if ($ListModes) {
     $summaries = @{
         manual = "Manual: Everything asks (with built-in denials for network/interpreters/destructive)"
-        semi   = "Semi:   Read-only git/filesystem/search/test auto-approve, writes ask, destructive denied"
+        semi   = "Semi:   [DEPRECATED, ADR-033] → auto (remaps at runtime)"
         auto   = "Auto:   Everything auto-approves except git push + deletes (ask) and network (deny)"
     }
     if ($Json) {
@@ -141,7 +150,7 @@ try {
             'allow' { Write-Host " → ALLOW" -ForegroundColor Green }
             'ask'   { Write-Host " → ASK"  -ForegroundColor Yellow }
             'deny'  { Write-Host " → DENY" -ForegroundColor Red }
-            'help'  { Write-Host "Usage: permission-gate.ps1 -Command '<cmd>' [-Mode manual|semi|auto]" }
+            'help'  { Write-Host "Usage: permission-gate.ps1 -Command '<cmd>' [-Mode manual|auto]" }
         }
     }
 } catch {
