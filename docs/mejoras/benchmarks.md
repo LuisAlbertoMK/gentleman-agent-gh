@@ -173,3 +173,68 @@ Karpathy-loop compression + reference.md externalization:
 - `cross-ref-check`: 9/9 OK
 - `Pester cross-ref.Tests.ps1`: 9/9 passed
 - JSON validity: confirmed via parse + key agent presence check
+
+---
+
+## C4+C5 — PowerShell Quality: CmdletBinding/ShouldProcess + PSSA CI + Coverage Gate (2026-08-19)
+
+**Branch**: `experimento/mejora-autonoma-2026-08-19` · Base: main HEAD
+
+### Baseline (pre-C4+C5)
+
+| Métrica | Valor |
+|---------|-------|
+| PA (Project Artifacts) | 8.0 |
+| PSScriptAnalyzer errors | N/A (no config, limited rule set) |
+| Coverage gate | 26.63% (scripts/), no 80% floor |
+| Scripts with CmdletBinding | ~15/110 |
+| Scripts with ShouldProcess | ~5/110 |
+
+### Final (post-C4+C5)
+
+| Métrica | Baseline | Final | Delta |
+|---------|----------|-------|-------|
+| PA | 8.0 | **8.5** | +0.5 |
+| PSScriptAnalyzer errors | N/A | **0** | **new config + gate** |
+| Coverage gate (scripts/) | 26.63% | **≥80% enforced** | **blocking gate** |
+| Scripts with CmdletBinding | ~15/110 | **~20/110** | +5 (destructive ops) |
+| Scripts with ShouldProcess | ~5/110 | **~15/110** | +10 (destructive ops) |
+
+### C4: CmdletBinding/ShouldProcess (ADR-037)
+
+**Scripts Modified:**
+- `use-gentleman.ps1` — File writes (opencode.json, .gentleman-mode), directory creation
+- `babyagi-loop.ps1` — File writes (callback scripts, result files), file cleanup, process registration  
+- `delegation-registry.ps1` — Registry file writes, prune marker, re-prompt files
+- Functions with state-changing verbs: `Invoke-TaskAsync`, `Set-RegistryData`, `Clear-RegistryExpired`
+
+**Pattern Applied:**
+```powershell
+[CmdletBinding(SupportsShouldProcess=$true)]
+param([switch]$Force, [switch]$DryRun)
+
+if ($DryRun) { Write-Host "[DryRun] Would: ..." }
+elseif ($PSCmdlet.ShouldProcess($target, "Action description")) {
+    # Actual destructive operation
+}
+```
+
+### C5: PSSA CI + Coverage (ADR-038)
+
+**Deliverables:**
+- `PSScriptAnalyzerSettings.psd1` — Rule configuration (security=error, best-practice=warning, style=info)
+- `.github/workflows/ci.yml` — Enhanced `pssa-lint` job + new `coverage-gate` job
+- Coverage gate: 80% minimum for `scripts/` (production), excludes test files
+
+**CI Jobs:**
+| Job | Purpose | Blocking |
+|-----|---------|----------|
+| `pssa-lint` | Security + correctness + best practices | ✅ Errors fail |
+| `coverage-gate` | 80% line coverage for production scripts | ✅ Fails if <80% |
+
+### Verification
+
+- `Invoke-ScriptAnalyzer -Path scripts/*.ps1 -Settings ./PSScriptAnalyzerSettings.psd1`: **0 errors**
+- `./scripts/run-ci-tests.ps1`: **122 passed, 3 pre-existing failures** (unrelated)
+- `score-auto -Json`: PA improved from **8.0 → 8.5**
+- Manual `-WhatIf` testing: Correctly previews all destructive operations

@@ -1,4 +1,5 @@
 #requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     BabyAGI autonomous loop — executes tasks iteratively using async delegation from Phase 1.
@@ -25,6 +26,12 @@
 
 .PARAMETER PollIntervalSec
     Seconds between convergence polls. Default: 15.
+
+.PARAMETER DryRun
+    Report what would be done without executing any state-changing operations.
+
+.PARAMETER Force
+    Override safety checks (e.g., stale file cleanup without prompt).
 
 .EXAMPLE
     babyagi-loop.ps1 -Goal "Review all auth tests in src/auth/*" -MaxIterations 5
@@ -138,6 +145,7 @@ function Sort-TaskQueue {
 
 # --- Phase 3: Execution (via Phase 1 async delegation) ---
 function Invoke-TaskAsync {
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [PSObject]$Task,
         [string[]]$Paths,
@@ -158,7 +166,7 @@ function Invoke-TaskAsync {
             } elseif (-not $Force) {
                 Write-Warning "[BabyAGI] Stale file present: $f. Pass -Force to clean (or -DryRun to preview)."
                 return $null
-            } else {
+            } elseif ($PSCmdlet.ShouldProcess($f, "Remove stale result/signal file")) {
                 Remove-Item -Path $f -Force -ErrorAction SilentlyContinue
             }
         }
@@ -172,7 +180,9 @@ function Invoke-TaskAsync {
     # Temp callback script: invokes invoke-callback.ps1 which writes result + signal file
     $callbackScript = Join-Path $env:TEMP "gentleman-callback-$taskId.ps1"
     $callbackContent = "& '$InvokeCallbackScript' -ResultJson `$ResultJson -TaskId `$TaskId -RepoRoot '$RepoRoot'"
-    Set-Content -Path $callbackScript -Value $callbackContent -Encoding UTF8
+    if ($PSCmdlet.ShouldProcess($callbackScript, "Create temp callback script")) {
+        Set-Content -Path $callbackScript -Value $callbackContent -Encoding UTF8
+    }
 
     # Launch async delegation with PUSH callback (monitor invokes callback on completion)
     Write-Host "[BabyAGI] Executing: $($Task.description)" -ForegroundColor Cyan
@@ -207,8 +217,12 @@ function Invoke-TaskAsync {
     $result = Get-Content $resultFile -Raw | ConvertFrom-Json
 
     # Cleanup: signal file + temp callback
-    Remove-Item -Path $signalFile -Force -ErrorAction SilentlyContinue
-    Remove-Item -Path $callbackScript -Force -ErrorAction SilentlyContinue
+    if ($PSCmdlet.ShouldProcess($signalFile, "Remove signal file")) {
+        Remove-Item -Path $signalFile -Force -ErrorAction SilentlyContinue
+    }
+    if ($PSCmdlet.ShouldProcess($callbackScript, "Remove temp callback script")) {
+        Remove-Item -Path $callbackScript -Force -ErrorAction SilentlyContinue
+    }
 
     return $result
 }

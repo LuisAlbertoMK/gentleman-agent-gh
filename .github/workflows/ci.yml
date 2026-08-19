@@ -144,14 +144,61 @@ jobs:
             Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser -AllowClobber
           }
 
-      - name: Run PSScriptAnalyzer (security + correctness)
-        # Only security/correctness rules — style rules deferred to quality-gate.yml
+      - name: Run PSScriptAnalyzer (security + correctness + best practices)
+        # Uses PSScriptAnalyzerSettings.psd1 for rule configuration
+        # Enforces: security (invoke-expression, plaintext passwords), correctness (approved verbs, ShouldProcess),
+        # best practices (unused params, empty catch blocks)
         run: |
-          $rules = @('PSAvoidUsingInvokeExpression', 'PSAvoidUsingWriteHost', 'PSAvoidUsingPlainTextForPassword', 'PSAvoidUsingUsernameAuthentically')
-          $results = Invoke-ScriptAnalyzer -Path ./scripts -Recurse -IncludeRule $rules -PassThru
-          if ($results.Count -gt 0) {
-            Write-Error "PSScriptAnalyzer: $($results.Count) issues found"
-            $results | Format-Table -Property RuleName, Line, Message -AutoSize
+          $results = Invoke-ScriptAnalyzer -Path ./scripts -Recurse -Settings ./PSScriptAnalyzerSettings.psd1 -PassThru
+          $errors = $results | Where-Object { $_.Severity -eq 'Error' }
+          $warnings = $results | Where-Object { $_.Severity -eq 'Warning' }
+          
+          if ($errors.Count -gt 0) {
+            Write-Error "PSScriptAnalyzer: $($errors.Count) ERROR(S) found"
+            $errors | Format-Table -Property RuleName, Line, Message, Severity -AutoSize
             exit 1
           }
-          Write-Output "OK: PSScriptAnalyzer passed (security + correctness)"
+          
+          if ($warnings.Count -gt 0) {
+            Write-Warning "PSScriptAnalyzer: $($warnings.Count) WARNING(S) found (non-blocking)"
+            $warnings | Format-Table -Property RuleName, Line, Message, Severity -AutoSize
+          }
+          
+          Write-Output "OK: PSScriptAnalyzer passed (no errors)"
+
+  coverage-gate:
+    name: Coverage — gate (scripts/ minimum 80%)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: tests
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run coverage with 80% gate for scripts/
+        # C5: Enforce minimum 80% coverage for production scripts (scripts/)
+        # Excludes test files and known-flaky suites
+        run: |
+          ./scripts/tests/Coverage.ps1 -TestPath ./scripts/tests `
+            -CoverageRootPath ./scripts `
+            -Strict -MinimumCoverage 80 `
+            -ExcludePattern "e2e|Integration|session-checkpoint|skill-coverage|ui-specialist|subagent|analyze-automejora|config-validator|benchmark\.|permission-gate|readme-drift" `
+            -ReportDir ./test-results
+
+      - name: Publish JaCoCo coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-coverage-scripts
+          path: ./test-results/coverage.xml
+          if-no-files-found: warn
+
+      - name: Publish coverage summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-summary-scripts
+          path: ./test-results/summary.json
+          if-no-files-found: warn

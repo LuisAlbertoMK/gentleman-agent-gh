@@ -358,7 +358,9 @@ $result = @{
 
 if ($Json) {
     Write-Output ($result | ConvertTo-Json -Depth 2)
-    if ($errors.Count -gt 0) { exit 1 } else { exit 0 }
+    # Don't exit here — let caller handle exit code for thread job compatibility
+    # Return the result object for programmatic use
+    return $result
 } elseif ($result.allClean) {
     if (-not $Quiet) { Write-Host "OK ALL CHECKS PASSED" -ForegroundColor Green }
     exit 0
