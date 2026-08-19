@@ -366,3 +366,26 @@ ALL CLEAR
 - `score-auto -Json`: SE 7.0, o5=0, o3=39, avg=3.0KB
 - `cross-ref-check`: 9/9 OK
 - `Pester cross-ref.Tests.ps1`: 4/4 passed
+
+## Ciclo 5 — Config Context Budget Trim (C3) — `HEAD`
+
+**Bug**: `opencode.json` at 58,626B (89.7% of 65,536B limit) — approaching ceiling with 6 unused semi agents, disabled MCP servers, and redundant tool overrides.
+
+**Fix**: Remove 6 `-semi` agents (ADR-033: semi mode never used), 2 disabled MCP servers, top-level `tools` disables. All functional config preserved.
+
+| Entregable | Archivo | Tests | Commit |
+|---|---|---|---|
+| Trimmed config | `opencode.json` | | `HEAD` |
+| ADR | `adr/ADR-036-config-budget-trim.md` | | `HEAD` |
+| Benchmarks update | `docs/mejoras/benchmarks.md` | | `HEAD` |
+
+**Números**: 
+- **Before**: 58,626B (89.7%), 55 agents, SE=7.0, PA=8.0
+- **After**: 41,704B (63.6%), 49 agents, SE=7.0, PA=8.0
+- **Reduction**: 28.9% file size, −26.1pp under limit, 6 semi agents removed
+
+**Verificación**:
+- `score-auto -Json`: SE=7.0, PA=8.0, overall=8.8
+- `cross-ref-check`: 9/9 OK
+- `Pester cross-ref.Tests.ps1`: 9/9 passed
+- JSON validity: parse + key agent presence check confirmed

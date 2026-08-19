@@ -133,3 +133,43 @@ Karpathy-loop compression + reference.md externalization:
 - `score-auto -Json`: SE=7.0, o5=0, o3=39, avg=3.0KB
 - `cross-ref-check`: 9/9 OK
 - `Pester cross-ref.Tests.ps1`: 4/4 passed
+
+---
+
+## C3 — Config Context Budget Trim (2026-08-19)
+
+**Branch**: `experimento/mejora-autonoma-2026-08-19` · Base: main HEAD
+
+### Baseline (pre-C3)
+
+| Métrica | Valor |
+|---------|-------|
+| Config size | 58,626B |
+| % of 65,536B limit | 89.7% |
+| Agent count | 55 |
+| SE (Skill Effectiveness) | 7.0 |
+| PA (Project Artifacts) | 8.0 |
+
+### Final (post-C3 trim)
+
+| Métrica | Baseline | Final | Delta |
+|---------|----------|-------|-------|
+| Config size | 58,626B | **41,704B** | −16,922B (−28.9%) |
+| % of 65,536B limit | 89.7% | **63.6%** | −26.1pp (target <85% ✓) |
+| Agent count | 55 | **49** | −6 (semi removed) |
+| SE | 7.0 | **7.0** | = |
+| PA | 8.0 | **8.0** | = |
+
+### Method
+
+- Removed 6 unused `-semi` agents (ADR-033: semi mode never used)
+- Removed disabled MCP servers (`headroom`, `chrome-devtools-mcp`)
+- Removed top-level `tools` disables (redundant per-agent overrides)
+- All 42 functional agents preserved, routing/permissions/MCP intact
+
+### Verification
+
+- `score-auto -Json`: SE=7.0, PA=8.0, overall=8.8
+- `cross-ref-check`: 9/9 OK
+- `Pester cross-ref.Tests.ps1`: 9/9 passed
+- JSON validity: confirmed via parse + key agent presence check
