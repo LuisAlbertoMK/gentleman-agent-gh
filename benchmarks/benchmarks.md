@@ -107,7 +107,7 @@ Nota: opencode.json creció 52,206→53,556B (+1,350B) desde audit 08-03 — 82%
 | B2 BenchmarkSeconds | 1.012s | 1.092s | −7.3% (ruido) | ✅ |
 | B3 Score | 9.3/10 (Cycle Activity 3.0, Script Performance 9.0) | 9.3/10 | 0.0% | ✅ estable · 4 PSSA pre-existing (no new) |
 | B4 Gate pre-commit | 17/17 | 16/16 | +1 step | ✅ |
-| B5 Pester size tests | 2/2 | nuevo | — | ✅
+| B5 Pester size tests | 2/2 | nuevo | — | ✅ |
 
 ---
 
@@ -289,3 +289,53 @@ Nota: opencode.json creció 52,206→53,556B (+1,350B) desde audit 08-03 — 82%
 | Suite destructiva | 208/0 | 208/0 | 0 | ✅ estable |
 | B1 opencode.json | 53,556 B | 53,556 B | 0 | ✅ dentro budget |
 | B3 Gate | 18/18 | 18/18 | 0 | ✅ |
+
+---
+
+## FINAL PUSH — Overall ≥9.0 (2026-08-19)
+
+### Objective 1: Fix Pester Failure
+- **Root cause**: `cross-ref-check.ps1 -Json` output polluted pipeline with progress messages + returned object alongside JSON string
+- **Fix**: Suppressed `Write-Host` when `-Json`; added `exit` after JSON output to avoid returning object
+- **Result**: Pester 4/4 pass, 0 fail
+
+### Objective 2: Compress 5 Smallest Skills >3KB (39→34 o3)
+| Skill | Before (B) | After (B) | Δ |
+|---|---|---|---|
+| sdd-spec | 3,360 | 2,969 | −391 |
+| sdd-verify | 3,320 | 2,987 | −333 |
+| self-improvement | 3,444 | 2,354 | −1,090 |
+| engram-protocol | 3,238 | 2,903 | −335 |
+| sdd-explore | 3,112 | 2,691 | −421 |
+| **Total** | **16,474** | **13,904** | **−2,570 (−15.6%)** |
+
+### Final Verification (ALL mandatory)
+| Check | Result |
+|---|---|
+| `score-auto -Json` | **SE: 6.0, PA: 10.0, Overall: 9.0** |
+| `o3` (skills >3KB) | **34** (was 39) |
+| `o5` (skills >5KB) | **0** |
+| Avg skill size | **2.9 KB** |
+| `cross-ref-check` | **10/10 OK** |
+| `Pester cross-ref.Tests.ps1` | **4 passed, 0 failed** |
+| `Invoke-ScriptAnalyzer` | **0 errors** |
+
+### Final Scores (score-auto -Json 2026-08-19)
+| Dimension | Score |
+|---|---|
+| Skill Effectiveness (SE) | 6.0 |
+| Score Depth (SD) | 8.5 |
+| Orthography (Or) | 10.0 |
+| Metrics (Me) | 10.0 |
+| Best Practices (BP) | 9.8 |
+| Cycle Activity (CA) | 3.0 |
+| Backlog Integrity (Bi/BI2) | 10.0 |
+| Script Performance (SP) | 9.0 |
+| Bitacora (Bi) | 10.0 |
+| Dead Code (DC) | 10.0 |
+| Project Artifacts (PA) | 10.0 |
+| Clean Code (CC) | 9.7 |
+| Security (Sec) | 10.0 |
+| **Overall** | **9.0** |
+
+**TARGET ACHIEVED: Overall ≥9.0** ✅

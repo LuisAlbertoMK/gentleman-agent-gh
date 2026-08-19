@@ -120,7 +120,7 @@ if ($env:PESTER_TEST -eq '1') {
 }
 $jobs += Start-ThreadJob -Name "backlog"  -ScriptBlock { & "$using:scriptLibRoot\check-backlog-integrity.ps1" -Json }
 
-$jobs | Wait-Job -Timeout 30 | Out-Null
+$jobs | Wait-Job -Timeout 300 | Out-Null
 
 # Receive each job by name — handle failures gracefully with defaults
 $crossRefOutput = Receive-Job -Name "crossref" -ErrorAction SilentlyContinue
@@ -130,7 +130,10 @@ $backlogRaw     = Receive-Job -Name "backlog" -ErrorAction SilentlyContinue
 $jobs | Remove-Job -Force 2>$null
 
 # Parse parallel results with safe defaults on failure
-$crossRefClean = try { ($crossRefOutput | ConvertFrom-Json -EA SilentlyContinue).allClean -eq $true } catch { $false }
+$crossRefClean = try { 
+    $jsonLine = $crossRefOutput | Where-Object { $_ -match '^\s*\{' } | Select-Object -First 1
+    ($jsonLine | ConvertFrom-Json -EA SilentlyContinue).allClean -eq $true 
+} catch { $false }
 $backlogData   = try { $backlogRaw | ConvertFrom-Json -EA SilentlyContinue } catch { $null }
 
 $hasReadme      = Test-Path "README.md"

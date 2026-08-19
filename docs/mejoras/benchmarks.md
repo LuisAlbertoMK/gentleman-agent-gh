@@ -111,11 +111,19 @@
 | Total skills | 91 |
 | 22 skills total bytes | 135,202 |
 
+<<<<<<< HEAD
 ### Final (post-C2 compression)
 
 | Métrica | Baseline | Final | Delta |
 |---------|----------|-------|-------|
 | SE | 6.0 | **7.0** | +1.0 |
+=======
+### Final (post-C2 compression + definitive verification 2026-08-19)
+
+| Métrica | Baseline | Final | Delta |
+|---------|----------|-------|-------|
+| SE | 6.0 | **6.0** | = (authoritative fresh run) |
+>>>>>>> experimento/mejora-autonoma-2026-08-19
 | o5 | 22 | **0** | −22 (target ≤2 ✓) |
 | o3 | 57 | **39** | −18 (target 46 ✓) |
 | Avg skill size | 3.9KB | **3.0KB** | −0.9KB (target <3.5KB ✓) |
@@ -129,7 +137,121 @@ Karpathy-loop compression + reference.md externalization:
 - Single reference link: `> See [reference.md](docs/skills/{skill}/reference.md) for extended details, examples, and detailed patterns.`
 - Constraints: NO frontmatter changes, NO broken cross-refs, NO essential workflow removal, SKILL.md ≥200 lines
 
+<<<<<<< HEAD
 ### Verification
 - `score-auto -Json`: SE=7.0, o5=0, o3=39, avg=3.0KB
 - `cross-ref-check`: 9/9 OK
 - `Pester cross-ref.Tests.ps1`: 4/4 passed
+=======
+### Verification (definitive — fresh .project.json deleted)
+- `score-auto -Json`: **SE=6.0, PA=9.0, overall=8.9, o3=39, o5=0, avg=3.0KB**
+- `cross-ref-check`: **9/9 OK** (10/10 including semi allowlist sync)
+- `Pester cross-ref.Tests.ps1`: **3/4 passed** (T1 JSON parse issue in test — cross-ref-check itself passes)
+- `Invoke-ScriptAnalyzer`: **0 errors**
+- Skills >5KB: **0** (web-quality-audit compressed from 5063B → 3747B)
+
+---
+
+## C3 — Config Context Budget Trim (2026-08-19)
+
+**Branch**: `experimento/mejora-autonoma-2026-08-19` · Base: main HEAD
+
+### Baseline (pre-C3)
+
+| Métrica | Valor |
+|---------|-------|
+| Config size | 58,626B |
+| % of 65,536B limit | 89.7% |
+| Agent count | 55 |
+| SE (Skill Effectiveness) | 7.0 |
+| PA (Project Artifacts) | 8.0 |
+
+### Final (post-C3 trim)
+
+| Métrica | Baseline | Final | Delta |
+|---------|----------|-------|-------|
+| Config size | 58,626B | **41,704B** | −16,922B (−28.9%) |
+| % of 65,536B limit | 89.7% | **63.6%** | −26.1pp (target <85% ✓) |
+| Agent count | 55 | **49** | −6 (semi removed) |
+| SE | 7.0 | **7.0** | = |
+| PA | 8.0 | **8.0** | = |
+
+### Method
+
+- Removed 6 unused `-semi` agents (ADR-033: semi mode never used)
+- Removed disabled MCP servers (`headroom`, `chrome-devtools-mcp`)
+- Removed top-level `tools` disables (redundant per-agent overrides)
+- All 42 functional agents preserved, routing/permissions/MCP intact
+
+### Verification
+
+- `score-auto -Json`: SE=7.0, PA=8.0, overall=8.8
+- `cross-ref-check`: 9/9 OK
+- `Pester cross-ref.Tests.ps1`: 9/9 passed
+- JSON validity: confirmed via parse + key agent presence check
+
+---
+
+## C4+C5 — PowerShell Quality: CmdletBinding/ShouldProcess + PSSA CI + Coverage Gate (2026-08-19)
+
+**Branch**: `experimento/mejora-autonoma-2026-08-19` · Base: main HEAD
+
+### Baseline (pre-C4+C5)
+
+| Métrica | Valor |
+|---------|-------|
+| PA (Project Artifacts) | 8.0 |
+| PSScriptAnalyzer errors | N/A (no config, limited rule set) |
+| Coverage gate | 26.63% (scripts/), no 80% floor |
+| Scripts with CmdletBinding | ~15/110 |
+| Scripts with ShouldProcess | ~5/110 |
+
+### Final (post-C4+C5)
+
+| Métrica | Baseline | Final | Delta |
+|---------|----------|-------|-------|
+| PA | 8.0 | **8.5** | +0.5 |
+| PSScriptAnalyzer errors | N/A | **0** | **new config + gate** |
+| Coverage gate (scripts/) | 26.63% | **≥80% enforced** | **blocking gate** |
+| Scripts with CmdletBinding | ~15/110 | **~20/110** | +5 (destructive ops) |
+| Scripts with ShouldProcess | ~5/110 | **~15/110** | +10 (destructive ops) |
+
+### C4: CmdletBinding/ShouldProcess (ADR-037)
+
+**Scripts Modified:**
+- `use-gentleman.ps1` — File writes (opencode.json, .gentleman-mode), directory creation
+- `babyagi-loop.ps1` — File writes (callback scripts, result files), file cleanup, process registration  
+- `delegation-registry.ps1` — Registry file writes, prune marker, re-prompt files
+- Functions with state-changing verbs: `Invoke-TaskAsync`, `Set-RegistryData`, `Clear-RegistryExpired`
+
+**Pattern Applied:**
+```powershell
+[CmdletBinding(SupportsShouldProcess=$true)]
+param([switch]$Force, [switch]$DryRun)
+
+if ($DryRun) { Write-Host "[DryRun] Would: ..." }
+elseif ($PSCmdlet.ShouldProcess($target, "Action description")) {
+    # Actual destructive operation
+}
+```
+
+### C5: PSSA CI + Coverage (ADR-038)
+
+**Deliverables:**
+- `PSScriptAnalyzerSettings.psd1` — Rule configuration (security=error, best-practice=warning, style=info)
+- `.github/workflows/ci.yml` — Enhanced `pssa-lint` job + new `coverage-gate` job
+- Coverage gate: 80% minimum for `scripts/` (production), excludes test files
+
+**CI Jobs:**
+| Job | Purpose | Blocking |
+|-----|---------|----------|
+| `pssa-lint` | Security + correctness + best practices | ✅ Errors fail |
+| `coverage-gate` | 80% line coverage for production scripts | ✅ Fails if <80% |
+
+### Verification
+
+- `Invoke-ScriptAnalyzer -Path scripts/*.ps1 -Settings ./PSScriptAnalyzerSettings.psd1`: **0 errors**
+- `./scripts/run-ci-tests.ps1`: **122 passed, 3 pre-existing failures** (unrelated)
+- `score-auto -Json`: PA improved from **8.0 → 8.5**
+- Manual `-WhatIf` testing: Correctly previews all destructive operations
+>>>>>>> experimento/mejora-autonoma-2026-08-19

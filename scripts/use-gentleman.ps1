@@ -1,4 +1,8 @@
 ﻿#requires -Version 5.1
+<<<<<<< HEAD
+=======
+[CmdletBinding(SupportsShouldProcess=$true)]
+>>>>>>> experimento/mejora-autonoma-2026-08-19
 <#
 .SYNOPSIS
     Gentleman-ize any project — generate opencode.json from the SSoT chain
@@ -369,7 +373,7 @@ if (-not $targetIsChainRepo) {
 
 if ($DryRun) {
     Out-Message "  [dry-run] WOULD create $projectCfgFile (generated from chain)" -color Yellow
-} else {
+} elseif ($PSCmdlet.ShouldProcess($projectCfgFile, "Create project config from chain")) {
     $projectCfg | ConvertTo-Json -Depth 20 | Set-Content $projectCfgFile -Encoding UTF8 -Force
     Out-Message "  Created $projectCfgFile" -color Green
 }
@@ -383,7 +387,7 @@ if (Test-Path $modeDst -PathType Leaf) {
     if ($Force) {
         if ($DryRun) {
             Out-Message "  [dry-run] WOULD overwrite .gentleman-mode '${existingMode}' -> 'manual' (-Force)" -color Yellow
-        } else {
+        } elseif ($PSCmdlet.ShouldProcess($modeDst, "Overwrite .gentleman-mode to 'manual'")) {
             Set-Content -LiteralPath $modeDst -Value "manual" -NoNewline -Encoding Ascii
             Out-Message "  .gentleman-mode: overwritten to 'manual' (-Force; was '$existingMode')" -color DarkGray
         }
@@ -393,7 +397,7 @@ if (Test-Path $modeDst -PathType Leaf) {
 } else {
     if ($DryRun) {
         Out-Message "  [dry-run] WOULD create .gentleman-mode='manual'" -color Yellow
-    } else {
+    } elseif ($PSCmdlet.ShouldProcess($modeDst, "Create .gentleman-mode with 'manual'")) {
         Set-Content -LiteralPath $modeDst -Value "manual" -NoNewline -Encoding Ascii
         Out-Message "  .gentleman-mode: 'manual' (default for external projects)" -color Green
     }

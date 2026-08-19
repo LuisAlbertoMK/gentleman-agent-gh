@@ -1,4 +1,5 @@
 ﻿#requires -Version 7
+[CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
     Async delegation registry — state for non-blocking subagent delegations.
@@ -157,7 +158,9 @@ if (Test-Path $pruneMarker) {
 # Main: load + prune, then dispatch
 if ($shouldPrune) {
     $reg = Clear-RegistryExpired (Get-RegistryData) $TtlMinutes
-    Set-Content $pruneMarker -Value (Get-Date -Format "o") -NoNewline -Encoding UTF8
+    if ($PSCmdlet.ShouldProcess($pruneMarker, "Update prune timestamp")) {
+        Set-Content $pruneMarker -Value (Get-Date -Format "o") -NoNewline -Encoding UTF8
+    }
 } else {
     $reg = Get-RegistryData
 }
@@ -338,7 +341,9 @@ switch ($Action) {
 
         # Write re-prompt instructions to a temp file the orchestrator picks up before task()
         $promptFile = Join-Path $RepoRoot ".learnings\delegation-$TaskId-re-prompt.md"
-        $NewPrompt | Set-Content $promptFile -Encoding UTF8
+        if ($PSCmdlet.ShouldProcess($promptFile, "Write re-prompt instructions")) {
+            $NewPrompt | Set-Content $promptFile -Encoding UTF8
+        }
 
         if ($Quiet) {
             @{ status = "re-prompted"; task_id = $TaskId; prompt_file = $promptFile } | ConvertTo-Json -Compress
