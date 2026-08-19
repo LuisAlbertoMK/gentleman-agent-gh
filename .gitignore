@@ -153,3 +153,8 @@ TestResults.xml
 .breaker-cleared/*
 !.breaker-cleared/.gitkeep
 docs/ciclos/c28-w2-backup/
+
+# C1 cross-ref integrity artifacts
+cross-ref-output.json
+score-output.json
+sync-vmk-output.txt
