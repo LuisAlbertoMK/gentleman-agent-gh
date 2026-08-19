@@ -23,45 +23,27 @@ From orchestrator: change name, artifact store (`engram | openspec | hybrid | no
 3. **Read Existing Specs** (openspec/hybrid: `openspec/specs/{domain}/spec.md`)
 4. **Write Specs** (openspec/hybrid: `openspec/changes/{change}/specs/{domain}/spec.md`)
 
-### Delta Format
+### Delta Format (condensed)
 ```
 # Delta for {Domain}
-
 ### Requirement: {Name}
-{RFC 2119: MUST/SHALL/SHOULD} {behavior}
-#### Scenario: {Name}
-- GIVEN {precondition} | WHEN {action} | THEN {outcome}
-
-### Requirement: {Name}
-{Full updated text — replaces existing entirely} (Previously: {what changed})
+{RFC 2119} {behavior}
 #### Scenario: {Name} - GIVEN/WHEN/THEN
-
-### Requirement: {Name} (Reason: {why}) (Migration: {replacement or "None"})
-
-### Requirement: {Old} → {New} (Reason: {why}) (Migration: {how to update refs})
+### Requirement: {Name} (Previously: {what changed}) - GIVEN/WHEN/THEN
+### Requirement: {Name} (Reason: {why}) (Migration: {replacement})
+### Requirement: {Old} → {New} (Reason: {why}) (Migration: {how})
 ```
 
 ### MODIFIED Workflow (CRITICAL)
 1. Copy ENTIRE requirement block (from `### Requirement:` through ALL scenarios)
-2. Paste under `## MODIFIED Requirements`
-3. Edit the copy
-4. Add "(Previously: {summary})"
+2. Paste under `## MODIFIED Requirements` → Edit → Add "(Previously: {summary})"
 NEVER write partial MODIFIED blocks. New behavior without changing existing → ADDED.
 
 ### New Domain (No Existing Spec)
 Full spec: `# {Domain} Specification` → `## Purpose` → `## Requirements` with Given/When/Then.
 
 5. **Persist** — §C of `sdd-phase-common.md`: artifact `spec`, topic_key `sdd/{change}/spec`, type `architecture`
-6. **Return Summary**
-```markdown
-
-**Change**: {change-name}
-| Domain | Type | Requirements | Scenarios |
-|---|---|---|---|
-| {domain} | Delta/New | {N added, M modified, K removed} | {total} |
-- Happy paths: {covered/missing} | Edge cases: {covered/missing} | Error states: {covered/missing}
-Next: design (sdd-design) or tasks (sdd-tasks).
-```
+6. **Return Summary**: Change, domain table (Type, Reqs, Scenarios), coverage (happy/edge/error), Next phase.
 
 - Given/When/Then for all scenarios; RFC 2119 keywords (MUST/SHALL/SHOULD/MAY)
 - Every requirement: ≥1 scenario (happy + edge cases); Scenarios TESTABLE — automatable from G/W/T

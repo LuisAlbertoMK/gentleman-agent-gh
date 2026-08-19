@@ -99,17 +99,17 @@ function Get-ConfigRef {
 }
 
 # [1/9] APC check
-if (-not $Quiet) { Write-Host "[1/9] APC..." -N }
+if (-not $Json -and -not $Quiet) { Write-Host "[1/9] APC..." -N }
 $apcPath = Join-Path $RepoRoot "ANTI-PATTERN-CATALOG.md"
 if (Test-Path $apcPath) {
-    if (-not $Quiet) { Write-Host " OK" }
+    if (-not $Json -and -not $Quiet) { Write-Host " OK" }
 } else {
     $errors += "APC not found"
-    if (-not $Quiet) { Write-Host " FAIL" }
+    if (-not $Json -and -not $Quiet) { Write-Host " FAIL" }
 }
 
 # [2/9] SKILL.md presence
-if (-not $Quiet) { Write-Host "[2/9] SKILL.md..." -N }
+if (-not $Json -and -not $Quiet) { Write-Host "[2/9] SKILL.md..." -N }
 $missingSkills = [System.Collections.Generic.List[string]]::new()
 $skillDirs = Get-SkillDir $skillsDir
 foreach ($skill in $skillDirs) {
@@ -118,31 +118,31 @@ foreach ($skill in $skillDirs) {
     }
 }
 if ($missingSkills.Count -eq 0) {
-    if (-not $Quiet) { Write-Host " OK (all)" }
+    if (-not $Json -and -not $Quiet) { Write-Host " OK (all)" }
 } else {
     $warnings += "Missing SKILL.md: $($missingSkills -join ', ')"
-    if (-not $Quiet) { Write-Host " WARN" }
+    if (-not $Json -and -not $Quiet) { Write-Host " WARN" }
 }
 
 # [3/9] INDEX count
-if (-not $Quiet) { Write-Host "[3/9] INDEX count..." -N }
+if (-not $Json -and -not $Quiet) { Write-Host "[3/9] INDEX count..." -N }
 $actualCount = $skillDirs.Count
 $indexLine = Select-String -Path (Join-Path $RepoRoot "SKILLS-INDEX.md") -Pattern "all \d+ skills"
 if ($indexLine -match "all (\d+) skills") {
     $declaredCount = [int]$Matches[1]
-    if ($declaredCount -eq $actualCount) {
-        if (-not $Quiet) { Write-Host " OK ($actualCount)" }
-    } else {
-        $errors += "INDEX says $declaredCount, has $actualCount"
-        if (-not $Quiet) { Write-Host " FAIL ($declaredCount vs $actualCount)" }
-    }
+if ($declaredCount -eq $actualCount) {
+    if (-not $Json -and -not $Quiet) { Write-Host " OK ($actualCount)" }
+} else {
+    $errors += "INDEX says $declaredCount, has $actualCount"
+    if (-not $Json -and -not $Quiet) { Write-Host " FAIL ($declaredCount vs $actualCount)" }
+}
 } else {
     $warnings += "INDEX header mismatch"
-    if (-not $Quiet) { Write-Host " WARN" }
+    if (-not $Json -and -not $Quiet) { Write-Host " WARN" }
 }
 
 # [4/9] Junctions
-if (-not $Quiet) { Write-Host "[4/9] junctions..." -N }
+if (-not $Json -and -not $Quiet) { Write-Host "[4/9] junctions..." -N }
 $missingJunctions = [System.Collections.Generic.List[string]]::new()
 if (Test-Path $globalSkills) {
     foreach ($skill in $skillDirs) {
@@ -153,14 +153,14 @@ if (Test-Path $globalSkills) {
     }
 }
 if ($missingJunctions.Count -eq 0) {
-    if (-not $Quiet) { Write-Host " OK (all)" }
+    if (-not $Json -and -not $Quiet) { Write-Host " OK (all)" }
 } else {
     $warnings += "Missing junctions: $($missingJunctions -join ', ')"
-    if (-not $Quiet) { Write-Host " WARN" }
+    if (-not $Json -and -not $Quiet) { Write-Host " WARN" }
 }
 
 # [5/9] _shared files
-if (-not $Quiet) { Write-Host "[5/9] _shared..." -N }
+if (-not $Json -and -not $Quiet) { Write-Host "[5/9] _shared..." -N }
 $requiredShared = @{
     'skill-resolver.md'     = Test-Path (Join-Path $skillsDir "_shared\skill-resolver.md")
     'sdd-phase-common.md'   = Test-Path (Join-Path $skillsDir "sdd\references\sdd-phase-common.md")
@@ -169,14 +169,14 @@ $requiredShared = @{
 }
 $missingShared = @($requiredShared.GetEnumerator().Where({ -not $_.Value }).ForEach({ $_.Key }))
 if ($missingShared.Count -eq 0) {
-    if (-not $Quiet) { Write-Host " OK" }
+    if (-not $Json -and -not $Quiet) { Write-Host " OK" }
 } else {
     $errors += "Missing _shared: $($missingShared -join ', ')"
-    if (-not $Quiet) { Write-Host " FAIL" }
+    if (-not $Json -and -not $Quiet) { Write-Host " FAIL" }
 }
 
 # [6/9] Cross-refs
-if (-not $Quiet) { Write-Host "[6/9] cross-refs..." -N }
+if (-not $Json -and -not $Quiet) { Write-Host "[6/9] cross-refs..." -N }
 $allSkillNames = @($skillDirs.ForEach({ $_.Name.ToLower() }))
 $brokenRefs = [System.Collections.Generic.List[string]]::new()
 $skillContentCache = @{}
@@ -204,14 +204,14 @@ foreach ($skill in $skillDirs) {
 }
 
 if ($brokenRefs.Count -eq 0) {
-    if (-not $Quiet) { Write-Host " OK" }
+    if (-not $Json -and -not $Quiet) { Write-Host " OK" }
 } else {
     $errors += $brokenRefs
-    if (-not $Quiet) { Write-Host " FAIL ($($brokenRefs.Count))" }
+    if (-not $Json -and -not $Quiet) { Write-Host " FAIL ($($brokenRefs.Count))" }
 }
 
 # [7/9] Config refs
-if (-not $Quiet) { Write-Host "[7/9] config_refs..." -N }
+if (-not $Json -and -not $Quiet) { Write-Host "[7/9] config_refs..." -N }
 $missingConfigRefs = [System.Collections.Generic.List[string]]::new()
 
 foreach ($skill in $skillDirs) {
@@ -228,14 +228,14 @@ foreach ($skill in $skillDirs) {
 }
 
 if ($missingConfigRefs.Count -eq 0) {
-    if (-not $Quiet) { Write-Host " OK" }
+    if (-not $Json -and -not $Quiet) { Write-Host " OK" }
 } else {
     $errors += $missingConfigRefs
-    if (-not $Quiet) { Write-Host " FAIL ($($missingConfigRefs.Count))" }
+    if (-not $Json -and -not $Quiet) { Write-Host " FAIL ($($missingConfigRefs.Count))" }
 }
 
 # [8/9] review-rules.jsonc
-if (-not $Quiet) { Write-Host "[8/9] review-rules.jsonc..." -N }
+if (-not $Json -and -not $Quiet) { Write-Host "[8/9] review-rules.jsonc..." -N }
 $rulesPath = Join-Path $RepoRoot "review-rules.jsonc"
 
 if (Test-Path $rulesPath) {
@@ -262,22 +262,22 @@ if (Test-Path $rulesPath) {
         if ($selectorCount -lt 1) { $issues += "selectors $selectorCount" }
 
         if ($issues.Count -eq 0) {
-            if (-not $Quiet) { Write-Host " OK (z$zoneCount c$ctxCount m$modeCount p$profileCount s$selectorCount)" }
+            if (-not $Json -and -not $Quiet) { Write-Host " OK (z$zoneCount c$ctxCount m$modeCount p$profileCount s$selectorCount)" }
         } else {
             $errors += "review-rules.jsonc: $($issues -join '; ')"
-            if (-not $Quiet) { Write-Host " FAIL" }
+            if (-not $Json -and -not $Quiet) { Write-Host " FAIL" }
         }
     } catch {
         $errors += "review-rules.jsonc parse: $_"
-        if (-not $Quiet) { Write-Host " FAIL" }
+        if (-not $Json -and -not $Quiet) { Write-Host " FAIL" }
     }
 } else {
     $warnings += "review-rules.jsonc missing"
-    if (-not $Quiet) { Write-Host " WARN" }
+    if (-not $Json -and -not $Quiet) { Write-Host " WARN" }
 }
 
 # [9/9] README vs opencode.json agents
-if (-not $Quiet) { Write-Host "[9/9] README agents..." -N }
+if (-not $Json -and -not $Quiet) { Write-Host "[9/9] README agents..." -N }
 try {
     $oc = Get-Content (Join-Path $RepoRoot "opencode.json") -Raw -Encoding UTF8 | ConvertFrom-Json
     $readme = Get-Content (Join-Path $RepoRoot "README.md") -Raw -Encoding UTF8
@@ -291,17 +291,17 @@ try {
     }
 
     if ($missingInReadme.Count -eq 0) {
-        if (-not $Quiet) { Write-Host " OK ($($ocAgents.Count) agents match)" }
+        if (-not $Json -and -not $Quiet) { Write-Host " OK ($($ocAgents.Count) agents match)" }
     } else {
         $errors += $missingInReadme
-        if (-not $Quiet) { Write-Host " FAIL ($($missingInReadme.Count) missing)" }
+        if (-not $Json -and -not $Quiet) { Write-Host " FAIL ($($missingInReadme.Count) missing)" }
     }
 } catch {
-    if (-not $Quiet) { Write-Host " WARN (parse: $($_.Exception.Message))" }
+    if (-not $Json -and -not $Quiet) { Write-Host " WARN (parse: $($_.Exception.Message))" }
 }
 
 # [10/9] semi-agents.json vs permission-gate.ps1 allowlist
-if (-not $Quiet) { Write-Host "[10/9] semi allowlist sync..." -N }
+if (-not $Json -and -not $Quiet) { Write-Host "[10/9] semi allowlist sync..." -N }
 try {
     $semiPath = Join-Path $RepoRoot "scripts\opencode-config\semi-agents.json"
     $gatePath = Join-Path $RepoRoot "scripts\permission-gate.ps1"
@@ -336,14 +336,14 @@ try {
 
         $dedupedSemi = $checked.Keys.Count
         if ($missingInGate.Count -eq 0) {
-            if (-not $Quiet) { Write-Host " OK ($dedupedSemi unique semi allows across $($semiCommands.Count) entries, $($gateCommands.Count) gate patterns)" }
+            if (-not $Json -and -not $Quiet) { Write-Host " OK ($dedupedSemi unique semi allows across $($semiCommands.Count) entries, $($gateCommands.Count) gate patterns)" }
         } else {
             $warnings += "semi-agents.json allows missing from permission-gate.ps1: $($missingInGate -join ', ')"
-            if (-not $Quiet) { Write-Host " WARN ($($missingInGate.Count) mismatches)" }
+            if (-not $Json -and -not $Quiet) { Write-Host " WARN ($($missingInGate.Count) mismatches)" }
         }
     }
 } catch {
-    if (-not $Quiet) { Write-Host " WARN (check: $($_.Exception.Message))" }
+    if (-not $Json -and -not $Quiet) { Write-Host " WARN (check: $($_.Exception.Message))" }
 }
 
 # Output
@@ -358,9 +358,8 @@ $result = @{
 
 if ($Json) {
     Write-Output ($result | ConvertTo-Json -Depth 2)
-    # Don't exit here — let caller handle exit code for thread job compatibility
-    # Return the result object for programmatic use
-    return $result
+    # Exit after JSON output to avoid polluting pipeline with the result object
+    exit ($result.allClean ? 0 : 1)
 } elseif ($result.allClean) {
     if (-not $Quiet) { Write-Host "OK ALL CHECKS PASSED" -ForegroundColor Green }
     exit 0

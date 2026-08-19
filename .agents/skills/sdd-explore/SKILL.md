@@ -33,37 +33,9 @@ Follow §B (retrieval) and §C (persistence) from `skills/_shared/sdd-phase-comm
 1. **Load Skills** — §A from `sdd-phase-common.md`
 2. **Understand Request** — Parse: feature? bug fix? refactor? Domain?
 3. **Investigate** — Read entry points, search related code, check tests, identify patterns, map dependencies.
-4. **Analyze Options** — Compare approaches:
-| Approach | Pros | Cons | Complexity |
-|---|---|---|---|
-| Option A | ... | ... | Low/Med/High |
-| Option B | ... | ... | Low/Med/High |
-5. **Persist Artifact** — Mandatory for named changes. §C from `sdd-phase-common.md`: artifact `explore`, topic_key `sdd/{change}/explore`, type `architecture`
-6. **Return Analysis** (write to `exploration.md` if saving):
-```markdown
-## Exploration: {topic}
-
-### Current State
-{How system works today relevant to topic}
-
-### Affected Areas
-- `path/file.ext` — {why}
-
-### Approaches
-1. **{Name}** — {desc}
-   - Pros: ... | Cons: ... | Effort: Low/Med/High
-2. **{Name}** — {desc}
-   - Pros: ... | Cons: ... | Effort: Low/Med/High
-
-### Recommendation
-{Chosen approach and why}
-
-### Risks
-- {Risk 1}
-
-### Ready for Proposal
-{Yes/No — what to tell user}
-```
+4. **Analyze Options** — Compare approaches (table: Approach | Pros | Cons | Complexity: Low/Med/High).
+5. **Persist Artifact** — Mandatory for named changes. §C from `sdd-phase-common.md`: artifact `explore`, topic_key `sdd/{change}/explore`, type `architecture`.
+6. **Return Analysis** (write to `exploration.md` if saving): Current State, Affected Areas, Approaches (table), Recommendation, Risks, Ready for Proposal.
 
 ## Rules
 - Only file you MAY create: `exploration.md` in change folder
@@ -72,6 +44,7 @@ Follow §B (retrieval) and §C (persistence) from `skills/_shared/sdd-phase-comm
 - Keep CONCISE — summary, not novel
 - State if info insufficient or request too vague
 - Return envelope per §D from `sdd-phase-common.md`
+---
 ---
 
 ## Reference Materials
