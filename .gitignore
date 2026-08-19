@@ -153,3 +153,6 @@ TestResults.xml
 .breaker-cleared/*
 !.breaker-cleared/.gitkeep
 docs/ciclos/c28-w2-backup/
+cross-ref-output.json
+score-output.json
+sync-vmk-output.txt
