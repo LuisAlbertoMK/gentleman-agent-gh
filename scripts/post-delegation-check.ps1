@@ -56,12 +56,18 @@
     Requires -AllowedPaths — without it the check FAILS closed (v3 Perm-4).
     All synchronous behavior is preserved when -Async is NOT set.
 
+.PARAMETER CompletionCallback
+    Optional push callback script passed through to the async monitor. The monitor
+    invokes `& $CompletionCallback -ResultJson <json> -TaskId <TaskId>` after the
+    final result is produced, replacing consumer-side polling. Ignored unless -Async.
+
 .EXAMPLE
     scripts\post-delegation-check.ps1                           # git diff + empty + scope
     scripts\post-delegation-check.ps1 -AllowedPaths "src/*" -ExpectedFiles "src/utils.ts"
     scripts\post-delegation-check.ps1 -AllowedPaths "src/*" -SubagentOutputFile $tmpFile
     scripts\post-delegation-check.ps1 -AllowedPaths "src/*" -SubagentOutput $output
     scripts\post-delegation-check.ps1 -AllowedPaths "src/*" -Async   # background monitor
+    scripts\post-delegation-check.ps1 -AllowedPaths "src/*" -Async -CompletionCallback "./callback.ps1"  # push mode
 #>
 param(
     [string]$BaseRef        = "HEAD",
@@ -72,7 +78,8 @@ param(
     [string]$RepoRoot       = $(Split-Path -Parent $PSScriptRoot),
     [int]$TimeoutSeconds    = 30,
     [switch]$Quiet,
-    [switch]$Async
+    [switch]$Async,
+    [string]$CompletionCallback = ""
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -114,7 +121,9 @@ function Launch-AsyncMonitor {
         [string]$BaseRef,
         [string[]]$AllowedPaths,
         [string[]]$ExpectedFiles,
-        [string]$RepoRoot
+        [string]$RepoRoot,
+        [string]$TaskId = "",
+        [string]$CompletionCallback = ""
     )
     $monitorScript = Join-Path $RepoRoot 'scripts\monitor-subagent.ps1'
     if (-not (Test-Path $monitorScript)) { $monitorScript = Join-Path $PSScriptRoot 'monitor-subagent.ps1' }
@@ -132,8 +141,16 @@ function Launch-AsyncMonitor {
         $escapedFiles = ($ExpectedFiles | ForEach-Object { "'" + (ConvertTo-SqlLiteral $_) + "'" }) -join ' '
         $cmd += " -ExpectedFiles $escapedFiles"
     }
+    if ($CompletionCallback) {
+        $cmd += " -CompletionCallback '" + (ConvertTo-SqlLiteral $CompletionCallback) + "'"
+    }
+    if ($TaskId) {
+        $cmd += " -TaskId '" + (ConvertTo-SqlLiteral $TaskId) + "'"
+    }
     $argLine = "-NoProfile -NoLogo -Command `"$cmd`""
-    Start-Process -FilePath "pwsh" -ArgumentList $argLine -WindowStyle Hidden | Out-Null
+    # Capture the process so the caller can register its PID in the delegation registry
+    $proc = Start-Process -FilePath "pwsh" -ArgumentList $argLine -WindowStyle Hidden -PassThru
+    return $proc
 }
 
 # --- Resolve subagent output (string or file) ---
@@ -160,9 +177,24 @@ if ($Async) {
         else { Write-Output "FAIL Async monitor NOT started — AllowedPaths required (fail-closed per v3 Perm-4)" }
         exit 1
     }
-    Launch-AsyncMonitor -BaseRef $BaseRef -AllowedPaths $AllowedPaths -ExpectedFiles $ExpectedFiles -RepoRoot $RepoRoot
+    $proc = Launch-AsyncMonitor -BaseRef $BaseRef -AllowedPaths $AllowedPaths -ExpectedFiles $ExpectedFiles -RepoRoot $RepoRoot -TaskId $BaseRef -CompletionCallback $CompletionCallback
+
+    # Register the monitor PID in the delegation registry so cancel/poll can find it
+    $regScript = Join-Path $RepoRoot 'scripts\delegation-registry.ps1'
+    if (-not (Test-Path $regScript)) { $regScript = Join-Path $PSScriptRoot 'delegation-registry.ps1' }
+    if (Test-Path $regScript) {
+        $escapedReg   = ConvertTo-SqlLiteral $regScript
+        $escapedPaths = ConvertTo-SqlLiteral ($AllowedPaths -join ',')
+        $escapedBaseRef = ConvertTo-SqlLiteral $BaseRef
+        $regCmd = "& '$escapedReg' -Action register -TaskId '$escapedBaseRef' -BaseRef '$escapedBaseRef' -AllowedPaths '$escapedPaths' -MonitorPid $($proc.Id) -Quiet"
+        try {
+            & pwsh -NoProfile -NoLogo -Command $regCmd 2>&1 | Out-Null
+        } catch {
+            Write-Warning "post-delegation-check: registry registration failed: $($_.Exception.Message)"
+        }
+    }
     $resultFile = Join-Path $RepoRoot (($BaseRef -replace '[/\\:*?"<>|]', '_') + '.async-result.json')
-    Write-Output "Async monitor started — result file: $resultFile"
+    Write-Output "Async monitor started (PID $($proc.Id)) — result file: $resultFile"
     exit 0
 }
 
@@ -273,4 +305,3 @@ if ($Quiet) {
 
 $ec = if ($results.passed) { 0 } else { 1 }
 exit $ec
-
