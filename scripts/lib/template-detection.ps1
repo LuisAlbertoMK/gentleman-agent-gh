@@ -1,4 +1,4 @@
-#requires -Version 7
+#requires -Version 5.1
 <#
 .SYNOPSIS
     Shared template-detection module — SSoT for agent → permission-template mapping.
