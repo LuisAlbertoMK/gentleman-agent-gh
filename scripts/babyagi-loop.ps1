@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
     BabyAGI autonomous loop — executes tasks iteratively using async delegation from Phase 1.
@@ -47,6 +47,9 @@ param(
     [switch]$Force
 )
 
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
 # Guardrails — fail-closed
 if (-not $AllowedPaths -or $AllowedPaths.Count -eq 0) {
     Write-Error "FAIL-CLOSED: -AllowedPaths is required. Cannot start BabyAGI loop without path scope."
@@ -55,8 +58,11 @@ if (-not $AllowedPaths -or $AllowedPaths.Count -eq 0) {
 
 # Resolve script directory for Phase 1 dependency
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$RepoRoot = Split-Path -Parent $ScriptDir
 $PostDelegation = Join-Path $ScriptDir "post-delegation-check.ps1"
 $MonitorScript = Join-Path $ScriptDir "monitor-subagent.ps1"
+$InvokeCallbackScript = Join-Path $ScriptDir "invoke-callback.ps1"
+$RegistryScript = Join-Path $ScriptDir "delegation-registry.ps1"
 
 if (-not (Test-Path $PostDelegation)) {
     Write-Error "Phase 1 dependency not found: $PostDelegation"
@@ -140,44 +146,70 @@ function Invoke-TaskAsync {
     )
 
     $taskRef = "$($Task.id)_$BaseRef"
-    $resultFile = "${taskRef}.async-result.json"
+    $taskId  = $taskRef
+    $resultFile = Join-Path $RepoRoot "${taskRef}.async-result.json"
+    $signalFile = Join-Path $RepoRoot "${taskRef}.async-done"
 
-    # Clean up any stale result file (guarded: dry-run / requires -Force for removal)
-    if (Test-Path $resultFile) {
-        if ($DryRun) {
-            Write-Host "[BabyAGI][DryRun] Would remove stale result: $resultFile"
-        } elseif (-not $Force) {
-            Write-Warning "[BabyAGI] Stale result file present: $resultFile. Pass -Force to clean (or -DryRun to preview)."
-            return $null
-        } else {
-            try {
-                Remove-Item -Path $resultFile -Force -ErrorAction Stop
-            } catch {
-                Write-Error "[BabyAGI] Failed to remove stale result: $($_.Exception.Message)"
+    # Clean up any stale result/signal files (guarded: dry-run / requires -Force)
+    foreach ($f in @($resultFile, $signalFile)) {
+        if (Test-Path $f) {
+            if ($DryRun) {
+                Write-Host "[BabyAGI][DryRun] Would remove stale: $f"
+            } elseif (-not $Force) {
+                Write-Warning "[BabyAGI] Stale file present: $f. Pass -Force to clean (or -DryRun to preview)."
                 return $null
+            } else {
+                Remove-Item -Path $f -Force -ErrorAction SilentlyContinue
             }
         }
     }
 
-    # Launch async delegation from Phase 1
-    Write-Host "[BabyAGI] Executing: $($Task.description)" -ForegroundColor Cyan
-    & $PostDelegation -BaseRef $taskRef -AllowedPaths $Paths -Async `
-        -ExtraContext "Task: $($Task.description)" 2>&1 | Out-Null
-
-    # Poll for result file (convergence delegated to Phase 1 monitor)
-    $maxWait = 300
-    $elapsed = 0
-    while (-not (Test-Path $resultFile) -and $elapsed -lt $maxWait) {
-        Start-Sleep -Seconds $PollSec
-        $elapsed += $PollSec
+    # Register task in delegation-registry (PID tracking + cancel support)
+    if (Test-Path $RegistryScript) {
+        & $RegistryScript -Action register -TaskId $taskId -AllowedPaths $Paths -BaseRef $BaseRef -Quiet 2>$null | Out-Null
     }
 
-    if (-not (Test-Path $resultFile)) {
+    # Temp callback script: invokes invoke-callback.ps1 which writes result + signal file
+    $callbackScript = Join-Path $env:TEMP "gentleman-callback-$taskId.ps1"
+    $callbackContent = "& '$InvokeCallbackScript' -ResultJson `$ResultJson -TaskId `$TaskId -RepoRoot '$RepoRoot'"
+    Set-Content -Path $callbackScript -Value $callbackContent -Encoding UTF8
+
+    # Launch async delegation with PUSH callback (monitor invokes callback on completion)
+    Write-Host "[BabyAGI] Executing: $($Task.description)" -ForegroundColor Cyan
+    & $PostDelegation -BaseRef $taskRef -AllowedPaths $Paths -Async -CompletionCallback $callbackScript -TaskId $taskId 2>&1 | Out-Null
+
+    # PUSH-WAIT: FileSystemWatcher + Wait-Event — NO polling loop (replaces Start-Sleep polling)
+    $eventId = "gentleman_async_done_$taskId"
+    $watcher = New-Object System.IO.FileSystemWatcher
+    $watcher.Path = $RepoRoot
+    $watcher.Filter = "${taskId}.async-done"
+    $watcher.IncludeSubdirectories = $false
+    $watcher.EnableRaisingEvents = $true
+
+    $null = Register-ObjectEvent -InputObject $watcher -EventName "Created" -SourceIdentifier $eventId
+
+    $maxWait = 300
+    $null = Wait-Event -SourceIdentifier $eventId -Timeout $maxWait
+
+    # Drain events + dispose watcher
+    Get-Event -SourceIdentifier $eventId -ErrorAction SilentlyContinue | Remove-Event -Force
+    Unregister-Event -SourceIdentifier $eventId -Force -ErrorAction SilentlyContinue
+    $watcher.Dispose() | Out-Null
+
+    # Check if completion signal arrived (signal file exists = callback fired)
+    if (-not (Test-Path $signalFile)) {
         Write-Warning "[BabyAGI] Timeout waiting for task $($Task.id) result after ${maxWait}s"
+        Remove-Item -Path $callbackScript -Force -ErrorAction SilentlyContinue
         return $null
     }
 
+    # Read the result (written atomically by invoke-callback.ps1)
     $result = Get-Content $resultFile -Raw | ConvertFrom-Json
+
+    # Cleanup: signal file + temp callback
+    Remove-Item -Path $signalFile -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path $callbackScript -Force -ErrorAction SilentlyContinue
+
     return $result
 }
 

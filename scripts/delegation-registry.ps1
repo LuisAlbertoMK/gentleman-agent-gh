@@ -291,7 +291,11 @@ switch ($Action) {
 
         # Update entry status
         $entry.status = if ($json -and $json.passed) { "resolved" } else { "failed" }
-        $entry.resolved = (Get-Date -Format "o")
+        if ($entry.PSObject.Properties.Name -contains 'resolved') {
+            $entry.resolved = (Get-Date -Format "o")
+        } else {
+            $entry | Add-Member -NotePropertyName resolved -NotePropertyValue (Get-Date -Format "o")
+        }
         $reg[$TaskId] = $entry
         Set-RegistryData $reg
 
@@ -370,10 +374,36 @@ switch ($Action) {
         $killed = $false
         if ($monitorPid -gt 0) {
             try {
-                Stop-Process -Id $monitorPid -Force -ErrorAction Stop
-                $killed = $true
+                # Identity verification: confirm PID is a monitor-subagent process
+                # (prevents PID-reuse: a recycled PID from a different process must not be killed)
+                $cmdLine = ""
+                $procName = ""
+                try {
+                    $wmiProc = Get-CimInstance -ClassName Win32_Process -Filter "ProcessId=$monitorPid" -ErrorAction Stop
+                    if ($wmiProc) { $cmdLine = $wmiProc.CommandLine; $procName = $wmiProc.Name }
+                } catch {
+                    # Fallback: WMI (older Windows)
+                    try {
+                        $wmiProc = Get-WmiObject -Class Win32_Process -Filter "ProcessId=$monitorPid" -ErrorAction SilentlyContinue
+                        if ($wmiProc) { $cmdLine = $wmiProc.CommandLine; $procName = $wmiProc.Name }
+                    } catch {}
+                }
+
+                $isMonitor = $cmdLine -match 'monitor-subagent'
+                if (-not $isMonitor -and $procName -eq 'pwsh') {
+                    # Best-effort: pwsh process with no WMI data available
+                    Write-Warning "delegation-registry: PID $monitorPid is pwsh but command line unavailable (WMI blocked) — verifying via PID file timestamp"
+                    $isMonitor = (Test-Path $pidFile)  # PID file present is best-evidence
+                }
+
+                if ($isMonitor) {
+                    Stop-Process -Id $monitorPid -Force -ErrorAction Stop
+                    $killed = $true
+                } else {
+                    Write-Warning "delegation-registry: PID $monitorPid is NOT a monitor-subagent process (Name=$procName) — refusing to kill (PID reuse protection)"
+                }
             } catch {
-                Write-Warning "delegation-registry: could not kill monitor PID $monitorPid — $($_.Exception.Message)"
+                Write-Warning "delegation-registry: could not verify/kill monitor PID $monitorPid — $($_.Exception.Message)"
             }
         }
 

@@ -1,89 +1,141 @@
-# accessibility — Reference Materials
+# Accessibility — Extended Reference
 
-> **Externalized from** .agents/skills/accessibility/SKILL.md to keep the skill under the 3KB
-> token budget (ADR-007). Contains worked examples, testing patterns, edge cases,
-> anti-patterns, and quick-reference cards.
-> **Consumable by**: $Skill sub-agent when producing output.
-## Testing Patterns (3)
-
-### 1. Color Contrast — Automated + Manual
-- **Automated**: axe-core color-contrast rule + custom per-theme script above
-- **Manual**: Verify getComputedStyle contrast in **every theme** (light/dark/high-contrast) for: text, UI borders, focus rings, disabled states
-- **Threshold**: AA = 4.5:1 (normal), 3:1 (large/UI); AAA = 7:1 / 4.5:1
-
-### 2. ARIA & Semantic Structure — Lint + Screen Reader
-- **Lint**: eslint-plugin-jsx-a11y + axe-core (rules: aria-*, role, scope, landmark)
-- **Screen reader**: NVDA/VoiceOver walk-through — verify landmark announcements, form label association, live region behavior
-- **Check**: No duplicate IDs, aria-describedby points to existing element, aria-live not overused
-
-### 3. Keyboard Navigation — Tab Flow + Focus Visible
-- **Automated**: Playwright page.keyboard.press('Tab') loop → screenshot each focus state
-- **Manual**: Tab through entire page — every interactive reachable, focus order matches visual, :focus-visible ring visible (2px solid + 2px offset)
-- **Regression**: Test every responsive breakpoint (mobile/tablet/desktop) — grid reorder must not break tab order
+> This file contains verbose actionable examples, testing patterns, edge cases, and anti-patterns externalized from `SKILL.md` to keep the main skill under 5KB. See [SKILL.md](../../../.agents/skills/accessibility/SKILL.md) for the core POUR principles, EAA 2025 requirements, and touch target guidelines.
 
 ---
 
-## Edge Cases (4)
+## Actionable Examples (5)
 
-### 1. When NOT to Use ARIA
-- **Native HTML exists**: <button> not <div role="button">, <nav> not <div role="navigation">
-- **Over-engineering**: Simple links/buttons need no ARIA — native semantics win
-- **Rule**: ARIA is a **last resort** when native cannot express the pattern (e.g., complex tree, custom slider)
+### 1. axe-core Automated Audit (CI + Local)
+```bash
+# Install
+npm i -D @axe-core/playwright @axe-core/cli
 
-### 2. Cognitive Disabilities (WCAG 2.2 3.3.8 + 2.3.3)
-- **Auth**: No puzzle CAPTCHAs — allow copy-paste, autofill, WebAuthn/passkeys, magic links
-- **Timeouts**: Extendable (aria-live warning + extend button) — no auto-logout without notice
-- **Language**: Simple, consistent terminology; avoid jargon; provide glossary for complex flows
+# Run in Playwright test
+import { injectAxe, checkA11y } from '@axe-core/playwright';
+await injectAxe(page);
+await checkA11y(page, undefined, { detailedReport: true, verbose: true });
 
-### 3. Dynamic Content & Live Regions
-- **Polite vs Assertive**: aria-live="polite" for updates (toast, cart count); role="alert" (assertive) for errors only
-- **Atomic updates**: Wrap changed region in aria-atomic="true" to prevent full re-read
-- **Race conditions**: Debounce rapid updates — batch into single announcement
+# CLI audit (headless)
+npx axe https://example.com --save --dir ./a11y-results
+```
 
-### 4. Internationalization & RTL
-- **lang attribute**: html lang="es-AR" + per-section lang changes
-- **RTL focus order**: Logical (DOM) order must match visual RTL — test keyboard tab in RTL mode
-- **Number/date formats**: Screen readers announce per locale — test with NVDA Spanish, VoiceOver Arabic
-- **Font scaling**: Support rem + @media (prefers-reduced-motion) — no fixed px on text containers
+### 2. Color Contrast Verification (Per-Theme)
+```javascript
+// Contrast check utility (WCAG 2.2 1.4.3/1.4.6)
+function getContrastRatio(fg, bg) {
+  const lum = c => { const s = c/255; return s <= 0.03928 ? s/12.92 : Math.pow((s+0.055)/1.055, 2.4); };
+  const L1 = 0.2126*lum(fg.r) + 0.7152*lum(fg.g) + 0.0722*lum(fg.b);
+  const L2 = 0.2126*lum(bg.r) + 0.7152*lum(bg.g) + 0.0722*lum(bg.b);
+  return (Math.max(L1,L2)+0.05)/(Math.min(L1,L2)+0.05);
+}
+
+// Usage per theme
+const styles = getComputedStyle(document.querySelector('.hero .btn'));
+const fg = parseColor(styles.color);
+const bg = parseColor(styles.backgroundColor);
+console.log(getContrastRatio(fg, bg)); // Must be ≥4.5:1 (AA) / ≥7:1 (AAA)
+```
+
+### 3. Screen Reader Testing Protocol (NVDA/VoiceOver)
+```bash
+# NVDA (Windows) - Test checklist
+1. Install NVDA + speech viewer (Tools → Speech Viewer)
+2. Navigate: Tab / Shift+Tab / Arrow keys / H (headings) / K (links)
+3. Verify: landmarks announced, form labels read, errors in role="alert", dynamic updates via aria-live
+
+# VoiceOver (macOS/iOS)
+# Cmd+F5 to start → Control+Option+Arrow to navigate
+# rotor (Control+Option+U) for landmarks/headings/links
+```
+
+### 4. Focus Trap Modal (Reusable Pattern)
+```typescript
+// focus-trap.ts — minimal, no deps
+export function trapFocus(element: HTMLElement): () => void {
+  const focusables = element.querySelectorAll<HTMLElement>(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  );
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+  
+  function handler(e: KeyboardEvent) {
+    if (e.key !== 'Tab') return;
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+  element.addEventListener('keydown', handler);
+  first?.focus();
+  return () => element.removeEventListener('keydown', handler);
+}
+```
+
+### 5. Skip Link + Landmark Pattern
+```html
+<!-- First focusable element -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- Landmarks (native preferred) -->
+<header role="banner">…</header>
+<nav role="navigation" aria-label="Primary">…</nav>
+<main id="main-content" role="main">…</main>
+<aside role="complementary" aria-label="Sidebar">…</aside>
+<footer role="contentinfo">…</footer>
+
+<style>
+.skip-link { position: absolute; top: -100%; left: 0; padding: 0.5rem 1rem; background: var(--clr-focus); }
+.skip-link:focus { top: 0; z-index: 9999; }
+</style>
+```
 
 ---
 
-## Anti-Patterns (2) — STOP Doing These
+## Testing Patterns
 
-### ❌ 1. outline: none / outline: 0 Without Focus-Visible Replacement
-`css
-/* NEVER */
-button:focus { outline: none; }
+### 1. axe-core CI Gate
+```bash
+# Add to CI pipeline
+npx playwright test --project=chromium --reporter=line
+# Fails on any WCAG violation with detailed report
+```
 
-/* ALWAYS — visible focus for keyboard users */
-button:focus-visible { outline: 2px solid var(--clr-focus); outline-offset: 2px; }
-button:focus:not(:focus-visible) { outline: none; } /* mouse click = no ring */
-`
+### 2. Contrast Per-Theme Automation
+```javascript
+// Test contrast for all themes
+themes.forEach(theme => {
+  document.documentElement.setAttribute('data-theme', theme);
+  const contrast = getContrastRatio(getComputedStyle(btn).color, getComputedStyle(btn).backgroundColor);
+  expect(contrast).toBeGreaterThanOrEqual(4.5);
+});
+```
 
-### ❌ 2. grid-auto-flow: dense on Interactive Grids
-`css
-/* NEVER — breaks DOM tab order (WCAG 2.4.3) */
-.grid { display: grid; grid-auto-flow: dense; }
-
-/* ALWAYS — preserve source order */
-.grid { display: grid; }
-/* If reordering needed: use order ONLY on non-interactive items, or restructure DOM */
-`
+### 3. Keyboard Navigation Regression
+```bash
+# Playwright: tab through all interactive elements
+await page.keyboard.press('Tab');
+// Verify focus-visible outline present on each
+```
 
 ---
 
-## Output
-`A11Y:<page>—<date> CRITICAL:[wcag-2.x]<violation>→<fix> HIGH:... MEDIUM:... VERIFY:[axe|nvda|tab]→<pass/fail>`
+## Edge Cases
 
-## Quick Reference Card
+| Edge Case | Handling |
+|-----------|----------|
+| **Theme-switching contrast failure** | Hero buttons on gradients → override with `.hero .btn { --clr-accent: ... }`. Footer spans on dark bg → test `getComputedStyle` contrast per theme. |
+| **grid-auto-flow: dense on interactive** | NEVER use on interactive elements (breaks DOM tab flow). Preserve source order; TEST keyboard tab through every responsive variant. |
+| **Touch target in dense tables** | 24×24px fallback allowed ONLY for dense tables; otherwise 44×44px enhanced required. |
+| **Reduced motion with custom animations** | `@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }` |
+| **Authentication without cognitive test** | WCAG 3.3.8: No cognitive test unless copy-paste/autofill/SSO available. |
 
-| Check | Tool/Method | Pass Criteria |
-|-------|-------------|---------------|
-| Contrast (all themes) | axe + getComputedStyle script | ≥4.5:1 text, ≥3:1 UI/focus |
-| Focus visible | Keyboard tab + :focus-visible CSS | 2px solid + 2px offset on all interactive |
-| Touch targets | DevTools element inspector | ≥44×44px (24×24px dense only) |
-| ARIA validity | eslint-plugin-jsx-a11y + axe | Zero violations |
-| Screen reader | NVDA/VoiceOver walk-through | Landmarks, labels, live regions announced |
-| Keyboard order | Tab through all breakpoints | DOM order = visual order |
-| Reduced motion | @media (prefers-reduced-motion) | Animations disabled/near-zero |
-| Language | html lang + section lang | Matches content language |
+---
+
+## Anti-Patterns
+
+1. **Testing only default theme** — EAA 2025 requires EVERY theme independently tested for contrast
+2. **outline: none on focus** — Never remove focus outline; use `:focus-visible` with 2px solid outline + 2px offset
+3. **Skip links missing** — First focusable element must be skip link to `#main-content`
+4. **Native HTML ignored** — Prefer `<button>` over `<div role="button">`, `<nav>` over `<div role="navigation">`
+5. **Dynamic content without aria-live** — Errors → `role="alert"`, updates → `aria-live="polite"`
+6. **Form inputs without labels** — Each input must have explicit `<label>` or `aria-label`; errors → `aria-invalid` + `aria-describedby` + `role="alert"`
+7. **Touch targets via padding only** — Use `min-width` + `min-height` (not padding) for 44×44px enhanced targets

@@ -177,6 +177,27 @@ if ($Async) {
         else { Write-Output "FAIL Async monitor NOT started — AllowedPaths required (fail-closed per v3 Perm-4)" }
         exit 1
     }
+
+    # Validate CompletionCallback: must be an existing .ps1 file + reject metachar injection
+    if ($CompletionCallback) {
+        $callbackResolved = Resolve-Path $CompletionCallback -ErrorAction SilentlyContinue
+        if (-not $callbackResolved) {
+            $results.checks += [PSCustomObject]@{ name = "callback_validation"; passed = $false; detail = "CompletionCallback path does not exist: $CompletionCallback" }
+            $results.passed = $false
+            if ($Quiet) { $results | ConvertTo-Json -Compress }
+            else { Write-Output "FAIL CompletionCallback path does not exist: $CompletionCallback" }
+            exit 1
+        }
+        $CompletionCallback = $callbackResolved.Path
+        if ($CompletionCallback -match '[$`^()\[\];{}]') {
+            $results.checks += [PSCustomObject]@{ name = "callback_validation"; passed = $false; detail = "CompletionCallback path contains unsafe metacharacters" }
+            $results.passed = $false
+            if ($Quiet) { $results | ConvertTo-Json -Compress }
+            else { Write-Output "FAIL CompletionCallback contains unsafe characters" }
+            exit 1
+        }
+    }
+
     $proc = Launch-AsyncMonitor -BaseRef $BaseRef -AllowedPaths $AllowedPaths -ExpectedFiles $ExpectedFiles -RepoRoot $RepoRoot -TaskId $BaseRef -CompletionCallback $CompletionCallback
 
     # Register the monitor PID in the delegation registry so cancel/poll can find it
