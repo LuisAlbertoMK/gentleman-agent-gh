@@ -1,4 +1,4 @@
-#requires -Version 7
+#requires -Version 5.1
 
 <#
 .SYNOPSIS
@@ -14,5 +14,5 @@
     .\scripts\gentleman-init.ps1
     gentleman-init -TargetDir ..\my-api -DefaultAgent gentleman-quick -Json -Yes
 #>
-& (Join-Path $PSScriptRoot 'use-gentleman.ps1') @args
+& (Join-Path $PSScriptRoot 'use-gentleman.ps1') $args
 

@@ -1,4 +1,4 @@
-#requires -Version 7
+#requires -Version 5.1
 [CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
@@ -115,13 +115,15 @@ if (-not $SkipShortcuts) {
     info "Creating global shell shortcuts"
     $npmDir = "$env:APPDATA\npm"
     if (-not (Test-Path $npmDir)) { New-Item -ItemType Directory -Path $npmDir -Force | Out-Null }
-    $shortcuts = @(@{ Name = "gentleman-vmk"; Ps1Cmd = "opencode --agent gentleman-vMK @args"; CmdCmd = "opencode --agent gentleman-vMK %*" })
+    $shortcuts = @(@{ Name = "gentleman-vmk"; Ps1Cmd = "opencode --agent gentleman-vMK $args"; CmdCmd = "opencode --agent gentleman-vMK %*"; BatCmd = "gentleman-vmk" })
     foreach ($sc in $shortcuts) {
         $ps1Path = Join-Path $npmDir "$($sc.Name).ps1"
         $cmdPath = Join-Path $npmDir "$($sc.Name).cmd"
+        $batPath = Join-Path $npmDir "$($sc.Name).bat"
         if ($DryRun) {
             if (-not (Test-Path $ps1Path) -or $Force) { info "Would create $ps1Path" }
             if (-not (Test-Path $cmdPath) -or $Force) { info "Would create $cmdPath" }
+            if (-not (Test-Path $batPath) -or $Force) { info "Would create $batPath" }
             continue
         }
         if (-not (Test-Path $ps1Path) -or $Force) {
@@ -132,6 +134,16 @@ if (-not $SkipShortcuts) {
             Set-Content -Path $cmdPath -Value "@echo off`n$($sc.CmdCmd)"
             ok "Created $cmdPath"
         } else { skip "$cmdPath already exists" }
+        if (-not (Test-Path $batPath) -or $Force) {
+            $srcBat = Join-Path $RepoDir "scripts\gentleman-vmk.bat"
+            if (Test-Path $srcBat) {
+                Copy-Item -Path $srcBat -Destination $batPath -Force
+                ok "Created $batPath (from scripts/gentleman-vmk.bat)"
+            } else {
+                Set-Content -Path $batPath -Value "@echo off`n`"%~dp0gentleman-vmk.ps1`" %*"
+                ok "Created $batPath (fallback)"
+            }
+        } else { skip "$batPath already exists" }
     }
 } else { skip "Global shortcuts (via -SkipShortcuts)" }
 
