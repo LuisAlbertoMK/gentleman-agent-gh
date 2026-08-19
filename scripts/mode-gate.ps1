@@ -37,7 +37,6 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$TargetAgent,
 
-    [ValidateSet('manual', 'semi', 'auto')]
     [string]$Mode,
 
     [switch]$Json,
@@ -79,6 +78,16 @@ if (-not $Mode) {
     } else {
         $Mode = 'manual'  # default fallback
     }
+}
+
+# --- ADR-033: 'semi' mode DEPRECATED → remap to 'auto' with warning ---
+if ($Mode -eq 'semi') {
+    Write-Warning "'semi' mode is DEPRECATED (ADR-033: simplified to manual|auto). Remapping to 'auto' — suffixed -semi agents still accepted for backward compat but auto routing preferred."
+    $Mode = 'auto'
+}
+if ($Mode -and $Mode -notin 'manual','auto','') {
+    Write-Error "Invalid mode '$Mode'. Valid modes: manual, auto. (semi is deprecated, maps to auto.)"
+    exit 1
 }
 
 # --- Determine expected suffix ---
@@ -186,7 +195,6 @@ $result = [PSCustomObject]@{
         else { "Mode '$Mode' — suffix '$expectedSuffix' matches" }
     } else {
         if ($Mode -eq 'auto') { "AUTO mode requires -auto suffix (got: $TargetAgent, expected: $TargetAgent-auto)" }
-        elseif ($Mode -eq 'semi') { "SEMI mode requires -semi suffix (got: $TargetAgent, expected: $TargetAgent-semi)" }
         else { "MANUAL mode requires NO suffix (got: $TargetAgent, expected: $TargetAgent without suffix)" }
     }
 }

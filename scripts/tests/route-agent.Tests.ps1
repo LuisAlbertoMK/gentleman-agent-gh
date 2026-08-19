@@ -19,11 +19,13 @@ Describe "route-agent.ps1 — mode-aware suffix routing (C5)" {
         $json.mode        | Should -Be "auto"
     }
 
-    It "semi mode appends -semi to mode-aware agents" {
-        $r = & "pwsh" -NoProfile -Command "& '$scriptPath' -BaseAgent gentleman-deep -Mode semi -Json"
+    It "semi mode is DEPRECATED (ADR-033) — routes as auto with -auto suffix" {
+        $r = & "pwsh" -NoProfile -Command "& '$scriptPath' -BaseAgent gentleman-deep -Mode semi -Json -WarningAction SilentlyContinue" 2>$null
         $json = $r | ConvertFrom-Json
-        $json.targetAgent | Should -Be "gentleman-deep-semi"
-        $json.suffix      | Should -Be "-semi"
+        $json.targetAgent | Should -Be "gentleman-deep-auto"
+        $json.suffix      | Should -Be "-auto"
+        $json.mode        | Should -Be "semi"   # input preserved for logging
+        $json.note        | Should -Match "deprecated|auto"
     }
 
     It "manual mode returns no suffix" {

@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Gentleman-ize any project — generate opencode.json from the SSoT chain

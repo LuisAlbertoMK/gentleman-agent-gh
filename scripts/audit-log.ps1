@@ -10,7 +10,7 @@
 .PARAMETER Agent
   Agent name for append (e.g. gentleman-deep-auto)
 .PARAMETER Mode
-  Mode for append: manual | semi | auto
+   Mode for append: manual | auto (semi is DEPRECATED→auto since ADR-033)
 .PARAMETER Action
   Action type: ALLOW | DENY | ASK_ALLOW | ASK_DENY | WRITE | EDIT | ERROR
 .PARAMETER Detail
@@ -37,7 +37,7 @@ param(
     [string]$Command,
 
     [string]$Agent = "unknown",
-    [ValidateSet('manual','semi','auto','unknown')]
+    [ValidateSet('manual','auto','unknown')]
     [string]$Mode = "unknown",
     [ValidateSet('ALLOW','DENY','ASK_ALLOW','ASK_DENY','WRITE','EDIT','ERROR','DECISION','INFO')]
     [string]$Action = "INFO",

@@ -5,11 +5,11 @@
     Mode-aware agent routing — resolves the correct agent variant for delegation.
 
 .DESCRIPTION
-    Reads .gentleman-mode (manual|semi|auto) and appends the routing suffix
+    Reads .gentleman-mode (manual|auto) and appends the routing suffix
     to the base agent name per the Mode-Aware Routing protocol in AGENTS.md:
 
       manual → no suffix  (e.g. gentleman-quick)
-      semi   → -semi      (e.g. gentleman-quick-semi)
+      semi   → [DEPRECATED, ADR-033] remaps to auto
       auto   → -auto      (e.g. gentleman-quick-auto)
 
     Read-only specialists and SDD phase subagents never get a suffix —
@@ -40,7 +40,6 @@ param(
     [Parameter(Mandatory)]
     [string]$BaseAgent,
 
-    [ValidateSet('manual', 'semi', 'auto')]
     [string]$Mode = "",
 
     [switch]$Json
@@ -86,7 +85,11 @@ if ($ReadOnlySpecialists -contains $BaseAgent) {
 elseif ($ModeAwareAgents -contains $BaseAgent) {
     switch ($Mode) {
         'manual' { $suffix = "" ; $note = "manual mode — no suffix" }
-        'semi'   { $suffix = "-semi"; $note = "semi mode — suffixed -semi" }
+        'semi'   {
+            # ADR-033: 'semi' DEPRECATED → remap to auto routing.
+            Write-Warning "'semi' mode is DEPRECATED (ADR-033: simplified to manual|auto). Routing as 'auto' (-auto suffix)."
+            $suffix = "-auto" ; $note = "semi (deprecated per ADR-033) → auto suffix -auto"
+        }
         'auto'   { $suffix = "-auto"; $note = "auto mode — suffixed -auto" }
     }
     $TargetAgent = $BaseAgent + $suffix

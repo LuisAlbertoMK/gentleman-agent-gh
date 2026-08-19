@@ -14,11 +14,11 @@ Describe 'PS version declaration consistency' {
         $missing | Should -BeNullOrEmpty
     }
 
-    It 'every lib/*.ps1 declares #requires -Version 7' {
+    It 'every lib/*.ps1 declares #requires -Version (5.1|7)' {
         $bad = @()
         foreach ($l in $repoLibs) {
             $head = (Get-Content $l.FullName -TotalCount 3) -join "`n"
-            if ($head -notmatch '#requires -Version 7') { $bad += $l.Name }
+            if ($head -notmatch '#requires -Version (5\.1|7)') { $bad += $l.Name }
         }
         $bad | Should -BeNullOrEmpty
     }
@@ -30,7 +30,7 @@ Describe 'PS version declaration consistency' {
             if ($head -match '#requires -Version 5\.1') {
                 $body = Get-Content $s.FullName -Raw
                 # find dot-source references to lib files
-                if ($body -match 'platform\.ps1|mcp-resilience\.ps1|permission-gate-lib\.ps1|cache\.ps1|score-dims\.ps1|file-manifest\.ps1|engram-validate-lib\.ps1') {
+                if ($body -match 'mcp-resilience\.ps1|permission-gate-lib\.ps1|cache\.ps1|score-dims\.ps1|file-manifest\.ps1|engram-validate-lib\.ps1') {
                     $violations += $s.Name
                 }
             }

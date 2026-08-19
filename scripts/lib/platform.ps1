@@ -1,14 +1,38 @@
-#requires -Version 7
+#requires -Version 5.1
 <#
 .SYNOPSIS
-    Cross-platform helpers for PowerShell 7 scripts — Windows, Linux, macOS.
+    Cross-platform helpers — PowerShell 5.1 compatible, works on PS 7+ too.
 .DESCRIPTION
-    Dot-sourced by sync-all.ps1, global-setup.ps1, sync-vmk.ps1.
+    Dot-sourced by sync-all.ps1, global-setup.ps1, sync-vmk.ps1, setup-machine.ps1,
+    use-gentleman.ps1, sync-install.ps1.
     Provides: Get-GentlemanRoot, Get-GentlemanProjectRoot, Get-GlobalConfigDir,
     New-CrossPlatLink, Find-Pwsh.
+
+    PS5.1 compatibility: $IsLinux/$IsMacOS/$IsWindows automatic variables
+    are PS6+ only. When absent (PS 5.1 Desktop edition) we polyfill them
+    using [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform()
+    and $PSVersionTable.PSEdition ('Desktop' = Windows PowerShell 5.1).
 .NOTES
     This file is NOT meant to be invoked directly.
 #>
+
+# ── PS5.1 compat shim: polyfill $IsLinux / $IsMacOS / $IsWindows ──────────
+# These auto-variables are PS6+ only. On PS 5.1 (Desktop edition) they are
+# undefined — we set them once using the .NET RuntimeInformation API which
+# works on both PS 5.1 and PS 7+. PSEdition 'Desktop' = always Windows.
+if (-not (Test-Path Variable:\IsWindows)) {
+    $IsWindows = $PSVersionTable.PSEdition -eq 'Desktop' -or
+                 [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
+                     [System.Runtime.InteropServices.OSPlatform]::Windows)
+}
+if (-not (Test-Path Variable:\IsLinux)) {
+    $IsLinux = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
+                [System.Runtime.InteropServices.OSPlatform]::Linux)
+}
+if (-not (Test-Path Variable:\IsMacOS)) {
+    $IsMacOS = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
+                [System.Runtime.InteropServices.OSPlatform]::OSX)
+}
 
 function Get-GentlemanRoot {
     <#
