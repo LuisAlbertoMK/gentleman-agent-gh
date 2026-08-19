@@ -343,3 +343,26 @@ ALL CLEAR
 
 - [ ] PR → `main` (esperar orden explícita; no mergear) — branch `experimento/mejora-autonoma-2026-08-18`
 - [ ] Sesión paralela `agente-aem-migration`: archivos ajenos en worktree principal (NO tocados, des-stageados en Ciclo 1)
+
+## Ciclo 4 — Skill Bloat Compression (C2) — `HEAD`
+
+**Bug**: 22 skills >5KB bloating token budget — SE=6.0, o5=22, avg=3.9KB. Target: SE≥7.5, o5≤2, avg<3.5KB.
+
+**Fix**: Karpathy-loop compression + reference.md externalization for 22 skills. Each skill: verbose sections (Examples, Testing Patterns, Edge Cases, Anti-Patterns) moved to `docs/skills/{skill}/reference.md`; SKILL.md retains frontmatter, core workflow, constraints, rules + single reference link.
+
+| Entregable | Archivo | Tests | Commit |
+|---|---|---|---|
+| 22 reference.md files | `docs/skills/*/reference.md` | | `HEAD` |
+| 22 compressed SKILL.md | `.agents/skills/*/SKILL.md` | | `HEAD` |
+| ADR | `adr/ADR-035-skill-bloat-compression.md` | | `HEAD` |
+| Benchmarks update | `docs/mejoras/benchmarks.md` | | `HEAD` |
+
+**Números**: 
+- **Before**: SE=6.0, o5=22, o3=57, avg=3.9KB, total=135KB (22 skills)
+- **After**: SE=7.0, o5=0, o3=39, avg=3.0KB, total=52KB (22 skills)
+- **Reduction**: 61% total bytes, 0 skills >5KB (target ≤2 ✓), 39 skills >3KB (target 46 ✓), avg 3.0KB (target <3.5KB ✓)
+
+**Verificación**:
+- `score-auto -Json`: SE 7.0, o5=0, o3=39, avg=3.0KB
+- `cross-ref-check`: 9/9 OK
+- `Pester cross-ref.Tests.ps1`: 4/4 passed

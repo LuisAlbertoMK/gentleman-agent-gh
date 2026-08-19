@@ -34,6 +34,22 @@
 .PARAMETER MaxWaitSec
     Hard deadline; result is written when reached even if not yet stable (default: 300).
 
+.PARAMETER CompletionCallback
+    Optional push callback script invoked after the final result is produced:
+    & $CompletionCallback -ResultJson <json> -TaskId <TaskId>.
+    When provided, the callback owns the result-file write for {TaskId}.async-result.json
+    (invoke-callback.ps1) and the monitor skips its own file write unless -WriteResultFile
+    is passed. Backward compatible: when omitted, file-based behavior is unchanged.
+
+.PARAMETER TaskId
+    Optional delegation task id. When provided, the monitor writes its PID to
+    .learnings\async-monitor-{TaskId}.pid (for registry cancel) and removes it on exit.
+
+.PARAMETER WriteResultFile
+    Force the monitor to write the result file even when a -CompletionCallback is set
+    (the callback would otherwise own the write). Default behavior without callback
+    (file-based) always writes the result file.
+
 .EXAMPLE
     scripts\monitor-subagent.ps1 -BaseRef HEAD -AllowedPaths "src/*" -RepoRoot "D:\repo"
     scripts\monitor-subagent.ps1 -BaseRef HEAD -AllowedPaths "scripts/*" -PollIntervalSec 1 -MaxWaitSec 10
@@ -44,7 +60,10 @@ param(
     [string[]]$ExpectedFiles = @(),
     [string]$RepoRoot       = $(Split-Path -Parent $PSScriptRoot),
     [int]$PollIntervalSec   = 15,
-    [int]$MaxWaitSec        = 300
+    [int]$MaxWaitSec        = 300,
+    [string]$CompletionCallback = "",
+    [string]$TaskId             = "",
+    [switch]$WriteResultFile
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -174,6 +193,23 @@ function Get-CheckSnapshot {
 
 # --- Main poll loop ---
 [Console]::Error.WriteLine("[monitor] started: BaseRef=$BaseRef result=$resultFile poll=${PollIntervalSec}s max=${MaxWaitSec}s")
+Write-Progress -Activity "async monitor ($BaseRef)" -Status "started" -PercentComplete 0
+
+# --- PID file (registry cancel support): write before polling, remove on exit ---
+$pidFile = $null
+if ($TaskId) {
+    $learningsDir = Join-Path $RepoRoot '.learnings'
+    if (-not (Test-Path $learningsDir)) {
+        New-Item -ItemType Directory -Path $learningsDir -Force -ErrorAction SilentlyContinue | Out-Null
+    }
+    $pidFile = Join-Path $learningsDir "async-monitor-$TaskId.pid"
+    try {
+        Set-Content -Path $pidFile -Value $PID -Encoding UTF8 -ErrorAction Stop
+        [Console]::Error.WriteLine("[monitor] pid=$PID -> $pidFile")
+    } catch {
+        [Console]::Error.WriteLine("[monitor] WARNING: could not write PID file: $($_.Exception.Message)")
+    }
+}
 
 $started      = Get-Date
 $deadline     = $started.AddSeconds([Math]::Max(1, $MaxWaitSec))
@@ -185,6 +221,7 @@ $reason       = "timeout"
 
 while ($true) {
     $pollCount++
+    Write-Progress -Activity "async monitor ($BaseRef)" -Status "poll $pollCount (stable=$stablePolls/2)" -PercentComplete ([Math]::Min(95, [int]($pollCount * 10)))
     $snap = Get-CheckSnapshot
     $sig = ($snap.changedFiles -join "`n")
 
@@ -206,18 +243,47 @@ while ($true) {
 # --- Write final result ---
 $waitedSec = [Math]::Round(((Get-Date) - $started).TotalSeconds, 1)
 $result = @{
-    base_ref      = $BaseRef
-    status        = if ($lastSnapshot.passed) { "OK" } else { "FAIL" }
-    passed        = $lastSnapshot.passed
-    checks        = $lastSnapshot.checks
-    changed_files = $lastSnapshot.changedFiles
-    file_count    = $lastSnapshot.changedFiles.Count
-    reason        = $reason
-    poll_count    = $pollCount
-    waited_sec    = $waitedSec
-    result_file   = $resultFile
+    schema_version = 1
+    base_ref       = $BaseRef
+    status         = if ($lastSnapshot.passed) { "OK" } else { "FAIL" }
+    passed         = $lastSnapshot.passed
+    checks         = $lastSnapshot.checks
+    changed_files  = $lastSnapshot.changedFiles
+    file_count     = $lastSnapshot.changedFiles.Count
+    reason         = $reason
+    poll_count     = $pollCount
+    waited_sec     = $waitedSec
+    result_file    = $resultFile
 }
-$result | ConvertTo-Json -Depth 5 | Set-Content -Path $resultFile -Encoding UTF8
+$resultJson = $result | ConvertTo-Json -Depth 5
 
-[Console]::Error.WriteLine("[monitor] done: status=$($result.status) reason=$reason -> $resultFile")
+# Atomic result write (temp file + Move-Item). Backward compat: without a
+# -CompletionCallback the monitor always writes the result file; with a callback
+# the callback owns the {TaskId}.async-result.json write unless -WriteResultFile forces it.
+if ($WriteResultFile -or -not $CompletionCallback) {
+    $tmpResult = $resultFile + '.tmp'
+    $resultJson | Set-Content -Path $tmpResult -Encoding UTF8
+    Move-Item -LiteralPath $tmpResult -Destination $resultFile -Force
+    [Console]::Error.WriteLine("[monitor] done: status=$($result.status) reason=$reason -> $resultFile")
+}
+
+# --- Push completion callback (replaces consumer-side polling for completion) ---
+if ($CompletionCallback) {
+    try {
+        & $CompletionCallback -ResultJson $resultJson -TaskId $TaskId
+    } catch {
+        [Console]::Error.WriteLine("[monitor] callback FAILED for TaskId=${TaskId}: $($_.Exception.Message)")
+    }
+}
+
+# --- Cleanup: remove PID file if created ---
+if ($pidFile -and (Test-Path -LiteralPath $pidFile)) {
+    try {
+        Remove-Item -LiteralPath $pidFile -Force -ErrorAction Stop
+    } catch {
+        [Console]::Error.WriteLine("[monitor] WARNING: could not remove PID file ${pidFile}: $($_.Exception.Message)")
+    }
+}
+
+Write-Progress -Activity "async monitor ($BaseRef)" -Status "done: $($result.status)" -PercentComplete 100
 exit $(if ($lastSnapshot.passed) { 0 } else { 1 })

@@ -27,80 +27,21 @@ Any AEM migration task: readiness assessment, content transfer (CTT), component/
 | **Analytics** | AppMeasurement.js | Web SDK extension | `data` object ↔ XDM mapping |
 | **Debug** | CRXDE Lite, Felix | RDE, Query Perf, AEP Debugger | logs, `/system/console/*`, `arc.*` |
 
-## Workflow
+## Workflow Overview
 
-### 1. Pre-Flight Assessment
-```
-BPA (Best Practices Analyzer) → CAM (Cloud Acceleration Manager) → Pattern Detector
-↓
-Gap inventory: components, dialogs, datasources, clientlibs, workflows, searches
-↓
-ICE scoring (Impact × Confidence × Effort) + blast radius (Bajo/Medio/Alto)
-```
-**Stop**: Alto blast-radius gaps require human checkpoint before Phase 2.
-
-### 2. Content Transfer (CTT)
-```
-Pre-flight: Revision Cleanup + dataStore consistency
-Disk space ≥ datastore_size + nodestore_size × 1.5
-↓
-CAM project: extraction → migration set → ingest (wipe mode = faster)
-↓
-Max 10 migration sets/project → split to 2nd project if >10
-↓
-Post: verify content renders (project structure must be correct)
-```
-
-### 3. Code & Component Migration
-**Dialog (ExtJS → Coral 3):**
-- `dialog/` → `_cq_dialog/` (rename, do NOT delete until backup)
-- `multifield` → `composite="{Boolean}true"` + `<field>` container
-- `optionsProvider` → `datasource` child node, `sling:resourceType` → dev implements servlet
-- `namePrefix` → `name="./prop"` on field container
-- Validation (`vtype`, `regex`, `allowBlank`) → Coral 3 clientlib `foundation-validation`
-
-**Sling Models**: `@Model(adaptables={Resource.class, SlingHttpServletRequest.class})`, injectors (`@ValueMapValue`, `@ChildResource`, `@ScriptVariable`), register to `sling:resourceTypes`, export-ready for Cloud Service.
-
-### 4. Tags / Data Layer / Analytics
-```
-Launch property → AEP Tags property (Company/Env mapping in IMS config)
-↓
-digitalData.* → ACDL (adobe.dataLayer) OR XDM schema
-↓
-Data elements: map js vars → report suite / XDM fields
-↓
-Rules: Event+Conditions+Actions → Web SDK extension
-  Client-side: %dataElement%  |  Event-forwarding: {{dataElement}}
-  Edge: arc.event.xdm.*
-↓
-AppMeasurement → Web SDK: 3 paths
-  1. Web SDK tag ext (recommended)
-  2. Analytics ext → Web SDK ext (grace period, uses `data` obj)
-  3. AppMeasurement → Web SDK lib (manual, no tags)
-  ⚠️ No mixed Web-SDK+AppMeasurement on same page
-```
-
-### 5. Debugging
-| Tool | URL / Location | Use |
-|------|---------------|-----|
-| Logs | `error.log`, `access.log` | Frontline debugging (needs adequate logging config) |
-| Bundles | `/system/console/bundles` | Validate bundle present + active, unsatisfied imports |
-| Components | `/system/console/components` | Component lifecycle, PID for OSGi config |
-| Sling Models | `/system/console/status-Sling-Model` | Registered resource types, adaptables |
-| Query Perf | `/libs/granite/operations/content/maintenance` | Explain slow queries, traversal detection |
-| Remote debug | IDE JDWP to `:4502` (JDWP) | Step-through live Java code |
-| RDE | `aio cli` | Rapid dev-iteration cycle |
-| AEP Debugger | Chrome extension | Tags build/env, Analytics report suites, Target activities |
-
-**Slow-query fix**: nodetype restriction → `@Type` index; path scoping (`path=/content/site/us`); `jcr:contains` over `LIKE`; tune `oak.queryLimitInMemory`/`oak.queryLimitReads`.
+1. **Pre-Flight Assessment** — BPA → CAM → Pattern Detector → Gap inventory + ICE scoring + blast radius. **Stop** on Alto blast-radius gaps.
+2. **Content Transfer (CTT)** — Revision cleanup → disk space check → CAM extraction/ingest → max 10 sets/project → verify render.
+3. **Code & Component Migration** — ExtJS→Coral 3 dialogs (rename, multifield→composite, optionsProvider→datasource), Sling Models (@Model with injectors, register to resourceTypes).
+4. **Tags / Data Layer / Analytics** — Launch→AEP Tags, digitalData→ACDL/XDM, AppMeasurement→Web SDK (3 paths, no mixed mode).
+5. **Debugging** — Logs, bundles, components, Sling Models, Query Perf, remote debug, RDE, AEP Debugger. Slow-query fixes: @Type index, path scoping, jcr:contains.
 
 ## Constraints
 
-- CTT does NOT analyze content; published/unpublished distinction is NOT preserved → filter manually.
-- AEP Debugger requires Experience Cloud auth in an open tab for non-public data.
-- Web SDK migration must be all-or-nothing per page (no mixed AppMeasurement + Web SDK).
-- Extjs-to-coral3 `optionsProvider` servlet → developer must implement (cannot auto-convert).
-- BPA requires admin user; preferred on Stage/Clone, never directly on Prod.
+- CTT does NOT analyze content; published/unpublished distinction NOT preserved → filter manually.
+- AEP Debugger requires Experience Cloud auth for non-public data.
+- Web SDK migration all-or-nothing per page (no mixed AppMeasurement + Web SDK).
+- Extjs-to-coral3 optionsProvider servlet → developer must implement.
+- BPA requires admin user; Stage/Clone only, never Prod.
 
 ## References
 - `references/reference.md` — Deep reference (mappings, JSON schemas, servlet skeletons)
@@ -110,3 +51,7 @@ AppMeasurement → Web SDK: 3 paths
 
 ## Cross-Refs
 self-improvement | analysis-mode | deep-debugging | code-generation | security-scanner | quality-gate
+
+---
+
+> See [reference.md](docs/skills/aem-migration/reference.md) for extended details, examples, and detailed patterns.

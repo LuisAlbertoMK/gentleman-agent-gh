@@ -93,3 +93,43 @@
 - **Ciclo 3**: findings con taxonomía R1 + dedup; fixture staged una vez en BeforeAll (paralelismo Pester).
 - **Rendimiento**: NO regresivo — mediana final muy por debajo del baseline pinned.
 - **Condición de parada**: plan §4 cumplido (3/3 ciclos + entregables + rollback map con hashes reales). Pendiente solo PR a main (sin mergear sin orden explícita).
+
+---
+
+## C2 — Skill Bloat Compression (2026-08-19)
+
+**Branch**: `experimento/mejora-autonoma-2026-08-19` · Base: main HEAD
+
+### Baseline (pre-C2)
+
+| Métrica | Valor |
+|---------|-------|
+| SE (Skill Efficiency) | 6.0 |
+| o5 (skills >5KB) | 22 |
+| o3 (skills >3KB) | 57 |
+| Avg skill size | 3.9KB |
+| Total skills | 91 |
+| 22 skills total bytes | 135,202 |
+
+### Final (post-C2 compression)
+
+| Métrica | Baseline | Final | Delta |
+|---------|----------|-------|-------|
+| SE | 6.0 | **7.0** | +1.0 |
+| o5 | 22 | **0** | −22 (target ≤2 ✓) |
+| o3 | 57 | **39** | −18 (target 46 ✓) |
+| Avg skill size | 3.9KB | **3.0KB** | −0.9KB (target <3.5KB ✓) |
+| 22 skills total bytes | 135,202 | **52,547** | −61% |
+| Total skills | 91 | 91 | = |
+
+### Method
+Karpathy-loop compression + reference.md externalization:
+- 22 skills compressed: verbose sections (Examples, Testing Patterns, Edge Cases, Anti-Patterns) moved to `docs/skills/{skill}/reference.md`
+- SKILL.md retains: frontmatter, core workflow, constraints, rules, cross-refs
+- Single reference link: `> See [reference.md](docs/skills/{skill}/reference.md) for extended details, examples, and detailed patterns.`
+- Constraints: NO frontmatter changes, NO broken cross-refs, NO essential workflow removal, SKILL.md ≥200 lines
+
+### Verification
+- `score-auto -Json`: SE=7.0, o5=0, o3=39, avg=3.0KB
+- `cross-ref-check`: 9/9 OK
+- `Pester cross-ref.Tests.ps1`: 4/4 passed

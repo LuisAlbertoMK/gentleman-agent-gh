@@ -5,12 +5,12 @@
 .DESCRIPTION
     Tracks pending/running/completed subagent delegations so the orchestrator keeps
     working while subagents run in background. Actions: register, poll, resolve,
-    re-prompt, list. State persisted in .learnings/delegation-registry.json (atomic),
+    re-prompt, cancel, list. State persisted in .learnings/delegation-registry.json (atomic),
     TTL auto-purge (default 60 min), thread-safe via named mutex.
 .PARAMETER Action
     Registry operation to perform.
 .PARAMETER TaskId
-    Task-tool ID (for poll/resolve/re-prompt).
+    Task-tool ID (for poll/resolve/re-prompt/cancel).
 .PARAMETER AllowedPaths
     Regex pattern(s) for write-scope validation (register).
 .PARAMETER ExpectedFiles
@@ -21,6 +21,8 @@
     New instructions for re-prompt.
 .PARAMETER TtlMinutes
     TTL for registry entries (default 60).
+.PARAMETER MonitorPid
+    PID of the background monitor process (register; enables cancel via registry alone).
 .PARAMETER RepoRoot
     Repository root (default: parent of script dir).
 .PARAMETER Quiet
@@ -30,11 +32,12 @@
     scripts/delegation-registry.ps1 -Action poll -TaskId "abc-123"
     scripts/delegation-registry.ps1 -Action resolve -TaskId "abc-123"
     scripts/delegation-registry.ps1 -Action re-prompt -TaskId "abc-123" -NewPrompt "Focus on error handling"
+    scripts/delegation-registry.ps1 -Action cancel -TaskId "abc-123"
     scripts/delegation-registry.ps1 -Action list
 #>
 param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet("register","poll","resolve","re-prompt","list")]
+    [ValidateSet("register","poll","resolve","re-prompt","list","cancel")]
     [string]$Action,
 
     [string]$TaskId = "",
@@ -45,6 +48,7 @@ param(
     [int]$TtlMinutes = 60,
     [int]$TimeoutSeconds = 60,
     [int]$MaxToolCalls = 25,
+    [int]$MonitorPid = 0,
     [string]$SubagentOutputFile = "",
     [string]$RepoRoot = "",
     [switch]$Quiet
@@ -175,6 +179,7 @@ switch ($Action) {
             expected_files     = @($ExpectedFiles)
             timeout_seconds    = $TimeoutSeconds
             max_tool_calls     = $MaxToolCalls
+            monitor_pid        = $MonitorPid
             subagent_output    = $SubagentOutputFile
             status             = "pending"
             prompt             = ""
@@ -286,7 +291,11 @@ switch ($Action) {
 
         # Update entry status
         $entry.status = if ($json -and $json.passed) { "resolved" } else { "failed" }
-        $entry.resolved = (Get-Date -Format "o")
+        if ($entry.PSObject.Properties.Name -contains 'resolved') {
+            $entry.resolved = (Get-Date -Format "o")
+        } else {
+            $entry | Add-Member -NotePropertyName resolved -NotePropertyValue (Get-Date -Format "o")
+        }
         $reg[$TaskId] = $entry
         Set-RegistryData $reg
 
@@ -336,6 +345,81 @@ switch ($Action) {
         } else {
             Write-Output "[delegation-registry] re-prompted: $TaskId (prompt saved to $promptFile)"
             Write-Output "  The orchestrator should read this file and re-invoke task() with updated instructions."
+        }
+    }
+
+    "cancel" {
+        if (-not $TaskId) { throw "cancel requires -TaskId" }
+        if (-not $reg.ContainsKey($TaskId)) {
+            if ($Quiet) { @{ status = "not_found"; task_id = $TaskId } | ConvertTo-Json -Compress }
+            else { Write-Output "[delegation-registry] not found: $TaskId" }
+            exit 1
+        }
+        $entry = $reg[$TaskId]
+
+        # Find the monitor PID: pid file first, registry monitor_pid as fallback
+        $monitorPid = 0
+        $pidFile = Join-Path $registryDir "async-monitor-$TaskId.pid"
+        if (Test-Path -LiteralPath $pidFile) {
+            try {
+                $monitorPid = [int](Get-Content -LiteralPath $pidFile -Raw -Encoding UTF8 -ErrorAction Stop)
+            } catch {
+                Write-Debug "delegation-registry: could not read PID file $pidFile — $($_.Exception.Message)"
+            }
+        }
+        if (-not $monitorPid -and ($entry.PSObject.Properties.Name -contains 'monitor_pid') -and $entry.monitor_pid) {
+            $monitorPid = [int]$entry.monitor_pid
+        }
+
+        $killed = $false
+        if ($monitorPid -gt 0) {
+            try {
+                # Identity verification: confirm PID is a monitor-subagent process
+                # (prevents PID-reuse: a recycled PID from a different process must not be killed)
+                $cmdLine = ""
+                $procName = ""
+                try {
+                    $wmiProc = Get-CimInstance -ClassName Win32_Process -Filter "ProcessId=$monitorPid" -ErrorAction Stop
+                    if ($wmiProc) { $cmdLine = $wmiProc.CommandLine; $procName = $wmiProc.Name }
+                } catch {
+                    # Fallback: WMI (older Windows)
+                    try {
+                        $wmiProc = Get-WmiObject -Class Win32_Process -Filter "ProcessId=$monitorPid" -ErrorAction SilentlyContinue
+                        if ($wmiProc) { $cmdLine = $wmiProc.CommandLine; $procName = $wmiProc.Name }
+                    } catch {}
+                }
+
+                $isMonitor = $cmdLine -match 'monitor-subagent'
+                if (-not $isMonitor -and $procName -eq 'pwsh') {
+                    # Best-effort: pwsh process with no WMI data available
+                    Write-Warning "delegation-registry: PID $monitorPid is pwsh but command line unavailable (WMI blocked) — verifying via PID file timestamp"
+                    $isMonitor = (Test-Path $pidFile)  # PID file present is best-evidence
+                }
+
+                if ($isMonitor) {
+                    Stop-Process -Id $monitorPid -Force -ErrorAction Stop
+                    $killed = $true
+                } else {
+                    Write-Warning "delegation-registry: PID $monitorPid is NOT a monitor-subagent process (Name=$procName) — refusing to kill (PID reuse protection)"
+                }
+            } catch {
+                Write-Warning "delegation-registry: could not verify/kill monitor PID $monitorPid — $($_.Exception.Message)"
+            }
+        }
+
+        $entry.status = "cancelled"
+        if ($entry.PSObject.Properties.Name -contains 'cancelled') {
+            $entry.cancelled = (Get-Date -Format "o")
+        } else {
+            $entry | Add-Member -NotePropertyName cancelled -NotePropertyValue (Get-Date -Format "o")
+        }
+        $reg[$TaskId] = $entry
+        Set-RegistryData $reg
+
+        if ($Quiet) {
+            @{ status = "cancelled"; task_id = $TaskId; monitor_killed = $killed; monitor_pid = $monitorPid } | ConvertTo-Json -Compress
+        } else {
+            Write-Output "[delegation-registry] cancelled: $TaskId (monitor PID $monitorPid, killed=$killed)"
         }
     }
 
