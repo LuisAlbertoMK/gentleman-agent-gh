@@ -190,3 +190,16 @@ $files | ForEach-Object -Parallel { ... } -ThrottleLimit $throttle
 
 ## Refs
 execution-mode · lean-context · context-watchdog · performance-tracker · command-wrapper
+
+## Externalized Sections (ADR-007 compression)
+## File Read Optimization
+| Size | Method | vs Get-Content |
+|------|--------|----------------|
+| <1MB | Get-Content -Raw | 1x |
+| 1-50MB | StreamReader | 2-5x |
+| 50-500MB | File.ReadAllBytes | 5-10x |
+| >500MB | Memory-mapped | 10-50x |
+
+Multi-read: `Get-ChildItem "*.log" -Recurse | ForEach-Object -Parallel { [System.IO.File]::ReadAllText($_.FullName) } -ThrottleLimit 8`
+
+

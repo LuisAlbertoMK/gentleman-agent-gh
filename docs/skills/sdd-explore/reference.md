@@ -126,3 +126,14 @@ expect(artifact.content).toContain('Recommendation');
 ### Anti-Pattern 2: Creating Implementation Instead of Exploration
 **Bad**: Writing `webhook-retry.ts` implementation during explore phase
 **Good**: Produce `exploration.md` with approaches. Implementation happens in `sdd-spec` → `sdd-design` → `sdd-apply` phases only.
+
+## Externalized Sections (ADR-007 compression)
+## Persistence
+Follow §B (retrieval) and §C (persistence) from `skills/_shared/sdd-phase-common.md`:
+- **engram**: Optionally read `sdd-init/{project}`. Save as `sdd/{change}/explore` (or `sdd/explore/{topic-slug}` standalone).
+- **openspec**: Read `skills/_shared/openspec-convention.md`.
+- **hybrid**: Both — Engram + filesystem.
+- **none**: Return result only.
+- **Retrieval**: engram searches `sdd-init/{project}` + `sdd/`; openspec reads config + specs; none uses orchestrator prompt.
+
+

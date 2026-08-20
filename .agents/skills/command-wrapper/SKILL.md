@@ -1,4 +1,4 @@
-﻿---
+---
 name: command-wrapper
 description: "Run commands safely — description, error handling, output parsing, and safety wrappers for destructive operations"
 triggers: "Command wrapper, error handling, output parsing"
@@ -40,8 +40,5 @@ security-scanner · delivery-harness · subagent-isolation · recovery-protocol 
 ## Anti-Patterns
 Skip description · Ignore stderr · Parse output by eye · Raw bash for destructive ops · No timeout
 
-## Examples
-`node --version` → `v22.14.0` regex PASS→proceed · exit 127→ERROR HANDLING row 1 · malformed `2.14`→flagged, never silently accepted.
-
-## Testing
-1. `git push --force --dry-run`→BLOCK+ask. 2. `ghostcmd`/locked-file/missing path → mapped action fires. 3. `gh issue list --json` → fields AND warnings extracted.
+## Reference
+> docs/skills/command-wrapper/reference.md

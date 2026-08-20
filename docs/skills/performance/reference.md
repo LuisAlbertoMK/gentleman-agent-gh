@@ -138,3 +138,17 @@ No yields = input delay + processing + presentation all in one frame = INP failu
 `PERF:<page>—<date> BUDGET:[LCP|INP|CLS|TBT]<value>vs<target>→PASS/FAIL FIX:<issue>→<change> VERIFY:[lhci|test]→<pass/fail>`
 
 ## Cross-Refs: web-quality-audit | ui-engine | baseline-ui
+
+## Externalized Sections (ADR-007 compression)
+## Scroll-Driven + Visibility (0KB)
+```css
+.reveal { animation: fade-up 0.5s ease-out; animation-timeline: view(); animation-range: entry 0% entry 100%; }
+@supports not (animation-timeline:view()) { .reveal { opacity:1; transform:none; } }
+.lazy-section { content-visibility: auto; contain-intrinsic-size: 500px; }
+```
+Scroll: JS only GSAP-level. Visibility: skips off-screen. `contain: layout style paint` = render boundary.
+---
+
+docs/skills/performance/reference.md
+---
+

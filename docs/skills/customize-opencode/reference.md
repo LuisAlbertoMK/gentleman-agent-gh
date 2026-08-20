@@ -213,3 +213,26 @@ opencode doctor --json 2>&1 | jq '.mcpServers[] | {name: .name, status: .status}
 | **Skipping JSONC comment preservation** | Loses documentation context; diffs become noisy | Use JSONC-aware editors/tools; never minify config files |
 
 (End of file - total ~280 lines)
+
+## Externalized Sections (ADR-007 compression)
+## FAILURE MODES
+JSON/JSONC parse error → `git checkout -- <file>`, report line/column · `opencode doctor` fails → STOP, escalate · Schema violation → STOP, cite · Unclear → STOP, 1 question.
+
+
+## STANDALONE MODE
+Invoked directly: report findings, apply fixes if clear and verified.
+
+
+## OUTPUT FORMAT
+`Changed [file] ([change-type]). Risk: [LOW|MEDIUM|HIGH]. Verified: [pass/fail].`
+
+## RISK HEURISTIC
+| Change Type | Risk | Requires Review |
+|---|---|---|
+| Theme, keybindings, UI prefs | LOW | No |
+| Add/remove skill, agent, plugin | MEDIUM | Yes (test load) |
+| permissions, modelRouter | HIGH | Yes (dry-run + test) |
+| MCP server config | HIGH | Yes (connection test) |
+| Global `~/.config/opencode/` | HIGH | Yes (all projects) |
+
+

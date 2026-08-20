@@ -33,26 +33,9 @@ Launch subagent. Parse 4-field min3 attacks.
 APPROVED→push|FIX→R2(new diff). R2✅→push. R2❌→STOP|BLOCK→STOP escalate|ESCALATE→STOP partial.
 Max2 rounds. Record Engram per breaker schema.
 
-## Decision Tree
-Tests:no runner→SKIP|pre-exist→user-ok|new→fix. Cred:FP→user-ok|real→vault. Commit→type(scope):desc. PSSA missing→SKIP|auto-fix→-Mode Fix. Pester missing→SKIP.
-Breaker:missing→SKIP push|✅→push|🔧→R2|🚫→STOP|⚠→STOP partial
-
-## Commands
-`go test ./...`·`npm/pnpm/yarn test`·`cargo test`·`pytest`
-`$secretsPattern='(api[_-]?key|secret|token|-----BEGIN)'; git diff --cached|Select-String -Pattern $secretsPattern`
-`"$env:GENTLEMAN_AGENT_ROOT/scripts/pssa-gate.ps1" -Mode Check`
-`"$env:GENTLEMAN_AGENT_ROOT/scripts/run-tests.ps1" -Quiet` — Note: if *.Tests.ps1 files are staged, the pre-commit hook re-runs the staged subset (now parallel) — intentional double coverage; commit tests separately.
-
 ## Refs
 security-scanner·triple-verify·commit-crafter·ci-cd·code-review-agent·adversarial-breaker
 ---
 
-## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-007).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Testing Patterns, Edge Cases, Anti-Patterns, Quick Reference**
-  → docs/skills/quality-gate/reference.md
-
+docs/skills/quality-gate/reference.md
 ---

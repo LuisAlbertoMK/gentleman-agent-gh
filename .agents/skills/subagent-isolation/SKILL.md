@@ -1,4 +1,4 @@
-﻿---
+---
 name: subagent-isolation
 description: "Clean context boundaries between agents - prevent hallucination cascades, cross-contamination, enforce error isolation."
 triggers: "Subagent isolation, context boundaries"
@@ -38,9 +38,6 @@ Every delegation output MUST include this 4-field block AS-IS (never summarized)
 | Timeout | Retry once with cleaner prompt, then escalate |
 | Wrong output | Log to Engram, re-delegate with corrected context |
 | Hallucinates | Flag as contamination -> check isolation rules |
-
-## Context cleanup
-After delegation: extract only needed output, reference by delegation ID, summarize large outputs. Never retain full subagent output in main context.
 
 ## Refs
 delivery-harness · command-wrapper · lean-context · context-watchdog · execution-mode

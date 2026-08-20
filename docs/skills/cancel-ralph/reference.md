@@ -133,3 +133,22 @@ Note: Prefer completing tasks properly with `<promise>DONE</promise>` when possi
 
 ## Refs
 ralph-loop · recovery-protocol
+
+## Externalized Sections (ADR-007 compression)
+## How to Use
+
+```bash
+# 1. Check if loop is active
+test -f .opencode/ralph-loop.local.md && echo "Active" || echo "No active loop"
+
+# 2. Read current iteration
+grep '^iteration:' .opencode/ralph-loop.local.md
+
+# 3. Delete state file
+rm -f .opencode/ralph-loop.local.md
+
+# 4. Output confirmation
+echo "Ralph loop cancelled at iteration $(grep '^iteration:' .opencode/ralph-loop.local.md 2>/dev/null || echo 'unknown')"
+```
+
+

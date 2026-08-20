@@ -4,39 +4,16 @@ description: "Trigger: !analisis, !analysis, multi-agent analysis. Read-only 4-p
 triggers: "!analisis, !analysis, !analisis --meta, analysis mode, multi-agent analysis, smart analysis, process analysis"
 changelog: docs/ciclos/cycle28-20260815.md
 ---
-
 ## When to Use
-Trigger: !analisis, !analysis, multi-agent analysis. Read-only 4-phase pipeline. `!analisis`/`!analysis` as first token.
-
-**Loading**: `skill(name="analysis-mode")`. Fail→`Read` this file(project→global). External: copy to `<project>/.agents/skills/analysis-mode/`.
-
+Trigger: !analisis, !analysis, multi-agent analysis. Read-only 4-phase pipeline. `!analisis`/`!analysis` as first token. Loading + P1/P4 detail → reference.
 **SCOPE GUARD**: `git diff --name-only HEAD~1|Measure-Object -Line`. <10 files→HALT→load `code-review-agent`.
 - **EXCEPTION**: `--meta` flag (`!analisis --meta`) bypasses scope guard — analysis is about WORK PROCESS, not code. Skip file-count; focus on workflow, communication, tooling, protocol.
-
 **GATE**: Forbidden: `ctx_execute`/`Write`/`Edit`/`Bash`(except git status/diff/log)/`skill`(except project-mapper). Allowed: `Read`/`Grep`/`Glob`/`webfetch`/`websearch`/`project-mapper`. Output→`docs/mejoras/**`. Forbidden→log `BLOCKED:[tool][reason]`, continue.
-
 **CONCISO**: Concise output — no intros, straight to point.
-
-## P1: ANALYZE
-0. `project-mapper`→stack. Public site?→+seo. 1.Scope: affected subsystems only. 2.5-6 specialists: sec·infra·frontend·perf·datascience·docs(+seo if public). 3.Parallel→`Decision|Files|Findings|Nuance`. 4.No result→`SKIPPED-{name}`, continue.
-
-## P2: VALIDATE (8 dims, N/A ok)
-Sec→security|UX→frontend|Data→datascience|DX→docs|Perf→performance|Infra→infra|Arch→main(self)|Biz→main(self). Arch first(structural)→Biz(strategic). No interleave.
-
 ## P3: SYNTHESIZE
 `|Finding|Consensus|Risk|Files|Recommendation|`
 UNANIMOUS(all)|MAJORITY(≥50%)|SPLIT(<50%)|OUTLIER(single). >30 findings→top-15, rest appendix.
-
-## P4: PERSIST
-**4a Compare**: `mem_search("analysis:<project>")`. Found→delta(improvements/regressions/new/stale)→`## Trend vs Previous`. None→"No previous analysis—baseline".
-**4b Save**: `mem_save(title:"analysis:<project>:<YYYY-MM-DD>",type:architecture,topic_key:"analysis/<project>")` Content:`**What**:Analyzed <project> <date>—<scope>. **Why**:<trigger>. **Where**:<top files max8>. **Key Findings**:<top5 by risk>. **Learned**:<surprises or None>`.
-**4c Enrich**: Append to `docs/mejoras/YYYY-MM-DD-<project>-analisis.md`: `## Engram Persistence`(id+topic_key+ts) + `## Trend Analysis`(delta).
-
 ## OUTPUT
 `docs/mejoras/YYYY-MM-DD-<project>-analisis.md` — Summary,Findings(8dims),Synthesis,RiskMatrix,Recs,Engram,Trend. Gate: Plan only — NO code/commit. Exit before implementing.
-
-## AUTO-TRIGGER
-In `_core-behavior-gp.md`. Loads only on explicit `!analisis`.
-
 ## Reference
-Worked examples, testing patterns, edge cases, anti-patterns, quick reference → docs/skills/analysis-mode/reference.md
+P1 ANALYZE + P4 PERSIST detail + loading → docs/skills/analysis-mode/reference.md

@@ -344,3 +344,17 @@ const user = await db.query(`SELECT * FROM users WHERE email = ${email}`); // Al
 function validate(data: unknown) { return z.object({...}).parse(data); }
 ```
 **Fix**: Check `package.json` / `go.mod` / `Cargo.toml` first. Only use existing deps. If new dep needed: STOP, report [name]+[why]+[alternative using existing deps].
+
+## Externalized Sections (ADR-007 compression)
+## FILE CREATION
+(1) Read parent dir to confirm structure. (2) Write file. (3) Verify syntax.
+
+
+## DISAMBIGUATION
+If request matches quick-executor scope (single existing file, clear before/after, <20 lines) → defer to quick-executor.
+
+
+## SEVERITY
+| P0 | Generated code breaks build | P1 | Convention mismatch | P2 | Missing edge case | P3 | Style nits |
+
+

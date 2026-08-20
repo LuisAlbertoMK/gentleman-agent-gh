@@ -94,3 +94,19 @@
 
 ## Refs
 cross-project-forge · dreaming · immune-system · research · session-resume
+
+## Externalized Sections (ADR-007 compression)
+## Commands
+
+```powershell
+# Manual load
+Get-ChildItem "docs/cross-project/patterns/*.json" | ForEach-Object { Get-Content $_ | ConvertFrom-Json }
+
+# Search by technology
+$patterns | Where-Object { $_.context.technologies -match "gradient" }
+
+# Search by severity
+$patterns | Where-Object { $_.severity -eq "HIGH" -or $_.severity -eq "CRITICAL" }
+```
+
+

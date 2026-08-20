@@ -169,3 +169,25 @@ pcregrep -M '### GIVEN .* WHEN .* THEN .*' openspec/changes/*/specs/*/spec.md
 #### Scenario: same password → different hashes
 - GIVEN two users with same password WHEN registered THEN password hashes differ
 ```
+
+## Delta Format (condensed)
+```
+# Delta for {Domain}
+### Requirement: {Name}
+{RFC 2119} {behavior}
+#### Scenario: {Name} - GIVEN/WHEN/THEN
+### Requirement: {Name} (Previously: {what changed}) - GIVEN/WHEN/THEN
+### Requirement: {Name} (Reason: {why}) (Migration: {replacement})
+### Requirement: {Old} → {New} (Reason: {why}) (Migration: {how})
+```
+
+## New Domain (No Existing Spec)
+Full spec: `# {Domain} Specification` → `## Purpose` → `## Requirements` with Given/When/Then.
+
+## Rules
+- Given/When/Then for all scenarios; RFC 2119 keywords (MUST/SHALL/SHOULD/MAY)
+- Every requirement: ≥1 scenario (happy + edge cases); Scenarios TESTABLE — automatable from G/W/T
+- Specs describe WHAT, not HOW; MODIFIED: ALWAYS copy full requirement + all scenarios before editing
+- REMOVED: include Reason; Migration if consumers affected; RENAMED: state both names; include Migration
+- Apply `rules.specs` from `openspec/config.yaml`; Size: <650 words; Prefer tables; Scenarios: 3-5 lines max
+- Return envelope per §D of `sdd-phase-common.md`

@@ -8,21 +8,9 @@ changelog: docs/ciclos/cycle28-20260815.md
 ## When to Use
 Start Ralph Loop - auto-continues until task completion
 
-
 # Ralph Loop
 
 Start an iterative development loop that automatically continues until the task is complete.
-
-## How It Works
-
-The Ralph Loop creates a continuous feedback cycle for completing complex tasks:
-
-1. You work on the task until you go idle
-2. The plugin detects the idle state and checks for completion
-3. If not complete, it prompts you to continue where you left off
-4. This repeats until you output the completion promise or max iterations reached
-
-Your previous work remains accessible through files and git history, enabling progressive refinement across iterations.
 
 ## Starting the Loop
 
@@ -70,33 +58,9 @@ Check current iteration:
 grep '^iteration:' .opencode/ralph-loop.local.md
 ```
 
-## State File Format
-
-The state file at `.opencode/ralph-loop.local.md` uses YAML frontmatter:
-
-```markdown
----
-active: true
-iteration: 3
-maxIterations: 100
-sessionId: ses_abc123
----
-
-Your original task prompt
-```
-
-Add `.opencode/ralph-loop.local.md` to your `.gitignore`.
-
 ## Refs
 cancel-ralph · help · execution-mode · context-watchdog · recovery-protocol
 ---
 
-## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-007).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Testing Patterns, Edge Cases, Anti-Patterns, Quick Reference**
-  → docs/skills/ralph-loop/reference.md
-
+docs/skills/ralph-loop/reference.md
 ---

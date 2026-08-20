@@ -232,3 +232,12 @@ Rationale: Generic testing misses critical paths; risk-based targets coverage wh
 | Open Questions | ✅ | Risks with likelihood + mitigation |
 
 **Artifacts to persist**: `design.md` + `ADR-{NNN}.md` (if new decision) → `sdd/{change}/` + Engram via `mem_save`
+
+## Externalized Sections (ADR-007 compression)
+## Input Artifacts (load in parallel)
+
+- `sdd/{change-name}/proposal` — the approved change proposal
+- `sdd/{change-name}/exploration` — (optional) exploration artifacts if a discovery phase ran
+- Project standards from orchestrator (if injected)
+
+

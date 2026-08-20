@@ -161,3 +161,11 @@ go test -v -tags=integration ./internal/db/...
 | **Create files** | Wrong skill for file creation; no scaffold/templates | Delegate to code-generation skill |
 | **Edit generated files** | Changes lost on regeneration; masks source-of-truth issue | Find and edit the source definition instead |
 | **Large refactor in one edit** | Exceeds atomic-edit threshold; hard to verify/rollback | Break into multiple quick-executor calls or use refactoring-planner |
+
+## Externalized Sections (ADR-007 compression)
+## FAILURE
+- Parse/compile fail → `git checkout -- <file>` (if git), suggest deep-debugging
+- Test fail → 1 fix attempt. Still fails → STOP, escalate
+- Unclear requirements → STOP, 1 question
+
+

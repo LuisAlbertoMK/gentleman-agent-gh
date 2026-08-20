@@ -114,3 +114,15 @@ Iterate: Add Mermaid diagrams for architecture → re-test → install globally
   2. Add 1 "wildcard" test per iteration (unseen prompt from user logs)
   3. Track `holdout_pass_rate` vs `train_pass_rate` → gap >15% = overfit
 - **Metric**: `overfit_score = train_pass - holdout_pass` → target <0.15
+
+## Externalized Sections (ADR-007 compression)
+## Running evals (continuous)
+Workspace: `<skill>-workspace/`. Results in `iteration-N/eval-ID/{with_skill,baseline}/outputs/`.
+
+1. **Spawn all runs same turn**: Each test → 2 Task calls (with-skill + baseline). Baseline = `without_skill` (new) or snapshot (improvement).
+2. **Draft assertions while running**: Objective → quantitative. Subjective → skip.
+3. **Capture timing**: `total_tokens` + `duration_ms` → `timing.json`.
+4. **Grade → Aggregate → Viewer**: Grade via `agents/grader.md` → `grading.json`. Aggregate: `skill_aggregate_benchmark(...)`. Analyze: `agents/analyzer.md`. Viewer: `skill_serve_review` or `skill_export_static_review`.
+5. **Read feedback**: `feedback.json`. Stop via `skill_stop_review`.
+
+

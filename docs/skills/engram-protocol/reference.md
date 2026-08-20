@@ -150,3 +150,18 @@ mem_session_summary(content: "## Goal\n...\n## Discoveries\n...\n## Accomplished
 ---
 
 (End of file - extended with examples, testing patterns, edge cases, anti-patterns)
+
+## Externalized Sections (ADR-007 compression)
+## Token Budget
+>500 tok→summary. 5 turns no progress→`lean-context CAVEMAN lite`. 10→`mem_session_summary`+reset. Self-check/5 calls.
+L1:−60-70%. L2:1-2 lines+Engram ID −40-50%. L3:1-liner/topic+`Ref:engram-obs-{id}`−80-90%.
+
+
+## Memory Search
+"remember"/"recall"→`mem_context`→`mem_search`→`mem_get_observation`. Proactive: known-area·unfamiliar·first msg.
+Task injection: extract keywords, `mem_search(query,type="bugfix|pattern|decision",limit=3)`, inject top3.
+
+
+## Auto-Clean: `$env:TEMP\opencode\`>24h at session start.
+
+

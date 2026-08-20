@@ -72,3 +72,18 @@ grep -rn "securityContext\|resources" charts/*/values.yaml --include="*.yaml" | 
 3. **Ignore .yml** — K8s/Helm/Ansible use both .yaml and .yml; omitting .yml misses ~30% of configs.
 4. **Skip drift detection** — Terraform plan without -detailed-exitcode hides drift; always use it.
 5. **Trust image tags** — `latest` in non-prod is still a supply-chain risk; pin everywhere or use digests.
+
+## Externalized Sections (ADR-007 compression)
+## SCAN DIMENSIONS (progressive — audit what's present)
+
+**Terraform**: `grep -rn "^resource\|^data\|^module\|backend\|state" --include="*.tf"` → remote state, typed vars, minimal perms
+
+**Docker**: `grep -rn "FROM\|latest" --include="Dockerfile*"` → pinned versions, non-root, multi-stage
+
+**K8s** (BOTH .yaml AND .yml): `grep -rn "securityContext\|resources\|limits\|privileged\|cap_add\|livenessProbe\|readinessProbe\|NetworkPolicy\|ingress" --include="*.yaml" --include="*.yml"`
+
+**CI/CD** (multi-system): `grep -rn "secrets\.\|GITHUB_TOKEN\|CI_JOB_TOKEN\|GITLAB_TOKEN\|permissions:\|uses:\|image:" --include="*.yml"`
+
+**Helm/Ansible/CF**: `grep -rn "securityContext\|resources\|become:\|AWSTemplateFormatVersion" --include="*.yaml" --include="*.yml" --include="values.*"`
+
+

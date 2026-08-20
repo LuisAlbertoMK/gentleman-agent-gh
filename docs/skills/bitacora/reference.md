@@ -202,3 +202,26 @@ User: bitacora --append "Fix auth 🔒 rate limiting"
 8. **C28: Treat archive as deletion** — Archive preserves history. `BITACORA.archive.md` is queryable with `bitacora --file BITACORA.archive.md --search "..."`.
 
 ## Cross-Refs: dreaming | session-resume | immune-system | auto-metrics | bitacora | engram-protocol
+
+## Externalized Sections (ADR-007 compression)
+## Query Commands
+| Command | Action |
+|---------|--------|
+| `bitacora` | show full log |
+| `bitacora --search "Karpathy"` | grep for keyword |
+| `bitacora --since 2026-06-01` | entries after date |
+| `bitacora --append "Fix auth middleware"` | manual append |
+| `bitacora --stats` | entry count, date range, top keywords |
+
+### Search example
+User: `bitacora --search "auth"` → entries matching "auth". No matches→`"No entries matching 'auth' in BITACORA.md"`.
+
+### Cross-session search
+`bitacora --search "metrics"`→BITACORA.md + `mem_search("metrics")`→Engram. Both results shown.
+
+### Integration with Engram
+1. `mem_save_prompt` captures full request→Engram (machine-readable, cross-session)
+2. `bitacora --append` writes 1-line→BITACORA.md (human-readable, per-project)
+3. `bitacora --search "keyword"` returns matches + suggestion: `"See mem_search('keyword') for full context"`
+
+

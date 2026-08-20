@@ -95,3 +95,37 @@ fast-check generates 1000s inputs against suspected function
 | Add logging without hypothesis | Noise, no signal | Log to TEST a specific hypothesis |
 | Rewrite instead of bisect | Overkill, loses history | `git bisect` first for regressions |
 | Ignore shared state | Misses cross-component bugs | Read order: error origin → caller → shared state |
+
+## Externalized Sections (ADR-007 compression)
+## TOOL ESCALATION
+| Stage | When | Tools |
+|-------|------|-------|
+| Static | First 2 cycles | grep, read, git log |
+| Dynamic | No answer after 2 cycles | print/logging, test harness |
+| Runtime | Still stuck | debugger, profiler, strace/APM |
+| Minimal repro | Complex bugs | Isolate to smallest reproducing case |
+
+
+## CONTEXT CHECKPOINT
+After 4+ hypothesis rounds: summarize findings, save progress, compress context before continuing.
+
+
+## SEVERITY
+| P0 | Production down, data loss | P1 | Major functionality broken | P2 | Degraded performance | P3 | Minor issue |
+
+## Read Order
+(1) error origin, (2) immediate caller, (3) shared state/config.
+
+## OUTPUT
+```
+### Diagnosis
+- Severity: P[N]
+- Symptom: [quote error]
+- Root cause: [file:line — why]
+- Evidence: [grep/read/profiler output]
+### Fix
+- File: path → [before] → [after]
+- Verification: [command + expected]
+```
+
+

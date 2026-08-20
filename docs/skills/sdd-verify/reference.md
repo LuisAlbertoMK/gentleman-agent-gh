@@ -122,3 +122,15 @@ const testResults = await runContractTests(contract, baseUrl);
 - Verification is read-only assessment
 - Any code modification during verify phase invalidates the verification
 - Report issues with severity; let orchestrator route fix to implementation phase
+
+## Conditions & Actions
+- `strict_tdd: true` → Strict TDD; load module
+- `workspace-planning` → STOP
+- Tasks only → Task completion; skip spec/design
+- Tasks + specs → Completeness + correctness; skip design
+- Full artifacts → Verify all dimensions
+- Task incomplete → CRITICAL (core) / WARNING (cleanup)
+- Test non-zero / No passing test → CRITICAL `UNTESTED`/`FAILING`
+- Design deviation → WARNING unless breaks spec
+- Unchecked tasks / No runtime evidence → CRITICAL / `PASS WITH WARNINGS`
+- Missing covering tests → CRITICAL (unless manual OK)

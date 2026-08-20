@@ -120,3 +120,23 @@
 
 ## Refs
 cross-project-wisdom · opencode-skill-creator · skill-registry · skill-graph · dreaming
+
+## Externalized Sections (ADR-007 compression)
+## Rollback
+
+If the forged skill causes issues:
+
+```powershell
+# 1. Remove skill directory
+Remove-Item -Recurse .agents/skills/cross-project-{name}/
+# 2. Revert AGENTS.md if changed
+git checkout AGENTS.md
+# 3. Demote pattern back to active
+# Edit pattern JSON: status=active, skill_ref=null
+# 4. mem_save(topic_key="forge/rollback/{name}")
+```
+---
+
+docs/skills/cross-project-forge/reference.md
+---
+

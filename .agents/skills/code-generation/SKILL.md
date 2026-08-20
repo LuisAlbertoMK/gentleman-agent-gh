@@ -13,20 +13,11 @@ New files, new functions, scripts, boilerplate. NOT for debugging (→ deep-debu
 3. **VALIDATE**: Syntax check. Run lint/typecheck if exists.
 4. **EDGE CASES**: For each public function: null/empty, error states, boundary values. Domain-specific: data layer (connection failures, timeouts), API (auth, rate limiting, malformed input), UI (empty states, loading), CLI (invalid flags, help text).
 
-## FILE CREATION
-(1) Read parent dir to confirm structure. (2) Write file. (3) Verify syntax.
-
 ## STANDARDS
 - Match import style, naming, error handling, type system
 - Every function: input validation + error handling + one clear purpose
 - No new deps unless codebase already uses them
 - Tests → detect framework → write matching patterns
-
-## DISAMBIGUATION
-If request matches quick-executor scope (single existing file, clear before/after, <20 lines) → defer to quick-executor.
-
-## SEVERITY
-| P0 | Generated code breaks build | P1 | Convention mismatch | P2 | Missing edge case | P3 | Style nits |
 
 ## OUTPUT
 ```
@@ -40,12 +31,5 @@ Created/modified [file]. Pattern matched from [source]. Ready for review.
 quick-executor · commit-crafter · quality-gate
 ---
 
-## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-007).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Testing Patterns, Edge Cases, Anti-Patterns, Quick Reference**
-  → docs/skills/code-generation/reference.md
-
+docs/skills/code-generation/reference.md
 ---

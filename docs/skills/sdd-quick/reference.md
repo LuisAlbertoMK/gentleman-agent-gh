@@ -179,3 +179,24 @@ Proposal omits rollback because "it's trivial to revert."
 Writing the proposal *after* coding, as a retroactive summary.
 - **Symptom:** Proposal references commit SHAs or "as implemented"
 - **Fix:** Proposal **precedes** Apply phase. If code exists, you're in full SDD Apply already.
+
+## Externalized Sections (ADR-007 compression)
+## Return Envelope
+
+```
+sdd-quick | {change-name}
+Phases: Propose→Apply→Verify
+Files:{N} | Tests:{P/FAIL} | Build:{P/FAIL}
+Status:{Ready|Blocked}
+Time:{actual time}
+```
+
+## Flow — Phase Detail
+### Phase 1: Propose (simplified)
+Load `{file:sdd/phases/02-propose.md}`. Relaxations: Skip `Capabilities` + `Affected Areas` table (list ≤3 files inline). Keep: Intent, Scope (In/Out), Risks, Rollback, Success Criteria. Budget: **<200 words**. Output → §C.
+### Phase 2: Apply (standard)
+Load `{file:sdd/phases/06-apply.md}`. No tasks breakdown; standard TDD if risky logic; no workload check (≤3 files). Persist via §C.
+### Phase 3: Verify (essential only)
+Load `{file:sdd/phases/07-verify.md}`. Gates: Tests pass | Build OK | No regressions. **Skip:** Design coherence, spec mapping, coverage, assertion audit. Output → §C.
+
+

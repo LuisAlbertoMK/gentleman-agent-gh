@@ -20,16 +20,6 @@ Load this skill when a planned PR may exceed **400 changed lines**, SDD forecast
 - Treat polluted diffs as base bugs: retarget or rebase until only the current work unit appears.
 - Do not mix chain strategies after the user chooses one.
 
-## Decision Gates
-
-| Condition | Action |
-|---|---|
-| PR ≤400 changed lines and focused | Keep single PR. |
-| PR >400, each slice can land independently | Use Stacked PRs to main. |
-| PR >400, feature must integrate before main | Use Feature Branch Chain with tracker. |
-| Generated/vendor/migration diff cannot split cleanly | Ask maintainer for `size:exception`. |
-| SDD provides `delivery_strategy` | Follow it before apply/PR creation. |
-
 ## Execution Steps
 
 1. Estimate changed lines and identify independent work units.
@@ -39,10 +29,6 @@ Load this skill when a planned PR may exceed **400 changed lines**, SDD forecast
 5. Verify each PR independently: CI/tests/docs/manual checks, rollback scope, and clean diff.
 6. Keep tracker PR draft/no-merge until all child PRs are reviewed and integrated.
 
-## Output Contract
-
-Return the chosen strategy, PR order, current PR boundary, dependency diagram, review budget (`additions + deletions`), verification plan, and any `size:exception` rationale.
-
 ## References
 
 - [references/chaining-details.md](references/chaining-details.md) — strategy diagrams, PR body section, branch commands, and reviewer guidance.
@@ -50,12 +36,5 @@ Return the chosen strategy, PR order, current PR boundary, dependency diagram, r
 ---
 ---
 
-## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-007).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Testing Patterns, Edge Cases, Anti-Patterns, Quick Reference**
-  → docs/skills/chained-pr/reference.md
-
+docs/skills/chained-pr/reference.md
 ---

@@ -130,3 +130,21 @@ npm test  # must pass
 ---
 
 (End of file - total 178 lines)
+
+## Externalized Sections (ADR-007 compression)
+## Decision Gates
+
+| Condition | Action |
+|---|---|
+| PR ≤400 changed lines and focused | Keep single PR. |
+| PR >400, each slice can land independently | Use Stacked PRs to main. |
+| PR >400, feature must integrate before main | Use Feature Branch Chain with tracker. |
+| Generated/vendor/migration diff cannot split cleanly | Ask maintainer for `size:exception`. |
+| SDD provides `delivery_strategy` | Follow it before apply/PR creation. |
+
+
+## Output Contract
+
+Return the chosen strategy, PR order, current PR boundary, dependency diagram, review budget (`additions + deletions`), verification plan, and any `size:exception` rationale.
+
+

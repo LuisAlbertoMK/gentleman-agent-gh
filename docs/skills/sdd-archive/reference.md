@@ -108,4 +108,16 @@
 # Policy: reviewGate.result: allow is MANDATORY for ALL modes except none
 # Even engram/hybrid/openspec with single-line delta → gate required
 # CORRECT: Run review (can be lightweight), then archive
+
+## Return Summary Template
+```markdown
+**Change**: {change-name}
+**Archived to**: `openspec/changes/archive/YYYY-MM-DD-{change}/` | Engram | inline
+### Specs Synced
+| Domain | Action | Details |
+| {domain} | Created/Updated | {N added, M modified, K removed} |
+### Contents
+proposal.md ✅ | specs/ ✅ | design.md ✅ | tasks.md ✅ ({N}/{N})
+SDD Cycle Complete — Ready for next change.
+```
 ```

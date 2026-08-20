@@ -8,7 +8,6 @@ changelog: docs/ciclos/cycle28-20260815.md
 ## When to Use
 Permanent immunity against repeated errors — detect, diagnos
 
-
 ## Protocol — Every failure = asset. Once documented -> permanent immunity.
 
 ### 1. DETECT
@@ -25,30 +24,6 @@ Root cause: Context miss | Pattern miss | Knowledge gap | Tool misuse | Hallucin
 
 ### 3. DOCUMENT -> ANTI-PATTERN-CATALOG.md
 ```
-## YYYY-MM-DD: title
-**Symptom**: | **Root cause**: | **Fix**: | **Prevention**: 1 rule | **Files**: paths
-```
-
-### 4. IMMUNIZE (both required)
-- Catalog entry = loaded at session start (documents failure)
-- Prevention rule -> AGENTS.md (changes behavior)
-- Code/skill change -> `mem_save` + update SKILL.md
-- Cross-project: also `mem_save(topic_key="pattern/{name}", type="pattern", scope="personal")` so wisdom loader can retrieve it
-- Rule: "Catalog documents. AGENTS.md prevents. Both or not immunized."
-
-#### Cross-Project Save Format
-When saving to Engram for cross-project retrieval, use:
-```
-title: "pattern: {symptom}"
-type: "pattern"
-scope: "personal"
-content: "**Domain**: {domain}\n**Symptom**: {symptom}\n**Root cause**: {root_cause}\n**Fix**: {fix}\n**Prevention**: {prevention}"
-topic_key: "pattern/{normalized-title}"
-```
-
-### 5. VERIFY
-Pre-task: "Seen this before?" If yes -> apply prevention BEFORE starting.
-
 ## Recovery Flow
 1. User corrects you -> STOP (don't argue), diagnose root cause
 2. Same error 2x -> mandatory catalog entry
@@ -59,12 +34,5 @@ Pre-task: "Seen this before?" If yes -> apply prevention BEFORE starting.
 `Error -> STOP -> Diagnose -> Document -> Immunize -> Verify -> Continue`
 ---
 
-## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-007).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Testing Patterns, Edge Cases, Anti-Patterns, Quick Reference**
-  → docs/skills/immune-system/reference.md
-
+docs/skills/immune-system/reference.md
 ---

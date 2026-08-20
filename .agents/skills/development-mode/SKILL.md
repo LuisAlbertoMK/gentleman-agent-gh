@@ -15,16 +15,6 @@ System resource prioritization — RAM/CPU/GPU/file I/O optimization. NOT task e
 **Power Plan**: `powercfg /SETACTIVE "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"` + PROCTHROTTLEMIN/MAX 100
 **GPU**: `Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\DirectX\UserGpuPreferences" "opencode.exe" "High" -EA SilentlyContinue`
 
-## File Read Optimization
-| Size | Method | vs Get-Content |
-|------|--------|----------------|
-| <1MB | Get-Content -Raw | 1x |
-| 1-50MB | StreamReader | 2-5x |
-| 50-500MB | File.ReadAllBytes | 5-10x |
-| >500MB | Memory-mapped | 10-50x |
-
-Multi-read: `Get-ChildItem "*.log" -Recurse | ForEach-Object -Parallel { [System.IO.File]::ReadAllText($_.FullName) } -ThrottleLimit 8`
-
 ## Deactivate (restore)
 `Get-Process "opencode*" | ForEach-Object { $_.PriorityClass = [System.Diagnostics.ProcessPriorityClass]::Normal }`
 `powercfg /SETACTIVE "381b4222-f694-41f0-9685-ff5bb260df2e"`
@@ -45,12 +35,5 @@ Multi-read: `Get-ChildItem "*.log" -Recurse | ForEach-Object -Parallel { [System
 - GPU priority only affects DirectX apps
 ---
 
-## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-007).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Testing Patterns, Edge Cases, Anti-Patterns, Quick Reference**
-  → docs/skills/development-mode/reference.md
-
+docs/skills/development-mode/reference.md
 ---

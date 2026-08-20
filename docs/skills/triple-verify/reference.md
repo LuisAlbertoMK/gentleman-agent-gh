@@ -149,3 +149,21 @@ pnpm test:contract             # pact/contract tests
 4. **Ignore zone thresholds** — Treating Amarilla 15L diff as Verde (skip verify) or Rojo 5L diff as Amarilla
 5. **!ship --no-verify as default** — Using emergency override for routine work (reserved for production incidents)
 6. **Verify theater** — Running commands that "look like" verify but don't actually validate (e.g., `pytest` with no tests, `ruff` on excluded paths)
+
+## Externalized Sections (ADR-007 compression)
+## Zones
+Zones, thresholds, verify depth defined in `review-rules.jsonc`.
+- **Roja**: full triple-verify (E1+E2+E3)
+- **Amarilla**: verify if diff > threshold lines
+- **Verde**: skip verify, quality-gate only
+- Context zones in `context_zones`, workflow modes in `modes`
+- **Edit `review-rules.jsonc` — NOT this file**
+
+
+## References
+quality-gate · code-review-agent · judgment-day · commit-crafter · CYCLE.md
+
+---
+
+> See [reference.md](docs/skills/triple-verify/reference.md) for extended details, examples, and detailed patterns.
+

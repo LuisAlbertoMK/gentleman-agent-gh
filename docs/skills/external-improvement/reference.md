@@ -126,3 +126,23 @@ git stash drop
 **What**: Treat P5 as "run tests and done" — skip `learning` field in session summary.
 **Why it fails**: Compound knowledge lost. Next external project repeats same discoveries.
 **Fix**: P5 subagent 3 MUST write `learning` to engram with `topic_key: external-improvement/<pattern>`. Verify via `mem_search` before next cycle.
+
+## Externalized Sections (ADR-007 compression)
+## Error Handling
+| Failure | Action |
+|---------|--------|
+| Subagent timeout | Retry once with stricter scope, then SKIP |
+| Phase gate not met | STOP phase, try next if independent |
+| Score drop >0.5 | Full revert |
+| 3 consecutive SKIP | Abort cycle, write partial report |
+| Human needed | `conflict` file + escalation |
+
+
+## Behaviors
+- **Internal** (gentleman-agent-gh): P1 skip, P2 ↔ score-auto.ps1, P3 light, P4 full, P5 full
+- **External**: full 5 phases with standalone fallback
+- Serial batches unless dep graph says parallel. Rollback per batch.
+- Max 3 consecutive SKIP → abort. Score drop >0.5 → full revert.
+- Stdlib doesn't cover this (needs 3 tool types in one pass).
+
+

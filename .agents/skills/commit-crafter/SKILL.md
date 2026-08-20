@@ -1,4 +1,4 @@
-﻿---
+---
 name: commit-crafter
 description: Craft conventional commit messages from diff analysis.
 triggers: "commit, mensaje, commit message, conventional commit, git commit, craft commit"
@@ -27,26 +27,10 @@ Craft conventional commit messages from diff analysis.
 ## Scope by file pattern
 `api/*/routes/*`→api | `db/*/store/*`→db | `auth/*`→auth | `components/*`→ui | `deploy/*/.github/*`→deploy | `docs/*`→docs
 
-## Examples
-```bash
-git diff --cached --stat
-feat(api): add user search endpoint   # fuzzy match + pagination; Resolves #142
-fix(auth): handle nil token on refresh # root cause: omitted nil check after decode; +integration test
-refactor(db): extract query builder   # moves 340 lines store.go→sqlbuilder; tests pass
-perf(cache): reduce TTL lookups by 60% # 2.3ms/op→0.9ms/op (benchstat p<0.01)
-feat(config)!: switch to env-only credentials # BREAKING CHANGE: .credentials.json no longer read
-```
-
-## Edge Cases
-| Edge Case | Handling |
-|---|---|
-| Mixed-type diff | Split per type; never combine `feat` + `fix` |
-| No scope match | Parent directory name; root → no scope |
-| Empty body | OK for trivial; required for `feat`/`fix`/`perf` |
-| Breaking in non-feat | `fix!`/`refactor!` valid; always add `BREAKING CHANGE:` footer |
-
 ## Anti-Patterns
 `feat: fix bug` (type contradicts intent) · 80-char subject (truncated) · Explaining HOW · `update file.go` (vague) · Skipping scope · Redundant phrasing
 
 ## Refs
 judgment-day · quality-gate · work-unit-commits
+## Reference
+> docs/skills/commit-crafter/reference.md

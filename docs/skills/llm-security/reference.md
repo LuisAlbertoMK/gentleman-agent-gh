@@ -85,3 +85,27 @@ expect(r).not.match(/root:|key|sec|pwd/i)
 
 1. **"Just text" = safe** — LLM output executes as HTML/JS/MD; always sanitize
 2. **Skip RAG ACL "internal"** — Insider/compromised = total leak; enforce per-query filters
+
+## Externalized Sections (ADR-007 compression)
+## SCAN DIMENSIONS
+### Chat/Completion
+- `grep -rn "openai\|anthropic\|ollama\|ChatOpenAI\|generateText" --include="*.{ts,js,py,go}"`
+- `grep -rn "messages\.push\|role.*user" --include="*.{ts,js,py,go}"` → input sanitized?
+- `grep -rn "system.*message\|systemPrompt\|system_prompt" --include="*.{ts,js,py,go}"` → leakage in errors?
+
+### RAG Pipeline
+- `grep -rn "retrieval\|embedding\|vector.*search\|similarity\|chunk" --include="*.{ts,js,py,go}"` → per-user ACL?
+- `grep -rn "pinecone\|weaviate\|chroma\|qdrant\|pgvector" --include="*.{ts,js,py,go}"` → namespace isolation?
+
+### Tool Use / Agents
+- `grep -rn "tool.*call\|function.*call\|tools.*=" --include="*.{ts,js,py,go}"` → privilege boundaries?
+- `grep -rn "execute.*command\|invoke.*tool" --include="*.{ts,js,py,go}"` → sandboxing/rate limit?
+
+### Output Handling
+- `grep -rn "innerHTML\|dangerouslySetInnerHTML" --include="*.{ts,js,jsx,tsx,vue}"` → XSS via LLM output
+- `grep -rn "console\.log.*prompt\|logger.*prompt" --include="*.{ts,js,py,go}"` → PII in logs
+
+### Config
+- `grep -rn "temperature\|max_tokens\|model.*=" --include="*.{ts,js,py,yaml,yml}"` → bounds/pinning
+
+

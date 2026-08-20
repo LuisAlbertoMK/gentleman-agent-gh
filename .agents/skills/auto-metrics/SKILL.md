@@ -5,21 +5,11 @@ triggers: "!score, !metrics, explicit score/metric request, session end via !clo
 changelog: docs/ciclos/cycle28-20260815.md
 ---
 ## When to Use
-Only run on explicit request (!score, !metrics, !close) or user asking for score.
-NOT automatic after every task — eliminated to reduce ceremony for trivial changes.
-
+Only on explicit request (!score, !metrics, !close). NOT automatic after every task.
 ## PRE-FLIGHT (HARD GATE)
-If `.learnings/bias-calibration.json` exists with `samples >= 2`:
-- Check bitácora for today's audit entry (`[audit] {today}`)
-- If no audit found: **FAIL** — "no audit today — scoring without bias correction is forbidden. Run !audit first."
-- This is a HARD gate. Do NOT skip. Do NOT score without audit if biases exist.
-
+If `.learnings/bias-calibration.json` exists with `samples >= 2`: check bitácora for `[audit] {today}`. None → **FAIL** — run !audit first. Never score without audit if biases exist.
 ## CORRECTION (if audit available)
-1. Subtract each dim's avg offset from self-score BEFORE threshold checks
-2. Log: "Bias corrected: {dim}={offset}"
-3. Then check thresholds (<7→immune, ≥9→mem_save)
-4. Update calibration: append today's self/audit pair
-
+1. Subtract each dim's avg offset from self-score BEFORE thresholds 2. Log `Bias corrected: {dim}={offset}` 3. Thresholds (<7→immune, ≥9→mem_save) 4. Append today's self/audit pair
 ## 7 Dimensions (1-10)
 | Dim | 1-3 | 4-6 | 7-9 | 10 |
 |-----|-----|-----|-----|----|
@@ -30,23 +20,12 @@ If `.learnings/bias-calibration.json` exists with `samples >= 2`:
 | Speed | >5 wasted | Back-forth | Efficient | 0 redundant |
 | Breadth | 1 dim | 2-3 dims | All relevant | +unexpected |
 | SkillEval | No baseline | <10% delta | >=10% | >=20% +mem_save |
-
 ## ACTION
 ≥8 Maintain · 6-7.9 Light review · 4-5.9 Improve+immune+dream · <4 Full stop+root cause
-
 ## STORAGE
 `mem_save(type="learning", title="auto-score:{task}", content="Correctness:X|Tokens:X|...|Avg:X.X|Pattern:{what}")`
-
 ## TREND (every 10 or session end)
-`mem_search(query="auto-score:", limit=20)` → per-dim means, compare prev(5) vs recent(5). Dim drop >0.5 → immune-system. Avg<6 → gap analysis.
+`mem_search(query="auto-score:", limit=20)` → per-dim means, prev(5) vs recent(5). Drop >0.5 → immune-system. Avg<6 → gap analysis.
 ---
-
-## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-007).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Testing Patterns, Edge Cases, Anti-Patterns, Quick Reference**
-  → docs/skills/auto-metrics/reference.md
-
+docs/skills/auto-metrics/reference.md
 ---

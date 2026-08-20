@@ -35,3 +35,20 @@ MEDIUM:[seo] title 42 chars → 50-60
 
 3. **Severity buckets** — report lists CRITICAL/HIGH/MEDIUM/LOW; a passing pre-deploy gate shows 0 CRITICAL + 0 HIGH:
    Expected: gate blocks on any CRITICAL/HIGH (CI/CD section).
+
+## Categories — Detail & Fixes
+**Perf(30%)**: WebP/AVIF, code-split, font-display:swap, preconnect, preload LCP, lazy, scheduler.yield(), transform+opacity. Fix LCP>2500 → `<link rel=preload as=image href=hero.webp fetchpriority=high>`; CLS>0.1 → `img{width:100%;height:auto;aspect-ratio:16/9}`; INP>200 → `await scheduler.yield()` in handlers.
+**A11y(20%)**: alt, contrast 4.5:1, captions, keyboard, focus 2px, skip, touch. EAA2025: theme contrast per variant, reduced-motion, focus all themes. No `dense` on interactive. Fix contrast<4.5 → `--text:oklch(0.2 0 0)`.
+**Responsive(15%)**: CQ `inline-size` not `size`; `repeat(auto-fit,minmax(280px,1fr))`; `clamp()` + vw(page)/cqi(containers); Subgrid; MQ=page, CQ=components.
+**Animation(10%)**: transform+opacity only; 3 easing max; ≤500ms total, <200ms/element; scroll-driven `animation-timeline`; prefers-reduced-motion; no decorative.
+**Design Tokens(10%)**: OKLCH>HSL/RGB; 8pt; 3-tier (Primitive→Semantic→Component); `clamp()` fluid; `light-dark()`/OKLCH inversion dark; ≥4.5:1 per theme.
+**SEO(15%)**: robots.txt·sitemap·canonical·title 50-60·meta 150-160·H1·HTTPS·mobile·JSON-LD. See **seo**.
+**Best Practices(15%)**: HTTPS·`npm audit`·CSP·DOCTYPE·UTF-8·clean console·contextual permissions·301·no broken links.
+
+## Externalized Sections (ADR-007 compression)
+## Thresholds (value→why)
+LCP<2500ms→load p75|CLS<0.1→stability p75|INP<200ms→responsiveness p75|FID<100ms→legacy delay|TBT<200ms→lab INP proxy|FCP<1800ms→first paint|TTFB<800ms→server latency|contrast≥4.5:1→WCAG AA text|touch≥24×24(rec44)→WCAG 2.5.8|anim<200ms/elem→no lag
+
+## Categories
+Perf(30%): WebP/AVIF, code-split, font-display:swap, preconnect, preload LCP, lazy, scheduler.yield | A11y(20%): alt, contrast 4.5:1, captions, keyboard, focus 2px, skip, touch; EAA2025 theme contrast + reduced-motion | Responsive(15%): CQ `inline-size`, auto-fit minmax(280px,1fr), clamp(), Subgrid; MQ=page, CQ=components | Animation(10%): transform+opacity, ≤500ms, <200ms/elem, scroll-driven, reduced-motion | Tokens(10%): OKLCH, 8pt, 3-tier, light-dark() | SEO(15%): robots, sitemap, canonical, title 50-60, meta 150-160, H1, JSON-LD → **seo** | Best Practices(15%): HTTPS, npm audit, CSP, DOCTYPE, UTF-8, 301
+

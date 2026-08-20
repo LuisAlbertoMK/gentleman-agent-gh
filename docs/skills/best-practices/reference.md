@@ -127,3 +127,19 @@ Applying `X-Frame-Options: DENY` breaks legitimate iframe embeds (payment widget
 ```powershell
 $nonce = [Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(16))
 ```
+
+## Externalized Sections (ADR-007 compression)
+## Browser Compat
+<!DOCTYPE html> | meta charset="UTF-8" (first in head) | viewport meta | Feature detect, not UA sniff | Build-time polyfill (Babel), NOT third-party CDN (polyfill.io compromised 2024)
+
+## Deprecated
+document.write() -> dynamic script | Sync XHR -> fetch() | AppCache -> Service Workers | Non-passive touch/wheel -> {passive:true}
+
+## Console & Errors
+No console.log in prod. Error tracking (Sentry/Bugsnag). React: ErrorBoundary. Global: error+unhandledrejection handlers.
+
+## Source Maps
+Prod: sourcemap:hidden(Vite)/devtool:hidden-source-map. Strip sourcesContent from tracker uploads.
+
+## Audit: HTTPS | npm audit clean | CSP | Trusted Types | SRI | HSTS+headers | no deprecated APIs | passive listeners | no console errors | valid HTML | error handling | no interstitials
+

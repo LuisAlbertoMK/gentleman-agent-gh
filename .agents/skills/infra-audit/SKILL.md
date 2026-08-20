@@ -8,18 +8,6 @@ changelog: docs/ciclos/cycle28-20260815.md
 ## When to Use
 Reviewing infrastructure (Terraform, Docker, K8s, CI/CD, Helm, Ansible, CloudFormation). Progressive scan: audit what's present, report what's missing.
 
-## SCAN DIMENSIONS (progressive — audit what's present)
-
-**Terraform**: `grep -rn "^resource\|^data\|^module\|backend\|state" --include="*.tf"` → remote state, typed vars, minimal perms
-
-**Docker**: `grep -rn "FROM\|latest" --include="Dockerfile*"` → pinned versions, non-root, multi-stage
-
-**K8s** (BOTH .yaml AND .yml): `grep -rn "securityContext\|resources\|limits\|privileged\|cap_add\|livenessProbe\|readinessProbe\|NetworkPolicy\|ingress" --include="*.yaml" --include="*.yml"`
-
-**CI/CD** (multi-system): `grep -rn "secrets\.\|GITHUB_TOKEN\|CI_JOB_TOKEN\|GITLAB_TOKEN\|permissions:\|uses:\|image:" --include="*.yml"`
-
-**Helm/Ansible/CF**: `grep -rn "securityContext\|resources\|become:\|AWSTemplateFormatVersion" --include="*.yaml" --include="*.yml" --include="values.*"`
-
 ## CHECKLIST
 | Check | Sev |
 |-------|-----|

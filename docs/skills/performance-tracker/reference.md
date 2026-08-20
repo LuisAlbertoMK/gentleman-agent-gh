@@ -335,6 +335,23 @@ mem_save -title "perf-score:myapp-web" -content "...|**Platform**:web|**Avg**:5.
 
 ---
 
+## 6 Dimensions (1-10)
+| Dim | 9-10 | 7-8 | 5-6 | 3-4 | 1-2 |
+|---|---|---|---|---|---|
+| **Load** | M<1.5s/D<1s/W LCP<1.5 TTI<2 | <2.5/<2/<2.5/<3.5 | <4/<3.5/<4/<5 | <6/<5/<6/<7 | >6/>5/>6/>7 |
+| **Render** | 60fps/0drop/CLS<0.1 INP<200 | 55fps/<2%/<0.25 <350 | 45fps/<5%/<0.5 <500 | 30fps/<10%/<0.75 <700 | <30fps/freeze/>0.75 >700 |
+| **Memory** | <50MB/<100/<30 | <100/<200/<60 | <200/<400/<100 | <350/OOM/<800/<200 | >350/>800/>200 |
+| **Network** | p95<200ms payload<50KB cache>80% | <500ms/<150KB/>60% | <1s/<500KB/>40% | <2s/<1MB/>20% | >2s/>1MB/<20% |
+| **Bundle** | APK<30MB/S<50MB/JS<100KB | <50/<100/<200 | <80/<200/<400 | <120/<400/<800 | >120/>400/>800KB |
+| **Energy** | 1%/hr CPU<10% / idle<2% | 2%/hr<20% / <5% | 4%/hr<30% / <10% | 8%/hr<50% / <20% | >8%/>50%/>20%/const |
+
+## Quick Checks
+```powershell
+Get-ChildItem build/static/js/*.js -Recurse | Measure-Object -Property Length -Sum
+npx lighthouse http://localhost:3000 --output json | ConvertFrom-Json | Select-Object -ExpandProperty categories
+Get-ChildItem build/static/js/*.js | Sort-Object Length -Descending | Select-Object -First 5 Name, @{N="KB";E={$_.Length/1KB -as [int]}}
+```
+
 ## Cross-Refs: auto-metrics | gap-analysis | web-quality-audit | performance | metricas
 
 

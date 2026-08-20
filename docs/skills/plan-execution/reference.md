@@ -251,3 +251,18 @@ Use when: External contracts, schema evolution, multi-service.
 - Blocked tasks + reasons
 - Current branch state
 - Hypothesis for root cause
+
+## Externalized Sections (ADR-007 compression)
+## VERIFICATION GATES (auto-detect language)
+| If present | Run |
+|------------|-----|
+| package.json | `npm test` / `npm run lint` / `npx tsc --noEmit` |
+| pyproject.toml / setup.py | `pytest` / `flake8` / `mypy` |
+| go.mod | `go test ./...` / `golangci-lint run` |
+| Cargo.toml | `cargo test` / `cargo clippy` |
+| pom.xml / build.gradle | `mvn test` / `gradle test` |
+| Makefile | `make test` (if target exists) |
+
+Single task timeout: 5 min. If exceeded → escalate.
+
+

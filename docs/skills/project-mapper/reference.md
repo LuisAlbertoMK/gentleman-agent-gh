@@ -331,3 +331,31 @@ mem_save(
 | > 1000       | 1-2   | Top-level only| Ask       |
 
 **Confidence thresholds**: High ≥ 0.8, Medium 0.5-0.8, Low < 0.5 (report all)
+
+## Architecture Detection
+| Pattern | Structure Signal | Confidence |
+|---|---|---|
+| Go Standard Layout | `internal/`, `pkg/`, `cmd/` | High |
+| Hexagonal / Clean | `src/domain/`, `application/`, `infrastructure/` | High |
+| Atomic Design | `components/atoms/`…`pages/` | High |
+| MVC | `app/Models/`, `Controllers/`, `Views/` | High |
+| Service Layer | `services/`, `repositories/`, `models/` | Medium |
+| Feature-Based | `src/features/{feature}/` | Medium |
+| Module-Based | `src/modules/{module}/` | Medium |
+| Layered | `presentation/`, `business/`, `data/` | Medium |
+| Microkernel | `core/`, `plugins/`, `extensions/` | Low |
+| Event-Driven | `events/`, `handlers/`, `projections/` | Medium |
+
+## Output Format
+```
+## Project Map: {name}
+### Classification: Tech Layer + Business Type
+### Tech Stack: Lang | Framework | DB | Test | CI
+### Architecture: {pattern}
+{path} -> {role}
+### Dependency Graph
+{src} -> {dest}
+### Module Counts: Layer | Files | Lines | Total
+### Quick Stats: Tests (N, X%), Lint, Docker size
+### Suggested -> gap-analysis with {template}
+```

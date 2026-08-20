@@ -154,6 +154,19 @@ Rationale: CTT is a transfer tool, not an analysis tool
 
 ---
 
+## Domain Model
+| Layer | Source (6.x/AMS) | Target (Cloud Service) | Artifact |
+|---|---|---|---|
+| Content | CRX/DE package, node store | CTT v3.0 migration set | `04-migration-set/` |
+| Code | Felix console | Cloud Manager CI/CD | `ui.apps`/`ui.content` |
+| Dialogs | ExtJS (Coral 2) | Granite UI `_cq_dialog/` (Coral 3) | extjs-to-coral3 mapping |
+| Components | JSP/Sling taglibs | HTL/Sightly | `@Model` Sling Models |
+| Datasources | `optionsProvider` servlet | `datasource` + JSON servlet | Sling ResourceType servlet |
+| Data layer | `digitalData.*` | ACDL/XDM/Web SDK | `adobe.dl`, `datastream` |
+| Tags | Launch property | AEP Tags property | Library→Environment→Publish |
+| Analytics | AppMeasurement.js | Web SDK extension | `data`↔XDM mapping |
+| Debug | CRXDE, Felix | RDE, Query Perf, AEP Debugger | logs, `/system/console/*`, `arc.*` |
+
 ## Deep Reference Materials (in `references/reference.md`)
 
 - ExtJS → Coral 3 field mapping table (50+ fields)
@@ -162,3 +175,10 @@ Rationale: CTT is a transfer tool, not an analysis tool
 - Servlet skeleton for `optionsProvider` → `datasource` migration
 - AppMeasurement → Web SDK migration decision tree
 - Query optimization patterns (oak:index definitions)
+
+## Workflow Detail
+1. **Pre-Flight** — BPA→CAM→Pattern Detector→Gap inventory+ICE+blast radius. STOP on Alto gaps.
+2. **CTT** — Revision cleanup→disk check→CAM extract/ingest→max 10 sets/project→verify render.
+3. **Code/Migration** — ExtJS→Coral 3 (rename, multifield→composite, optionsProvider→datasource); Sling Models (@Model+injectors, register resourceTypes).
+4. **Tags/Data/Analytics** — Launch→AEP Tags, digitalData→ACDL/XDM, AppMeasurement→Web SDK (3 paths, no mixed mode).
+5. **Debugging** — Logs, bundles, components, Models, Query Perf, RDE, AEP Debugger. Slow-query: @Type index, path scoping, jcr:contains.
