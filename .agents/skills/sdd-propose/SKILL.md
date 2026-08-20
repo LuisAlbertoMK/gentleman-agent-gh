@@ -7,7 +7,7 @@ changelog: docs/ciclos/cycle28-20260815.md
 
 > **ORCHESTRATOR GATE**: `skill()` → ORCHESTRATOR STOP. Delegate to `sdd-propose` sub-agent. Executor: execute directly.
 
-Change name, exploration analysis OR user description, store mode (`engram|openspec|hybrid|none`).
+Input: change name, exploration analysis OR user description, store mode (`engram|openspec|hybrid|none`).
 
 | Mode | Behavior |
 |---|---|
@@ -15,91 +15,47 @@ Change name, exploration analysis OR user description, store mode (`engram|opens
 | `openspec` | Follow `openspec-convention.md` |
 | `hybrid` | Both (Engram primary + filesystem) |
 | `none` | Return only |
+
 Never force `openspec/` unless requested or `hybrid`.
 
-### 0: Interactive Proposal Shaping
-Offer question round before finalizing (3-5 questions/round). Cover:
-1. Business problem — why now
-2. Target users — who, workflow, urgency
-3. Business rules — policies, permissions, compliance
-4. Product outcome — what becomes possible
-5. Current-state gap — what's wrong/missing
-6. Impact — teams, data, UX, support
-7. Edge cases — empty states, failures, migrations
-8. Decision gaps — unknowns risking ambiguity
-9. Scope boundaries — v1 vs deferred vs unchanged
-10. Business risk — worst downside if wrong
-Summarize assumptions. Offer corrections or round 2. If blocked from asking, write `## Proposal question round` in result.
+### 0: Shaping
+Question round before finalizing (3-5/round): business problem, target users, business rules, product outcome, current-state gap, impact, edge cases, decision gaps, scope boundaries, business risk. Summarize assumptions; offer corrections or round 2. Blocked → `## Proposal question round` in result.
 
-### 1: Load Skills → §A of `sdd-phase-common.md`
+### 1: Load Skills → §A `sdd-phase-common.md`
 ### 2: Create Directory
-- openspec/hybrid: `openspec/changes/{change}/proposal.md`
-- engram/none: skip
+openspec/hybrid: `openspec/changes/{change}/proposal.md` · engram/none: skip
 ### 3: Read Specs (openspec/hybrid: `openspec/specs/`)
 ### 4: Write proposal.md
 ```markdown
 # Proposal: {Change Title}
-
 {Problem. Why now. User need or tech debt.}
-
 ### In Scope - {Deliverable}
 ### Out of Scope - {Excluded / deferred}
-
 > Contract with sdd-spec. Research `openspec/specs/` first.
 ### New Capabilities - `<name>`: <description>
 ### Modified Capabilities - `<name>`: <what changes>
-
 {Technical approach. Reference exploration if available.}
-
 | Area | Impact | Description |
-|---|---|---|
 | `path` | New/Mod/Removed | {What changes} |
-
 | Risk | Likelihood | Mitigation |
-|---|---|---|
 | {Risk} | Low/Med/High | {Mitigation} |
-
 {Specific revert steps.}
-
 - {Deps if any}
-
 - [ ] {Measurable outcome}
 ```
-**Budget**: <450 words. Bullets/tables over prose. If no spec changes, write "None" in both Capabilities subsections.
+**Budget**: <450 words; bullets/tables > prose. No spec changes → "None" in both Capabilities.
 
-### 5: Persist — §C of `sdd-phase-common.md`: artifact `proposal`, topic_key `sdd/{change}/proposal`, type `architecture`
-
+### 5: Persist — §C: artifact `proposal`, topic_key `sdd/{change}/proposal`, type `architecture`
 ### 6: Return
 ```markdown
-
 **Change**: {name}
 **Location**: `openspec/changes/{name}/proposal.md` | Engram `sdd/{name}/proposal` | inline
 - **Intent**: {one-liner} | **Scope**: {N in, M deferred}
 - **Approach**: {one-liner} | **Risk**: {Low/Med/High}
 Ready for sdd-spec or sdd-design.
 ```
-
-- `openspec` mode: always create `proposal.md`; Exists already: read → update
-- Every proposal: rollback plan + success criteria; Concrete file paths in Affected Areas
-
-## Examples
-- **Feature (openspec)**: JWT refresh rotation — In/Out scope, Affected Areas table, Risk\|Mitigation, revert env var, success criteria
-- **Tech debt (hybrid)**: Event bus → typed channels — compile-time contracts, migration adapters, feature-flag revert
-- **Bug (engram)**: Cache invalidation race — move invalidation past DB commit hook, idempotency keys
-- **Architectural (none)**: Feature flag framework — in-mem eval, centralized config, audit trail
-- **Migration (openspec)**: DB schema v2 zero-downtime — online schema change, batch 1000, row-count reconciliation
-
-## Testing Patterns
-- **Contract validation**: assert all sections present (In/Out Scope, Affected Areas, Risk table, Revert, success criteria); `<450 words`; tables > prose
-- **Mode verification**: openspec→`openspec/changes/{change}/proposal.md` exists; engram→`sdd/{change}/proposal` topic_key; none→returns inline, no persistence
-- **Interactive shaping**: 3-5 questions across 10 categories; writes `## Proposal question round` marker when blocked from asking
-
-## Edge Cases
-- Exploration missing/corrupted → continue with user description, log warning, note in proposal (exploration is optional)
-- Existing proposal (openspec) → read→merge, preserve `<!-- USER_EDIT -->` sections, add changelog entry
-- Spec conflict → detect during `openspec/specs/` research, add `## Spec Conflict Warning`, escalate to orchestrator (NO auto-resolve)
-- Pure deletion → In Scope lists removals, New Capabilities "None", Modified uses "→ Removed"
+`openspec` mode: always create `proposal.md`; exists → read → update. Every proposal: rollback plan + success criteria; concrete paths in Affected Areas.
 
 ## Anti-Patterns
-- **Over-specification**: no pseudo-code, signatures, or algorithms — proposal owns *what/why*, sdd-spec owns *how*; blocks design alternatives
-- **Vague scope**: In/Out of Scope must list concrete paths — "Improve auth" is unverifiable vs "JWT issuer, refresh flow, rate limiting"
+- **Over-specification**: no pseudo-code/signatures/algorithms — proposal owns what/why, sdd-spec owns how
+- **Vague scope**: In/Out must list concrete paths — "Improve auth" unverifiable vs "JWT issuer, refresh flow, rate limiting"

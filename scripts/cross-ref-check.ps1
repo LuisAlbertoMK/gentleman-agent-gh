@@ -311,9 +311,10 @@ try {
         $gateContent = Get-Content $gatePath -Raw -Encoding UTF8
 
         # Extract semi-agent allows: "xxx *" → xxx; "exact": "allow" → exact command
+        # NOTE: linear-time pattern (no nested quantifier) — avoids catastrophic backtracking on long lines
         $semiAllow = @(
-            [regex]::Matches($semiContent, '"((?:\w+[ -]?)+) \*":\s*"allow"') | ForEach-Object { $_.Groups[1].Value }
-            [regex]::Matches($semiContent, '"((?:\w+[ -]?)+)":\s*"allow"')   | ForEach-Object { $_.Groups[1].Value }
+            [regex]::Matches($semiContent, '"([A-Za-z0-9_.-]+(?: [A-Za-z0-9_.-]+)*) \*":\s*"allow"') | ForEach-Object { $_.Groups[1].Value }
+            [regex]::Matches($semiContent, '"([A-Za-z0-9_.-]+(?: [A-Za-z0-9_.-]+)*)":\s*"allow"')   | ForEach-Object { $_.Groups[1].Value }
         )
         # Extract gate patterns: command name after '^ (word chars, dots, hyphens)
         $gatePatterns = [regex]::Matches($gateContent, "'\^([a-zA-Z][a-zA-Z0-9._-]+)") | ForEach-Object { $_.Groups[1].Value }

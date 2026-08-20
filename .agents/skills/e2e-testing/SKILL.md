@@ -5,52 +5,20 @@ triggers: test, e2e, playwright, browser testing, interactive testing, form test
 changelog: docs/ciclos/cycle28-20260815.md
 ---
 
-# E2E Testing Skill
-
-Hybrid: **simple scripts** for quick checks + **Playwright test runner** for comprehensive testing.
-
 ## When to Use
-Use for browser-level verification of user flows: smoke tests, form validation, login/dashboard flows, and visual regression. Prefer **Quick Mode** for fast smoke checks with no setup; use **Full Mode** for CI pipelines, assertions, and screenshot comparisons.
+Browser-level verification of user flows: smoke tests, form validation, login/dashboard flows, visual regression. **Quick Mode** for fast smoke checks; **Full Mode** for CI pipelines, assertions, screenshots.
 
-## Quick Mode (Simple Scripts)
-
-### Flags
-- `--url` / `-u` — URL to test (required)
-- `--actions` / `-a` — Comma-separated actions
-- `--headed` — Open browser visually
-- `--analyze` — Ollama analysis on final screenshot
-- `--model` / `-m` — Ollama model (default: moondream:latest)
-- `--screenshot` / `-s` — Filename for final screenshot
-
-### Commands
+## Quick Mode (e2t CLI)
+Flags: `--url/-u` (required) · `--actions/-a` comma-separated · `--headed` · `--analyze` (Ollama on final screenshot) · `--model/-m` (default moondream:latest) · `--screenshot/-s`.
 ```powershell
 e2t http://localhost:3000 --actions "click:#login"
-e2t http://localhost:3000 --actions "click:#login" --headed
 e2t http://localhost:3000 --actions "fill:#email=test,fill:#pass=test,click:#submit"
 e2t http://localhost:3000 --actions "click:#login" --analyze
 ```
-
-### Action Syntax
-```
-click:#selector          — Click element
-fill:#selector=value     — Fill input (use = as separator)
-type:#selector=value     — Type text
-select:#selector=value   — Select dropdown
-wait:#selector           — Wait for element
-wait:1000                — Wait N ms
-screenshot:name.png      — Take screenshot
-```
+Action syntax: `click:#sel` · `fill:#sel=value` · `type:#sel=value` · `select:#sel=value` · `wait:#sel` / `wait:1000` · `screenshot:name.png`.
 
 ## Full Mode (Playwright Test Runner)
-
-### Structure
-```
-tests/e2e/
-  login.spec.js        — Login flow tests
-  dashboard.spec.js    — Dashboard tests
-```
-
-### Example
+Structure: `tests/e2e/login.spec.js`, `dashboard.spec.js`.
 ```javascript
 const { test, expect } = require('@playwright/test');
 test('login flow', async ({ page }) => {
@@ -60,35 +28,18 @@ test('login flow', async ({ page }) => {
   await expect(page).toHaveURL(/dashboard/);
 });
 ```
-
-### Run
-```bash
-npx playwright test                    # All tests
-npx playwright test tests/e2e/login.spec.js  # Specific
-npx playwright test --ui               # With UI
-npx playwright show-report             # View report
-```
+Run: `npx playwright test` | `npx playwright test tests/e2e/login.spec.js` | `--ui` | `npx playwright show-report`.
 
 ## When to Use Which
 | Scenario | Mode | Why |
-|----------|------|-----|
+|---|---|---|
 | Quick smoke test | Simple | Fast, no setup |
 | Form validation | Simple | Interactive actions |
 | CI/CD pipeline | Full | Assertions, reporting |
 | Visual regression | Full | Screenshot comparisons |
 
 ## Requirements
-- Playwright: `npm install -D playwright`
-- Chromium: `npx playwright install chromium`
-- Ollama (optional): For AI analysis
----
+Playwright: `npm install -D playwright` · Chromium: `npx playwright install chromium` · Ollama (optional): AI analysis.
 
-## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-007).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Testing Patterns, Edge Cases, Anti-Patterns, Quick Reference**
-  → docs/skills/e2e-testing/reference.md
-
----
+## Reference
+Worked examples, testing patterns, edge cases, anti-patterns → docs/skills/e2e-testing/reference.md
