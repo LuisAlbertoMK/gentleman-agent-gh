@@ -1,6 +1,6 @@
 # ADR-033: Simplificar modos de permiso — eliminar `semi`, quedar `manual` + `auto`
 
-- **Status**: Proposed (pending benchmark E2E + user apply to opencode.json)
+- **Status**: Accepted (2026-08-20: benchmark E2E passed, user applied cleanup to global opencode.json, 5 semi agents removed)
 - **Deciders**: gentleman-vMK (propuesta autónoma)
 - **Date**: 2026-08-19
 - **Tier**: T2 — permission-mode architecture, multi-file (config + gate + switch)

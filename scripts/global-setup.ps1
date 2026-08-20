@@ -50,8 +50,16 @@ function Sync-File {
             Add-Result $Label "OK" "Already up to date";return
         }
     }
-    Copy-Item -LiteralPath $Source -Destination $Dest -Force
-    Add-Result $Label "SYNCED" "Copied to $Dest"
+    try {
+        Copy-Item -LiteralPath $Source -Destination $Dest -Force -ErrorAction Stop
+        Add-Result $Label "SYNCED" "Copied to $Dest"
+    } catch [System.Management.Automation.ActionPreferenceStopException] {
+        if($_.Exception.Message -match 'with itself'){
+            Add-Result $Label "OK" "Source and destination are the same file — skipped"
+        } else {
+            Add-Result $Label "FAIL" $_.Exception.Message
+        }
+    }
 }
 
 # 1. Sync AGENTS.md
