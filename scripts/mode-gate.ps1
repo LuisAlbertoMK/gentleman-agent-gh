@@ -81,6 +81,7 @@ if (-not $Mode) {
 }
 
 # --- ADR-033: 'semi' mode DEPRECATED → remap to 'auto' with warning ---
+$originalMode = $Mode
 if ($Mode -eq 'semi') {
     Write-Warning "'semi' mode is DEPRECATED (ADR-033: simplified to manual|auto). Remapping to 'auto' — suffixed -semi agents still accepted for backward compat but auto routing preferred."
     $Mode = 'auto'
@@ -120,9 +121,12 @@ if ($isReadOnly) {
 } elseif ($Mode -eq 'manual') {
     $modeOk = -not $hasSuffix  # No suffix allowed in manual
 } elseif ($Mode -eq 'auto') {
-    $modeOk = $TargetAgent -match '-auto$'
-} elseif ($Mode -eq 'semi') {
-    $modeOk = $TargetAgent -match '-semi$'
+    if ($originalMode -eq 'semi') {
+        # ADR-033 backward compat: an explicit -semi request stays honored after the remap
+        $modeOk = $TargetAgent -match '-semi$'
+    } else {
+        $modeOk = $TargetAgent -match '-auto$'
+    }
 }
 
 # --- Read-only and SDD sub-agents are always allowed ---
@@ -183,7 +187,7 @@ if (-not $modeOk -and $Mode -ne 'manual' -and -not $isReadOnly -and -not $hasSuf
 # --- Build result ---
 $result = [PSCustomObject]@{
     action          = 'mode-gate'
-    mode            = $Mode
+    mode            = $originalMode
     target_agent    = $TargetAgent
     expected_suffix = $expectedSuffix
     allowed         = $modeOk

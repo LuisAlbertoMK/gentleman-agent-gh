@@ -120,7 +120,9 @@ Validates the agent section contains the full expected set: gentleman-*,
         return @($failures)
     }
 
-    $names = @($Config.agent.PSObject.Properties.Name)
+    # 'default' is the subagent-depth config namespace (agent.default.depth), not an
+    # agent — the JS generator's semantic compare also excludes it. Count real agents.
+    $names = @($Config.agent.PSObject.Properties.Name | Where-Object { $_ -ne 'default' })
     $gentleman = @($names | Where-Object { $_ -like 'gentleman*' })
     $sdd       = @($names | Where-Object { $_ -like 'sdd*' })
     $orch      = @($names | Where-Object { $_ -eq 'gentle-orchestrator' })

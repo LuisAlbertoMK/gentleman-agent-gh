@@ -1,8 +1,5 @@
 ﻿#requires -Version 5.1
-<<<<<<< HEAD
-=======
 [CmdletBinding(SupportsShouldProcess=$true)]
->>>>>>> experimento/mejora-autonoma-2026-08-19
 <#
 .SYNOPSIS
     Gentleman-ize any project — generate opencode.json from the SSoT chain

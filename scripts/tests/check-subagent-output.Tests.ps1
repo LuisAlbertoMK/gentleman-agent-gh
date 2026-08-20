@@ -112,6 +112,22 @@ Describe "check-subagent-output.ps1 — contract validation flag in Quiet mode (
         $scriptPath = Join-Path (Split-Path $PSScriptRoot -Parent) 'check-subagent-output.ps1'
     }
 
+    BeforeEach {
+        # Hermetic fixture: temp git repo with a committed base file + an untracked
+        # file. The script fail-closes (exit 1, status=FAIL) on an EMPTY diff, so it
+        # needs visible changes to reach contract validation — a real-repo dependency
+        # made these tests flaky depending on CI working-tree state.
+        $script:fixtureRepo = Join-Path $TestDrive 'repo'
+        New-Item -ItemType Directory -Path $script:fixtureRepo -Force | Out-Null
+        git -C $script:fixtureRepo init -q
+        git -C $script:fixtureRepo config user.email "test@example.com"
+        git -C $script:fixtureRepo config user.name "Test"
+        Set-Content -Path (Join-Path $script:fixtureRepo 'base.txt') -Value 'base'
+        git -C $script:fixtureRepo add .
+        git -C $script:fixtureRepo commit -q -m "base"
+        Set-Content -Path (Join-Path $script:fixtureRepo 'untracked.txt') -Value 'change'
+    }
+
     It "reports contract_valid=true for well-formed output" {
         $valid = "## Decision Taken`nFix C4d`n## Files Changed`nsrc/x.ts`n## Key Findings`n1. [HIGH] f`n## Nuance`nok"
         $tmpFile = Join-Path $TestDrive 'agent_out.txt'
@@ -120,7 +136,7 @@ Describe "check-subagent-output.ps1 — contract validation flag in Quiet mode (
         # child script via -File, instead of double-interpolating the agent output
         # inside a -Command string (which corrupts content containing quotes/`/'$').
         $content = Get-Content -Raw -Path $tmpFile
-        $json = & pwsh -NoProfile -File $scriptPath -Quiet -AgentOutput $content | ConvertFrom-Json -ErrorAction SilentlyContinue
+        $json = & pwsh -NoProfile -File $scriptPath -RepoRoot $script:fixtureRepo -Quiet -AgentOutput $content | ConvertFrom-Json -ErrorAction SilentlyContinue
         $json.contract_valid | Should -BeTrue
     }
 
@@ -130,7 +146,7 @@ Describe "check-subagent-output.ps1 — contract validation flag in Quiet mode (
         Set-Content -Path $tmpFile -Value $bad -NoNewline
         $content = Get-Content -Raw -Path $tmpFile
         # SAFE transport: see note in the well-formed test above.
-        $json = & pwsh -NoProfile -File $scriptPath -Quiet -AgentOutput $content | ConvertFrom-Json -ErrorAction SilentlyContinue
+        $json = & pwsh -NoProfile -File $scriptPath -RepoRoot $script:fixtureRepo -Quiet -AgentOutput $content | ConvertFrom-Json -ErrorAction SilentlyContinue
         $json.contract_valid | Should -BeFalse
     }
 }

@@ -63,7 +63,9 @@ param(
     [int]$MaxWaitSec        = 300,
     [string]$CompletionCallback = "",
     [string]$TaskId             = "",
-    [switch]$WriteResultFile
+    [switch]$WriteResultFile,
+    [switch]$DryRun,
+    [switch]$Force
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -192,6 +194,11 @@ function Get-CheckSnapshot {
 }
 
 # --- Main poll loop ---
+if ($DryRun) {
+    [Console]::Error.WriteLine("[monitor][DryRun] would monitor: BaseRef=$BaseRef result=$resultFile poll=${PollIntervalSec}s max=${MaxWaitSec}s")
+    Write-Output "dry-run: no polling performed (BaseRef=$BaseRef)"
+    exit 0
+}
 [Console]::Error.WriteLine("[monitor] started: BaseRef=$BaseRef result=$resultFile poll=${PollIntervalSec}s max=${MaxWaitSec}s")
 Write-Progress -Activity "async monitor ($BaseRef)" -Status "started" -PercentComplete 0
 
@@ -203,6 +210,9 @@ if ($TaskId) {
         New-Item -ItemType Directory -Path $learningsDir -Force -ErrorAction SilentlyContinue | Out-Null
     }
     $pidFile = Join-Path $learningsDir "async-monitor-$TaskId.pid"
+    if ((Test-Path -LiteralPath $pidFile -ErrorAction SilentlyContinue) -and -not $Force) {
+        [Console]::Error.WriteLine("[monitor] WARNING: stale PID file exists ($pidFile) — pass -Force to suppress this warning")
+    }
     try {
         Set-Content -Path $pidFile -Value $PID -Encoding UTF8 -ErrorAction Stop
         [Console]::Error.WriteLine("[monitor] pid=$PID -> $pidFile")

@@ -38,6 +38,8 @@ $TemplateMap = @{
     'gentleman-quick'         = 'readwrite'
     'gentleman-codex'         = 'readwrite'
     'gentleman-implementer'   = 'readwrite'
+    'gentleman-aem'           = 'readwrite'
+    'gentleman-aem-sub'       = 'readwrite'
 
     # Subagent twins (mode: subagent, hidden: true)
     'gentleman-deep-sub'          = 'readwrite'

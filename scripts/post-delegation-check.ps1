@@ -252,8 +252,12 @@ if (Test-Path $csoScript) {
 
     # C4d: Extract contract validation result from check-subagent-output
     if ($SubagentOutput -and $csoResult) {
-        $contractOk = $csoResult.contract_valid -ne $false
-        $contractDetail = if ($csoResult.contract_detail) { $csoResult.contract_detail } else { "pass" }
+        # StrictMode-safe: the child exits early (empty-output FAIL JSON) without a
+        # contract_valid property — treat absent property as "not a contract violation".
+        $hasContractValid  = $null -ne $csoResult.PSObject.Properties['contract_valid']
+        $hasContractDetail = $null -ne $csoResult.PSObject.Properties['contract_detail']
+        $contractOk = if ($hasContractValid) { $csoResult.contract_valid -ne $false } else { $true }
+        $contractDetail = if ($hasContractDetail -and $csoResult.contract_detail) { $csoResult.contract_detail } else { "pass" }
         $results.checks += [PSCustomObject]@{
             name   = "contract_validation"
             passed = $contractOk
