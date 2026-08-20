@@ -14,7 +14,9 @@
     pwsh -File scripts\benchmark-async-push.ps1 -Verbose
 #>
 param(
-    [switch]$Json
+    [switch]$Json,
+    [switch]$DryRun,
+    [switch]$Force
 )
 
 $ErrorActionPreference = 'Continue'  # don't stop on individual test errors
@@ -45,11 +47,19 @@ if ($legacyHasContent) {
 }
 $legacyHasWaitEvent = $false  # legacy used polling, not Wait-Event
 
+# ─── Dry-Run: report the plan without state changes ────────────────────────
+if ($DryRun) {
+    Write-Host "[benchmark][DryRun] Would run functional latency + cancel benchmarks (temp dir, watcher, dummy process)."
+    Write-Host "[benchmark][DryRun] Static: push polling loops=$pushPollLoops watcher=$pushHasWatcher wait-event=$pushHasWaitEvent"
+    Write-Host "[benchmark][DryRun] No files written, no processes spawned."
+    exit 0
+}
+
 # ─── 2. FUNCTIONAL: Latency (signal → detection) ────────────────────────────
 Write-Verbose "[benchmark] Functional latency: signal file → detection"
 
 $testDir = Join-Path ([System.IO.Path]::GetTempPath()) ("gentleman-bench-{0}" -f [System.Diagnostics.Process]::GetCurrentProcess().Id)
-if (Test-Path $testDir) { Remove-Item -Path $testDir -Recurse -Force -ErrorAction SilentlyContinue }
+if (Test-Path $testDir) { Remove-Item -Path $testDir -Recurse -Force -ErrorAction SilentlyContinue }  # cleanup: stale temp bench dir from prior run
 New-Item -ItemType Directory -Path $testDir -Force | Out-Null
 
 $taskId = "bench_test_$(Get-Random)"
@@ -93,7 +103,7 @@ $sw.Stop()
 Get-Event -SourceIdentifier $eventId -ErrorAction SilentlyContinue | Remove-Event
 Unregister-Event -SourceIdentifier $eventId -Force -ErrorAction SilentlyContinue
 $watcher.Dispose() | Out-Null
-Remove-Item -Path $testDir -Recurse -Force -ErrorAction SilentlyContinue
+if (-not $DryRun) { Remove-Item -Path $testDir -Recurse -Force }  # cleanup: temp bench dir
 
 # Legacy equivalent: worst-case 15s poll interval (PollIntervalSec default)
 $legacyLatencyMs = 15000
@@ -119,7 +129,7 @@ Start-Sleep -Milliseconds 300
 $orphanedProcs = 0
 try { $check = Get-Process -Id $pidFromFile -ErrorAction SilentlyContinue; if ($check) { $orphanedProcs++ } } catch {}
 
-Remove-Item -Path $pidFile -Force -ErrorAction SilentlyContinue
+Remove-Item -Path $pidFile -Force -ErrorAction SilentlyContinue  # cleanup: benchmark pid file
 if ($dummyProc -and -not $dummyProc.HasExited) { $dummyProc.Kill() }
 
 # Legacy: no PID tracking → cannot cancel

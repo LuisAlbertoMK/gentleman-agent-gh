@@ -1,8 +1,5 @@
 #requires -Version 7
-<<<<<<< HEAD
-=======
 [CmdletBinding(SupportsShouldProcess=$true)]
->>>>>>> experimento/mejora-autonoma-2026-08-19
 <#
 .SYNOPSIS
     BabyAGI autonomous loop — executes tasks iteratively using async delegation from Phase 1.
@@ -169,12 +166,8 @@ function Invoke-TaskAsync {
             } elseif (-not $Force) {
                 Write-Warning "[BabyAGI] Stale file present: $f. Pass -Force to clean (or -DryRun to preview)."
                 return $null
-<<<<<<< HEAD
-            } else {
-=======
             } elseif ($PSCmdlet.ShouldProcess($f, "Remove stale result/signal file")) {
->>>>>>> experimento/mejora-autonoma-2026-08-19
-                Remove-Item -Path $f -Force -ErrorAction SilentlyContinue
+                Remove-Item -Path $f -Force -ErrorAction SilentlyContinue  # cleanup: stale result/signal file (race-tolerant)
             }
         }
     }
@@ -187,13 +180,9 @@ function Invoke-TaskAsync {
     # Temp callback script: invokes invoke-callback.ps1 which writes result + signal file
     $callbackScript = Join-Path $env:TEMP "gentleman-callback-$taskId.ps1"
     $callbackContent = "& '$InvokeCallbackScript' -ResultJson `$ResultJson -TaskId `$TaskId -RepoRoot '$RepoRoot'"
-<<<<<<< HEAD
-    Set-Content -Path $callbackScript -Value $callbackContent -Encoding UTF8
-=======
     if ($PSCmdlet.ShouldProcess($callbackScript, "Create temp callback script")) {
         Set-Content -Path $callbackScript -Value $callbackContent -Encoding UTF8
     }
->>>>>>> experimento/mejora-autonoma-2026-08-19
 
     # Launch async delegation with PUSH callback (monitor invokes callback on completion)
     Write-Host "[BabyAGI] Executing: $($Task.description)" -ForegroundColor Cyan
@@ -220,25 +209,20 @@ function Invoke-TaskAsync {
     # Check if completion signal arrived (signal file exists = callback fired)
     if (-not (Test-Path $signalFile)) {
         Write-Warning "[BabyAGI] Timeout waiting for task $($Task.id) result after ${maxWait}s"
-        Remove-Item -Path $callbackScript -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path $callbackScript -Force -ErrorAction SilentlyContinue  # cleanup: temp callback script (timeout path)
         return $null
     }
 
     # Read the result (written atomically by invoke-callback.ps1)
-    $result = Get-Content $resultFile -Raw | ConvertFrom-Json
+    $result = Get-Content $resultFile -Raw -ErrorAction Stop | ConvertFrom-Json
 
     # Cleanup: signal file + temp callback
-<<<<<<< HEAD
-    Remove-Item -Path $signalFile -Force -ErrorAction SilentlyContinue
-    Remove-Item -Path $callbackScript -Force -ErrorAction SilentlyContinue
-=======
     if ($PSCmdlet.ShouldProcess($signalFile, "Remove signal file")) {
-        Remove-Item -Path $signalFile -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path $signalFile -Force -ErrorAction SilentlyContinue  # cleanup: signal file (race-tolerant)
     }
     if ($PSCmdlet.ShouldProcess($callbackScript, "Remove temp callback script")) {
-        Remove-Item -Path $callbackScript -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path $callbackScript -Force -ErrorAction SilentlyContinue  # cleanup: temp callback script (race-tolerant)
     }
->>>>>>> experimento/mejora-autonoma-2026-08-19
 
     return $result
 }

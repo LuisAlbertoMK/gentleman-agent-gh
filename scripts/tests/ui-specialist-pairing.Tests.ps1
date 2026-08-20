@@ -29,10 +29,12 @@ BeforeAll {
         return $violations
     }
 
-    # Test fixture: CSS with known violations
+    # Test fixture: CSS with known violations (Tailwind arbitrary-value duration class
+    # matches the duration-over-500ms rule pattern `duration-[5xxms]`)
     $script:testCss = @"
 .button {
     transition: all 500ms ease;
+    class="btn duration-[500ms]";
     width: 300px;
     height: 200px;
     font-size: 16px;

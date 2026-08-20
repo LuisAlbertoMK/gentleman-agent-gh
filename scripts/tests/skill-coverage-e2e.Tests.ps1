@@ -29,8 +29,8 @@ Describe 'E2E: Skill Coverage (all 90 skills)' {
             }
     }
 
-    It 'canonical skill count is 90 (excl _shared)' {
-        $script:skillTable.Count | Should -Be 90 -Because "SKILLS-INDEX/README/.project must agree on 90 canonical skills"
+    It 'canonical skill count is 91 (excl _shared)' {
+        $script:skillTable.Count | Should -Be 91 -Because "SKILLS-INDEX/README/.project must agree on 91 canonical skills"
     }
 
     It 'every skill has valid YAML frontmatter (--- + name/triggers/description)' {
@@ -44,8 +44,13 @@ Describe 'E2E: Skill Coverage (all 90 skills)' {
 
     It 'every skill declares >=1 depth section (Examples/Testing/Anti-Patterns)' {
         foreach ($s in $script:skillTable) {
-            ($s.Content -match '(?im)^##[^\n]*(Examples|Testing Patterns|Anti-Patterns|Edge Cases|Quality Gates)') |
-                Should -BeTrue -Because "$($s.Name): no depth section"
+            $hasDepth = $s.Content -match '(?im)^##[^\n]*(Examples|Testing Patterns|Anti-Patterns|Edge Cases|Quality Gates)'
+            # ADR-007: depth content (Examples/Testing Patterns/Edge Cases) is externalized to
+            # docs/skills/<name>/reference.md to stay under the 3KB token budget — a reference
+            # link satisfies the depth requirement.
+            $hasExternalRef = $s.Content -match 'docs/skills/'
+            ($hasDepth -or $hasExternalRef) |
+                Should -BeTrue -Because "$($s.Name): no depth section or externalized reference (ADR-007)"
         }
     }
 

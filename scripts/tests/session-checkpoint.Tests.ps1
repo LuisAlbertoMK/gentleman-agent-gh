@@ -29,9 +29,11 @@ BeforeAll {
     # Helper: run session-checkpoint.ps1 in check mode and parse JSON output
     function Invoke-CheckpointCheck {
         param([int]$Percent, [string[]]$Discoveries = @(), [string[]]$Decisions = @())
-        $params = @("-Mode", "check", "-UsagePercent", $Percent, "-Quiet")
-        if ($Discoveries) { $params += "-Discoveries"; $params += $Discoveries }
-        if ($Decisions) { $params += "-Decisions"; $params += $Decisions }
+        # Hashtable splatting — array splatting passes "-Mode" positionally in PS 7.6.5
+        # and trips the ValidateSet on -Mode. Use named params.
+        $params = @{ Mode = "check"; UsagePercent = $Percent; Quiet = $true }
+        if ($Discoveries) { $params.Discoveries = $Discoveries }
+        if ($Decisions) { $params.Decisions = $Decisions }
         $out = & (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null
         return $out | ConvertFrom-Json -ErrorAction SilentlyContinue
     }
@@ -87,7 +89,7 @@ Describe "Session Checkpoint Bridge — Checkpoint Creation" {
 
     It "mark mode with Force creates checkpoint JSON at 5%" {
         $before = (Get-ChildItem -LiteralPath $script:checkpointDir -ErrorAction SilentlyContinue | Measure-Object).Count
-        $params = @("-Mode", "mark", "-UsagePercent", "5", "-Force", "-Quiet")
+        $params = @{ Mode = "mark"; UsagePercent = 5; Force = $true; Quiet = $true }
         $out = & (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null
         $result = $out | ConvertFrom-Json -ErrorAction SilentlyContinue
         $result.checkpoint_created | Should -Be $true
@@ -96,7 +98,7 @@ Describe "Session Checkpoint Bridge — Checkpoint Creation" {
     }
 
     It "checkpoint JSON has required fields" {
-        $params = @("-Mode", "mark", "-UsagePercent", "50", "-Force", "-Quiet")
+        $params = @{ Mode = "mark"; UsagePercent = 50; Force = $true; Quiet = $true }
         $out = & (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null
         $result = $out | ConvertFrom-Json -ErrorAction SilentlyContinue
         $checkpointJson = Get-Content -LiteralPath $result.checkpoint_file -Raw | ConvertFrom-Json
@@ -120,7 +122,7 @@ Describe "Session Checkpoint Bridge — Engram-Validate Gate" {
 
     It "checkpoint content passes poisoning guard format" {
         # The checkpoint mem_save content must include **What**: field
-        $params = @("-Mode", "mark", "-UsagePercent", "50", "-Force", "-Quiet")
+        $params = @{ Mode = "mark"; UsagePercent = 50; Force = $true; Quiet = $true }
         $out = & (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null
         $result = $out | ConvertFrom-Json -ErrorAction SilentlyContinue
         $result.validated | Should -Be $true
@@ -135,7 +137,7 @@ Describe "Session Checkpoint Bridge — Mode Behavior" {
     }
 
     It "full mode with discoveries triggers miner" {
-        $params = @("-Mode", "full", "-UsagePercent", "45", "-Discoveries", "N+1 query in UserList", "-Quiet")
+        $params = @{ Mode = "full"; UsagePercent = 45; Discoveries = @("N+1 query in UserList"); Quiet = $true }
         $out = & (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null
         $result = $out | ConvertFrom-Json -ErrorAction SilentlyContinue
         $result.checkpoint_created | Should -Be $true

@@ -366,8 +366,6 @@ ALL CLEAR
 - `score-auto -Json`: SE 7.0, o5=0, o3=39, avg=3.0KB
 - `cross-ref-check`: 9/9 OK
 - `Pester cross-ref.Tests.ps1`: 4/4 passed
-<<<<<<< HEAD
-=======
 
 ## Ciclo 5 — Config Context Budget Trim (C3) — `HEAD`
 
@@ -477,4 +475,3 @@ delegation-registry.ps1 -WhatIf: shows registry writes would occur
 
 ### Pendiente
 - [x] Merge to `main` (commit ce1499a1) — all automejora v3 cycles + C1b bonus + final push
->>>>>>> experimento/mejora-autonoma-2026-08-19

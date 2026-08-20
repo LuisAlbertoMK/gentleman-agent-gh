@@ -55,8 +55,9 @@ Describe "Resource Optimization -- opencode.json Config" {
         $config._resource_profile | Should -Be "lightweight"
     }
 
-    It "preserves all existing agents (>50)" {
-        $config.agent.PSObject.Properties.Name.Count | Should -BeGreaterThan 50
+    It "preserves all existing agents (>=49 canonical, ADR-033)" {
+        # ADR-033 removed the 6 -semi variants → 49 canonical agents (ConfigValidator enforces 49).
+        $config.agent.PSObject.Properties.Name.Count | Should -BeGreaterOrEqual 49
     }
 }
 

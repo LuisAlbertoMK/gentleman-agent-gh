@@ -111,19 +111,11 @@
 | Total skills | 91 |
 | 22 skills total bytes | 135,202 |
 
-<<<<<<< HEAD
-### Final (post-C2 compression)
-
-| Métrica | Baseline | Final | Delta |
-|---------|----------|-------|-------|
-| SE | 6.0 | **7.0** | +1.0 |
-=======
 ### Final (post-C2 compression + definitive verification 2026-08-19)
 
 | Métrica | Baseline | Final | Delta |
 |---------|----------|-------|-------|
 | SE | 6.0 | **6.0** | = (authoritative fresh run) |
->>>>>>> experimento/mejora-autonoma-2026-08-19
 | o5 | 22 | **0** | −22 (target ≤2 ✓) |
 | o3 | 57 | **39** | −18 (target 46 ✓) |
 | Avg skill size | 3.9KB | **3.0KB** | −0.9KB (target <3.5KB ✓) |
@@ -137,12 +129,6 @@ Karpathy-loop compression + reference.md externalization:
 - Single reference link: `> See [reference.md](docs/skills/{skill}/reference.md) for extended details, examples, and detailed patterns.`
 - Constraints: NO frontmatter changes, NO broken cross-refs, NO essential workflow removal, SKILL.md ≥200 lines
 
-<<<<<<< HEAD
-### Verification
-- `score-auto -Json`: SE=7.0, o5=0, o3=39, avg=3.0KB
-- `cross-ref-check`: 9/9 OK
-- `Pester cross-ref.Tests.ps1`: 4/4 passed
-=======
 ### Verification (definitive — fresh .project.json deleted)
 - `score-auto -Json`: **SE=6.0, PA=9.0, overall=8.9, o3=39, o5=0, avg=3.0KB**
 - `cross-ref-check`: **9/9 OK** (10/10 including semi allowlist sync)
@@ -254,4 +240,3 @@ elseif ($PSCmdlet.ShouldProcess($target, "Action description")) {
 - `./scripts/run-ci-tests.ps1`: **122 passed, 3 pre-existing failures** (unrelated)
 - `score-auto -Json`: PA improved from **8.0 → 8.5**
 - Manual `-WhatIf` testing: Correctly previews all destructive operations
->>>>>>> experimento/mejora-autonoma-2026-08-19

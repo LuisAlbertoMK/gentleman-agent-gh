@@ -185,6 +185,11 @@ const stats = { orchestrator: 0, readwrite: 0, readonly: 0, sddorchestrator: 0, 
 const orderedAgents = {};
 for (const [agentName, agentDef] of Object.entries(base.agent)) {
   const templateName = detectTemplate(agentName);
+
+  // ADR-033: 'semi' mode DEPRECATED (simplified to manual|auto) — -semi agents are
+  // removed from the canonical config. opencode.json carries the 49 post-ADR-033 agents.
+  if (templateName === 'semi') continue;
+
   const template = templates[templateName];
 
   if (!template) {
