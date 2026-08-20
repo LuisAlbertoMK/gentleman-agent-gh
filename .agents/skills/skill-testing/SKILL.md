@@ -4,71 +4,33 @@ description: "Test and verify skill quality — syntax, coverage, integration, a
 triggers: "Test/verify skill, coverage"
 changelog: docs/ciclos/cycle28-20260815.md
 ---
-
 Trigger: After creating/modifying skill, before production use.
-
 ## When to Use
-
-- After new/edited skill
-- Pre-critical-task verification
-- Periodic active skill checks
-
+After new/edited skill · pre-critical-task verification · periodic active skill checks.
 ## Framework
-
 `Test → Verify → Score → Approve/Reject`
-
 ## Test Types
-
 1. **Syntax**: frontmatter complete · Headers correct · Assets exist · Triggers unique
 2. **Coverage**: primary use case · edge cases · templates · anti-patterns
 3. **Integration**: Load via trigger → Apply → Verify output
 4. **Tokens**: Avg prompt < X · Longest template < Y · Decision tree legible
-
-## Checklist by Type
-
-| Type | Check |
-|------|-------|
-| Prompt | Frontmatter · Framework · Templates · Anti-patterns · Examples · Triggers |
-| Workflow | Sequential steps · Decisions · Error handling · Commands · Test cases |
-| Template | Structure · Placeholders · Examples · Variations |
-
 ## Scoring
-
 | Criteria | Weight |
 |----------|--------|
 | Syntax | 20% |
 | Coverage | 30% |
 | Integration | 30% |
 | Usability | 20% |
-
 **Thresholds**: 9-10: ✅ Production | 7-8: ⚠ Needs work | <7: ❌ Reject
-
 ## Default Tests (ALL skills)
-
-1. Syntax: frontmatter parses
-2. Structure: required sections exist
-3. Links: assets exist (if referenced)
-4. Triggers: clear and unique
-5. Format: valid markdown
-
-**Prompt skills (+):** Token budget OK · ≥3 templates · Anti-patterns · Decision tree
-**Workflow skills (+):** Sequential steps · Error handling · Executable commands · ≥1 example
+1. Syntax: frontmatter parses 2. Structure: required sections exist 3. Links: assets exist (if referenced) 4. Triggers: clear and unique 5. Format: valid markdown
 ## Report Template
 ```markdown
 ## Skill Test Report | {name} | {version}| Test | Status || Syntax | ✅/❌ |
 ### Verdict: ✅ APPROVED / ⚠ NEEDS WORK / ❌ REJECTED
 ```
-
 ## Refs
 skill-registry · opencode-skill-creator · skill-improver · quality-gate · karpathy-loop
----
-
-## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-007).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Testing Patterns, Edge Cases, Anti-Patterns, Quick Reference**
-  → docs/skills/skill-testing/reference.md
-
+## Reference
+Checklist by type (Prompt/Workflow/Template) + per-type extras → docs/skills/skill-testing/reference.md
 ---

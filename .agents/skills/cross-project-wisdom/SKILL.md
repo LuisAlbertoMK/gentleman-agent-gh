@@ -8,7 +8,6 @@ changelog: docs/ciclos/cycle28-20260815.md
 ## When to Use
 Load patterns from prior projects relevant to the current ta
 
-
 ## Pattern Load
 
 1. Read all JSON files from `docs/cross-project/patterns/*.json`
@@ -37,19 +36,6 @@ When invoked from Pre-Flight Gate (rung 0b):
 3. Output format: `⚠ Pattern: {severity} {summary} — see {file}`
 4. Never block — always advisory
 
-## Commands
-
-```powershell
-# Manual load
-Get-ChildItem "docs/cross-project/patterns/*.json" | ForEach-Object { Get-Content $_ | ConvertFrom-Json }
-
-# Search by technology
-$patterns | Where-Object { $_.context.technologies -match "gradient" }
-
-# Search by severity
-$patterns | Where-Object { $_.severity -eq "HIGH" -or $_.severity -eq "CRITICAL" }
-```
-
 ## Pattern Lifecycle
 
 - `seed`: manual add (file in `patterns/`)
@@ -60,12 +46,5 @@ $patterns | Where-Object { $_.severity -eq "HIGH" -or $_.severity -eq "CRITICAL"
 Each pattern JSON carries `hits` — increment on confirmed re-encounter.
 ---
 
-## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-007).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Testing Patterns, Edge Cases, Anti-Patterns, Quick Reference**
-  → docs/skills/cross-project-wisdom/reference.md
-
+docs/skills/cross-project-wisdom/reference.md
 ---

@@ -1,4 +1,4 @@
-﻿---
+---
 name: context-watchdog
 description: "Monitor context window — Recursive Summary Compression (L1/L2/L3), YELLOW/RED zones, hallucination detection"
 triggers: "Context explosion, compress, compression schedule, session break"
@@ -24,37 +24,10 @@ Monitor context window — Recursive Summary Compression (L1/L2/L3), YELLOW/RED 
 | ORANGE 60-80% | L2 raw + L3 L1s, **compact at 70%** |
 | RED >80% | `mem_save` → `session_summary` → new session |
 
-## Compression Levels
-| L | Trigger | Action | Savings |
-|---|---|---|---|
-| **L1** | ~8 msgs / ~15 calls | Oldest block ≥8 msgs → summary | 60-70% |
-| **L2** | ~20 msgs / ≥3 L1s | Decisions → 1-2 lines + Engram ID | 40-50% |
-| **L3** | YELLOW+ | 1-liner/topic + `Ref: engram-obs-{id}` | 80-90% |
-
-```
-<40% <8 → Normal | <40% ≥8 → L1 | 40-60% ≥20 → L1+L2
-60-80% any → L2+L3 compact@70% | >80% any → mem_save + break
-```
-
-## Stale Content Detection (DCP)
-30-40% waste = stale, not excess. Prune at L1: scan >25 calls old · Before L2: check engram supersedes · Pre-commit: verify file re-reads.
-
-| Signal | Action |
-|---|---|
-| Stale ref (A read, B edited, still ref A) | Re-read before using |
-| Superseded decision (mem_save X, user Y) | Check engram → L1 + update |
-| Echo chamber (re-stating own output) | Force YELLOW + fresh observation |
-| Chunk >50 calls no re-read | Exclude from next summary |
-| Repeated quote (same excerpt 2+) | Keep only freshest copy |
-
 ## Drift + Force-RED
 65% failures = drift: re-reads same content, re-states question, references unsaid → force YELLOW + L1. Force-RED: same point 2x · self-contradiction · "as I mentioned" referencing nothing.
 
-## Examples
-"compress" → `ctx_stats` → map % to zone → compress at 70% max, never RED. Same point restated 2x → force RED.
-
-## Testing
-1. `ctx_stats` → zone row dictates action. 2. After ≥8 msgs L1-summarize → 60-70% savings band. 3. Restate point 2x → drift flag + force RED within 2 turns.
-
 ## Anti-Patterns
 Compress at RED (recovery > savings; rule 1) · Jump to L3 skipping L1 (destroys chain) · Summarize stale instead of pruning (compounds drift)
+## Reference
+> docs/skills/context-watchdog/reference.md

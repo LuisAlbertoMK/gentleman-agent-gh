@@ -89,3 +89,26 @@ Listing every shortcut, alias, or command variant in the skill file. The skill s
 
 ### Anti-Pattern 2: Updating Without Verifying Plugin Behavior
 Changing the skill documentation without running the actual commands to verify behavior. Always test `/ralph-loop` and `/cancel-ralph` before updating docs.
+
+## Externalized Sections (ADR-007 compression)
+## How It Works
+1. Start → state `.opencode/ralph-loop.local.md`
+2. Loop: plugin checks `<promise>DONE</promise>` on idle
+3. Continue: "Continue from where you left off"
+4. Stop: DONE or max 100 iterations
+5. Cleanup: delete state file
+
+**Signal**: `<promise>DONE</promise>` only when truly complete.
+**State**: `.opencode/ralph-loop.local.md` (`.gitignore` it): `active:true iteration:3 maxIterations:100 sessionId:ses_abc123` + task prompt
+
+
+## Troubleshooting
+- **MCP timeout**: `.learnings/mcp-circuit-state.json` → OPEN wait 60s → `scripts/health-check-system.ps1` → `scripts/lib/mcp-resilience.ps1`
+- **Context overflow >80%**: `/compact` / `mem_session_summary` + new session. context-watchdog compress at YELLOW (40%)
+- **Agent failure**: check contract → retry narrower → 2x fail → STOP → report
+- **Forgets**: `engram_mem_context` → always `mem_session_summary` before compaction
+- **Error 3x**: `auto-pattern-detector.ps1` → immune-system → AGENTS.md
+- **Script parse**: replace `—` → `--`, `→` → `->`. ASCII only in `.ps1`
+- **Full**: `docs/operations/RUNBOOK.md`
+
+

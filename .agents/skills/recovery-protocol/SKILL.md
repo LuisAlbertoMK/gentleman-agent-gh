@@ -36,12 +36,5 @@ STOP code → Ask "¿Podés mostrarme exactamente qué esperás?" → Offer rest
 ## Workflow: Detect→STOP→ACKNOWLEDGE→DIAGNOSE→CORRECT→LEARN→continue
 ---
 
-## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-007).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Testing Patterns, Edge Cases, Anti-Patterns, Quick Reference**
-  → docs/skills/recovery-protocol/reference.md
-
+docs/skills/recovery-protocol/reference.md
 ---

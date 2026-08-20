@@ -139,3 +139,20 @@ print('Valid DAG:', ' → '.join(ordered))
 - On timeout: kill subagent process, mark BLOCKER
 - Retry once with: `prompt + " PREVIOUS ATTEMPT TIMED OUT. Scope: ONLY <specific file/function>. Max 100 lines output."`
 - If retry times out → escalate to human with Engram context
+
+## Externalized Sections (ADR-007 compression)
+## ERROR HANDLING
+| Failure | Action |
+|---------|--------|
+| Subagent timeout | Retry once with stricter scope, then flag BLOCKER |
+| Wrong output | Re-delegate with corrected context + Engram ID of error |
+| Dependency fail | Cascade: rollback dependents, report partial delivery |
+| Merge conflict | Open conflict file, delegate resolution to human |
+
+
+## DEPENDENCIES
+- subagent-isolation (context boundaries)
+- work-unit-commits (commit organization)
+- command-wrapper (safe command execution)
+
+

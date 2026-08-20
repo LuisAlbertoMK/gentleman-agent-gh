@@ -1,4 +1,4 @@
-﻿---
+---
 name: ci-cd
 description: "CI/CD pipeline setup — GitHub Actions, local pre-push quality gate, auto-detect test runner, SDD spec coverage"
 triggers: "CI/CD pipeline, GitHub Actions, quality gate"
@@ -19,10 +19,6 @@ Quality gate before tests(fail fast)·Tests on every push·Lint advisory·CI pas
 name:ci on:[push,pull_request] jobs:quality{runs-on:ubuntu-latest steps:{uses:actions/checkout@v4;run:if(Test-Path go.mod){go test./...}elseif(Test-Path package.json){npm test}}}
 ```
 ## Single Project(Go): `go test ./... -race -cover`
-## Examples
-- **Quality gate (pre-push)**: `./scripts/quality-gate.ps1 --exit-on-fail` — secrets, commit format, cross-ref
-- **Coverage threshold**: `go test -coverprofile=c.out && go tool cover -func=c.out | grep total`
-
 ## Monorepo
 ```yaml
 strategy:{matrix:{dir:[api,web,worker],os:[ubuntu,windows]-latest}}
@@ -36,16 +32,10 @@ strategy:{matrix:{os:[ubuntu,windows,macos]-latest}}
 steps:{uses:actions/checkout@v4;run:./scripts/quality-gate.ps1;if:${{!inputs.skip_tests}},run:go test./...-race-cover}
 ```
 
-## Edge Cases
-No tests→skip "No test files—skip"(not fail)|Monorepo→detect per dir;fallback"no runner"|SDD missing specs dir→skip coverage check|skip_tests→lint+quality only|Matrix partial→"api/windows:PASS|web/linux:FAIL|..."|No go.mod/pkg.json→"Run `project-mapper` first"|Timeout→"Check deadlocks"—use--timeout 5m|Coverage below→"Coverage X%<threshold Y%"|Runner offline→"Check status/fallback to ubuntu-latest"|Branch protection→"PR merge blocked—requires CI pass"
-
-## Testing Patterns
-- **Matrix coverage**: `git diff --name-only HEAD~1 | xargs -I{} dirname {} | wc -l` — verify changed dirs in matrix
-- **Gate dry-run**: `./scripts/quality-gate.ps1; if ($LASTEXITCODE) { "GATE BLOCKED" }` — local CI gate test
-- **Spec coverage**: `ls .sdd/specs/*/*.feature 2>$null | wc -l` — fail if zero specs
-
 ## Refs
 quality-gate·triple-verify·security-scanner·project-mapper·execution-mode·infra-audit
 
 ## Anti-Patterns
 Gate after tests·Block lint·Ignore monorepo·Hardcode runner·Hardcode OS·Skip coverage·Push-only triggers
+## Reference
+> docs/skills/ci-cd/reference.md

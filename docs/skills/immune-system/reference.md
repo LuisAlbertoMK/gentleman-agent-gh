@@ -125,3 +125,30 @@ User explicitly wants different approach than catalog prevention.
 - **Fix symptom** → Trace root cause | Fix current case → Generalize prevention
 - **Assume obvious** → No mem_save → Next session forgets → "Why did we do X?"
 - **Scope mismatch** → Project-scoped memory for reusable pattern → Cross-project re-work
+
+## Externalized Sections (ADR-007 compression)
+## YYYY-MM-DD: title
+**Symptom**: | **Root cause**: | **Fix**: | **Prevention**: 1 rule | **Files**: paths
+```
+
+### 4. IMMUNIZE (both required)
+- Catalog entry = loaded at session start (documents failure)
+- Prevention rule -> AGENTS.md (changes behavior)
+- Code/skill change -> `mem_save` + update SKILL.md
+- Cross-project: also `mem_save(topic_key="pattern/{name}", type="pattern", scope="personal")` so wisdom loader can retrieve it
+- Rule: "Catalog documents. AGENTS.md prevents. Both or not immunized."
+
+#### Cross-Project Save Format
+When saving to Engram for cross-project retrieval, use:
+```
+title: "pattern: {symptom}"
+type: "pattern"
+scope: "personal"
+content: "**Domain**: {domain}\n**Symptom**: {symptom}\n**Root cause**: {root_cause}\n**Fix**: {fix}\n**Prevention**: {prevention}"
+topic_key: "pattern/{normalized-title}"
+```
+
+### 5. VERIFY
+Pre-task: "Seen this before?" If yes -> apply prevention BEFORE starting.
+
+

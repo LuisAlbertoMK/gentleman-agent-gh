@@ -30,28 +30,5 @@ Create Gentle AI pull requests with issue-first checks. Trigger: creating, openi
 ## Breaking Changes
 Add `!` after type/scope. `BREAKING CHANGE:` in footer. Maps to `type:breaking-change`.
 
-## Commands
-```bash
-# Check issue
-gh issue view <N> --repo Gentleman-Programming/gentle-ai
-# Branch
-git checkout main && git pull && git checkout -b <type>/<desc>
-# Test
-go test ./... && go test ./internal/tui/... && cd e2e && ./docker-test.sh
-# PR
-gh pr create --repo Gentleman-Programming/gentle-ai --title "<type>(<scope>): <desc>" --body-file body.md
-# Check status
-gh pr checks --repo Gentleman-Programming/gentle-ai <PR#> && gh pr view <PR#>
-gh pr edit <PR#> --repo Gentleman-Programming/gentle-ai --add-label "type:bug"
-```
----
-
-## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-007).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Testing Patterns, Edge Cases, Anti-Patterns, Quick Reference**
-  → docs/skills/branch-pr/reference.md
-
----
+## Reference
+> docs/skills/branch-pr/reference.md

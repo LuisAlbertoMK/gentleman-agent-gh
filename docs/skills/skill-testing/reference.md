@@ -134,3 +134,13 @@ assert(actual_max < budget.max * 1.1);
 | Integration (load + apply) | ✅ |
 ### Verdict: ✅ APPROVED (9.2/10)
 ```
+
+## Checklist by Type
+| Type | Check |
+|------|-------|
+| Prompt | Frontmatter · Framework · Templates · Anti-patterns · Examples · Triggers |
+| Workflow | Sequential steps · Decisions · Error handling · Commands · Test cases |
+| Template | Structure · Placeholders · Examples · Variations |
+
+**Prompt skills (+):** Token budget OK · ≥3 templates · Anti-patterns · Decision tree
+**Workflow skills (+):** Sequential steps · Error handling · Executable commands · ≥1 example

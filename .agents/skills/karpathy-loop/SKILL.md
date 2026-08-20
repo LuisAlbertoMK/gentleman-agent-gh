@@ -16,17 +16,6 @@ Prompt bloated/slow/expensive · need consistent quality at lower cost · produc
 
 Example: Write 680/170tok→6.3 | Cut T1 480/120→7.3 | T2 340/85→7.3 | T3 260/65→5.3 ✗ → REVERT T2. Final 340ch/85tok 7.3/10.
 
-## Scoring Table
-| Score | Correctness | Conciseness | Robustness |
-|---|---|---|---|
-| 9-10 | All intents preserved | No wasted tokens | All edge cases |
-| 7-8 | Minor rephrase | Some filler | Most edge cases |
-| 5-6 | Nuance lost | Wordy but functional | Key edge case missing |
-| 3-4 | Intent partially lost | Redundant >2x | Multiple gaps |
-| 1-2 | Wrong format/behavior | Bloated >3x | Critical gaps |
-
-Stop: avg ≥7 AND tokens <100. Revert if any score drops ≥3.
-
 ## Compression Levels
 | Level | Target | What to cut |
 |---|---|---|

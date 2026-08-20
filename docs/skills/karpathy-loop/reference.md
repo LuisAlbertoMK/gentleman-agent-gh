@@ -132,3 +132,17 @@ Over-optimize before measuring · Cut context before identity · Sacrifice corre
 **Compress identity** — "Senior engineer" → "Expert" → "" loses authority signaling. Keep minimal identity (role) until T3.
 
 **Blind template reuse** — Applying T3 pattern from code-review to spec-writing fails. Each prompt type has different compressibility.
+
+## Externalized Sections (ADR-007 compression)
+## Scoring Table
+| Score | Correctness | Conciseness | Robustness |
+|---|---|---|---|
+| 9-10 | All intents preserved | No wasted tokens | All edge cases |
+| 7-8 | Minor rephrase | Some filler | Most edge cases |
+| 5-6 | Nuance lost | Wordy but functional | Key edge case missing |
+| 3-4 | Intent partially lost | Redundant >2x | Multiple gaps |
+| 1-2 | Wrong format/behavior | Bloated >3x | Critical gaps |
+
+Stop: avg ≥7 AND tokens <100. Revert if any score drops ≥3.
+
+

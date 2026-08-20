@@ -26,22 +26,8 @@ Whenever you write a comment another human will read: GitHub PR/issue comments, 
 <Concrete next action>
 ```
 
-## Examples
-- **Request change**: "Good approach overall. I'd split this into a separate commit because it mixes validation logic with UI wiring. That keeps the reviewer's focus narrower and makes rollback cleaner if integration fails."
-- **Security**: "The token is exposed in the query string — logs and browser history capture it. Move it to an `Authorization: Bearer` header or secure cookie."
-- **Perf**: "This loop queries the DB per iteration — 50 items = 50 round trips. Batch with `WHERE id IN (...)` / `findMany`. Cuts ~500ms→~50ms."
-- **Celebrate**: "Love the simplification on line 89 — flat map cut 60 lines and made intent obvious. Thanks."
-
 ## Testing
 1. Tone: aggressive input → warm+direct rewrite, keeps the ask, includes "why". 2. Language: ES thread + EN draft → output ES (neutral). 3. Formula: raw feedback → 3-part structure; missing why/action → FAIL.
-
-## Edge Cases
-| Scenario | Handling |
-|---|---|
-| Mixed-language thread | Thread language; ambiguous → last human message |
-| Non-native author | Simpler sentences, no idioms, explicit "why" |
-| High-stakes security finding | Lead with impact, unambiguous, tag owners, immediate mitigation |
-| Own PR | Same formula, self-review models the standard |
 
 ## Commands
 `gh pr view <PR_NUMBER> --json title,body,additions,deletions,changedFiles`
@@ -51,3 +37,5 @@ code-review-agent . comment-writer . branch-pr
 
 ## Anti-Patterns
 Write before reading the PR · Recapitulate entire diff
+## Reference
+> docs/skills/comment-writer/reference.md

@@ -88,3 +88,26 @@ echo "CAVEMAN:  $(./compress caveman response.md | wc -w) words"
 ### 2. Context % Guessing
 **Bad**: "Feels like we're at 60%" → apply ULTRA without checking  
 **Fix**: Use `ctx_stats` tool or context-watchdog for actual %. Apply LEVEL SELECT table strictly.
+
+## Externalized Sections (ADR-007 compression)
+## SELF-CHECK
+1. first word = answer? 2. 30% cut without loss? 3. level correct?
+
+**NEVER CUT**: safety(1-line) · critical caveats(1x) · func code · security warnings · irreversible confirmations
+- Safety: "This command will DELETE ALL DATA in production — are you sure?"
+- Caveat: "Works on Node ≥18; fails silently on 16"
+- Confirmation: "Proceed? (y/N)" — always show before destructive ops
+
+
+## FILE OPS
+Edit (str_replace) for existing. Grep+Read(offset,limit) for reading. Never full re-read after edit.
+
+
+## ESCALATION
+Context crosses 40% mid-conversation? Move LEAN→ULTRA immediately. Crosses 80%? → CAVEMAN lite. Under 10 turns remaining? → CAVEMAN full. **Never escalate mid-code-block** — finish the thought first, then switch on next turn.
+
+
+## USER RESPONSE POLICY
+**Default for USER-facing responses**: CAVEMAN for yes/no/status, LEAN for process updates. **Protocol outputs** (analysis tables, verification results, recommendations): remain detailed per protocol. **Trigger words for user-facing LEAN**: "listo?", "funcionó?", "status?", "ok?", "gracias", "gg".
+
+

@@ -8,7 +8,6 @@ changelog: docs/ciclos/cycle28-20260815.md
 ## When to Use
 5-phase improvement cycle for external projects — 3+ subagen
 
-
 ## 5-Phase Cycle
 
 Each phase: 3+ subagents via `task()` or `delivery-harness`. Return 4-field: `Decision Taken | Files Changed | Key Findings | Nuance`.
@@ -23,13 +22,6 @@ Each phase: 3+ subagents via `task()` or `delivery-harness`. Return 4-field: `De
 
 **Rule**: If P3 finds no batch with I/R ≥ 1.0 → STOP (project healthy).
 
-## Behaviors
-- **Internal** (gentleman-agent-gh): P1 skip, P2 ↔ score-auto.ps1, P3 light, P4 full, P5 full
-- **External**: full 5 phases with standalone fallback
-- Serial batches unless dep graph says parallel. Rollback per batch.
-- Max 3 consecutive SKIP → abort. Score drop >0.5 → full revert.
-- Stdlib doesn't cover this (needs 3 tool types in one pass).
-
 ## Output
 ```
 docs/external/<project>/
@@ -40,24 +32,8 @@ docs/external/<project>/
 └── P5-REPORT.md
 ```
 
-## Error Handling
-| Failure | Action |
-|---------|--------|
-| Subagent timeout | Retry once with stricter scope, then SKIP |
-| Phase gate not met | STOP phase, try next if independent |
-| Score drop >0.5 | Full revert |
-| 3 consecutive SKIP | Abort cycle, write partial report |
-| Human needed | `conflict` file + escalation |
-
 ## Cross-Refs: delivery-harness | project-mapper | gap-analysis | sdd-propose | sdd-verify | triple-verify | bitacora | commit-crafter
 ---
 
-## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-007).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Testing Patterns, Edge Cases, Anti-Patterns, Quick Reference**
-  → docs/skills/external-improvement/reference.md
-
+docs/skills/external-improvement/reference.md
 ---

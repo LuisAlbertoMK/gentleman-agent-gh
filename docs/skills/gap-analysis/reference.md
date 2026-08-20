@@ -207,3 +207,13 @@ print('All priority calculations correct')
 **Anti-Pattern 7: Priority Inflation via Urgency Override**
 - Artificially setting Urgency=2.0 (Critical) for everything to force attention
 - **Fix**: Urgency=2.0 only for: production outage, active exploit, regulatory deadline, data loss risk. Default=1.0.
+
+## Externalized Sections (ADR-007 compression)
+## Dimensions Detail
+1. **Functional**: Core flows vs reqs | Edge cases | Business rules | Roadmap alignment
+2. **Technical**: Modularity | N+1 | API p95 | Caching | Leaks | `test --cover` | grep TODO/FIXME
+3. **Security**: MFA/RBAC/rate-limit | Encryption | Secrets vault | npm audit | Input validation
+4. **UX**: Friction | Loading/empty/error states | Design system | Touch>=48px | WCAG 2.2 AA
+5. **Ops**: CI/CD+rollback | Docker/k8s | Monitoring | Build time | Dev loop
+6. **Business**: Pricing | Feature adoption | Competitor diffs | TCO | Roadmap
+

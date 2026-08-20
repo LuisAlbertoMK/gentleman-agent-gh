@@ -116,3 +116,24 @@ git diff --name-only HEAD~1 | wc -l  # → 5
 **Why it breaks**: 8-dim validation requires coverage. Missing dims = blind spots (e.g., no datascience → data quality issues missed; no docs → DX gaps invisible).
 **Correct**: Always 5-6 specialists minimum. Public site → +seo = 7.
 **Detection**: Synthesis table shows N/A for unassigned dimensions → flagged in risk matrix
+
+## Externalized Sections (ADR-007 compression)
+## P2: VALIDATE (8 dims, N/A ok)
+Sec→security|UX→frontend|Data→datascience|DX→docs|Perf→performance|Infra→infra|Arch→main(self)|Biz→main(self). Arch first(structural)→Biz(strategic). No interleave.
+
+
+## AUTO-TRIGGER
+In `_core-behavior-gp.md`. Loads only on explicit `!analisis`.
+
+## Loading
+`skill(name="analysis-mode")`. Fail→`Read` this file(project→global). External: copy to `<project>/.agents/skills/analysis-mode/`.
+
+## P1: ANALYZE
+0. `project-mapper`→stack. Public site?→+seo. 1.Scope: affected subsystems only. 2.5-6 specialists: sec·infra·frontend·perf·datascience·docs(+seo if public). 3.Parallel→`Decision|Files|Findings|Nuance`. 4.No result→`SKIPPED-{name}`, continue.
+
+## P4: PERSIST
+**4a Compare**: `mem_search("analysis:<project>")`. Found→delta(improvements/regressions/new/stale)→`## Trend vs Previous`. None→"No previous analysis—baseline".
+**4b Save**: `mem_save(title:"analysis:<project>:<YYYY-MM-DD>",type:architecture,topic_key:"analysis/<project>")` Content:`**What**:Analyzed <project> <date>—<scope>. **Why**:<trigger>. **Where**:<top files max8>. **Key Findings**:<top5 by risk>. **Learned**:<surprises or None>`.
+**4c Enrich**: Append to `docs/mejoras/YYYY-MM-DD-<project>-analisis.md`: `## Engram Persistence`(id+topic_key+ts) + `## Trend Analysis`(delta).
+
+

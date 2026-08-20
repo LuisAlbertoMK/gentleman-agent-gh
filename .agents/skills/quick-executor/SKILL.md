@@ -23,11 +23,6 @@ changelog: docs/ciclos/cycle28-20260815.md
    - Other: Read, verify syntax manually, note in report.
 5. **REPORT**: One line.
 
-## FAILURE
-- Parse/compile fail → `git checkout -- <file>` (if git), suggest deep-debugging
-- Test fail → 1 fix attempt. Still fails → STOP, escalate
-- Unclear requirements → STOP, 1 question
-
 ## STANDALONE MODE
 If invoked directly (not via orchestrator): report issues as findings, do not escalate. Apply fixes if clear.
 

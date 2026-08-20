@@ -76,3 +76,23 @@ Non-English docs present → audit source-of-truth language first; flag translat
 5. **cat README (use grep)** — Reading entire file instead of targeted grep → token waste, misses cross-file patterns
 6. **Conflating generated with manual** — Auditing Swagger output as if hand-written → false positives, wasted effort
 7. **Single-version audit in multi-version repo** — Only checking `latest/` → misses regressions in maintained versions
+
+## Externalized Sections (ADR-007 compression)
+## DIÁTAXIS DECISION TREE
+```
+Is the reader learning a skill? → TUTORIAL
+Is the reader doing a specific task? → HOW-TO
+Is the reader looking up information? → REFERENCE
+Is the reader trying to understand why? → EXPLANATION
+```
+Flag gaps: if only one type exists, others are likely missing.
+
+## SCAN DIMENSIONS
+**README**: `grep -rn "## Quick Start\|## Getting Started\|## Prerequisites\|## Configuration\|## Architecture\|## Contributing" --include="README.md"` → structure; `grep -rn "TODO\|WIP\|placeholder\|coming soon" --include="*.md"` → stale markers.
+**API Docs**: `grep -rn "swagger\|openapi\|@param\|@returns\|@example" --include="*.ts" --include="*.js" --include="*.py" --include="*.go"` → descriptions, schemas, error codes, examples.
+**Onboarding**: `grep -rn "getting started\|prerequisites\|setup\|installation" --include="*.md"` → onboarding steps.
+**Standard Files**: Check CHANGELOG.md, CONTRIBUTING.md, LICENSE, SECURITY.md exist; `grep -rn "Keep a Changelog\|## \[" --include="CHANGELOG.md"` → format.
+**Links**: `grep -rn "\[.*\](http" --include="*.md"` → localhost, 127.0.0.1, TODO URLs.
+**Code**: `grep -rn "TODO\|FIXME\|HACK\|XXX" --include="*.ts" --include="*.js" --include="*.py" --include="*.go"` → tech debt.
+
+

@@ -83,3 +83,12 @@ Expected: `True` (rule 4: ROI estimate required).
 8. **Unit test getters/DTOs** — zero bug catch, pure burden
 9. **Coverage theater** — expect(true).toBe(true); measure branch coverage
 10. **No debt budget** — debt compounds; 10-20% sprint capacity
+
+## 5. ROI
+`ROI = (bug_leak_cost × catch_prob) / (test_hours × maint_hours)`. High: Auth, data, API, payments. Example: src/payments/ 3/12 (25%) → 8/12 (67%): 1.Unit PaymentProcessor(6 paths,4h) 2.Int Stripe mock(3h) 3.E2E checkout(2h) → 9h → -60% P0 risk → ROI ($50k×0.7)/(9h×2h/yr)=$1,944/h.
+
+## 6. Testing Patterns — Verify Strategy
+Monthly: `gh run list --limit 50 --json conclusion | jq failures`; `npx nyc report --reporter=lcov`. PR: map changed files to risk tier → CRITICAL=E2E+int+unit, HIGH=int+unit, else=unit. Quarterly: Wk1 Top 5 risk→unit | Wk2 Top 3 APIs→contract | Wk3 2 journeys→E2E | Wk4 CRITICAL→mutation.
+
+## 7. Edge Cases — Pyramid FAILS
+Flaky dominant→Quarantine→fix root→pyramid | Legacy zero tests→Characterization→strangle | Over-mocked→reduce mocks, real deps | Microservices→Pact | UI-heavy→Chromatic | Data/ML→property-based+statistical | Regulated→traceability req→test→evidence.

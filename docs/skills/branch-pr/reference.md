@@ -372,3 +372,24 @@ issue-creation · commit-crafter · work-unit-commits · chained-pr · quality-g
 
 ## Anti-Patterns
 Create PR without approved issue · Skip local tests · Force-push to main · Add multiple type labels · Co-Authored-By trailers
+
+## Externalized Sections (ADR-007 compression)
+## Commands
+```bash
+# Check issue
+gh issue view <N> --repo Gentleman-Programming/gentle-ai
+# Branch
+git checkout main && git pull && git checkout -b <type>/<desc>
+# Test
+go test ./... && go test ./internal/tui/... && cd e2e && ./docker-test.sh
+# PR
+gh pr create --repo Gentleman-Programming/gentle-ai --title "<type>(<scope>): <desc>" --body-file body.md
+# Check status
+gh pr checks --repo Gentleman-Programming/gentle-ai <PR#> && gh pr view <PR#>
+gh pr edit <PR#> --repo Gentleman-Programming/gentle-ai --add-label "type:bug"
+```
+---
+
+docs/skills/branch-pr/reference.md
+---
+

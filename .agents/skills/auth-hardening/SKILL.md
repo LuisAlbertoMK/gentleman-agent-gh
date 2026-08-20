@@ -1,4 +1,4 @@
-﻿---
+---
 name: auth-hardening
 description: "Trigger: auth, JWT, OAuth, RBAC, CSRF, session, login, password hashing. Audit and harden auth flows."
 triggers: "auth, authentication, authorization, JWT, OAuth, RBAC, CSRF, session, login, password hashing, token, cookie"
@@ -8,24 +8,10 @@ changelog: docs/ciclos/cycle28-20260815.md
 ## When to Use
 Review auth flows, login, tokens, RBAC — "is this auth secure?"
 
-## EXAMPLES (6 real grep commands)
-JWT alg=none: `grep -rn "algorithm.*['\"]none['\"]" --include="*.ts"`
-Hardcoded secret: `grep -rn "secret\s*=\s*['\"][^'\"]+['\"]" --include="*.ts" | grep -v process.env`
-OAuth no PKCE: `grep -rn "authorization_code" --include="*.ts" | grep -v code_verifier`
-Role after fetch: `grep -B3 "find.*User" --include="*.ts" | grep -v "authorize\|canAccess"`
-No HttpOnly: `grep -rn "cookie.*httpOnly.*false" --include="*.ts"`
-Weak hashing: `grep -rn "md5\|sha1" --include="*.ts" | grep -v "_test\|checksum"`
-
 ## TESTING (3 patterns)
 Auth integration: test DB → `POST /login` → 200 + `Set-Cookie: session=...; HttpOnly; Secure; SameSite=Lax`
 Token validation: expired JWT→401; `alg=none`→401; wrong aud→403
 RBAC matrix: parametrize roles×endpoints → 200 allowed, 403 denied, no 500s
-
-## EDGE CASES (4)
-MFA bypass: backup codes / recovery often skip rate limits → audit separately
-CORS + auth: `Access-Control-Allow-Origin: *` + credentials → browser rejects; must echo origin
-Refresh reuse: same token accepted twice → revoke ALL sessions on reuse
-When NOT: stateless APIs→no sessions; serverless cold starts→avoid DB sessions; high-throughput internal→prefer mTLS over JWT
 
 ## CHECKLIST (sev: pattern)
 CRIT: JWT alg=none `algorithm.*["']none["']` | Hardcoded secret `secret\s*=\s*["'][^"']+["']` excl env | MD5/SHA1 password `md5\|sha1`
@@ -50,3 +36,5 @@ security-scanner · best-practices · quality-gate · code-review-agent
 
 ## Anti-Patterns (8)
 Flag bcrypt weak · Skip JWT alg · Happy path only · Ignore refresh tokens · Client-side-only roles · Flag env vars hardcoded · Use `alg: none` for testing · Store JWT in localStorage
+## Reference
+> docs/skills/auth-hardening/reference.md

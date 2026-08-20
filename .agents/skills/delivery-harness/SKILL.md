@@ -8,7 +8,6 @@ changelog: docs/ciclos/cycle28-20260815.md
 ## When to Use
 Orchestrate multi-agent work — break goals into work units,
 
-
 Trigger: Multi-step tasks, parallel subagent work, complex deliverables.
 
 ## WORKFLOW
@@ -33,29 +32,9 @@ Trigger: Multi-step tasks, parallel subagent work, complex deliverables.
 - NEVER share subagent internal state between units
 - After collection: summarize results, preserve the 4-field contract AS-IS (never summarize: Decision Taken, Files Changed, Key Findings, Nuance)
 
-## ERROR HANDLING
-| Failure | Action |
-|---------|--------|
-| Subagent timeout | Retry once with stricter scope, then flag BLOCKER |
-| Wrong output | Re-delegate with corrected context + Engram ID of error |
-| Dependency fail | Cascade: rollback dependents, report partial delivery |
-| Merge conflict | Open conflict file, delegate resolution to human |
-
-## DEPENDENCIES
-- subagent-isolation (context boundaries)
-- work-unit-commits (commit organization)
-- command-wrapper (safe command execution)
-
 ## Refs
 subagent-isolation · work-unit-commits · command-wrapper · execution-mode · chained-pr
 ---
 
-## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-007).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Testing Patterns, Edge Cases, Anti-Patterns, Quick Reference**
-  → docs/skills/delivery-harness/reference.md
-
+docs/skills/delivery-harness/reference.md
 ---

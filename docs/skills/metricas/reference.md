@@ -332,3 +332,19 @@ git show --stat HEAD
 | JSON for scripting | `metricas git-diff --format json \| jq '.summary.delta_pct'` |
 | List baselines | `metricas bookmark --list-baselines` |
 | Delete baseline | `metricas bookmark --delete-baseline old-baseline` |
+
+## Externalized Sections (ADR-007 compression)
+## Output Schema
+```json
+{
+  "mode": "git-diff|bookmark", "base": "abc1234", "head": "def5678",
+  "summary": {"files_changed": 12, "tokens_before": 45230, "tokens_after": 47891,
+    "delta_tokens": 2661, "delta_pct": 5.88, "lines_added": 342, "lines_removed": 198},
+  "by_file": [{"path": "src/auth.ts", "lang": "typescript", "tokens_before": 1240,
+    "tokens_after": 1456, "delta_pct": 17.42, "status": "modified"}],
+  "by_language": {"typescript": {"before": 28400, "after": 30100, "delta_pct": 5.99}},
+  "flagged": ["src/auth.ts:17.42%"]
+}
+```
+
+

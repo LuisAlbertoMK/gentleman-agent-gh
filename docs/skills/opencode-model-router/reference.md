@@ -105,3 +105,28 @@ assert_direct "Nightly cron job"            # → DIRECT forced
 4. **Pay when free covers it** — Qwen3.7 Max, paid Nemotron — free tier handles 95% of tasks
 5. **Forget security gate** — Check 3 conditions BEFORE consulting routing table
 6. **Combine analysis + execution in one delegation** — Split: analyzer understands, implementer executes
+
+## Externalized Sections (ADR-007 compression)
+## 📏 CONTEXT → ACTION
+| Context | Action |
+|---------|--------|
+| <50K | Normal routing |
+| 50K-100K | Prefer fast models |
+| >150K | Direct forced |
+
+---
+
+> See [reference.md](docs/skills/opencode-model-router/reference.md) for extended details, examples, and detailed patterns.
+
+## ⚠️ RUNTIME REALITY (opencode 1.18.x)
+- `gentleman-*` sin sufijo = `mode: primary` → Task tool NO los expone.
+- Twins `-sub` (implementer/security/deep/quick) SÍ: `subagent` + `hidden` + whitelist `task` (template `orchestrator`).
+- DELEGATE ✅ = twin. DELEGATE ⚠️ = `general` — NO reportar falla.
+- `opencode.json` sync SSoT: `scripts/regenerate-opencode.ps1` (`-Yes` regenera; CI falla si deriva).
+
+
+## 🔧 IMPLEMENTER
+`gentleman-implementer-sub` (DeepSeek V4 Flash Free) — precise execution. No unrequested changes.
+**Avoid**: Qwen3.7 Max (re-plans, paid), Nemotron 3 Ultra (over-analyzes).
+
+

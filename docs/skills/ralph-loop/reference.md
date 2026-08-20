@@ -126,3 +126,35 @@ for i in {1..100}; do node stress-test.js; done
 **What:** Starting with "fix login bug" but expanding to "refactor all auth + add 2FA + update docs" in one loop.
 **Why it breaks:** Iterations become unfocused, maxIterations exhausted, completion criteria ambiguous.
 **Correct approach:** Define ONE clear completion criterion upfront. Split large work into chained loops with explicit handoff.
+
+## Externalized Sections (ADR-007 compression)
+## State File Format
+
+The state file at `.opencode/ralph-loop.local.md` uses YAML frontmatter:
+
+```markdown
+---
+active: true
+iteration: 3
+maxIterations: 100
+sessionId: ses_abc123
+---
+
+Your original task prompt
+```
+
+Add `.opencode/ralph-loop.local.md` to your `.gitignore`.
+
+
+## How It Works
+
+The Ralph Loop creates a continuous feedback cycle for completing complex tasks:
+
+1. You work on the task until you go idle
+2. The plugin detects the idle state and checks for completion
+3. If not complete, it prompts you to continue where you left off
+4. This repeats until you output the completion promise or max iterations reached
+
+Your previous work remains accessible through files and git history, enabling progressive refinement across iterations.
+
+

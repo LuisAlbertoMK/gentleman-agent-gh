@@ -27,18 +27,6 @@ Executing a multi-step plan (from agent, spec, or task list). NOT for 1-file edi
 
 **Step 5: REPORT** — Summary of done/blocked/failed.
 
-## VERIFICATION GATES (auto-detect language)
-| If present | Run |
-|------------|-----|
-| package.json | `npm test` / `npm run lint` / `npx tsc --noEmit` |
-| pyproject.toml / setup.py | `pytest` / `flake8` / `mypy` |
-| go.mod | `go test ./...` / `golangci-lint run` |
-| Cargo.toml | `cargo test` / `cargo clippy` |
-| pom.xml / build.gradle | `mvn test` / `gradle test` |
-| Makefile | `make test` (if target exists) |
-
-Single task timeout: 5 min. If exceeded → escalate.
-
 ## FAILURE RULES
 - 3 failures total OR 2 consecutive → STOP, report to orchestrator
 - Blocked ≠ failed. Blocked tasks remain in queue.
@@ -66,12 +54,5 @@ quick-executor · deep-debugging · quality-gate
 ---
 ---
 
-## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-007).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Testing Patterns, Edge Cases, Anti-Patterns, Quick Reference**
-  → docs/skills/plan-execution/reference.md
-
+docs/skills/plan-execution/reference.md
 ---

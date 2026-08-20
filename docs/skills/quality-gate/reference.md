@@ -162,3 +162,17 @@ go test ./... && npm test && cargo test
 ```
 
 (End of file)
+
+## Externalized Sections (ADR-007 compression)
+## Commands
+`go test ./...`·`npm/pnpm/yarn test`·`cargo test`·`pytest`
+`$secretsPattern='(api[_-]?key|secret|token|-----BEGIN)'; git diff --cached|Select-String -Pattern $secretsPattern`
+`"$env:GENTLEMAN_AGENT_ROOT/scripts/pssa-gate.ps1" -Mode Check`
+`"$env:GENTLEMAN_AGENT_ROOT/scripts/run-tests.ps1" -Quiet` — Note: if *.Tests.ps1 files are staged, the pre-commit hook re-runs the staged subset (now parallel) — intentional double coverage; commit tests separately.
+
+
+## Decision Tree
+Tests:no runner→SKIP|pre-exist→user-ok|new→fix. Cred:FP→user-ok|real→vault. Commit→type(scope):desc. PSSA missing→SKIP|auto-fix→-Mode Fix. Pester missing→SKIP.
+Breaker:missing→SKIP push|✅→push|🔧→R2|🚫→STOP|⚠→STOP partial
+
+

@@ -6,8 +6,6 @@ delegate_only: true
 changelog: docs/ciclos/cycle28-20260815.md
 ---
 
-> **ORCHESTRATOR GATE**: `skill()` → ORCHESTRATOR STOP. Delegate to `sdd-explore` sub-agent. Executors only.
-
 ## Executor Override
 If you ARE the `sdd-explore` sub-agent, gate does not apply. Execute directly.
 
@@ -20,14 +18,6 @@ Explore codebase for a topic/feature, compare approaches, return structured anal
 ## Input
 - Topic or feature to explore
 - Artifact store mode (`engram | openspec | hybrid | none`)
-
-## Persistence
-Follow §B (retrieval) and §C (persistence) from `skills/_shared/sdd-phase-common.md`:
-- **engram**: Optionally read `sdd-init/{project}`. Save as `sdd/{change}/explore` (or `sdd/explore/{topic-slug}` standalone).
-- **openspec**: Read `skills/_shared/openspec-convention.md`.
-- **hybrid**: Both — Engram + filesystem.
-- **none**: Return result only.
-- **Retrieval**: engram searches `sdd-init/{project}` + `sdd/`; openspec reads config + specs; none uses orchestrator prompt.
 
 ## Workflow
 1. **Load Skills** — §A from `sdd-phase-common.md`
@@ -47,12 +37,5 @@ Follow §B (retrieval) and §C (persistence) from `skills/_shared/sdd-phase-comm
 ---
 ---
 
-## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-007).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Testing Patterns, Edge Cases, Anti-Patterns, Quick Reference**
-  → docs/skills/sdd-explore/reference.md
-
+docs/skills/sdd-explore/reference.md
 ---

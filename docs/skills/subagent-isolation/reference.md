@@ -148,3 +148,9 @@ if undeclared: print(f'UNDECLARED REFS: {undeclared}'); sys.exit(1)
 ### Anti-Pattern 2: "Implicit Parallelization" — Running dependent delegations in parallel
 **Why it fails**: Race conditions, stale reads, corrupted state.  
 **Correct**: Explicit `depends_on: [delegation-id]` in orchestration. Sequential by default; parallel only when declared independent.
+
+## Externalized Sections (ADR-007 compression)
+## Context cleanup
+After delegation: extract only needed output, reference by delegation ID, summarize large outputs. Never retain full subagent output in main context.
+
+

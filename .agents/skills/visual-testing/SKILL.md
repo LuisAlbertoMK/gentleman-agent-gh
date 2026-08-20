@@ -1,26 +1,12 @@
-﻿---
+---
 name: visual-testing
 description: "Visual verification - screenshots, visual regression, UI bug detection via Playwright. See vision-analyze for LLM."
 triggers: "screenshot, visual diff, visual bug, regression test, VRT, UI broken, text overflow, layout shift, responsive test, visual regression"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 883
 ---
 
 ## When to Use
 Visual verification — screenshots, visual regression, UI bug detection. **Tool**: Playwright — `npx playwright test --project=chromium`.
-
-## Setup
-```bash
-npm install -D @playwright/test && npx playwright install chromium
-```
-```typescript
-export default defineConfig({
-  testDir:'./tests',
-  expect:{toHaveScreenshot:{maxDiffPixelRatio:0.01,threshold:0.2,animations:'disabled'}},
-  use:{baseURL:'http://localhost:3000'},
-  webServer:{command:'npm run dev',port:3000,reuseExistingServer:!process.env.CI},
-});
-```
 
 ## Automated
 ```typescript
@@ -32,14 +18,6 @@ test('home',async({page})=>{await page.goto('/');await expect(page).toHaveScreen
 
 ## Baseline
 `npx playwright test --update-snapshots` (create/update). Store in `tests/*-snapshots/`. Commit.
-
-## Dynamic Content
-```typescript
-// Mask
-await expect(page).toHaveScreenshot('dash.png',{mask:[page.locator('[data-testid=timestamp]')]});
-// Freeze
-await page.addInitScript(()=>{Date.now=()=>1700000000000});
-```
 
 ## Decision Tree
 Visual bug?→playwright open→screenshot→fix→verify | CI regression?→toHaveScreenshot→baseline | Responsive?→multi-viewport(375/768/1024/1440) | Dynamic?→mask/freeze | Font?→mask/fallback
@@ -55,5 +33,5 @@ No baseline·Threshold too strict(flaky)·No viewport reset·Skip anim freeze·N
 
 ## Cross-Refs: quality-gate | performance | baseline-ui | accessibility | ui-engine
 
-## Testing
-1. Baseline: change → `--update-snapshots` → `git status` shows modified snapshots, committed. 2. Deterministic: same spec twice, no changes → both pass (animations disabled, dynamic masked). 3. Regression: real CSS change → `✗` with pixel diff >0.01 — caught.
+## Reference
+> docs/skills/visual-testing/reference.md
