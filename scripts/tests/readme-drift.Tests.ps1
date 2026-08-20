@@ -22,7 +22,7 @@ Describe 'README.md count drift' -Tag 'docs', 'drift' {
         It 'README agent count matches opencode.json' {
             $configPath = Join-Path $RepoRoot 'opencode.json'
             $config = Get-Content $configPath -Raw | ConvertFrom-Json
-            $actualAgentCount = $config.agent.PSObject.Properties.Count
+            $actualAgentCount = @($config.agent.PSObject.Properties).Count
 
             $match = [regex]::Match($ReadmeContent, '(\d+)\s+specialized agents')
             $readmeAgentCount = [int]$match.Groups[1].Value
