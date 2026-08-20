@@ -18,10 +18,7 @@ BabyAGI delegation loop: **EXECUTION → TASK CREATION → PRIORITIZATION**, asy
 Blocking-unacceptable multi-step work · dependent chains (N+1 needs N's output) · bounded-horizon background work.
 
 ## Workflow
-1. **EXECUTION** — run task. Delegate per `opencode-model-router` (routing + security gate).
-2. **TASK CREATION** — derive next tasks from outcome (4-field contract).
-3. **PRIORITIZATION** — rank (impact×effort×risk); pick top-1.
-4. Repeat until `convergence_check` or `max_iterations`.
+1. **EXECUTION** — run task. Delegate per `opencode-model-router` (routing + security gate). 2. **TASK CREATION** — derive next tasks from outcome (4-field contract). 3. **PRIORITIZATION** — rank (impact×effort×risk); pick top-1. 4. Repeat until `convergence_check` or `max_iterations`.
 
 ## Guardrails (caps)
 | Cap | Default | Purpose |
@@ -35,7 +32,6 @@ Blocking-unacceptable multi-step work · dependent chains (N+1 needs N's output)
 - **AUTO**: `auto-sub` template (deny floor + `task: deny`), no approval, zero `ask`.
 - **LOG**: execute + log to `audit-log.psl`.
 - **CONFIRM**: pause → human approval required.
-
 Escalate on: credentials, network egress, package installs, `git push --force`, destructive ops.
 
 ## Async handoff (fire-and-forget)
@@ -45,37 +41,16 @@ scripts\post-delegation-check.ps1 -BaseRef HEAD -AllowedPaths "src/*" -Async
 $r = Get-Content HEAD.async-result.json -Raw | ConvertFrom-Json
 if (-not $r.passed) { # FAIL — review before proceeding }
 ```
-
 `monitor-subagent.ps1` polls (15s) check-subagent-output + validate-write-scope; writes when git stable (2 identical polls) or 300s.
-
-## Implementation
-| Script | Phase | Purpose |
-|---|---|---|
-| `scripts/post-delegation-check.ps1` | 1 | `-Async` + fail-closed + Launch-AsyncMonitor |
-| `scripts/monitor-subagent.ps1` | 1 | Polling + convergence detection |
-| `scripts/babyagi-loop.ps1` | 2 | Loop: New-InitialTasks, Sort-TaskQueue, Invoke-TaskAsync, New-TasksFromResult |
-| `scripts/auto-improve.ps1` | 3 | Self-improvement: scan→create→loop→verify |
-| `tests/babyagi-loop.Tests.ps1` | 2 | 9 Pester (T1-T6 + fail-closed) |
-| `tests/post-delegation-async.Tests.ps1` | 1 | 5 Pester (T1-T5) |
-| `adr/ADR-031-*` | 1 | ADR + E2E verification |
 
 ## Refs
 `adr/ADR-022`,`adr/ADR-024` deny floor · `adr/ADR-031` async delegation · `delivery-harness` fan-out · `ralph-loop` single-task · `opencode-model-router` targets/fallback
 
 ## Examples
-User: "mini-orchestrator: audit security + apply fixes, max 6 iterations"
-```powershell
-& .\scripts\babyagi-loop.ps1 -InitialTask "security audit" -MaxIterations 6
-# → T1 → gentleman-security-sub (fire-and-forget)
-# → New-TasksFromResult → Sort-TaskQueue → Invoke-TaskAsync
-# → convergence: result-delta < threshold → "Converged after 4 iterations"
-# → monitor-subagent.ps1 polls 15s until git stable (2 identical polls) or 300s
-```
+"mini-orchestrator: audit security + apply fixes, max 6 iterations" → `babyagi-loop.ps1 -InitialTask "security audit" -MaxIterations 6` → T1→security-sub (fire-and-forget) → New-TasksFromResult → Sort-TaskQueue → Invoke-TaskAsync → convergence → monitor polls 15s until stable/300s.
 
 ## Testing
-1. `Invoke-Pester tests\babyagi-loop.Tests.ps1` → 9/9 pass (T1-T6 + fail-closed)
-2. `Invoke-Pester tests\post-delegation-async.Tests.ps1` → 5/5 pass (T1-T5)
-3. Async smoke: `scripts\post-delegation-check.ps1 -BaseRef HEAD -AllowedPaths "src/*" -Async` → returns immediately; assert `(Get-Content HEAD.async-result.json -Raw | ConvertFrom-Json).passed`
+`Invoke-Pester tests\babyagi-loop.Tests.ps1` → 9/9; `tests\post-delegation-async.Tests.ps1` → 5/5; Async smoke: `post-delegation-check.ps1 -Async` → immediate return; `(Get-Content HEAD.async-result.json | ConvertFrom-Json).passed`.
 
 ## Anti-Patterns
-Blocking when async handoff available · ignoring `convergence_check` · not reading `{BaseRef}.async-result.json` · delegating sensitive data (security: DIRECT) · looping past `max_iterations`.
+Blocking when async available · ignoring `convergence_check` · not reading `{BaseRef}.async-result.json` · delegating sensitive data (security: DIRECT) · looping past `max_iterations`.

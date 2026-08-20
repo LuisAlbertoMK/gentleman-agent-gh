@@ -10,15 +10,15 @@ Refactoring: impact analysis, dependency mapping, migration. Test baseline manda
 
 ## Pre-flight
 | Check | Question | Blocker? |
-|-------|----------|----------|
-| Tests | Existing? Pass rate? | Yes -- no refactor without baseline |
-| Coverage | Line %? | Yes if <40% -- tests first |
-| Dependencies | What depends on this? | Yes -- map before touching |
+|---|---|---|
+| Tests | Existing? Pass rate? | Yes — no refactor without baseline |
+| Coverage | Line %? | Yes if <40% — tests first |
+| Dependencies | What depends on this? | Yes — map before touching |
 | Risk | How critical? | High→incremental; Low→direct |
 
 ## Step types
 | Type | Risk | Rollback | Evidence |
-|------|------|----------|----------|
+|---|---|---|---|
 | Extract fn | Low | Single revert | Tests pass |
 | Rename/move | Low-Med | Single revert | Tests + imports |
 | Change signature | Med | Revert + fix callers | Tests + integration |
@@ -26,11 +26,7 @@ Refactoring: impact analysis, dependency mapping, migration. Test baseline manda
 | Merge modules | High | Full revert | Above + perf |
 
 ## Rules
-1. NEVER refactor without test baseline -- no tests -> add first
-2. Each step independently revertible
-3. After EACH step: `go test ./...`. Never batch
-4. Track: `[x] Step N`
-5. Step fails -> stop, analyze, fix or rollback
+1. NEVER refactor without test baseline — no tests → add first. 2. Each step independently revertible. 3. After EACH step: `go test ./...`. Never batch. 4. Track `[x] Step N`. 5. Step fails → stop, analyze, fix or rollback.
 
 ## Output template
 ```
@@ -43,49 +39,21 @@ Refactoring: impact analysis, dependency mapping, migration. Test baseline manda
 3. [RISKY] Action -- integration tests, revert + rebase
 ### Acceptance: after each step -> tests pass
 ```
-## Scenario: Split Monolithic Module (HIGH risk)
-1. [PREP] Write tests at entry points → baseline pass
-2. [SAFE] Extract `types.go` from `main.go` → tests pass
-3. [SAFE] Extract `db.go` (data layer) → tests pass, no import cycles
-4. [MODERATE] Extract `handlers.go` → update routes/imports
-5. [RISKY] Split into `internal/db`, `internal/api`, `internal/types` → full build + integration
-6. [VERIFY] `go test ./... && go build ./...` → baseline perf
+
+## Scenario: Split Monolithic Module (HIGH)
+1. [PREP] Tests at entry points → baseline pass. 2. [SAFE] Extract `types.go` → tests pass. 3. [SAFE] Extract `db.go` → no import cycles. 4. [MODERATE] Extract `handlers.go` → update routes/imports. 5. [RISKY] Split `internal/db|api|types` → full build + integration. 6. [VERIFY] `go test ./... && go build ./...` → baseline perf.
 
 ## Failure Recovery
-**If tests fail after a step:**
-1. `git diff` to see what changed
-2. Failure in refactored code? → fix the mapping error
-3. Unrelated failure? → `git stash` refactor, fix baseline, reapply
-4. Unfixable in 5 min? → `git checkout -- .`, redo step
-
-**Rollback:** Each step maps to 1-2 files — `git checkout <file>` reverts; `git revert` full branch for split/merge.
+1. `git diff` → what changed. 2. Failure in refactored code → fix mapping. 3. Unrelated → `git stash` refactor, fix baseline, reapply. 4. Unfixable in 5 min → `git checkout -- .`, redo step. **Rollback**: each step maps to 1-2 files — `git checkout <file>`; `git revert` full branch for split/merge.
 
 ## Post-Refactor: mem_save
-```
-title: "Refactored {module} — {extract|rename|split}"
-type: "architecture"
-content: |
-  What: {X} from {Y} | Why: {reason} | Where: {paths} | Learned: {gotchas}
-```
+`title:"Refactored {module} — {extract|rename|split}" type:"architecture" content:"What: {X} from {Y} | Why: {reason} | Where: {paths} | Learned: {gotchas}"`
 
 ## Refs
 metricas · quality-gate · sdd · code-review-agent · triple-verify
 
 ## Examples
-User: "refactoring: split main.go — behavior identical"
-```bash
-go test ./...                    # baseline GREEN (mandatory pre-step)
-git mv main.go types.go          # [SAFE] extract types
-go test ./...                    # → ok
-# extract db.go → go test ./... → ok, no import cycles
-# risky split into internal/* → full build + integration
-go test ./... && go build ./...  # acceptance: baseline perf
-```
-
-## Testing
-1. Baseline gate: `go test ./...` must pass BEFORE step 1 — no refactor without it
-2. Per-step: after EACH step `go test ./...`; failure → stop, analyze, fix or `git checkout <file>`
-3. Cycle scan: after each extract, `go list -deps ./...` → no import cycles
+"refactoring: split main.go" → `go test ./...` baseline → `git mv main.go types.go` → test → extract db.go → risky split → `go test && go build` acceptance.
 
 ## Anti-Patterns
-Refactor without test baseline · Batch steps before testing · Skip impact analysis · No rollback plan · Change API in same refactor
+Refactor without baseline · Batch steps before testing · Skip impact analysis · No rollback plan · Change API in same refactor

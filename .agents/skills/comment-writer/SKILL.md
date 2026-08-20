@@ -6,129 +6,48 @@ changelog: docs/ciclos/cycle28-20260815.md
 ---
 
 ## When to Use
-
-Load this skill whenever you write a comment that another human will read.
-
-Use it for:
-
-- GitHub PR or issue comments.
-- Review feedback and requested changes.
-- Maintainer replies.
-- Slack, Discord, or async project updates.
+Whenever you write a comment another human will read: GitHub PR/issue comments, review feedback, maintainer replies, Slack/Discord updates.
 
 ## Voice Rules
-
 | Rule | Requirement |
-|------|-------------|
-| Be useful fast | Start with the actionable point. Do not recap the whole PR before feedback. |
-| Be warm and direct | Sound like a thoughtful teammate, not a corporate bot. |
-| Keep it short | Prefer 1 to 3 short paragraphs or a tight bullet list. |
-| Explain why | Give the technical reason when asking for a change. |
-| Avoid pile-ons | Comment on the highest-value issue, not every tiny preference. |
-| Match target context language | Write in the target context language by default: Spanish issue/thread -> Spanish comment, English issue/thread -> English comment, mixed context -> target message language. If the user explicitly requests a language or tone, follow that request. For Spanish comments, use neutral/professional Spanish by default unless the user or target context clearly calls for regional tone. |
-| No em dashes | Use commas, periods, or parentheses instead. |
+|---|---|
+| Be useful fast | Start with the actionable point. No PR recap first. |
+| Be warm and direct | Thoughtful teammate, not corporate bot. |
+| Keep it short | 1-3 short paragraphs or a tight bullet list. |
+| Explain why | Give the technical reason when asking for change. |
+| Avoid pile-ons | Comment on highest-value issue, not every preference. |
+| Match target context language | Spanish thread→Spanish, English→English, mixed→target message language. User request overrides. Spanish default: neutral/professional. |
+| No em dashes | Commas, periods, or parentheses instead. |
 
 ## Comment Formula
-
-```text
+```
 <Direct observation or request>
-
 <Why it matters, only if needed>
-
 <Concrete next action>
 ```
 
 ## Examples
+- **Request change**: "Good approach overall. I'd split this into a separate commit because it mixes validation logic with UI wiring. That keeps the reviewer's focus narrower and makes rollback cleaner if integration fails."
+- **Security**: "The token is exposed in the query string — logs and browser history capture it. Move it to an `Authorization: Bearer` header or secure cookie."
+- **Perf**: "This loop queries the DB per iteration — 50 items = 50 round trips. Batch with `WHERE id IN (...)` / `findMany`. Cuts ~500ms→~50ms."
+- **Celebrate**: "Love the simplification on line 89 — flat map cut 60 lines and made intent obvious. Thanks."
 
-### Request change
-
-```markdown
-Good approach overall. I'd split this into a separate commit because it mixes validation logic with UI wiring.
-
-That keeps the reviewer's focus narrower and makes rollback cleaner if the integration fails.
-```
-
-### Approve with a note
-
-```markdown
-Approved. The scope is clear and the change is well-contained.
-
-For the next PR, add links to the previous and following PRs so the chain stays navigable.
-```
-
-### Security concern (C28)
-
-```markdown
-The token is exposed in the query string - logs and browser history will capture it.
-
-Move it to an `Authorization: Bearer` header or a secure cookie. That prevents accidental leakage in proxy logs and Referer headers.
-```
-
-### Performance nudge (C28)
-
-```markdown
-This loop queries the DB per iteration - 50 items = 50 round trips.
-
-Batch it with a single `WHERE id IN (...)` or use the repository's `findMany`. Cuts latency from ~500ms to ~50ms.
-```
-
-### Celebrate good work (C28)
-
-```markdown
-Love the simplification on line 89 - replacing the visitor pattern with a flat map cut 60 lines and made the intent obvious.
-
-That kind of cleanup pays dividends. Thanks for taking the time.
-```
-
-## Testing Patterns
-
-### 1. Tone calibration test
-```bash
-# Input: aggressive PR comment
-# Expected: rewrite to warm + direct without losing the ask
-echo "This is wrong. Fix it." | ./scripts/tone-check.sh
-# Output should include actionable request + "why"
-```
-
-### 2. Language matching test
-```bash
-# Input: Spanish issue thread + English comment draft
-# Expected: output in Spanish (neutral/professional)
-./scripts/lang-match.sh --context=es --draft="Please fix this bug"
-# Output: "Por favor, corrige este error. El caso limite en la linea 12..."
-```
-
-### 3. Formula compliance test
-```bash
-# Input: raw feedback
-# Expected: 3-part structure (observation, why, action)
-./scripts/formula-check.sh --comment="Good work but add tests"
-# FAIL: missing "why" and "action"
-# PASS: "Good work. Tests prevent regressions when we refactor. Add unit tests for the parser."
-```
+## Testing
+1. Tone: aggressive input → warm+direct rewrite, keeps the ask, includes "why". 2. Language: ES thread + EN draft → output ES (neutral). 3. Formula: raw feedback → 3-part structure; missing why/action → FAIL.
 
 ## Edge Cases
-
 | Scenario | Handling |
-|----------|----------|
-| **Mixed-language thread** (English PR, Spanish comments) | Default to thread language; if ambiguous, match the *last human message* |
-| **Author is non-native English speaker** | Simpler sentences, avoid idioms, keep "why" explicit - warmth over cleverness |
-| **High-stakes security finding** | Lead with impact (not "nice work"), be unambiguous, tag security owners, suggest immediate mitigation |
-| **Comment on your own PR** | Same formula. Self-review: "I'm splitting this because..." - models the standard |
+|---|---|
+| Mixed-language thread | Thread language; ambiguous → last human message |
+| Non-native author | Simpler sentences, no idioms, explicit "why" |
+| High-stakes security finding | Lead with impact, unambiguous, tag owners, immediate mitigation |
+| Own PR | Same formula, self-review models the standard |
 
 ## Commands
-
-```bash
-# Inspect a PR before writing review feedback
-gh pr view <PR_NUMBER> --json title,body,additions,deletions,changedFiles
-```
+`gh pr view <PR_NUMBER> --json title,body,additions,deletions,changedFiles`
 
 ## Refs
 code-review-agent . comment-writer . branch-pr
 
 ## Anti-Patterns
-
-| Anti-Pattern | Why It Fails | Fix |
-|--------------|--------------|-----|
-| Write before reading the PR | Feedback misses context, wastes reviewer time | Read first. Comment on what you actually saw. |
-| Recapitulate entire diff | Noise drowns signal; author tunes out | Quote the specific line or block. One observation per comment. |
+Write before reading the PR · Recapitulate entire diff
