@@ -1,5 +1,5 @@
 #requires -Version 5.1
-[CmdletBinding(SupportsShouldProcess=$true)]
+[CmdletBinding()]
 <#
 .SYNOPSIS
   Project Complexity Index (PCI) + capability probe for automejora-analyzer (read-only).
