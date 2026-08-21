@@ -11,10 +11,71 @@ Before answering "what's missing", "qué falta", "gaps", "needs improvement", "q
 
 **Violation**: Skipping this gate → protocol violation → Default-FAIL.
 - Add `confidence:` to EVERY claim: `high`|`medium`|`low`|`unvalidated`
+- **AUTO-TRIGGER** (root-cause fix from 2026-07-28 self-analysis): if user query
+  matches `/qué(falta|te falta)|what.fails|what.s missing|gaps?|needs? improvement|weak|worst point/i`
+  → run Phase 4 of `analysis-mode` (cross-ref docs/mejoras + ctx_search + mem_search)
+  BEFORE forming a gap answer. If analysis-mode lacks Phase 4 → HALT, restore first.
+  This makes the Evidence Gate skill-driven, not prompt-memory-dependent.
+
+## Proactive Memory Capture Hook (MANDATORY for memory weakness #1)
+
+Medium-term conversational memory is lost at compaction cycles unless explicitly
+persisted to Engram. Close the loop: the checkpoint script cannot call mem_save
+(it's an MCP tool); THIS hook is the enforcer.
+Before each response that crosses a decision boundary (post-fix, post-decision,
+or whenever context enters YELLOW+):
+1. Read `ctx_stats` (capture `percent` if the tool exposes it; in this
+   runtime ctx_stats reports adapter/KB stats only — see ctx_watchdog zone
+   thresholds at ctx-watchdog.ps1:11-15 if percent is unavailable).
+2. Trigger mem_save IF EITHER:
+   a. percent >= 40 (YELLOW+ zone), OR
+   b. a decision boundary was crossed this round (post-fix, post-decision,
+      post-discovery) — reliable even when percent is unavailable.
+   a. Call `engram_mem_save` with `topic_key="checkpoint/session-state"`,
+      type=`pattern`, title="checkpoint:auto".
+   b. IF mem_save unavailable / returns judgment_required → flag
+      `confidence: low` and surface to user.
+3. Tag every persisted checkpoint with: zone, percent, session_id, decisions[], discoveries[].
+Fallback if mem_save fails → `ctx_index(content, source="session-fallback", intent="checkpoint")`.
+This is the detector the meta-analysis (docs/mejoras/2026-07-28-orchestrator-self-analysis.md:13)
+asked for: "mechanisms exist, enforcement is nulo". THIS hook enforces.
+
+## UX Decision Boundary Hook (MANDATORY for UX weakness #2)
+
+Creativity vs precision gap: I can detail WHAT and WHY a design does, but not
+HOW it FEELS (micro-interactions, timing, easing). Bridge lives in
+scripts/ui-specialist-pairing.ps1 — but its `full` mode requires Ollama
+(localhost:11434), which is NOT always running (validated: ECONNREFUSED on
+this runtime). Mirror the Memory Hook pattern — offline-first.
+
+Before each UX-facing response (design audit, component spec, visual suggestion):
+1. Run `baseline-ui` skill audit on the target (no runtime dependency — works offline).
+2. IF baseline-ui surfaces violations + decision boundary crossed:
+   a. Delegate `ui-engine` as subagent for 3 implementation variants.
+   b. IF ollama reachable (ctx_stats/ping 11434) → fire `vision-analyze` for
+      micro-interaction validation (timing, state transitions, feedback).
+   c. ELSE → flag `confidence: low` for visual-feel claims; rely on lint + docs
+      cross-reference (Material 3, Apple HIG, shadcn/ui) instead.
+3. Persist audit findings to Engram via mem_save (use the Memory Hook above).
+
+## Performance Profiling Hook (MANDATORY for perf weakness #3)
+
+Extrema precisión: I can find N+1, O(n²), memory hotspots — but hardware-profile.ps1,
+benchmark-regression.ps1, heap-snapshot.ps1 ALL require PS 7.0, and `pwsh *` is
+policy-denied in this runtime. Same enforcement gap as #1/#2: written, not runnable here.
+
+On any perf-adjacent decision boundary (post-optimization, post-fix >50 lines, N+1 found):
+1. Run `ctx_stats` token-budget analysis (offline-first — always fires).
+2. IF perf concern + ctx_execute/sandbox has shell:
+   a. Run `performance-tracker` / `perf-profiling` skill (read-only analysis).
+   b. IF hardware-profile.ps1 reachable (pwsh 7+): capture zone via
+      hardware-profile.ps1 -Json + perf-regression.ps1 benchmark (10 runs, median/IQR).
+   c. ELSE → flag `confidence: low`; ship ctx_stats baseline + plan, escalate to human.
+3. Persist profiling findings via mem_save (Memory Hook).
 
 ## Routing
 
-**Load skill `opencode-model-router`** for the single routing authority. It contains:
+**Load skill `opencode-model-router`**** for the single routing authority. It contains:
 - Task → Agent → Model → Fallback mapping
 - Security gate (credentials, context >150K)
 - Context → Action thresholds

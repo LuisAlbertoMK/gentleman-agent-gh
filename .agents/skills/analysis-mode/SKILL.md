@@ -13,6 +13,16 @@ Trigger: !analisis, !analysis, multi-agent analysis. Read-only 4-phase pipeline.
 ## P3: SYNTHESIZE
 `|Finding|Consensus|Risk|Files|Recommendation|`
 UNANIMOUS(all)|MAJORITY(≥50%)|SPLIT(<50%)|OUTLIER(single). >30 findings→top-15, rest appendix.
+## Phase 4: CROSS-REFERENCE (evidence gate — restored)
+**MANDATORY** before emitting any "what's missing"/"qué falta"/"gaps" finding.
+Prevents the 2026-07-28 failure mode (responding from training data without
+consulting documented analyses). Steps:
+1. `glob docs/mejoras/*.md` — list existing analyses for this project.
+2. `ctx_search(queries: ["analysis:<project>", "<topic> gaps", "<topic> improvement"])`
+3. `mem_search(query: "analysis:<project>")`
+4. **Cross-reference**: IF finding exists → cite `file:line`. IF novel → flag `confidence: unvalidated`.
+5. NEVER present speculation as fact — every claim MUST carry `confidence: high|medium|low|unvalidated`.
+Append cross-ref results as `## Evidence Check` block to the P3 synthesis in `docs/mejoras/**`.
 ## OUTPUT
 `docs/mejoras/YYYY-MM-DD-<project>-analisis.md` — Summary,Findings(8dims),Synthesis,RiskMatrix,Recs,Engram,Trend. Gate: Plan only — NO code/commit. Exit before implementing.
 ## Reference
