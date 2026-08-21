@@ -475,3 +475,29 @@ delegation-registry.ps1 -WhatIf: shows registry writes would occur
 
 ### Pendiente
 - [x] Merge to `main` (commit ce1499a1) — all automejora v3 cycles + C1b bonus + final push
+
+## Ciclo 7 - Subagent validation hardening + mejoras index gate (Cycle 29) - `5f65013e`
+
+**Fecha**: 2026-08-20 · **Plan**: `plan-auto-mejora-v3-2026-08-20.md` · **Branch**: `experimento/mejora-autonoma-2026-08-20`
+
+### G1: check-subagent-output.ps1 stderr noise + non-hermetic tests
+- **Root cause 1**: filtro de stderr solo excluia `^warning:` -> lineas `fatal:` de git contaban como archivos cambiados -> empty diff reportaba exit 0 (silent failure NO detectado)
+- **Root cause 2**: sin git identity global, commits de fixtures fallaban exit 128 -> T2-T4 pasaban vacuamente
+- **Fix**: `2>$null` + `$LASTEXITCODE -ne 0` fatal (ADR-040); fixtures hermetico; T5 nuevo (BaseRef invalido -> exit 1)
+- **Breaker**: PASS-WITH-NOTES; HIGH (BaseRef silencioso) corregido; MEDIUM empty-repo y LOW case-sensitivity documentados, no fix (pre-existentes/fuera de scope)
+
+### G2: docs/mejoras index sink (19/54 indexados)
+- **Fix**: `scripts/mejoras-index-check.ps1` fail-closed + 14 tests (ADR-041); README sincronizado 54/54; script count drift README 117->118
+
+### Verificacion
+--- Pester (suite completa x2, post-commits) ---
+RUN1/RUN2: resultados identicos; vs baseline main (1288 pass/32 fail/1321):
++1 fix pre-existente (T1), +19 tests nuevos verdes, 0 regresiones de codigo
+(2 fails ambientales validate-write-scope T1/T3: sensibles a arbol sucio, pasan en arbol limpio)
+
+--- Quality gate pre-commit ---
+22/22 ALL CLEAR en ambos commits de codigo
+
+### ADRs
+- `adr/ADR-040-subagent-output-stderr-fatal.md`
+- `adr/ADR-041-mejoras-index-freshness-gate.md`
