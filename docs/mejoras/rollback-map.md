@@ -148,3 +148,19 @@ Branch: `experimento/mejora-autonoma-2026-08-20` · Base: `main` HEAD `33425647`
 ### Per-cycle rollback
 - **Ciclo 1 (G1)**: `git revert 5f65013e 37c4573a` (orden: fatal-check primero, luego stderr) - valida que T1 vuelva a fallar como en baseline
 - **Ciclo 2 (G2)**: `git revert e1ab1b27` - autocontenido, no afecta Ciclo 1
+
+---
+
+# Rollback Map - Ciclo 30 (2026-08-20)
+
+Branch: `experimento/mejora-autonoma-2026-08-20-c30` | Base: `main` HEAD `85176d54`
+
+| Commit | Mensaje | Rollback |
+|--------|---------|----------|
+| `bd707b76` | fix(gate): strip GIT_* env before running staged Pester suites | `git revert bd707b76` - reintroduce vector de corrupcion (fixtures bajo gate tocan repo real) |
+| `ea617cde` | feat(validation): add -AgentOutputFile to check-subagent-output | `git revert ea617cde` - elimina transporte por archivo y hardening de fixtures (tests vuelven a ser fragiles bajo gate) |
+| `e8121588` | feat(monitor): wire C4d contract validation into async delegation | `git revert e8121588` - async-result.json pierde contract_*; T6-T8 fallan |
+| `013e4577` | feat(monitor): expose contract_ran in async-result.json | `git revert 013e4577` - consumidores pierden senal explicita not-evaluated |
+
+### Per-cycle rollback
+- **Ciclo 30 completo**: `git revert 013e4577 e8121588 ea617cde bd707b76` (orden inverso) - vuelve al comportamiento pre-C4d del monitor; docs/mejoras/2026-08-15 deja de estar implementado en async
