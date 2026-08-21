@@ -126,8 +126,13 @@ function Get-CheckSnapshot {
         $escapedRoot = ConvertTo-SqlLiteral $RepoRoot
         $csoCmd = "& '$csoScript' -BaseRef '$escapedBase' -RepoRoot '$escapedRoot' -Quiet"
         if ($ExpectedFiles) {
-            $escapedFiles = ($ExpectedFiles | ForEach-Object { "'" + (ConvertTo-SqlLiteral $_) + "'" }) -join ' '
-            $csoCmd += " -ExpectedFiles " + $escapedFiles
+            # Build an array subexpression @('a','b') in the -Command string.
+            # Naive space-joined '-ExpectedFiles a b' does NOT bind [string[]]
+            # when the command runs through `pwsh -Command` (only the first
+            # value binds; the rest hit positional/binding errors). Verified:
+            # @() subexpression binds correctly and reports missing files.
+            $quoted = ($ExpectedFiles | ForEach-Object { "'" + (ConvertTo-SqlLiteral $_) + "'" }) -join ','
+            $csoCmd += " -ExpectedFiles @($quoted)"
         }
         if ($SubagentOutputFile -and (Test-Path -LiteralPath $SubagentOutputFile)) {
             $csoCmd += " -AgentOutputFile '" + (ConvertTo-SqlLiteral $SubagentOutputFile) + "'"

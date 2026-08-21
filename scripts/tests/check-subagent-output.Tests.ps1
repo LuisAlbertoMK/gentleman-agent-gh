@@ -209,5 +209,22 @@ found stuff
         $json.contract_valid | Should -BeFalse
         $json.contract_detail | Should -Match 'Nuance'
     }
+
+    It 'T6 -ExpectedFiles multi-value via -Command binds all elements (regression: was silently dropped)' {
+        # Reproduces the monitor/post-delegation -Command subprocess vector:
+        # `pwsh -NoProfile -NoLogo -Command "& 'cso' -ExpectedFiles @('a','b')"`.
+        # Previously the monitor built '-ExpectedFiles 'a' 'b' (space-joined),
+        # which PS fails to bind to [string[]] under -Command — ExpectedFiles
+        # arrived empty and missing files were never reported (silent pass).
+        Set-Content -Path (Join-Path $script:fixtureRepo 'new.txt') -Value 'x'
+        $baseRef = (git -C $script:fixtureRepo rev-parse HEAD).Trim()
+        $csoCmd = "& '$scriptPath' -BaseRef '$baseRef' -RepoRoot '$script:fixtureRepo' -Quiet -ExpectedFiles @('new.txt','ghost-missing.txt')"
+        $out = & pwsh -NoProfile -NoLogo -Command $csoCmd 2>&1
+        $LASTEXITCODE | Should -Be 0   # ghost-missing.txt makes missing_expected nonempty, but status stays OK for missing_expected alone
+        $json = ($out | Where-Object { $_ -match '^\{' } | Select-Object -First 1) | ConvertFrom-Json -ErrorAction SilentlyContinue
+        $json | Should -Not -BeNullOrEmpty -Because "raw=$($out -join ' | ')"
+        $json.missing_expected | Should -Contain 'ghost-missing.txt'
+        $json.missing_expected | Should -NOT -Contain 'new.txt'
+    }
 }
 
