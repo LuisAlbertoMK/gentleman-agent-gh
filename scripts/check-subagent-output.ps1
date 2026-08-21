@@ -37,6 +37,7 @@ param(
     [string]$RepoRoot   = $(Split-Path -Parent $PSScriptRoot),
     [string[]]$ExpectedFiles = @(),
     [string]$AgentOutput = "",   # C4d: subagent text output for 4-field contract validation
+    [string]$AgentOutputFile = "",   # C4d: path to file containing subagent text output (overrides -AgentOutput when set)
     [switch]$Quiet
 )
 Set-StrictMode -Version Latest
@@ -139,6 +140,17 @@ if ($files.Count -eq 0) {
 $missing = @()
 if ($ExpectedFiles) {
     $missing = $ExpectedFiles | Where-Object { $files -notcontains $_ }
+}
+
+# C4d: load agent output from file when provided (overrides inline -AgentOutput)
+if ($AgentOutputFile) {
+    try {
+        $AgentOutput = [IO.File]::ReadAllText($AgentOutputFile)
+    } catch {
+        if ($Quiet) { @{status="FAIL";reason="agent-output-unreadable";detail=$_.Exception.Message} | ConvertTo-Json -Compress }
+        else { Write-Error "Cannot read -AgentOutputFile: $($_.Exception.Message)" }
+        exit 1
+    }
 }
 
 # --- C4d: Contract validation ---

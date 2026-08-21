@@ -117,7 +117,22 @@ Describe "check-subagent-output.ps1 — contract validation flag in Quiet mode (
         # file. The script fail-closes (exit 1, status=FAIL) on an EMPTY diff, so it
         # needs visible changes to reach contract validation — a real-repo dependency
         # made these tests flaky depending on CI working-tree state.
-        $script:fixtureRepo = Join-Path $TestDrive 'repo'
+        #
+        # GIT_* SANITIZATION: when this suite runs inside a git pre-commit hook,
+        # git exports GIT_DIR/GIT_INDEX_FILE/GIT_WORK_TREE into the hook process.
+        # Those variables override -C for every child git call (fixture setup AND
+        # the script-under-test subprocess), redirecting them at the REAL repo and
+        # producing empty-diff early exits. Strip them for the duration of each test.
+        $script:savedGitEnv = @{}
+        foreach ($v in 'GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY') {
+            if (Test-Path "Env:$v") { $script:savedGitEnv[$v] = [Environment]::GetEnvironmentVariable($v) }
+            Remove-Item "Env:$v" -ErrorAction SilentlyContinue
+        }
+        # Unique path per test: $TestDrive may persist across Its within a run;
+        # a fixed 'repo' name lets one test's leftover untracked files be silently
+        # committed by the next test's `git add .` + `commit`, producing an
+        # empty-status fixture and bogus empty-output failures.
+        $script:fixtureRepo = Join-Path $TestDrive "repo-$([guid]::NewGuid().ToString('N').Substring(0, 8))"
         New-Item -ItemType Directory -Path $script:fixtureRepo -Force | Out-Null
         git -C $script:fixtureRepo init -q
         git -C $script:fixtureRepo config user.email "test@example.com"
@@ -125,29 +140,74 @@ Describe "check-subagent-output.ps1 — contract validation flag in Quiet mode (
         Set-Content -Path (Join-Path $script:fixtureRepo 'base.txt') -Value 'base'
         git -C $script:fixtureRepo add .
         git -C $script:fixtureRepo commit -q -m "base"
+        if ($LASTEXITCODE -ne 0) { throw "fixture base commit failed (exit $LASTEXITCODE)" }
         Set-Content -Path (Join-Path $script:fixtureRepo 'untracked.txt') -Value 'change'
     }
 
+    AfterEach {
+        foreach ($kv in $script:savedGitEnv.GetEnumerator()) {
+            [Environment]::SetEnvironmentVariable($kv.Key, $kv.Value)
+        }
+    }
+
     It "reports contract_valid=true for well-formed output" {
-        $valid = "## Decision Taken`nFix C4d`n## Files Changed`nsrc/x.ts`n## Key Findings`n1. [HIGH] f`n## Nuance`nok"
+        $valid = @'
+## Decision Taken
+Fix C4d
+## Files Changed
+src/x.ts
+## Key Findings
+1. [HIGH] f
+## Nuance
+ok
+'@
+        # SAFE transport: pass the agent output via -AgentOutputFile instead of an
+        # inline -AgentOutput argument. Inline multiline arguments depend on the
+        # caller's native argument-passing mode and get truncated at the first
+        # newline under some hosts (e.g. the pre-commit gate), producing a binding
+        # failure and empty stdout. File transport is environment-independent.
         $tmpFile = Join-Path $TestDrive 'agent_out.txt'
-        Set-Content -Path $tmpFile -Value $valid -NoNewline
-        # SAFE transport: read content in-process and pass as a real argument to the
-        # child script via -File, instead of double-interpolating the agent output
-        # inside a -Command string (which corrupts content containing quotes/`/'$').
-        $content = Get-Content -Raw -Path $tmpFile
-        $json = & pwsh -NoProfile -File $scriptPath -RepoRoot $script:fixtureRepo -Quiet -AgentOutput $content | ConvertFrom-Json -ErrorAction SilentlyContinue
+        Set-Content -Path $tmpFile -Value $valid
+        $json = & pwsh -NoProfile -File $scriptPath -RepoRoot $script:fixtureRepo -Quiet -AgentOutputFile $tmpFile | ConvertFrom-Json -ErrorAction SilentlyContinue
+        $json | Should -Not -BeNullOrEmpty
         $json.contract_valid | Should -BeTrue
     }
 
     It "reports contract_valid=false for missing Nuance" {
-        $bad = "## Decision Taken`nFix`n## Files Changed`nsrc/x.ts`n## Key Findings`n1. [HIGH] f"
+        $bad = @'
+## Decision Taken
+Fix
+## Files Changed
+src/x.ts
+## Key Findings
+1. [HIGH] f
+'@
         $tmpFile = Join-Path $TestDrive 'agent_out_bad.txt'
-        Set-Content -Path $tmpFile -Value $bad -NoNewline
-        $content = Get-Content -Raw -Path $tmpFile
+        Set-Content -Path $tmpFile -Value $bad
         # SAFE transport: see note in the well-formed test above.
-        $json = & pwsh -NoProfile -File $scriptPath -RepoRoot $script:fixtureRepo -Quiet -AgentOutput $content | ConvertFrom-Json -ErrorAction SilentlyContinue
+        $rawOut = & pwsh -NoProfile -File $scriptPath -RepoRoot $script:fixtureRepo -Quiet -AgentOutputFile $tmpFile 2>&1
+        $json = $rawOut | ConvertFrom-Json -ErrorAction SilentlyContinue
+        $json | Should -Not -BeNullOrEmpty -Because "cso must emit parseable JSON; got: $($rawOut -join ' | ')"
         $json.contract_valid | Should -BeFalse
+    }
+
+    It 'T5 -AgentOutputFile loads output from file and detects contract violation' {
+        $badOutput = @'
+## Decision Taken
+did things
+## Files Changed
+- a.txt
+## Key Findings
+found stuff
+'@
+        $outFile = Join-Path $TestDrive 'agent-output.md'
+        Set-Content -Path $outFile -Value $badOutput -Encoding UTF8
+        Set-Content -Path (Join-Path $script:fixtureRepo 'new.txt') -Value 'x'
+        $r = & pwsh -NoProfile -File $scriptPath -RepoRoot $script:fixtureRepo -BaseRef HEAD -AgentOutputFile $outFile -Quiet 2>&1
+        $LASTEXITCODE | Should -Be 0
+        $json = ($r | Where-Object { $_ -match '^\{' } | Select-Object -First 1) | ConvertFrom-Json
+        $json.contract_valid | Should -BeFalse
+        $json.contract_detail | Should -Match 'Nuance'
     }
 }
 
