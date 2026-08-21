@@ -231,8 +231,10 @@ if (Test-Path $csoScript) {
         $csoCmd += " -AgentOutput '$escapedOutput'"
     }
     if ($ExpectedFiles) {
-        $escapedFiles = ($ExpectedFiles | ForEach-Object { "'" + (ConvertTo-SqlLiteral $_) + "'" }) -join ' '
-        $csoCmd += " -ExpectedFiles " + $escapedFiles
+        # Array subexpression @() binds [string[]] correctly through the -Command
+        # subprocess vector — see monitor-subagent.ps1 and ADR-042 note.
+        $quoted = ($ExpectedFiles | ForEach-Object { "'" + (ConvertTo-SqlLiteral $_) + "'" }) -join ','
+        $csoCmd += " -ExpectedFiles @($quoted)"
     }
     $csoSubproc = Invoke-SubprocessWithTimeout -CommandLine $csoCmd -TimeoutSec $TimeoutSeconds
     $csoResult = $csoSubproc.output | Where-Object { $_ -match '^\{' } | Select-Object -First 1 | ConvertFrom-Json -ErrorAction SilentlyContinue
