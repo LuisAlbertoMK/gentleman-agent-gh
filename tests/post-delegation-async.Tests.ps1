@@ -41,7 +41,7 @@ Describe 'monitor-subagent.ps1' {
         $ast = [System.Management.Automation.Language.Parser]::ParseFile($monitorPath, [ref]$tokens, [ref]$errors)
         $errors.Count | Should -Be 0
         $paramNames = @($ast.ParamBlock.Parameters | ForEach-Object { $_.Name.VariablePath.UserPath })
-        'BaseRef','AllowedPaths','ExpectedFiles','RepoRoot','PollIntervalSec','MaxWaitSec' |
+        'BaseRef','AllowedPaths','ExpectedFiles','SubagentOutputFile','RepoRoot','PollIntervalSec','MaxWaitSec' |
             ForEach-Object { $paramNames | Should -Contain $_ }
     }
 
@@ -98,5 +98,113 @@ Describe 'monitor-subagent.ps1' {
         $json = Get-Content -Path $resultFile -Raw | ConvertFrom-Json
         $json.base_ref | Should -Be 'HEAD~1'
         $json.status | Should -Be 'OK'
+    }
+
+    It 'T6 -SubagentOutputFile with valid 4-field output reports contract_valid=true' {
+        $repo = Join-Path $TestDrive 'repo-contract-valid'
+        New-Item -ItemType Directory -Path $repo -Force | Out-Null
+        git -C $repo init --quiet 2>&1
+        git -C $repo config user.email 'test@test.local'
+        git -C $repo config user.name 'Pester Test'
+        Set-Content -Path (Join-Path $repo 'init.txt') -Value 'initial'
+        git -C $repo add init.txt 2>&1
+        git -C $repo commit -m 'init' --quiet 2>&1
+        Set-Content -Path (Join-Path $repo 'new.txt') -Value 'new file'
+
+        $outFile = Join-Path $repo 'agent-output.txt'
+        Set-Content -Path $outFile -Value @"
+## Decision Taken
+Added new file.
+
+## Files Changed
+new.txt
+
+## Key Findings
+1. LOW Test finding — evidence — recommendation
+
+## Nuance
+Some detail here.
+"@
+
+        Push-Location $repo
+        try {
+            $out = & pwsh -NoProfile -File $monitorPath -BaseRef HEAD -AllowedPaths '*.txt' -SubagentOutputFile $outFile -RepoRoot $repo -PollIntervalSec 1 -MaxWaitSec 30 2>&1
+        } finally { Pop-Location }
+        $LASTEXITCODE | Should -Be 0
+
+        $resultFile = Join-Path $repo 'HEAD.async-result.json'
+        Test-Path $resultFile | Should -BeTrue
+        $json = Get-Content -Path $resultFile -Raw | ConvertFrom-Json
+        $json.contract_valid | Should -BeTrue
+        $contractCheck = @($json.checks) | Where-Object { $_.name -eq 'contract_validation' }
+        $contractCheck | Should -Not -BeNullOrEmpty
+        $contractCheck.passed | Should -BeTrue
+    }
+
+    It 'T7 -SubagentOutputFile with missing Nuance fails contract validation' {
+        $repo = Join-Path $TestDrive 'repo-contract-fail'
+        New-Item -ItemType Directory -Path $repo -Force | Out-Null
+        git -C $repo init --quiet 2>&1
+        git -C $repo config user.email 'test@test.local'
+        git -C $repo config user.name 'Pester Test'
+        Set-Content -Path (Join-Path $repo 'init.txt') -Value 'initial'
+        git -C $repo add init.txt 2>&1
+        git -C $repo commit -m 'init' --quiet 2>&1
+        Set-Content -Path (Join-Path $repo 'new.txt') -Value 'new file'
+
+        $outFile = Join-Path $repo 'agent-output.txt'
+        Set-Content -Path $outFile -Value @"
+## Decision Taken
+Added new file.
+
+## Files Changed
+new.txt
+
+## Key Findings
+1. LOW Test finding — evidence — recommendation
+"@
+
+        Push-Location $repo
+        try {
+            $out = & pwsh -NoProfile -File $monitorPath -BaseRef HEAD -AllowedPaths '*.txt' -SubagentOutputFile $outFile -RepoRoot $repo -PollIntervalSec 1 -MaxWaitSec 30 2>&1
+        } finally { Pop-Location }
+        $LASTEXITCODE | Should -Be 1
+
+        $resultFile = Join-Path $repo 'HEAD.async-result.json'
+        Test-Path $resultFile | Should -BeTrue
+        $json = Get-Content -Path $resultFile -Raw | ConvertFrom-Json
+        $json.status | Should -Be 'FAIL'
+        $json.contract_valid | Should -BeFalse
+        $contractCheck = @($json.checks) | Where-Object { $_.name -eq 'contract_validation' }
+        $contractCheck | Should -Not -BeNullOrEmpty
+        $contractCheck.passed | Should -BeFalse
+    }
+
+    It 'T8 -SubagentOutputFile nonexistent path skips contract check' {
+        $repo = Join-Path $TestDrive 'repo-contract-skip'
+        New-Item -ItemType Directory -Path $repo -Force | Out-Null
+        git -C $repo init --quiet 2>&1
+        git -C $repo config user.email 'test@test.local'
+        git -C $repo config user.name 'Pester Test'
+        Set-Content -Path (Join-Path $repo 'init.txt') -Value 'initial'
+        git -C $repo add init.txt 2>&1
+        git -C $repo commit -m 'init' --quiet 2>&1
+        Set-Content -Path (Join-Path $repo 'new.txt') -Value 'new file'
+
+        $fakePath = Join-Path $repo 'nonexistent-output.txt'
+
+        Push-Location $repo
+        try {
+            $out = & pwsh -NoProfile -File $monitorPath -BaseRef HEAD -AllowedPaths '*.txt' -SubagentOutputFile $fakePath -RepoRoot $repo -PollIntervalSec 1 -MaxWaitSec 30 2>&1
+        } finally { Pop-Location }
+        $LASTEXITCODE | Should -Be 0
+
+        $resultFile = Join-Path $repo 'HEAD.async-result.json'
+        Test-Path $resultFile | Should -BeTrue
+        $json = Get-Content -Path $resultFile -Raw | ConvertFrom-Json
+        $json.contract_valid | Should -BeTrue   # sync-path convention: not evaluated = no violation detected
+        $json.contract_detail | Should -Be 'not evaluated'
+        $contractCheck = @($json.checks) | Where-Object { $_.name -eq 'contract_validation' }
+        $contractCheck | Should -BeNullOrEmpty
     }
 }
