@@ -94,14 +94,14 @@ if (-not (Test-Path (Join-Path $RepoRoot ".git"))) {
 # 1. Committed changes (BaseRef..HEAD range) — detect subagent commits
 $committed = @()
 try {
-    $committed = git -C $RepoRoot diff --name-only "$BaseRef..HEAD" 2>&1 |
+    $committed = git -C $RepoRoot diff --name-only "$BaseRef..HEAD" 2>$null |
         Where-Object { $_ -and $_ -notmatch "^warning:" -and $_ -notmatch "^\s*$" }
     } catch { Write-Debug "check-subagent-output: committed git diff failed (non-fatal) — $_" }
 
 # 2. Working-tree changes incl. untracked (via status porcelain)
 $statusRaw = @()
 try {
-    $statusRaw = git -C $RepoRoot status --porcelain 2>&1
+    $statusRaw = git -C $RepoRoot status --porcelain 2>$null
     } catch { Write-Debug "check-subagent-output: git status failed (non-fatal) — $_" }
 $wcFiles = @($statusRaw | Where-Object { $_ -and $_ -notmatch "^warning:" } |
     ForEach-Object {

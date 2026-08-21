@@ -16,6 +16,8 @@ Describe 'check-subagent-output.ps1' {
         git -C $repo init --quiet 2>&1
         Set-Content -Path (Join-Path $repo 'init.txt') -Value 'initial'
         git -C $repo add init.txt 2>&1
+        git -C $repo config user.email "test@local"
+        git -C $repo config user.name "Test"
         git -C $repo commit -m 'init' --quiet 2>&1
 
         $r = & $scriptPath -RepoRoot $repo -BaseRef HEAD 2>&1
@@ -29,6 +31,8 @@ Describe 'check-subagent-output.ps1' {
         git -C $repo init --quiet 2>&1
         Set-Content -Path (Join-Path $repo 'init.txt') -Value 'initial'
         git -C $repo add init.txt 2>&1
+        git -C $repo config user.email "test@local"
+        git -C $repo config user.name "Test"
         git -C $repo commit -m 'init' --quiet 2>&1
 
         Set-Content -Path (Join-Path $repo 'new.txt') -Value 'new file'
@@ -43,6 +47,8 @@ Describe 'check-subagent-output.ps1' {
         git -C $repo init --quiet 2>&1
         Set-Content -Path (Join-Path $repo 'init.txt') -Value 'initial'
         git -C $repo add init.txt 2>&1
+        git -C $repo config user.email "test@local"
+        git -C $repo config user.name "Test"
         git -C $repo commit -m 'init' --quiet 2>&1
 
         Set-Content -Path (Join-Path $repo 'new.txt') -Value 'new file'
@@ -57,6 +63,8 @@ Describe 'check-subagent-output.ps1' {
         git -C $repo init --quiet 2>&1
         Set-Content -Path (Join-Path $repo 'init.txt') -Value 'initial'
         git -C $repo add init.txt 2>&1
+        git -C $repo config user.email "test@local"
+        git -C $repo config user.name "Test"
         git -C $repo commit -m 'init' --quiet 2>&1
 
         Set-Content -Path (Join-Path $repo 'new.txt') -Value 'new file'
