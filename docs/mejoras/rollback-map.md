@@ -132,3 +132,19 @@ git revert e3bec66b        # Ciclo 1 (Pester runner)
 git log --oneline 31134225..experimento/mejora-autonoma-2026-08-18  # 4 commits
 git merge-base --is-ancestor 31134225 main && echo "main clean"
 ```
+
+---
+
+# Rollback Map - Plan Auto-Mejora v3 (2026-08-20)
+
+Branch: `experimento/mejora-autonoma-2026-08-20` · Base: `main` HEAD `33425647`
+
+| Commit | Mensaje | Rollback |
+|--------|---------|----------|
+| `37c4573a` | fix(validation): discard git stderr in check-subagent-output | `git revert 37c4573a` - restaura filtro 2>&1 (reintroduce bug silent-failure) y tests no-hermeticos |
+| `e1ab1b27` | feat(gate): add docs/mejoras index freshness check | `git revert e1ab1b27` - elimina scripts/mejoras-index-check.ps1, tests/mejoras-index-check.Tests.ps1, revierte README.md y docs/mejoras/README.md |
+| `5f65013e` | fix(validation): treat git diff failure as fatal | `git revert 5f65013e` - elimina check $LASTEXITCODE y T5 (BaseRef invalido vuelve a OK silencioso) |
+
+### Per-cycle rollback
+- **Ciclo 1 (G1)**: `git revert 5f65013e 37c4573a` (orden: fatal-check primero, luego stderr) - valida que T1 vuelva a fallar como en baseline
+- **Ciclo 2 (G2)**: `git revert e1ab1b27` - autocontenido, no afecta Ciclo 1

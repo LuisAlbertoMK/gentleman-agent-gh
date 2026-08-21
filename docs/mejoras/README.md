@@ -26,10 +26,45 @@
 | 2026-07-24 | [`execution-report`](2026-07-24-gentleman-agent-gh-ejecucion.md) | Execution | 12/15 findings implemented across 12 files. 3 skipped. Pipeline `!ejecutar` v1.1. | ✅ completed |
 | 2026-08-14 | [`2026-08-14-resource-optimization-investigation`](2026-08-14-resource-optimization-investigation.md) | Resource Optimization | 5-pass research (25+ sources): 3 root causes, tiered config profiles, CPU/RAM monitoring scripts, PS 5.1/7 syntax validation. Implemented in `f4d4ec84`. | ✅ completed |
 | — | [`PERFORMANCE-PLAN`](PERFORMANCE-PLAN.md) | Performance | `!ship` ~46s→32s. P0-1 (incremental PSSA), P0-2 (ThreadJob), P0-3/P1/P2 items. Todos completados (P0-1..3, P1-1..3, P2-1..3). | ✅ completed (9/9) |
+| 2026-08-20 | [`plan-auto-mejora-v3-2026-08-20`](plan-auto-mejora-v3-2026-08-20.md) | Plan | Plan auto-mejora autónoma v3 — ciclo del día | 📄 Disponible |
+| 2026-08-19 | [`gentleman-agent-gh-analisis-08-19`](2026-08-19-gentleman-agent-gh-analisis.md) | Delegación | Mini-orchestrator async delegation — analysis report | 📄 Disponible |
+| 2026-08-19 | [`mejora-log-ps5-ps7-compat`](2026-08-19-mejora-log-ps5-ps7-compat.md) | Compatibilidad | PS5.1/PS7 dual compatibility — mejora log | 📄 Disponible |
+| 2026-08-19 | [`ps5-ps7-compat-investigacion`](2026-08-19-ps5-ps7-compat-gentleman-vmk-investigacion.md) | Compatibilidad | Investigación PowerShell 5.1→7 para gentleman-vmk | 📄 Disponible |
+| 2026-08-19 | [`v3-full-historical-regression`](2026-08-19-v3-full-historical-regression.md) | Performance | V3 full historical regression benchmark | 📄 Disponible |
+| 2026-08-19 | [`plan-auto-mejora-v3-2026-08-19`](plan-auto-mejora-v3-2026-08-19.md) | Plan | Plan auto-mejora v3 — 2026-08-19 | 📄 Disponible |
+| 2026-08-19 | [`plan-ps5-ps7-compat-2026-08-19`](plan-ps5-ps7-compat-2026-08-19.md) | Compatibilidad | Plan PS5/PS7 compatibilidad gentleman-vmk | 📄 Disponible |
+| 2026-08-19 | [`rollback-map-v3-2026-08-19`](rollback-map-v3-2026-08-19.md) | Rollback | Rollback map v3 automejora | 📄 Disponible |
+| 2026-08-18 | [`v3-regression-baseline-report`](2026-08-18-v3-regression-baseline-report.md) | CI/CD | V3 regression baseline — CI quality hardening | 📄 Disponible |
+| 2026-08-18 | [`token-budget-reduction`](token-budget-reduction-20260818.md) | Performance | Token budget reduction — cycle C29 | 📄 Disponible |
+| 2026-08-18 | [`plan-auto-mejora-v3-2026-08-18`](plan-auto-mejora-v3-2026-08-18.md) | Plan | Plan auto-mejora v3 — calidad código + CI/CD | 📄 Disponible |
+| 2026-08-16 | [`ui-seo-skills-cluster-analisis`](2026-08-16-ui-seo-skills-cluster-analisis.md) | Skills | UI/UX/SEO skills cluster — automejora analysis | 📄 Disponible |
+| 2026-08-15 | [`subagent-result-quality`](2026-08-15-subagent-result-quality.md) | Delegación | Subagent quality — budget enforcement + CI | 📄 Disponible |
+| 2026-08-14 | [`analisis-mejora-proceso-trabajo`](2026-08-14-analisis-mejora-proceso-trabajo.md) | Workflow | Mejora proceso — merge experimento + global sync | 📄 Disponible |
+| 2026-08-14 | [`weakness-improvement-plan`](2026-08-14-weakness-improvement-plan.md) | Plan | Plan 3 puntos débiles — protocolo automejora v3 | 📄 Disponible |
+| 2026-08-13 | [`automejora-analisis-08-13`](2026-08-13-gentleman-agent-gh-automejora-analisis.md) | Multi-dimension | Automejora analysis 08-13 | 📄 Disponible |
+| 2026-08-13 | [`plan-auto-mejora-v3-2026-08-13`](plan-auto-mejora-v3-2026-08-13.md) | Plan | Plan auto-mejora v3 — 2026-08-13 | 📄 Disponible |
+| 2026-08-12 | [`gentleman-agent-gh-analisis-08-12`](2026-08-12-gentleman-agent-gh-analisis.md) | Multi-dimension | Análisis v3 actualización 08-12 | 📄 Disponible |
+| 2026-08-12 | [`v3-ciclo1`](2026-08-12-v3-ciclo1.md) | Multi-dimension | Ciclo 1 v3 mejora autónoma | 📄 Disponible |
+| 2026-08-10 | [`mejora-autonoma-v2-baseline`](2026-08-10-mejora-autonoma-v2-baseline.md) | Baseline | Mejora autónoma v2 — baseline | 📄 Disponible |
+| 2026-08-09 | [`ciclo-1-testing-coverage`](2026-08-09-ciclo-1-testing-coverage.md) | Testing | Ciclo 1 — testing coverage | 📄 Disponible |
+| 2026-08-09 | [`ciclo-1-v2-ci-coverage`](2026-08-09-ciclo-1-v2-ci-coverage.md) | CI/CD | Ciclo 1 v2 — CI coverage root tests | 📄 Disponible |
+| 2026-08-09 | [`ciclo-2-security-hardening`](2026-08-09-ciclo-2-security-hardening.md) | Security | Ciclo 2 — hardening permisos auto-mode | 📄 Disponible |
+| 2026-08-09 | [`ciclo-5-root-cleanup`](2026-08-09-ciclo-5-root-cleanup.md) | Limpieza | Ciclo 5 — root cleanup + .gitignore defensivo | 📄 Disponible |
+| 2026-08-09 | [`mejora-autonoma-analisis-inicial`](2026-08-09-mejora-autonoma-analisis-inicial.md) | Multi-dimension | Análisis inicial mejora autónoma | 📄 Disponible |
+| 2026-08-08 | [`gentleman-agent-gh-analisis-08-08`](2026-08-08-gentleman-agent-gh-analisis.md) | Multi-dimension | Autonomía agentes auto — auto-decisión paths | 📄 Disponible |
+| 2026-08-08 | [`skill-design-breaker-analisis`](2026-08-08-skill-design-breaker-analisis.md) | Skills | Skill Design (SDD) + Adversarial Breaker analysis | 📄 Disponible |
+| 2026-08-07 | [`gentleman-agent-gh-analisis-08-07`](2026-08-07-gentleman-agent-gh-analisis.md) | Multi-dimension | Análisis v3 — baseline general del proyecto | 📄 Disponible |
+| 2026-08-07 | [`execution-report-08-07`](2026-08-07-gentleman-agent-gh-execution-report.md) | Execution | Execution report v3 kickoff — 12/15 findings | 📄 Disponible |
+| 2026-08-07 | [`modo-auto-herencia-subagentes`](2026-08-07-modo-auto-herencia-subagentes.md) | Delegación | Herencia de modo auto — orquestador + subagentes | 📄 Disponible |
+| 2026-08-07 | [`v3-cycle1-B2`](2026-08-07-v3-cycle1-B2.md) | Permisos | Cycle 1 v3 — guard merge extraPermKeys | 📄 Disponible |
+| 2026-08-07 | [`rollback-map-v3-2026-08-07`](rollback-map-v3-2026-08-07.md) | Rollback | Rollback map v3 kickoff | 📄 Disponible |
+| — | [`benchmarks`](benchmarks.md) | Performance | Benchmarks protocolo mejora autónoma | 📄 Disponible |
+| — | [`plan-kimi-k3`](plan-kimi-k3.md) | Plan | Plan Diamante — análisis exhaustivo verificado | 📄 Disponible |
+| — | [`rollback-map`](rollback-map.md) | Rollback | Rollback map plan auto-mejora v3 | 📄 Disponible |
 
 ## Trend Summary
 
-- **Total documents**: 20 (19 analyses + 1 performance plan, all indexed above)
+- **Total documents**: 55 (54 analyses + 1 performance plan, all indexed above)
 - **Completed**: 6 (tdd-testing, orchestrator, permission-modes, execution-report, PERFORMANCE-PLAN 9/9, resource-optimization)
 - **Current**: 2026-08-04 analysis — R1-R5 completed (commit 92f848aa, gate 16/16); R10 docs cleanup in progress
 
