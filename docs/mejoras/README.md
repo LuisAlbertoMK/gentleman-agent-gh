@@ -27,6 +27,7 @@
 | 2026-08-14 | [`2026-08-14-resource-optimization-investigation`](2026-08-14-resource-optimization-investigation.md) | Resource Optimization | 5-pass research (25+ sources): 3 root causes, tiered config profiles, CPU/RAM monitoring scripts, PS 5.1/7 syntax validation. Implemented in `f4d4ec84`. | ✅ completed |
 | — | [`PERFORMANCE-PLAN`](PERFORMANCE-PLAN.md) | Performance | `!ship` ~46s→32s. P0-1 (incremental PSSA), P0-2 (ThreadJob), P0-3/P1/P2 items. Todos completados (P0-1..3, P1-1..3, P2-1..3). | ✅ completed (9/9) |
 | 2026-08-20 | [`plan-auto-mejora-v3-2026-08-20`](plan-auto-mejora-v3-2026-08-20.md) | Plan | Plan auto-mejora autónoma v3 — ciclo del día | 📄 Disponible |
+| 2026-08-20 | [`plan-auto-mejora-v3-2026-08-20-c30`](plan-auto-mejora-v3-2026-08-20-c30.md) | Plan | Ciclo 30: validación de contrato async C4d en monitor-subagent + hardening GIT_* del gate | ✅ merged (0307e06d) |
 | 2026-08-19 | [`gentleman-agent-gh-analisis-08-19`](2026-08-19-gentleman-agent-gh-analisis.md) | Delegación | Mini-orchestrator async delegation — analysis report | 📄 Disponible |
 | 2026-08-19 | [`mejora-log-ps5-ps7-compat`](2026-08-19-mejora-log-ps5-ps7-compat.md) | Compatibilidad | PS5.1/PS7 dual compatibility — mejora log | 📄 Disponible |
 | 2026-08-19 | [`ps5-ps7-compat-investigacion`](2026-08-19-ps5-ps7-compat-gentleman-vmk-investigacion.md) | Compatibilidad | Investigación PowerShell 5.1→7 para gentleman-vmk | 📄 Disponible |
