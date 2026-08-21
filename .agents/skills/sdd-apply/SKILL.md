@@ -3,6 +3,7 @@ name: sdd-apply
 description: "Implement SDD tasks from specs and design."
 triggers: "SDD apply, implement SDD, code change"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1816
 ---
 Input + store modes → reference. Status (sdd-status-contract.md), delivery (ask-on-risk|auto-chain|single-pr|exception-ok), PR slice / size:exception.
 | State | Action |

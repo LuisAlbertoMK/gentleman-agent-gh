@@ -3,6 +3,7 @@ name: skill-improver
 description: "Audit and improve skills - preserve intent, fix frontmatter, convert tutorial prose to actionable rules, track usage."
 triggers: "Skill improvement, audit skills, refactor skills, skill refresher, drift detection, auto-heal"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1956
 ---
 
 ## When to Use

@@ -3,6 +3,7 @@ name: cross-project-forge
 description: "Manual pipeline promoting a recurring pattern to an auto-generated skill when it hits severity threshold."
 triggers: "forge, promote pattern, auto-skill, forjar, convertir patrón, skill desde patrón, cross-project-forge"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1976
 ---
 ## When to Use
 Check severity threshold (ready to forge?):

@@ -3,6 +3,7 @@ name: external-auditor
 description: "Blind second-opinion audit via subagent. Run with !audit — not automatic."
 triggers: "!audit, external audit, blind review, 'second opinion', 'verificá mi auto-score'"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1961
 ---
 ## When to Use
 Explicit (!audit), user request, OR required by close-session gate. Auto-required when changes touch: security-scanner/, quality-gate/, auto-metrics/, external-auditor/, immune-system/, ANTI-PATTERN-CATALOG.md, .project.json. Also HIGH-risk (8+ files, auth/storage/API). Skip trivial tasks (~2000 tok waste).

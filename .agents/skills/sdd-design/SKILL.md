@@ -4,6 +4,7 @@ description: Create the SDD technical design and architecture approach. Trigger:
 delegate_only: true
 triggers: "SDD design, design phase, technical design, architecture design, sdd-design"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1766
 ---
 # SDD — Design Phase
 Creates the technical design and architecture approach for a change. Triggered by the orchestrator when moving from proposal to implementation.

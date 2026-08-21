@@ -3,6 +3,7 @@ name: quick-executor
 description: "Trigger: quick edit, single file, atomic edit, fast fix, one-line fix. Single-file low-risk changes."
 triggers: "quick edit, single file, atomic edit, fast fix, one-line fix, small change, quick fix"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1955
 ---
 ## When to Use
 1 file, clear before/after, low risk. SCOPE GUARD: >1 file → STOP, report to orchestrator or delegate to plan-execution.

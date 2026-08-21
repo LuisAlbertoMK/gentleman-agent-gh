@@ -3,6 +3,7 @@ name: dreaming
 description: "Cross-session pattern extraction via Engram. Run via !dream — not automatic."
 triggers: "!dream, dreaming, patrones, memory review, session end, !close, pattern extraction"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1918
 ---
 ## When to Use
 Only on explicit request (`!dream`) or user asking. Recommended weekly or after milestone.

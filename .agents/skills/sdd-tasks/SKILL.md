@@ -3,6 +3,7 @@ name: sdd-tasks
 description: "Break SDD change into implementation tasks. Trigger: orchestrator launches task planning."
 triggers: "SDD tasks, task planning, implementation tasks, work breakdown"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1682
 ---
 Input: change name, artifact store (`engram|openspec|hybrid|none`), delivery strategy (`ask-on-risk|auto-chain|single-pr|exception-ok`).
 | Mode | Read | Save |

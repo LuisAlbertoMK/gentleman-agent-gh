@@ -3,6 +3,7 @@ name: aem-migration
 description: "Adobe Experience Manager site migrations — assessment, content transfer, component/dialog/HTL/Sling-Models migration, Tags/Launch data-layer, Analytics/Target/Campaign integration, AEM debugging."
 triggers: "aem migration, adobe experience manager migration, migration aem, aem cloud service, adobe launch tags migration, data layer migration, digitaldata, appmeasurement to web sdk, aep web sdk, adobe analytics migration, adobe target migration, content transfer tool, best practices analyzer, extjs to coral3, sling model, datasource migration, aem debugging"
 changelog: docs/agentes/aem-migration/automejora-cycle-log.md
+token_budget: 1985
 ---
 # AEM Migration Skill
 > Domain expertise for `gentleman-aem`. Compact per ADR-007.

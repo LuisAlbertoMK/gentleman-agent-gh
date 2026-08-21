@@ -3,6 +3,7 @@ name: sdd
 description: "pipeline — 9 phases. Use sdd-quick for LOW-risk fast path."
 triggers: "pipeline, phase, spec-driven development"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1582
 ---
 # Pipeline
 **Fast path for LOW-risk:** `{file:sdd-quick/SKILL.md}` — 3 phases.

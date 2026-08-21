@@ -3,6 +3,7 @@ name: deep-debugging
 description: "Trigger: deep debug, root cause, hypothesis, multi-file bug, ambiguous failure. Hypothesis-driven debugging."
 triggers: "deep debug, root cause, hypothesis, multi-file bug, ambiguous failure, debug, RCA"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1941
 ---
 ## When to Use
 Multi-file bugs, ambiguous failures. NOT for 1-file edits (→ quick-executor), architecture decisions (→ sdd), or refactors (→ refactoring-planner).

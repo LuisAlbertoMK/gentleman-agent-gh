@@ -3,6 +3,7 @@ name: development-mode
 description: "System resource prioritization — RAM/CPU/GPU/file I/O optimization. NOT task execution mode (see execution-mode)."
 triggers: "modo desarrollo, dev mode, development mode, performance mode, resource priority"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1931
 ---
 
 ## When to Use

@@ -3,6 +3,7 @@ name: web-quality-audit
 description: "Comprehensive web audit: performance, a11y, SEO, responsive, animation, design tokens."
 triggers: "audit, review web quality, lighthouse, page quality, optimize website, design audit, ui audit, web audit, site review"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1468
 ---
 ## When to Use
 Full web audit: perf, a11y, SEO, responsive, anim. **Pre-req**: Target running+accessible. Public URL (no auth/CAPTCHA/WAF).

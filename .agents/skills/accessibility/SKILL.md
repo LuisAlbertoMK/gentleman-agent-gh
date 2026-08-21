@@ -3,6 +3,7 @@ name: accessibility
 description: "WCAG 2.2 + EAA 2025 — audit and improve web accessibility."
 triggers: "a11y, accessibility, WCAG, screen reader, keyboard navigation, EAA, European Accessibility Act, contrast, focus, touch target"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1295
 ---
 
 ## When to Use
@@ -12,6 +13,8 @@ WCAG 2.2 + EAA 2025 — audit and improve web accessibility.
 ## Grid A11y: NEVER grid-auto-flow: dense on interactive (breaks DOM tab flow). Preserve source order · TEST keyboard tab through every responsive variant.
 ## Cross-Refs: baseline-ui | web-quality-audit | ui-engine
 **Standards**: WCAG 2.2 (w3.org/TR/WCAG22) · EAA (digital-strategy.ec.europa.eu) · WAI-ARIA (w3.org/TR/wai-aria) · axe (deque.com/axe)
+## Output
+`A11Y-AUDIT:<url>—<date> CRITICAL:[wcag\|color\|keyboard]<issue>→<fix> HIGH:[contrast\|focus\|alt]<issue>→<fix> MEDIUM:[aria\|label\|nav]<issue>→<fix> VERIFY:[axe\|keyboard]→PASS/FAIL`
 
 ---
 

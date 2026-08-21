@@ -1,10 +1,11 @@
-﻿---
+---
 name: _shared
 description: "Internal shared references for SDD skills. Not an invokable skill."
 triggers:
   - sdd shared references
   - internal shared docs
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 451
 ---
 
 ## Purpose

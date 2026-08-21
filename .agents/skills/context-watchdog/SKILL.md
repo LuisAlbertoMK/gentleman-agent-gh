@@ -3,6 +3,7 @@ name: context-watchdog
 description: "Monitor context window — Recursive Summary Compression (L1/L2/L3), YELLOW/RED zones, hallucination detection"
 triggers: "Context explosion, compress, compression schedule, session break"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1618
 ---
 
 ## When to Use

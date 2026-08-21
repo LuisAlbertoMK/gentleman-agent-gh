@@ -4,6 +4,7 @@ description: "Explore SDD ideas before committing to a change. Trigger: orchestr
 triggers: "SDD explore, explore ideas, investigation, discovery, SDD exploration"
 delegate_only: true
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1797
 ---
 
 ## Executor Override

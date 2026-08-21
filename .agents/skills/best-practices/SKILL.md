@@ -3,6 +3,7 @@ name: best-practices
 description: Apply modern web development best practices for security, compatibility, and code quality.
 triggers: "best practices, security audit, modernize code, code quality, check vulnerabilities"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1973
 ---
 
 ## When to Use

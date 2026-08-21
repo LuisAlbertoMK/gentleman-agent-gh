@@ -3,6 +3,7 @@ name: subagent-isolation
 description: "Clean context boundaries between agents - prevent hallucination cascades, cross-contamination, enforce error isolation."
 triggers: "Subagent isolation, context boundaries"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1923
 ---
 
 ## When to Use

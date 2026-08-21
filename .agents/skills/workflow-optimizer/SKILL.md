@@ -3,6 +3,7 @@ name: workflow-optimizer
 description: "Optimize workflow patterns — faster info access, reduced token waste, smarter caching, auto-learning triggers."
 triggers: [optimize-workflow, faster-access, token-optimization, workflow-pattern, information-access, fluidez]
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1916
 ---
 ## When to Use
 Optimize workflow — info access, token economy, caching, auto-learning triggers.

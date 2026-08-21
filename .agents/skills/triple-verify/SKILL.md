@@ -3,6 +3,7 @@ name: triple-verify
 description: "Triple verification — 3 enfoques, thresholds por zona, modos !ship/!fast/!draft"
 triggers: "Triple verify, triangulate, 3 enfoques, !ship, !listo, !fast, !draft"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1916
 ---
 ## 3 Approaches
 | E1 — Testing | E2 — Static | E3 — Build/Runtime |

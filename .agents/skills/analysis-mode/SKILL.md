@@ -3,6 +3,7 @@ name: analysis-mode
 description: "Trigger: !analisis, !analysis, multi-agent analysis. Read-only 4-phase pipeline. Supports --meta for process/workflow analysis (bypasses scope guard)."
 triggers: "!analisis, !analysis, !analisis --meta, analysis mode, multi-agent analysis, smart analysis, process analysis"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 2386
 ---
 ## When to Use
 Trigger: !analisis, !analysis, multi-agent analysis. Read-only 4-phase pipeline. `!analisis`/`!analysis` as first token. Loading + P1/P4 detail → reference.

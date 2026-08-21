@@ -3,6 +3,7 @@ name: infra-audit
 description: "Trigger: infrastructure audit, IaC, Terraform, Kubernetes, CI/CD, Docker, cloud, Helm, Ansible. Audit infra reliability."
 triggers: "infrastructure audit, IaC, Terraform, Kubernetes, CI/CD, Docker, cloud, deployment, Helm, Ansible, k8s"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1619
 ---
 
 ## When to Use

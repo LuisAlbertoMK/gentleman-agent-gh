@@ -3,6 +3,7 @@ name: code-review-agent
 description: "4R code review - Risk/Readability/Reliability/Resilience with evidence gates and actionable fixes"
 triggers: "Code review, CR, revisar codigo, criticar"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1763
 ---
 4R: each R scored independently->verdict+fixes.
 ## When to Use

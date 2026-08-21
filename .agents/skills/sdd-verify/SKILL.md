@@ -4,6 +4,7 @@ description: "Execute tests and prove implementation matches specs, design, and 
 triggers: "SDD verify, verification, test verification, verify change, SDD verification"
 delegate_only: true
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1935
 ---
 Run when orchestrator launches verification. Prove completion via source inspection + real execution. Use status from `sdd-status-contract.md`.
 - Read all `contextFiles` before judging. Full: proposal + specs + design + tasks. Partial degrades.

@@ -3,6 +3,7 @@ name: cross-project-wisdom
 description: "Prior-project patterns - advisory cross-repo knowledge. Trigger: patterns, wisdom, cross-project, retrospectiva"
 triggers: "patterns, wisdom, lesson learned, in another project I, last time this, cross-project, retrospectiva, experiencia previa, !wisdom, pattern guard"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1845
 ---
 
 ## When to Use

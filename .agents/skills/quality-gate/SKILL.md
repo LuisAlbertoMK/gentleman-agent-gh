@@ -3,6 +3,7 @@ name: quality-gate
 description: "Pre-commit gate — TDD + Pester tests pass, secrets scan, conventional commit, PSSA gate"
 triggers: "Quality gate, pre-commit, PSSA gate"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1977
 ---
 
 ## When to Use

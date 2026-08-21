@@ -3,6 +3,7 @@ name: lean-context
 description: "Unified compression levels — LEAN, ULTRA, and CAVEMAN modes for token-efficient responses"
 triggers: "Ultra-lean default, compact responses, caveman, /caveman"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1729
 ---
 
 ## When to Use

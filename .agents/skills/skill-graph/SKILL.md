@@ -1,8 +1,9 @@
-﻿---
+---
 name: skill-graph
 description: "Sparse loading — resolve only relevant skills + dependencies, digest per context budget"
 triggers: "sparse loading, skill resolution, relevant skills, which skill, skill-graph"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1515
 ---
 
 ## When to Use

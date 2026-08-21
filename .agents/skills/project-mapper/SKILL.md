@@ -3,6 +3,7 @@ name: project-mapper
 description: "Scan project structure, detect tech stack, classify architecture, generate dependency map; auto-chains to gap-analysis."
 triggers: "Mapear, project map, estructura, tech stack, arquitectura"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1904
 ---
 # Project Mapper
 Scan project structure, detect stack, classify architecture. Auto-link to gap-analysis.

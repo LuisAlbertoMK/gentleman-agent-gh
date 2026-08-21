@@ -3,6 +3,7 @@ name: plan-execution
 description: "Trigger: execute plan, implement plan, step-by-step execution, plan completion. Execute plans with rollback."
 triggers: "execute plan, implement plan, step-by-step execution, task execution, plan completion, run plan, do plan"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1709
 ---
 ## When to Use
 Executing a multi-step plan (from agent, spec, or task list). NOT for 1-file edits (→ quick-executor) or single-concept changes.

@@ -345,6 +345,65 @@ if ($stagedSecurity) {
     if ($LASTEXITCODE -eq 0) { Pass } else { Fail "adversarial profile violations — see output above, touch .breaker-cleared/<file> markers or set FORCE_SHIP=1" }
 } else { Pass }
 
+# [23/23] Async-result verification — fail-closed on unresolved subagent failures
+# Scans for *.async-result.json produced by monitor-subagent.ps1 / post-delegation-check.ps1.
+# If ANY has .passed = $false, blocks commit — prevents silent-failure mode where LLM
+# forgets post-delegation verification (gap documented in mejora-log.md:775).
+# To unblock: fix the failed check(s) and re-run, or remove the stale result file
+# after manual confirmation.
+Write-Host "[23/23] Async-result verification..."
+$staleResults = @()
+$asyncResults = Get-ChildItem -Path $RepoRoot -Filter '*.async-result.json' -ErrorAction SilentlyContinue
+foreach ($ar in $asyncResults) {
+    try {
+        $parsed = Get-Content -LiteralPath $ar.FullName -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
+        # HARDENED (adversarial-bypass finding #1-3): fail-closed by default.
+        # Only accept actual boolean $true; reject missing field (was $true),
+        # string "false" (was $true via [bool]), array-wrapped objects (was $true).
+        $isPassed = $false
+        if ($null -ne $parsed -and $parsed -isnot [array] -and $null -ne $parsed.PSObject.Properties['passed']) {
+            if ($parsed.passed -is [bool] -and $parsed.passed -eq $true) { $isPassed = $true }
+        }
+        if (-not $isPassed) {
+            $failedChecks = if ($parsed.checks) {
+                ($parsed.checks | Where-Object { -not $_.passed } | ForEach-Object { "$($_.name): $($_.detail)" }) -join '; '
+            } else { "status=$($parsed.status)" }
+            $staleResults += [PSCustomObject]@{
+                File   = $ar.Name
+                Detail = $failedChecks
+            }
+        }
+    } catch {
+        $staleResults += [PSCustomObject]@{
+            File   = $ar.Name
+            Detail = "unparseable JSON: $($_.Exception.Message)"
+        }
+    }
+}
+if ($staleResults) {
+    $staleResults | ForEach-Object { Write-Host "    $_ : $($_.Detail)" }
+    Fail "unresolved subagent failure(s) — fix checks / re-run monitor or remove stale *.async-result.json"
+} else { Pass }
+
+# [24/24] Token budget regression (Pattern 3 — skill-testing)
+# Reads `token_budget` frontmatter from SKILL.md files and asserts current
+# file size ≤ budget * 1.1 (10% drift). Skills without token_budget are
+# WARN (non-blocking) since not all skills declare budgets.
+Write-Host "[24/24] Token budget regression..."
+$tbrScript = Join-Path $RepoRoot 'scripts\test-token-budget-regression.ps1'
+if (Test-Path -LiteralPath $tbrScript) {
+    $tbrOut = & $tbrScript -SkillsPath (Join-Path $RepoRoot '.agents\skills') -Json -ErrorAction SilentlyContinue 2>&1 | Out-String
+    $tbrResult = try { $tbrOut | ConvertFrom-Json -ErrorAction Stop } catch { $null }
+    if ($null -eq $tbrResult) {
+        Warn "token budget runner unavailable"
+    } elseif (-not $tbrResult.passed) {
+        $tbrResult.violations | ForEach-Object { Write-Host "    $($_.Skill): $($_.Current)B > $($_.Limit)B (budget $($_.Budget)B)" }
+        Fail "token budget regression violations"
+    } else { Pass }
+} else {
+    Warn "test-token-budget-regression.ps1 not found at $tbrScript"
+}
+
 # Summary
 Write-Host "`n=== Gate: $passed/$($passed+$failed) passed ==="
 if ($blocked) { Write-Host "  $([char]0x1b)[31mBLOCKED$([char]0x1b)[0m" }

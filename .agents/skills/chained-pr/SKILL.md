@@ -3,6 +3,7 @@ name: chained-pr
 description: "Split oversized changes into chained PRs that protect review focus."
 triggers: "chained PR, stacked PR, sequential branches, PR chain, stacked branches, PR stack, oversized PR, 400 lines, review slices"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1948
 ---
 
 ## When to Use

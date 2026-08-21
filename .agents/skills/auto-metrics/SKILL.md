@@ -3,6 +3,7 @@ name: auto-metrics
 description: "Self-evaluation scoring. Trigger via !score or !metrics — not automatic."
 triggers: "!score, !metrics, explicit score/metric request, session end via !close"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1740
 ---
 ## When to Use
 Only on explicit request (!score, !metrics, !close). NOT automatic after every task.

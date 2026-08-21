@@ -9,6 +9,7 @@ triggers:
   - "compare"
   - "token count"
   - "size change"
+token_budget: 1753
 ---
 
 # metricas — Before/After Delta + % Comparison

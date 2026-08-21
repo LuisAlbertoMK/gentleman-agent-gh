@@ -4,6 +4,7 @@ description: "Write SDD delta specs with requirements and scenarios. Trigger: or
 triggers: "SDD spec, specification, given when then, requisitos, spec writing"
 delegate_only: true
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1702
 ---
 From orchestrator: change name, artifact store (`engram | openspec | hybrid | none`).
 - **engram**: Read `sdd/{change}/proposal`; save as `sdd/{change}/spec`

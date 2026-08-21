@@ -3,6 +3,7 @@ name: cancel-ralph
 description: Cancel active Ralph Loop
 triggers: "cancel ralph, stop loop, cancel loop, ralph stop, end loop"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1837
 ---
 
 ## When to Use

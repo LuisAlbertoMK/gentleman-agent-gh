@@ -3,6 +3,7 @@ name: sdd-propose
 description: "Create SDD change proposal with intent, scope, approach. Trigger: orchestrator launches proposal work."
 triggers: "SDD propose, proposal, intent, approach, change proposal"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1694
 ---
 Input: change name, exploration analysis OR user description, store mode (`engram|openspec|hybrid|none`).
 | Mode | Behavior |

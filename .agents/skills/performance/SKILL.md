@@ -3,6 +3,7 @@ name: performance
 description: "Web performance — CWV/INP, compositor animation, scroll-driven, content-visibility."
 triggers: "performance, speed up, load time, slow loading, page speed, performance audit, INP, animation performance, scroll performance, compositor"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 2150
 ---
 <!-- karpathy-compressed: 2026-07-10 -->
 ## Budget
@@ -40,5 +41,7 @@ async function handleHeavy() {
 | `width/height/top/left` | Main Layout+Paint | ❌ |
 | `margin/padding` | Main Layout+cascades | ❌ |
 Animate ONLY `transform`+`opacity`. One layout prop → poisons to main thread.
+## Output
+`PERF-AUDIT:<url>—<date> CRITICAL:[LCP\|CLS\|FCP\|TBT\|INP]<actual>/<budget>→<fix> HIGH:[img\|font\|JS\|CSS]<kb>→<fix> INP:<ms>→<proc>/<present> VERIFY:[lighthouse\|web-vitals]→PASS/FAIL`
 ## Reference
 > docs/skills/performance/reference.md

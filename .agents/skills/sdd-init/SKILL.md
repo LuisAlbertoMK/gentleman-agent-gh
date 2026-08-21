@@ -4,6 +4,7 @@ description: "Initialize SDD context, testing capabilities, registry, persistenc
 triggers: "SDD init, initialize SDD, bootstrap SDD, SDD context setup"
 delegate_only: true
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1672
 ---
 
 ## Activation

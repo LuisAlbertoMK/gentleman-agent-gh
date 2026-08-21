@@ -3,6 +3,7 @@ name: work-unit-commits
 description: "Plan commits as reviewable work units."
 triggers: "work unit, commit splitting, commit organization, reviewable commits, split commit, stacked PR, chained PR commits"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1744
 ---
 ## When to Use
 Splitting feature into reviewable work units · preparing commits before PR · large change into chained/stacked PRs · healthy reviewer cognitive load · SDD tasks without exceeding 400 lines.

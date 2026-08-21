@@ -3,6 +3,7 @@ name: comment-writer
 description: "Write warm, direct collaboration comments. Trigger: PR feedback, issue replies, reviews, Slack messages, GitHub."
 triggers: "comments, PR feedback, review comment, GitHub comment, write feedback"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1689
 ---
 
 ## When to Use

@@ -3,6 +3,7 @@ name: ralph-loop
 description: Start Ralph Loop - auto-continues until task completion
 triggers: "ralph, ralph loop, auto-continue, iterative loop, /ralph-loop, continuous task, autonomous loop"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1674
 ---
 
 ## When to Use

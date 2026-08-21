@@ -3,6 +3,7 @@ name: testing-strategy
 description: "Test strategy - pyramid analysis, coverage gaps, risk-based prioritization, test debt, ROI-driven investment."
 triggers: "testing strategy, test plan, test coverage, test pyramid, test debt, test gap, test priority, test audit, quality strategy"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1996
 ---
 ## When to Use
 Test strategy & planning — pyramid analysis, coverage gaps, risk-based prioritization, test debt, ROI-driven investment. Scope: strategy only — NOT execution (`e2e-testing`, `api-testing`, `quality-gate`). READ-ONLY — recommend, don't implement.

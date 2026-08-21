@@ -3,6 +3,7 @@ name: e2e-testing
 description: "E2E testing - hybrid: e2t CLI smoke checks + Playwright for flows, assertions, visual regression, Ollama AI analysis."
 triggers: test, e2e, playwright, browser testing, interactive testing, form testing
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1925
 ---
 ## When to Use
 Browser-level verification of user flows: smoke, forms, login/dashboard, visual regression. Quick Mode = fast smoke; Full Mode = CI pipelines, assertions, screenshots.

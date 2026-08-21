@@ -3,6 +3,7 @@ name: sdd-archive
 description: "Archive completed SDD change by syncing delta specs. Trigger: orchestrator launches archive after implement+verify."
 triggers: "SDD archive, archive SDD, close SDD, persist artifacts"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1992
 ---
 Mode per `sdd-status-contract.md`:
 | Mode | Action |

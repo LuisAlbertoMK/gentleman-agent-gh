@@ -3,6 +3,7 @@ name: self-improvement
 description: "Continuous improvement cycle - macro + micro, self-reflection merge, inter(30) minimum, SkillOpt gated validation."
 triggers: "Self-improvement, improvement cycle, auto-mejora, ciclo de mejora, comienza ciclo, self-reflection, Hermes, reflexioná"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1988
 ---
 ## When to Use
 Macro (cycle) + micro (per-task reflection).

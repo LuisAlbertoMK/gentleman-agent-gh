@@ -3,6 +3,7 @@ name: ui-engine
 description: "UI system — Grid/Flexbox/@layer/:has(), container queries, compositor-only animation, OKLCH tokens, component patterns"
 triggers: "ui, layout, responsive, animation, design tokens, css, grid, flexbox, container query, dark mode, component layout, page layout, component patterns, hooks, compound components, state management"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1839
 ---
 ## When to Use
 UI: Grid/Flexbox/@layer/:has()·CQ·OKLCH·anim·patterns.

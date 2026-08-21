@@ -3,6 +3,7 @@ name: gap-analysis
 description: "Complete gap analysis — 8-dim quality framework, project intake, priority scoring"
 triggers: "Gap analysis, system audit, identificar gaps, project intake"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1559
 ---
 
 ## When to Use

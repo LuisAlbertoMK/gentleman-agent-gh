@@ -3,6 +3,7 @@ name: llm-security
 description: "Trigger: LLM, AI, prompt injection, RAG, OpenAI, Anthropic, Ollama, LangChain, agent, tool use, data exfiltration."
 triggers: "LLM, AI, prompt injection, RAG, OpenAI, Anthropic, Ollama, LangChain, agent, tool use, data exfiltration, model"
 changelog: docs/ciclos/cycle28-20260815.md
+token_budget: 1626
 ---
 
 ## When to Use
