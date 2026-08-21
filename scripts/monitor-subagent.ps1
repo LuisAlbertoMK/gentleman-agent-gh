@@ -25,6 +25,11 @@
 .PARAMETER ExpectedFiles
     Filenames that SHOULD appear in the diff (passed to check-subagent-output).
 
+.PARAMETER SubagentOutputFile
+    Path to a file containing the subagent's text output. When provided (and the
+    file exists), enables C4d 4-field contract validation via check-subagent-output;
+    contract_valid/contract_detail are added to the result JSON.
+
 .PARAMETER RepoRoot
     Repository root (default: parent of script dir). Result JSON is written here.
 
@@ -58,6 +63,7 @@ param(
     [string]$BaseRef        = "HEAD",
     [string[]]$AllowedPaths = @(),
     [string[]]$ExpectedFiles = @(),
+    [string]$SubagentOutputFile = "",
     [string]$RepoRoot       = $(Split-Path -Parent $PSScriptRoot),
     [int]$PollIntervalSec   = 15,
     [int]$MaxWaitSec        = 300,
@@ -110,6 +116,8 @@ function Get-CheckSnapshot {
     $checks = @()
     $passed = $true
 
+    $contractRan = $false; $contractValid = $true; $contractDetail = ""
+
     # 1. Empty-output detection (mirrors post-delegation-check.ps1 sync path)
     $csoScript = Join-Path $RepoRoot 'scripts\check-subagent-output.ps1'
     if (-not (Test-Path $csoScript)) { $csoScript = Join-Path $PSScriptRoot 'check-subagent-output.ps1' }
@@ -121,12 +129,22 @@ function Get-CheckSnapshot {
             $escapedFiles = ($ExpectedFiles | ForEach-Object { "'" + (ConvertTo-SqlLiteral $_) + "'" }) -join ' '
             $csoCmd += " -ExpectedFiles " + $escapedFiles
         }
+        if ($SubagentOutputFile -and (Test-Path -LiteralPath $SubagentOutputFile)) {
+            $csoCmd += " -AgentOutputFile '" + (ConvertTo-SqlLiteral $SubagentOutputFile) + "'"
+        } elseif ($SubagentOutputFile) {
+            Write-Warning "SubagentOutputFile not found: $SubagentOutputFile — contract validation skipped"
+        }
         $csoSubproc = Invoke-SubprocessWithTimeout -CommandLine $csoCmd -TimeoutSec 30
         $csoResult = $csoSubproc.output | Where-Object { $_ -match '^\{' } | Select-Object -First 1 | ConvertFrom-Json -ErrorAction SilentlyContinue
         if ($csoSubproc.timedOut) {
             $csoOk = $false
         } else {
             $csoOk = $csoResult -and $csoResult.status -ne 'FAIL'
+        }
+        if ($SubagentOutputFile -and (Test-Path -LiteralPath $SubagentOutputFile) -and -not $csoSubproc.timedOut -and $csoResult) {
+            $contractRan = $true
+            if ($null -ne $csoResult.PSObject.Properties['contract_valid']) { $contractValid = [bool]$csoResult.contract_valid }
+            if ($null -ne $csoResult.PSObject.Properties['contract_detail']) { $contractDetail = $csoResult.contract_detail }
         }
         $checks += [PSCustomObject]@{
             name   = "empty_output"
@@ -169,6 +187,16 @@ function Get-CheckSnapshot {
         $passed = $false
     }
 
+    # 2b. C4d contract validation result (only when -SubagentOutputFile provided)
+    if ($contractRan) {
+        $checks += [PSCustomObject]@{
+            name   = "contract_validation"
+            passed = $contractValid
+            detail = if ($contractValid) { "pass" } else { $contractDetail }
+        }
+        if (-not $contractValid) { $passed = $false }
+    }
+
     # 3. Changed-files snapshot (committed + working tree, unique) — stability signal
     $committed = @()
     try {
@@ -190,6 +218,9 @@ function Get-CheckSnapshot {
         checks       = $checks
         passed       = $passed
         changedFiles = $changedFiles
+        contractRan    = $contractRan
+        contractValid  = $contractValid
+        contractDetail = $contractDetail
     }
 }
 
@@ -260,6 +291,9 @@ $result = @{
     checks         = $lastSnapshot.checks
     changed_files  = $lastSnapshot.changedFiles
     file_count     = $lastSnapshot.changedFiles.Count
+    contract_ran    = $lastSnapshot.contractRan
+    contract_valid  = if ($lastSnapshot.contractRan) { $lastSnapshot.contractValid } else { $true }  # sync-path convention: not evaluated = no violation detected
+    contract_detail = if ($lastSnapshot.contractRan) { $lastSnapshot.contractDetail } else { "not evaluated" }
     reason         = $reason
     poll_count     = $pollCount
     waited_sec     = $waitedSec

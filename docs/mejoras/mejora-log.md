@@ -501,3 +501,33 @@ RUN1/RUN2: resultados identicos; vs baseline main (1288 pass/32 fail/1321):
 ### ADRs
 - `adr/ADR-040-subagent-output-stderr-fatal.md`
 - `adr/ADR-041-mejoras-index-freshness-gate.md`
+
+## Ciclo 8 - Async contract validation C4d + gate GIT_* hardening (Cycle 30) - `013e4577`
+
+**Fecha**: 2026-08-20 | **Plan**: `plan-auto-mejora-v3-2026-08-20-c30.md` | **Branch**: `experimento/mejora-autonoma-2026-08-20-c30`
+
+### G1: monitor-subagent.ps1 sin validacion de contrato async (doc/code drift vs 2026-08-15)
+- **Fix**: `-AgentOutputFile` en check-subagent-output (transporte por archivo, fail-closed); `-SubagentOutputFile` en monitor; checks `contract_validation` + campos `contract_ran/contract_valid/contract_detail` en async-result.json (ADR-042)
+- **Semantica not-evaluated**: valid=true + detail='not evaluated' + ran=false (convencion sync-path)
+
+### Incidente: corrupcion del repo real por fixtures bajo gate
+- git exporta GIT_DIR/GIT_INDEX_FILE al hook -> fixtures operaron sobre el repo REAL: core.worktree reescrito a Temp inexistente (todo git fatal), commits de fixture en la rama, identidad local pisada
+- **Recuperacion**: config reparada, read-tree HEAD, reset a 85176d54
+- **Fix sistemico**: gate [12/13] strip GIT_* antes de Pester (bd707b76) + sanitizacion en el propio suite
+- **Flake residual**:  persiste entre Its -> nombre fijo de fixture permitia que add . commitee leftovers del test anterior -> ruta unica GUID por test
+
+### Breaker (adversarial)
+- [HIGH] ExpectedFiles array binding roto via -Command (PRE-EXISTENTE, ambas rutas) -> diferido Ciclo 31 con receta: repetir parametro (-ExpectedFiles 'a' -ExpectedFiles 'b' acumula en [string[]])
+- [MEDIUM] timeout enmascara senal de contrato -> resuelto exponiendo contract_ran (013e4577)
+- [LOW] strip solo en check 12 -> riesgo residual aceptado, documentado en ADR-042
+
+### Verificacion
+--- Pester (suite completa x2) ---
+RUN1/RUN2 identicos: 1308 pass / 31 fail pre-existentes / 1340 total
+vs baseline main 85176d54 (1304/31/1336): +4 tests nuevos verdes, 0 regresiones
+
+--- Quality gate pre-commit ---
+22/22 ALL CLEAR en los 5 commits (bd707b76, ea617cde, e8121588, 013e4577 + docs)
+
+### ADRs
+- `adr/ADR-042-monitor-c4d-async-contract.md`

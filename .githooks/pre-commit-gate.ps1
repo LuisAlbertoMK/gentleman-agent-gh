@@ -177,6 +177,16 @@ if ($stagedSkillMds) {
 Write-Host "[12/13] Pester tests..."
 if ($stagedTests) {
     try {
+        # Strip hook-exported GIT_* overrides before running test suites: git sets
+        # GIT_DIR/GIT_INDEX_FILE/GIT_WORK_TREE in the hook environment, and they are
+        # inherited by every child process (Pester runs IN-PROCESS). Test fixtures
+        # that create hermetic git repos then silently operate on THIS repo instead
+        # — observed corruption: fixture `git init` rewrote core.worktree here,
+        # fixture commits landed on the real branch, and the local identity was
+        # overwritten. Defense-in-depth: suites should also sanitize their own env.
+        foreach ($gitEnvVar in 'GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY') {
+            Remove-Item "Env:$gitEnvVar" -ErrorAction SilentlyContinue
+        }
         Import-Module Pester -ErrorAction Stop
         $pester = Get-Module Pester
         $testPaths = @($stagedTests | ForEach-Object { Join-Path $RepoRoot $_ })
