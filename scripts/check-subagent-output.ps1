@@ -96,6 +96,16 @@ $committed = @()
 try {
     $committed = git -C $RepoRoot diff --name-only "$BaseRef..HEAD" 2>$null |
         Where-Object { $_ -and $_ -notmatch "^warning:" -and $_ -notmatch "^\s*$" }
+    if ($LASTEXITCODE -ne 0) {
+        # stderr is suppressed above; a nonzero exit here means the diff itself
+        # failed (e.g. invalid BaseRef) — fatal, never fall through to OK.
+        if ($Quiet) {
+            @{status="FAIL";reason="git-diff-error";detail="git diff exited $LASTEXITCODE (invalid BaseRef '$BaseRef'?)"} | ConvertTo-Json -Compress
+        } else {
+            Write-Output "X  GIT ERROR: git diff '$BaseRef..HEAD' failed (exit $LASTEXITCODE). Check -BaseRef."
+        }
+        exit 1
+    }
     } catch { Write-Debug "check-subagent-output: committed git diff failed (non-fatal) — $_" }
 
 # 2. Working-tree changes incl. untracked (via status porcelain)

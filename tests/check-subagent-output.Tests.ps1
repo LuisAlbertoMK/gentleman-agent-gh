@@ -72,4 +72,20 @@ Describe 'check-subagent-output.ps1' {
         $LASTEXITCODE | Should -Be 0
         ($r -join '`n') | Should -Match 'OK'
     }
+
+    It 'T5 fails fatally on invalid BaseRef (stderr suppressed, exit must be 1)' {
+        $repo = Join-Path $TestDrive 'repo-badref'
+        New-Item -ItemType Directory -Path $repo -Force | Out-Null
+        git -C $repo init --quiet 2>&1
+        Set-Content -Path (Join-Path $repo 'init.txt') -Value 'initial'
+        git -C $repo add init.txt 2>&1
+        git -C $repo config user.email "test@local"
+        git -C $repo config user.name "Test"
+        git -C $repo commit -m 'init' --quiet 2>&1
+
+        Set-Content -Path (Join-Path $repo 'new.txt') -Value 'new file'
+        $r = & $scriptPath -RepoRoot $repo -BaseRef 'nonexistent-ref' 2>&1
+        $LASTEXITCODE | Should -Be 1
+        ($r -join '`n') | Should -Match 'GIT ERROR'
+    }
 }
