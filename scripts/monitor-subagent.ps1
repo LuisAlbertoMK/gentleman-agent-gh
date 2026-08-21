@@ -291,6 +291,7 @@ $result = @{
     checks         = $lastSnapshot.checks
     changed_files  = $lastSnapshot.changedFiles
     file_count     = $lastSnapshot.changedFiles.Count
+    contract_ran    = $lastSnapshot.contractRan
     contract_valid  = if ($lastSnapshot.contractRan) { $lastSnapshot.contractValid } else { $true }  # sync-path convention: not evaluated = no violation detected
     contract_detail = if ($lastSnapshot.contractRan) { $lastSnapshot.contractDetail } else { "not evaluated" }
     reason         = $reason

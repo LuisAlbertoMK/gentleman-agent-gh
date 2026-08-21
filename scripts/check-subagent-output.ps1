@@ -24,6 +24,12 @@
   Optional list of filenames that SHOULD appear in the diff.
   If provided and any are missing, exits 1 (partial completion).
 
+.PARAMETER AgentOutputFile
+  Path to a file containing the subagent's text output for 4-field contract
+  validation. Preferred over inline -AgentOutput: multiline content survives
+  any host's argument-passing mode. When both are given, the file wins.
+  Unreadable file fails closed (exit 1).
+
 .PARAMETER Quiet
   JSON summary on stdout.
 
@@ -37,7 +43,7 @@ param(
     [string]$RepoRoot   = $(Split-Path -Parent $PSScriptRoot),
     [string[]]$ExpectedFiles = @(),
     [string]$AgentOutput = "",   # C4d: subagent text output for 4-field contract validation
-    [string]$AgentOutputFile = "",   # C4d: path to file containing subagent text output (overrides -AgentOutput when set)
+    [string]$AgentOutputFile = "",   # C4d: path to file containing subagent text output (overrides -AgentOutput when both are given)
     [switch]$Quiet
 )
 Set-StrictMode -Version Latest

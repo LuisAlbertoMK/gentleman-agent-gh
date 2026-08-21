@@ -136,6 +136,7 @@ Some detail here.
         Test-Path $resultFile | Should -BeTrue
         $json = Get-Content -Path $resultFile -Raw | ConvertFrom-Json
         $json.contract_valid | Should -BeTrue
+        $json.contract_ran | Should -BeTrue
         $contractCheck = @($json.checks) | Where-Object { $_.name -eq 'contract_validation' }
         $contractCheck | Should -Not -BeNullOrEmpty
         $contractCheck.passed | Should -BeTrue
@@ -203,6 +204,7 @@ new.txt
         Test-Path $resultFile | Should -BeTrue
         $json = Get-Content -Path $resultFile -Raw | ConvertFrom-Json
         $json.contract_valid | Should -BeTrue   # sync-path convention: not evaluated = no violation detected
+        $json.contract_ran | Should -BeFalse
         $json.contract_detail | Should -Be 'not evaluated'
         $contractCheck = @($json.checks) | Where-Object { $_.name -eq 'contract_validation' }
         $contractCheck | Should -BeNullOrEmpty
