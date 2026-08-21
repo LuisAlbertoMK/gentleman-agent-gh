@@ -14,6 +14,18 @@
 Describe "post-delegation-check.ps1 -- contract validation wiring (C4d)" {
     BeforeAll {
         $scriptPath = Join-Path (Split-Path $PSScriptRoot -Parent) 'post-delegation-check.ps1'
+
+        # Isolated fixture repo so tests don't depend on the real working tree.
+        $script:fixtureRepo = Join-Path $TestDrive 'fixture-repo'
+        if (Test-Path $script:fixtureRepo) { Remove-Item -Recurse -Force $script:fixtureRepo }
+        New-Item -ItemType Directory -Path $script:fixtureRepo -Force | Out-Null
+        git -C $script:fixtureRepo init -q
+        git -C $script:fixtureRepo config user.email "test@test.com"
+        git -C $script:fixtureRepo config user.name "Test"
+        Set-Content -Path (Join-Path $script:fixtureRepo 'base.txt') -Value 'base'
+        git -C $script:fixtureRepo add .
+        git -C $script:fixtureRepo commit -q -m "base"
+        Set-Content -Path (Join-Path $script:fixtureRepo 'untracked.txt') -Value 'change'
     }
 
     It "script has no syntax errors" {
@@ -44,7 +56,7 @@ Describe "post-delegation-check.ps1 -- contract validation wiring (C4d)" {
         $tmpFile = Join-Path $TestDrive 'valid_out.txt'
         Set-Content -Path $tmpFile -Value $validOutput -NoNewline
 
-        $r = & pwsh -NoProfile -File $scriptPath -BaseRef HEAD -Quiet -SubagentOutputFile $tmpFile 2>&1
+        $r = & pwsh -NoProfile -File $scriptPath -BaseRef HEAD -Quiet -RepoRoot $script:fixtureRepo -AllowedPaths '*' -SubagentOutputFile $tmpFile 2>&1
         $jsonLine = $r | Where-Object { $_ -match '^\{' } | Select-Object -First 1
         $json = $jsonLine | ConvertFrom-Json -ErrorAction SilentlyContinue
         $checkNames = @($json.checks | ForEach-Object { $_.name })
@@ -56,7 +68,7 @@ Describe "post-delegation-check.ps1 -- contract validation wiring (C4d)" {
         $tmpFile = Join-Path $TestDrive 'valid_out2.txt'
         Set-Content -Path $tmpFile -Value $validOutput -NoNewline
 
-        $r = & pwsh -NoProfile -File $scriptPath -BaseRef HEAD -Quiet -SubagentOutputFile $tmpFile 2>&1
+        $r = & pwsh -NoProfile -File $scriptPath -BaseRef HEAD -Quiet -RepoRoot $script:fixtureRepo -AllowedPaths '*' -SubagentOutputFile $tmpFile 2>&1
         $jsonLine = $r | Where-Object { $_ -match '^\{' } | Select-Object -First 1
         $json = $jsonLine | ConvertFrom-Json -ErrorAction SilentlyContinue
         $contractCheck = $json.checks | Where-Object { $_.name -eq 'contract_validation' } | Select-Object -First 1
@@ -69,7 +81,7 @@ Describe "post-delegation-check.ps1 -- contract validation wiring (C4d)" {
         $tmpFile = Join-Path $TestDrive 'invalid_out.txt'
         Set-Content -Path $tmpFile -Value $invalidOutput -NoNewline
 
-        $r = & pwsh -NoProfile -File $scriptPath -BaseRef HEAD -Quiet -SubagentOutputFile $tmpFile 2>&1
+        $r = & pwsh -NoProfile -File $scriptPath -BaseRef HEAD -Quiet -RepoRoot $script:fixtureRepo -AllowedPaths '*' -SubagentOutputFile $tmpFile 2>&1
         $jsonLine = $r | Where-Object { $_ -match '^\{' } | Select-Object -First 1
         $json = $jsonLine | ConvertFrom-Json -ErrorAction SilentlyContinue
         $contractCheck = $json.checks | Where-Object { $_.name -eq 'contract_validation' } | Select-Object -First 1
@@ -83,7 +95,7 @@ Describe "post-delegation-check.ps1 -- contract validation wiring (C4d)" {
         $tmpFile = Join-Path $TestDrive 'empty_kf.txt'
         Set-Content -Path $tmpFile -Value $invalidOutput -NoNewline
 
-        $r = & pwsh -NoProfile -File $scriptPath -BaseRef HEAD -Quiet -SubagentOutputFile $tmpFile 2>&1
+        $r = & pwsh -NoProfile -File $scriptPath -BaseRef HEAD -Quiet -RepoRoot $script:fixtureRepo -AllowedPaths '*' -SubagentOutputFile $tmpFile 2>&1
         $jsonLine = $r | Where-Object { $_ -match '^\{' } | Select-Object -First 1
         $json = $jsonLine | ConvertFrom-Json -ErrorAction SilentlyContinue
         $contractCheck = $json.checks | Where-Object { $_.name -eq 'contract_validation' } | Select-Object -First 1
@@ -97,7 +109,7 @@ Describe "post-delegation-check.ps1 -- contract validation wiring (C4d)" {
         $tmpFile = Join-Path $TestDrive 'file_transport.txt'
         Set-Content -Path $tmpFile -Value $validOutput -NoNewline
 
-        $r = & pwsh -NoProfile -File $scriptPath -BaseRef HEAD -Quiet -AllowedPaths 'scripts/*' -SubagentOutputFile $tmpFile 2>&1
+        $r = & pwsh -NoProfile -File $scriptPath -BaseRef HEAD -Quiet -RepoRoot $script:fixtureRepo -AllowedPaths '*' -SubagentOutputFile $tmpFile 2>&1
         $jsonLine = $r | Where-Object { $_ -match '^\{' } | Select-Object -First 1
         $json = $jsonLine | ConvertFrom-Json -ErrorAction SilentlyContinue
         $contractCheck = $json.checks | Where-Object { $_.name -eq 'contract_validation' } | Select-Object -First 1
@@ -107,7 +119,7 @@ Describe "post-delegation-check.ps1 -- contract validation wiring (C4d)" {
 
     It "SubagentOutputFile with missing file logs warning but does not crash" {
         $missingFile = Join-Path $TestDrive 'nonexistent.txt'
-        $r = & pwsh -NoProfile -File $scriptPath -BaseRef HEAD -Quiet -SubagentOutputFile $missingFile 2>&1
+        $r = & pwsh -NoProfile -File $scriptPath -BaseRef HEAD -Quiet -RepoRoot $script:fixtureRepo -AllowedPaths '*' -SubagentOutputFile $missingFile 2>&1
         $jsonLine = $r | Where-Object { $_ -match '^\{' } | Select-Object -First 1
         $json = $jsonLine | ConvertFrom-Json -ErrorAction SilentlyContinue
         $json | Should -Not -BeNullOrEmpty

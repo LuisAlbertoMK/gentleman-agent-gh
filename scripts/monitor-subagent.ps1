@@ -116,7 +116,7 @@ function Get-CheckSnapshot {
     $checks = @()
     $passed = $true
 
-    $contractRan = $false; $contractValid = $true; $contractDetail = ""
+    $contractRan = $false; $contractValid = $false; $contractDetail = "not evaluated"
 
     # 1. Empty-output detection (mirrors post-delegation-check.ps1 sync path)
     $csoScript = Join-Path $RepoRoot 'scripts\check-subagent-output.ps1'

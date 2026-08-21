@@ -219,16 +219,24 @@ if ($Async) {
     exit 0
 }
 
-# --- 1. Empty-output detection ---
-$csoScript = Join-Path $RepoRoot 'scripts\check-subagent-output.ps1'
-if (Test-Path $csoScript) {
+    # --- 1. Empty-output detection ---
+    $csoScript = Join-Path $RepoRoot 'scripts\check-subagent-output.ps1'
+    if (-not (Test-Path $csoScript)) { $csoScript = Join-Path $PSScriptRoot 'check-subagent-output.ps1' }
+    if (Test-Path $csoScript) {
     $escapedBase = ConvertTo-SqlLiteral $BaseRef
     $escapedRoot = ConvertTo-SqlLiteral $RepoRoot
     $csoCmd = "& '$csoScript' -BaseRef '$escapedBase' -RepoRoot '$escapedRoot' -Quiet"
     if ($SubagentOutput) {
         # C4d: pass subagent text output so Validate-AgentReturnContract runs
-        $escapedOutput = ConvertTo-SqlLiteral $SubagentOutput
-        $csoCmd += " -AgentOutput '$escapedOutput'"
+        # Prefer file-based transport (-AgentOutputFile) when available to avoid
+        # multiline command-string escaping issues; fall back to inline -AgentOutput
+        # only when the user provided -SubagentOutput as a raw string.
+        if ($SubagentOutputFile -and (Test-Path $SubagentOutputFile)) {
+            $csoCmd += " -AgentOutputFile '" + (ConvertTo-SqlLiteral $SubagentOutputFile) + "'"
+        } else {
+            $escapedOutput = ConvertTo-SqlLiteral $SubagentOutput
+            $csoCmd += " -AgentOutput '$escapedOutput'"
+        }
     }
     if ($ExpectedFiles) {
         # Array subexpression @() binds [string[]] correctly through the -Command
@@ -254,12 +262,20 @@ if (Test-Path $csoScript) {
 
     # C4d: Extract contract validation result from check-subagent-output
     if ($SubagentOutput -and $csoResult) {
-        # StrictMode-safe: the child exits early (empty-output FAIL JSON) without a
-        # contract_valid property — treat absent property as "not a contract violation".
+        # C4d: When SubagentOutput was provided, contract validation MUST run.
+        # If contract_valid is absent from the cso result, it means cso exited
+        # before reaching contract validation (e.g., empty-output FAIL or timeout) —
+        # this is a contract validation FAILURE, not "not a violation".
         $hasContractValid  = $null -ne $csoResult.PSObject.Properties['contract_valid']
         $hasContractDetail = $null -ne $csoResult.PSObject.Properties['contract_detail']
-        $contractOk = if ($hasContractValid) { $csoResult.contract_valid -ne $false } else { $true }
-        $contractDetail = if ($hasContractDetail -and $csoResult.contract_detail) { $csoResult.contract_detail } else { "pass" }
+        $contractOk = if ($hasContractValid) { $csoResult.contract_valid -ne $false } else { $false }
+        $contractDetail = if ($hasContractValid) {
+            if ($csoResult.contract_detail) { $csoResult.contract_detail }
+            elseif ($csoResult.contract_valid -ne $false) { "OK (contract valid)" }
+            else { "Contract violation (no detail)" }
+        } else {
+            "not evaluated (cso exited before contract validation)"
+        }
         $results.checks += [PSCustomObject]@{
             name   = "contract_validation"
             passed = $contractOk
@@ -271,13 +287,14 @@ if (Test-Path $csoScript) {
     Write-Warning "check-subagent-output.ps1 not found at $csoScript — empty-output check skipped"
 }
 
-# --- 2. Write-scope validation ---
-if ($AllowedPaths) {
-    $wsScript = Join-Path $RepoRoot 'scripts\validate-write-scope.ps1'
-    if (Test-Path $wsScript) {
-        $escapedPaths = "'" + ((ConvertTo-SqlLiteral ($AllowedPaths -join ','))) + "'"
-        $escapedBase  = ConvertTo-SqlLiteral $BaseRef
-        $wsCmd = "& '$wsScript' -AllowedPaths $escapedPaths -BaseRef '$escapedBase'"
+    # --- 2. Write-scope validation ---
+    if ($AllowedPaths) {
+        $wsScript = Join-Path $RepoRoot 'scripts\validate-write-scope.ps1'
+        if (-not (Test-Path $wsScript)) { $wsScript = Join-Path $PSScriptRoot 'validate-write-scope.ps1' }
+        if (Test-Path $wsScript) {
+            $escapedPaths = "'" + ((ConvertTo-SqlLiteral ($AllowedPaths -join ','))) + "'"
+            $escapedBase  = ConvertTo-SqlLiteral $BaseRef
+            $wsCmd = "& '$wsScript' -AllowedPaths $escapedPaths -BaseRef '$escapedBase' -RepoRoot '$RepoRoot'"
         $wsSubproc = Invoke-SubprocessWithTimeout -CommandLine $wsCmd -TimeoutSec $TimeoutSeconds
         if ($wsSubproc.timedOut) {
             Write-Warning "validate-write-scope.ps1 timed out after $TimeoutSeconds s"
