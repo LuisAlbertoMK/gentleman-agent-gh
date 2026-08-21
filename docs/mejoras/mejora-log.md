@@ -529,5 +529,8 @@ vs baseline main 85176d54 (1304/31/1336): +4 tests nuevos verdes, 0 regresiones
 --- Quality gate pre-commit ---
 22/22 ALL CLEAR en los 5 commits (bd707b76, ea617cde, e8121588, 013e4577 + docs)
 
+### Post-merge breaker follow-up (branch independiente, merge 2026-08-20)
+- [HIGH] `ExpectedFiles` ([string[]]) dropeado bajo vector `-Command` (pre-existente, afecta sync + async) — breaker lo hallo. Fix verificado en aislado: emitir `@('a','b')` array-subexpression en el string del comando. Merge `e819b4a8` + T6 de regresion. Suite x2 clean-tree: 1309/31 (variance 31↔33 atribuible 100% al dirty-tree flakiness de validate-write-scope T1/T3 documentado en Ciclo 7: 4/4 estable en isolado)
+
 ### ADRs
 - `adr/ADR-042-monitor-c4d-async-contract.md`
