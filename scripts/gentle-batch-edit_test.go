@@ -137,3 +137,30 @@ func TestApplyReplacements(t *testing.T) {
 		})
 	}
 }
+
+// BenchmarkApplyReplacements measures pure-CPU cost per file (no IO), so it can
+// be compared against the worker-pool overhead documented in DESIGN NOTES:
+//   - if per-file cost is tiny  -> sequential wins (parallelism overhead dominates)
+//   - if per-file cost is high  -> bounded pool (GOMAXPROCS, max 8) pays off
+// 50 unbounded goroutines were 40x slower (NTFS lock thrash); this bench lets the
+// cap stay data-driven instead of arbitrary. b.SetBytes reports MB/s throughput.
+func BenchmarkApplyReplacements(b *testing.B) {
+	sizes := []struct {
+		name string
+		src  string
+	}{
+		{"small_250b", strings.Repeat("a.b.c", 50)},            // ~250 B
+		{"medium_13kb", strings.Repeat("word.subword ", 1024)}, // ~13 KB
+		{"large_1_2mb", strings.Repeat("a.b.c ", 200000)},      // ~1.2 MB
+	}
+	rs := []repl{{Old: ".", New: "_"}, {Old: " ", New: "-"}}
+	for _, sz := range sizes {
+		b.Run(sz.name, func(b *testing.B) {
+			b.SetBytes(int64(len(sz.src)))
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				applyReplacements(sz.src, rs, false)
+			}
+		})
+	}
+}
