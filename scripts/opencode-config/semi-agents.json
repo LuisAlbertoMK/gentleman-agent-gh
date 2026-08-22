@@ -53,7 +53,7 @@
   },
   "gentleman-quick-semi": {
     "description": "Fast executor — SEMI mode (safe commands auto, writes/commits ask)",
-    "model": "opencode/mimo-v2.5-free",
+    "model": "opencode/big-pickle",
     "mode": "primary",
     "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
     "permission": {
@@ -101,7 +101,7 @@
   },
   "gentleman-codex-semi": {
     "description": "Code generation — SEMI mode (safe commands auto, writes/commits ask)",
-    "model": "opencode/deepseek-v4-flash-free",
+    "model": "opencode/laguna-s-2.1-free",
     "mode": "primary",
     "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
     "permission": {
@@ -152,7 +152,7 @@
   },
   "gentleman-implementer-semi": {
     "description": "Plan executor — SEMI mode (safe commands auto, writes/commits ask)",
-    "model": "opencode/deepseek-v4-flash-free",
+    "model": "opencode/laguna-s-2.1-free",
     "mode": "primary",
     "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
     "permission": {
