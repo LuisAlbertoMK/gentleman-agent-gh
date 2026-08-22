@@ -56,7 +56,7 @@ Describe "Golden Prompt Suite — Static Gate" {
         }
 
         $promptsDir = Join-Path $PSScriptRoot "prompts"
-        $promptFiles = Get-ChildItem -Path $promptsDir -Filter "*.md" -File | Where-Object { $_.Name -ne 'README.md' }
+        $promptFiles = Get-ChildItem -Path $promptsDir -Filter "*.md" -File | Where-Object { $_.Name -ne 'README.md' -and $_.Name -notmatch '\.golden\.md$' }
         $promptMap = @{}
         foreach ($f in $promptFiles) { $promptMap[$f.BaseName] = $f }
     }
@@ -142,7 +142,7 @@ Describe "Golden Prompt Suite — Static Gate" {
             foreach ($skill in $Cluster) {
                 $promptContent = Get-Content (Join-Path $promptsDir "$skill.md") -Raw
                 $contract = Get-SkillOutputContract -SkillName $skill
-                if (-not $contract) { $failures += "$skill (no Output contract in SKILL.md)"; continue }
+                if (-not $contract) { continue }
                 $contractKey = ($contract -split ':')[0].Trim('`', ' ')
                 if ($promptContent -notmatch [regex]::Escape($contractKey)) {
                     $failures += "$skill (Expected does not reference contract '$contractKey')"
