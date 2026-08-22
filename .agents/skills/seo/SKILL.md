@@ -3,7 +3,7 @@ name: seo
 description: "Search engine visibility & ranking — technical SEO, on-page, structured data, E-E-A-T, AI Overviews"
 triggers: "seo, search engine, meta tags, structured data, sitemap, search optimization, ranking, schema, robots.txt, meta description, EEAT, E-E-A-T, AI Overview, SGE, AI Mode, generative search, AEO, GEO, Google Core Update, GA4, topical authority, content cluster"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1994
+token_budget: 2400
 ---
 ## When to Use
 SEO audit/meta/sitemap/Core Update/AI Overviews/E-E-A-T/CWV/INP. NOT: content/link building/PPC/social. Pre-reqs: GSC·PageSpeed·RichResultsTest.
@@ -23,3 +23,10 @@ Win = cited. 1. Answer-first 40-60w. 2. Info gain. 3. Clean H2/lists/table. 4. C
 Keyword-stuff·Dup titles·No schema·Skip mobile·Missing robots/sitemap·Incomplete JSON-LD·Mass AI·No E-E-A-T·Thin affiliate·No monitor·Fake schema
 ## Cross-Refs: web-quality-audit | performance | baseline-ui | docs-audit
 > docs/skills/seo/reference.md
+
+## Verification
+- Output: response matches the ## Output contract format exactly
+- token_budget: total tokens within frontmatter token_budget
+- frontmatter: name, description, triggers, token_budget present and stable
+- cross-refs: each referenced skill exists
+- anti-patterns: none of the listed anti-patterns reintroduced

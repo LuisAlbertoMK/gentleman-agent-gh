@@ -3,7 +3,7 @@ name: vision-analyze
 description: "Local vision analysis - screenshots, UI review, error detection via Ollama. 100% local. NOT visual regression."
 triggers: [capture, vision, analyze-ui, visual-review, captura, analizar-imagen]
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1459
+token_budget: 1900
 ---
 ## When to Use
 Local vision analysis — screenshots, UI review, error detection.
@@ -22,3 +22,10 @@ Local vision analysis — screenshots, UI review, error detection.
 ## Anti-Patterns
 Use for pixel diffing/regression (visual-testing's job) · Force llava:7b with <8GB RAM (OOM) · Route screenshots through external APIs (leak)
 > docs/skills/vision-analyze/reference.md
+
+## Verification
+- Output: response matches the ## Output contract format exactly
+- token_budget: total tokens within frontmatter token_budget
+- frontmatter: name, description, triggers, token_budget present and stable
+- cross-refs: each referenced skill exists
+- anti-patterns: none of the listed anti-patterns reintroduced

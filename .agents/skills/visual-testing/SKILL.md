@@ -3,7 +3,7 @@ name: visual-testing
 description: "Visual verification - screenshots, visual regression, UI bug detection via Playwright. See vision-analyze for LLM."
 triggers: "screenshot, visual diff, visual bug, regression test, VRT, UI broken, text overflow, layout shift, responsive test, visual regression"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1851
+token_budget: 2200
 ---
 
 ## When to Use
@@ -36,3 +36,10 @@ No baseline·Threshold too strict(flaky)·No viewport reset·Skip anim freeze·N
 
 ## Reference
 > docs/skills/visual-testing/reference.md
+
+## Verification
+- Output: response matches the ## Output contract format exactly
+- token_budget: total tokens within frontmatter token_budget
+- frontmatter: name, description, triggers, token_budget present and stable
+- cross-refs: each referenced skill exists
+- anti-patterns: none of the listed anti-patterns reintroduced

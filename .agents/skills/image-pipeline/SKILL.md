@@ -3,7 +3,7 @@ name: image-pipeline
 description: "Image optimization — compress, convert WebP/AVIF, resize, describe. Single-file atomic edits, batch processing, metadata extraction."
 triggers: "compress, convert WebP/AVIF, resize, describe"
 changelog: docs/ciclos/cycle28-20260816.md
-token_budget: 1900
+token_budget: 2200
 ---
 
 ## When to Use
@@ -37,6 +37,13 @@ IMG-PIPELINE:<file> STATUS:<ok|warn|error> FORMAT:<fmt> SIZE:<before->after> RAT
 Upscaling beyond source | hardpx width on responsive | metadata not stripped | lossy on SVG | no SSIM gate | missing alt-text
 
 ## Cross-Refs: visual-testing | vision-analyze | web-quality-audit | performance
+
+## Verification
+- Output: response matches the ## Output contract format exactly
+- token_budget: total tokens within frontmatter token_budget
+- frontmatter: name, description, triggers, token_budget present and stable
+- cross-refs: each referenced skill exists
+- anti-patterns: none of the listed anti-patterns reintroduced
 
 ---
 

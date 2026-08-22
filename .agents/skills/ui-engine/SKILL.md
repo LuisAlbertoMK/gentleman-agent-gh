@@ -3,7 +3,7 @@ name: ui-engine
 description: "UI system — Grid/Flexbox/@layer/:has(), container queries, compositor-only animation, OKLCH tokens, component patterns"
 triggers: "ui, layout, responsive, animation, design tokens, css, grid, flexbox, container query, dark mode, component layout, page layout, component patterns, hooks, compound components, state management"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1839
+token_budget: 2200
 ---
 ## When to Use
 UI: Grid/Flexbox/@layer/:has()·CQ·OKLCH·anim·patterns.
@@ -26,3 +26,10 @@ OKLCH>HSL: perceptual, dark, wide, ≥4.5:1. `vw`=page, `cqi`=container.
 Flex2D·Grid1D·!important vs @layer·flex:1 w/o min-inline-size:0·container-type:size w/o block-size·grid-auto-flow:dense·MQ for components·Decorative·>500ms·transition:all·HSL/RGB·Fixed font·cqi outside container·Prop drill>3L·Context high-freq
 ## Cross-Refs: baseline-ui | accessibility | performance
 > docs/skills/ui-engine/reference.md
+
+## Verification
+- Output: response matches the ## Output contract format exactly
+- token_budget: total tokens within frontmatter token_budget
+- frontmatter: name, description, triggers, token_budget present and stable
+- cross-refs: each referenced skill exists
+- anti-patterns: none of the listed anti-patterns reintroduced
