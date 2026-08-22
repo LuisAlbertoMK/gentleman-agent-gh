@@ -3,7 +3,8 @@
 // Usage: gentle-batch-edit [-n] [-c N] spec.jsonl
 //
 // spec.jsonl = one JSON object per line:
-//   {"file":"path/to/file","replacements":[{"old":"x","new":"y"}]}
+//
+//	{"file":"path/to/file","replacements":[{"old":"x","new":"y"}]}
 //
 // Each replacement is applied to ALL occurrences of `old` in `file`.
 // Exit non-zero if any file fails (fail-closed).
@@ -37,8 +38,8 @@ import (
 )
 
 type specLine struct {
-	File          string     `json:"file"`
-	Replacements  []repl     `json:"replacements"`
+	File         string `json:"file"`
+	Replacements []repl `json:"replacements"`
 }
 type repl struct {
 	Old string `json:"old"`
@@ -49,6 +50,29 @@ type result struct {
 	File  string
 	Edits int
 	Err   error
+}
+
+// applyReplacements applies each replacement to src. In dryRun it only counts
+// occurrences (returning src unchanged); otherwise it replaces all and counts.
+// Pure and deterministic (no I/O): the unit-testable core of process().
+func applyReplacements(src string, rs []repl, dryRun bool) (edits int, out string) {
+	out = src
+	for _, r := range rs {
+		if r.Old == "" {
+			continue
+		}
+		if dryRun {
+			edits += strings.Count(out, r.Old)
+			continue
+		}
+		n := strings.Count(out, r.Old)
+		if n == 0 {
+			continue
+		}
+		out = strings.ReplaceAll(out, r.Old, r.New)
+		edits += n
+	}
+	return edits, out
 }
 
 func main() {
@@ -147,22 +171,7 @@ func process(s specLine, dryRun bool) result {
 		return result{File: p, Err: err}
 	}
 	src := string(b)
-	edits := 0
-	for _, r := range s.Replacements {
-		if r.Old == "" {
-			continue
-		}
-		if dryRun {
-			edits += strings.Count(src, r.Old)
-			continue
-		}
-		n := strings.Count(src, r.Old)
-		if n == 0 {
-			continue
-		}
-		src = strings.ReplaceAll(src, r.Old, r.New)
-		edits += n
-	}
+	edits, src := applyReplacements(src, s.Replacements, dryRun)
 	if dryRun || edits == 0 {
 		return result{File: p, Edits: edits}
 	}
