@@ -1,6 +1,7 @@
 ---
 name: trial-verify
 description: When facing >=2 viable options for a non-trivial reversible decision, implement/evaluate ALL of them, verify via independent subagent scoring, and PROCEED with the verified winner without asking the user to choose. Triggered by exception (d) of the 1-question rule.
+triggers: trial-verify, multi-option decision, which option, autonomous option resolution
 ---
 
 # Trial-Verify Protocol
@@ -51,6 +52,26 @@ Trivial decisions (naming, one-liners) skip this — just pick and go.
 ## Budget caps
 
 Max 3 options · max 2 verification delegations · abort trial if total >15 tool calls.
+
+## Testing
+
+Validated empirically before codification (2026-08-24):
+- Trial #1 (self-application): variants scored by gentleman-deep-sub-auto
+  (C=21/25) + gentleman-quick-sub-auto (A=20/25); disagreement resolved as
+  documented synthesis. Ledgers: Engram trial/trial-verify-implementation.
+- Trial #2 (hardcoded-path prevention): P3 won 20/25 with repo evidence;
+  detection regex tested against dirty+clean fixtures (1 hit / 0 false positive).
+- Known limitation at validation time: hooks were NOT active in the authoring
+  clone (core.hooksPath unset) — gate integration verified only by manual
+  fixture test until hooks are configured. See Anti-Patterns.
+
+## Anti-Patterns
+
+- NEVER self-grade candidates without an independent subagent (observed bias).
+- Never let the learning loop promote defaults that bypass Alto checkpoints.
+- Do not trust "wired per docs" — verify `git config core.hooksPath` per clone.
+- Registering a new skill WITHOUT updating canonical counts breaks cross-ref,
+  skill-coverage, and drift gates (happened once; fixed same session).
 
 ## Learning loop
 

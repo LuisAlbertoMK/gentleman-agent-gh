@@ -15,11 +15,11 @@
 
 ---
 
-Suite of **91 skills** (+ `_shared`) + **119 top-level scripts** (112 PowerShell + 7 shell) for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
+Suite of **92 skills** (+ `_shared`) + **119 top-level scripts** (112 PowerShell + 7 shell) for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
 > **Score**: 8.8/10 (14 dimensions) — tracking in .project.json.
-> **Skills**: 91 (+ `_shared`)
+> **Skills**: 92 (+ `_shared`)
 > **Cycle**: 28 (active) — Security Hardening + Quality Recovery
 
 ---
@@ -238,7 +238,7 @@ The project uses two MCPs for cross-session memory:
 
 ```
 gentleman-agent-gh/
-├── .agents/skills/          # 91 skills + _shared (canonical, git-tracked)
+├── .agents/skills/          # 92 skills + _shared (canonical, git-tracked)
 │   ├── quality-gate/
 │   ├── code-review-agent/
 │   └── .../

@@ -1,9 +1,9 @@
 #requires -Version 7
 <#
 .SYNOPSIS
-  E2E coverage gate for all 90 skills in .agents/skills/.
+  E2E coverage gate for all registered skills in .agents/skills/.
   Read-only validations (NO skill content mutated):
-    - canonical count == 90 (excl _shared)  [aligns SKILLS-INDEX + README + .project.json]
+    - canonical count triple-agreement  [aligns SKILLS-INDEX + README + .project.json]
     - YAML frontmatter (---, name, triggers, description) on every skill
     - every skill declares >=1 depth section (Examples|Testing|Anti-Patterns|Testing Patterns)
     - every declared Cross-Ref resolves to a real skill dir
@@ -14,7 +14,7 @@
 
 Set-StrictMode -Version Latest
 
-Describe 'E2E: Skill Coverage (all 90 skills)' {
+Describe 'E2E: Skill Coverage (all registered skills)' {
     BeforeAll {
         $proj = (git rev-parse --show-toplevel 2>$null)
         if (-not $proj) { $proj = $PWD.Path }
@@ -29,8 +29,15 @@ Describe 'E2E: Skill Coverage (all 90 skills)' {
             }
     }
 
-    It 'canonical skill count is 91 (excl _shared)' {
-        $script:skillTable.Count | Should -Be 91 -Because "SKILLS-INDEX/README/.project must agree on 91 canonical skills"
+    It 'canonical skill count agrees across filesystem, SKILLS-INDEX and .project.json' {
+        # v7 (dual-review iteration 2): pure filesystem==index was CIRCULAR — if both
+        # drifted together the test passed falsely (reviewer verdict: REJECT).
+        # Triple-agreement forces updating ALL canonical sources on every skill add.
+        $declared = [int]([regex]::Match((Get-Content (Join-Path $proj 'SKILLS-INDEX.md') -Raw), 'all (\d+) skills')).Groups[1].Value
+        $projSkills = (Get-Content (Join-Path $proj '.project.json') -Raw | ConvertFrom-Json).dimensions_detail.PA.e.skills
+        ($declared -gt 0) | Should -BeTrue -Because 'regex no-match yields 0 and would make the next assertions vacuous'
+        $script:skillTable.Count | Should -Be $declared -Because 'filesystem must match SKILLS-INDEX declaration'
+        $script:skillTable.Count | Should -Be $projSkills -Because 'filesystem must match .project.json dimensions_detail.PA.e.skills'
     }
 
     It 'every skill has valid YAML frontmatter (--- + name/triggers/description)' {
