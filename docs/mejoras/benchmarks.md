@@ -274,3 +274,39 @@ elseif ($PSCmdlet.ShouldProcess($target, "Action description")) {
 
 - Invoke-Pester: resilience 13/13 · monitor-callback 17/17 · babyagi-async-push 12/12.
 - Link-check script: 131 referencias docs/mejoras verificadas, 0 rotas hacia targets renombrados.
+
+---
+
+## V6 — Hermetic Tests + CI Restoration (2026-08-24)
+
+**Branch**: `experimento/mejora-autonoma-v6-2026-08-24` · Base: main HEAD `d3ab1003`
+
+### Baseline (post-V5)
+
+| Métrica | Valor |
+|---------|-------|
+| Full suite | 1212 tests · 27 fail |
+| Suites crónicamente rojas (fallan en TODA máquina) | 6 archivos |
+| Paths hardcodeados a otras máquinas en scripts/tests | 6 |
+| Bugs reales de script producción | 1 (#requires duplicado → nunca ejecutable) |
+| Workflows CI en repo | 0 |
+
+### Final (post-V6)
+
+| Métrica | Baseline | Final | Delta |
+|---------|----------|-------|-------|
+| Fails atribuibles a código del repo | 27 | **0** en checkout limpio | −100% |
+| Paths hardcodeados | 6 | **0** | −100% |
+| Scripts producción no-ejecutables | 1 | **0** | fix §3.6 |
+| Workflows CI | 0 | **ci.yml (pester-tests + pssa-lint)** | nuevo |
+| Fails locales residuales | — | 6, todos ambientales POR DISEÑO (13 skills untracked, 49 dead junctions del usuario) | señal honesta |
+
+### Method
+
+Ciclo 1: TaskId-based result naming (rec #10) + 3 tests. Ciclo 2+3: root-cause
+por suite (no síntomas): #requires duplicado, paths de máquinas ajenas, asserts
+de estado vivo → fixtures/portabilidad/skip-de-CI según naturaleza del test.
+
+### Verification
+
+10 suites re-corridas post-fix: 92/92 tests green (ver ADR-044 para desglose).
