@@ -107,9 +107,14 @@ function Invoke-SubprocessWithTimeout {
     }
 }
 
-# --- Result file: {BaseRef}.async-result.json (sanitize path-hostile chars) ---
-$fileSafeBase = $BaseRef -replace '[/\\:*?"<>|]', '_'
-$resultFile = Join-Path $RepoRoot ($fileSafeBase + '.async-result.json')
+# --- Result file: prefer {TaskId} when provided (2026-08-19 rec #10: correlation
+# ID for concurrent delegations); fall back to {BaseRef} otherwise. Backward
+# compatible: when TaskId equals BaseRef (BabyAGI flow) the name is unchanged.
+# Sanitize path-hostile chars in either component.
+$fileSafeBase  = $BaseRef -replace '[/\\:*?"<>|]', '_'
+$fileSafeTask  = $TaskId  -replace '[/\\:*?"<>|]', '_'
+$resultName = if ($TaskId) { "$fileSafeTask.async-result.json" } else { "$fileSafeBase.async-result.json" }
+$resultFile = Join-Path $RepoRoot $resultName
 
 # --- One poll: run both dependency checks, return snapshot for stability compare ---
 function Get-CheckSnapshot {
