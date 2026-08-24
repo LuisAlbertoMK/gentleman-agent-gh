@@ -1008,3 +1008,13 @@ a35fb543 fix(sync): register gentle-orchestrator in config pipeline for full age
 a378b36d fix(scripts): preserve single-element arrays in JSON serialization
 0d88467c fix: eliminate opencap typo (base HEAD)
 ```
+
+## Experimento 2026-08-24 - Filenames + async resilience (66d14670, d0f5b0a4)
+
+**Branch**: experimento/mejora-autonoma-2026-08-24 (base main da90e1b0) | **Protocolo**: v3
+**Gaps** (evidencia): #8 self-analysis 07-28 (9 filenames homogeneos); #5/#11 async analysis 08-19 (sin scope-filter, sin tests resilience)
+**Enfoques**: A rename+refs GANADOR | B index-only rechazado (no cierra glob discovery) | C subdirs rechazado (mayor blast radius)
+**Ciclo 1** (66d14670): 9 renames con keyword de dominio, 21 referencias actualizadas, 7 stale refs preexistentes reparadas (mapeo inequivoco), 5 stale refs abiertas documentadas
+**Ciclo 2** (d0f5b0a4): scope-filter en monitor-subagent.ps1 Get-CheckSnapshot (rec #5, guarded) + async-resilience.Tests.ps1 (13 tests: concurrent/orphan/false-stability con e2e behavioral en temp git repo)
+**Tests**: 54/54 async suites (resilience 13, callback 17, push 12 + structural)
+**ADR**: ADR-043 | **Rollback**: docs/mejoras/rollback-map.md ciclo 2026-08-24

@@ -240,3 +240,37 @@ elseif ($PSCmdlet.ShouldProcess($target, "Action description")) {
 - `./scripts/run-ci-tests.ps1`: **122 passed, 3 pre-existing failures** (unrelated)
 - `score-auto -Json`: PA improved from **8.0 → 8.5**
 - Manual `-WhatIf` testing: Correctly previews all destructive operations
+
+---
+
+## V5 — Filenames Disambiguation + Async Resilience (2026-08-24)
+
+**Branch**: `experimento/mejora-autonoma-2026-08-24` · Base: main HEAD `da90e1b0`
+
+### Baseline (pre-V5)
+
+| Métrica | Valor |
+|---------|-------|
+| M1: Archivos homogéneos en docs/mejoras/ | 9/58 (15.5%) |
+| M2: Referencias rotas a análisis renombrados / preexistentes inequívocas | 21 refs a nombres viejos · 8 stale inequívocas |
+| M3: Escenarios async cubiertos (concurrent/crash/false-stability) | 0/3 |
+| M4: Pass rate suites async | 29/29 (callback 17 + push 12) |
+
+### Final (post-Ciclo 2)
+
+| Métrica | Baseline | Final | Delta |
+|---------|----------|-------|-------|
+| M1: archivos homogéneos | 9/58 | **0/58** | −100% (target ✓) |
+| M2: refs rotas (link-check 131 refs) | 8 inequívocas + 21 a nombres viejos | **0** inequívocas rotas · 5 no-mapeables documentadas como abiertas | target parcial (documentadas, no adivinadas) |
+| M3: escenarios async | 0/3 | **3/3** (+13 tests, 1 behavioral e2e) | nuevo |
+| M4: pass rate suites async | 29/29 | **54/54** | sin regresión |
+
+### Method
+
+- Ciclo 1: git mv ×9 → scripted basename replacement ×21 files → link-check verification.
+- Ciclo 2: guarded AllowedPaths filter en Get-CheckSnapshot (monitor-subagent.ps1) + behavioral test ejecutando el monitor real como subprocess contra un git repo temporal.
+
+### Verification
+
+- Invoke-Pester: resilience 13/13 · monitor-callback 17/17 · babyagi-async-push 12/12.
+- Link-check script: 131 referencias docs/mejoras verificadas, 0 rotas hacia targets renombrados.

@@ -164,3 +164,17 @@ Branch: `experimento/mejora-autonoma-2026-08-20-c30` | Base: `main` HEAD `85176d
 
 ### Per-cycle rollback
 - **Ciclo 30 completo**: `git revert 013e4577 e8121588 ea617cde bd707b76` (orden inverso) - vuelve al comportamiento pre-C4d del monitor; docs/mejoras/2026-08-15 deja de estar implementado en async
+
+---
+
+# Rollback Map - Ciclo 2026-08-24
+
+Branch: `experimento/mejora-autonoma-2026-08-24` | Base: `main` HEAD `da90e1b0`
+
+| Commit | Mensaje | Rollback |
+|--------|---------|----------|
+| `66d14670` | docs(mejoras): rename analyses with domain keywords + fix stale cross-references | `git revert 66d14670` - restaura filenames homogeneos y stale refs; los 9 archivos vuelven a su nombre YYYY-MM-DD-gentleman-agent-gh-analisis.md |
+| `d0f5b0a4` | fix(monitor): scope-filter stability signal + resilience tests for async gaps | `git revert d0f5b0a4` - convergencia vuelve a resetearse con commits externos fuera de scope; async-resilience.Tests.ps1 eliminado |
+
+### Per-cycle rollback
+- **Ciclo completo**: `git revert d0f5b0a4 66d14670` (orden inverso). Ciclos independientes: docs (Ciclo 1) y code+tests (Ciclo 2) no se solapan.
