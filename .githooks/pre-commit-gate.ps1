@@ -404,6 +404,31 @@ if (Test-Path -LiteralPath $tbrScript) {
     Warn "test-token-budget-regression.ps1 not found at $tbrScript"
 }
 
+# [25/25] Machine-specific path scan (V6 regression class — hardcoded
+# "D:/repo", "C:/Users/<someone>" inside scripts broke suites on other
+# machines). Scans staged .ps1 for absolute drive paths outside comments.
+# Verified winner P3 (trial 2, ADR-044 era): local hook + CI backstop.
+Write-Host "[25/25] Machine-specific path scan..."
+$machPathHits = @()
+foreach ($sf in $staged) {
+    if ($sf -notmatch '\.ps1$') { continue }
+    $full = Join-Path $RepoRoot $sf
+    if (-not (Test-Path -LiteralPath $full)) { continue }
+    $lineNo = 0
+    foreach ($ln in Get-Content -LiteralPath $full) {
+        $lineNo++
+        # strip comment tails before scanning (# ... but not #requires which is a directive)
+        $code = ($ln -replace "(?<=(?<!`)')#.*$", '')
+        if ($code -match '["''](?:[A-Za-z]:[\\/](?:Users|gentleman)[^"'']*)["'']' -and $code -notmatch '\$env:|\$PSScriptRoot|Join-Path') {
+            $machPathHits += "${sf}:${lineNo}"
+        }
+    }
+}
+if ($machPathHits.Count -gt 0) {
+    $machPathHits | ForEach-Object { Write-Host "    $_" }
+    Fail "hardcoded machine paths in staged .ps1 (use PSScriptRoot / env vars)"
+} else { Pass }
+
 # Summary
 Write-Host "`n=== Gate: $passed/$($passed+$failed) passed ==="
 if ($blocked) { Write-Host "  $([char]0x1b)[31mBLOCKED$([char]0x1b)[0m" }

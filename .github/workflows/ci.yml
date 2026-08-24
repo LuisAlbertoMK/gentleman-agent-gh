@@ -37,3 +37,20 @@ jobs:
           $errors | ForEach-Object { Write-Host "::error file=$($_.ScriptPath) line=$($_.Line):: $($_.RuleName): $($_.Message)" }
           if ($errors.Count -gt 0) { exit 1 }
           Write-Host "[PSSA] 0 errors ($(@($results).Count) total findings)"
+
+      - name: Machine-specific path scan (CI backstop for --no-verify)
+        shell: pwsh
+        run: |
+          $hits = @()
+          Get-ChildItem -Path ./scripts,./.githooks -Recurse -Filter *.ps1 | ForEach-Object {
+            $lineNo = 0
+            foreach ($ln in Get-Content -LiteralPath $_.FullName) {
+              $lineNo++
+              $code = ($ln -replace "(?<=(?<!`)')#.*$", '')
+              if ($code -match '["''](?:[A-Za-z]:[\\/](?:Users|gentleman)[^"'']*)["'']' -and $code -notmatch '\$env:|\$PSScriptRoot|Join-Path') {
+                $hits += "$($_.FullName):$lineNo"
+              }
+            }
+          }
+          if ($hits.Count -gt 0) { $hits | ForEach-Object { Write-Host "::error:: hardcoded machine path: $_" }; exit 1 }
+          Write-Host "[path-scan] clean"
