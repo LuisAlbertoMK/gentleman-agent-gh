@@ -13,11 +13,13 @@
 
 Set-StrictMode -Version Latest
 
-Describe 'E2E: Subagent Routing (4 agents I use)' {
+Describe 'E2E: Subagent Routing (4 agents I use)' -Skip:(($env:CI -eq 'true') -or ((-not (Test-Path (Join-Path $env:USERPROFILE '.config/opencode/opencode.json'))) -and (-not (Test-Path (Join-Path $env:USERPROFILE '.config/opencode/opencode.jsonc'))))) {
     BeforeAll {
         $script:proj = (git rev-parse --show-toplevel 2>$null); if (-not $script:proj) { $script:proj = $PWD.Path }
-        $script:cfg  = 'C:\Users\MK\.config\opencode\opencode.json'
-        if (-not (Test-Path $script:cfg)) { throw "global opencode.json not found: $script:cfg" }
+        # Global OpenCode config may be .json (strict) or .jsonc (comments allowed)
+        $jsonPath  = Join-Path $env:USERPROFILE '.config/opencode/opencode.json'
+        $jsoncPath = Join-Path $env:USERPROFILE '.config/opencode/opencode.jsonc'
+        $script:cfg  = if (Test-Path $jsonPath) { $jsonPath } else { $jsoncPath }
         $script:json = Get-Content $script:cfg -Raw | ConvertFrom-Json -ErrorAction Stop
         $script:used = @('gentleman-implementer-sub-auto','gentleman-deep-sub-auto',
                          'gentleman-quick-sub-auto','gentleman-codex-sub-auto')

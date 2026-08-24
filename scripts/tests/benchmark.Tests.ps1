@@ -30,14 +30,21 @@ Describe 'R6: pinned baseline gate' {
     }
 
     It 'passes the gate when current metrics are at or above the baseline' {
-        $bl = Join-Path ([System.IO.Path]::GetTempPath()) "bench-cur-$([guid]::NewGuid()).json"
+        # v6 hermetic fix: pin baseline AND compare inside the SAME child pwsh with a
+        # clean temp USERPROFILE — a machine with dead skill junctions fails the gate
+        # unconditionally (by design), which is environmental, not a repo regression.
+        $tmpRoot = Join-Path ([System.IO.Path]::GetTempPath()) "bench-r6-$([guid]::NewGuid())"
+        New-Item -ItemType Directory -Path $tmpRoot -Force | Out-Null
+        $bl = Join-Path $tmpRoot "baseline.json"
         try {
-            & $script:bench -Json | Out-File $bl -Encoding utf8
-            $out = & $script:bench -Gate -Baseline $bl 2>&1 | Out-String
+            $jsonRun = "`$env:USERPROFILE='$tmpRoot'; & '$($script:bench.Path)' -Json"
+            & pwsh -NoProfile -Command $jsonRun | Out-File $bl -Encoding utf8
+            $gateRun = "`$env:USERPROFILE='$tmpRoot'; & '$($script:bench.Path)' -Gate -Baseline '$bl'; if(`$LASTEXITCODE) { exit `$LASTEXITCODE }"
+            $out = & pwsh -NoProfile -Command $gateRun 2>&1 | Out-String
             $LASTEXITCODE | Should -Be 0
             $out | Should -Not -Match "REGRESSIONS"
         } finally {
-            Remove-Item $bl -Force -ErrorAction SilentlyContinue
+            Remove-Item $tmpRoot -Recurse -Force -ErrorAction SilentlyContinue
         }
     }
 
