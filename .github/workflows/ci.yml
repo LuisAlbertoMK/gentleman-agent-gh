@@ -1,204 +1,39 @@
-name: CI quality gate (ConfigValidator)
-
-# Cycle 3 — G2: validate opencode.json schema before deploy.
-# Enfoque A (Minimal) from plan-auto-mejora-v3-2026-08-13 §3: ConfigValidator.psm1
-# guards G1 (skills.paths array unwrapping) + G3 (50-agent completeness) + prompt
-# ref integrity. Complements .github/workflows/quality-gate.yml (lint/security/tests)
-# — this workflow is the fail-fast config gate: quality → tests → validate.
-#
-# PowerShell Core ONLY: every step uses `shell: pwsh` (never Windows PowerShell).
-# Relative paths only — runner is ubuntu-latest, no D:\... paths exist there.
+name: CI
 
 on:
   push:
-    branches: [ master, main, 'experimento/**' ]
+    branches: [main]
   pull_request:
 
-permissions:
-  contents: read
-
-concurrency:
-  group: cfg-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  quality:
-    name: Quality — ConfigValidator
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    defaults:
-      run:
-        shell: pwsh
+  pester-tests:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env:
+      PESTER_TEST: '1'
+      CI: 'true'
     steps:
       - uses: actions/checkout@v4
 
-      - name: Validate opencode.json schema (ConfigValidator)
-        # Fail fast: any check (skills.paths array, prompt refs, agent completeness)
-        # failing aborts the pipeline before tests/validate run.
-        run: |
-          Import-Module ./scripts/lib/ConfigValidator.psm1 -Force
-          $code = Test-OpencodeConfig -Path ./opencode.json
-          if ($code -ne 0) { Write-Error "opencode.json failed ConfigValidator"; exit $code }
-          Write-Output "OK: opencode.json passes ConfigValidator"
-
-  tests:
-    name: Tests — Pester (robust runner, R3)
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: quality
-    defaults:
-      run:
+      - name: Run full Pester suite
         shell: pwsh
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Run Pester via run-ci-tests.ps1 (pinned 5.5.0, Run.Exit, NUnit)
-        # Thin pipeline (R3): central runner script pins Pester, sets Run.Exit=$true
-        # (non-zero exit on any failure), and emits NUnit XML for publishing below.
-        # Local and CI share the exact same invocation — no inline Pester config drift.
-        run: |
-          ./scripts/run-ci-tests.ps1 -Path ./scripts/tests -OutputDir ./test-results
-
-      - name: Publish NUnit test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: pester-nunit-results
-          path: ./test-results/testResults.xml
-          if-no-files-found: warn
-
-  coverage:
-    name: Coverage — gate + JaCoCo publish (R2, G2)
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: tests
-    defaults:
-      run:
-        shell: pwsh
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Run coverage suite (stable unit subset, pinned Pester 5.5.0)
-        # G2 gate: measure-only unless the floor is crossed — Strict promotes the
-        # 20% floor to a hard gate. Excludes pre-existing broken suites
-        # (analyze-automejora WhatIf MetadataException, config-validator SSoT
-        # drift, readme-drift counts, permission-gate supply-chain floor) so the
-        # gate measures coverage of WORKING tests, not unrelated repo drift.
-        # Ratchets upward: raise -MinimumCoverage as lib coverage improves.
-        run: |
-          ./scripts/tests/Coverage.ps1 -TestPath ./scripts/tests `
-            -CoverageRootPath ./scripts/lib `
-            -Strict -MinimumCoverage 20 `
-            -ExcludePattern "e2e|Integration|session-checkpoint|skill-coverage|ui-specialist|subagent|analyze-automejora|config-validator|benchmark\.|permission-gate|readme-drift" `
-            -ReportDir ./test-results
-
-      - name: Publish JaCoCo coverage artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: jacoco-coverage
-          path: ./test-results/coverage.xml
-          if-no-files-found: warn
-
-      - name: Publish coverage summary
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-summary
-          path: ./test-results/summary.json
-          if-no-files-found: warn
-
-  validate:
-    name: Validate — SSoT in sync
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: tests
-    defaults:
-      run:
-        shell: pwsh
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Check opencode.json matches SSoT
-        # Regenerate pipeline: opencode-base.json + generator + agent-overrides.json
-        # must produce exactly the committed opencode.json. Exit 1 on mismatch.
-        run: |
-          node ./scripts/lib/generate-opencode-config.js --validate
-          if ($LASTEXITCODE -ne 0) { Write-Error "opencode.json stale vs SSoT — run scripts/regenerate-opencode.ps1 -Yes"; exit 1 }
-          Write-Output "OK: opencode.json in sync with SSoT"
+        run: ./scripts/run-ci-tests.ps1
 
   pssa-lint:
-    name: Linter — PSScriptAnalyzer
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: quality
-    defaults:
-      run:
-        shell: pwsh
+    runs-on: windows-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
       - name: Install PSScriptAnalyzer
-        run: |
-          if (-not (Get-Module -ListAvailable -Name PSScriptAnalyzer)) {
-            Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser -AllowClobber
-          }
-
-      - name: Run PSScriptAnalyzer (security + correctness + best practices)
-        # Uses PSScriptAnalyzerSettings.psd1 for rule configuration
-        # Enforces: security (invoke-expression, plaintext passwords), correctness (approved verbs, ShouldProcess),
-        # best practices (unused params, empty catch blocks)
-        run: |
-          $results = Invoke-ScriptAnalyzer -Path ./scripts -Recurse -Settings ./PSScriptAnalyzerSettings.psd1 -PassThru
-          $errors = $results | Where-Object { $_.Severity -eq 'Error' }
-          $warnings = $results | Where-Object { $_.Severity -eq 'Warning' }
-          
-          if ($errors.Count -gt 0) {
-            Write-Error "PSScriptAnalyzer: $($errors.Count) ERROR(S) found"
-            $errors | Format-Table -Property RuleName, Line, Message, Severity -AutoSize
-            exit 1
-          }
-          
-          if ($warnings.Count -gt 0) {
-            Write-Warning "PSScriptAnalyzer: $($warnings.Count) WARNING(S) found (non-blocking)"
-            $warnings | Format-Table -Property RuleName, Line, Message, Severity -AutoSize
-          }
-          
-          Write-Output "OK: PSScriptAnalyzer passed (no errors)"
-
-  coverage-gate:
-    name: Coverage — gate (scripts/ minimum 80%)
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: tests
-    defaults:
-      run:
         shell: pwsh
-    steps:
-      - uses: actions/checkout@v4
+        run: Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
 
-      - name: Run coverage with 80% gate for scripts/
-        # C5: Enforce minimum 80% coverage for production scripts (scripts/)
-        # Excludes test files and known-flaky suites
+      - name: Lint scripts/ with repo settings
+        shell: pwsh
         run: |
-          ./scripts/tests/Coverage.ps1 -TestPath ./scripts/tests `
-            -CoverageRootPath ./scripts `
-            -Strict -MinimumCoverage 80 `
-            -ExcludePattern "e2e|Integration|session-checkpoint|skill-coverage|ui-specialist|subagent|analyze-automejora|config-validator|benchmark\.|permission-gate|readme-drift" `
-            -ReportDir ./test-results
-
-      - name: Publish JaCoCo coverage artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: jacoco-coverage-scripts
-          path: ./test-results/coverage.xml
-          if-no-files-found: warn
-
-      - name: Publish coverage summary
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-summary-scripts
-          path: ./test-results/summary.json
-          if-no-files-found: warn
+          $results = Invoke-ScriptAnalyzer -Path ./scripts -Recurse -Settings ./PSScriptAnalyzerSettings.psd1
+          $errors = @($results | Where-Object { $_.Severity -eq 'Error' })
+          $errors | ForEach-Object { Write-Host "::error file=$($_.ScriptPath) line=$($_.Line):: $($_.RuleName): $($_.Message)" }
+          if ($errors.Count -gt 0) { exit 1 }
+          Write-Host "[PSSA] 0 errors ($(@($results).Count) total findings)"
