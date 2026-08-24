@@ -147,7 +147,7 @@ Análisis multi-agente v3 con 5 especialistas read-only (security, infra, perfor
 
 ## Trend vs Previous
 
-**Previous**: No previous v3 analysis exists (baseline). Previous v2 analyses: `docs/mejoras/2026-07-29-gentleman-agent-gh-token-context-analysis.md`, `docs/mejoras/2026-08-03-gentleman-agent-gh-analisis.md`.
+**Previous**: No previous v3 analysis exists (baseline). Previous v2 analyses: `docs/mejoras/2026-07-29-gentleman-agent-gh-token-context-analysis.md`, `docs/mejoras/2026-08-03-security-infra-dx-perf-audit.md`.
 
 **Improvements**: v3 adds mandatory blast-radius classification, business traceability per gap, and statistical significance requirement (5-10 runs for BenchmarkSeconds) — v2 gaps were evidence-based but not business-traced or statistically validated.
 

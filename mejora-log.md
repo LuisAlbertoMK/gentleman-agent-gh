@@ -288,7 +288,7 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 
 ## Ciclo 9 - 2026-08-03 (4 gaps severos SEC + gate SSoT + registry + docs)
 
-**Gap**: 7 findings del analisis multi-auditoria `docs/mejoras/2026-08-03-gentleman-agent-gh-analisis.md` (sec/infra/dx/perf+docs, 4 audits paralelos): SEC-1 force-push shadowing, SEC-2 gate divergence icm/wsl/iex, SEC-5 git clean/git rm sin cubrir, INFRA-1 SSoT sin verificar local, INFRA-3 conteo engram stale, DX-1 trigger parser, DX-2 description vacia. Usuario aprobo: "si todos".
+**Gap**: 7 findings del analisis multi-auditoria `docs/mejoras/2026-08-03-security-infra-dx-perf-audit.md` (sec/infra/dx/perf+docs, 4 audits paralelos): SEC-1 force-push shadowing, SEC-2 gate divergence icm/wsl/iex, SEC-5 git clean/git rm sin cubrir, INFRA-1 SSoT sin verificar local, INFRA-3 conteo engram stale, DX-1 trigger parser, DX-2 description vacia. Usuario aprobo: "si todos".
 
 **Enfoques evaluados (3 por sub-gap, 7 total)**:
 - SEC-1: (A) reordenar SSoT + regenerar - GANADOR; (B) editar opencode.json a mano - rechazado: se pierde con regeneracion; (C) deny global en root - rechazado: rompe permisos por agente
@@ -335,7 +335,7 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 
 *683 = conteo C8 sin suites Integration; el conteo comparable con la misma selección C8 no decreció (0 fail en ambas).
 
-**Archivos tocados (14)**: `scripts/lib/permission-templates.json`, `opencode.json` (regenerado), `scripts/lib/permission-gate-lib.ps1`, `scripts/permission-gate.ps1`, `scripts/tests/permission-gate.Tests.ps1` (+9 tests), `.githooks/pre-commit-gate.ps1`, `scripts/tests/_e2e_pipeline.Tests.ps1`, `scripts/build-skill-registry.ps1`, `.agents/skills/_shared/SKILL.md`, `QUICKSTART.md`, `README.md`, `PROTOCOL.md`, `mejora-log.md`, `docs/mejoras/2026-08-03-gentleman-agent-gh-analisis.md` (nuevo).
+**Archivos tocados (14)**: `scripts/lib/permission-templates.json`, `opencode.json` (regenerado), `scripts/lib/permission-gate-lib.ps1`, `scripts/permission-gate.ps1`, `scripts/tests/permission-gate.Tests.ps1` (+9 tests), `.githooks/pre-commit-gate.ps1`, `scripts/tests/_e2e_pipeline.Tests.ps1`, `scripts/build-skill-registry.ps1`, `.agents/skills/_shared/SKILL.md`, `QUICKSTART.md`, `README.md`, `PROTOCOL.md`, `mejora-log.md`, `docs/mejoras/2026-08-03-security-infra-dx-perf-audit.md` (nuevo).
 
 **Pendientes no bloqueantes** (entorno): 3 junctions globales degradadas (vmk-skills/prompts, global-skills) — **resueltas 2026-08-03** (ver sección siguiente). Enfoques totales evaluados C1-C9: 3×4 (C1-C4) + 2 (C5) + 3 (C6) + 3 (C7) + 3 (C8) + 7 (C9) = 27 ≥ 10 ✅.
 
@@ -511,7 +511,7 @@ Protocolo: Mejora Autónoma Iterativa (N-ciclos)
 
 ## Ciclo 4 — 2026-08-04 (v2) — Token reduction (user priority, mem #2390)
 
-**Gap**: Reducir token footprint de skills sin degradar calidad/routing (prioridad de usuario, mem #2390). Análisis previo: `docs/mejoras/2026-07-29-token-context-analysis.md`; avg skill 2,532B vs target 2,000B; 18 skills >2,900B en riesgo de >3KB WARN.
+**Gap**: Reducir token footprint de skills sin degradar calidad/routing (prioridad de usuario, mem #2390). Análisis previo: `docs/mejoras/2026-07-29-gentleman-agent-gh-token-context-analysis.md`; avg skill 2,532B vs target 2,000B; 18 skills >2,900B en riesgo de >3KB WARN.
 
 **Alcance corregido (vs plan original)**: Description compression a ≤120 chars preservando routing keywords (estándar wisdom-forge L180) + body compression de las 18 skills más grandes. **RECHAZADOS**: (1) SKILLS-INDEX merge — `cross-ref-check.ps1:89` lo parsea; rompería gate [3/13]; (2) descriptions agresivas ≤60B — `skill-resolver-fast.ps1` L39-77 puntúa por `trigger_index` + names; descriptions alimentan `build-skill-registry`; corte conservador preserva routing. Verificado: resolver top-3 sin cambio en 3 queries de prueba (deep-debugging/auth-hardening/e2e-testing).
 
@@ -855,7 +855,7 @@ Métricas de benchmark: Pester suite completa (pass/fail), opencode.json size vs
 ## Análisis v3
 - **34 gaps** identificados por 5 especialistas (security, infra, performance, docs, deep) + gate battery en vivo
 - **7 gaps blast radius Alto** → checkpoint humano (aprobado por usuario: "inicia y termina todo")
-- Reporte completo: `docs/mejoras/2026-08-07-gentleman-agent-gh-analisis.md`
+- Reporte completo: `docs/mejoras/2026-08-07-v3-baseline-34-gaps.md`
 - Execution report: `docs/mejoras/2026-08-07-gentleman-agent-gh-execution-report.md`
 
 ## Ciclo 1 — Docs Sync (Blast: Bajo, ICE 640)

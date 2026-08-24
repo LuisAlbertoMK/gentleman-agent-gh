@@ -110,7 +110,7 @@ Gaps G5/G6 (Medium blast) deferred to post-checkpoint cycles.
 
 ## 3. Cross-reference con análisis previo (2026-08-07)
 
-El análisis del 2026-08-07 (`docs/mejoras/2026-08-07-gentleman-agent-gh-analisis.md`) identificó 34 gaps. Los gaps DX (docs stale) del análisis previo se confirman en el baseline fresco:
+El análisis del 2026-08-07 (`docs/mejoras/2026-08-07-v3-baseline-34-gaps.md`) identificó 34 gaps. Los gaps DX (docs stale) del análisis previo se confirman en el baseline fresco:
 
 - **README agent count**: 2026-08-07 decía "37 vs 45 real" → README actual dice "45" ✅ (actualizado en Ciclo 10 v2)
 - **README skill count**: 2026-08-07 decía "78 skills" → sigue "78" pero real es 88 ❌ (NO actualizado)

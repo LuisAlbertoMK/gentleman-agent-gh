@@ -40,7 +40,7 @@ Todo ciclo corre en worktree efímero o subagent aislado. Branch `experimento/me
 
 ## 0. Evidencia de Gaps (10 gaps, §0.4)
 
-Ver `docs/mejoras/2026-08-19-gentleman-agent-gh-analisis.md` §4 para detalle completo. Resumen:
+Ver `docs/mejoras/2026-08-19-async-delegation-analysis.md` §4 para detalle completo. Resumen:
 
 | Gap | Evidencia | I×C×E | Blast | Business |
 |---|---|---|---|---|
@@ -231,7 +231,7 @@ OUT: .agents/skills/, scripts/lib/score-dims.ps1
 
 ## Deliverables
 ```
-docs/mejoras/2026-08-19-gentleman-agent-gh-analisis.md  ← ✅ DONE (this analysis)
+docs/mejoras/2026-08-19-async-delegation-analysis.md  ← ✅ DONE (this analysis)
 docs/mejoras/plan-auto-mejora-v3-2026-08-19.md          ← THIS FILE
 docs/mejoras/mejora-log.md                              ← append C1-C5
 docs/mejoras/benchmarks.md                              ← baseline vs final table

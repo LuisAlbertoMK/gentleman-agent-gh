@@ -94,4 +94,4 @@ Run via: `pwsh -File scripts/tests/Coverage.ps1` (CI auto-discovers `*.Tests.ps1
 
 - `adr/ADR-019` — Automated post-delegation empty-output detection
 - `adr/ADR-023` — Async delegation decision record
-- `docs/mejoras/2026-08-08-gentleman-agent-gh-execution-report.md` — prior execution context
+- `docs/mejoras/2026-08-07-gentleman-agent-gh-execution-report.md` — prior execution context

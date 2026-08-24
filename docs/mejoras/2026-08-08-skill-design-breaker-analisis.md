@@ -2,7 +2,7 @@
 
 **Fecha**: 2026-08-08 · **Project**: gentleman-agent-gh · **Trigger**: `!analisis — mejora skill de diseño y breaker mejora + best practices`
 
-**Pre-Answer Gate**: ✅ Cross-referenced against existing `docs/mejoras/2026-08-08-gentleman-agent-gh-analisis.md` (autonomous agents), ADR/ADR-021 (template-detection), `engram:analysis:gentleman-agent-gh`. No prior analysis on SDD design skills or breaker improvements exists — baseline.
+**Pre-Answer Gate**: ✅ Cross-referenced against existing `docs/mejoras/2026-08-08-auto-agent-autonomy-delegation.md` (autonomous agents), ADR/ADR-021 (template-detection), `engram:analysis:gentleman-agent-gh`. No prior analysis on SDD design skills or breaker improvements exists — baseline.
 
 ---
 
@@ -124,7 +124,7 @@ El **SDD design pipeline** (9 fases) y el **adversarial-breaker** están bien es
 
 - Topic key: `analysis/gentleman-agent-gh`
 - Observation ID: 2555
-- Previous analysis: `2026-08-08-gentleman-agent-gh-analisis.md` (autonomous agents — different scope)
+- Previous analysis: `2026-08-08-auto-agent-autonomy-delegation.md` (autonomous agents — different scope)
 
 ## 7. Trend Analysis
 

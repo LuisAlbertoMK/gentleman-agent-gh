@@ -1,7 +1,7 @@
 # Análisis: Agentes custom (`mode: primary`) no delegables como subagent por el runtime — fallback silencioso a `general`
 
 **Fecha**: 2026-08-01 · **Trigger**: observación de routing (fallback `gentleman-implementer` → `general`)
-**Pre-Answer Gate**: ✅ Cross-referenciado contra `2026-08-01-gentleman-agent-gh-analisis.md` (globalización, criterio b Paso 5), `2026-07-30-auto-permission-analysis.md`, `2026-07-28-permission-modes-analysis.md`; Engram (`mem_search` all_projects) sin resultados previos → hallazgo NO duplicado.
+**Pre-Answer Gate**: ✅ Cross-referenciado contra `2026-08-01-globalization-multi-project.md` (globalización, criterio b Paso 5), `2026-07-30-auto-permission-analysis.md`, `2026-07-28-permission-modes-analysis.md`; Engram (`mem_search` all_projects) sin resultados previos → hallazgo NO duplicado.
 
 ---
 

@@ -11,7 +11,7 @@
 !analisis
 ```
 **Trigger**: User runs `!analisis` on a 15-file PR
-**Flow**: project-mapper detects React+Node stack → 6 specialists (security, infra, frontend, perf, datascience, docs) → parallel analysis → synthesis table → persist to `docs/mejoras/2026-08-16-gentleman-agent-gh-analisis.md` → Engram save with topic_key `analysis/gentleman-agent-gh`
+**Flow**: project-mapper detects React+Node stack → 6 specialists (security, infra, frontend, perf, datascience, docs) → parallel analysis → synthesis table → persist to `docs/mejoras/2026-08-16-ui-seo-skills-cluster-analisis.md` → Engram save with topic_key `analysis/gentleman-agent-gh`
 **Output**: 8-dim findings table, risk matrix, top-15 recommendations, trend vs previous baseline
 
 ### Example 2: Process/Workflow Meta-Analysis

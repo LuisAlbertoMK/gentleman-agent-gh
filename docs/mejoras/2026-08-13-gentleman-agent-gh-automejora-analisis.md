@@ -93,7 +93,7 @@ ICE = I × C × E (E = inverse effort: 10 = minimum effort). Higher = higher pri
 
 ## 5. Trend vs Previous
 
-**Previous analysis**: `docs/mejoras/2026-08-12-gentleman-agent-gh-analisis.md` (T2, referenced in mejora-log.md:586 as evidence source for v3 baseline).
+**Previous analysis**: `docs/mejoras/2026-08-12-v3-update-docs-stale.md` (T2, referenced in mejora-log.md:586 as evidence source for v3 baseline).
 
 **Delta**:
 - **improvements**: npm audit 2 vulns → 0 (resolved in v3 C1, mejora-log C1 corrida 3); CI quality gate 18/18 → 22/22 (added ConfigValidator, mejora-log C3 v3); PSSA PSReviewUnusedParameter 44 → 24 (mejora-log C6 v3)

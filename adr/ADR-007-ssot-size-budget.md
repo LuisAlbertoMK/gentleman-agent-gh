@@ -6,4 +6,4 @@
 - **Amendment 2026-08-11**: el código enqueña consistentemente 98,304B (3 sites) pero este ADR/ADR-014/ADR-019 citan 65,536B → prosa desactualizada. Archivo actual 72,983B (74% de 98,304 → GREEN). Reducir a 65,536B requiere compactar PERF-1 (instrucción root→agentes), declarado won't-fix por riesgo en semántica de merge de opencode. Revisión a 65,536B bloqueada hasta que PERF-1 se reconsidere con checkpoint humano (ver plan `docs/mejoras/plan-kimi-k3.md` §P0.1).
 - **Alternatives** (PERF-1): compactar root→agentes — rechazado (won't-fix justificado arriba).
 - **Consequences**: Guard verificado en ambos sentidos (52,205 fail / 52,206 pass, `-gt` correcto). Regeneración idempotente (SHA256 idéntico). Gate 14/14.
-- **Refs**: `mejora-log.md` §Ciclo 8/9; `scripts/regenerate-opencode.ps1`, `.githooks/pre-commit-gate.ps1`, `docs/mejoras/2026-08-03-gentleman-agent-gh-analisis.md` (PERF-1 won't-fix).
+- **Refs**: `mejora-log.md` §Ciclo 8/9; `scripts/regenerate-opencode.ps1`, `.githooks/pre-commit-gate.ps1`, `docs/mejoras/2026-08-03-security-infra-dx-perf-audit.md` (PERF-1 won't-fix).

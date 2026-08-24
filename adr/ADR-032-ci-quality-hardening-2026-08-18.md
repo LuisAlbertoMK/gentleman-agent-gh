@@ -4,7 +4,7 @@
 - **Deciders**: gentleman-vMK
 - **Date**: 2026-08-18
 - **Tier**: T2 — CI/CD infrastructure, multi-file changes (plan v3 G1-G3)
-- **Context**: Analysis `docs/mejoras/2026-08-18-gentleman-agent-gh-analisis.md` (plan-auto-mejora-v3-2026-08-18) identified the gaps: (G1) committed code lacked test coverage on the exact test-runner path, (G2) no coverage gate — regressions in coverage were invisible, (G3) adversarial review existed but findings were unstructured (no severity taxonomy consumable by CI).
+- **Context**: Analysis `docs/mejoras/plan-auto-mejora-v3-2026-08-18.md` (plan-auto-mejora-v3-2026-08-18) identified the gaps: (G1) committed code lacked test coverage on the exact test-runner path, (G2) no coverage gate — regressions in coverage were invisible, (G3) adversarial review existed but findings were unstructured (no severity taxonomy consumable by CI).
 
 ## Decision
 

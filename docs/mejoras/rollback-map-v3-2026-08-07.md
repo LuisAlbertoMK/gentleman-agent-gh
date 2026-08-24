@@ -7,7 +7,7 @@
 
 | Gap | Commit | Archivos | `git revert` |
 |---|---|---|---|
-| README stale (37→45 agents, score 9.3→9.0) | `94b4a11d` | README.md, QUICKSTART.md, PROTOCOL.md, docs/ARCHITECTURE.md, docs/CHANGELOG.md, docs/CONTRIBUTING.md, docs/mejoras/plan-v3-2026-08-07.md, docs/mejoras/2026-08-07-gentleman-agent-gh-analisis.md | `git revert 94b4a11d` |
+| README stale (37→45 agents, score 9.3→9.0) | `94b4a11d` | README.md, QUICKSTART.md, PROTOCOL.md, docs/ARCHITECTURE.md, docs/CHANGELOG.md, docs/CONTRIBUTING.md, .archive/docs/plan-v3-2026-08-07.md, docs/mejoras/2026-08-07-v3-baseline-34-gaps.md | `git revert 94b4a11d` |
 
 ## Ciclo 2 — Skill-Graph Caching (Blast: Alto-impact)
 

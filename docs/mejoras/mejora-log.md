@@ -187,7 +187,7 @@ ALL CLEAR — 22/22 checks passed
 **Objective**: Mini agente autónomo para tareas mecánicas/repetitivas y delegated-work que el orquestador no puede hacer directamente, de forma controlada (BabyAGI pattern sobre la base existente de `auto-sub` deny floor).
 
 ### Contexto
-- Evidence gate: `docs/mejoras/2026-08-08-gentleman-agent-gh-analisis.md` ya identificó el gap (delegación síncrona, no hay self-improvement loop autónomo, `-sub-auto` no puede delegar further).
+- Evidence gate: `docs/mejoras/2026-08-08-auto-agent-autonomy-delegation.md` ya identificó el gap (delegación síncrona, no hay self-improvement loop autónomo, `-sub-auto` no puede delegar further).
 - Web research: BabyAGI pattern (Execution→Task Creation→Prioritization loop + iteration/token caps), AutoGPT pattern (goal→plan→execute→reflect), Agent Guardrails (tiered approval, circuit breakers, deny-by-default).
 
 ### Implementación (Phase 1: Async Delegation)
