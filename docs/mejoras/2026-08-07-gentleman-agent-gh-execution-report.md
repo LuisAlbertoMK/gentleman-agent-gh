@@ -3,7 +3,7 @@
 > **Protocolo**: Mejora Autónoma Iterativa v3
 > **Branch**: `experimento/mejora-autonoma-v3-2026-08-07`
 > **Fecha**: 2026-08-07
-> **Origen**: Análisis en `docs/mejoras/2026-08-07-gentleman-agent-gh-analisis.md` (34 gaps, 5 especialistas)
+> **Origen**: Análisis en `docs/mejoras/2026-08-07-v3-baseline-34-gaps.md` (34 gaps, 5 especialistas)
 
 ## Summary
 

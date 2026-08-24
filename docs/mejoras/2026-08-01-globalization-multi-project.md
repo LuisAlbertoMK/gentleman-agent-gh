@@ -1,7 +1,7 @@
 # Análisis: Globalización del Gentleman Agent para N proyectos externos
 
 **Fecha**: 2026-08-01 · **Trigger**: `!analisis` (re-verificación del plan de portabilidad antes de ejecutar)
-**Pre-Answer Gate**: ✅ Cross-referenciado contra `2026-07-28-permission-modes-analysis.md`, `2026-07-30-auto-permission-analysis.md`, `2026-07-30-infra-capabilities-external-audit.md`, `2026-07-31-gentleman-agent-gh-analisis.md`, memoria #2014
+**Pre-Answer Gate**: ✅ Cross-referenciado contra `2026-07-28-permission-modes-analysis.md`, `2026-07-30-auto-permission-analysis.md`, `2026-07-30-infra-capabilities-external-audit.md`, `2026-07-31-skill-ecosystem-audit.md`, memoria #2014
 **SCOPE GUARD**: diff HEAD~1 = 1 archivo (bitacora doc — no es el target). El scope real (configs global+repo, 90 scripts, 81 skills, MCP) supera el umbral → pipeline multi-agente aplica. Desviación documentada.
 **Especialistas**: sec · infra · docs · arch · verificación (frontend/perf/datascience/seo = SKIPPED-N/A)
 **Veredicto general**: APROBADO-CON-CONDICIONES (5/5 especialistas)

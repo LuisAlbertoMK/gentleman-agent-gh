@@ -239,7 +239,7 @@ Describe 'E2E: Execution State' {
     }
 
     It 'analysis file references all 7 findings' {
-        $path = Join-Path $script:ProjectRoot "docs/mejoras/2026-07-28-gentleman-agent-gh-analysis.md"
+        $path = Join-Path $script:ProjectRoot "docs/mejoras/2026-07-28-tdd-testing-analysis.md"
         $path | Should -Exist
         $content = Get-Content $path -Raw
         $content | Should -Match 'validate-write-scope'

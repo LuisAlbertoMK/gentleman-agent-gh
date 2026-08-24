@@ -70,7 +70,7 @@ MEDIUM   ■■     (2 findings: 0 Mock, 0 CodeCoverage)
 
 ## Engram Persistence
 
-Engram MCP no disponible en este entorno. Findings documentados en `docs/mejoras/2026-07-28-gentleman-agent-gh-analysis.md`.
+Engram MCP no disponible en este entorno. Findings documentados en `docs/mejoras/2026-07-28-tdd-testing-analysis.md`.
 
 ## Trend Analysis
 

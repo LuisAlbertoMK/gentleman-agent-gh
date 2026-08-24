@@ -219,6 +219,17 @@ function Get-CheckSnapshot {
         })
     $changedFiles = @($committed + $wcFiles | Sort-Object -Unique)
 
+    # 3b. Scope-filter the stability signal (2026-08-19 rec #5): when -AllowedPaths
+    # is provided, changes OUTSIDE the delegation scope are ignored so external
+    # commits (other agents, user edits) cannot reset convergence detection.
+    # Patterns are -like wildcards relative to repo root (e.g. "src/*").
+    if ($AllowedPaths) {
+        $changedFiles = @($changedFiles | Where-Object {
+            $file = $_
+            @($AllowedPaths | Where-Object { $file -like $_ }).Count -gt 0
+        })
+    }
+
     return [PSCustomObject]@{
         checks       = $checks
         passed       = $passed

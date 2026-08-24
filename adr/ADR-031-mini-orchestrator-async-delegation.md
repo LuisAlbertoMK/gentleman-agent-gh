@@ -4,7 +4,7 @@
 - **Deciders**: gentleman-vMK
 - **Date**: 2026-08-15
 - **Tier**: T2 — Medium complexity, new skill + script modification
-- **Context**: Analysis `docs/mejoras/2026-08-08-gentleman-agent-gh-analisis.md` identified the gap: autonomous agents exist (`auto-sub` with deny floor) but delegation is synchronous (blocks conversation) and there is no self-improvement loop trigger. Feature request: "mini agente autónomo para tareas mecánicas/repetitivas, en forma controlada."
+- **Context**: Analysis `docs/mejoras/2026-08-08-auto-agent-autonomy-delegation.md` identified the gap: autonomous agents exist (`auto-sub` with deny floor) but delegation is synchronous (blocks conversation) and there is no self-improvement loop trigger. Feature request: "mini agente autónomo para tareas mecánicas/repetitivas, en forma controlada."
 
 ## Decision
 
