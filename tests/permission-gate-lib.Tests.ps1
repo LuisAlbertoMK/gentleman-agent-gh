@@ -135,9 +135,9 @@ Describe "permission-gate-lib.ps1" {
             $result | Should -Be "ask"
         }
 
-        It "Classifies 'npm install express' as deny" {
+        It "Classifies 'npm install express' as ask [supply chain — now ask not deny per C3b+Option-A]" {
             $result = Get-CommandClass -cmd "npm install express" -mode "manual"
-            $result | Should -Be "deny"
+            $result | Should -Be "ask"
         }
 
         It "Classifies 'git push origin main' as ask in manual/semi/auto" {
