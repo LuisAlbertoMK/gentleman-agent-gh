@@ -1,4 +1,4 @@
-#requires -Version 5.1
+#requires -Version 7
 <#
 .SYNOPSIS
     Remove deprecated '*-semi' agents from the global OpenCode config (opencodec.json).
@@ -23,7 +23,6 @@
 .LINK
     adr/ADR-033-eliminar-modo-semi-manual-auto.md
 #>
-#requires -Version 7
 [CmdletBinding(SupportsShouldProcess)]
 param(
     [string]$ConfigPath = $null,

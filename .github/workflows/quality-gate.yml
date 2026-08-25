@@ -212,7 +212,10 @@ jobs:
           $hooks = @('trailing-whitespace', 'end-of-file-fixer', 'check-yaml', 'check-json', 'check-added-large-files', 'actionlint', 'gitleaks', 'secrets-scan', 'pssa-gate')
           foreach ($h in $hooks) {
             pre-commit run --all-files --show-diff-on-failure $h
-            if ($LASTEXITCODE -ne 0) { Write-Error "pre-commit hook failed: $h"; exit $LASTEXITCODE }
+            if ($LASTEXITCODE -ne 0) {
+              Write-Output "::error::pre-commit hook failed: $h"
+              exit $LASTEXITCODE
+            }
           }
 
   tests:
