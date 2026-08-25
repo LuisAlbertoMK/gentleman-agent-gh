@@ -280,10 +280,14 @@ jobs:
         run: |
           $out = ./scripts/verify.ps1 -Quiet 2>&1 | Out-String
           if ($LASTEXITCODE -ne 0) {
-            # Surface per-check verdicts so failures are visible without log access.
-            foreach ($ln in ($out -split "`n")) {
-              $t = $ln.Trim()
-              if ($t -match '"(name|detail|allPassed|failed)"') { Write-Output "::error::$t" }
+            $idx = $out.IndexOf('{')
+            if ($idx -ge 0) {
+              try {
+                $json = $out.Substring($idx) | ConvertFrom-Json
+                foreach ($c in ($json.checks | Where-Object { -not $_.passed })) {
+                  Write-Output "::error::VERIFY FAILED: $($c.name) — $($c.detail)"
+                }
+              } catch { Write-Output "::error::verify.ps1 output unparseable" }
             }
             exit $LASTEXITCODE
           }
