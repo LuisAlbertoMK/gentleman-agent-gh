@@ -11,6 +11,9 @@
     Supports: *, ? (single char). Does NOT support: **, {a,b}, regex syntax.
 .PARAMETER BaseRef
     Git ref to compare against (default: HEAD).
+
+.PARAMETER RepoRoot
+    Repository root (default: current directory).
 .PARAMETER Staged
     Diff the index (staged changes) against BaseRef instead of the working tree.
     Used by the pre-commit gate to scope-check what is about to be committed.
@@ -26,6 +29,7 @@ param(
     [System.Management.Automation.AllowEmptyCollection()]
     [string[]]$AllowedPaths,
     [string]$BaseRef = "HEAD",
+    [string]$RepoRoot   = $(try { (Get-Location).Path } catch { $PWD }),
     [switch]$Staged,
     [switch]$Json
 )
@@ -60,9 +64,9 @@ if ($BaseRef -match '\s') {
 $gitOutput = $null
 try {
     if ($Staged) {
-        $gitOutput = & git diff --cached --name-only $BaseRef 2>&1
+        $gitOutput = & git -C $RepoRoot diff --cached --name-only $BaseRef 2>&1
     } else {
-        $gitOutput = & git diff --name-only $BaseRef 2>&1
+        $gitOutput = & git -C $RepoRoot diff --name-only $BaseRef 2>&1
     }
     $exitCode = $LASTEXITCODE
 } catch {

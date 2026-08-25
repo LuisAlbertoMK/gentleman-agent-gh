@@ -9,4 +9,4 @@ keyboard focus visible (2px ring), no cognitive CAPTCHA, reduced-motion support.
 Verify with axe, NVDA, and tab-order walkthrough.
 ```
 
-**Expected**: `A11Y:<page>—<date> CRITICAL:[wcag-2.x]<violation>→<fix> HIGH:... MEDIUM:... VERIFY:[axe|nvda|tab]→<pass/fail>`
+**Expected**: `A11Y-AUDIT:<page>—<date> CRITICAL:[wcag-2.x]<violation>→<fix> HIGH:... MEDIUM:... VERIFY:[axe|nvda|tab]→<pass/fail>`

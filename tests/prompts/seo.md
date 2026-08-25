@@ -9,4 +9,4 @@ answer-first writing, and the monthly AI Visibility check (GSC GenAI report, 20-
 Return findings by Critical/High/Medium priority.
 ```
 
-**Expected**: `SEO:<url>—<date> CRITICAL:[<check>]→<fix> HIGH:[<check>]→<fix> MEDIUM:[<check>]→<fix> VERIFY:[gsc|search-console|structured-data]→<pass/fail>`
+**Expected**: `SEO AUDIT:<url>—<date> CRITICAL:[<check>]→<fix> HIGH:[<check>]→<fix> MEDIUM:[<check>]→<fix> VERIFY:[gsc|search-console|structured-data]→<pass/fail>`

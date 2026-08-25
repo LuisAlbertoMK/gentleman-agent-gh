@@ -62,10 +62,13 @@
 | — | [`benchmarks`](benchmarks.md) | Performance | Benchmarks protocolo mejora autónoma | 📄 Disponible |
 | — | [`plan-kimi-k3`](plan-kimi-k3.md) | Plan | Plan Diamante — análisis exhaustivo verificado | 📄 Disponible |
 | — | [`rollback-map`](rollback-map.md) | Rollback | Rollback map plan auto-mejora v3 | 📄 Disponible |
+| 2026-08-21 | [`parallel-edit-benchmark`](2026-08-21-parallel-edit-benchmark.md) | Performance | 5-pass benchmark: applyReplacements CPU/IO, gentle-batch-edit Go vs PS, token budget regression gate. | 📄 Disponible |
+| — | [`mejora-log`](mejora-log.md) | Multi-dimension | Consolidated improvement log: 7 sections spanning all improvement cycles, gaps, and resolutions. | 📄 Disponible |
+| — | [`plan-template`](plan-template.md) | Planning | Template for improvement cycle planning — structure, ICE scoring, blast-radius classification. | 📄 Disponible |
 
 ## Trend Summary
 
-- **Total documents**: 55 (54 analyses + 1 performance plan, all indexed above)
+- **Total documents**: 58 (57 analyses + 1 performance plan, all indexed above)
 - **Completed**: 6 (tdd-testing, orchestrator, permission-modes, execution-report, PERFORMANCE-PLAN 9/9, resource-optimization)
 - **Current**: 2026-08-04 analysis — R1-R5 completed (commit 92f848aa, gate 16/16); R10 docs cleanup in progress
 

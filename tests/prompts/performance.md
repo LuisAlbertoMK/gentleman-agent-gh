@@ -9,4 +9,4 @@ large hero image), apply fixes (scheduler.yield(), preload hero with fetchpriori
 and verify with lhci or the test suite.
 ```
 
-**Expected**: `PERF:<page>—<date> BUDGET:[LCP|INP|CLS|TBT]vs→PASS/FAIL FIX:<fix> VERIFY:[lhci|test]→<pass/fail>`
+**Expected**: `PERF-AUDIT:<page>—<date> BUDGET:[LCP|INP|CLS|TBT]vs→PASS/FAIL FIX:<fix> VERIFY:[lhci|test]→<pass/fail>`

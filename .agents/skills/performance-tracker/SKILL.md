@@ -3,7 +3,7 @@ name: performance-tracker
 description: "Score and track app performance — 6 dims, continuous scoring, trend analysis"
 triggers: "performance score, mobile perf, desktop perf, rendimiento, app score, benchmark, perf tracking, performance trend"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1789
+token_budget: 2200
 ---
 ## When to Use
 Score and track app performance — 6 dims, continuous scoring. App PERFORMANCE only (agent perf → `auto-metrics`). Mobile, Desktop, Web.
@@ -25,3 +25,10 @@ Load|Render|Memory|Network|Bundle|Energy — thresholds, quick checks → refere
 Score without real data · cross-platform in same trend · skip bundle/cache · score once
 ## Reference
 Thresholds table + quick checks + worked examples (5) → docs/skills/performance-tracker/reference.md
+
+## Verification
+- Output: response matches the ## Output contract format exactly
+- token_budget: total tokens within frontmatter token_budget
+- frontmatter: name, description, triggers, token_budget present and stable
+- cross-refs: each referenced skill exists
+- anti-patterns: none of the listed anti-patterns reintroduced
