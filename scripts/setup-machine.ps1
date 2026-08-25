@@ -115,7 +115,10 @@ if (-not $SkipShortcuts) {
     info "Creating global shell shortcuts"
     $npmDir = "$env:APPDATA\npm"
     if (-not (Test-Path $npmDir)) { New-Item -ItemType Directory -Path $npmDir -Force | Out-Null }
-    $shortcuts = @(@{ Name = "gentleman-vmk"; Ps1Cmd = "opencode --agent gentleman-vMK $args"; CmdCmd = "opencode --agent gentleman-vMK %*"; BatCmd = "gentleman-vmk" })
+    $shortcuts = @(
+        @{ Name = "gentleman-vmk"; Ps1Cmd = "opencode --agent gentleman-vMK $args"; CmdCmd = "opencode --agent gentleman-vMK %*"; BatCmd = "gentleman-vmk" }
+        @{ Name = "gentle-batch-edit"; Ps1Cmd = "gentle-batch-edit.bat $args"; CmdCmd = "gentle-batch-edit.bat %*"; BatCmd = "gentle-batch-edit" }
+    )
     foreach ($sc in $shortcuts) {
         $ps1Path = Join-Path $npmDir "$($sc.Name).ps1"
         $cmdPath = Join-Path $npmDir "$($sc.Name).cmd"
@@ -135,12 +138,12 @@ if (-not $SkipShortcuts) {
             ok "Created $cmdPath"
         } else { skip "$cmdPath already exists" }
         if (-not (Test-Path $batPath) -or $Force) {
-            $srcBat = Join-Path $RepoDir "scripts\gentleman-vmk.bat"
+            $srcBat = Join-Path $RepoDir "scripts\$($sc.BatCmd).bat"
             if (Test-Path $srcBat) {
                 Copy-Item -Path $srcBat -Destination $batPath -Force
-                ok "Created $batPath (from scripts/gentleman-vmk.bat)"
+                ok "Created $batPath (from scripts/$($sc.BatCmd).bat)"
             } else {
-                Set-Content -Path $batPath -Value "@echo off`n`"%~dp0gentleman-vmk.ps1`" %*"
+                Set-Content -Path $batPath -Value "@echo off`n`"%~dp0$($sc.Name).ps1`" %*"
                 ok "Created $batPath (fallback)"
             }
         } else { skip "$batPath already exists" }
@@ -289,11 +292,15 @@ if (-not $SkipVision) {
 
 # Step 8: Verify
 info "Verifying setup"
-$verifyCmds = Get-Command gentleman-vmk, codebase-memory-mcp, headroom, engram, ollama -EA SilentlyContinue
+$verifyCmds = Get-Command gentleman-vmk, gentle-batch-edit, codebase-memory-mcp, headroom, engram, ollama -EA SilentlyContinue
+$goCmd = Get-Command "go" -EA SilentlyContinue
+$goAvailable = $null -ne $goCmd
 $checks = @(
     @{ Label = "GENTLEMAN_AGENT_ROOT"; Test = { $env:GENTLEMAN_AGENT_ROOT -eq $__rootDir } },
     @{ Label = "opencode.json exists"; Test = { Test-Path (Join-Path $RepoDir "opencode.json") } },
     @{ Label = "Global shortcut: gentleman-vmk"; Test = { $verifyCmds.Name -contains "gentleman-vmk" } },
+    @{ Label = "Global shortcut: gentle-batch-edit"; Test = { $verifyCmds.Name -contains "gentle-batch-edit" -or $goAvailable } },
+    @{ Label = "Go toolchain"; Test = { $goAvailable } },
     @{ Label = "MCP: codebase-memory-mcp"; Test = { $verifyCmds.Name -contains "codebase-memory-mcp" } },
     @{ Label = "MCP: headroom"; Test = { $verifyCmds.Name -contains "headroom" } },
     @{ Label = "MCP: engram"; Test = { $verifyCmds.Name -contains "engram" } },
@@ -323,6 +330,11 @@ if ($allOk) {
     } else {
         Write-Host "✅ Machine setup COMPLETE" -ForegroundColor Green
         Write-Host "   → Run 'gentleman-vmk' to launch" -ForegroundColor Cyan
+        if ($goAvailable) {
+            Write-Host "   → Run 'gentle-batch-edit spec.jsonl' for bulk file edits" -ForegroundColor Cyan
+        } else {
+            Write-Host "   → Install Go (https://go.dev/dl) to enable 'gentle-batch-edit'" -ForegroundColor DarkGray
+        }
     }
 } else {
     Write-Host ""
