@@ -270,6 +270,9 @@ jobs:
         # PowerShell. Measure-only until baseline is clean; then add -FailOnDead to block merges.
         run: ./scripts/check-deadcode.ps1
 
+      - name: Install PSScriptAnalyzer (for verify.ps1 PSSA gate)
+        run: Install-Module PSScriptAnalyzer -RequiredVersion 1.25.0 -Force -Scope CurrentUser
+
       - name: Windows smoke test
         run: |
           ./scripts/verify.ps1 -Quiet

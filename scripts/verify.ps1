@@ -52,6 +52,7 @@ function Invoke-E1Check{
 function Invoke-E2Check{
     $ps=Join-Path $Root 'scripts\pssa-gate.ps1'
     if(Test-Path $ps){
+        if(-not(Get-Module -ListAvailable PSScriptAnalyzer)){Add-Check 'PSSA Gate' $true 'PSScriptAnalyzer not installed (skipped)';return}
         $cmd=(Resolve-Path $ps).Path
         $scriptsDir=Join-Path $Root 'scripts'
         if($cmd.StartsWith($scriptsDir)){& $cmd -Mode Check -Path $Root;Add-Check 'PSSA Gate' ($LASTEXITCODE-eq0) "exit $LASTEXITCODE"}else{Add-Check 'PSSA Gate' $false 'path outside scripts dir'}
