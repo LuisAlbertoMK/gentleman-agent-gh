@@ -143,9 +143,12 @@ $av=[IO.Directory]::EnumerateFiles($target, '*.ps1', [IO.SearchOption]::AllDirec
     try{$ln=[IO.File]::ReadAllText($_)}catch{return}
     $ln=$ln -split '\r?\n'
     $res=@()
+    $inBlock=$false
     for($i=0;$i-lt$ln.Count;$i++){
         $t=$ln[$i].Trim()
         if($t-eq''-or$t.StartsWith('#')){continue}
+        if($inBlock){if($t-match'#>'){$inBlock=$false};continue}
+        if($t-match'<#'){$inBlock=$true;if($t-match'#>'){$inBlock=$false};continue}
         if($t-match'(^|[^""])&&([^""]|$)'){$res+=[PSCustomObject]@{ScriptName=$rp;Line=$i+1;Text=$t}}
     }
     $res
