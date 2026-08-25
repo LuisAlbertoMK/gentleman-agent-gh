@@ -178,3 +178,19 @@ Branch: `experimento/mejora-autonoma-2026-08-24` | Base: `main` HEAD `da90e1b0`
 
 ### Per-cycle rollback
 - **Ciclo completo**: `git revert d0f5b0a4 66d14670` (orden inverso). Ciclos independientes: docs (Ciclo 1) y code+tests (Ciclo 2) no se solapan.
+
+---
+
+# Rollback Map - Ciclo V6 (2026-08-24)
+
+Branch: `experimento/mejora-autonoma-v6-2026-08-24` | Base: `main` HEAD `d3ab1003`
+
+| Commit | Mensaje | Rollback |
+|--------|---------|----------|
+| `9eac4027` | fix(monitor): TaskId-based result file naming | `git revert 9eac4027` - vuelve a {BaseRef}.async-result.json (colisión en llamadas directas concurrentes) |
+| `d47a5290` | fix(tests): hermeticize 3 chronically-red suites | `git revert d47a5290` - reintroduce #requires duplicado y path D:\ hardcodeado |
+| `32ec063c` | fix(tests): hermeticize benchmark R6 + routing e2e | `git revert 32ec063c` - R6 vuelve a depender de junctions sanas de la máquina |
+| `50c5d576` | ci: restore workflow + last env fixes | `git revert 50c5d576` - elimina CI y reintroduce drift README/token-budget |
+
+### Per-cycle rollback
+Commits independientes entre sí; revert individual seguro en cualquier orden.

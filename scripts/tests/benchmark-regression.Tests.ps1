@@ -1,9 +1,9 @@
 #requires -Version 7
 <#
 .SYNOPSIS
-    Pester tests for benchmark-regression.ps1 — median/IQR calculation,
+    Pester tests for benchmark-regression.ps1 ÔÇö median/IQR calculation,
     regression detection, baseline comparison, JSON output.
-    Follows protocolo_mejora_autonoma_v3.md §0.7 (5-10 runs, median/IQR).
+    Follows protocolo_mejora_autonoma_v3.md ┬º0.7 (5-10 runs, median/IQR).
 #>
 param([switch]$Quiet)
 Set-StrictMode -Version Latest
@@ -36,16 +36,16 @@ BeforeAll {
     $script:scriptPath = Join-Path (Split-Path $PSScriptRoot -Parent) "benchmark-regression.ps1"
 }
 
-Describe "Benchmark Regression — Statistical Math" {
+Describe "Benchmark Regression ÔÇö Statistical Math" {
     It "Calculates median of even-length sample set" {
-        # 10 values → median = avg of 5th and 6th
+        # 10 values ÔåÆ median = avg of 5th and 6th
         $samples = @(100, 200, 300, 400, 500, 600, 700, 800, 900, 1000)
         $median = Get-Median -Samples $samples
         $median | Should -Be 550
     }
 
     It "Calculates median of odd-length sample set" {
-        # 5 values → median = 3rd value
+        # 5 values ÔåÆ median = 3rd value
         $samples = @(100, 200, 300, 400, 500)
         $median = Get-Median -Samples $samples
         $median | Should -Be 300
@@ -68,7 +68,7 @@ Describe "Benchmark Regression — Statistical Math" {
     }
 
     It "Regression percent calculation is correct" {
-        # 20% slower: 500 → 600
+        # 20% slower: 500 ÔåÆ 600
         $baseline = 500
         $new = 600
         $regPct = (($new - $baseline) / $baseline) * 100
@@ -82,7 +82,7 @@ Describe "Benchmark Regression — Statistical Math" {
     }
 }
 
-Describe "Benchmark Regression — Script Structure" {
+Describe "Benchmark Regression ÔÇö Script Structure" {
     BeforeAll {
         $scriptContent = Get-Content -Path $script:scriptPath -Raw
     }
@@ -95,7 +95,7 @@ Describe "Benchmark Regression — Script Structure" {
         $scriptContent | Should -Match '\[int\]\$Runs\s*=\s*10'
     }
 
-    It "Runs minimum is 5 (protocol §0.7)" {
+    It "Runs minimum is 5 (protocol ┬º0.7)" {
         $scriptContent | Should -Match 'ValidateRange\(5'
     }
 
@@ -128,7 +128,7 @@ Describe "Benchmark Regression — Script Structure" {
     }
 }
 
-Describe "Benchmark Regression — Baseline JSON" {
+Describe "Benchmark Regression ÔÇö Baseline JSON" {
     It "benchmark-baseline.json exists in docs/mejoras" {
         $baselinePath = Join-Path $script:repoRoot "docs/mejoras/benchmark-baseline.json"
         Test-Path $baselinePath | Should -Be $true
@@ -140,5 +140,34 @@ Describe "Benchmark Regression — Baseline JSON" {
             $baseline = Get-Content $baselinePath -Raw | ConvertFrom-Json -ErrorAction SilentlyContinue
             $baseline.median_ms | Should -Not -BeNullOrEmpty
         }
+    }
+}
+
+Describe "Benchmark Regression — End-to-End Execution" {
+    # Guards born from the 2026-08-25 perf-regression.yml CI failure: the
+    # script shipped with (1) a $Quiet reference missing from param() that
+    # dies under Set-StrictMode, and (2) array splatting binding '-DryRun'
+    # as a positional VALUE. Structure/regex tests above cannot catch either;
+    # only executing the real workflow command can.
+
+    It "emits parseable JSON end-to-end (guards StrictMode crash)" {
+        $output = & $script:scriptPath -Command 'sync-vmk.ps1 -DryRun -Json' -Runs 5 -Json 2>&1
+        $joined = ($output | Where-Object { $_ -is [string] }) -join "`n"
+        $json = $joined | ConvertFrom-Json -ErrorAction SilentlyContinue
+        $json | Should -Not -BeNullOrEmpty -Because 'perf-regression.yml exits 1 when no JSON is produced'
+        $json.runs | Should -Be 5
+        $json.median_ms | Should -BeGreaterThan 0
+        $json.status | Should -BeIn @('OK', 'BASELINE_CREATED', 'REGRESSION')
+    }
+
+    It "switch arguments bind correctly through the Command string" {
+        $output = & $script:scriptPath -Command 'sync-vmk.ps1 -DryRun -Json' -Runs 5 -Json 2>&1
+        $stderr = ($output | Where-Object { $_ -isnot [string] }) | Out-String
+        $stderr | Should -Not -Match 'ValidateSet|Cannot validate argument'
+    }
+
+    It "exit code is 0 when no regression detected" {
+        & $script:scriptPath -Command 'sync-vmk.ps1 -DryRun -Json' -Runs 5 -Json *> $null
+        $LASTEXITCODE | Should -Be 0
     }
 }

@@ -10,56 +10,10 @@
     that the monitoring scripts function correctly.
 #>
 
-Describe "Resource Optimization -- opencode.json Config" {
-    BeforeAll {
-        $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-        $configPath = Join-Path $repoRoot "opencode.json"
-        $config = Get-Content $configPath -Raw | ConvertFrom-Json
-    }
-
-    It "has small_model configured for lightweight tasks" {
-        $config.small_model | Should -Be "opencode/free"
-    }
-
-    It "has agent.default.depth set to 2" {
-        $config.agent.default.depth | Should -Be 2
-    }
-
-    It "has compaction.auto enabled" {
-        $config.compaction.auto | Should -BeTrue
-    }
-
-    It "has compaction.prune enabled" {
-        $config.compaction.prune | Should -BeTrue
-    }
-
-    It "has compaction.reserved reduced to 6000" {
-        $config.compaction.reserved | Should -Be 6000
-    }
-
-    It "has watcher disabled" {
-        $config.watcher.enabled | Should -BeFalse
-    }
-
-    It "has watcher ignore patterns for noise directories" {
-        $config.watcher.ignore | Should -Contain "node_modules"
-        $config.watcher.ignore | Should -Contain ".git"
-        $config.watcher.ignore | Should -Contain "dist"
-    }
-
-    It "has snapshot disabled" {
-        $config.snapshot.enabled | Should -BeFalse
-    }
-
-    It "has resource profile marker" {
-        $config._resource_profile | Should -Be "lightweight"
-    }
-
-    It "preserves all existing agents (>=49 canonical, ADR-033)" {
-        # ADR-033 removed the 6 -semi variants → 49 canonical agents (ConfigValidator enforces 49).
-        $config.agent.PSObject.Properties.Name.Count | Should -BeGreaterOrEqual 49
-    }
-}
+# NOTE: the former "opencode.json Config" Describe block was removed (v6 hermetic
+# cycle): it asserted fields of the LIVE ~/.config-local opencode.json, which
+# changes whenever the user switches resource profiles. Mutable local state is
+# not a repo contract. Profile files are covered by "Config Profile Files" below.
 
 Describe "Resource Optimization -- Config Profile Files" {
     BeforeAll {
@@ -174,7 +128,7 @@ Describe "Resource Optimization -- Heap Snapshot Script" -Tag "ps7" {
         $scriptPath = Join-Path $repoRoot "scripts/heap-snapshot.ps1"
     }
 
-    It "exits gracefully when no OpenCode process found" {
+    It "exits gracefully when no OpenCode process found" -Skip:(($env:CI -eq 'true') -or (-not (Test-Path (Join-Path $env:USERPROFILE '.config/opencode')))) {
         & $scriptPath -Action status -Json 2>$null | Out-Null
         $LASTEXITCODE | Should -Be 0
     }

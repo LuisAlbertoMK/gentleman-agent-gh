@@ -1018,3 +1018,12 @@ a378b36d fix(scripts): preserve single-element arrays in JSON serialization
 **Ciclo 2** (d0f5b0a4): scope-filter en monitor-subagent.ps1 Get-CheckSnapshot (rec #5, guarded) + async-resilience.Tests.ps1 (13 tests: concurrent/orphan/false-stability con e2e behavioral en temp git repo)
 **Tests**: 54/54 async suites (resilience 13, callback 17, push 12 + structural)
 **ADR**: ADR-043 | **Rollback**: docs/mejoras/rollback-map.md ciclo 2026-08-24
+
+## Experimento V6 2026-08-24 - Hermetic suite + CI restoration (9eac4027..50c5d576)
+
+**Branch**: experimento/mejora-autonoma-v6-2026-08-24 (base main d3ab1003) | **Protocolo**: v3
+**Gaps** (evidencia): 27 fails de full-suite V5 (0 atribuibles al branch, worktree-comparado) + workflows CI ausentes
+**Ciclos**: 1) TaskId naming rec#10 +tests | 2) hermetizar remove-semi/resource-opt/subagent-quality-e2e (root cause: #requires duplicado REAL + path D: hardcodeado) | 3) benchmark R6 + subagent-e2e (path C:\Users\MK + opencode.jsonc) + ci.yml + cross-ref x4 paths + token-budget fixture + README drift 118->119
+**Tests**: 10 suites re-corridas post-fix = 92/92 green en checkout limpio; 6 fails locales residuales ambientales-por-diseño
+**Hallazgo clase**: mismo anti-patrón (paths hardcodeados de máquinas distintas) en 3 archivos distintos = síntoma de desarrollo sin CI
+**ADR**: ADR-044 | **Rollback**: docs/mejoras/rollback-map.md ciclo V6

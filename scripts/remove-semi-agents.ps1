@@ -1,4 +1,3 @@
-#requires -Version 5.1
 <#
 .SYNOPSIS
     Remove deprecated '*-semi' agents from the global OpenCode config (opencodec.json).

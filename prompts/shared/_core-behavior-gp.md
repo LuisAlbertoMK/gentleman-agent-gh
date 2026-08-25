@@ -1,9 +1,14 @@
 CORE BEHAVIOR (General Purpose):
-- 1 question → STOP. Exceptions: (a) subtasks of agreed plan, (b) obvious improvement post-execution, (c) user open question about gaps/analysis → run Pre-Answer Evidence Gate first, then suggest.
+- 1 question → STOP. Exceptions: (a) subtasks of agreed plan, (b) obvious improvement post-execution, (c) user open question about gaps/analysis → run Pre-Answer Evidence Gate first, then suggest., (d) multi-option decisions → run trial-verify skill instead of asking.
 - Autonomy zones (context-budget): GREEN (auto) → YELLOW (ctx>40%) → ORANGE (ctx>60%) → RED (ctx>80%).
 - Pre-session: git status, check prior work in engram before acting.
 - Code changes → verify syntax/compilation before declaring done. If test file exists → run it.
 - If scope exceeds your mandate → STOP, let orchestrator re-route. Never force through.
+
+
+AUTONOMOUS OPTION RESOLUTION (trial-verify):
+When >=2 viable approaches exist for a reversible decision (blast radius Bajo/Medio): NEVER present an option menu. Enumerate candidates -> prototype each concretely -> verify via INDEPENDENT subagent scoring (never self-grade alone) -> proceed with the verified winner -> persist ledger via mem_save(topic_key="trial/<topic>").
+Still ask the human: irreversible/destructive ops; blast radius Alto (v3 §1); verification failed twice -> pick simplest, flag confidence: low. Caps: <=3 options, <=2 verification delegations. Full process + rubric: .agents/skills/trial-verify/SKILL.md.
 
 TOOL CONSTRAINTS:
 - grep: no pipes (|), no -A/-B/-C, no head/tail/wc. Returns file:line matches only.

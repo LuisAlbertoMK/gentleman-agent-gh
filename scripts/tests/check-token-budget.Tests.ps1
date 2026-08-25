@@ -54,9 +54,19 @@ Describe "check-token-budget.ps1 — budget logic (C9)" {
         $json.stats.prompts.budget | Should -Be 2000
     }
 
-    It "exits code 1 when budget exceeded (current repo state)" {
-        & pwsh -NoProfile -Command "& '$scriptPath' -Json > `$null" 2>&1 | Out-Null
-        $global:LASTEXITCODE | Should -Be 1
+    It "exits code 1 when budget exceeded (hermetic fixture)" {
+        # v6 hermetic fix: previously asserted the LIVE repo exceeds its prompt
+        # budget — optimizing docs made this test fail. Now a controlled temp
+        # fixture guarantees the over-budget condition deterministically.
+        $tmpPrompts = Join-Path ([System.IO.Path]::GetTempPath()) ("tokbud-" + [guid]::NewGuid().ToString('N').Substring(0, 8))
+        New-Item -ItemType Directory -Path $tmpPrompts -Force | Out-Null
+        try {
+            Set-Content -Path (Join-Path $tmpPrompts 'oversized.md') -Value ('x' * 5000) -Encoding UTF8
+            & pwsh -NoProfile -Command "& '$scriptPath' -Json -PromptsPath '$tmpPrompts' > `$null" 2>&1 | Out-Null
+            $global:LASTEXITCODE | Should -Be 1
+        } finally {
+            Remove-Item $tmpPrompts -Recurse -Force -ErrorAction SilentlyContinue
+        }
     }
 }
 
