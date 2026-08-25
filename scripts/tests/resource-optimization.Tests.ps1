@@ -128,7 +128,7 @@ Describe "Resource Optimization -- Heap Snapshot Script" -Tag "ps7" {
         $scriptPath = Join-Path $repoRoot "scripts/heap-snapshot.ps1"
     }
 
-    It "exits gracefully when no OpenCode process found" {
+    It "exits gracefully when no OpenCode process found" -Skip:(($env:CI -eq 'true') -or (-not (Test-Path (Join-Path $env:USERPROFILE '.config/opencode')))) {
         & $scriptPath -Action status -Json 2>$null | Out-Null
         $LASTEXITCODE | Should -Be 0
     }

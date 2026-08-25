@@ -46,7 +46,7 @@ jobs:
             $lineNo = 0
             foreach ($ln in Get-Content -LiteralPath $_.FullName) {
               $lineNo++
-              $code = ($ln -replace "(?<=(?<!`)')#.*$", '')
+              $code = ($ln -replace '^\s*#.*$', '' -replace "(?<=(?<!`)')#.*$", '')
               if ($code -match '["''](?:[A-Za-z]:[\\/](?:Users|gentleman)[^"'']*)["'']' -and $code -notmatch '\$env:|\$PSScriptRoot|Join-Path') {
                 $hits += "$($_.FullName):$lineNo"
               }
