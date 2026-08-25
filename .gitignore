@@ -95,6 +95,9 @@ coverage.xml
 .turbo/
 *.tsbuildinfo
 
+# Go compiled binaries (from scripts/gentle-batch-edit.go)
+gentle-batch-edit.exe
+
 # Generated reports
 docs/health-report.html
 
