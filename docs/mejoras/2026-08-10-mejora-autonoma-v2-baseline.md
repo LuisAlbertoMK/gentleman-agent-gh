@@ -16,7 +16,7 @@
 
 ## Bugs preexistentes (§3.5: se corrigen antes de continuar)
 
-1. reports contract_valid=true for well-formed output (E2E) — **NO corregido todavía**: es un contract-validation test inside scripts/tests/ que falla. Registrado para el cycle que integre tests/.
+1.reports contract_valid=true for well-formed output (E2E) — **NO corregido todavía**: es un contract-validation test inside scripts/tests/ que falla. Registrado para el cycle que integre tests/.
 
 ## Notas
 
