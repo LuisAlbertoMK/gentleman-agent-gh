@@ -26,7 +26,7 @@ $stagedRules     = $staged | Where-Object { $_ -match 'review-rules\.jsonc$' }
 $stagedAgents    = $staged | Where-Object { $_ -match 'AGENTS\.md|\.agents/skills/' }
 $stagedRoja      = $staged | Where-Object { $_ -match '^(src/|test/|scripts/|migrations/|ci/|\.github/)' }
 $stagedSkillMds  = $staged | Where-Object { $_ -match '\.agents/skills/[^/]+/SKILL\.md$' }
-$stagedTests     = $staged | Where-Object { $_ -match '\.Tests\.ps1$' }
+$stagedTests     = $staged | Where-Object { $_ -match '\.Tests\.ps1$' -and $_ -notmatch '^\.(jd|breaker)-cleared/' } # clearance markers are prose, not Pester suites
 $stagedConfig    = $staged | Where-Object { $_ -match 'scripts/opencode-config/' }
 
 Write-Host "`n=== Gentleman Quality Gate ==="
@@ -417,8 +417,8 @@ foreach ($sf in $staged) {
     $lineNo = 0
     foreach ($ln in Get-Content -LiteralPath $full) {
         $lineNo++
-        # strip comment tails before scanning (# ... but not #requires which is a directive)
-        $code = ($ln -replace "(?<=(?<!`)')#.*$", '')
+        # strip full-line comments first, then comment tails (# ... but not #requires which is a directive)
+        $code = ($ln -replace '^\s*#.*$', '' -replace "(?<=(?<!`)')#.*$", '')
         if ($code -match '["''](?:[A-Za-z]:[\\/](?:Users|gentleman)[^"'']*)["'']' -and $code -notmatch '\$env:|\$PSScriptRoot|Join-Path') {
             $machPathHits += "${sf}:${lineNo}"
         }
