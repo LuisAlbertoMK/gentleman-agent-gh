@@ -219,6 +219,11 @@ jobs:
             pre-commit run --all-files --show-diff-on-failure $h
             if ($LASTEXITCODE -ne 0) {
               Write-Output "::error::pre-commit hook failed: $h"
+              # Fixer hooks mutate the working tree — list exactly which files
+              # they changed so the offender is visible without log access.
+              foreach ($f in (git diff --name-only)) {
+                Write-Output "::error::[$h] modified: $f"
+              }
               exit $LASTEXITCODE
             }
           }
