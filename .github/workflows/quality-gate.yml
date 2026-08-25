@@ -121,17 +121,22 @@ jobs:
         # are under ADR-018 (prompts immutable), not a commit blocker.
         run: |
           $result = & ./scripts/check-token-budget.ps1 -Json 2>&1 | Out-String
-          $jsonLine = $result | Where-Object { $_ -match '^\{' } | Select-Object -First 1
+          $budgetExit = $LASTEXITCODE
+          $jsonLine = $result -split "`n" | Where-Object { $_ -match '^\{' } | Select-Object -First 1
           $json = $jsonLine | ConvertFrom-Json -ErrorAction SilentlyContinue
+          if (-not $json) { exit $budgetExit }
           if ($json -and -not $json.passed) {
             $skillAvg = if ($json.stats.skills) { $json.stats.skills.average } else { 'N/A' }
             $promptAvg = if ($json.stats.prompts) { $json.stats.prompts.average } else { 'N/A' }
             $overFiles = 0
             if ($json.stats.skills) { $overFiles += $json.stats.skills.overBudgetFiles }
             if ($json.stats.prompts) { $overFiles += $json.stats.prompts.overBudgetFiles }
+            # Warn-level by design (ADR-018): over-budget never blocks the gate,
+            # so swallow the script's non-zero exit after reporting.
             Write-Output "::warning title=Token Budget::skills $($skillAvg)B/$($json.budget), prompts $($promptAvg)B/$($json.budget) ($overFiles files over)"
           }
           else { Write-Output "OK: All skills/prompts within token budget" }
+          exit 0
 
       - name: Budget script validation
         # (mirrors pre-commit gate check [20/20]).
