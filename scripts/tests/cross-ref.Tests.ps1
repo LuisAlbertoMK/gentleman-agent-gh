@@ -12,14 +12,14 @@ $ErrorActionPreference = 'Stop'
 Describe "Cross-Reference Integrity" {
 
     It "T1: cross-ref-check.ps1 -Json returns 0 errors" {
-        $RepoRoot = "D:\gentleman-agent-gh"
+        $RepoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
         $result = & (Join-Path $RepoRoot "scripts\cross-ref-check.ps1") -Json | ConvertFrom-Json
         $result.errors.Count | Should -Be 0
         $result.brokenCrossRefs | Should -Be 0
     }
 
     It "T2: SKILLS-INDEX.md has no stale/orphaned skill entries" {
-        $RepoRoot = "D:\gentleman-agent-gh"
+        $RepoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
         $skillsDir = Join-Path $RepoRoot ".agents\skills"
         $actualCount = (Get-ChildItem $skillsDir -Directory).Where({ $_.Name -ne '_shared' }).Count
         $indexLine = Select-String -Path (Join-Path $RepoRoot "SKILLS-INDEX.md") -Pattern "all \d+ skills"
@@ -29,7 +29,7 @@ Describe "Cross-Reference Integrity" {
     }
 
     It "T3: Every ## Cross-Refs entry resolves to a real skill directory" {
-        $RepoRoot = "D:\gentleman-agent-gh"
+        $RepoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
         $skillsDir = Join-Path $RepoRoot ".agents\skills"
         $allSkillNames = @((Get-ChildItem $skillsDir -Directory).Where({ $_.Name -ne '_shared' }).ForEach({ $_.Name.ToLower() }))
 
@@ -70,8 +70,9 @@ Describe "Cross-Reference Integrity" {
         $brokenRefs.Count | Should -Be 0
     }
 
-    It "T4: All skills have junctions in global config" {
-        $RepoRoot = "D:\gentleman-agent-gh"
+    # Machine-setup validation: skipped in CI and when no global skills dir exists
+    It "T4: All skills have junctions in global config" -Skip:(($env:CI -eq 'true') -or (-not (Test-Path (Join-Path $env:USERPROFILE '.config/opencode/skills')))) {
+        $RepoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
         $globalSkills = Join-Path $env:USERPROFILE ".config/opencode/skills"
         $skillsDir = Join-Path $RepoRoot ".agents\skills"
         $missingJunctions = @()

@@ -49,7 +49,8 @@ param(
     [string]$Baseline = "",
     [double]$Threshold = 15.0,
     [switch]$Json,
-    [switch]$UpdateBaseline
+    [switch]$UpdateBaseline,
+    [switch]$Quiet
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -91,7 +92,10 @@ if (-not $Json -and -not $Quiet) {
 
 for ($i = 0; $i -lt $Runs; $i++) {
     $sw = [System.Diagnostics.Stopwatch]::StartNew()
-    & $scriptPath @scriptArgs > $null 2>&1
+    # Array splatting (@scriptArgs) binds '-Switch' tokens as positional VALUES,
+    # not switches (e.g. '-DryRun' hit sync-vmk.ps1's Target ValidateSet).
+    # Re-parse the full command line so switches bind correctly.
+    Invoke-Expression ("& '" + ($scriptPath -replace "'", "''") + "' $($scriptArgs -join ' ')") > $null 2>&1
     $sw.Stop()
     $elapsedMs = $sw.Elapsed.TotalMilliseconds
     $samples += $elapsedMs

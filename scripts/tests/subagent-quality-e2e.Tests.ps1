@@ -14,7 +14,9 @@
 
 Describe "Subagent Quality Pipeline - E2E" {
     BeforeAll {
-        $repoRoot = "D:/gentleman-agent-gh"
+        # Derive from script location (v6 hermetic fix: was hardcoded to
+        # "D:/gentleman-agent-gh" which breaks on any other checkout path).
+        $repoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
         $regScript = Join-Path $repoRoot 'scripts\delegation-registry.ps1'
         $bgScript  = Join-Path $repoRoot 'scripts\subagent-budget-guard.ps1'
     }

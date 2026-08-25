@@ -32,7 +32,7 @@ Describe "check-config-drift.ps1 — syntax validation" {
     }
 }
 
-Describe "check-config-drift.ps1 — output structure" {
+Describe "check-config-drift.ps1 — output structure" -Skip:(($env:CI -eq 'true') -or (-not (Test-Path (Join-Path $env:USERPROFILE '.config/opencode')))) {
     It "produces valid JSON with expected fields" {
         $json = Invoke-DriftCheck -Json
         $json.timestamp | Should -Not -BeNullOrEmpty
@@ -95,7 +95,7 @@ Describe "check-config-drift.ps1 — MCP exclusion" {
     }
 }
 
-Describe "check-config-drift.ps1 — exit code" {
+Describe "check-config-drift.ps1 — exit code" -Skip:(($env:CI -eq 'true') -or (-not (Test-Path (Join-Path $env:USERPROFILE '.config/opencode')))) {
     It "exit code reflects drift count (capped at 2)" {
         $json = Invoke-DriftCheck -Json
         $json.exitCode | Should -BeGreaterOrEqual 0

@@ -26,7 +26,7 @@ $stagedRules     = $staged | Where-Object { $_ -match 'review-rules\.jsonc$' }
 $stagedAgents    = $staged | Where-Object { $_ -match 'AGENTS\.md|\.agents/skills/' }
 $stagedRoja      = $staged | Where-Object { $_ -match '^(src/|test/|scripts/|migrations/|ci/|\.github/)' }
 $stagedSkillMds  = $staged | Where-Object { $_ -match '\.agents/skills/[^/]+/SKILL\.md$' }
-$stagedTests     = $staged | Where-Object { $_ -match '\.Tests\.ps1$' }
+$stagedTests     = $staged | Where-Object { $_ -match '\.Tests\.ps1$' -and $_ -notmatch '^\.(jd|breaker)-cleared/' } # clearance markers are prose, not Pester suites
 $stagedConfig    = $staged | Where-Object { $_ -match 'scripts/opencode-config/' }
 
 Write-Host "`n=== Gentleman Quality Gate ==="
@@ -403,6 +403,31 @@ if (Test-Path -LiteralPath $tbrScript) {
 } else {
     Warn "test-token-budget-regression.ps1 not found at $tbrScript"
 }
+
+# [25/25] Machine-specific path scan (V6 regression class — hardcoded
+# "D:/repo", "C:/Users/<someone>" inside scripts broke suites on other
+# machines). Scans staged .ps1 for absolute drive paths outside comments.
+# Verified winner P3 (trial 2, ADR-044 era): local hook + CI backstop.
+Write-Host "[25/25] Machine-specific path scan..."
+$machPathHits = @()
+foreach ($sf in $staged) {
+    if ($sf -notmatch '\.ps1$') { continue }
+    $full = Join-Path $RepoRoot $sf
+    if (-not (Test-Path -LiteralPath $full)) { continue }
+    $lineNo = 0
+    foreach ($ln in Get-Content -LiteralPath $full) {
+        $lineNo++
+        # strip full-line comments first, then comment tails (# ... but not #requires which is a directive)
+        $code = ($ln -replace '^\s*#.*$', '' -replace "(?<=(?<!`)')#.*$", '')
+        if ($code -match '["''](?:[A-Za-z]:[\\/](?:Users|gentleman)[^"'']*)["'']' -and $code -notmatch '\$env:|\$PSScriptRoot|Join-Path') {
+            $machPathHits += "${sf}:${lineNo}"
+        }
+    }
+}
+if ($machPathHits.Count -gt 0) {
+    $machPathHits | ForEach-Object { Write-Host "    $_" }
+    Fail "hardcoded machine paths in staged .ps1 (use PSScriptRoot / env vars)"
+} else { Pass }
 
 # Summary
 Write-Host "`n=== Gate: $passed/$($passed+$failed) passed ==="

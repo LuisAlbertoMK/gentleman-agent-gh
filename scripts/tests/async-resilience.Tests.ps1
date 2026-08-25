@@ -28,6 +28,41 @@ Describe "Async delegation resilience (concurrency / crash / false-stability)" {
             $babyagiSrc | Should -Match '\$\{taskRef\}\.async-result\.json'
         }
 
+        It "monitor prefers TaskId for its own result file (rec #10: direct-call concurrency)" {
+            $monitorSrc | Should -Match 'if \(\$TaskId\) \{ "\$fileSafeTask\.async-result\.json" \}'
+        }
+
+        It "monitor falls back to BaseRef naming without TaskId (backward compat)" {
+            $monitorSrc | Should -Match '"\$fileSafeBase\.async-result\.json"'
+        }
+
+        It "BEHAVIORAL: with -TaskId the result lands in {TaskId}.async-result.json, not {BaseRef}" {
+            $tmp = Join-Path ([System.IO.Path]::GetTempPath()) ("async-tid-" + [guid]::NewGuid().ToString('N').Substring(0, 8))
+            try {
+                New-Item -ItemType Directory -Path (Join-Path $tmp 'src') -Force | Out-Null
+                git -C $tmp init --quiet 2>$null
+                Set-Content -Path (Join-Path $tmp 'src/.keep') -Value ''
+                git -C $tmp add . 2>$null
+                git -C $tmp -c user.name=t -c user.email=t@t.local commit --quiet -m init 2>$null
+                Set-Content -Path (Join-Path $tmp 'src/change.txt') -Value 'x'
+
+                $outLog = Join-Path $tmp 'm-out.log'; $errLog = Join-Path $tmp 'm-err.log'
+                $proc = Start-Process -FilePath 'pwsh' -ArgumentList @(
+                    '-NoProfile', '-NoLogo', '-File', (Join-Path $sdir 'monitor-subagent.ps1'),
+                    '-RepoRoot', $tmp, '-BaseRef', 'HEAD', '-TaskId', 'taskA_1',
+                    '-AllowedPaths', 'src/*',
+                    '-PollIntervalSec', '1', '-MaxWaitSec', '30',
+                    '-WriteResultFile'
+                ) -RedirectStandardOutput $outLog -RedirectStandardError $errLog -PassThru -WindowStyle Hidden
+                if (-not $proc.WaitForExit(60000)) { $proc.Kill(); throw "monitor did not converge within 60s" }
+
+                Test-Path (Join-Path $tmp 'taskA_1.async-result.json') | Should -BeTrue -Because "TaskId naming must win"
+                Test-Path (Join-Path $tmp 'HEAD.async-result.json') | Should -BeFalse -Because "BaseRef file must not be created when TaskId is set"
+            } finally {
+                Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue
+            }
+        }
+
         It "monitor PID file is TaskId-scoped (concurrent monitors don't overwrite each other)" {
             $monitorSrc | Should -Match 'async-monitor-\$TaskId\.pid'
         }
