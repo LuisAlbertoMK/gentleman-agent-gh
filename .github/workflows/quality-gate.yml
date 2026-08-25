@@ -273,6 +273,9 @@ jobs:
       - name: Install PSScriptAnalyzer (for verify.ps1 PSSA gate)
         run: Install-Module PSScriptAnalyzer -RequiredVersion 1.25.0 -Force -Scope CurrentUser
 
+      - name: Restore generated state (test runs mutate metrics snapshots)
+        run: git checkout -- .
+
       - name: Windows smoke test
         run: |
           ./scripts/verify.ps1 -Quiet
