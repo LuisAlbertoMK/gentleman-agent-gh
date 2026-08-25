@@ -1,8 +1,8 @@
 # ADR-037: CmdletBinding/ShouldProcess for Destructive PowerShell Operations
 
-**Status**: Accepted  
-**Date**: 2026-08-19  
-**Deciders**: gentleman-agent-gh team  
+**Status**: Accepted
+**Date**: 2026-08-19
+**Deciders**: gentleman-agent-gh team
 **Technical Story**: PowerShell quality improvements — C4 (CmdletBinding/ShouldProcess)
 
 ## Context

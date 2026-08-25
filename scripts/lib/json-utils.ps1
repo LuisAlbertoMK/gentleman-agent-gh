@@ -15,4 +15,3 @@ function ConvertTo-JsonSafe {
     $json = [regex]::Replace($json, '"paths"\s*:\s*"([^"]+)"', '"paths": ["$1"]')
     $json
 }
-

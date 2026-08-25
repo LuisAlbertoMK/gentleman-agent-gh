@@ -240,7 +240,7 @@ tooling/config        | 15    | 800   | 21300
 
 **Scenario**: Project mixes patterns (e.g., `internal/` + `src/domain/` + `app/Http/Controllers`)
 
-**Resolution**: 
+**Resolution**:
 - Score each pattern by signal strength (file count, depth, naming)
 - Report primary + secondary: "Primary: Go Standard (0.82), Secondary: Hexagonal (0.35)"
 - Drill into conflicting directories to understand intent
@@ -294,7 +294,7 @@ tooling/config        | 15    | 800   | 21300
 
 **Bad**: Seeing `package.json` → instantly output "Architecture: React" without checking `src/` structure
 
-**Good**: 
+**Good**:
 - Pass 1: Collect ALL signals (root + 2 levels deep)
 - Pass 2: Score each architecture pattern against signals
 - Pass 3: Validate with deeper drill (3 levels) on top candidate

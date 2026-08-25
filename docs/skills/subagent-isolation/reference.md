@@ -122,19 +122,19 @@ if undeclared: print(f'UNDECLARED REFS: {undeclared}'); sys.exit(1)
 ## Edge Cases (4)
 
 ### Edge Case 1: Implicit Dependency via File System
-**Scenario**: Subagent A writes `config.json`, Subagent B reads it.  
+**Scenario**: Subagent A writes `config.json`, Subagent B reads it.
 **Fix**: Declare `config.json` as output of A → input of B. Never parallelize.
 
 ### Edge Case 2: Engram ID Drift
-**Scenario**: Delegation references `engram_ids: ["bugfix:auth-2026"]` but that observation was superseded.  
+**Scenario**: Delegation references `engram_ids: ["bugfix:auth-2026"]` but that observation was superseded.
 **Fix**: Always verify Engram ID freshness via `mem_search` before delegating. Use `topic_key` for evolving decisions.
 
 ### Edge Case 3: Cascading Timeout Recovery
-**Scenario**: Delegation times out → retry with cleaner prompt → still times out.  
+**Scenario**: Delegation times out → retry with cleaner prompt → still times out.
 **Fix**: After 2 timeouts, escalate to human with "stuck delegation" label. Do NOT retry a third time.
 
 ### Edge Case 4: Partial Output Corruption
-**Scenario**: Subagent returns valid 4-field contract but `Key Findings` contains hallucinated file paths.  
+**Scenario**: Subagent returns valid 4-field contract but `Key Findings` contains hallucinated file paths.
 **Fix**: Post-delegation validation: verify every file path in `Files Changed` and `Key Findings` exists via `glob`/`read` before accepting.
 
 ---
@@ -142,15 +142,13 @@ if undeclared: print(f'UNDECLARED REFS: {undeclared}'); sys.exit(1)
 ## Anti-Patterns (2 Additional)
 
 ### Anti-Pattern 1: "Context Accumulation" — Keeping full subagent output in main context
-**Why it fails**: Blows context window, introduces noise, next delegation inherits garbage.  
+**Why it fails**: Blows context window, introduces noise, next delegation inherits garbage.
 **Correct**: Extract only `Decision Taken` + `Files Changed` + 1-line summary. Store full output in Engram with delegation ID.
 
 ### Anti-Pattern 2: "Implicit Parallelization" — Running dependent delegations in parallel
-**Why it fails**: Race conditions, stale reads, corrupted state.  
+**Why it fails**: Race conditions, stale reads, corrupted state.
 **Correct**: Explicit `depends_on: [delegation-id]` in orchestration. Sequential by default; parallel only when declared independent.
 
 ## Externalized Sections (ADR-007 compression)
 ## Context cleanup
 After delegation: extract only needed output, reference by delegation ID, summarize large outputs. Never retain full subagent output in main context.
-
-

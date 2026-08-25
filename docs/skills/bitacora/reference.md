@@ -223,5 +223,3 @@ User: `bitacora --search "auth"` → entries matching "auth". No matches→`"No 
 1. `mem_save_prompt` captures full request→Engram (machine-readable, cross-session)
 2. `bitacora --append` writes 1-line→BITACORA.md (human-readable, per-project)
 3. `bitacora --search "keyword"` returns matches + suggestion: `"See mem_search('keyword') for full context"`
-
-

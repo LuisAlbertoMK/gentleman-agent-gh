@@ -72,4 +72,3 @@ Describe "delegation-registry.ps1 — async delegation lifecycle (C8)" {
         ($j | Measure-Object).Count | Should -BeGreaterThan 0
     }
 }
-

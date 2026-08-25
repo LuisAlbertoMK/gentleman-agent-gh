@@ -206,7 +206,7 @@ Karpathy-loop compression + reference.md externalization:
 
 **Scripts Modified:**
 - `use-gentleman.ps1` — File writes (opencode.json, .gentleman-mode), directory creation
-- `babyagi-loop.ps1` — File writes (callback scripts, result files), file cleanup, process registration  
+- `babyagi-loop.ps1` — File writes (callback scripts, result files), file cleanup, process registration
 - `delegation-registry.ps1` — Registry file writes, prune marker, re-prompt files
 - Functions with state-changing verbs: `Invoke-TaskAsync`, `Set-RegistryData`, `Clear-RegistryExpired`
 

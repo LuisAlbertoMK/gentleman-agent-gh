@@ -133,5 +133,3 @@ Self-check every 5 calls: repeating?→compress · unused skills loaded?→unloa
 
 ## Metrics to Track
 Token usage/task (reduce 20%) · Time to first output (-30%) · Repeat error rate (target 0) · Skill load accuracy (target 100%).
-
-

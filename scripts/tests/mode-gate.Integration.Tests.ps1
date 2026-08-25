@@ -198,4 +198,3 @@ Describe "Mode gate — edge cases" {
         }
     }
 }
-

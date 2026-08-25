@@ -52,7 +52,7 @@ Describe 'Capability probe' {
         $tools = @($json.capabilities.testRunner.tools)
         if ($tools.Count -eq 1) {
             # raw JSON must serialize the single tool as an array, not a bare string
-            $raw | Should -Match '"tools"\s*:\s*\[' 
+            $raw | Should -Match '"tools"\s*:\s*\['
             $raw | Should -Not -Match '"tools"\s*:\s*"'
         }
         $tools.Count | Should -BeGreaterThan 0

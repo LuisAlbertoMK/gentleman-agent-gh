@@ -60,4 +60,3 @@ Describe "ctx-watchdog.ps1 — script execution (C8)" {
         $json.level | Should -Be 'L2'
     }
 }
-

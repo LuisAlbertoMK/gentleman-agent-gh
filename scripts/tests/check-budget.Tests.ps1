@@ -83,4 +83,3 @@ Describe "check-budget.ps1 — loop prevention (C6)" {
         $json.loopDetected | Should -BeFalse
     }
 }
-

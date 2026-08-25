@@ -125,4 +125,3 @@ Describe "close-session — Integration: non-Quiet output format" {
         $jsonOut.goal | Should -Be "TestBranchGoal"
     }
 }
-

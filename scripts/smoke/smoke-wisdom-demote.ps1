@@ -34,4 +34,3 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "[FAIL] wisdom-demote.ps1 exit $LASTEXITCODE" -ForegroundColor Red
     exit 1
 }
-

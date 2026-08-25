@@ -103,8 +103,8 @@ mem_session_summary(content: "## Goal\n...\n## Discoveries\n...\n## Accomplished
 
 ### Edge Case 2: Topic Key Collision Across Types
 ```bash
-# mem_save(title: "X", type: "decision", topic_key: "auth") 
-# mem_save(title: "Y", type: "bugfix", topic_key: "auth") 
+# mem_save(title: "X", type: "decision", topic_key: "auth")
+# mem_save(title: "Y", type: "bugfix", topic_key: "auth")
 # → Different types with same key = DIFFERENT observations (no auto-merge)
 # VERIFY: mem_search(type="decision") returns only decision; type="bugfix" returns only bugfix
 ```
@@ -163,5 +163,3 @@ Task injection: extract keywords, `mem_search(query,type="bugfix|pattern|decisio
 
 
 ## Auto-Clean: `$env:TEMP\opencode\`>24h at session start.
-
-

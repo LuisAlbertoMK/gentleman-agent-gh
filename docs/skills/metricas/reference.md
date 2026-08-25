@@ -106,10 +106,10 @@ metricas git-diff --base main --head HEAD --threshold 15 --format json | jq -r '
 def test_token_counts_match_golden():
     from metricas import tokenize_file
     import json
-    
+
     with open("tests/fixtures/token_counts.json") as f:
         golden = json.load(f)
-    
+
     for path, expected in golden.items():
         actual = tokenize_file(path, lang="typescript")
         assert actual == expected, f"{path}: expected {expected}, got {actual}"
@@ -120,15 +120,15 @@ def test_token_counts_match_golden():
 ```python
 def test_delta_calculation_accuracy(tmp_path):
     from metricas import compute_delta, tokenize_file
-    
+
     # Create baseline
     (tmp_path / "sample.py").write_text("def foo():\n    return 42\n")
     baseline_tokens = tokenize_file(tmp_path / "sample.py", lang="python")
-    
+
     # Modify: add 2 lines, ~15 tokens
     (tmp_path / "sample.py").write_text("def foo():\n    x = 10\n    y = 20\n    return x + y\n")
     after_tokens = tokenize_file(tmp_path / "sample.py", lang="python")
-    
+
     delta = compute_delta(baseline_tokens, after_tokens)
     assert delta.delta_tokens == pytest.approx(15, abs=3)  # Allow tokenizer variance
     assert delta.delta_pct == pytest.approx((15/baseline_tokens)*100, rel=0.1)
@@ -139,17 +139,17 @@ def test_delta_calculation_accuracy(tmp_path):
 ```python
 def test_bookmark_save_and_compare(tmp_path, monkeypatch):
     from metricas import BookmarkManager
-    
+
     monkeypatch.chdir(tmp_path)
     (tmp_path / "src").mkdir()
     (tmp_path / "src" / "main.py").write_text("x = 1\n")
-    
+
     mgr = BookmarkManager(tmp_path / ".metricas_baselines")
     mgr.save("baseline1", ["src/**/*.py"])
-    
+
     # Modify
     (tmp_path / "src" / "main.py").write_text("x = 1\ny = 2\nz = 3\n")
-    
+
     result = mgr.compare("baseline1", ["src/**/*.py"])
     assert result.summary.delta_tokens > 0
     assert len(result.by_file) == 1
@@ -223,7 +223,7 @@ def tokenize_file_streaming(path: Path, lang: str) -> int:
 
 **Problem**: `.tsx` (TS+JSX), `.vue` (TS+HTML+CSS), `.svelte` — single file, multiple languages.
 
-**Handling**: 
+**Handling**:
 - Primary lang by extension (`.tsx` → `typescript`)
 - Sub-language regions: extract `<script>`, `<template>`, `<style>` blocks, tokenize each with appropriate tokenizer, sum
 - Fallback: primary lang tokenizer on whole file
@@ -346,5 +346,3 @@ git show --stat HEAD
   "flagged": ["src/auth.ts:17.42%"]
 }
 ```
-
-

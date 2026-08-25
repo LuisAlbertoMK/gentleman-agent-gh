@@ -72,5 +72,3 @@
 
 **Gaps**: #8 (AEMaaCS troubleshooting guide), #11 (EDS/Off-platform migration), #12 (engagement metrics framework)
 **Decision**: Postergado — ICE ≤ 6, Bajo blast radius. Agent is production-ready sin estos.
-
-

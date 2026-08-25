@@ -105,7 +105,7 @@ Describe "opencode.json Configuration Validation" {
             $agentNames = $config.agent | Get-Member -MemberType NoteProperty | ForEach-Object { $_.Name }
             $semiAgents = $agentNames | Where-Object { $_ -match '-semi$' }
             $autoAgents = $agentNames | Where-Object { $_ -match '-auto$' }
-            
+
             # If there are -semi agents, there should be corresponding base agents
             foreach ($semi in $semiAgents) {
                 $base = $semi -replace '-semi$', ''
@@ -116,7 +116,7 @@ Describe "opencode.json Configuration Validation" {
         It "Subagent variants have matching base agents" {
             $agentNames = $config.agent | Get-Member -MemberType NoteProperty | ForEach-Object { $_.Name }
             $subAgents = $agentNames | Where-Object { $_ -match '-sub(-semi|-auto)?$' }
-            
+
             foreach ($sub in $subAgents) {
                 $base = $sub -replace '-sub(-semi|-auto)?$', '-sub'
                 if ($base -ne $sub) {

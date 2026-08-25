@@ -30,7 +30,7 @@ function parseInvoice(pdfPath) {
   return new Promise((resolve, reject) => {
     const parser = new PDFParser();
     parser.on('pdfParser_dataReady', pdfData => {
-      const tables = pdfData.Pages.flatMap(page => 
+      const tables = pdfData.Pages.flatMap(page =>
         page.Tables?.map(t => t.Rows.map(r => r.map(c => c.Text))) || []
       );
       resolve(tables);
@@ -96,7 +96,7 @@ const fs = require('fs');
 test('extracts text from sample PDF', async () => {
   const buffer = fs.readFileSync('fixtures/sample.pdf');
   const data = await pdf(buffer);
-  
+
   expect(data.text.length).toBeGreaterThan(50);
   expect(data.text).not.toMatch(/[\f\x00]/); // no garbage
   expect(data.numpages).toBeGreaterThan(0);
@@ -110,7 +110,7 @@ const PDFParser = require('pdf2json');
 
 test('parses invoice table rows correctly', async () => {
   const tables = await parseInvoice('fixtures/invoice.pdf');
-  
+
   expect(tables.length).toBeGreaterThan(0);
   const firstTable = tables[0];
   expect(firstTable.length).toBeGreaterThan(1); // header + data rows
@@ -129,9 +129,9 @@ const path = require('path');
 test('batch extracts all PDFs in directory', () => {
   const testDir = 'fixtures/batch-test';
   const files = fs.readdirSync(testDir).filter(f => f.endsWith('.pdf'));
-  
+
   execSync(`node batch-extract.js ${testDir}`, { encoding: 'utf8' });
-  
+
   files.forEach(file => {
     const txtPath = path.join(testDir, `${file}.txt`);
     expect(fs.existsSync(txtPath)).toBe(true);
@@ -165,10 +165,10 @@ test('batch extracts all PDFs in directory', () => {
 async function processLargePDF(pdfPath, chunkSize = 50) {
   const pdf = await PDFDocument.load(fs.readFileSync(pdfPath));
   const totalPages = pdf.getPageCount();
-  
+
   for (let i = 0; i < totalPages; i += chunkSize) {
     const chunk = await PDFDocument.create();
-    const pages = await chunk.copyPages(pdf, 
+    const pages = await chunk.copyPages(pdf,
       Array.from({length: Math.min(chunkSize, totalPages - i)}, (_, j) => i + j)
     );
     pages.forEach(p => chunk.addPage(p));

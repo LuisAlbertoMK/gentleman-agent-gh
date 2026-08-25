@@ -42,7 +42,7 @@ Parallelize dependent units · Share context between subagents · No rollback pl
 **Goal**: Refactor user service (5 files)
 **Breakdown**: 5 units (1 file each, parallel)
 **Failure**: Unit 3 returns compilation error
-**Action**: 
+**Action**:
 1. Re-delegate Unit 3 with error context + Engram ID of failure
 2. If retry fails → rollback Units 1,2,4,5 via `git stash` + `git stash pop` per unit
 3. Report: "3/5 done, Unit 3 BLOCKED — see Engram error-resolution#47"
@@ -113,20 +113,20 @@ print('Valid DAG:', ' → '.join(ordered))
 ### Edge Case 1: Subagent Returns Empty/Truncated Output
 **Symptom**: Subagent completes but stdout is empty or cut off
 **Cause**: Context window limit hit during subagent execution
-**Fix**: 
+**Fix**:
 - Require file-based output fallback in delegation prompt: "If output >10KB, write to `docs/agentes/{task}/05-completion-report.md` and echo only the path"
 - On collection: check for `.md` report path, read it instead of stdout
 
 ### Edge Case 2: Hidden Shared State Between "Independent" Units
 **Symptom**: Parallel units pass individually but fail when merged
 **Cause**: Both write to same config file / global registry / DB migration
-**Fix**: 
+**Fix**:
 - Declare shared resources in unit spec: `shared_resources: ["src/config/app.ts", "db:migrations"]`
 - If shared → serialize (make serial) OR add merge step with explicit conflict resolution
 
 ### Edge Case 3: Partial Success with Cascade Rollback
 **Scenario**: Unit A✓ B✓ C✗ (C depends on B)
-**Behavior**: 
+**Behavior**:
 - Rollback C (trivial — not applied yet)
 - Rollback B (revert its files via `git checkout HEAD -- <files_B>`)
 - Unit A stands (no dependents failed)
@@ -134,7 +134,7 @@ print('Valid DAG:', ' → '.join(ordered))
 
 ### Edge Case 4: Subagent Hangs / Timeout
 **Symptom**: No response after 5 min (default timeout)
-**Fix**: 
+**Fix**:
 - Orchestrator tracks start time per unit
 - On timeout: kill subagent process, mark BLOCKER
 - Retry once with: `prompt + " PREVIOUS ATTEMPT TIMED OUT. Scope: ONLY <specific file/function>. Max 100 lines output."`
@@ -154,5 +154,3 @@ print('Valid DAG:', ' → '.join(ordered))
 - subagent-isolation (context boundaries)
 - work-unit-commits (commit organization)
 - command-wrapper (safe command execution)
-
-

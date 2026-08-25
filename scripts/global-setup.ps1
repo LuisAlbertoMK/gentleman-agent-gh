@@ -1,4 +1,4 @@
-﻿#requires -Version 7
+#requires -Version 7
 [CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
@@ -171,4 +171,3 @@ if($Json){
     Write-Output "Synced: $($s['SYNCED']) | OK: $($s['OK']) | Failed: $($s['FAIL'])"
     Write-Output "═══════════════════════════════════════"
 }
-

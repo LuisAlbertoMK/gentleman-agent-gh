@@ -162,19 +162,19 @@ npx @redocly/openapi-cli lint openapi.yaml
 ## Edge Cases (4)
 
 ### Edge Case 1: No Schema Changes (Pure Logic Change)
-**Scenario**: Change only adds business logic, no DB/API changes.  
+**Scenario**: Change only adds business logic, no DB/API changes.
 **Handling**: Data Design section states "No schema changes required". Data Migration = N/A. API Surface = N/A or "No new endpoints".
 
 ### Edge Case 2: Breaking API Change Required
-**Scenario**: Must remove/rename endpoint field (breaking change).  
+**Scenario**: Must remove/rename endpoint field (breaking change).
 **Handling**: API Design documents version bump strategy. Migration plan includes deprecation timeline. ADR records tradeoff.
 
 ### Edge Case 3: Cross-Context Data Sharing
-**Scenario**: Two bounded contexts need shared data.  
+**Scenario**: Two bounded contexts need shared data.
 **Handling**: Document shared kernel or anti-corruption layer. Security Boundaries must show trust boundary explicitly.
 
 ### Edge Case 4: Legacy Code Without Tests (Testing Strategy)
-**Scenario**: Design affects untested legacy module.  
+**Scenario**: Design affects untested legacy module.
 **Handling**: Testing Strategy requires characterization tests FIRST. Risk factor 5 (non-testable code) gets explicit mitigation.
 
 ---
@@ -239,5 +239,3 @@ Rationale: Generic testing misses critical paths; risk-based targets coverage wh
 - `sdd/{change-name}/proposal` — the approved change proposal
 - `sdd/{change-name}/exploration` — (optional) exploration artifacts if a discovery phase ran
 - Project standards from orchestrator (if injected)
-
-

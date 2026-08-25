@@ -185,4 +185,3 @@ Describe 'Detect-Template — chain coverage' {
         if ($unresolved.Count -gt 0) { $unresolved | Write-Host }
     }
 }
-

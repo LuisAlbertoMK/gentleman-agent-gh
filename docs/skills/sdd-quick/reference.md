@@ -198,5 +198,3 @@ Load `{file:sdd/phases/02-propose.md}`. Relaxations: Skip `Capabilities` + `Affe
 Load `{file:sdd/phases/06-apply.md}`. No tasks breakdown; standard TDD if risky logic; no workload check (≤3 files). Persist via §C.
 ### Phase 3: Verify (essential only)
 Load `{file:sdd/phases/07-verify.md}`. Gates: Tests pass | Build OK | No regressions. **Skip:** Design coherence, spec mapping, coverage, assertion audit. Output → §C.
-
-

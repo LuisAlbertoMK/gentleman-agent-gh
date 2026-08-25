@@ -151,4 +151,3 @@ Scroll: JS only GSAP-level. Visibility: skips off-screen. `contain: layout style
 
 docs/skills/performance/reference.md
 ---
-

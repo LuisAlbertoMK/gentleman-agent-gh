@@ -293,4 +293,3 @@ Describe 'E2E: Pipeline Integration' {
         $content | Should -Match 'DryRun'
     }
 }
-

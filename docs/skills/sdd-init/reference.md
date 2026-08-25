@@ -79,4 +79,3 @@ Return `status`, `executive_summary`, `artifacts`, `next_recommended`, `risks`. 
 ---
 
 > See [reference.md](docs/skills/sdd-init/reference.md) for extended details, examples, and detailed patterns.
-

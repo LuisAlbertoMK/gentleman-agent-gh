@@ -8,4 +8,3 @@
 
 ## Testing
 1. `git push --force --dry-run`→BLOCK+ask. 2. `ghostcmd`/locked-file/missing path → mapped action fires. 3. `gh issue list --json` → fields AND warnings extracted.
-

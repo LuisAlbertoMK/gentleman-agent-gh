@@ -16,5 +16,3 @@ MFA bypass: backup codes / recovery often skip rate limits → audit separately
 CORS + auth: `Access-Control-Allow-Origin: *` + credentials → browser rejects; must echo origin
 Refresh reuse: same token accepted twice → revoke ALL sessions on reuse
 When NOT: stateless APIs→no sessions; serverless cold starts→avoid DB sessions; high-throughput internal→prefer mTLS over JWT
-
-

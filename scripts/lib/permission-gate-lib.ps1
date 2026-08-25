@@ -209,4 +209,3 @@ function Get-ConfiguredMode {
     }
     return $Mode
 }
-

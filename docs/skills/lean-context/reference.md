@@ -61,20 +61,20 @@ echo "CAVEMAN:  $(./compress caveman response.md | wc -w) words"
 ## C28 Depth — Edge Cases
 
 ### 1. Mixed Content (prose + code + safety)
-**Input**: Explanation with code snippet and safety warning  
-**Rule**: Prose compressed per level, code block untouched, safety warning verbatim  
+**Input**: Explanation with code snippet and safety warning
+**Rule**: Prose compressed per level, code block untouched, safety warning verbatim
 **LEAN**: Prose trimmed, code intact, warning intact
 
 ### 2. Mid-Conversation Escalation
-**Scenario**: Context at 35% → user asks complex question → context jumps to 45%  
+**Scenario**: Context at 35% → user asks complex question → context jumps to 45%
 **Rule**: Complete current response at LEAN, next response at ULTRA. Never switch mid-block.
 
 ### 3. User Trigger Override
-**Input**: User says "status?" at context 20%  
+**Input**: User says "status?" at context 20%
 **Rule**: Respond CAVEMAN ultra regardless of context level. Trigger word wins.
 
 ### 4. Protocol Output Exemption
-**Input**: Analysis table, verification result, recommendation  
+**Input**: Analysis table, verification result, recommendation
 **Rule**: Remain detailed per protocol. Compression levels apply ONLY to user-facing responses.
 
 ---
@@ -82,11 +82,11 @@ echo "CAVEMAN:  $(./compress caveman response.md | wc -w) words"
 ## C28 Depth — Anti-Patterns (Additional)
 
 ### 1. Recursive Compression
-**Bad**: Compress response, then compress again because "still too long"  
+**Bad**: Compress response, then compress again because "still too long"
 **Fix**: Choose correct level upfront using LEVEL SELECT table. If ULTRA not enough → CAVEMAN lite, not re-compress.
 
 ### 2. Context % Guessing
-**Bad**: "Feels like we're at 60%" → apply ULTRA without checking  
+**Bad**: "Feels like we're at 60%" → apply ULTRA without checking
 **Fix**: Use `ctx_stats` tool or context-watchdog for actual %. Apply LEVEL SELECT table strictly.
 
 ## Externalized Sections (ADR-007 compression)
@@ -109,5 +109,3 @@ Context crosses 40% mid-conversation? Move LEAN→ULTRA immediately. Crosses 80%
 
 ## USER RESPONSE POLICY
 **Default for USER-facing responses**: CAVEMAN for yes/no/status, LEAN for process updates. **Protocol outputs** (analysis tables, verification results, recommendations): remain detailed per protocol. **Trigger words for user-facing LEAN**: "listo?", "funcionó?", "status?", "ok?", "gracias", "gg".
-
-

@@ -144,5 +144,3 @@ git stash drop
 - Serial batches unless dep graph says parallel. Rollback per batch.
 - Max 3 consecutive SKIP → abort. Score drop >0.5 → full revert.
 - Stdlib doesn't cover this (needs 3 tool types in one pass).
-
-

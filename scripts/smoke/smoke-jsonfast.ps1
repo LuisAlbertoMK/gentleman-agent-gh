@@ -33,4 +33,3 @@ Check 'pretty' { $r = ConvertTo-JsonFast ([PSCustomObject]@{a=1}) -Pretty; $r -m
 Remove-Module JsonFast -Force -EA SilentlyContinue
 Write-Host "`nJsonFast: $pass pass, $fail fail" -ForegroundColor $(if($fail -eq 0){'Green'}else{'Red'})
 if ($fail -gt 0) { exit 1 }; exit 0
-

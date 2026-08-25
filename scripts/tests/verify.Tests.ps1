@@ -97,4 +97,3 @@ Describe 'verify.ps1 — JSON contract' {
         $r.allPassed | Should -BeOfType [bool]
     }
 }
-

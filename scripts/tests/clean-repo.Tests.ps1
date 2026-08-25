@@ -68,4 +68,3 @@ Describe 'clean-repo.ps1 — apply path' {
         (Test-Path -LiteralPath (Join-Path $script:repoDir 'tracked.txt')) | Should -Be $true
     }
 }
-

@@ -234,5 +234,3 @@ Invoked directly: report findings, apply fixes if clear and verified.
 | permissions, modelRouter | HIGH | Yes (dry-run + test) |
 | MCP server config | HIGH | Yes (connection test) |
 | Global `~/.config/opencode/` | HIGH | Yes (all projects) |
-
-

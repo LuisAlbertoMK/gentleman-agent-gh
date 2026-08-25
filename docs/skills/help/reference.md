@@ -110,5 +110,3 @@ Changing the skill documentation without running the actual commands to verify b
 - **Error 3x**: `auto-pattern-detector.ps1` → immune-system → AGENTS.md
 - **Script parse**: replace `—` → `--`, `→` → `->`. ASCII only in `.ps1`
 - **Full**: `docs/operations/RUNBOOK.md`
-
-

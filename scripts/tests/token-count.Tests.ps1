@@ -32,4 +32,3 @@ Describe 'R7: heuristic divisor defaults to chars/3.5' {
         @($out)[0] | Should -Be 10
     }
 }
-

@@ -171,14 +171,14 @@ $web = mem_search -query "perf-score:myapp-web" -limit 10
 # Verify scoring logic against known baselines
 function Test-PerfScoreLogic {
     param([hashtable]$metrics, [int]$expectedAvg)
-    
+
     $load = Get-LoadScore $metrics.lcp $metrics.tti
     $render = Get-RenderScore $metrics.fps $metrics.cls $metrics.inp
     $memory = Get-MemoryScore $metrics.memMB
     $network = Get-NetworkScore $metrics.p95ms $metrics.payloadKB $metrics.cacheHit
     $bundle = Get-BundleScore $metrics.bundleKB
     $energy = Get-EnergyScore $metrics.batteryPctHr $metrics.cpuPct
-    
+
     $actual = [math]::Round(($load+$render+$memory+$network+$bundle+$energy)/6, 1)
     Assert-Equal $actual $expectedAvg "Score calculation mismatch"
 }
@@ -198,17 +198,17 @@ Test-PerfScoreLogic @{ lcp=7.0; tti=8.0; fps=25; cls=0.9; inp=900; memMB=500; p9
 function Test-TrendDetection {
     # Clean slate
     mem_purge -confirm -scope session  # or use unique test project
-    
+
     # Inject declining trend: 9.0 → 8.5 → 8.0 → 7.5 → 7.0 (drop 0.5 per step)
     9.0, 8.5, 8.0, 7.5, 7.0 | ForEach-Object {
         mem_save -type learning -title "perf-score:testapp" -content "**Load**:9|**Render**:9|**Memory**:9|**Network**:9|**Bundle**:9|**Energy**:9|**Avg**:$_|**Platform**:web|**App**:testapp"
     }
-    
+
     # Run detection
     $result = Invoke-TrendCheck "testapp"  # uses the regression detection logic
     Assert-True $result.regressionDetected "Should detect >0.5 drop over 5 runs"
     Assert-Equal $result.delta 2.0 "Total drop should be 2.0"
-    
+
     # Inject stable trend: 8.0, 8.1, 7.9, 8.0, 8.1
     8.0, 8.1, 7.9, 8.0, 8.1 | ForEach-Object { ... }
     $result = Invoke-TrendCheck "testapp"
@@ -226,16 +226,16 @@ function Test-PlatformIsolation {
     mem_save -title "perf-score:app-android" -content "...|**Platform**:mob|**App**:app|**Avg**:7.0"
     mem_save -title "perf-score:app-ios" -content "...|**Platform**:mob|**App**:app|**Avg**:8.5"
     mem_save -title "perf-score:app-web" -content "...|**Platform**:web|**App**:app|**Avg**:6.0"
-    
+
     # Query each platform independently
     $android = mem_search "perf-score:app-android" -limit 5
     $ios = mem_search "perf-score:app-ios" -limit 5
     $web = mem_search "perf-score:app-web" -limit 5
-    
+
     Assert-Equal $android.Count 1 "Android trend isolated"
     Assert-Equal $ios.Count 1 "iOS trend isolated"
     Assert-Equal $web.Count 1 "Web trend isolated"
-    
+
     # Verify cross-platform query does NOT mix
     $all = mem_search "perf-score:app" -limit 20  # broader query
     Assert-True ($all | Where-Object { $_.title -like "*android*" }).Count -eq 1
@@ -353,5 +353,3 @@ Get-ChildItem build/static/js/*.js | Sort-Object Length -Descending | Select-Obj
 ```
 
 ## Cross-Refs: auto-metrics | gap-analysis | web-quality-audit | performance | metricas
-
-

@@ -167,5 +167,3 @@ go test -v -tags=integration ./internal/db/...
 - Parse/compile fail → `git checkout -- <file>` (if git), suggest deep-debugging
 - Test fail → 1 fix attempt. Still fails → STOP, escalate
 - Unclear requirements → STOP, 1 question
-
-

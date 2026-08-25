@@ -58,7 +58,7 @@ export function trapFocus(element: HTMLElement): () => void {
   );
   const first = focusables[0];
   const last = focusables[focusables.length - 1];
-  
+
   function handler(e: KeyboardEvent) {
     if (e.key !== 'Tab') return;
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
@@ -161,4 +161,3 @@ min-width+min-height (not padding) · 44px default, 24px fallback for dense tabl
 **Operable**: 2.1.1 Keyboard: prefer native · **2.4.13 Focus**: min 2px solid outline+outline-offset:2px on :focus-visible, never outline:none · 2.4.1 Skip links → #main-content · **2.5.8 AA Targets**: ≥24×24px, **enhanced 44×44px** touch-first · 2.5.7 Dragging: single-pointer alt · 2.3 Motion: @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
 **Understandable**: 3.1.1 html lang · 3.3 Forms: each input→label/aria-label, errors→aria-invalid+aria-describedby+role="alert" · 3.3.8 Auth: no cognitive test unless copy-paste/autofill/SSO
 **Robust**: 4.1.2 Prefer native semantic HTML · 4.1.3 Dynamic→aria-live="polite", errors→role="alert"
-

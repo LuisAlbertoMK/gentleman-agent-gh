@@ -25,5 +25,3 @@ Return one per line:
 - Speed: X — {evidence}
 - Breadth: X — {evidence}
 ```
-
-

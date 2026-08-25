@@ -20,4 +20,3 @@
 2. Vendor/Gen: `generated`/`vendor/` path -> SKIP - add `// code-review:skip`
 3. Sec vs Speed: Race<1ms, +40% -> WARN ACCEPTED IF (a) doc (b) metrics alert (c) flag rollback
 4. Config/Schema: Rel gate only: default+validation+doc -> PASS (Risk/Res unchanged)
-

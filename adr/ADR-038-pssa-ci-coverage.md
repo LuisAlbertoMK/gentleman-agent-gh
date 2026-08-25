@@ -1,8 +1,8 @@
 # ADR-038: PSScriptAnalyzer CI Integration + Test Coverage Gate
 
-**Status**: Accepted  
-**Date**: 2026-08-19  
-**Deciders**: gentleman-agent-gh team  
+**Status**: Accepted
+**Date**: 2026-08-19
+**Deciders**: gentleman-agent-gh team
 **Technical Story**: PowerShell quality improvements — C5 (PSSA CI + Coverage)
 
 ## Context

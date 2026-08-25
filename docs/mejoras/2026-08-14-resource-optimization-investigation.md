@@ -1,10 +1,10 @@
 # Investigación: Optimización de Recursos (CPU/RAM/GPU) para OpenCode
 
-**Fecha:** 2026-08-14  
-**Protocolo:** Automejora v3 (`docs/protocolos/protocolo_mejora_autonoma_v3.md`)  
-**Branch:** `experimento/resource-optimization-2026-08-14`  
-**Modelo base:** laguna-s-2.1-free  
-**Investigador:** >20 años experiencia (simulado como Senior Architect + GDE)  
+**Fecha:** 2026-08-14
+**Protocolo:** Automejora v3 (`docs/protocolos/protocolo_mejora_autonoma_v3.md`)
+**Branch:** `experimento/resource-optimization-2026-08-14`
+**Modelo base:** laguna-s-2.1-free
+**Investigador:** >20 años experiencia (simulado como Senior Architect + GDE)
 
 ---
 
@@ -345,5 +345,5 @@ const rss = parseInt(fs.readFileSync('/proc/self/statm').toString().split(' ')[1
 ---
 
 ## 7. Engram Persistence
-**Topic Key**: `analysis/resource-optimization-opencode`  
+**Topic Key**: `analysis/resource-optimization-opencode`
 **Saved**: All findings persist for cross-session reference

@@ -70,7 +70,7 @@ Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\DirectX\UserGpuPreferences" "python.e
 Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\DirectX\UserGpuPreferences" "node.exe" "High" -EA SilentlyContinue
 
 # Verify GPU scheduling
-Get-Process "python*","node*" | Where-Object { $_.Modules.ModuleName -match "nvcuda|nvml|dxgi" } | 
+Get-Process "python*","node*" | Where-Object { $_.Modules.ModuleName -match "nvcuda|nvml|dxgi" } |
     Select-Object Name, @{N='GPU';E={$_.Modules | Where-Object { $_.ModuleName -match "nvcuda|dxgi" }}}
 ```
 
@@ -120,7 +120,7 @@ $methods = @{
     "Get-Content -Raw" = { Get-Content $file -Raw }
     "StreamReader" = { [System.IO.StreamReader]::new($file).ReadToEnd() }
     "File.ReadAllBytes" = { [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($file)) }
-    "MemoryMapped" = { 
+    "MemoryMapped" = {
         $mmf = [System.IO.MemoryMappedFiles.MemoryMappedFile]::CreateFromFile($file)
         $stream = $mmf.CreateViewStream()
         [System.IO.StreamReader]::new($stream).ReadToEnd()
@@ -163,7 +163,7 @@ try {
 # Solution: Wrap in a monitor loop or use Job objects
 $job = Start-Job {
     while ($true) {
-        Get-Process "opencode*","node*" -EA SilentlyContinue | 
+        Get-Process "opencode*","node*" -EA SilentlyContinue |
             ForEach-Object { if ($_.PriorityClass -ne "High") { $_.PriorityClass = "High" } }
         Start-Sleep 30
     }
@@ -201,5 +201,3 @@ execution-mode · lean-context · context-watchdog · performance-tracker · com
 | >500MB | Memory-mapped | 10-50x |
 
 Multi-read: `Get-ChildItem "*.log" -Recurse | ForEach-Object -Parallel { [System.IO.File]::ReadAllText($_.FullName) } -ThrottleLimit 8`
-
-

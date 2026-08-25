@@ -109,7 +109,7 @@ Iterate: Add Mermaid diagrams for architecture → re-test → install globally
 ### Anti-Pattern: Eval Overfitting
 - **Symptom**: Skill passes 100% on eval suite but fails on real user prompts
 - **Why it fails**: Evals test known patterns; real world has distribution shift
-- **Fix**: 
+- **Fix**:
   1. Hold-out set: 20% of evals NEVER seen during iteration
   2. Add 1 "wildcard" test per iteration (unseen prompt from user logs)
   3. Track `holdout_pass_rate` vs `train_pass_rate` → gap >15% = overfit
@@ -124,5 +124,3 @@ Workspace: `<skill>-workspace/`. Results in `iteration-N/eval-ID/{with_skill,bas
 3. **Capture timing**: `total_tokens` + `duration_ms` → `timing.json`.
 4. **Grade → Aggregate → Viewer**: Grade via `agents/grader.md` → `grading.json`. Aggregate: `skill_aggregate_benchmark(...)`. Analyze: `agents/analyzer.md`. Viewer: `skill_serve_review` or `skill_export_static_review`.
 5. **Read feedback**: `feedback.json`. Stop via `skill_stop_review`.
-
-

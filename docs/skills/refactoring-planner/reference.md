@@ -18,5 +18,3 @@
 
 ## Post-Refactor: mem_save
 `title:"Refactored {module} — {extract|rename|split}" type:"architecture" content:"What: {X} from {Y} | Why: {reason} | Where: {paths} | Learned: {gotchas}"`
-
-

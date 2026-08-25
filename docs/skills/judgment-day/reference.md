@@ -130,9 +130,9 @@ test('Full pipeline: different findings → fix → re-judge → APPROVED', asyn
     { profile: 'security', verdict: 'FIX', findings: [{ line: 50, type: 'injection' }] }
   ];
   const fixDiff = 'src/test/target.ts:10:-tightCoupling();+looseCoupling(); src/test/target.ts:50:-rawSQL();+paramSQL();';
-  
+
   const result = await runJudgmentDay({ target, initialReviews, fixDiff, maxRejudge: 2 });
-  
+
   expect(result.rounds).toBe(2);
   expect(result.finalVerdict).toBe('APPROVED');
   expect(result.calibration).toBe('OK');

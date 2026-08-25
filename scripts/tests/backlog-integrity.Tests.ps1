@@ -100,4 +100,3 @@ Describe 'check-backlog-integrity.ps1' {
         $parsed.timestamp | Should -Not -BeNullOrEmpty
     }
 }
-

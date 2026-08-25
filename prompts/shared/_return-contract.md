@@ -1,4 +1,4 @@
-﻿# Return Contract — Canonical
+# Return Contract — Canonical
 
 Every delegation output MUST include this 4-field block AS-IS (never summarized):
 

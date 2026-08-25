@@ -26,4 +26,3 @@ $null = Get-Command $Script -ErrorAction Stop
 
 Write-Host '[PASS] wisdom-store.ps1 parse check' -ForegroundColor Green
 exit 0
-

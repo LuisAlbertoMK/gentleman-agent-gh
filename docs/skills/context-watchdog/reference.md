@@ -35,5 +35,3 @@
 | Echo chamber (re-stating own output) | Force YELLOW + fresh observation |
 | Chunk >50 calls no re-read | Exclude from next summary |
 | Repeated quote (same excerpt 2+) | Keep only freshest copy |
-
-

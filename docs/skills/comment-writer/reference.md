@@ -16,5 +16,3 @@
 - **Security**: "The token is exposed in the query string — logs and browser history capture it. Move it to an `Authorization: Bearer` header or secure cookie."
 - **Perf**: "This loop queries the DB per iteration — 50 items = 50 round trips. Batch with `WHERE id IN (...)` / `findMany`. Cuts ~500ms→~50ms."
 - **Celebrate**: "Love the simplification on line 89 — flat map cut 60 lines and made intent obvious. Thanks."
-
-

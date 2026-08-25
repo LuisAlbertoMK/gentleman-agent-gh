@@ -157,4 +157,3 @@ Describe 'R8b: CI-aware junction coverage gate' {
         }
     }
 }
-

@@ -216,4 +216,3 @@ print('All priority calculations correct')
 4. **UX**: Friction | Loading/empty/error states | Design system | Touch>=48px | WCAG 2.2 AA
 5. **Ops**: CI/CD+rollback | Docker/k8s | Monitoring | Build time | Dev loop
 6. **Business**: Pricing | Feature adoption | Competitor diffs | TCO | Roadmap
-

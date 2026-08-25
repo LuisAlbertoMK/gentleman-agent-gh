@@ -139,4 +139,3 @@ git checkout AGENTS.md
 
 docs/skills/cross-project-forge/reference.md
 ---
-

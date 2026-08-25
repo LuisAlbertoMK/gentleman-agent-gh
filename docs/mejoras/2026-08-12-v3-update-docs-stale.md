@@ -129,4 +129,3 @@ El gap de docs stale (G1) es **confirmado y actualizado** con nuevas discrepanci
 | 4 | G4: PSSA warnings | 🔴 Pending | Reduce PSSA warnings |
 
 **Engram Persistence**: `analysis/gentleman-agent-gh/v3-2026-08-12` · confidence: high
-

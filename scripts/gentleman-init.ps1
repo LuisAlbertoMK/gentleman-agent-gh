@@ -15,4 +15,3 @@
     gentleman-init -TargetDir ..\my-api -DefaultAgent gentleman-quick -Json -Yes
 #>
 & (Join-Path $PSScriptRoot 'use-gentleman.ps1') $args
-

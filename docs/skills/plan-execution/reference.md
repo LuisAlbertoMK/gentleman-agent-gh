@@ -228,7 +228,7 @@ Use when: External contracts, schema evolution, multi-service.
 
 ### Anti-Pattern 1: "Verify at the End Only"
 **What**: Skip per-task verification, run full suite once at the end.
-**Why it fails**: 
+**Why it fails**:
 - Defects compound — fix cost grows exponentially
 - Rollback scope becomes entire plan (can't isolate)
 - Blocked tasks indistinguishable from failed
@@ -264,5 +264,3 @@ Use when: External contracts, schema evolution, multi-service.
 | Makefile | `make test` (if target exists) |
 
 Single task timeout: 5 min. If exceeded → escalate.
-
-

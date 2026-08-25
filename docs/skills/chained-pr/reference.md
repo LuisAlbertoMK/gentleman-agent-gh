@@ -146,5 +146,3 @@ npm test  # must pass
 ## Output Contract
 
 Return the chosen strategy, PR order, current PR boundary, dependency diagram, review budget (`additions + deletions`), verification plan, and any `size:exception` rationale.
-
-

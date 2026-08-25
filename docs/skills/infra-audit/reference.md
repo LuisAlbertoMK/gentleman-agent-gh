@@ -85,5 +85,3 @@ grep -rn "securityContext\|resources" charts/*/values.yaml --include="*.yaml" | 
 **CI/CD** (multi-system): `grep -rn "secrets\.\|GITHUB_TOKEN\|CI_JOB_TOKEN\|GITLAB_TOKEN\|permissions:\|uses:\|image:" --include="*.yml"`
 
 **Helm/Ansible/CF**: `grep -rn "securityContext\|resources\|become:\|AWSTemplateFormatVersion" --include="*.yaml" --include="*.yml" --include="values.*"`
-
-

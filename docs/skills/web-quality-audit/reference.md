@@ -51,4 +51,3 @@ LCP<2500ms→load p75|CLS<0.1→stability p75|INP<200ms→responsiveness p75|FID
 
 ## Categories
 Perf(30%): WebP/AVIF, code-split, font-display:swap, preconnect, preload LCP, lazy, scheduler.yield | A11y(20%): alt, contrast 4.5:1, captions, keyboard, focus 2px, skip, touch; EAA2025 theme contrast + reduced-motion | Responsive(15%): CQ `inline-size`, auto-fit minmax(280px,1fr), clamp(), Subgrid; MQ=page, CQ=components | Animation(10%): transform+opacity, ≤500ms, <200ms/elem, scroll-driven, reduced-motion | Tokens(10%): OKLCH, 8pt, 3-tier, light-dark() | SEO(15%): robots, sitemap, canonical, title 50-60, meta 150-160, H1, JSON-LD → **seo** | Best Practices(15%): HTTPS, npm audit, CSP, DOCTYPE, UTF-8, 301
-

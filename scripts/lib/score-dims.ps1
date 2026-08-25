@@ -740,5 +740,3 @@ Add-Dimension "SG" $sgScore @{
     days_old = $sgDaysOld
     last_updated = $sgLastUpdated
 } "SSoT age: ${sgDaysOld}d"
-
-

@@ -40,4 +40,3 @@ node_modules/
     $l=git log -1 --oneline 2>&1 | Out-String;$l=$l.Trim()
     Write-Host "[info] Snapshots: $c | Latest: $l" -ForegroundColor Blue
 }finally{Pop-Location}
-

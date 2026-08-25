@@ -107,5 +107,3 @@ expect(r).not.match(/root:|key|sec|pwd/i)
 
 ### Config
 - `grep -rn "temperature\|max_tokens\|model.*=" --include="*.{ts,js,py,yaml,yml}"` → bounds/pinning
-
-

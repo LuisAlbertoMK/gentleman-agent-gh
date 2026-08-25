@@ -51,5 +51,3 @@ try {
     Write-Error "Script execution failed: $_"
     exit 1
 }
-
-

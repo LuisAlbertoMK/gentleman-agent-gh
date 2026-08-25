@@ -7,14 +7,14 @@
         'PSAvoidUsingPlainTextForPassword'
         'PSAvoidUsingUsernameAuthentically'
         'PSAvoidUsingWriteHost'
-        
+
         # Correctness rules
         'PSUseApprovedVerbs'
         'PSUseSingularNouns'
         'PSUseBOMForUnicodeEncodedFile'
         'PSAvoidUsingEmptyCatchBlock'
         'PSAvoidUsingWMICmdlet'
-        
+
         # Best practices
         'PSUseShouldProcessForStateChangingFunctions'
         'PSShouldProcess'
@@ -22,7 +22,7 @@
         'PSUseDeclaredVarsMoreThanAssignments'
         'PSReviewUnusedVariable'
     )
-    
+
     # Rules to exclude (style rules that are too noisy for this codebase)
     ExcludeRules = @(
         'PSAvoidUsingPositionalParameters'
@@ -34,6 +34,6 @@
         'PSUseParamBlockOnly'
         'PSUsePipeline'
     )
-    
+
     IncludeDefaultRules = $false
 }

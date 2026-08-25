@@ -155,4 +155,3 @@ Describe 'engram-validate.ps1 — Pipeline mode' {
         $result | Should -Be $null
     }
 }
-

@@ -150,5 +150,3 @@ topic_key: "pattern/{normalized-title}"
 
 ### 5. VERIFY
 Pre-task: "Seen this before?" If yes -> apply prevention BEFORE starting.
-
-

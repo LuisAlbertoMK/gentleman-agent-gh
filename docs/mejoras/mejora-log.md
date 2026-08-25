@@ -357,7 +357,7 @@ ALL CLEAR
 | ADR | `adr/ADR-035-skill-bloat-compression.md` | | `HEAD` |
 | Benchmarks update | `docs/mejoras/benchmarks.md` | | `HEAD` |
 
-**Números**: 
+**Números**:
 - **Before**: SE=6.0, o5=22, o3=57, avg=3.9KB, total=135KB (22 skills)
 - **After**: SE=7.0, o5=0, o3=39, avg=3.0KB, total=52KB (22 skills)
 - **Reduction**: 61% total bytes, 0 skills >5KB (target ≤2 ✓), 39 skills >3KB (target 46 ✓), avg 3.0KB (target <3.5KB ✓)
@@ -379,7 +379,7 @@ ALL CLEAR
 | ADR | `adr/ADR-036-config-budget-trim.md` | | `HEAD` |
 | Benchmarks update | `docs/mejoras/benchmarks.md` | | `HEAD` |
 
-**Números**: 
+**Números**:
 - **Before**: 58,626B (89.7%), 55 agents, SE=7.0, PA=8.0
 - **After**: 41,704B (63.6%), 49 agents, SE=7.0, PA=8.0
 - **Reduction**: 28.9% file size, −26.1pp under limit, 6 semi agents removed
@@ -394,7 +394,7 @@ ALL CLEAR
 
 ## Ciclo 6 — PowerShell Quality: CmdletBinding/ShouldProcess + PSSA CI + Coverage Gate (C4+C5) — `HEAD`
 
-**Fecha**: 2026-08-19  
+**Fecha**: 2026-08-19
 **Branch**: `experimento/mejora-autonoma-2026-08-19` (continúa)
 
 ### C4: CmdletBinding/ShouldProcess (ADR-037)
@@ -426,7 +426,7 @@ elseif ($PSCmdlet.ShouldProcess($target, "Action description")) {
 
 **Bug**: PSScriptAnalyzer runs with ad-hoc rule set, no config file, no coverage floor for production scripts.
 
-**Fix**: 
+**Fix**:
 1. `PSScriptAnalyzerSettings.psd1` — explicit rule config (security=error, best-practice=warning, style=info)
 2. `.github/workflows/ci.yml` — enhanced `pssa-lint` job + new `coverage-gate` job (80% floor for `scripts/`)
 

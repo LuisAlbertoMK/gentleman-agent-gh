@@ -227,4 +227,3 @@ found stuff
         $json.missing_expected | Should -NOT -Contain 'new.txt'
     }
 }
-

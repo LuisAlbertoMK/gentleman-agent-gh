@@ -48,8 +48,8 @@
 # Trigger: installed new skill "container-security" globally
 # Registry exists with 9 skills; adds 1, no conflicts
 ```
-**Before:** 9 skills in registry  
-**After:** 10 skills (container-security added)  
+**Before:** 9 skills in registry
+**After:** 10 skills (container-security added)
 **mem_save called:** "Added container-security to registry"
 
 ### Example 3: Incremental Update (Skill Removed)
@@ -57,8 +57,8 @@
 # Trigger: removed deprecated skill "legacy-helper" from ~/.claude/skills/
 # Registry removes entry, compacts rules
 ```
-**Before:** 10 skills including legacy-helper  
-**After:** 9 skills, legacy-helper removed  
+**Before:** 10 skills including legacy-helper
+**After:** 9 skills, legacy-helper removed
 **mem_save called:** "Removed legacy-helper from registry"
 
 ### Example 4: Cross-Source Deduplication (Project Override)
@@ -67,7 +67,7 @@
 # Global: generic boilerplate generator
 # Project: project-tailored with TypeScript + React patterns
 ```
-**Resolution:** Project version wins (more specific)  
+**Resolution:** Project version wins (more specific)
 **Compact rule updated:** From generic to "TypeScript + React scaffolds; follows project conventions"
 
 ### Example 5: Empty Registry (No Skills Found)

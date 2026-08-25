@@ -27,4 +27,3 @@ Describe "post-delegation-check.ps1 — basic validation (C7)" {
         $json.PSObject.Properties.Name -contains 'checks' | Should -BeTrue
     }
 }
-

@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 5.1
 <#
 .SYNOPSIS
     Gentleman-ize any project — generate opencode.json from the SSoT chain
@@ -484,4 +484,3 @@ if ($Json) {
     Write-Host "  Secure : shared-deny-rules.json re-asserted (global + per-agent) + write-deny ~/.config/opencode/**" -ForegroundColor DarkGray
     Write-Host "═══════════════════════════" -ForegroundColor Cyan
 }
-

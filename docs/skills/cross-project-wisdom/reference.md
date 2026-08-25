@@ -108,5 +108,3 @@ $patterns | Where-Object { $_.context.technologies -match "gradient" }
 # Search by severity
 $patterns | Where-Object { $_.severity -eq "HIGH" -or $_.severity -eq "CRITICAL" }
 ```
-
-

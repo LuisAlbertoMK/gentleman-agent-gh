@@ -94,5 +94,3 @@ Flag gaps: if only one type exists, others are likely missing.
 **Standard Files**: Check CHANGELOG.md, CONTRIBUTING.md, LICENSE, SECURITY.md exist; `grep -rn "Keep a Changelog\|## \[" --include="CHANGELOG.md"` → format.
 **Links**: `grep -rn "\[.*\](http" --include="*.md"` → localhost, 127.0.0.1, TODO URLs.
 **Code**: `grep -rn "TODO\|FIXME\|HACK\|XXX" --include="*.ts" --include="*.js" --include="*.py" --include="*.go"` → tech debt.
-
-

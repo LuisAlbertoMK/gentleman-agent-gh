@@ -365,5 +365,3 @@ Fix: `fsGroup: 1000` + `securityContext.fsGroupChangePolicy: "OnRootMismatch"` +
 - `grep -rn "ServiceAccount\|ClusterRole\|RoleBinding" --include="*.yaml"` → least-privilege check
 
 **Image**: `grep -rn "FROM\|image:" --include="Dockerfile*"` → pinned versions, minimal base
-
-

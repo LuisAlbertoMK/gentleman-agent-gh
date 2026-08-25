@@ -18,5 +18,3 @@ Trigger: same bug 2x · unused 5+ · correction 2x · loss >5%.
 | Loss >5% | Revert, rewrite |
 
 **Healing**: Engram log `(skill, session, why, fix)`.
-
-

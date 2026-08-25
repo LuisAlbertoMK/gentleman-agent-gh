@@ -144,5 +144,3 @@ Over-optimize before measuring · Cut context before identity · Sacrifice corre
 | 1-2 | Wrong format/behavior | Bloated >3x | Critical gaps |
 
 Stop: avg ≥7 AND tokens <100. Revert if any score drops ≥3.
-
-

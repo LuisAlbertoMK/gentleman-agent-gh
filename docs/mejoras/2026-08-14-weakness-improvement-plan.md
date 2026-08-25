@@ -1,8 +1,8 @@
 # Plan: Ataque a 3 puntos débiles — Protocolo Automejora v3
 
-**Protocolo**: `docs/protocolos/protocolo_mejora_autonoma_v3.md`  
-**Base**: `experimento/resource-optimization-2026-08-14` → nuevo branch `experimento/weakness-improvement-2026-08-14`  
-**Presupuesto**: 5 enfoques por debilidad, prioridad a los que tengan bajo effort + alto impacto  
+**Protocolo**: `docs/protocolos/protocolo_mejora_autonoma_v3.md`
+**Base**: `experimento/resource-optimization-2026-08-14` → nuevo branch `experimento/weakness-improvement-2026-08-14`
+**Presupuesto**: 5 enfoques por debilidad, prioridad a los que tengan bajo effort + alto impacto
 
 ---
 

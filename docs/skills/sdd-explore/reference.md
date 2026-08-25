@@ -135,5 +135,3 @@ Follow §B (retrieval) and §C (persistence) from `skills/_shared/sdd-phase-comm
 - **hybrid**: Both — Engram + filesystem.
 - **none**: Return result only.
 - **Retrieval**: engram searches `sdd-init/{project}` + `sdd/`; openspec reads config + specs; none uses orchestrator prompt.
-
-

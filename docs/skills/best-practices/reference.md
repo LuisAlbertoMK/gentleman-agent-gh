@@ -142,4 +142,3 @@ No console.log in prod. Error tracking (Sentry/Bugsnag). React: ErrorBoundary. G
 Prod: sourcemap:hidden(Vite)/devtool:hidden-source-map. Strip sourcesContent from tracker uploads.
 
 ## Audit: HTTPS | npm audit clean | CSP | Trusted Types | SRI | HSTS+headers | no deprecated APIs | passive listeners | no console errors | valid HTML | error handling | no interstitials
-

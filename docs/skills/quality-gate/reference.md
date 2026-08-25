@@ -174,5 +174,3 @@ go test ./... && npm test && cargo test
 ## Decision Tree
 Tests:no runner→SKIP|pre-exist→user-ok|new→fix. Cred:FP→user-ok|real→vault. Commit→type(scope):desc. PSSA missing→SKIP|auto-fix→-Mode Fix. Pester missing→SKIP.
 Breaker:missing→SKIP push|✅→push|🔧→R2|🚫→STOP|⚠→STOP partial
-
-

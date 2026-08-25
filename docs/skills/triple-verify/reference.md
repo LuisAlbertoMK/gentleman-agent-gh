@@ -62,12 +62,12 @@
 def test_e1_layers():
     # 1. Unit: pure functions, no I/O
     assert calculate_discount(100, 0.1) == 90
-    
+
     # 2. Integration: DB, cache, external mock
     with patch("src.api.client") as mock:
         mock.get.return_value = {"status": "ok"}
         assert fetch_user(1) == expected
-    
+
     # 3. E2E: full stack via testcontainer/Playwright
     page.goto("/dashboard")
     expect(page).to_have_title("Dashboard")
@@ -166,4 +166,3 @@ quality-gate · code-review-agent · judgment-day · commit-crafter · CYCLE.md
 ---
 
 > See [reference.md](docs/skills/triple-verify/reference.md) for extended details, examples, and detailed patterns.
-

@@ -28,5 +28,3 @@ await expect(page).toHaveScreenshot('dash.png',{mask:[page.locator('[data-testid
 // Freeze
 await page.addInitScript(()=>{Date.now=()=>1700000000000});
 ```
-
-

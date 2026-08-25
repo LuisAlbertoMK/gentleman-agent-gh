@@ -150,5 +150,3 @@ rm -f .opencode/ralph-loop.local.md
 # 4. Output confirmation
 echo "Ralph loop cancelled at iteration $(grep '^iteration:' .opencode/ralph-loop.local.md 2>/dev/null || echo 'unknown')"
 ```
-
-

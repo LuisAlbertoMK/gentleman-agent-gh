@@ -20,4 +20,3 @@ Input: change name, task(s), store (engram|openspec|hybrid|none), status (sdd-st
 
 ## 2a Workload Gate
 400-line risk High / Chained PRs Yes / Decision needed Yes → confirm auto-chain (stacked-to-main|feature-branch-chain), exception-ok, single-pr (only size:exception); none → STOP + locked.
-

@@ -112,4 +112,3 @@ Describe 'expand-config.ps1 — edge cases' {
             Should -Throw -ExpectedMessage '*opencode.json not found*'
     }
 }
-

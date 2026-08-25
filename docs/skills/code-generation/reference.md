@@ -22,7 +22,7 @@ interface UserCardProps {
 
 export function UserCard({ user, onEdit }: UserCardProps) {
   if (!user) return null;
-  
+
   return (
     <article className="user-card">
       <header>
@@ -49,7 +49,7 @@ func (s *UserService) GetUserByID(ctx context.Context, id string) (*User, error)
     if id == "" {
         return nil, ErrInvalidID
     }
-    
+
     user, err := s.repo.GetByID(ctx, id)
     if err != nil {
         if errors.Is(err, sql.ErrNoRows) {
@@ -82,7 +82,7 @@ def main(
     """Deploy the application."""
     if env not in ("staging", "prod"):
         raise typer.BadParameter("env must be 'staging' or 'prod'")
-    
+
     cfg = DeployConfig.from_file(config)
     deployer = Deployer(cfg, dry_run=dry_run)
     deployer.run(env)
@@ -154,12 +154,12 @@ describe('validateEmail', () => {
         expect(validateEmail('user@example.com')).toEqual({ valid: true });
         expect(validateEmail('test.email+tag@domain.org')).toEqual({ valid: true });
     });
-    
+
     it('rejects invalid formats', () => {
         expect(validateEmail('invalid')).toEqual({ valid: false, error: 'Invalid email format' });
         expect(validateEmail('@nodomain')).toEqual({ valid: false, error: 'Invalid email format' });
     });
-    
+
     it('handles edge cases', () => {
         expect(validateEmail('')).toEqual({ valid: false, error: 'Email is required' });
         expect(validateEmail('a'.repeat(255) + '@b.c')).toEqual({ valid: false, error: 'Email too long' });
@@ -183,20 +183,20 @@ import { UserRepository } from './user.repository';
 describe('UserService', () => {
     let repo: UserRepository;
     let service: UserService;
-    
+
     beforeEach(() => {
         repo = { findById: vi.fn(), create: vi.fn() } as any;
         service = new UserService(repo);
     });
-    
+
     it('returns user when found', async () => {
         const user = { id: '1', name: 'Test' };
         vi.mocked(repo.findById).mockResolvedValue(user);
-        
+
         const result = await service.getById('1');
         expect(result).toEqual(user);
     });
-    
+
     it('throws when not found', async () => {
         vi.mocked(repo.findById).mockResolvedValue(null);
         await expect(service.getById('1')).rejects.toThrow('User not found');
@@ -220,14 +220,14 @@ import (
 func TestUserService_Integration(t *testing.T) {
     pool := db.NewTestPool(t)
     defer pool.Close()
-    
+
     repo := user.NewRepository(pool)
     svc := user.NewService(repo)
-    
+
     t.Run("create and get user", func(t *testing.T) {
         created, err := svc.Create(context.Background(), user.CreateInput{Name: "Test"})
         require.NoError(t, err)
-        
+
         got, err := svc.GetByID(context.Background(), created.ID)
         require.NoError(t, err)
         require.Equal(t, "Test", got.Name)
@@ -245,13 +245,13 @@ test.describe('Users API', () => {
         const response = await request.post('/api/users', {
             data: { name: 'John Doe', email: 'john@example.com' }
         });
-        
+
         expect(response.status()).toBe(201);
         const body = await response.json();
         expect(body.id).toBeDefined();
         expect(body.name).toBe('John Doe');
     });
-    
+
     test('returns 404 for non-existent user', async ({ request }) => {
         const response = await request.get('/api/users/nonexistent');
         expect(response.status()).toBe(404);
@@ -312,7 +312,7 @@ async function transfer(from: string, to: string, amount: number, idempotencyKey
         // Check idempotency
         const existing = await db.idempotencyKeys.find(idempotencyKey);
         if (existing) return existing.result;
-        
+
         const result = await doTransfer(from, to, amount);
         await db.idempotencyKeys.create({ key: idempotencyKey, result });
         return result;
@@ -356,5 +356,3 @@ If request matches quick-executor scope (single existing file, clear before/afte
 
 ## SEVERITY
 | P0 | Generated code breaks build | P1 | Convention mismatch | P2 | Missing edge case | P3 | Style nits |
-
-

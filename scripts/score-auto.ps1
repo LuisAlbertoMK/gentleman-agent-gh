@@ -130,9 +130,9 @@ $backlogRaw     = Receive-Job -Name "backlog" -ErrorAction SilentlyContinue
 $jobs | Remove-Job -Force 2>$null
 
 # Parse parallel results with safe defaults on failure
-$crossRefClean = try { 
+$crossRefClean = try {
     $jsonLine = $crossRefOutput | Where-Object { $_ -match '^\s*\{' } | Select-Object -First 1
-    ($jsonLine | ConvertFrom-Json -EA SilentlyContinue).allClean -eq $true 
+    ($jsonLine | ConvertFrom-Json -EA SilentlyContinue).allClean -eq $true
 } catch { $false }
 $backlogData   = try { $backlogRaw | ConvertFrom-Json -EA SilentlyContinue } catch { $null }
 

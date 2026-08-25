@@ -20,5 +20,3 @@ feat(config)!: switch to env-only credentials # BREAKING CHANGE: .credentials.js
 | No scope match | Parent directory name; root → no scope |
 | Empty body | OK for trivial; required for `feat`/`fix`/`perf` |
 | Breaking in non-feat | `fix!`/`refactor!` valid; always add `BREAKING CHANGE:` footer |
-
-

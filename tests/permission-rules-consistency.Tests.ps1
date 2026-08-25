@@ -92,11 +92,11 @@ Describe "Permission Rules Consistency" {
         It "Deny rules in JSON are referenced in opencode.json" {
             $denyRules = Get-Content $denyRulesPath -Raw | ConvertFrom-Json
             $jsonRuleNames = $denyRules | Get-Member -MemberType NoteProperty | ForEach-Object { $_.Name }
-            
+
             # Verify at least some rules are present in opencode.json permissions
             $opencodePerms = $config.permission.bash
             $opencodePermNames = $opencodePerms | Get-Member -MemberType NoteProperty | ForEach-Object { $_.Name }
-            
+
             # At least 10 rules should be present (both use shared-deny-rules.json as SSoT)
             $matchedRules = $jsonRuleNames | Where-Object { $opencodePermNames -contains $_ }
             $matchedRules.Count | Should -BeGreaterOrEqual 10
@@ -104,7 +104,7 @@ Describe "Permission Rules Consistency" {
 
         It "No conflicting rules (same command, different verdicts)" {
             $denyRules = Get-Content $denyRulesPath -Raw | ConvertFrom-Json
-            
+
             # Check for commands marked as both 'deny' and 'allow' in same file
             $conflicts = @()
             $denyRules | Get-Member -MemberType NoteProperty | ForEach-Object {
@@ -112,7 +112,7 @@ Describe "Permission Rules Consistency" {
                 $value = $denyRules.$name
                 # This is a simple check - more sophisticated validation would parse patterns
             }
-            
+
             $conflicts.Count | Should -Be 0
         }
     }

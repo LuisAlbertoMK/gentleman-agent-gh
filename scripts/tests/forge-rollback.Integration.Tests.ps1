@@ -86,4 +86,3 @@ Describe "forge-rollback — Integration: error handling" {
             Should -Throw
     }
 }
-

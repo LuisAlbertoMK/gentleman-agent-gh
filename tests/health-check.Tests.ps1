@@ -87,7 +87,7 @@ Describe "health-check.ps1" {
         It "Produces valid JSON with -Json parameter" {
             $result = & $scriptPath -Json -Quiet 2>&1
             $output = $result | Out-String
-            
+
             try {
                 $json = $output | ConvertFrom-Json -ErrorAction Stop
                 # Verify structure
@@ -102,7 +102,7 @@ Describe "health-check.ps1" {
         It "Includes junction checks in JSON output" {
             $result = & $scriptPath -Json -Quiet 2>&1
             $output = $result | Out-String
-            
+
             try {
                 $json = $output | ConvertFrom-Json -ErrorAction Stop
                 $junctionChecks = $json.checks | Where-Object { $_.check -match "junction|skills|prompts" }

@@ -116,10 +116,10 @@ Describe "permission-gate-lib.ps1" {
         It "Classifies 'curl https://example.com' as deny in all modes" {
             $result = Get-CommandClass -cmd "curl https://example.com" -mode "manual"
             $result | Should -Be "deny"
-            
+
             $result = Get-CommandClass -cmd "curl https://example.com" -mode "semi"
             $result | Should -Be "deny"
-            
+
             $result = Get-CommandClass -cmd "curl https://example.com" -mode "auto"
             $result | Should -Be "deny"
         }
@@ -127,10 +127,10 @@ Describe "permission-gate-lib.ps1" {
         It "Classifies 'rm -rf /' as deny in manual/semi, ask in auto" {
             $result = Get-CommandClass -cmd "rm -rf /" -mode "manual"
             $result | Should -Be "deny"
-            
+
             $result = Get-CommandClass -cmd "rm -rf /" -mode "semi"
             $result | Should -Be "deny"
-            
+
             $result = Get-CommandClass -cmd "rm -rf /" -mode "auto"
             $result | Should -Be "ask"
         }
@@ -143,10 +143,10 @@ Describe "permission-gate-lib.ps1" {
         It "Classifies 'git push origin main' as ask in manual/semi/auto" {
             $result = Get-CommandClass -cmd "git push origin main" -mode "manual"
             $result | Should -Be "ask"
-            
+
             $result = Get-CommandClass -cmd "git push origin main" -mode "semi"
             $result | Should -Be "ask"
-            
+
             $result = Get-CommandClass -cmd "git push origin main" -mode "auto"
             $result | Should -Be "ask"
         }
@@ -154,10 +154,10 @@ Describe "permission-gate-lib.ps1" {
         It "Classifies 'echo hello' as allow in semi/auto, ask in manual" {
             $result = Get-CommandClass -cmd "echo hello" -mode "semi"
             $result | Should -Be "allow"
-            
+
             $result = Get-CommandClass -cmd "echo hello" -mode "auto"
             $result | Should -Be "allow"
-            
+
             $result = Get-CommandClass -cmd "echo hello" -mode "manual"
             $result | Should -Be "ask"
         }
@@ -259,10 +259,10 @@ Describe "permission-gate-lib.ps1" {
             $repoRoot = Join-Path $PSScriptRoot ".."
             $result = Get-ConfiguredMode -Mode "manual" -RepoRoot $repoRoot
             $result | Should -Be "manual"
-            
+
             $result = Get-ConfiguredMode -Mode "semi" -RepoRoot $repoRoot
             $result | Should -Be "semi"
-            
+
             $result = Get-ConfiguredMode -Mode "auto" -RepoRoot $repoRoot
             $result | Should -Be "auto"
         }

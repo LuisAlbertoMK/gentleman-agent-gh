@@ -135,5 +135,3 @@ In `_core-behavior-gp.md`. Loads only on explicit `!analisis`.
 **4a Compare**: `mem_search("analysis:<project>")`. Found→delta(improvements/regressions/new/stale)→`## Trend vs Previous`. None→"No previous analysis—baseline".
 **4b Save**: `mem_save(title:"analysis:<project>:<YYYY-MM-DD>",type:architecture,topic_key:"analysis/<project>")` Content:`**What**:Analyzed <project> <date>—<scope>. **Why**:<trigger>. **Where**:<top files max8>. **Key Findings**:<top5 by risk>. **Learned**:<surprises or None>`.
 **4c Enrich**: Append to `docs/mejoras/YYYY-MM-DD-<project>-analisis.md`: `## Engram Persistence`(id+topic_key+ts) + `## Trend Analysis`(delta).
-
-
