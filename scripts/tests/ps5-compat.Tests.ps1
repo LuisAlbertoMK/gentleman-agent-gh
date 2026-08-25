@@ -137,7 +137,9 @@ Describe 'PS5/7 Compat — gentleman-vmk.bat wrapper' {
     It 'T12: setup-machine.ps1 installs .bat shortcut from scripts/gentleman-vmk.bat' {
         $path = Join-Path $repoRoot 'setup-machine.ps1'
         $content = Get-Content $path -Raw
-        $content | Should -Match 'gentleman-vmk\.bat'
+        # v2 loop-based shortcuts resolve the source .bat generically via the
+        # BatCmd table entry instead of a hardcoded 'gentleman-vmk.bat' string.
+        $content | Should -Match ('gentleman-vmk\.bat|BatCmd\s*=\s*[\"'']?gentleman-vmk')
         $content | Should -Match 'Copy-Item.*srcBat'
     }
 }
