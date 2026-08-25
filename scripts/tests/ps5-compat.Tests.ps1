@@ -61,15 +61,14 @@ Describe 'PS5/7 Compat — platform.ps1 shim' {
 Describe 'PS5/7 Compat — #requires version declarations' {
     BeforeAll {
         $repoRoot = Split-Path $PSScriptRoot -Parent
+        $criticalScripts = @(
+            'setup-machine.ps1', 'setup-install.ps1', 'gentleman-init.ps1',
+            'use-gentleman.ps1', 'sync-vmk.ps1', 'sync-all.ps1'
+        )
+        $criticalLibs = @(
+            'lib\platform.ps1', 'lib\json-utils.ps1', 'lib\template-detection.ps1'
+        )
     }
-
-    $criticalScripts = @(
-        'setup-machine.ps1', 'setup-install.ps1', 'gentleman-init.ps1',
-        'use-gentleman.ps1', 'sync-vmk.ps1', 'sync-all.ps1'
-    )
-    $criticalLibs = @(
-        'lib\platform.ps1', 'lib\json-utils.ps1', 'lib\template-detection.ps1'
-    )
 
     It 'T5: Critical path scripts declare #requires -Version 5.1' {
         foreach ($script in $criticalScripts) {
@@ -134,12 +133,13 @@ Describe 'PS5/7 Compat — gentleman-vmk.bat wrapper' {
         $content | Should -Match 'opencode --agent gentleman-vMK'
     }
 
-    It 'T12: setup-machine.ps1 installs .bat shortcut from scripts/gentleman-vmk.bat' {
+    It 'T12: setup-machine.ps1 installs .bat shortcut from scripts/$($sc.BatCmd).bat' {
         $path = Join-Path $repoRoot 'setup-machine.ps1'
         $content = Get-Content $path -Raw
         # v2 loop-based shortcuts resolve the source .bat generically via the
         # BatCmd table entry instead of a hardcoded 'gentleman-vmk.bat' string.
         $content | Should -Match ('gentleman-vmk\.bat|BatCmd\s*=\s*[\"'']?gentleman-vmk')
+        $content | Should -Match 'sc\.BatCmd'
         $content | Should -Match 'Copy-Item.*srcBat'
     }
 }

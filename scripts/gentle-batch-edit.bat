@@ -2,6 +2,7 @@
 REM gentle-batch-edit.bat - CMD wrapper that auto-detects Go toolchain
 REM   - If Go is available: compiles and runs the Go batch-edit engine
 REM   - Falls back to a helpful message if Go is not installed
+REM   - Integrated into setup-machine.ps1 as global shortcut (gentle-batch-edit)
 REM
 REM Usage:
 REM   gentle-batch-edit spec.jsonl              - apply edits
