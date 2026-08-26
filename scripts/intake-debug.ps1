@@ -1,5 +1,5 @@
 #requires -Version 7
-
+param()
 Set-StrictMode -Version Latest
 <#
 .SYNOPSIS

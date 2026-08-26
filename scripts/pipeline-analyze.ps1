@@ -27,8 +27,12 @@ param(
     [string]$ProjectPath,
     [ValidateSet('gather','report','full')]
     [string]$Mode = 'full',
-    [string]$OutDir = ''
+    [string]$OutDir = '',
+    [switch]$Quiet,
+    [switch]$Json
 )
+
+if ($Quiet -or $Json) { $null = $Quiet; $null = $Json }
 Set-StrictMode -Version Latest
 
 $ErrorActionPreference = 'Stop'

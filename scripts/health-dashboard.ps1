@@ -16,8 +16,12 @@
 #>
 param(
     [string]$OutputPath = "docs\health-report.html",
-    [switch]$OpenInBrowser
+    [switch]$OpenInBrowser,
+    [switch]$Quiet,
+    [switch]$Json
 )
+
+if ($Quiet -or $Json) { $null = $Quiet; $null = $Json }
 Set-StrictMode -Version Latest
 
 $ErrorActionPreference = 'Stop'

@@ -50,8 +50,12 @@ param(
 
     [int]$Timeout = 30000,
 
-    [switch]$Headed
+    [switch]$Headed,
+    [switch]$Quiet,
+    [switch]$Json
 )
+
+if ($Quiet -or $Json) { $null = $Quiet; $null = $Json }
 Set-StrictMode -Version Latest
 
 # Make native (node) non-zero exits observable as terminating errors in PS 7.3+,

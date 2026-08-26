@@ -18,6 +18,7 @@ param(
     [switch]$DryRun,
     [switch]$Force
 )
+Set-StrictMode -Version Latest
 
 $ErrorActionPreference = 'Continue'  # don't stop on individual test errors
 $root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)

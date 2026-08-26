@@ -29,8 +29,12 @@ param(
     [string]$Route = "/",
     [switch]$FullPage,
     [switch]$NoAnalysis,
-    [string]$Output
+    [string]$Output,
+    [switch]$Quiet,
+    [switch]$Json
 )
+
+if ($Quiet -or $Json) { $null = $Quiet; $null = $Json }
 Set-StrictMode -Version Latest
 
 $ErrorActionPreference = "Stop"

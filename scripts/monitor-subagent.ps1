@@ -71,8 +71,12 @@ param(
     [string]$TaskId             = "",
     [switch]$WriteResultFile,
     [switch]$DryRun,
-    [switch]$Force
+    [switch]$Force,
+    [switch]$Quiet,
+    [switch]$Json
 )
+
+if ($Quiet -or $Json) { $null = $Quiet; $null = $Json }
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 

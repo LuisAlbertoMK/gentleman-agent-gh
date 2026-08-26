@@ -1,5 +1,6 @@
 #requires -Version 5.1
-
+param()
+Set-StrictMode -Version Latest
 <#
 .SYNOPSIS
     Gentleman-ize a project — alias for use-gentleman.ps1.
