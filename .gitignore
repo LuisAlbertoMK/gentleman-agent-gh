@@ -110,7 +110,8 @@ docs/health-report.html
 # ============================================
 # Self-improving agent (learnings dirs)
 # ============================================
-.learnings/
+.learnings/*
+!.learnings/engram-sync.json
 
 # ============================================
 # Plugin: opencode-self-improve config

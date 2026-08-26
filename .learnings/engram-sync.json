@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "exported": "2026-08-26T17:50:41.8973303-06:00",
+  "project": "gentleman-agent-gh",
+  "types": [
+    "decision",
+    "architecture",
+    "bugfix",
+    "pattern"
+  ],
+  "max_age_days": 90,
+  "count": 2,
+  "observations": [
+    {
+      "topic_key": "pattern/user-skepticism-live-proof-pattern",
+      "type": "pattern",
+      "title": "User skepticism → live proof pattern",
+      "content": "**What**: User challenged claims (\no te creo) — responded with live tool demonstrations instead of arguments\n**Why**: Trust is built with evidence, not rhetoric. Showing tool outputs in real-time beat any explanation\n**Where**: This session, gentleman-agent-gh project\n**Learned**: When user doubts capabilities → immediately run 3+ real tool calls and show raw results. Don't argue, demonstrate. Pattern: claim → evidence → verification",
+      "exported_at": "2026-08-26T17:50:41.8980860-06:00",
+      "source_id": 765
+    },
+    {
+      "topic_key": "bug/score-cache-json-optimization-99-8-reduction",
+      "type": "bugfix",
+      "title": "score-cache.json optimization — 99.8% reduction",
+      "content": "**What**: Optimized score-cache.json from 155 lines/81KB to 9 lines/133 bytes\n**Why**: Cache was storing full base64-encoded composite hash (61K chars) + complete result object (duplicated in .project.json)\n**Where**: scripts/score-auto.ps1 (lines 64-67 hash generation, 245-255 cache save), scripts/perf-offline-fallback.ps1 (lines 90-101 cache read), .learnings/score-cache.json\n**Learned**: ConvertFrom-Json parses ISO timestamps as DateTime — use .ToString() before .Substring(); Get-FileHash -InputStream works for hashing strings without temp files; Backward compat v1+v2",
+      "exported_at": "2026-08-26T17:50:41.8981487-06:00",
+      "source_id": 767
+    }
+  ]
+}
