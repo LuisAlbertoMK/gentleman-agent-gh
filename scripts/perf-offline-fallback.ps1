@@ -90,11 +90,13 @@ if (Test-Path $projectFile) {
 if ($null -eq $score -and (Test-Path $cacheFile)) {
     try {
         $cached = Get-Content $cacheFile -Raw -Encoding UTF8 | ConvertFrom-Json
-        $score = $cached.result.score.current
-        if ($cached.result.score.dimensions) {
-            # Estimate token budget from known defaults
-            $tokenBudget = 18000  # medium default: 6000 reserved + 12000 keep
+        # v2 (slim): read from top-level fields; v1 (legacy): read from result.score
+        if ($cached.v -eq 2) {
+            $score = $cached.score
+        } else {
+            $score = $cached.result.score.current
         }
+        $tokenBudget = 18000  # medium default: 6000 reserved + 12000 keep
     } catch {
         Write-Debug "perf-offline: cache parse failed: $($_.Exception.Message)"
     }

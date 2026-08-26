@@ -62,17 +62,34 @@ try {
     if ($manifestScriptCount -lt $scriptFiles.Count -or $manifestSkillCount -ne $skillMdFiles.Count) { $cacheHash = $null }
 
     $compositeKey = "$scriptsHash|$skillsHash"
-    $cacheHash    = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($compositeKey))
+    # Compact hash: SHA256 of composite key, first 16 hex chars (~8KB → 16 bytes)
+    $fullHash = (Get-FileHash -InputStream ([IO.MemoryStream]::new([Text.Encoding]::UTF8.GetBytes($compositeKey))) -Algorithm SHA256).Hash
+    $cacheHash = $fullHash.Substring(0, 16)
 
     if (Test-Path $cacheFile) {
         $cached = Get-Content $cacheFile -Raw -Encoding UTF8 | ConvertFrom-Json
-        if ($cached.hash -eq $cacheHash) {
-            if ($Json) {
-                $cached.result | ConvertTo-Json -Depth 5
-            } elseif ($Quiet) {
-                $cached.result | ConvertTo-Json -Depth 5
+        # v2 (slim): compare compact hash; v1 (legacy): compare full base64 hash
+        $cachedHash = if ($cached.v -eq 2) { $cached.hash } else { $cached.hash }
+        if ($cachedHash -eq $cacheHash) {
+            # v2 slim: result not in cache, must recalculate (but hash matches = no change)
+            # For display, reconstruct minimal result from cached fields
+            if ($cached.v -eq 2) {
+                if ($Json -or $Quiet) {
+                    # Reconstruct minimal result for JSON output
+                    $tsStr = if ($cached.ts -is [string]) { $cached.ts.Substring(0,10) } else { "$($cached.ts)".Substring(0,10) }
+                    @{ score = @{ current = $cached.score; trend = $cached.trend; last_updated = $tsStr } } | ConvertTo-Json -Depth 5
+                } else {
+                    Write-Host "Score: $($cached.score)/10 (cached at $($cached.ts))" -ForegroundColor DarkGray
+                }
             } else {
-                Write-Host "Score: $($cached.result.score.current)/10 (cached at $($cached.timestamp))" -ForegroundColor DarkGray
+                # v1 legacy: full result available
+                if ($Json) {
+                    $cached.result | ConvertTo-Json -Depth 5
+                } elseif ($Quiet) {
+                    $cached.result | ConvertTo-Json -Depth 5
+                } else {
+                    Write-Host "Score: $($cached.result.score.current)/10 (cached at $($cached.timestamp))" -ForegroundColor DarkGray
+                }
             }
             exit 0
         }
@@ -242,10 +259,15 @@ try {
     if (-not (Test-Path $cacheDir)) {
         New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
     }
+    # Slim cache: only essential fields (score + hash for invalidation)
+    # Full result already synced to .project.json (single source of truth)
     $cacheObject = @{
-        hash      = $cacheHash
-        timestamp = (Get-Date -Format "o")
-        result    = $result
+        v     = 2
+        hash  = $cacheHash
+        ts    = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
+        score = $finalScore
+        trend = $result.score.trend
+        dims  = @($dimensions.Keys).Count
     }
     $cacheObject | ConvertTo-Json -Depth 5 | Set-Content $cacheFile -Encoding UTF8
 } catch {
