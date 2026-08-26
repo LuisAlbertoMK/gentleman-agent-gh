@@ -23,7 +23,7 @@
 | 3 | Create trial-verify junction in global skills | High | Low | 3 | 5m | ✅ Done (Cycle 30) | cross-ref-check.ps1 `OK ALL CHECKS PASSED` |
 | 4 | Fix gh CLI repo context (gentle-ai → gentleman-agent-gh) | High | Low | 3 | 5m | ✅ Done (Cycle 30) | `gh repo view` shows correct owner |
 | 5 | Document runtime-permission restart in RUNBOOK | Medium | Low | 2 | 10m | ✅ Done (Cycle 30) | RUNBOOK has "Permission & Runtime Issues" section |
-| 6 | Resolve 31 pre-existing test failures (G5) | High | Medium | 1.5 | 2-3h | Pending | Suite verde real (1304 pass / 0 fails) |
+| 6 | Resolve 31 pre-existing test failures (G5) | High | Medium | 1.5 | 2-3h | ✅ Done (Cycle 31) | All 74 test files + 813+ tests pass (0 fails), including E2E |
 | 7 | Script count consolidation vs ADR threshold (G6) | Medium | Low | 2 | 1h | ✅ Done (Cycle 31) | SP 9.0→10.0 via ADR-047 proportional threshold |
 | 8 | Evaluate Ollama install vs offline-first fallback (G8) | Medium | Low | 2 | 5 min decisión | Pending | UX bridge completo o fallback documentado |
 
