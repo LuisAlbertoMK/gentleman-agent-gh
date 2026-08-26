@@ -15,12 +15,12 @@
 
 ---
 
-Suite of **92 skills** (+ `_shared`) + **119 top-level scripts** (112 PowerShell + 7 shell) for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
+Suite of **92 skills** (+ `_shared`) + **122 top-level scripts** (115 PowerShell + 7 shell) for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
-> **Score**: 8.8/10 (14 dimensions) — tracking in .project.json.
+> **Score**: 9.6/10 (14 dimensions) — tracking in .project.json.
 > **Skills**: 92 (+ `_shared`)
-> **Cycle**: 28 (active) — Security Hardening + Quality Recovery
+> **Cycle**: 31 (active) — CA fidelity + G4-G8 remediation
 
 ---
 
@@ -243,7 +243,7 @@ gentleman-agent-gh/
 │   ├── code-review-agent/
 │   └── .../
 ├── skills/                  # Junctions workspace (git-ignored)
-├── scripts/                 # 119 top-level scripts (112 PowerShell + 7 shell)
+├── scripts/                 # 122 top-level scripts (115 PowerShell + 7 shell)
 │   └── smoke/               # Smoke tests
 ├── docs/                    # Documentation
 │   ├── metricas/            # Session metrics
