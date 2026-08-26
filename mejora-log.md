@@ -1027,3 +1027,12 @@ a378b36d fix(scripts): preserve single-element arrays in JSON serialization
 **Tests**: 10 suites re-corridas post-fix = 92/92 green en checkout limpio; 6 fails locales residuales ambientales-por-diseño
 **Hallazgo clase**: mismo anti-patrón (paths hardcodeados de máquinas distintas) en 3 archivos distintos = síntoma de desarrollo sin CI
 **ADR**: ADR-044 | **Rollback**: docs/mejoras/rollback-map.md ciclo V6
+
+## Experimento 2026-08-25/26 - Full regression audit + CI resurrection + toolchain freedom
+
+**Branch**: main (direct, owner-supervised) | **Protocolo**: v3 adaptado (auditoria + hotfix continuo)
+**Gaps** (evidencia): quality-gate.yml startup_failure x24 dias (job lint-linux sin indentar, port e1dc8263); suites de permisos contradictorias (deny vs ask) desde el mismo port; benchmark-regression.ps1 jamas ejecutado ($Quiet fuera de param + splat de switches como posicionales); pssa-gate contaba && dentro de comentarios de bloque; _coverage/ untracked rompia Git Hygiene
+**Ciclos**: 1) auditoria full-suite (~300 tests locales) | 2) resurreccion quality-gate + instrumentacion ::error para fixer-hooks y verify.ps1 | 3) ADR-045 documentacion retroactiva ask-policy | 4) ADR-046 toolchain freedom (4 capas: SSoT allow-tier, loader allowPatterns, templates auto/sub/semi, opencode.json vMK+-auto allows)
+**Tests**: permisos 157/157 bajo nueva politica; CI 8/8 verde (ci.yml + quality-gate completo por primera vez)
+**Hallazgo clase**: startup_failure NO crea check-runs => monitorear workflow-runs, no solo checks; y al portear suites SIEMPRE reconciliar asserts contra la SSoT vigente antes de mergear
+**ADR**: ADR-045, ADR-046 | **Rollback**: git revert ad740b41..HEAD por partes o revert directo de cada commit (todos atómicos)

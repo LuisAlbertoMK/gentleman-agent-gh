@@ -1,5 +1,8 @@
 # Protocolo de Mejora Autónoma Iterativa (N-ciclos)
 
+> ⚠️ **DEPRECATED** — superseded by [protocolo_mejora_autonoma_v3.md](./protocolo_mejora_autonoma_v3.md). Kept for historical reference only. Do not follow this version.
+
+
 ## 0. Setup
 - Crear branch `experimento/mejora-autonoma-<fecha>` desde main/master. Nunca commitear directo a main/master.
 - Registrar baseline: benchmarks actuales, suite de tests actual (pasan/fallan), bugs preexistentes conocidos.

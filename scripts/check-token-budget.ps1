@@ -32,6 +32,7 @@ param(
     [string]$SkillsPath = (Join-Path $PSScriptRoot "..\.agents\skills"),
     [string]$PromptsPath = (Join-Path $PSScriptRoot "..\prompts\shared"),
     [int]$BudgetBytes = 2000,
+    [int]$PromptBudgetBytes = 4000,
     [switch]$Json
 )
 Set-StrictMode -Version Latest
@@ -68,17 +69,19 @@ if (Test-Path $PromptsPath) {
 }
 if ($promptFiles.Count -gt 0) {
     $avgPrompt = [math]::Round(($promptFiles | Measure-Object -Property Length -Average).Average, 0)
-    $overBudgetPrompt = @($promptFiles | Where-Object { $_.Length -gt $BudgetBytes })
+    # ADR-046 note: orchestrator system prompts (gentleman-vMK, gentleman-aem)
+    # legitimately exceed the SKILL.md budget — prompts get their own cap.
+    $overBudgetPrompt = @($promptFiles | Where-Object { $_.Length -gt $PromptBudgetBytes })
     $stats.prompts = [PSCustomObject]@{
         count      = $promptFiles.Count
         average    = $avgPrompt
-        budget     = $BudgetBytes
-        underBudget = ($promptFiles | Where-Object { $_.Length -le $BudgetBytes }).Count
+        budget     = $PromptBudgetBytes
+        underBudget = ($promptFiles | Where-Object { $_.Length -le $PromptBudgetBytes }).Count
         overBudgetFiles = $overBudgetPrompt.Count
-        passed     = $avgPrompt -le $BudgetBytes
+        passed     = $avgPrompt -le $PromptBudgetBytes
     }
-    if ($avgPrompt -gt $BudgetBytes) {
-        $violations += "prompts avg $($avgPrompt)B exceeds $BudgetBytes B budget ($($overBudgetPrompt.Count) files over)"
+    if ($avgPrompt -gt $PromptBudgetBytes) {
+        $violations += "prompts avg $($avgPrompt)B exceeds $PromptBudgetBytes B budget ($($overBudgetPrompt.Count) files over)"
     }
 }
 

@@ -1,5 +1,8 @@
 # Protocolo de Mejora Autónoma Iterativa v2
 
+> ⚠️ **DEPRECATED** — superseded by [protocolo_mejora_autonoma_v3.md](./protocolo_mejora_autonoma_v3.md). Kept for historical reference only. Do not follow this version.
+
+
 ## 0. Setup
 - Branch: `experimento/mejora-autonoma-<fecha>` desde main/master. Nunca commit directo a main/master.
 - Definir **métricas de benchmark explícitas** antes de empezar (elegir las aplicables):

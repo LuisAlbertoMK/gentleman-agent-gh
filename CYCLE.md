@@ -161,6 +161,7 @@ LOOP:
 | 25 | Karpathy Compression | 9.1/10 | 15 skills compressed via 4 parallel subagents |
 | 26 | Skill Merge & DCP | 9.2/10 | 4→1 UI skills (−46%), stale detection 5 signals |
 | 27 | Audit Cleanup & Enrichment | 9.1/10 | 128 stale dirs, 3 scripts refactored, 10 skills expanded |
+| 28 | CI Resurrection & Toolchain Freedom | 9.9/10 | quality-gate 24d startup_failure fixed, ADR-046 toolchain freedom, benchmark-regression revived, permission suites unified 157/157 |
 
 ## Archived Cycles
 
