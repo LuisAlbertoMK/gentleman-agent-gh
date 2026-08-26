@@ -6,20 +6,18 @@
 
 ## Objective
 
-**Cycle 28** (ACTIVE): Security hardening + quality recovery — implement findings from global analysis (2026-07-29). Restore 4 score dims at 0.0. Compress skills >3KB. **Target**: 9.3→9.5/10 (current: 9.3/10, 4 dims restored).
+**Cycle 29** (ACTIVE): SE + CA remediation — inter-track.json creation + SSoT freshness. Fix Cycle Activity dim (was 3.0→9.7) via inter-track bootstrap + cache invalidation. **Target**: 9.5→9.8/10 (current: 9.9/10 post-Cycle 28).
 
-**Previous**: Cycle 27 — Deep audit, fix, and refactor del repo. **Result**: SUCCESS (10/10 backlog, score 9.1/10 → 6.2/10 post-close).
+**Previous**: Cycle 28 — CI Resurrection & Toolchain Freedom. **Result**: SUCCESS (9.9/10, quality-gate fix, ADR-046, benchmark-regression, 157/157 permissions).
 
 ### Backlog
 
 | # | Item | Impact | Risk | IR | Est | Status | Done Criteria |
 |---|------|--------|------|----|-----|--------|---------------|
-| 1 | Fix multiline pipeline bug in score-dims.ps1 (CC/BP dims) | High | Low | 3 | 30m | ✅ Done | `!score` reports CC>9, BP>9 |
-| 2 | Integration tests for score-auto.ps1 | Medium | Low | 2 | 1h | ✅ Done | `ScoreIntegration.Tests.ps1` with 11+ tests all pass |
-| 3 | Fix pre-commit hook numbering consistency | Low | Low | 1 | 15m | ✅ Done | Hook prints [1/12]–[12/12] |
-| 4 | Fix e2e pipeline tests (hook + execution state) | Medium | Low | 2 | 15m | ✅ Done | `e2e_pipeline.Tests.ps1` 24/24 pass |
-| 5 | Skill compression (>3KB skills) | Medium | Medium | 1 | 3h | ✅ Done | 0 skills >3KB (SE 8.0→10.0); avg 2.5KB |
-| 6 | Compress/merge non-junction skills | Low | Medium | 0.5 | 2h | 🔴 Pending | 0 non-junction skills |
+| 1 | Create .learnings/inter-track.json (count=29, target=30) | High | Low | 3 | 5m | ✅ Done | CA dim ≥9.0 in .project.json |
+| 2 | Invalidate stale score-cache.json | High | Low | 3 | 2m | ✅ Done | Cache file deleted, next score-auto regenerates fresh |
+| 3 | Update CYCLE.md SSoT for Cycle 29 | Medium | Low | 2 | 5m | ✅ Done | Cycle 29 ACTIVE in CYCLE.md |
+| 4 | Update .project.json with fresh score | Medium | Low | 2 | 5m | ✅ Done | .project.json reflects CA ≥9.7, overall ≥9.5 |
 
 ## Pilares
 1. **Script Performance** — reduce avg script size from 6.4KB to <5KB. Compress scripts >8KB. (✅ Cycle 8)

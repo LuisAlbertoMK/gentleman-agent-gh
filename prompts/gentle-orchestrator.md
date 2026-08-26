@@ -64,12 +64,4 @@ If agent fails 2x → STOP. Report to human in natural language.
 
 All delegation outputs MUST use the 4-field format from `{file:prompts/shared/_return-contract.md}`.
 
-## Delegation Contract (what to pass to subagents)
 
-```yaml
-goal: [one sentence]
-files: [exact paths or patterns]
-constraints: [what NOT to do]
-allowed_paths: [array of allowed paths for write-scope validation]
-expected_output: [format — see _return-contract.md]
-```
