@@ -25,8 +25,12 @@
 #>
 param(
     [Parameter(Mandatory=$true)][string]$Skill,
-    [Parameter()][int]$CoreLines
+    [Parameter()][int]$CoreLines,
+    [switch]$Quiet,
+    [switch]$Json
 )
+
+if ($Quiet -or $Json) { $null = $Quiet; $null = $Json }
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 

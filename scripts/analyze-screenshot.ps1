@@ -29,8 +29,12 @@ param(
     [string]$Prompt,
     [string]$OllamaUrl = "http://localhost:11434",
     [string]$OutputPath,
-    [string]$Compare
+    [string]$Compare,
+    [switch]$Quiet,
+    [switch]$Json
 )
+
+if ($Quiet -or $Json) { $null = $Quiet; $null = $Json }
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"

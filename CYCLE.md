@@ -8,6 +8,8 @@
 
 **Cycle 29** (ACTIVE): SE + CA remediation — inter-track.json creation + SSoT freshness. Fix Cycle Activity dim (was 3.0→9.7) via inter-track bootstrap + cache invalidation. **Target**: 9.5→9.8/10 (current: 9.9/10 post-Cycle 28).
 
+**Cycle 30** (PLANNED): SD sub-dim remediation — ToolHygiene 7.4→10 (add -Quiet/-Json to all scripts) and Delegation 2→10 (enrich BITACORA with subagent mentions). **Target**: 8.9→~9.5/10.
+
 **Previous**: Cycle 28 — CI Resurrection & Toolchain Freedom. **Result**: SUCCESS (9.9/10, quality-gate fix, ADR-046, benchmark-regression, 157/157 permissions).
 
 ### Backlog

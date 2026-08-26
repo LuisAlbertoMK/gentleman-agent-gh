@@ -31,6 +31,7 @@ param(
 
     [int]$MaxIterations = 3
 )
+Set-StrictMode -Version Latest
 
 # Guardrails -- fail-closed
 if (-not $AllowedPaths -or $AllowedPaths.Count -eq 0) {

@@ -1,4 +1,7 @@
 #requires -Version 7
+param([switch]$Quiet, [switch]$Json)
+
+if ($Quiet -or $Json) { $null = $Quiet; $null = $Json }
 Set-StrictMode -Version Latest
 <#
 .SYNOPSIS

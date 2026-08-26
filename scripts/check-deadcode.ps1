@@ -23,6 +23,7 @@ param(
     [string[]]$ScanPaths = @('scripts', '.github'),
     [switch]$FailOnDead
 )
+Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 # 1. Gather source files (exclude coverage output + this script's own dir noise).

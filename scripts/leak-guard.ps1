@@ -12,6 +12,7 @@
 #>
 [CmdletBinding(SupportsShouldProcess=$true)]
 param([switch]$Quiet)
+Set-StrictMode -Version Latest
 
 $ErrorActionPreference = 'Stop'
 

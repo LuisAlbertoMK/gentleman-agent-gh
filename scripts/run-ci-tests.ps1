@@ -30,6 +30,7 @@ param(
     [string]$OutputDir = (Join-Path (Split-Path $PSScriptRoot -Parent) 'test-results'),
     [switch]$WithCoverage
 )
+Set-StrictMode -Version Latest
 
 $ErrorActionPreference = 'Stop'
 

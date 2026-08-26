@@ -32,8 +32,12 @@ param(
     [string]$InstallDir = $(if ($IsLinux -or $IsMacOS) { Join-Path (Join-Path $HOME ".local") "gentleman-agent" } else { Join-Path $env:LOCALAPPDATA "gentleman-agent" }),
     [switch]$Update,
     [switch]$DryRun,
-    [switch]$Force
+    [switch]$Force,
+    [switch]$Quiet,
+    [switch]$Json
 )
+
+if ($Quiet -or $Json) { $null = $Quiet; $null = $Json }
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'

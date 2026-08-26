@@ -75,61 +75,65 @@ function Get-Frontmatter {
 }
 
 # --- Main ---
-$skills = @{}
-$triggerIndex = @{}
+try {
+    $skills = @{}
+    $triggerIndex = @{}
 
-$skillDirs = Get-ChildItem -Path $SkillsDir -Directory | Where-Object {
-    Test-Path (Join-Path $_.FullName "SKILL.md")
-}
-
-foreach ($dir in $skillDirs) {
-    $skillMd = Join-Path $dir.FullName "SKILL.md"
-    $content = Get-Content -Path $skillMd -Raw -Encoding UTF8
-    $parsed = Get-Frontmatter $content
-
-    $name = if ($parsed.name) { $parsed.name } else { $dir.Name }
-
-    # Build relative path from repo root
-    $relativePath = ".agents/skills/$($dir.Name)/SKILL.md"
-
-    $skills[$name] = @{
-        name         = [string]$name
-        triggers     = @($parsed.triggers)
-        tags         = @($parsed.tags)
-        dependencies = @($parsed.dependencies)
-        path         = [string]$relativePath
+    $skillDirs = Get-ChildItem -Path $SkillsDir -Directory | Where-Object {
+        Test-Path (Join-Path $_.FullName "SKILL.md")
     }
 
-    # Build trigger index
-    foreach ($trigger in $parsed.triggers) {
-        if (-not $triggerIndex.ContainsKey($trigger)) {
-            $triggerIndex[$trigger] = @()
+    foreach ($dir in $skillDirs) {
+        $skillMd = Join-Path $dir.FullName "SKILL.md"
+        $content = Get-Content -Path $skillMd -Raw -Encoding UTF8
+        $parsed = Get-Frontmatter $content
+
+        $name = if ($parsed.name) { $parsed.name } else { $dir.Name }
+
+        # Build relative path from repo root
+        $relativePath = ".agents/skills/$($dir.Name)/SKILL.md"
+
+        $skills[$name] = @{
+            name         = [string]$name
+            triggers     = @($parsed.triggers)
+            tags         = @($parsed.tags)
+            dependencies = @($parsed.dependencies)
+            path         = [string]$relativePath
         }
-        $triggerIndex[$trigger] += $name
+
+        # Build trigger index
+        foreach ($trigger in $parsed.triggers) {
+            if (-not $triggerIndex.ContainsKey($trigger)) {
+                $triggerIndex[$trigger] = @()
+            }
+            $triggerIndex[$trigger] += $name
+        }
     }
-}
 
-$registry = @{
-    generated    = (Get-Date -Format "o")
-    skills       = $skills
-    trigger_index = $triggerIndex
-}
-
-# Compact output: strip tags and dependencies (not used by resolver)
-$compact = @{
-    generated    = $registry.generated
-    trigger_index = $registry.trigger_index
-    skills       = @{}
-}
-foreach ($name in $registry.skills.Keys) {
-    $s = $registry.skills[$name]
-    $compact.skills[$name] = @{
-        name     = [string]$s.name
-        triggers = @($s.triggers)
-        path     = [string]$s.path
+    $registry = @{
+        generated    = (Get-Date -Format "o")
+        skills       = $skills
+        trigger_index = $triggerIndex
     }
+
+    # Compact output: strip tags and dependencies (not used by resolver)
+    $compact = @{
+        generated    = $registry.generated
+        trigger_index = $registry.trigger_index
+        skills       = @{}
+    }
+    foreach ($name in $registry.skills.Keys) {
+        $s = $registry.skills[$name]
+        $compact.skills[$name] = @{
+            name     = [string]$s.name
+            triggers = @($s.triggers)
+            path     = [string]$s.path
+        }
+    }
+
+    $compact | ConvertTo-Json -Depth 5 | Set-Content -Path $OutputFile -Encoding UTF8
+
+    if (-not $Quiet) { Write-Host "✓ Registry built: $($skills.Count) skills, $($triggerIndex.Count) triggers → $OutputFile" -ForegroundColor Green }
+} catch {
+    Write-Warning "build-skill-registry: $($_.Exception.Message)"
 }
-
-$compact | ConvertTo-Json -Depth 5 | Set-Content -Path $OutputFile -Encoding UTF8
-
-if (-not $Quiet) { Write-Host "✓ Registry built: $($skills.Count) skills, $($triggerIndex.Count) triggers → $OutputFile" -ForegroundColor Green }

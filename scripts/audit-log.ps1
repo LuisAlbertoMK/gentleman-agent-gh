@@ -104,88 +104,92 @@ if (-not (Test-Path -LiteralPath $logDir)) {
     New-Item -ItemType Directory -Path $logDir -Force | Out-Null
 }
 
-switch ($Command) {
-    'append' {
-        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-        $safeDetail = ConvertTo-SafeCsvField -Field $Detail
-        $line = "$timestamp, $Agent, $Mode, $Action, $safeDetail"
-        Add-Content -LiteralPath $logFile -Value $line -Encoding UTF8
-        Write-Verbose "audit: $line"
-    }
+try {
+    switch ($Command) {
+        'append' {
+            $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+            $safeDetail = ConvertTo-SafeCsvField -Field $Detail
+            $line = "$timestamp, $Agent, $Mode, $Action, $safeDetail"
+            Add-Content -LiteralPath $logFile -Value $line -Encoding UTF8
+            Write-Verbose "audit: $line"
+        }
 
-    'read' {
-        if (-not (Test-Path -LiteralPath $logFile)) {
-            Write-Host "Audit log not found" -ForegroundColor Yellow
-            return
-        }
-        [string[]]$allLines = Get-Content -LiteralPath $logFile -Encoding UTF8 -ErrorAction SilentlyContinue
-        if ($allLines.Count -le 1) {
-            Write-Host "No entries found" -ForegroundColor Yellow
-            return
-        }
-        [System.Collections.ArrayList]$filtered = @()
-        foreach ($line in $allLines) {
-            if ($line -match "^#") { continue }
-            if ($FilterAction -ne "*" -and $line -notmatch $FilterAction) { continue }
-            if ($FilterAgent -ne "*" -and $line -notmatch $FilterAgent) { continue }
-            $null = $filtered.Add($line)
-        }
-        if ($filtered.Count -eq 0) {
-            Write-Host "No matching entries" -ForegroundColor Yellow
-            return
-        }
-        $start = [Math]::Max(0, $filtered.Count - $Last)
-        for ($i = $start; $i -lt $filtered.Count; $i++) {
-            Write-Host $filtered[$i]
-        }
-        [int]$shown = [Math]::Min($Last, $filtered.Count)
-        Write-Host "($($filtered.Count) total, showing last $shown)" -ForegroundColor DarkGray
-    }
-
-    'session' {
-        if (-not (Test-Path -LiteralPath $logFile)) {
-            Write-Host "Audit log not found" -ForegroundColor Yellow
-            return
-        }
-        [string[]]$allLines = Get-Content -LiteralPath $logFile -Encoding UTF8 -ErrorAction SilentlyContinue
-        if (-not $Since) {
-            $Since = (Get-Date).AddHours(-8)
-        }
-        $sinceStr = $Since.ToString("yyyy-MM-dd HH:mm:ss")
-        [System.Collections.ArrayList]$filtered = @()
-        foreach ($line in $allLines) {
-            if ($line -match "^#") { continue }
-            if ($line -match "^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})") {
-                $entryDate = $Matches[1]
-                if ($entryDate -lt $sinceStr) { continue }
+        'read' {
+            if (-not (Test-Path -LiteralPath $logFile)) {
+                Write-Host "Audit log not found" -ForegroundColor Yellow
+                return
+            }
+            [string[]]$allLines = Get-Content -LiteralPath $logFile -Encoding UTF8 -ErrorAction SilentlyContinue
+            if ($allLines.Count -le 1) {
+                Write-Host "No entries found" -ForegroundColor Yellow
+                return
+            }
+            [System.Collections.ArrayList]$filtered = @()
+            foreach ($line in $allLines) {
+                if ($line -match "^#") { continue }
                 if ($FilterAction -ne "*" -and $line -notmatch $FilterAction) { continue }
                 if ($FilterAgent -ne "*" -and $line -notmatch $FilterAgent) { continue }
                 $null = $filtered.Add($line)
             }
+            if ($filtered.Count -eq 0) {
+                Write-Host "No matching entries" -ForegroundColor Yellow
+                return
+            }
+            $start = [Math]::Max(0, $filtered.Count - $Last)
+            for ($i = $start; $i -lt $filtered.Count; $i++) {
+                Write-Host $filtered[$i]
+            }
+            [int]$shown = [Math]::Min($Last, $filtered.Count)
+            Write-Host "($($filtered.Count) total, showing last $shown)" -ForegroundColor DarkGray
         }
-        if ($filtered.Count -eq 0) {
+
+        'session' {
+            if (-not (Test-Path -LiteralPath $logFile)) {
+                Write-Host "Audit log not found" -ForegroundColor Yellow
+                return
+            }
+            [string[]]$allLines = Get-Content -LiteralPath $logFile -Encoding UTF8 -ErrorAction SilentlyContinue
+            if (-not $Since) {
+                $Since = (Get-Date).AddHours(-8)
+            }
+            $sinceStr = $Since.ToString("yyyy-MM-dd HH:mm:ss")
+            [System.Collections.ArrayList]$filtered = @()
+            foreach ($line in $allLines) {
+                if ($line -match "^#") { continue }
+                if ($line -match "^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})") {
+                    $entryDate = $Matches[1]
+                    if ($entryDate -lt $sinceStr) { continue }
+                    if ($FilterAction -ne "*" -and $line -notmatch $FilterAction) { continue }
+                    if ($FilterAgent -ne "*" -and $line -notmatch $FilterAgent) { continue }
+                    $null = $filtered.Add($line)
+                }
+            }
+            if ($filtered.Count -eq 0) {
+                $sinceFmt = $Since.ToString("yyyy-MM-dd HH:mm")
+                Write-Host "No entries since $sinceFmt" -ForegroundColor Yellow
+                return
+            }
+
+            $total = $filtered.Count
+            [int]$allowCount = @($filtered | Where-Object { $_ -match ', ALLOW,' }).Count
+            [int]$denyCount = @($filtered | Where-Object { $_ -match ', DENY,' }).Count
+            [int]$errorCount = @($filtered | Where-Object { $_ -match ', ERROR,' }).Count
+            [int]$writeCount = @($filtered | Where-Object { $_ -match ', (WRITE|EDIT),' }).Count
+            [int]$askDenyCount = @($filtered | Where-Object { $_ -match ', ASK_DENY,' }).Count
             $sinceFmt = $Since.ToString("yyyy-MM-dd HH:mm")
-            Write-Host "No entries since $sinceFmt" -ForegroundColor Yellow
-            return
+
+            Write-Host "=== Session Audit: $sinceFmt -> now ===" -ForegroundColor Cyan
+            Write-Host "  Total:       $total entries"
+            Write-Host "  ALLOW:       $allowCount" -ForegroundColor Green
+            Write-Host "  DENY:        $denyCount" -ForegroundColor Red
+            Write-Host "  ASK_DENY:    $askDenyCount" -ForegroundColor Yellow
+            Write-Host "  WRITE/EDIT:  $writeCount" -ForegroundColor Magenta
+            Write-Host "  ERRORS:      $errorCount" -ForegroundColor Red
+            [int]$recent = [Math]::Min(10, $total)
+            Write-Host "--- Recent entries (last $recent) ---" -ForegroundColor DarkGray
+            $filtered | Select-Object -Last 10 | ForEach-Object { Write-Host "  $_" }
         }
-
-        $total = $filtered.Count
-        [int]$allowCount = @($filtered | Where-Object { $_ -match ', ALLOW,' }).Count
-        [int]$denyCount = @($filtered | Where-Object { $_ -match ', DENY,' }).Count
-        [int]$errorCount = @($filtered | Where-Object { $_ -match ', ERROR,' }).Count
-        [int]$writeCount = @($filtered | Where-Object { $_ -match ', (WRITE|EDIT),' }).Count
-        [int]$askDenyCount = @($filtered | Where-Object { $_ -match ', ASK_DENY,' }).Count
-        $sinceFmt = $Since.ToString("yyyy-MM-dd HH:mm")
-
-        Write-Host "=== Session Audit: $sinceFmt -> now ===" -ForegroundColor Cyan
-        Write-Host "  Total:       $total entries"
-        Write-Host "  ALLOW:       $allowCount" -ForegroundColor Green
-        Write-Host "  DENY:        $denyCount" -ForegroundColor Red
-        Write-Host "  ASK_DENY:    $askDenyCount" -ForegroundColor Yellow
-        Write-Host "  WRITE/EDIT:  $writeCount" -ForegroundColor Magenta
-        Write-Host "  ERRORS:      $errorCount" -ForegroundColor Red
-        [int]$recent = [Math]::Min(10, $total)
-        Write-Host "--- Recent entries (last $recent) ---" -ForegroundColor DarkGray
-        $filtered | Select-Object -Last 10 | ForEach-Object { Write-Host "  $_" }
     }
+} catch {
+    Write-Warning "audit-log: $($_.Exception.Message)"
 }

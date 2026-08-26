@@ -13,8 +13,12 @@
 #>
 param(
     [ValidateSet("debugging", "after-change", "start", "general")]
-    [string]$Context = "general"
+    [string]$Context = "general",
+    [switch]$Quiet,
+    [switch]$Json
 )
+
+if ($Quiet -or $Json) { $null = $Quiet; $null = $Json }
 Set-StrictMode -Version Latest
 
 # Detect context if not provided

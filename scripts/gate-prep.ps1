@@ -1,6 +1,7 @@
 #requires -Version 7
 [CmdletBinding(SupportsShouldProcess=$true)]
 param()
+Set-StrictMode -Version Latest
 <#
 .SYNOPSIS
     Pre-commit gate preparation — enforces staging-first → marker-generation → gate order.
