@@ -51,7 +51,9 @@ Describe "check-token-budget.ps1 — budget logic (C9)" {
         $json.stats.prompts | Should -Not -BeNull
         $json.stats.prompts.overBudgetFiles | Should -Not -BeNullOrEmpty
         $json.stats.prompts.passed | Should -BeOfType [bool]
-        $json.stats.prompts.budget | Should -Be 2000
+        # ADR-046: prompts have their own budget (orchestrator system prompts
+        # legitimately exceed the SKILL.md cap)
+        $json.stats.prompts.budget | Should -Be 4000
     }
 
     It "exits code 1 when budget exceeded (hermetic fixture)" {
