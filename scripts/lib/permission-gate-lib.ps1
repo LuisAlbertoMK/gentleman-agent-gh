@@ -40,6 +40,7 @@ function Convert-FromDenyGlob {
 # All deny rules now live ONLY in shared-deny-rules.json.
 $denyRulesPath = Join-Path (Split-Path $PSScriptRoot -Parent) 'opencode-config' 'shared-deny-rules.json'
 $script:denyPatterns = @()
+$script:allowPatterns = @()
 
 if (Test-Path $denyRulesPath) {
     try {
@@ -55,6 +56,13 @@ if (Test-Path $denyRulesPath) {
         # being hard-denied). Merged into autoAskPatterns below.
         $script:askPatterns = @($denyRules.PSObject.Properties |
             Where-Object { $_.Value -eq 'ask' } |
+            ForEach-Object { Convert-FromDenyGlob $_.Name } |
+            Sort-Object -Unique)
+        # ADR-046: Load explicit "allow" patterns (toolchain freedom — docker,
+        # python, pip, pnpm, node, npx, npm installs). Checked AFTER deny but
+        # BEFORE destructive/mode logic, in every mode.
+        $script:allowPatterns = @($denyRules.PSObject.Properties |
+            Where-Object { $_.Value -eq 'allow' } |
             ForEach-Object { Convert-FromDenyGlob $_.Name } |
             Sort-Object -Unique)
     } catch {
@@ -119,6 +127,7 @@ $script:semiAllowPatterns = @(
     # Build/test
     '^npm test', '^pytest\s', '^go test', '^Invoke-Pester',
     '^dotnet test', '^cargo test', '^npm run', '^npm ci',
+    '^pnpm run', '^pnpm test', '^pnpm exec',
     '^pip (freeze|list|show)(\s|$)',
     # Git read-only (no args)
     '^git stash list$', '^git status$', '^git diff$', '^git log$'
@@ -158,6 +167,13 @@ function Get-CommandClass {
     # 1. Check deny patterns (all modes) — hard security floor
     foreach ($p in $script:denyPatterns) {
         if ($cmd -match $p) { return 'deny' }
+    }
+
+    # 1.5 ADR-046: Explicit allow patterns (toolchain: docker/python/pip/pnpm/
+    # node/npx/npm installs) — permitted in EVERY mode; human oversight in
+    # manual/semi comes from those modes' default-ask, not from blocking here.
+    foreach ($p in $script:allowPatterns) {
+        if ($cmd -match $p) { return 'allow' }
     }
 
     # 2. Destructive filesystem: DENY in manual/semi, ASK in auto

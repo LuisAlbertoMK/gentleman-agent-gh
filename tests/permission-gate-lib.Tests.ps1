@@ -49,11 +49,13 @@ Describe "permission-gate-lib.ps1" {
             $script:denyPatterns.Count | Should -BeGreaterThan 22
         }
 
-        It "Includes critical deny patterns (curl, wget, docker)" {
+        It "Includes critical deny patterns (curl, wget) and routes docker to allow [ADR-046]" {
             $patterns = $script:denyPatterns -join "|"
             $patterns | Should -Match "curl"
             $patterns | Should -Match "wget"
-            $patterns | Should -Match "docker"
+            # ADR-046: docker is toolchain — allow pattern, not deny
+            $patterns | Should -Not -Match "docker"
+            ($script:allowPatterns -join "|") | Should -Match "docker"
         }
 
         It "Excludes destructive patterns (handled separately)" {
@@ -135,9 +137,9 @@ Describe "permission-gate-lib.ps1" {
             $result | Should -Be "ask"
         }
 
-        It "Classifies 'npm install express' as ask [supply chain — now ask not deny per C3b+Option-A]" {
+        It "Classifies 'npm install express' as allow [ADR-046 toolchain freedom]" {
             $result = Get-CommandClass -cmd "npm install express" -mode "manual"
-            $result | Should -Be "ask"
+            $result | Should -Be "allow"
         }
 
         It "Classifies 'git push origin main' as ask in manual/semi/auto" {
@@ -162,14 +164,18 @@ Describe "permission-gate-lib.ps1" {
             $result | Should -Be "ask"
         }
 
-        It "Classifies 'docker run nginx' as deny" {
-            $result = Get-CommandClass -cmd "docker run nginx" -mode "manual"
-            $result | Should -Be "deny"
+        It "Classifies 'docker run nginx' as allow in all modes [ADR-046 toolchain freedom]" {
+            foreach ($mode in @('manual','semi','auto')) {
+                $result = Get-CommandClass -cmd "docker run nginx" -mode $mode
+                $result | Should -Be "allow"
+            }
         }
 
-        It "Classifies 'python script.py' as deny" {
-            $result = Get-CommandClass -cmd "python script.py" -mode "manual"
-            $result | Should -Be "deny"
+        It "Classifies 'python script.py' as allow in all modes [ADR-046 toolchain freedom]" {
+            foreach ($mode in @('manual','semi','auto')) {
+                $result = Get-CommandClass -cmd "python script.py" -mode $mode
+                $result | Should -Be "allow"
+            }
         }
 
         It "Classifies 'npm test' as allow in semi mode" {
@@ -182,40 +188,24 @@ Describe "permission-gate-lib.ps1" {
             $result | Should -Be "allow"
         }
 
-        It "Classifies new package manager bare/wildcard patterns as deny in all modes" {
-            # bun bare and wildcard (added to shared-deny-rules.json)
-            $result = Get-CommandClass -cmd "bun" -mode "auto"
-            $result | Should -Be "deny"
-            $result = Get-CommandClass -cmd "bun run test" -mode "auto"
-            $result | Should -Be "deny"
-            $result = Get-CommandClass -cmd "bun" -mode "semi"
-            $result | Should -Be "deny"
-            $result = Get-CommandClass -cmd "bun" -mode "manual"
-            $result | Should -Be "deny"
+        It "Classifies package managers (bun/pnpm/yarn/pip3) as allow in all modes [ADR-046]" {
+            # bun bare and wildcard — ADR-046: toolchain freedom, allow everywhere
+            foreach ($mode in @('auto','semi','manual')) {
+                Get-CommandClass -cmd "bun" -mode $mode | Should -Be "allow"
+                Get-CommandClass -cmd "bun run test" -mode $mode | Should -Be "allow"
 
-            # pnpm bare and wildcard
-            $result = Get-CommandClass -cmd "pnpm" -mode "auto"
-            $result | Should -Be "deny"
-            $result = Get-CommandClass -cmd "pnpm test" -mode "auto"
-            $result | Should -Be "deny"
-            $result = Get-CommandClass -cmd "pnpm" -mode "semi"
-            $result | Should -Be "deny"
+                # pnpm — preferred package manager (owner directive)
+                Get-CommandClass -cmd "pnpm" -mode $mode | Should -Be "allow"
+                Get-CommandClass -cmd "pnpm test" -mode $mode | Should -Be "allow"
 
-            # yarn bare and wildcard
-            $result = Get-CommandClass -cmd "yarn" -mode "auto"
-            $result | Should -Be "deny"
-            $result = Get-CommandClass -cmd "yarn test" -mode "auto"
-            $result | Should -Be "deny"
-            $result = Get-CommandClass -cmd "yarn" -mode "semi"
-            $result | Should -Be "deny"
+                # yarn
+                Get-CommandClass -cmd "yarn" -mode $mode | Should -Be "allow"
+                Get-CommandClass -cmd "yarn test" -mode $mode | Should -Be "allow"
 
-            # pip3 bare and wildcard
-            $result = Get-CommandClass -cmd "pip3" -mode "auto"
-            $result | Should -Be "deny"
-            $result = Get-CommandClass -cmd "pip3 list" -mode "auto"
-            $result | Should -Be "deny"
-            $result = Get-CommandClass -cmd "pip3" -mode "semi"
-            $result | Should -Be "deny"
+                # pip3
+                Get-CommandClass -cmd "pip3" -mode $mode | Should -Be "allow"
+                Get-CommandClass -cmd "pip3 list" -mode $mode | Should -Be "allow"
+            }
         }
 
         It "Verifies semi-mode allowlist still works for npm test/run/ci and pip freeze/list/show" {
