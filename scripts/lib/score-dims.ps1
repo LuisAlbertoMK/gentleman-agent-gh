@@ -369,7 +369,9 @@ if ($hasScripts) {
 }
 
 $spScore = 10
-if ($totalScripts -lt 15 -or $totalScripts -gt 60) {
+# ADR-047: proportional threshold scales with skill ecosystem (1.3x skills, floor 60)
+$spScriptThreshold = [math]::Max(60, $skillDirCount * 1.3)
+if ($totalScripts -lt 15 -or $totalScripts -gt $spScriptThreshold) {
     $spScore -= 1
 }
 # Note: condition order matters — >20 checked first, then >15
@@ -383,10 +385,11 @@ if ($hugeScriptCount -gt 0) {
 }
 
 Add-Dimension "SP" ($math::Max(0, $math::Min(10, $spScore))) @{
-    sc   = $totalScripts
-    avg  = $avgScriptSizeKB
-    huge = $hugeScriptCount
-} "S:$totalScripts avg:${avgScriptSizeKB}KB"
+    sc     = $totalScripts
+    avg    = $avgScriptSizeKB
+    huge   = $hugeScriptCount
+    thresh = $spScriptThreshold
+} "S:$totalScripts avg:${avgScriptSizeKB}KB threshold:$spScriptThreshold (ADR-047)"
 
 # --- SE: Skill Effectiveness ---
 
@@ -607,7 +610,7 @@ $subScores += $(if ($hasErrorJson) { 10 } else { 0 })
 $subScores += $(if ($hasReports) { 10 } else { 0 })
 
 # Script Performance sub-dimensions
-$subScores += $(if ($totalScripts -ge 15 -and $totalScripts -le 60) { 10 } else { 7 })
+$subScores += $(if ($totalScripts -ge 15 -and $totalScripts -le $spScriptThreshold) { 10 } else { 7 })
 $subScores += $(if ($avgScriptSizeKB -le 10) { 10 } elseif ($avgScriptSizeKB -le 15) { 7 } else { 5 })
 $subScores += $(if ($hugeScriptCount -le 0) { 10 } else { 5 })
 

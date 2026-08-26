@@ -6,7 +6,7 @@
 
 ## Objective
 
-**Cycle 31** (ACTIVE): CA fidelity + G4-G8 remediation — wire inter-track to close-session, fix gh CLI context, resolve 31 test fails, script count penalty, Ollama UX bridge. **Target**: 9.4→9.7/10 (current: 9.4/10 post-Cycle 30).
+**Cycle 31** (ACTIVE): CA fidelity + G4-G8 remediation — wire inter-track to close-session, fix gh CLI context, resolve 31 test fails, script count penalty, Ollama UX bridge. **Target**: 9.4→9.7/10 (current: 9.6/10 post-G6 resolution).
 
 **Cycle 30** (COMPLETED): SD sub-dim remediation — ToolHygiene 7.4→10 (add -Quiet/-Json to all scripts) and Delegation 2→10 (enrich BITACORA with subagent mentions). **Result**: SUCCESS (9.4/10, CA 3→4 via inter-track sync, PA 8→10 via trial-verify junction).
 
@@ -24,7 +24,7 @@
 | 4 | Fix gh CLI repo context (gentle-ai → gentleman-agent-gh) | High | Low | 3 | 5m | ✅ Done (Cycle 30) | `gh repo view` shows correct owner |
 | 5 | Document runtime-permission restart in RUNBOOK | Medium | Low | 2 | 10m | ✅ Done (Cycle 30) | RUNBOOK has "Permission & Runtime Issues" section |
 | 6 | Resolve 31 pre-existing test failures (G5) | High | Medium | 1.5 | 2-3h | Pending | Suite verde real (1304 pass / 0 fails) |
-| 7 | Script count consolidation vs ADR threshold (G6) | Medium | Low | 2 | 1h | Pending | SP 9.0→10.0 (ADR justificado) |
+| 7 | Script count consolidation vs ADR threshold (G6) | Medium | Low | 2 | 1h | ✅ Done (Cycle 31) | SP 9.0→10.0 via ADR-047 proportional threshold |
 | 8 | Evaluate Ollama install vs offline-first fallback (G8) | Medium | Low | 2 | 5 min decisión | Pending | UX bridge completo o fallback documentado |
 
 ## Pilares
@@ -85,7 +85,7 @@ Averages into **Score Depth** dimension (13th dim) for granularity beyond 10.0 c
 | Orthography | corruption | files=0→10, ≤5→9, ≤10→7, else→4 |
 | Bitacora | exists, content | exists→10 else 0. content: min(lines/2, 10) |
 | Metrics | metrics_dir, errors_dir, error_json, reports | each exists→10 else 0 |
-| Script Performance | count, avg_size, huge | count 15-60→10 else 7. avg ≤10KB→10. huge=0→10 |
+| Script Performance | count, avg_size, huge | count 15-N→10 else 7 (proportional: 1.3×skills, floor 60, ADR-047). avg ≤10KB→10. huge=0→10 |
 | Skill Effectiveness | skill_count, over_3kb, over_5kb, skill_avg | ≥60→10. 0 over→10. avg ≤2.0KB→10 |
 | Cycle Activity | inter_ratio | min((IC/IT)×10, 10) |
 | Backlog Integrity | integrity | passed/total × 10 |
