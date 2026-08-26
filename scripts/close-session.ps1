@@ -62,6 +62,28 @@ if (Test-Path -LiteralPath $bitacoraPath) {
         Set-Content -LiteralPath $bitacoraPath -Value "$entry`r`n$existingContent" -Encoding UTF8
     }
 }
+# --- Inter-track increment (CYCLE.md LOOP step 6c: "Log a bitacora + inter-track++") ---
+if (Test-Path -LiteralPath "$PSScriptRoot/inter-track.ps1") {
+    try {
+        $itPrev = if (Test-Path ".learnings\inter-track.json") {
+            (Get-Content ".learnings\inter-track.json" -Raw | ConvertFrom-Json -EA SilentlyContinue).cycle.count
+        } else { 0 }
+        # Suppress stdout/stderr — inter-track -Quiet outputs JSON to stdout
+        # Skip increment in test mode (PESTER_TEST=1) to prevent test pollution
+        if (-not $env:PESTER_TEST) {
+            & "$PSScriptRoot/inter-track.ps1" -Increment -Quiet >$null 2>$null
+        }
+        $itNew = if (Test-Path ".learnings\inter-track.json") {
+            (Get-Content ".learnings\inter-track.json" -Raw | ConvertFrom-Json -EA SilentlyContinue).cycle.count
+        } else { $itPrev }
+        if (-not $Quiet -and $itNew -ne $itPrev) {
+            Write-Host "  📊 inter-track: $itPrev → $itNew (IC/IT)" -ForegroundColor Cyan
+        }
+    } catch {
+        Write-Debug "close-session: inter-track increment skipped ($($_.Exception.Message))"
+    }
+}
+
 # Git status
 $savedEap = $ErrorActionPreference; $ErrorActionPreference = "Continue"; $gitStatus = git status --short 2>$null; $ErrorActionPreference = $savedEap
 $gitStatusLines = @($gitStatus | Where-Object { $_ -match '\S' })
@@ -229,7 +251,7 @@ if ($Quiet) {
             $cpParams = @("-Mode", "full", "-Quiet")
             if ($Discoveries) { $cpParams += "-Discoveries"; $cpParams += $Discoveries }
             if ($Decisions) { $cpParams += "-Decisions"; $cpParams += $Decisions }
-            $cpResult = & $checkpointPath @cpParams 2>$null | ConvertFrom-Json -ErrorAction SilentlyContinue
+            $cpResult = & "$PSScriptRoot/session-checkpoint.ps1" @cpParams 2>$null | ConvertFrom-Json -ErrorAction SilentlyContinue
             if ($cpResult -and $cpResult.checkpoint_created) {
                 Write-Host "💾 Checkpoint saved (zone: $($cpResult.zone), $($cpResult.percent)%)" -ForegroundColor Cyan
             }

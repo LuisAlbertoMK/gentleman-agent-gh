@@ -1,3 +1,5 @@
+2026-08-26 — Gap analysis post-Cycle-30 verificado (8 gaps G1-G8, todos tool-backed): permisos runtime anulan ADR-046, junction trial-verify, gh repo equivocado, inter-track stale, 31 fails, SP cap 112 scripts, mem_save bridge, Ollama down → docs/mejoras/2026-08-26-gentleman-agent-gh-analisis.md
+2026-08-26 — Git pull analisis + sync-all: revisión cambios repo, git pull main (30 commits, Cycle 28-30, v9.9-verified), sync-all OK
 2026-08-26 - Session close
 2026-08-21 - Post-delegation enforcement hardened + skills quality pass: added [23/23] async-result.json fail-closed check + [24/24] token budget regression check to pre-commit-gate.ps1; hardened async-result parsing (3 adversarial bypasses fixed: missing field, string bool, array-wrap); created .gentleman/write-scope.json (38 patterns, mandatory enforcement); new scripts/test-token-budget-regression.ps1 (Pattern 3 runner); bulk-injected token_budget frontmatter into all 92 SKILL.md; added ## Output contracts to performance + accessibility. Adversarial-breake subagent confirmed all bypasses blocked. Gate 24/24 ALL CLEAR. Commit 864acc54.
 2026-08-21 - Session close

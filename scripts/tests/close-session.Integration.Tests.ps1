@@ -13,6 +13,11 @@
 #>
 
 BeforeAll {
+    # Set PESTER_TEST=1 (same pattern as sync-vmk.Tests.ps1, ScoreIntegration.Tests.ps1)
+    # so close-session.ps1 skips inter-track increment in test mode — prevents counter pollution
+    $script:oldPesterTest = $env:PESTER_TEST
+    $env:PESTER_TEST = '1'
+
     $scriptsRoot = Resolve-Path "$PSScriptRoot/.."
     $scriptPath = "$scriptsRoot/close-session.ps1"
 
@@ -32,6 +37,8 @@ AfterAll {
     if (Test-Path -LiteralPath $bitacoraPath) {
         Remove-Item -LiteralPath $bitacoraPath -Force
     }
+    # Restore PESTER_TEST env var
+    $env:PESTER_TEST = $script:oldPesterTest
 }
 
 Describe "close-session — Integration: JSON contract" {
