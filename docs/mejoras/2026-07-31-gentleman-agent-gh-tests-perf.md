@@ -83,7 +83,7 @@ BAJO     ■■■ (3) — reads redundantes, spawn overhead, coverage opcional
 | P0-B aislar estado: `-ModeFilePath` (mode-gate + permission-gate, ambos → temp GUID file), `-BitacoraPath` (close-session), save/restore `$env:USERPROFILE` (restore), guard `$env:PESTER_TEST` (sync-vmk) | 5 scripts producción + 5 tests | Dual-run simultáneo 18+50 pass; hash `.gentleman-mode` y BITACORA byte-idénticos |
 | P1-C hooks: `Run.Parallel` en pre-commit-gate (Pester 6, >1 archivo), guard `git diff --cached --quiet` en pre-push (1.39s cuando limpio), nota dedupe en quality-gate SKILL | `.githooks/pre-commit-gate.ps1`, `.githooks/pre-push`, `SKILL.md` | Gate 13 checks intacto; pre-push skip post-commit |
 
-**Fallos**: exit 1 = **4 fallos PRE-EXISTENTES** en `skill-graph.Tests.ps1:180-198` — `Get-AgentRecommendation` (<No file>:7) llama método sobre null → **bug de producción en skill-graph**, no drift de tests. Cero fallos nuevos introducidos.
+**Fallos**: exit 1 = **4 fallos PRE-EXISTENTES** en `skill-graph.Tests.ps1:180-198` — `Get-AgentRecommendation` (`<No file>`:7) llama método sobre null → **bug de producción en skill-graph**, no drift de tests. Cero fallos nuevos introducidos.
 **Write-scope**: 16/16 archivos de delegación dentro de scope (`.gentleman-mode` y `.project.json` son M pre-sesión, no de la delegación).
 **Pendiente (P2)**: extraer libs para eliminar spawn-por-test (permission-gate 50×, engram-validate 24×…), TestHelpers.ps1 compartido, matar regex-extraction, fix `Get-AgentRecommendation`, actualizar PERFORMANCE-PLAN.md.
 
