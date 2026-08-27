@@ -81,6 +81,17 @@ function Write-ActionRecord([string]$action, [hashtable]$payload) {
     $record | ConvertTo-Json -Compress | Write-Output
 }
 
+function Write-Ledger([string]$levelKey, [int]$contentChars) {
+    # Per-agent token ledger (Azure insight #1): track cost per capture tier
+    # chars/3.5 heuristic (metricas skill T2). No MCP call, local file only.
+    try {
+        $ledgerFile = Join-Path (Join-Path $repoRoot ".learnings") "token-ledger.jsonl"
+        $estTokens = [math]::Ceiling($contentChars / 3.5)
+        $entry = [ordered]@{ ts = (Get-Date -Format "o"); level = $levelKey; type = $Type; tokens = $estTokens; title = $Title }
+        ($entry | ConvertTo-Json -Compress) | Add-Content -LiteralPath $ledgerFile -Encoding UTF8
+    } catch { Write-Debug "ledger: $($_.Exception.Message)" }
+}
+
 $payload = [ordered]@{
     type      = $Type
     title     = $Title
@@ -97,6 +108,7 @@ switch ($Level) {
         } else {
             # Emit action record — caller pipes to engram_mem_save via MCP
             Write-ActionRecord "save_immediate" $payload
+            Write-Ledger "HIGH" $Content.Length
             Write-Host "[HIGH] queued immediate: $Title" -ForegroundColor Green
         }
     }
@@ -132,6 +144,7 @@ switch ($Level) {
         $queue += $entry
         $queue = Compact-QueueWindow -Queue $queue -Window $compactThreshold
         $queue | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $batchFile -Encoding UTF8
+        Write-Ledger "NORMAL" $Content.Length
         Write-Host "[NORMAL] queued ($($queue.Count)/$batchThreshold, window $compactThreshold): $Title" -ForegroundColor Yellow
 
         if ($queue.Count -ge $batchThreshold) {
@@ -173,6 +186,7 @@ switch ($Level) {
         $queue += $entry
         $queue = Compact-QueueWindow -Queue $queue -Window $compactThreshold
         $queue | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $batchFile -Encoding UTF8
+        Write-Ledger "LOW" $Content.Length
         Write-Host "[LOW] queued (session-end, $($queue.Count)/$compactThreshold window): $Title" -ForegroundColor DarkGray
         Write-ActionRecord "queue_low" $payload
     }
