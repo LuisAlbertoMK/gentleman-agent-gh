@@ -150,7 +150,8 @@ function Invoke-TaskAsync {
         [PSObject]$Task,
         [string[]]$Paths,
         [string]$BaseRef,
-        [int]$PollSec
+        [int]$PollSec,
+        [switch]$Force
     )
 
     $taskRef = "$($Task.id)_$BaseRef"
@@ -296,7 +297,7 @@ function Start-BabyAGILoop {
         Write-Host "[BabyAGI] Selected: $($currentTask.description) (priority=$($currentTask.priority), complexity=$($currentTask.complexity))" -ForegroundColor Yellow
 
         # Phase 3: execute via async delegation
-        $result = Invoke-TaskAsync -Task $currentTask -Paths $AllowedPaths -BaseRef "HEAD" -PollSec $PollIntervalSec
+        $result = Invoke-TaskAsync -Task $currentTask -Paths $AllowedPaths -BaseRef "HEAD" -PollSec $PollIntervalSec -Force:$Force
 
         if ($null -eq $result) {
             Write-Warning "[BabyAGI] Task $($currentTask.id) returned no result"
