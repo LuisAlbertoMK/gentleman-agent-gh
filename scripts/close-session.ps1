@@ -242,6 +242,16 @@ if ($Quiet) {
         Write-Host "Run '!score' to update project score after changes." -ForegroundColor Yellow
         Write-Host ""
     }
+    # --- Token ledger summary (engram-auto-capture I/R 3.0) ---
+    $ledgerFile = Join-Path (Join-Path $repoRoot '.learnings') 'token-ledger.jsonl'
+    if (Test-Path -LiteralPath $ledgerFile) {
+        try {
+            $entries = @(Get-Content -LiteralPath $ledgerFile -Tail 20 | ConvertFrom-Json -ErrorAction SilentlyContinue)
+            $total = @($entries | Measure-Object -Property tokens -Sum).Sum
+            Write-Host "  ledger: $($entries.Count) entries, ~$total tokens (auto-capture)" -ForegroundColor DarkGray
+        } catch { Write-Debug "ledger summary: $($_.Exception.Message)" }
+    }
+
     # --- Checkpoint bridge integration (medium-term memory) ---
     # On YELLOW+ zone with -Checkpoint, capture a proactive memory snapshot
     # so decisions/bugfixes made mid-session survive compaction cycles.
