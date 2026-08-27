@@ -44,7 +44,6 @@ param(
 
     [int]$BudgetTokens = 2048,
 
-    [Parameter(Mandatory=$true)]
     [string[]]$AllowedPaths,
 
     [int]$PollIntervalSec = 15,
