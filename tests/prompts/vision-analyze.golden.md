@@ -4,7 +4,7 @@
 vision-analyze (local vision via Ollama: UI, error, design, a11y, perf analysis)
 
 ## Trigger
-vision, screenshot, ollama, llava, visual analysis, error detection
+vision, capture, analyze-ui
 
 ## Input
 Vision-analyze the checkout page screenshot for UI errors and accessibility gaps, offline via Ollama (llava).

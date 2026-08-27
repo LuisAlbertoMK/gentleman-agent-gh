@@ -3,7 +3,7 @@ name: performance
 description: "Web performance — CWV/INP, compositor animation, scroll-driven, content-visibility."
 triggers: "performance, speed up, load time, slow loading, page speed, performance audit, INP, animation performance, scroll performance, compositor"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2500
+token_budget: 673
 ---
 <!-- karpathy-compressed: 2026-07-10 -->
 ## Budget

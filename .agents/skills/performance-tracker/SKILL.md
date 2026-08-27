@@ -3,7 +3,7 @@ name: performance-tracker
 description: "Score and track app performance — 6 dims, continuous scoring, trend analysis"
 triggers: "performance score, mobile perf, desktop perf, rendimiento, app score, benchmark, perf tracking, performance trend"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2200
+token_budget: 576
 ---
 ## When to Use
 Score and track app performance — 6 dims, continuous scoring. App PERFORMANCE only (agent perf → `auto-metrics`). Mobile, Desktop, Web.

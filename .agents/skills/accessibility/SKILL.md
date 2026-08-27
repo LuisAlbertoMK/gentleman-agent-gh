@@ -3,7 +3,7 @@ name: accessibility
 description: "WCAG 2.2 + EAA 2025 — audit and improve web accessibility."
 triggers: "a11y, accessibility, WCAG, screen reader, keyboard navigation, EAA, European Accessibility Act, contrast, focus, touch target"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1700
+token_budget: 445
 ---
 
 ## When to Use
