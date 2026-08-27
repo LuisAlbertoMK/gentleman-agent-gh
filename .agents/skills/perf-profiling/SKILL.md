@@ -3,12 +3,13 @@ name: perf-profiling
 description: "Trigger: performance profiling, slow queries, N+1, memory leak, CPU hotspot, query optimization. Audit with measurement."
 triggers: "performance profiling, slow queries, N+1, memory leak, CPU hotspot, profiling, query optimization"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1424
+token_budget: 1600
 ---
 ## When to Use
 Performance profiling, slow queries, memory leaks, CPU bottlenecks. No perf issue → report and stop.
 ## STEP 1: MEASURE (before grep)
 - **Go**: `go test -bench=. -benchmem -cpuprofile=cpu.prof` · **Python**: `python -m cProfile -o prof.out` / `py-spy top --pid` · **Node**: `node --prof app.js` / `clinic flame` · **Browser**: DevTools Performance. No profiler → grep fallback, note limitation.
+- **No pwsh7/hardware** → `scripts/perf-offline-fallback.ps1 -Json` (5.1, offline estimate via script count/size, no hardware needed).
 ## ROI MATRIX
 | Bottleneck | Impact | Effort | Priority |
 |---|---|---|---|
