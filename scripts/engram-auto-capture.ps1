@@ -52,6 +52,8 @@ param(
 
     [switch]$DryRun,
 
+    [switch]$Force,
+
     [int]$WindowSize = 10
 )
 
@@ -153,7 +155,7 @@ switch ($Level) {
                 $p = [ordered]@{ type = $item.type; title = $item.title; content = $item.content; topic_key = $item.topic_key }
                 Write-ActionRecord "flush_batch" $p
             }
-            Remove-Item -LiteralPath $batchFile -Force -ErrorAction SilentlyContinue
+            Remove-Item -LiteralPath $batchFile -Force
             Write-Host "  Batch flushed + queue cleared" -ForegroundColor Cyan
         }
     }
