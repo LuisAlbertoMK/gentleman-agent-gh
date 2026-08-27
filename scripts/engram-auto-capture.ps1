@@ -2,14 +2,18 @@
 [CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
-    Tiered engram auto-capture — HIGH immediate, NORMAL batched, LOW session-end.
+    Tiered engram auto-capture — HIGH immediate, NORMAL batched, LOW windowed.
 .DESCRIPTION
     Called after task/subagent completion. Classifies the outcome by level
     and routes to the appropriate capture tier (per engram-protocol SKILL.md):
 
       HIGH   → engram_mem_save immediate  (decision, bugfix, architecture)
       NORMAL → batched queue, flush every 3 items
-      LOW    → queued for session-end (mem_session_summary + engram-sync)
+      LOW    → windowed queue (cap 10), flush at session-end
+
+    Windowed compaction (JetBrains 2025: window=10 → 50% cost, 0% perf loss):
+    when queue exceeds WindowSize, keep latest WindowSize items (observation
+    masking). Prevents unbounded growth in long sessions.
 
     The orchestrator passes structured fields; this script emits a JSON
     action record to stdout so the caller can invoke the MCP tool.
@@ -46,7 +50,9 @@ param(
 
     [string]$TopicKey = "",
 
-    [switch]$DryRun
+    [switch]$DryRun,
+
+    [int]$WindowSize = 10
 )
 
 Set-StrictMode -Version Latest
@@ -55,6 +61,15 @@ Set-StrictMode -Version Latest
 $repoRoot = Get-GentlemanProjectRoot
 $batchFile = Join-Path (Join-Path $repoRoot ".learnings") "engram-batch.json"
 $batchThreshold = 3
+$compactThreshold = $WindowSize
+
+function Compact-QueueWindow {
+    param([array]$Queue, [int]$Window)
+    if ($Queue.Count -le $Window) { return $Queue }
+    $dropped = $Queue.Count - $Window
+    Write-Host "  ⊘ Windowed compaction: $($Queue.Count)→$Window (dropped $dropped oldest)" -ForegroundColor DarkYellow
+    return @($Queue | Select-Object -Last $Window)
+}
 
 function Write-ActionRecord([string]$action, [hashtable]$payload) {
     $record = [ordered]@{
@@ -64,6 +79,17 @@ function Write-ActionRecord([string]$action, [hashtable]$payload) {
         ts      = (Get-Date -Format "o")
     }
     $record | ConvertTo-Json -Compress | Write-Output
+}
+
+function Write-Ledger([string]$levelKey, [int]$contentChars) {
+    # Per-agent token ledger (Azure insight #1): track cost per capture tier
+    # chars/3.5 heuristic (metricas skill T2). No MCP call, local file only.
+    try {
+        $ledgerFile = Join-Path (Join-Path $repoRoot ".learnings") "token-ledger.jsonl"
+        $estTokens = [math]::Ceiling($contentChars / 3.5)
+        $entry = [ordered]@{ ts = (Get-Date -Format "o"); level = $levelKey; type = $Type; tokens = $estTokens; title = $Title }
+        ($entry | ConvertTo-Json -Compress) | Add-Content -LiteralPath $ledgerFile -Encoding UTF8
+    } catch { Write-Debug "ledger: $($_.Exception.Message)" }
 }
 
 $payload = [ordered]@{
@@ -82,6 +108,7 @@ switch ($Level) {
         } else {
             # Emit action record — caller pipes to engram_mem_save via MCP
             Write-ActionRecord "save_immediate" $payload
+            Write-Ledger "HIGH" $Content.Length
             Write-Host "[HIGH] queued immediate: $Title" -ForegroundColor Green
         }
     }
@@ -115,8 +142,10 @@ switch ($Level) {
         if (-not (Test-Path -LiteralPath $learningsDir)) { New-Item -ItemType Directory -Path $learningsDir -Force | Out-Null }
 
         $queue += $entry
+        $queue = Compact-QueueWindow -Queue $queue -Window $compactThreshold
         $queue | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $batchFile -Encoding UTF8
-        Write-Host "[NORMAL] queued ($($queue.Count)/$batchThreshold): $Title" -ForegroundColor Yellow
+        Write-Ledger "NORMAL" $Content.Length
+        Write-Host "[NORMAL] queued ($($queue.Count)/$batchThreshold, window $compactThreshold): $Title" -ForegroundColor Yellow
 
         if ($queue.Count -ge $batchThreshold) {
             Write-Host "  → Flushing $($queue.Count) batched items" -ForegroundColor Cyan
@@ -155,8 +184,10 @@ switch ($Level) {
         if (-not (Test-Path -LiteralPath $learningsDir)) { New-Item -ItemType Directory -Path $learningsDir -Force | Out-Null }
 
         $queue += $entry
+        $queue = Compact-QueueWindow -Queue $queue -Window $compactThreshold
         $queue | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $batchFile -Encoding UTF8
-        Write-Host "[LOW] queued (session-end, $($queue.Count) in queue): $Title" -ForegroundColor DarkGray
+        Write-Ledger "LOW" $Content.Length
+        Write-Host "[LOW] queued (session-end, $($queue.Count)/$compactThreshold window): $Title" -ForegroundColor DarkGray
         Write-ActionRecord "queue_low" $payload
     }
 }
