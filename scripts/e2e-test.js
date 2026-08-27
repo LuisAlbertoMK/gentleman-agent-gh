@@ -18,7 +18,14 @@
  *   screenshot:name.png      — Take screenshot
  */
 
-const { chromium } = require('playwright');
+let chromium;
+try {
+  ({ chromium } = require('playwright'));
+} catch (e) {
+  console.error('Playwright not installed. Run: npm i -D playwright && npx playwright install chromium');
+  console.error(`Details: ${e.message}`);
+  process.exit(1);
+}
 const http = require('http');
 const fs = require('fs');
 const path = require('path');

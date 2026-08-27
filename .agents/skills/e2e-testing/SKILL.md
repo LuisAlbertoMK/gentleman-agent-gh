@@ -1,18 +1,17 @@
 ---
 name: e2e-testing
-description: "E2E testing - hybrid: e2t CLI smoke checks + Playwright for flows, assertions, visual regression, Ollama AI analysis."
+description: "E2E testing - hybrid: e2e-test.js smoke checks + Playwright for flows, assertions, visual regression, Ollama AI analysis."
 triggers: test, e2e, playwright, browser testing, interactive testing, form testing
 changelog: docs/ciclos/cycle28-20260815.md
 token_budget: 1925
 ---
 ## When to Use
 Browser-level verification of user flows: smoke, forms, login/dashboard, visual regression. Quick Mode = fast smoke; Full Mode = CI pipelines, assertions, screenshots.
-## Quick Mode (e2t CLI)
-Flags: `-u` (required) · `-a` comma-separated · `--headed` · `--analyze` (Ollama on final screenshot) · `-m` (default moondream:latest) · `-s`.
+## Quick Mode (e2e-test.js CLI)
 ```powershell
-e2t http://localhost:3000 --actions "click:#login"
-e2t http://localhost:3000 --actions "fill:#email=test,fill:#pass=test,click:#submit"
-e2t http://localhost:3000 --actions "click:#login" --analyze
+.\scripts\e2e-test.ps1 -Url "http://localhost:3000" -Actions "click:#login"
+.\scripts\e2e-test.ps1 -Url "http://localhost:3000" -Actions "fill:#email=test,fill:#pass=test,click:#submit"
+# or: node scripts/e2e-test.js --url http://localhost:3000 --actions "click:#login" --analyze
 ```
 Actions: `click:#sel` · `fill:#sel=value` · `type` · `select` · `wait:#sel`/`wait:1000` · `screenshot:name.png`.
 ## Full Mode (Playwright Test Runner)
