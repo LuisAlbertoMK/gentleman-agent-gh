@@ -112,6 +112,7 @@ docs/health-report.html
 # ============================================
 .learnings/*
 !.learnings/engram-sync.json
+.learnings/engram-batch.json
 
 # ============================================
 # Plugin: opencode-self-improve config
