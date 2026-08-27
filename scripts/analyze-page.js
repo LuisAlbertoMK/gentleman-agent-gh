@@ -20,7 +20,14 @@
  *   node scripts/analyze-page.js http://localhost:3000 --no-analysis -o screenshot.png
  */
 
-const { chromium } = require('playwright');
+let chromium;
+try {
+  ({ chromium } = require('playwright'));
+} catch (e) {
+  console.error('Playwright not installed. Run: npm i -D playwright && npx playwright install chromium');
+  console.error(`Details: ${e.message}`);
+  process.exit(1);
+}
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
@@ -197,9 +204,14 @@ async function analyzeWithOllama(imagePath, model) {
     console.log('');
     console.log('💡 Make sure Ollama is running: ollama serve');
     console.log(`   And model is pulled: ollama pull ${model}`);
+    console.log('');
+    console.log('Falling back to visual analysis (Read tool)...');
+    console.log(`Screenshot saved at: ${imagePath}`);
+    console.log('Use the Read tool to view the image and analyze manually.');
 
     return {
-      success: false,
+      success: true,
+      fallback: true,
       error: err.message,
       image: imagePath
     };
