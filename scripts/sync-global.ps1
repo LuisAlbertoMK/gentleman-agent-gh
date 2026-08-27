@@ -28,7 +28,81 @@ else { $globalCfg = $globalJson }
 $projectCfg = Resolve-Path "$PSScriptRoot\..\opencode.json" -EA Stop
 $report = @{timestamp=(Get-Date -Format "o");steps=@{};errors=@();warnings=@()}
 
-function Write-Step([string]$N,[scriptblock]$B) { if($DryRun){Write-Host "[dry-run] $N" -Fore Yellow;return}; Write-Host "==> $N" -Fore Cyan; try {&$B;$report.steps[$N]="ok"}catch{Write-Host "[err] $N : $_" -Fore Red;$report.errors+="$N : $_";$report.steps[$N]="fail"} }
+function Write-Step([string]$N,[scriptblock]$B) {
+    if($DryRun){
+        Write-Host "[dry-run] $N -- checking drift (no writes)" -Fore Yellow
+        try {
+            $drift=$false; $driftDetail=""
+            switch($N){
+                "Skill junctions" {
+                    $skills=Get-ChildItem -Directory -Path $srcSkills -EA SilentlyContinue
+                    $missing=@(); foreach($s in $skills){ $link=Join-Path $dstSkills $s.Name; if(-not (Test-Path $link)){ $missing+=$s.Name } }
+                    if($missing.Count -gt 0){ $drift=$true; $driftDetail="$($missing.Count) missing junctions: $($missing -join ', ')" }
+                    else {
+                        $bad=@(Get-ChildItem $dstSkills -Directory -EA SilentlyContinue | Where-Object{ $_.Target -and -not (Test-Path $_.Target) })
+                        if($bad.Count -gt 0){ $drift=$true; $driftDetail="$($bad.Count) broken junctions" }
+                    }
+                }
+                "Scripts junction" { if(-not (Test-Path $dstScripts)){ $drift=$true; $driftDetail="scripts junction missing" } }
+                "Commands sync" {
+                    $srcCommands=Join-Path (Split-Path $projectCfg -Parent) "commands"
+                    if(Test-Path $srcCommands){
+                        $cmdDriftFound=$false
+                        foreach($f in Get-ChildItem -File -Path $srcCommands -Filter *.md -EA SilentlyContinue){
+                            if($cmdDriftFound){ continue }
+                            $dst=Join-Path (Join-Path (Get-GlobalConfigDir) "commands") $f.Name
+                            if(-not (Test-Path $dst)){ $drift=$true; $driftDetail="missing $($f.Name)"; $cmdDriftFound=$true; continue }
+                            $srcHash=(Get-FileHash $f.FullName -Algorithm SHA256 -EA SilentlyContinue).Hash
+                            $dstHash=(Get-FileHash $dst -Algorithm SHA256 -EA SilentlyContinue).Hash
+                            if($srcHash -ne $dstHash){ $drift=$true; $driftDetail="hash drift $($f.Name)"; $cmdDriftFound=$true }
+                        }
+                    }
+                }
+                "Global config" {
+                    $projMcp=$null; try{ $pj=Get-Content $projectCfg -Raw | ConvertFrom-Json; $projMcp=$pj.mcp }catch{}
+                    if(-not (Test-Path $globalCfg)){ $drift=$true; $driftDetail="global config missing" }
+                    elseif($Force){ $drift=$true; $driftDetail="-Force would overwrite" }
+                    else {
+                        try{
+                            $globRaw=Get-Content $globalCfg -Raw | ConvertFrom-Json
+                            $globMcpKeys=@(); if($globRaw.PSObject.Properties.Match('mcp').Count -gt 0 -and $null -ne $globRaw.mcp){ $globMcpKeys=@($globRaw.mcp.PSObject.Properties.Name) }
+                            $projMcpKeys=@(); if($null -ne $projMcp){ $projMcpKeys=@($projMcp.PSObject.Properties.Name) }
+                            $missingMcp=@($projMcpKeys | Where-Object{ $_ -notin $globMcpKeys })
+                            $extraMcp=@($globMcpKeys | Where-Object{ $_ -notin $projMcpKeys })
+                            if($missingMcp.Count -gt 0 -or $extraMcp.Count -gt 0){ $drift=$true; $driftDetail="mcp drift missing: $($missingMcp -join ',') extra: $($extraMcp -join ',')" }
+                        }catch{ $drift=$true; $driftDetail="parse error checking drift: $_" }
+                    }
+                }
+                "Agent sync" {
+                    try{
+                        $proj=Get-Content $projectCfg -Raw | ConvertFrom-Json
+                        $glob=Get-Content $globalCfg -Raw -EA SilentlyContinue | ConvertFrom-Json -EA SilentlyContinue
+                        $agentNames=@($proj.agent.PSObject.Properties.Name | Where-Object{ $_ -like 'gentleman-*' -or $_ -like 'gentle-*' -or $_ -like 'sdd-*' })
+                        $agentDriftFound=$false
+                        foreach($agentName in $agentNames){
+                            if($agentDriftFound){ continue }
+                            if($null -eq $glob -or $glob.PSObject.Properties.Match('agent').Count -eq 0 -or $glob.agent.PSObject.Properties.Match($agentName).Count -eq 0){ $drift=$true; $driftDetail="missing agent $agentName"; $agentDriftFound=$true; continue }
+                            $aJson=$proj.agent.$agentName | ConvertTo-Json -Depth 10 -Compress
+                            $bJson=$glob.agent.$agentName | ConvertTo-Json -Depth 10 -Compress
+                            if($aJson -ne $bJson){ $drift=$true; $driftDetail="drift agent $agentName"; $agentDriftFound=$true }
+                        }
+                    }catch{ $drift=$true; $driftDetail="agent check error: $_" }
+                }
+                "Verify junctions" {
+                    $skills=Get-ChildItem $dstSkills -Directory -EA SilentlyContinue
+                    $bad=@($skills | Where-Object{ $_ -is [System.IO.DirectoryInfo] -and $_.Target -and -not (Test-Path $_.Target) })
+                    if($bad.Count -gt 0){ $drift=$true; $driftDetail="$($bad.Count) broken junctions" }
+                }
+                "MCP availability" { if(-not (Get-Command engram -EA SilentlyContinue)){ $drift=$true; $driftDetail="engram not in PATH" } }
+                default { $drift=$false }
+            }
+            if($drift){ $report.steps[$N]="dry-run-drift"; $report.warnings+="$N drift: $driftDetail"; Write-Host "  [drift] $driftDetail" -Fore Yellow }
+            else { $report.steps[$N]="ok"; Write-Host "  [ok] no drift" -Fore Green }
+        } catch { Write-Host "[err] $N : $_" -Fore Red; $report.errors+="$N : $_"; $report.steps[$N]="fail" }
+        return
+    }
+    Write-Host "==> $N" -Fore Cyan; try {&$B;$report.steps[$N]="ok"}catch{Write-Host "[err] $N : $_" -Fore Red;$report.errors+="$N : $_";$report.steps[$N]="fail"}
+}
 
 # Step 1: Skill junctions
 Write-Step "Skill junctions" {
@@ -66,7 +140,18 @@ Write-Step "Commands sync" {
 Write-Step "Global config" {
     if ($Force -or -not (Test-Path $globalCfg)) {
         $existingAgents=@{}; if(Test-Path $globalCfg){try{$e=Get-Content $globalCfg -Raw|ConvertFrom-Json;if($e.PSObject.Properties.Match('agent').Count-gt 0){foreach($p in $e.agent.PSObject.Properties){$existingAgents[$p.Name]=$p.Value}}}catch{Write-Warning "  Could not read existing config"}}
-        $cfg=@{'$schema'="https://opencode.ai/config.json";mcp=@{context7=@{enabled=$true;type="remote";url="https://mcp.context7.com/mcp"};engram=@{command=@("engram","mcp","--tools=mem_save,mem_search,mem_context,mem_session_summary,mem_get_observation,mem_save_prompt,mem_current_project,mem_judge");type="local"}};permission=@{bash=@{"*"="allow";"git commit *"="ask";"git push *"="ask";"git push --delete *"="ask";"git rebase *"="ask";"git reset *"="ask";"git merge *"="ask";"git branch -D *"="ask";"git stash drop *"="ask";"gh pr merge *"="ask";"git push --force *"="deny"};read=@{"*"="allow";"**/.env"="deny";"**/.env.*"="deny";"**/.env*"="deny";"**/credentials.json"="deny";"**/secrets/**"="deny";"**/*secret*"="deny";"**/.ssh/**"="deny";"**/*.key"="deny";"**/*.pem"="deny"}};agent=$existingAgents}
+        # P0.1: dynamic MCP merge -- read opencode.json:mcp, fallback to 2 hardcoded MCPs
+        $mcpCfg=$null; try{
+            $projRaw=Get-Content $projectCfg -Raw | ConvertFrom-Json
+            if($projRaw.PSObject.Properties.Match('mcp').Count -gt 0 -and $null -ne $projRaw.mcp){
+                $mcpCfg=@{}
+                foreach($mp in $projRaw.mcp.PSObject.Properties){ $mcpCfg[$mp.Name]=$mp.Value }
+            }
+        }catch{ Write-Warning "  Could not read project mcp, using fallback: $_" }
+        if($null -eq $mcpCfg){
+            $mcpCfg=@{context7=@{enabled=$true;type="remote";url="https://mcp.context7.com/mcp"};engram=@{command=@("engram","mcp","--tools=mem_save,mem_search,mem_context,mem_session_summary,mem_get_observation,mem_save_prompt,mem_current_project,mem_judge");type="local"}}
+        }
+        $cfg=@{'$schema'="https://opencode.ai/config.json";mcp=$mcpCfg;permission=@{bash=@{"*"="allow";"git commit *"="ask";"git push *"="ask";"git push --delete *"="ask";"git rebase *"="ask";"git reset *"="ask";"git merge *"="ask";"git branch -D *"="ask";"git stash drop *"="ask";"gh pr merge *"="ask";"git push --force *"="deny"};read=@{"*"="allow";"**/.env"="deny";"**/.env.*"="deny";"**/.env*"="deny";"**/credentials.json"="deny";"**/secrets/**"="deny";"**/*secret*"="deny";"**/.ssh/**"="deny";"**/*.key"="deny";"**/*.pem"="deny"}};agent=$existingAgents}
         # SEC-F2: port the project deny floor (scripts/opencode-config/shared-deny-rules.json)
         # into the global bash map so dangerous commands are denied even outside this repo.
         try {
@@ -77,7 +162,7 @@ Write-Step "Global config" {
         } catch { Write-Warning "  Could not read shared-deny-rules.json: $_" }
         if($cfg.agent.Keys.Count -eq 0){$cfg.agent=@{}}
         $cfg|ConvertTo-Json -Depth 10|Set-Content $globalCfg -Encoding UTF8 -Force
-        Write-Host "  Written (preserved $($existingAgents.Keys.Count) agents)" -Fore Green
+        Write-Host "  Written (preserved $($existingAgents.Keys.Count) agents, $($mcpCfg.Keys.Count) MCPs)" -Fore Green
     } else { Write-Host "  Exists, skipping (-Force to overwrite)" -Fore Yellow }
 }
 
