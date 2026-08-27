@@ -7,7 +7,7 @@ token_budget: 1693
 ---
 
 ## When to Use
-Run long-lived server processes safely — dev-server.ps1, por
+Run long-lived server processes safely — dev-server.ps1, port detection, background management
 
 
 Commands like `ng serve`, `npm run dev`, `dotnet run`, `python -m http.server`
