@@ -186,7 +186,7 @@ function Invoke-TaskAsync {
 
     # Launch async delegation with PUSH callback (monitor invokes callback on completion)
     Write-Host "[BabyAGI] Executing: $($Task.description)" -ForegroundColor Cyan
-    & $PostDelegation -BaseRef $taskRef -AllowedPaths $Paths -Async -CompletionCallback $callbackScript -TaskId $taskId 2>&1 | Out-Null
+    & $PostDelegation -BaseRef $taskRef -AllowedPaths $Paths -Async -CompletionCallback $callbackScript 2>&1 | Out-Null
 
     # PUSH-WAIT: FileSystemWatcher + Wait-Event — NO polling loop (replaces Start-Sleep polling)
     $eventId = "gentleman_async_done_$taskId"
@@ -290,7 +290,7 @@ function Start-BabyAGILoop {
 
         # Take highest-priority task
         $currentTask = $taskQueue[0]
-        $taskQueue = $taskQueue[1..($taskQueue.Count - 1)]
+        $taskQueue = @($taskQueue | Select-Object -Skip 1)
 
         $currentTask.status = "in_progress"
         Write-Host "[BabyAGI] Selected: $($currentTask.description) (priority=$($currentTask.priority), complexity=$($currentTask.complexity))" -ForegroundColor Yellow
