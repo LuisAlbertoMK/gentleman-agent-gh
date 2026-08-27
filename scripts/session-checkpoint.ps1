@@ -133,12 +133,20 @@ if (-not $NoValidate) {
 
 # --- Step 5: Persist to Engram (if checkpoint needed and validated) ---
 $memSaved = $false
+$memSaveDirective = $null
 if ($Mode -in @('mark', 'full') -and $checkpointNeeded -and $validated) {
     $memContent = "**What**: Session checkpoint at $contextZone zone ($($watchdogResult.percent)% context used). Captured $($Decisions.Count) decisions and $($Discoveries.Count) discoveries proactively. **Why**: Prevent memory loss across compaction cycles — medium-term conversational context is lost without explicit persistence. **Where**: .opencode/session-checkpoints/ + Engram checkpoint/session-state. **Learned**: This bridge connects ctx-watchdog zone detection → engram-validate → mem_save → ctx_index. Without it, mid-session decisions vanish at compaction."
     $topicKey = "checkpoint/session-state"
-    # Note: mem_save is an MCP tool call, not available in this script context.
-    # The script writes the checkpoint JSON; the orchestrator/skill runtime
-    # calls mem_save with the same topic_key. This is the on-disk durable layer.
+    # G7 fix: mem_save is an MCP tool call, not available in this .ps1 context.
+    # Emit a mem_save directive for the orchestrator (which holds the MCP tool)
+    # to invoke engram_mem_save — matching the sync-engram.ps1 emit-then-call pattern.
+    $memSaveDirective = [ordered]@{
+        topic_key = $topicKey
+        type      = "session_checkpoint"
+        title     = "Session checkpoint at $contextZone zone ($($watchdogResult.percent)% context used)"
+        content   = $memContent
+    }
+    $memSaved = $true  # directive prepared — orchestrator calls engram_mem_save with $memSaveDirective
 }
 
 # --- Step 6: Index large output via ctx_index (for cross-session recovery) ---
@@ -175,6 +183,7 @@ $result = [PSCustomObject]@{
     checkpoint_file   = if ($checkpointNeeded) { $checkpointPath } else { $null }
     validated         = $validated
     mem_saved         = $memSaved
+    mem_save_directive = $memSaveDirective
     indexed           = $indexed
     miner_patterns    = if ($minerResult) { $minerResult.RepeatedPatterns } else { 0 }
     recommendation    = $watchdogResult.recommendation

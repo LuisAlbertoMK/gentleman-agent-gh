@@ -15,6 +15,7 @@ Local vision analysis — screenshots, UI review, error detection.
 - NEVER for visual regression/pixel diffing — that is `visual-testing` (`toHaveScreenshot`); Ollama slow + non-deterministic
 - NEVER force `--model llava:7b` with <8GB free RAM — RAM-aware auto-select prevents OOM
 - 100% local ONLY — never route screenshots through external APIs (data leak)
+- Never route screenshots through external APIs (data leak) — see docs/mejoras/2026-08-27-ollama-cloud-investigation.md for cloud options (rule unchanged; offline-first via caller).
 - Verify server + models before any run
 ## Output
 `VISION:<target>—<date> MODE:[ui|error|design|a11y|perf] MODEL:<name> ISSUES:<n> TOP:<issue> VERIFY:[screenshot|ollama]→<ok/fail>`

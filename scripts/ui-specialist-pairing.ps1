@@ -34,6 +34,12 @@
 .PARAMETER Json
     Output machine-readable JSON.
 
+.PARAMETER OllamaBaseUrl
+    Ollama endpoint host:port (default "127.0.0.1:11434"). Cloud-ready hook for a future cloud
+    provider per docs/mejoras/2026-08-27-ollama-cloud-investigation.md — NOT enabled now. The
+    default keeps vision-analyze 100% local (data-leak privacy rule intact); overriding this in
+    no way relaxes that rule.
+
 .EXAMPLE
     .\scripts/ui-specialist-pairing.ps1 -Target "src/components/Button.tsx" -Mode audit
     # → Lists violations: "❌ transition:all", "❌ 200ms (should be 120/200/300ms pattern)"
@@ -50,7 +56,11 @@ param(
     [ValidateSet('audit','variants','full')]
     [string]$Mode = 'audit',
     [switch]$Vision,
-    [switch]$Json
+    [switch]$Json,
+    # Ollama endpoint. Defaults to local. Cloud-ready via existing ollama-cloud-investigation.md
+    # (2026-08-27) — NOT enabled now; a future cloud provider can override this base URL without
+    # touching the check below or the 100%-local vision-analyze privacy rule.
+    [string]$OllamaBaseUrl = "127.0.0.1:11434"
 )
 Set-StrictMode - Version Latest
 $ErrorActionPreference = "Stop"
@@ -177,13 +187,16 @@ $visionResult = $null
 if ($Mode -eq 'full' -and $Vision) {
     $analyzerPath = Join-Path -Path $repoRoot -ChildPath "scripts/analyze-page.js"
     if (Test-Path -LiteralPath $analyzerPath) {
-        # Check if Ollama is running
+        # Check if Ollama is running. Offline-first: short 3s timeout so a down Ollama never
+        # blocks the audit. Cloud-ready via $OllamaBaseUrl (see .PARAMETER) — still points at
+        # localhost by default; NOT enabling cloud calls now (vision-analyze stays 100% local).
         try {
-            $ollamaCheck = Invoke-RestMethod -Uri "http://127.0.0.1:11434/api/version" -TimeoutSec 3 -ErrorAction Stop
+            $null = Invoke-RestMethod -Uri "http://$OllamaBaseUrl/api/version" -TimeoutSec 3 -ErrorAction Stop
             $visionResult = [PSCustomObject]@{
                 available      = $true
                 model          = "moondream:latest"  # or llava:7b
                 mode           = "ui"
+                endpoint       = $OllamaBaseUrl
                 note           = "Vision analysis available — run: node scripts/analyze-page.js <url> --mode ui"
                 micro_interaction_review = @(
                     "Timing: prefer 120ms (subtle) / 200ms (standard) / 300ms (express)"
@@ -192,7 +205,10 @@ if ($Mode -eq 'full' -and $Vision) {
                 )
             }
         } catch {
-            $visionResult = [PSCustomObject]@{ available = $false; error = "Ollama not running on 127.0.0.1:11434" }
+            $visionResult = [PSCustomObject]@{
+                available = $false
+                error     = "Ollama not reachable at $OllamaBaseUrl — degraded to audit/variants only (offline-first)"
+            }
         }
     } else {
         $visionResult = [PSCustomObject]@{ available = $false; error = "analyze-page.js not found" }
