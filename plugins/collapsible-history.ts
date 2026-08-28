@@ -4,7 +4,7 @@
  *
  * UX: each user prompt = collapsible card, collapsed by default except last.
  * Header: snippet 80 chars + timestamp + tokens + ▶/▼
- * Keys: Enter/o toggle, c collapse all, a expand all, j/k navigate.
+ * Keys (sidebar focused): Enter/o toggle, c collapse all, a expand all, j/k navigate.
  * State: in-memory Map<sessionId, Set<turnId>> — no disk I/O, no bun:sqlite.
  *
  * Host: @opencode-ai/plugin (server hooks) + @opencode-ai/plugin/tui (slot)
@@ -214,7 +214,7 @@ export const tui = async (api: any) => {
     // Here we render a placeholder that proofs the slot lifecycle.
     // Full grouping uses groupMessagesByTurn() above.
     const placeholder = `Collapsible history — ${PLUGIN_NAME} v${PLUGIN_VERSION}`
-    const hint = "Enter/o toggle · c collapse all · a expand all · j/k navigate"
+    const hint = "Tab→sidebar focus: Enter/o toggle · c collapse all · a expand all · j/k navigate"
 
     if (createSignal && solid?.jsx) {
       // SolidJS path — minimal JSX without heavy deps

@@ -17,6 +17,7 @@
     "commands/*",
     "data/*",
     "docs/*",
+    "plugins/*",
     "prompts/*",
     "scripts/*",
     "tests/*",

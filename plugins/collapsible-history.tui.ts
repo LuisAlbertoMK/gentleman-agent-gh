@@ -144,7 +144,7 @@ export const tui = async (api: any) => {
   const CollapsibleHistorySlot = (props: { sessionId?: string }) => {
     const sid: string = props.sessionId ?? api.state?.session?.current?.() ?? "unknown"
     const placeholder = `Collapsible history — ${PLUGIN_NAME} v${PLUGIN_VERSION}`
-    const hint = "Enter/o toggle · c collapse all · a expand all · j/k navigate"
+    const hint = "Tab→sidebar focus: Enter/o toggle · c collapse all · a expand all · j/k navigate"
 
     if (createSignal && solid?.jsx) {
       const [expanded] = createSignal(true)
