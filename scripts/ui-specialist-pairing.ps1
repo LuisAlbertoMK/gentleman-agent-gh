@@ -62,9 +62,44 @@ param(
     # touching the check below or the 100%-local vision-analyze privacy rule.
     [string]$OllamaBaseUrl = "127.0.0.1:11434"
 )
-Set-StrictMode - Version Latest
+Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path $PSScriptRoot -Parent
+
+function Test-OllamaBaseUrlAllowlist {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$BaseUrl
+    )
+    # Formato esperado host:port — host = hostname alfanum con .- o IPv4, port = dígitos
+    # Regex seguro por spec: ^([a-z0-9.-]+|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):\d+$
+    if ($BaseUrl -notmatch '^([a-z0-9\.\-]+|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):\d+$') {
+        return $false
+    }
+    $hostPart = ($BaseUrl -split ':')[0].ToLowerInvariant()
+    # Bloqueos SSRF incondicionales (incluso en cloud): metadata, link-local, privados
+    if ($hostPart -match 'metadata' -or $hostPart -match '^169\.254\.' -or $hostPart -match '^10\.' -or $hostPart -match '^192\.168\.') {
+        return $false
+    }
+    $isCloud = $env:OLLAMA_CLOUD -eq '1'
+    if (-not $isCloud) {
+        # Offline-first por defecto: solo localhost / 127.0.0.1
+        if ($hostPart -in @('localhost', '127.0.0.1')) {
+            return $true
+        }
+        return $false
+    } else {
+        # Cloud habilitado (OLLAMA_CLOUD=1): permitir hosts con regex seguro y longitud válida
+        # (bloqueos privados/metadata ya aplicados arriba)
+        if ($hostPart -match '^[a-z0-9\.\-]+$' -and $hostPart.Length -ge 1 -and $hostPart.Length -le 253) {
+            return $true
+        }
+        return $false
+    }
+}
+# Placeholder futuro: OllamaApiKey (no implementar ahora per docs/mejoras/2026-08-27-ollama-cloud-investigation.md opciones 1/2)
+# Si se habilita autenticación cloud, añadir param [string]$OllamaApiKey y header: @{ Authorization = "Bearer $OllamaApiKey" }
 
 # --- Step 1: baseline-ui audit (inline rules replication) ---
 # Mirrors baseline-ui/SKILL.md rules: layout, typography, animation, tokens, design
@@ -187,27 +222,37 @@ $visionResult = $null
 if ($Mode -eq 'full' -and $Vision) {
     $analyzerPath = Join-Path -Path $repoRoot -ChildPath "scripts/analyze-page.js"
     if (Test-Path -LiteralPath $analyzerPath) {
-        # Check if Ollama is running. Offline-first: short 3s timeout so a down Ollama never
-        # blocks the audit. Cloud-ready via $OllamaBaseUrl (see .PARAMETER) — still points at
-        # localhost by default; NOT enabling cloud calls now (vision-analyze stays 100% local).
-        try {
-            $null = Invoke-RestMethod -Uri "http://$OllamaBaseUrl/api/version" -TimeoutSec 3 -ErrorAction Stop
-            $visionResult = [PSCustomObject]@{
-                available      = $true
-                model          = "moondream:latest"  # or llava:7b
-                mode           = "ui"
-                endpoint       = $OllamaBaseUrl
-                note           = "Vision analysis available — run: node scripts/analyze-page.js <url> --mode ui"
-                micro_interaction_review = @(
-                    "Timing: prefer 120ms (subtle) / 200ms (standard) / 300ms (express)"
-                    "Easing: standard = cubic-bezier(0.2,0,0,1), emphasized = cubic-bezier(0.2,0,0,1)"
-                    "Feedback: combine transform + opacity + (optional) shadow, never color-only"
-                )
-            }
-        } catch {
+        # SSRF mitigation + offline-first: validar allowlist antes de request.
+        # Timeout: 5s local, 8s si OLLAMA_CLOUD=1 (ver docs/mejoras/2026-08-27-ollama-cloud-investigation.md latencia cloud 500-1500ms)
+        # Placeholder futuro: OllamaApiKey header si cloud requiere auth (no implementar ahora)
+        $ollamaTimeoutSec = if ($env:OLLAMA_CLOUD -eq '1') { 8 } else { 5 }
+        if (-not (Test-OllamaBaseUrlAllowlist -BaseUrl $OllamaBaseUrl)) {
+            Write-Warning "OllamaBaseUrl not in allowlist — skipping Ollama check (offline-first fallback)"
             $visionResult = [PSCustomObject]@{
                 available = $false
-                error     = "Ollama not reachable at $OllamaBaseUrl — degraded to audit/variants only (offline-first)"
+                error     = "Ollama endpoint not in allowlist — degraded to audit/variants only (offline-first)"
+            }
+        } else {
+            try {
+                $null = Invoke-RestMethod -Uri "http://$OllamaBaseUrl/api/version" -TimeoutSec $ollamaTimeoutSec -ErrorAction Stop
+                $visionResult = [PSCustomObject]@{
+                    available      = $true
+                    model          = "moondream:latest"  # or llava:7b
+                    mode           = "ui"
+                    endpoint       = $OllamaBaseUrl
+                    note           = "Vision analysis available — run: node scripts/analyze-page.js <url> --mode ui"
+                    micro_interaction_review = @(
+                        "Timing: prefer 120ms (subtle) / 200ms (standard) / 300ms (express)"
+                        "Easing: standard = cubic-bezier(0.2,0,0,1), emphasized = cubic-bezier(0.2,0,0,1)"
+                        "Feedback: combine transform + opacity + (optional) shadow, never color-only"
+                    )
+                }
+            } catch {
+                # Sanitizado: no ecoar $OllamaBaseUrl completo (evita info disclosure de IP privada)
+                $visionResult = [PSCustomObject]@{
+                    available = $false
+                    error     = "Ollama not reachable — degraded to audit/variants only (offline-first)"
+                }
             }
         }
     } else {

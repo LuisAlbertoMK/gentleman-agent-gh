@@ -24,8 +24,11 @@ $ErrorActionPreference = 'Stop'
 $globalPath = "$env:USERPROFILE\.config\opencode\opencode.jsonc"
 $repoPath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\opencode.json'))
 $repoExists = Test-Path -LiteralPath $repoPath
-$globalBackup = $globalPath + '.bak-laguna-20260827'
-$repoBackup = $repoPath + '.bak-laguna-20260827'
+$globalBackup = Join-Path ([System.IO.Path]::GetDirectoryName($globalPath)) ([System.IO.Path]::GetFileName($globalPath) + '.bak-laguna-20260827')
+$repoBackup = Join-Path ([System.IO.Path]::GetDirectoryName($repoPath)) ([System.IO.Path]::GetFileName($repoPath) + '.bak-laguna-20260827')
+# Validate backup parents early (no traversal)
+if ([System.IO.Path]::GetDirectoryName($globalBackup) -ne [System.IO.Path]::GetDirectoryName($globalPath)) { throw "Backup path traversal detected for globalBackup" }
+if ([System.IO.Path]::GetDirectoryName($repoBackup) -ne [System.IO.Path]::GetDirectoryName($repoPath)) { throw "Backup path traversal detected for repoBackup" }
 $lagunaPattern = 'opencode/laguna-s-2\.1-free'
 $museSparkPattern = 'opencode/muse-spark-1\.2-contributor-free'
 $bigPicklePattern = 'opencode/big-pickle'
@@ -35,14 +38,38 @@ $replacement = 'opencode/muse-spark-1.2-contributor-free'
 function Get-Count {
     param([string]$Path, [string]$Pattern)
     if (-not (Test-Path -LiteralPath $Path)) { return 0 }
-    $hits = Select-String -LiteralPath $Path -Pattern $Pattern -AllMatches -ErrorAction SilentlyContinue
+    try {
+        $hits = Select-String -LiteralPath $Path -Pattern $Pattern -AllMatches -ErrorAction Stop
+    } catch {
+        Write-Host "WARN: Select-String failed for $Path : $_" -ForegroundColor Yellow
+        return 0
+    }
     if ($null -eq $hits) { return 0 }
     return [int](($hits | ForEach-Object { $_.Matches.Count } | Measure-Object -Sum).Sum)
 }
 function Test-Json {
     param([string]$Path)
     if (-not (Test-Path -LiteralPath $Path)) { return $false }
-    try { $null = Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json; return $true } catch { return $false }
+    try {
+        $raw = Get-Content -LiteralPath $Path -Raw -ErrorAction Stop
+        $obj = $raw | ConvertFrom-Json -Depth 10 -ErrorAction Stop
+        if ($null -eq $obj) { throw "JSON null after parse: $Path" }
+        $propCount = @($obj.PSObject.Properties).Count
+        if ($propCount -eq 0) { throw "JSON schema validation failed: empty object in $Path" }
+        $propNames = @($obj.PSObject.Properties | ForEach-Object { $_.Name })
+        if ($Path -match 'opencode\.jsonc?$') {
+            $hasAgent = $propNames -contains 'agent'
+            $hasMcp = $propNames -contains 'mcp'
+            $hasModel = $propNames -contains 'model'
+            $hasDefaultAgent = $propNames -contains 'default_agent'
+            if (-not ($hasAgent -or $hasMcp -or $hasModel -or $hasDefaultAgent)) {
+                throw "JSON schema validation failed: expected agent/mcp/model/default_agent in $Path, got: $($propNames -join ',')"
+            }
+        }
+        return $true
+    } catch {
+        return $false
+    }
 }
 function Show-Counts {
     param([string]$Label, [string]$Path)
@@ -55,6 +82,12 @@ function Show-Counts {
 function Backup-IfNeeded {
     param([string]$Source, [string]$Backup)
     if (-not (Test-Path -LiteralPath $Source)) { return }
+    $srcDir = [System.IO.Path]::GetDirectoryName($Source)
+    $bakDir = [System.IO.Path]::GetDirectoryName($Backup)
+    if ($bakDir -ne $srcDir) { throw "Backup path traversal detected: Backup parent '$bakDir' != source parent '$srcDir'" }
+    $srcFile = [System.IO.Path]::GetFileName($Source)
+    $bakFile = [System.IO.Path]::GetFileName($Backup)
+    if (-not $bakFile.StartsWith($srcFile)) { throw "Backup filename validation failed: '$bakFile' does not start with '$srcFile'" }
     if (Test-Path -LiteralPath $Backup) { Write-Host "Backup already exists (kept): $Backup" -ForegroundColor DarkGray }
     elseif ($WhatIf) { Write-Host "[WhatIf] Would backup: $Backup" -ForegroundColor Cyan }
     else { Copy-Item -LiteralPath $Source -Destination $Backup; Write-Host "Backup created: $Backup" -ForegroundColor Green }
@@ -62,11 +95,22 @@ function Backup-IfNeeded {
 function Invoke-Migrate {
     param([string]$Path)
     # Get-Content -Raw + -replace; byte-preserving write (no BOM/newline) like Set-Content -NoNewline
-    $content = Get-Content -LiteralPath $Path -Raw
+    $content = Get-Content -LiteralPath $Path -Raw -ErrorAction Stop
     $updated = $content -replace $lagunaPattern, $replacement
     if ($content -ceq $updated) { return $false }
     if ($WhatIf) { Write-Host "[WhatIf] Would rewrite: $Path" -ForegroundColor Cyan; return $false }
-    [System.IO.File]::WriteAllText($Path, $updated, (New-Object System.Text.UTF8Encoding($false)))
+    $tmp = "$Path.tmp"
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($tmp, $updated, $utf8NoBom)
+    Move-Item -LiteralPath $tmp -Destination $Path -Force
+    # Verify hash/content post-move (atomic write check)
+    $written = [System.IO.File]::ReadAllText($Path, $utf8NoBom)
+    if ($written -cne $updated) {
+        $expectedHash = [System.BitConverter]::ToString([System.Security.Cryptography.SHA256]::Create().ComputeHash([System.Text.Encoding]::UTF8.GetBytes($updated))).Replace('-','')
+        $actualHash = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash
+        if ($expectedHash -ne $actualHash) { throw "Atomic write verification failed: hash mismatch for $Path (expected $expectedHash, got $actualHash)" }
+        throw "Atomic write verification failed: content mismatch after Move-Item for $Path"
+    }
     return $true
 }
 
@@ -129,12 +173,35 @@ Write-Host ''
 Write-Host '      ***** RESTART OpenCode required *****' -ForegroundColor White -BackgroundColor Red
 Write-Host '      Close all OpenCode sessions; config is loaded at startup.' -ForegroundColor Yellow
 
-# 8. git diff --stat (only if inside a git work tree)
+# 8. git diff --stat (only if inside a git work tree) with timeout
 Write-Host "== git diff --stat ==" -ForegroundColor Cyan
 try {
-    $gitRoot = ([string](git -C $PSScriptRoot rev-parse --show-toplevel 2>$null)).Trim()
-    if ($LASTEXITCODE -eq 0 -and $gitRoot -ne '') { git -C $gitRoot diff --stat -- opencode.json }
-    else { Write-Host 'Not a git work tree - skipping diff.' -ForegroundColor DarkGray }
+    $job = Start-Job -ScriptBlock { param($root) git -C $root rev-parse --show-toplevel 2>$null } -ArgumentList $PSScriptRoot
+    $completed = Wait-Job -Job $job -Timeout 10
+    if (-not $completed) {
+        Stop-Job -Job $job | Out-Null
+        Remove-Job -Job $job -Force | Out-Null
+        Write-Host 'WARNING: git rev-parse timed out after 10s - skipping diff.' -ForegroundColor Yellow
+    } else {
+        $gitRoot = ([string](Receive-Job -Job $job)).Trim()
+        Remove-Job -Job $job -Force | Out-Null
+        if ($gitRoot -ne '') {
+            $diffJob = Start-Job -ScriptBlock { param($gr) git -C $gr diff --stat -- opencode.json } -ArgumentList $gitRoot
+            $diffCompleted = Wait-Job -Job $diffJob -Timeout 10
+            if (-not $diffCompleted) {
+                Stop-Job -Job $diffJob | Out-Null
+                Remove-Job -Job $diffJob -Force | Out-Null
+                Write-Host 'WARNING: git diff timed out after 10s - skipping.' -ForegroundColor Yellow
+            } else {
+                $diffOut = Receive-Job -Job $diffJob
+                Remove-Job -Job $diffJob -Force | Out-Null
+                if ($diffOut) { $diffOut | Out-Host }
+                else { Write-Host 'No diff or not a git work tree.' -ForegroundColor DarkGray }
+            }
+        } else {
+            Write-Host 'Not a git work tree - skipping diff.' -ForegroundColor DarkGray
+        }
+    }
 } catch {
     Write-Host 'git unavailable - skipping diff.' -ForegroundColor DarkGray
 }
