@@ -269,12 +269,17 @@ export const tui = async (api: any) => {
   })
 }
 
-// ─── Module default (unified server + tui) ─────────────────────────────────
+// ─── Module default (server only) ───────────────────────────────────────
+// NOTE: opencode loader (v1.18.25) requires default export to contain EITHER
+// server() OR tui(), not both. Previous unified { server, tui } triggered
+// "must default export either server() or tui(), not both".
+// Fix: default now exports server only. TUI slot remains available via named
+// export `tui` (discovered as separate plugin export by opencode).
 export default {
+  id: PLUGIN_NAME,
   name: PLUGIN_NAME,
   version: PLUGIN_VERSION,
   server: CollapsibleHistoryPlugin,
-  tui,
   // Helpers exposed for unit tests without importing internals
   _helpers: {
     truncate,
