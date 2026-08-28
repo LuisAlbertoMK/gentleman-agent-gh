@@ -7,6 +7,7 @@ token_budget: 1810
 ---
 ## When to Use
 Local vision analysis — screenshots, UI review, error detection.
+Offline: if Ollama 127.0.0.1:11434 unreachable, returns degraded output gracefully, no crash — caller decides fallback per perf-offline-fallback.ps1
 ## Modes
 `ui` layout/alignment/contrast/broken components | `error` messages+affected components | `design` spacing/typography/color/balance | `accessibility` WCAG 2.2 contrast/touch/focus | `performance` CLS/missing images/loading.
 ## Security
