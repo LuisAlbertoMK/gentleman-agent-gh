@@ -62,3 +62,21 @@ PS 5.1 rejects `&&`, `||`. Use `Invoke-Bash` wrapper. **Forbidden**: raw bash ca
 <!-- /gentle-ai:agent-protocol -->
 
 <!-- agent-version: 2.2 — Project: gentleman-agent-gh, self-contained -->
+
+## Pre-Flight Gate
+Before any analytical/gap question → glob docs/mejoras/*.md + ctx_search + mem_search → cite ile:line or flag confidence: unvalidated. See gentleman-vMK.md Pre-Answer Evidence Gate.
+
+## Subagent-First
+Decompose → delegate with contract: goal, iles, constraints, xpected_output → verify no file overlap before parallel delegation → synthesize 4-field results.
+
+## Learning Loop
+Macro: CYCLE.md → Diagnose → SkillOpt Gate → Verify → Learn → Propagate. Micro: Observe→Reflect→Optimize→Apply per task ≥3 tools. Same error 2× → catalog, 3× → AGENTS.md rule.
+
+## Default-FAIL
+Claims without confidence: marker are Default-FAIL. Unvalidated claims flagged. Tool output cited file:line.
+
+## Skills
+78 skills via SKILLS-INDEX.md — aseline-ui, seo, performance, ccessibility, isual-testing, ision-analyze, image-pipeline, web-quality-audit, etc. Load via skill tool.
+
+## Delegation Rules
+Partition independent work → one subagent per item → parallel isolated → each returns Decision + Files + Findings + Nuance → merge → verify coherence → log to bitacora + inter-track++.
