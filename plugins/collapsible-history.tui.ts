@@ -5,7 +5,11 @@
  *
  * Loaded as second path plugin alongside collapsible-history.ts (server).
  * See DESIGN.md — slot: sidebar_content, OPT-IN via opencode.json plugin array.
- * SAFE: Node-compatible only, no Bun APIs.
+ * Keys (sidebar focused): Enter/o toggle, c collapse all, a expand all, j/k navigate.
+ *   | Global: ctrl+o, ctrl+shift+c/e, ctrl+j/k (via api.keymap.registerLayer if available)
+ * SAFE: Node-compatible only, no Bun APIs. All global keymap access is
+ * feature-checked + try/catch guarded so the plugin loads without error even
+ * when api.keymap is unavailable.
  */
 
 export const PLUGIN_NAME = "opencode-collapsible-history"
@@ -125,6 +129,53 @@ export function syncTurnOrder(sessionId: string, groups: TurnGroup[]): void {
   }
 }
 
+// ─── Global keybindings (Option B: api.keymap.registerLayer) ────────────────
+// Defensive registration per tui.d.ts:43/63. Feature-checks + try/catch so the
+// plugin still loads safely when api.keymap is unavailable; falls back to
+// api.commands then no-op. Avoids ctrl+c collision with the host.
+function maybeRegisterGlobalKeybindings(api: any): void {
+  const sessionId = () => api?.state?.session?.current?.() ?? "unknown"
+
+  const commands: Record<string, () => void> = {
+    "collapsible-history.toggle": () =>
+      toggleCollapsed(sessionId(), turnOrder.get(sessionId())?.[selectedIndex.get(sessionId()) ?? 0] ?? ""),
+    "collapsible-history.collapse-all": () => collapseAll(sessionId()),
+    "collapsible-history.expand-all": () => expandAll(sessionId()),
+    "collapsible-history.navigate-next": () => navigateSelection(sessionId(), 1),
+    "collapsible-history.navigate-prev": () => navigateSelection(sessionId(), -1),
+  }
+
+  const bindings: Array<{ key: string; command: string }> = [
+    { key: "ctrl+o", command: "collapsible-history.toggle" },
+    { key: "ctrl+shift+c", command: "collapsible-history.collapse-all" },
+    { key: "ctrl+shift+e", command: "collapsible-history.expand-all" },
+    { key: "ctrl+j", command: "collapsible-history.navigate-next" },
+    { key: "ctrl+k", command: "collapsible-history.navigate-prev" },
+  ]
+
+  try {
+    // Option B — preferred API when available (tui.d.ts:43/63)
+    if (api?.keymap?.registerLayer) {
+      api.keymap.registerLayer({
+        id: PLUGIN_NAME,
+        commands,
+        bindings,
+      })
+      return
+    }
+    // Fallback 1 — register plain commands without key bindings
+    if (api?.commands?.register) {
+      for (const [id, run] of Object.entries(commands)) {
+        api.commands.register({ id, run })
+      }
+      return
+    }
+  } catch {
+    // Fall through to no-op — never break plugin load over keymap
+  }
+  // Fallback 2 / no-op — if neither API exists, global bindings are skipped.
+}
+
 // ─── TUI Slot (SolidJS @opentui/solid JSX) ─────────────────────────────────
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const tui = async (api: any) => {
@@ -144,7 +195,7 @@ export const tui = async (api: any) => {
   const CollapsibleHistorySlot = (props: { sessionId?: string }) => {
     const sid: string = props.sessionId ?? api.state?.session?.current?.() ?? "unknown"
     const placeholder = `Collapsible history — ${PLUGIN_NAME} v${PLUGIN_VERSION}`
-    const hint = "Tab→sidebar focus: Enter/o toggle · c collapse all · a expand all · j/k navigate"
+    const hint = "Tab→sidebar focus: Enter/o toggle · c collapse all · a expand all · j/k navigate | ctrl+o toggle, ctrl+shift+c/e collapse/expand from input"
 
     if (createSignal && solid?.jsx) {
       const [expanded] = createSignal(true)
@@ -186,6 +237,9 @@ export const tui = async (api: any) => {
       // no slot available — still loads safely
     }
   }
+
+  // Global Option B keybindings (api.keymap.registerLayer w/ safe fallback)
+  maybeRegisterGlobalKeybindings(api)
 
   api.lifecycle?.onDispose?.(() => {})
 }
