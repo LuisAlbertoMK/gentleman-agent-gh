@@ -14,7 +14,7 @@ se resuelve desde la config global fusionada por OpenCode.
 |----------|---------|
 | [PROTOCOL.md](PROTOCOL.md) | Operational rules, workflows, shortcuts |
 | [SHORTCUTS.md](SHORTCUTS.md) | All `!command` shortcuts |
-| [SKILLS-INDEX.md](SKILLS-INDEX.md) | 78 skills trigger table |
+| [SKILLS-INDEX.md](SKILLS-INDEX.md) | 93 skills trigger table |
 | [QUICKSTART.md](QUICKSTART.md) | Getting started guide |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture |
 
@@ -76,7 +76,7 @@ Macro: CYCLE.md → Diagnose → SkillOpt Gate → Verify → Learn → Propagat
 Claims without confidence: marker are Default-FAIL. Unvalidated claims flagged. Tool output cited file:line.
 
 ## Skills
-78 skills via SKILLS-INDEX.md — aseline-ui, seo, performance, ccessibility, isual-testing, ision-analyze, image-pipeline, web-quality-audit, etc. Load via skill tool.
+93 skills via SKILLS-INDEX.md — aseline-ui, seo, performance, ccessibility, isual-testing, ision-analyze, image-pipeline, web-quality-audit, etc. Load via skill tool.
 
 ## Delegation Rules
 Partition independent work → one subagent per item → parallel isolated → each returns Decision + Files + Findings + Nuance → merge → verify coherence → log to bitacora + inter-track++.

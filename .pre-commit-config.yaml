@@ -62,7 +62,6 @@ repos:
         types: [file]
         files: \.ps1$
         pass_filenames: false
-          timeout: 120
 
       - id: deadcode-ratchet
         name: Dead-code ratchet (PS)
