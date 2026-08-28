@@ -749,8 +749,7 @@
   "plugin": [
     "context-mode",
     "opencode-ralph-loop",
-    "opencode-personality",
-    "opencode-token-optimizer"
+    "opencode-personality"
   ],
   "tool_output": {
     "max_bytes": 4096,
