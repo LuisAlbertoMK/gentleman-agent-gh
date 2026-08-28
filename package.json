@@ -12,7 +12,7 @@
     "postinstall": "npm run expand-config"
   },
   "engines": {
-    "opencode": ">=1.0.0"
+    "opencode": ">=1.18.24"
   },
   "files": [
     "AGENTS.md",
