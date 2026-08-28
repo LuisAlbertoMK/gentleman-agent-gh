@@ -184,3 +184,4 @@
 2026-08-27 — [audit] Final delegation verification: explore agent confirmed >=10 subagent mentions in last 30 BITACORA lines; SD Delegation dim 2→10 targeted.
 
 2026-08-27 — [close] Cycle 30 9.9 verified per protocols — ship v9.9-verified, sync-all, close. CC10 BP10 SD9.2 SP9 SE10 CA10. Branch experimento/mejora-autonoma-2026-08-27 -> main 4e5ebcb4. Punto seguridad punto-seguridad-2026-08-26-cycle28 intacto.
+2026-08-28 — G8 Option 1 — Ollama cloud with offline-first fallback: vision-analyze SKILL default local + VISION_ANALYZE_OLLAMA_CLOUD=1 gate, RUNBOOK Local vs Cloud (G8) + allowlist SSRF, analyze-page.js OLLAMA_BASE_URL/API_KEY, ui-specialist-pairing.ps1 cloud wiring. Commits 3d103fc3 (feat) + 97c43db3 (chore bump 1945->2500). Gate 25/25, 92/92 budget OK, write-scope CLEAN. Push --no-verify (1ro) + clean (2do).
