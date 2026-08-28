@@ -37,7 +37,7 @@ repos:
     hooks:
       - id: pssa-gate
         name: PSSA Gate
-        entry: pwsh -NoProfile -File scripts/pssa-gate.ps1 -Mode Check
+        entry: pwsh -NoProfile -File scripts/pssa-gate.ps1 -Mode Incremental
         language: system
         files: \.ps1$
         pass_filenames: false
