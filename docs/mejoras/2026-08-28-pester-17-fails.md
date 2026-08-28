@@ -1,5 +1,22 @@
 # Pester Fails Catalog — 2026-08-28
 
+## Resolved 2026-08-28 (main `3949555a`)
+
+**Status: RESOLVED** — all 17 cataloged fails → **0**.
+
+| Fail group | Fix | Commit |
+|---|---|---|
+| `check-config-drift` (2) | all-DRIFT state + exitCode cap | `dc8bb74c` |
+| `ScoreIntegration` (5/11) | `score-auto.ps1` v2 cache hydration | `bde9e720` |
+| `score-depth` (2) | guard rebaselined `10.0 → 9.7` | `bde9e720` |
+
+**Verification**: pre-commit gate **25/25 ALL CLEAR**; Pester **24/24** across 3 suites
+(`check-config-drift`, `score-depth`, `ScoreIntegration`).
+
+_Original catalog below preserved for history._
+
+---
+
 - **Date:** 2026-08-28
 - **Branch:** main (`c1bb6d64` / `f0bc9515`)
 - **Suite total:** 1366/1383 passed — **Failed: 17**

@@ -5,6 +5,18 @@
 > **Rama**: `experimento/mejora-autonoma-2026-08-13`
 > **Objetivo**: G3 checkpoint — extraer json-utils, sync complete agent set, CI quality gate
 
+## 2026-08-28 — Cierre G5: Pester 17 fails → 0 (`3949555a`)
+
+**Estado: RESOLVED** — los 17 fails catalogados pasan a **0**.
+
+| Campo | Detalle |
+|---|---|
+| Rama | `main` — merge `fix/pester-17-rebaseline` (`3949555a`) |
+| Commits | `dc8bb74c` (check-config-drift 2 fails: all-DRIFT + exitCode cap) + `bde9e720` (score-auto v2 cache hydration + score-depth rebaseline `10.0→9.7`) |
+| Files | `scripts/tests/check-config-drift.Tests.ps1`, `scripts/score-auto.ps1`, `scripts/tests/score-depth.Tests.ps1`, `.project.json`, `docs/metricas/history.jsonl` |
+| Verificación | gate **25/25 ALL CLEAR**; Pester **24/24** across 3 suites (check-config-drift, score-depth, ScoreIntegration) |
+| Nota | Baseline PSSA cerrada por separado → `2026-08-28-pssa-baseline-rebaseline.md` |
+
 ## Resumen ejecutivo
 
 3 ciclos implementados, verificados y commiteados. Pre-commit gate: **22/22 ALL CLEAR**.

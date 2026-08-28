@@ -7,6 +7,7 @@
 
 | Date | File | Domain | Key Finding | Status |
 |------|------|--------|-------------|--------|
+| 2026-08-28 | [`pester-17-fails`](2026-08-28-pester-17-fails.md) | Testing | G5 closure — 17 Pester fails → 0 fixed (dc8bb74c + bde9e720). Gate 25/25, Pester 24/24 (3 suites). | ✅ resolved |
 | 2026-08-04 | [`analysis-08-04`](2026-08-04-structural-gaps-post-cycles.md) | Multi-dimension | 15 findings: 5 enforcement (CRÍTICO/Alto), benchmark gate, tokenize-all roto, 7 docs "numbers that lie". R1-R5 completado (92f848aa, gate 16/16); R10 docs cleanup. | 🏁 active (plan) |
 | 2026-08-03 | [`analysis-08-03`](2026-08-03-security-infra-dx-perf-audit.md) | Multi-dimension | Veredictos por audit (PASS / PASS-WITH-NOTES). Findings verificados como arreglados en trend 08-04 (SEC-1/2/5, INFRA-1/3, DX-1..4, DOCS-1 4/5). | ✅ completed |
 | 2026-08-01 | [`globalization`](2026-08-01-globalization-multi-project.md) | Multi-dimension | Globalización del agente para N proyectos externos — veredicto APROBADO-CON-CONDICIONES (5/5 especialistas); 5 issues nuevos de globalización. | 🏁 active (plan) |
