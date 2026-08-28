@@ -5,7 +5,7 @@
  *
  * Loaded as second path plugin alongside collapsible-history.ts (server).
  * See DESIGN.md — slot: sidebar_content, OPT-IN via opencode.json plugin array.
- * Keys (global): ctrl+o, ctrl+g, ctrl+shift+g, ctrl+j/k | Sidebar focused: c/a/o/Enter/j/k
+ * Keys (global): alt+o, alt+g, alt+shift+g, alt+j/k | Sidebar focused: c/a/o/Enter/j/k
  * SAFE: Node-compatible only, no Bun APIs. All global keymap access is
  * feature-checked + try/catch guarded so the plugin loads without error even
  * when api.keymap is unavailable.
@@ -136,20 +136,34 @@ function maybeRegisterGlobalKeybindings(api: any): void {
   const sessionId = () => api?.state?.session?.current?.() ?? "unknown"
 
   const commands: Record<string, () => void> = {
-    "collapsible-history.toggle": () =>
-      toggleCollapsed(sessionId(), turnOrder.get(sessionId())?.[selectedIndex.get(sessionId()) ?? 0] ?? ""),
-    "collapsible-history.collapse-all": () => collapseAll(sessionId()),
-    "collapsible-history.expand-all": () => expandAll(sessionId()),
-    "collapsible-history.navigate-next": () => navigateSelection(sessionId(), 1),
-    "collapsible-history.navigate-prev": () => navigateSelection(sessionId(), -1),
+    "collapsible-history.toggle": () => {
+      toggleCollapsed(sessionId(), turnOrder.get(sessionId())?.[selectedIndex.get(sessionId()) ?? 0] ?? "")
+      try { api.ui?.toast?.({ message: "Collapsible: toggled" }) } catch { /* best-effort */ }
+    },
+    "collapsible-history.collapse-all": () => {
+      collapseAll(sessionId())
+      try { api.ui?.toast?.({ message: "Collapsible: collapsed all" }) } catch { /* best-effort */ }
+    },
+    "collapsible-history.expand-all": () => {
+      expandAll(sessionId())
+      try { api.ui?.toast?.({ message: "Collapsible: expanded all" }) } catch { /* best-effort */ }
+    },
+    "collapsible-history.navigate-next": () => {
+      navigateSelection(sessionId(), 1)
+      try { api.ui?.toast?.({ message: "Collapsible: next" }) } catch { /* best-effort */ }
+    },
+    "collapsible-history.navigate-prev": () => {
+      navigateSelection(sessionId(), -1)
+      try { api.ui?.toast?.({ message: "Collapsible: prev" }) } catch { /* best-effort */ }
+    },
   }
 
   const bindings: Array<{ key: string; command: string }> = [
-    { key: "ctrl+o", command: "collapsible-history.toggle" },
-    { key: "ctrl+g", command: "collapsible-history.collapse-all" },
-    { key: "ctrl+shift+g", command: "collapsible-history.expand-all" },
-    { key: "ctrl+j", command: "collapsible-history.navigate-next" },
-    { key: "ctrl+k", command: "collapsible-history.navigate-prev" },
+    { key: "alt+o", command: "collapsible-history.toggle" },
+    { key: "alt+g", command: "collapsible-history.collapse-all" },
+    { key: "alt+shift+g", command: "collapsible-history.expand-all" },
+    { key: "alt+j", command: "collapsible-history.navigate-next" },
+    { key: "alt+k", command: "collapsible-history.navigate-prev" },
   ]
 
   try {
@@ -194,7 +208,7 @@ export const tui = async (api: any) => {
   const CollapsibleHistorySlot = (props: { sessionId?: string }) => {
     const sid: string = props.sessionId ?? api.state?.session?.current?.() ?? "unknown"
     const placeholder = `Collapsible history — ${PLUGIN_NAME} v${PLUGIN_VERSION}`
-    const hint = "ctrl+o toggle · ctrl+g collapse · ctrl+shift+g expand · ctrl+j/k navigate (global) | sidebar focused: c/a/o/Enter/j/k"
+    const hint = "alt+o toggle · alt+g collapse · alt+shift+g expand · alt+j/k navigate (global) | sidebar focused: c/a/o/Enter/j/k"
 
     if (createSignal && solid?.jsx) {
       const [expanded] = createSignal(true)
