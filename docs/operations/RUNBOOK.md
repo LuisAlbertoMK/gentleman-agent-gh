@@ -64,6 +64,12 @@ Quick-reference troubleshooting for gentleman-agent-gh operations.
 | `pwsh -NoProfile -Command` subprocess spawn is DENIED | Subprocess spawn (`pwsh *`) is intentionally denied by security policy; in-process PowerShell (7.6.5) works fine | Use `& "$env:GENTLEMAN_AGENT_ROOT\scripts/xxx.ps1"` or `. "$env:GENTLEMAN_AGENT_ROOT\scripts/bash-safe.ps1"; & "..."` pattern — this runs in-process, not as a subprocess spawn | See `bash-safe.ps1` for the approved invocation wrapper |
 | Ollama (127.0.0.1:11434) unreachable | Vision-UX bridge degraded (offline-first mode active) | Start Ollama: `ollama serve` in a background terminal. If not installed → `winget install Ollama.Ollama` | Document in RUNBOOK: Ollama required for vision-analyze/UX modes; auto-fallback to offline-first documented in `docs/architecture.md` |
 
+## GitHub CLI Issues
+
+| Symptom | Diagnosis | Fix | Prevention |
+|---------|-----------|-----|------------|
+| `gh` commands target wrong repo (Gentleman-Programming/gentle-ai) | `gh` default repo is stale, or active `hosts.yml` comes from another profile | `gh repo set-default LuisAlbertoMK/gentleman-agent-gh` inside the worktree; verify with `git remote -v` and `gh repo view --json nameWithOwner` | Document in RUNBOOK; pin the default after `gh` reinstall |
+
 ## Vision Analyze — Ollama Local vs Cloud (G8)
 
 Option 1 (Ollama Cloud) — minimal cloud + offline-first fallback.
