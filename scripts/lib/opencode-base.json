@@ -232,7 +232,7 @@
   "compaction": {
     "auto": true,
     "prune": true,
-    "reserved": 6000,
+    "reserved": 4000,
       "keep": {
       "tokens": 8000
     }
