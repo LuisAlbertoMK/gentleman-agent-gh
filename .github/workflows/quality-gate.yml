@@ -103,6 +103,7 @@ jobs:
             exit 1
           }
           Write-Output "OK: opencode.json $size B ≤ $configSizeBudget B budget (ADR-007)"
+          if ($size -gt 65536) { Write-Output "::warning title=Config size drift::opencode.json $size B > 65536 B tightening target (ADR-007 soft)" }
 
       - name: Backlog integrity check
         # Verifies CYCLE.md backlog item status matches repo reality
