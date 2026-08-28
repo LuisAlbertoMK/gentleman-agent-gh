@@ -1,4 +1,4 @@
----
+﻿---
 name: workflow-optimizer
 description: "Optimize workflow patterns — faster info access, reduced token waste, smarter caching, auto-learning triggers."
 triggers: [optimize-workflow, faster-access, token-optimization, workflow-pattern, information-access, fluidez]
@@ -21,3 +21,5 @@ Pipeline: Capture (mem_save every decision/bugfix/discovery) → Extract (dreami
 Fast recall: `mem_context` → `mem_search` → `mem_get_observation`. Proactive: project → `mem_search(project=...)`; feature → query; error → `mem_search(type=bugfix)`.
 ## Reference
 Extended details, examples, patterns → docs/skills/workflow-optimizer/reference.md
+## Refs
+Cross-Refs: skill-graph | performance

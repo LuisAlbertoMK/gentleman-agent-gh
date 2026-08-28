@@ -1,4 +1,4 @@
----
+﻿---
 name: sdd-archive
 description: "Archive completed SDD change by syncing delta specs. Trigger: orchestrator launches archive after implement+verify."
 triggers: "SDD archive, archive SDD, close SDD, persist artifacts"
@@ -23,3 +23,5 @@ Mode per `sdd-status-contract.md`:
 - Archive = AUDIT TRAIL — never modify archived changes; create `openspec/changes/archive/` if missing
 ## Reference
 Return summary template + extended details → docs/skills/sdd-archive/reference.md
+## Refs
+Cross-Refs: sdd | sdd-verify

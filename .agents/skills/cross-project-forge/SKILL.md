@@ -1,4 +1,4 @@
----
+﻿---
 name: cross-project-forge
 description: "Manual pipeline promoting a recurring pattern to an auto-generated skill when it hits severity threshold."
 triggers: "forge, promote pattern, auto-skill, forjar, convertir patrón, skill desde patrón, cross-project-forge"
@@ -47,3 +47,5 @@ Update pattern JSON:
 - Add `skill_ref: "cross-project-{name}"`
 ## Reference
 > docs/skills/cross-project-forge/reference.md
+## Refs
+Cross-Refs: cross-project-wisdom | skill-registry

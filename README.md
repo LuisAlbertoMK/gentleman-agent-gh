@@ -200,7 +200,7 @@ The project uses two MCPs for cross-session memory:
 
 | Scope | Count | Reference |
 |-------|-------|-----------|
-| Skills | 78 specialized skills for analysis, security, testing, docs, and more | See [SKILLS-INDEX.md](SKILLS-INDEX.md) for full trigger table |
+| Skills | 92 specialized skills for analysis, security, testing, docs, and more | See [SKILLS-INDEX.md](SKILLS-INDEX.md) for full trigger table |
 
 ---
 

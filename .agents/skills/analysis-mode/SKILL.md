@@ -1,4 +1,4 @@
----
+﻿---
 name: analysis-mode
 description: "Trigger: !analisis, !analysis, multi-agent analysis. Read-only 4-phase pipeline. Supports --meta for process/workflow analysis (bypasses scope guard)."
 triggers: "!analisis, !analysis, !analisis --meta, analysis mode, multi-agent analysis, smart analysis, process analysis"
@@ -28,3 +28,5 @@ Append cross-ref results as `## Evidence Check` block to the P3 synthesis in `do
 `docs/mejoras/YYYY-MM-DD-<project>-analisis.md` — Summary,Findings(8dims),Synthesis,RiskMatrix,Recs,Engram,Trend. Gate: Plan only — NO code/commit. Exit before implementing.
 ## Reference
 P1 ANALYZE + P4 PERSIST detail + loading → docs/skills/analysis-mode/reference.md
+## Refs
+Cross-Refs: gap-analysis | project-mapper

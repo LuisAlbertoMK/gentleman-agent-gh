@@ -22,7 +22,9 @@
 param(
     [string[]]$ScanPaths = @('scripts', '.github'),
     [switch]$FailOnDead
-)
+,
+    [switch]$Quiet,
+    [switch]$Json)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 

@@ -1,4 +1,4 @@
----
+﻿---
 name: performance-tracker
 description: "Score and track app performance — 6 dims, continuous scoring, trend analysis"
 triggers: "performance score, mobile perf, desktop perf, rendimiento, app score, benchmark, perf tracking, performance trend"
@@ -25,6 +25,8 @@ Load|Render|Memory|Network|Bundle|Energy — thresholds, quick checks → refere
 Score without real data · cross-platform in same trend · skip bundle/cache · score once
 ## Reference
 Thresholds table + quick checks + worked examples (5) → docs/skills/performance-tracker/reference.md
+## Refs
+Cross-Refs: performance | auto-metrics
 
 ## Verification
 - Output: response matches the ## Output contract format exactly

@@ -1,4 +1,4 @@
----
+﻿---
 name: sdd-init
 description: "Initialize SDD context, testing capabilities, registry, persistence. Trigger: sdd init, iniciar sdd, openspec init."
 triggers: "SDD init, initialize SDD, bootstrap SDD, SDD context setup"
@@ -34,3 +34,5 @@ Generated artifacts default to English. Spanish: neutral/professional unless reg
 
 ## Reference
 > docs/skills/sdd-init/reference.md
+## Refs
+Cross-Refs: sdd | sdd-explore

@@ -1,4 +1,4 @@
----
+﻿---
 name: skill-registry
 description: "Build and maintain skill registry - scan skill dirs, deduplicate across sources, compact rules, persist to engram."
 triggers: "Skill registry, catalog, update skills"
@@ -34,3 +34,5 @@ Build and maintain skill registry — scan, dedupe, compact, persist. Trigger: "
 ---
 
 > See [reference.md](docs/skills/skill-registry/reference.md) for extended details, examples, and detailed patterns.
+## Refs
+Cross-Refs: skill-graph | cross-project-forge

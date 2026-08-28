@@ -61,7 +61,8 @@ try {
     $manifestSkillCount  = @($manifest | Where-Object { $_.group -eq 'skill' }).Count
     if ($manifestScriptCount -lt $scriptFiles.Count -or $manifestSkillCount -ne $skillMdFiles.Count) { $cacheHash = $null }
 
-    $compositeKey = "$scriptsHash|$skillsHash"
+    $interHash = if (Test-Path ".learnings/inter-track.json") { (Get-FileHash ".learnings/inter-track.json" -Algorithm SHA256).Hash.Substring(0,8) } else { "no-inter" }
+    $compositeKey = "$scriptsHash|$skillsHash|$interHash"
     # Compact hash: SHA256 of composite key, first 16 hex chars (~8KB → 16 bytes)
     $fullHash = (Get-FileHash -InputStream ([IO.MemoryStream]::new([Text.Encoding]::UTF8.GetBytes($compositeKey))) -Algorithm SHA256).Hash
     $cacheHash = $fullHash.Substring(0, 16)

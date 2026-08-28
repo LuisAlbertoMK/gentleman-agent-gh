@@ -20,7 +20,9 @@ param(
 
     [int]$Top = 8,
     [string]$RegistryPath = "$PSScriptRoot\skill-registry.json"
-)
+,
+    [switch]$Quiet,
+    [switch]$Json)
 # ponytail: -Quiet is a no-op here — output is already JSON-only data via Write-Output
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"

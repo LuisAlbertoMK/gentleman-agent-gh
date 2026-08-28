@@ -1,4 +1,4 @@
----
+﻿---
 name: performance
 description: "Web performance — CWV/INP, compositor animation, scroll-driven, content-visibility."
 triggers: "performance, speed up, load time, slow loading, page speed, performance audit, INP, animation performance, scroll performance, compositor"
@@ -45,6 +45,8 @@ Animate ONLY `transform`+`opacity`. One layout prop → poisons to main thread.
 `PERF-AUDIT:<url>—<date> CRITICAL:[LCP\|CLS\|FCP\|TBT\|INP]<actual>/<budget>→<fix> HIGH:[img\|font\|JS\|CSS]<kb>→<fix> INP:<ms>→<proc>/<present> VERIFY:[lighthouse\|web-vitals]→PASS/FAIL`
 ## Reference
 > docs/skills/performance/reference.md
+## Refs
+Cross-Refs: performance-tracker | baseline-ui
 
 ## Verification
 - Output: response matches the ## Output contract format exactly

@@ -30,7 +30,9 @@ param(
     [switch]$SkipVision,
     [switch]$DryRun,
     [switch]$Force
-)
+,
+    [switch]$Quiet,
+    [switch]$Json)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")

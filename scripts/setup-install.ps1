@@ -15,7 +15,9 @@
 #>
 param(
     [switch]$InstallGentleAI
-)
+,
+    [switch]$Quiet,
+    [switch]$Json)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $repoDir = Split-Path -Path $PSScriptRoot -Parent

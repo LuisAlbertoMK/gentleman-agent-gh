@@ -1,4 +1,4 @@
----
+﻿---
 name: triple-verify
 description: "Triple verification — 3 enfoques, thresholds por zona, modos !ship/!fast/!draft"
 triggers: "Triple verify, triangulate, 3 enfoques, !ship, !listo, !fast, !draft"
@@ -34,3 +34,5 @@ token_budget: 1916
 7. **Self-improvement override**: difficulty levels from CYCLE.md override verify depth
 ## Reference
 > docs/skills/triple-verify/reference.md
+## Refs
+Cross-Refs: trial-verify | testing-strategy

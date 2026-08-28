@@ -1,4 +1,4 @@
----
+﻿---
 name: auto-metrics
 description: "Self-evaluation scoring. Trigger via !score or !metrics — not automatic."
 triggers: "!score, !metrics, explicit score/metric request, session end via !close"
@@ -30,3 +30,5 @@ If `.learnings/bias-calibration.json` exists with `samples >= 2`: check bitácor
 ---
 docs/skills/auto-metrics/reference.md
 ---
+## Refs
+Cross-Refs: performance-tracker | metricas

@@ -1,4 +1,4 @@
----
+﻿---
 name: sdd
 description: "pipeline — 9 phases. Use sdd-quick for LOW-risk fast path."
 triggers: "pipeline, phase, spec-driven development"
@@ -35,3 +35,5 @@ Use when task list >5 apply steps.
 7. No rollback plan — every proposal must define "undo in 5 min"
 ## Reference
 Examples (1) + Testing Patterns (3) + Edge Cases (4) → docs/skills/sdd/reference.md
+## Refs
+Cross-Refs: sdd-quick | sdd-init

@@ -1,4 +1,4 @@
----
+﻿---
 name: research
 description: "Structured research workflow - define scope, gather evidence, synthesize findings, document decisions."
 triggers: "Research task, technical investigation, investigar, research, learn new tech, compare solutions, evaluate options"
@@ -35,3 +35,5 @@ Consult these when the skill needs detailed worked examples or guardrails:
   → docs/skills/research/reference.md
 
 ---
+## Refs
+Cross-Refs: gap-analysis | project-mapper

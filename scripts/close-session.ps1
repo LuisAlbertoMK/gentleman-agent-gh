@@ -71,7 +71,7 @@ if (Test-Path -LiteralPath "$PSScriptRoot/inter-track.ps1") {
         # Suppress stdout/stderr — inter-track -Quiet outputs JSON to stdout
         # Skip increment in test mode (PESTER_TEST=1) to prevent test pollution
         if (-not $env:PESTER_TEST) {
-            & "$PSScriptRoot/inter-track.ps1" -Increment -Quiet >$null 2>$null
+            & "$PSScriptRoot/inter-track.ps1" -Increment -Quiet
         }
         $itNew = if (Test-Path ".learnings\inter-track.json") {
             (Get-Content ".learnings\inter-track.json" -Raw | ConvertFrom-Json -EA SilentlyContinue).cycle.count

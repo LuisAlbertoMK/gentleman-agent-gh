@@ -35,7 +35,9 @@ param(
     [string]$TaskId,
 
     [string]$RepoRoot = $(Split-Path -Parent $PSScriptRoot)
-)
+,
+    [switch]$Quiet,
+    [switch]$Json)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 

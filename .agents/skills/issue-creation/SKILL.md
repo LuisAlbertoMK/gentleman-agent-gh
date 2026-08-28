@@ -1,4 +1,4 @@
----
+﻿---
 name: issue-creation
 description: "Create Gentle AI issues with issue-first checks."
 triggers: "create issue, GitHub issue, bug report, feature request, open issue, issue creation, report bug"
@@ -44,3 +44,5 @@ Consult these when the skill needs detailed worked examples or guardrails:
   → docs/skills/issue-creation/reference.md
 
 ---
+## Refs
+Cross-Refs: branch-pr | work-unit-commits

@@ -1,4 +1,4 @@
----
+﻿---
 name: gap-analysis
 description: "Complete gap analysis — 8-dim quality framework, project intake, priority scoring"
 triggers: "Gap analysis, system audit, identificar gaps, project intake"
@@ -20,3 +20,5 @@ Complete gap analysis — 8-dim quality framework, project int
 
 docs/skills/gap-analysis/reference.md
 ---
+## Refs
+Cross-Refs: project-mapper | research

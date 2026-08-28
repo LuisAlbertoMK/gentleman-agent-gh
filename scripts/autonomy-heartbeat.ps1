@@ -26,7 +26,9 @@ param(
     [switch]$Uninstall,
     [switch]$Status,
     [int]$Minutes = 5
-)
+,
+    [switch]$Quiet,
+    [switch]$Json)
 
 Set-StrictMode -Version Latest
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")

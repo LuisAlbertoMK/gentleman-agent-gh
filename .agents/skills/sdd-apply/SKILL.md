@@ -1,4 +1,4 @@
----
+﻿---
 name: sdd-apply
 description: "Implement SDD tasks from specs and design."
 triggers: "SDD apply, implement SDD, code change"
@@ -23,3 +23,5 @@ Input + store modes → reference. Status (sdd-status-contract.md), delivery (as
 - Artifacts: English; specs = acceptance criteria; follow design (freelancing → deviation); match patterns; stop on blocked.
 ## Reference
 Input/store modes + 2a/2b detail → docs/skills/sdd-apply/reference.md
+## Refs
+Cross-Refs: sdd | sdd-verify

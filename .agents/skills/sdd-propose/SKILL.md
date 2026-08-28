@@ -1,4 +1,4 @@
----
+﻿---
 name: sdd-propose
 description: "Create SDD change proposal with intent, scope, approach. Trigger: orchestrator launches proposal work."
 triggers: "SDD propose, proposal, intent, approach, change proposal"
@@ -26,3 +26,5 @@ openspec/hybrid: `openspec/changes/{change}/proposal.md` · engram/none: skip
 - **Vague scope**: In/Out must list concrete paths — "Improve auth" unverifiable vs "JWT issuer, refresh flow, rate limiting"
 ## Reference
 Shaping questions + proposal template + return envelope → docs/skills/sdd-propose/reference.md
+## Refs
+Cross-Refs: sdd | sdd-spec

@@ -1,4 +1,4 @@
----
+﻿---
 name: sdd-spec
 description: "Write SDD delta specs with requirements and scenarios. Trigger: orchestrator launches spec work."
 triggers: "SDD spec, specification, given when then, requisitos, spec writing"
@@ -27,3 +27,5 @@ NEVER write partial MODIFIED blocks. New behavior without changing existing → 
 Rules (Given/When/Then, RFC 2119, MODIFIED copy, REMOVED/RENAMED Migration, <650 words) → reference.
 ## Reference
 Delta Format + New Domain + rules → docs/skills/sdd-spec/reference.md
+## Refs
+Cross-Refs: sdd | sdd-design

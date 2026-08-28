@@ -1,4 +1,4 @@
----
+﻿---
 name: data-quality
 description: "Trigger: data audit, pipeline audit, schema validation, data governance, ETL. Audit data quality and reliability."
 triggers: "data audit, data pipeline audit, schema validation, data governance, ETL audit, data quality check, data review"
@@ -20,3 +20,5 @@ Reviewing data pipelines, schemas, ETL, analytics. No data layer → report and 
 Skip schema validation · Ignore error handling · No profiling · Python-only bias · Skip dbt/YAML · Assume ingestion succeeds · Silent schema drift · No late-data strategy · Hard-delete in DW · Magic numbers in transforms
 ## Reference
 dbt/YAML + Profiling detail → docs/skills/data-quality/reference.md
+## Refs
+Cross-Refs: perf-profiling | testing-strategy

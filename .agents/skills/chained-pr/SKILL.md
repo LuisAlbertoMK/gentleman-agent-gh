@@ -1,4 +1,4 @@
----
+﻿---
 name: chained-pr
 description: "Split oversized changes into chained PRs that protect review focus."
 triggers: "chained PR, stacked PR, sequential branches, PR chain, stacked branches, PR stack, oversized PR, 400 lines, review slices"
@@ -39,3 +39,5 @@ Load this skill when a planned PR may exceed **400 changed lines**, SDD forecast
 
 docs/skills/chained-pr/reference.md
 ---
+## Refs
+Cross-Refs: branch-pr | work-unit-commits

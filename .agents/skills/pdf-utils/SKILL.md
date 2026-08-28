@@ -1,4 +1,4 @@
----
+﻿---
 name: pdf-utils
 description: "PDF processing — extract text, parse tables, generate reports"
 triggers: "PDF, extract PDF, parse PDF, merge PDF, generate PDF, PDF table, PDF invoice, read PDF, PDF to text, PDF to markdown"
@@ -45,3 +45,5 @@ Consult these when the skill needs detailed worked examples or guardrails:
   → docs/skills/pdf-utils/reference.md
 
 ---
+## Refs
+Cross-Refs: image-pipeline | data-quality

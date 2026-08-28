@@ -1,4 +1,4 @@
----
+﻿---
 name: testing-strategy
 description: "Test strategy - pyramid analysis, coverage gaps, risk-based prioritization, test debt, ROI-driven investment."
 triggers: "testing strategy, test plan, test coverage, test pyramid, test debt, test gap, test priority, test audit, quality strategy"
@@ -21,3 +21,5 @@ CRITICAL (auth, payments, data integrity, security): 80%+ E2E + contract + mutat
 100% coverage (>80% diminishing) · Test implementation, not behavior · No risk diff · Plan w/o steps · Ignore maint cost · Mock everything · E2E for everything · Unit-test getters/DTOs · Coverage theater (assert true) · No debt budget (10-20% sprint)
 ## Reference
 ROI (sec 5) + Testing Patterns (sec 6) + Edge Cases (sec 7) → docs/skills/testing-strategy/reference.md
+## Refs
+Cross-Refs: e2e-testing | api-testing
