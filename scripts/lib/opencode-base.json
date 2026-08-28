@@ -749,7 +749,8 @@
   "plugin": [
     "context-mode",
     "opencode-ralph-loop",
-    "opencode-personality"
+    "opencode-personality",
+    "./plugins/collapsible-history.ts"
   ],
   "tool_output": {
     "max_bytes": 4096,
