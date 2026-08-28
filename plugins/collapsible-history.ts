@@ -4,8 +4,7 @@
  *
  * UX: each user prompt = collapsible card, collapsed by default except last.
  * Header: snippet 80 chars + timestamp + tokens + ▶/▼
- * Keys (sidebar focused): Enter/o toggle, c collapse all, a expand all, j/k navigate.
- *   | Global: ctrl+o, ctrl+shift+c/e, ctrl+j/k (via api.keymap.registerLayer if available)
+ * Keys (global): ctrl+o, ctrl+g, ctrl+shift+g, ctrl+j/k | Sidebar focused: c/a/o/Enter/j/k
  * State: in-memory Map<sessionId, Set<turnId>> — no disk I/O, no bun:sqlite.
  *
  * Host: @opencode-ai/plugin (server hooks) + @opencode-ai/plugin/tui (slot)
@@ -201,8 +200,8 @@ function maybeRegisterGlobalKeybindings(api: any): void {
 
   const bindings: Array<{ key: string; command: string }> = [
     { key: "ctrl+o", command: "collapsible-history.toggle" },
-    { key: "ctrl+shift+c", command: "collapsible-history.collapse-all" },
-    { key: "ctrl+shift+e", command: "collapsible-history.expand-all" },
+    { key: "ctrl+g", command: "collapsible-history.collapse-all" },
+    { key: "ctrl+shift+g", command: "collapsible-history.expand-all" },
     { key: "ctrl+j", command: "collapsible-history.navigate-next" },
     { key: "ctrl+k", command: "collapsible-history.navigate-prev" },
   ]
@@ -262,7 +261,7 @@ export const tui = async (api: any) => {
     // Here we render a placeholder that proofs the slot lifecycle.
     // Full grouping uses groupMessagesByTurn() above.
     const placeholder = `Collapsible history — ${PLUGIN_NAME} v${PLUGIN_VERSION}`
-    const hint = "Tab→sidebar focus: Enter/o toggle · c collapse all · a expand all · j/k navigate | ctrl+o toggle, ctrl+shift+c/e collapse/expand from input"
+    const hint = "ctrl+o toggle · ctrl+g collapse · ctrl+shift+g expand · ctrl+j/k navigate (global) | sidebar focused: c/a/o/Enter/j/k"
 
     if (createSignal && solid?.jsx) {
       // SolidJS path — minimal JSX without heavy deps
