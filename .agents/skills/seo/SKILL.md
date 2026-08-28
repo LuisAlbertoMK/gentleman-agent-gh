@@ -3,7 +3,7 @@ name: seo
 description: "Search engine visibility & ranking — technical SEO, on-page, structured data, E-E-A-T, AI Overviews"
 triggers: "seo, search engine, meta tags, structured data, sitemap, search optimization, ranking, schema, robots.txt, meta description, EEAT, E-E-A-T, AI Overview, SGE, AI Mode, generative search, AEO, GEO, Google Core Update, GA4, topical authority, content cluster"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2400
+token_budget: 685
 ---
 ## When to Use
 SEO audit/meta/sitemap/Core Update/AI Overviews/E-E-A-T/CWV/INP. NOT: content/link building/PPC/social. Pre-reqs: GSC·PageSpeed·RichResultsTest.
@@ -21,6 +21,9 @@ Win = cited. 1. Answer-first 40-60w. 2. Info gain. 3. Clean H2/lists/table. 4. C
 `SEO AUDIT:<url>—<date> CRITICAL:[tech]<issue>→<fix> HIGH:[EEAT|schema|AI]<issue>→<fix> MEDIUM:[clusters|links]<issue>→<fix> AI:Cited:Y/N·GA:<n>/<n>`
 ## Anti-Patterns
 Keyword-stuff·Dup titles·No schema·Skip mobile·Missing robots/sitemap·Incomplete JSON-LD·Mass AI·No E-E-A-T·Thin affiliate·No monitor·Fake schema
+## Examples
+1. Audit: `/seo https://example.com/blog` → `SEO-AUDIT:... CRITICAL:[title,canonical]→ HIGH:[sitemap]→ VERIFY:[GSC]`
+2. Schema: `ProfilePage + Person sameAs` → verify with Rich Results Test
 ## Cross-Refs: web-quality-audit | performance | baseline-ui | docs-audit
 > docs/skills/seo/reference.md
 

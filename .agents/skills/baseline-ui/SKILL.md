@@ -3,7 +3,7 @@ name: baseline-ui
 description: "Anti-slop UI — layout, typography, responsive, animation, tokens. Use for cleanup or polish."
 triggers: "ui cleanup, polish interface, fix layout, ui slop, generic ui, design review, anti-slop, ui polish, polish ui"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2300
+token_budget: 651
 ---
 ## When to Use
 Anti-slop audit&cleanup: layout·typography·responsive·animation·tokens. **Stack**: CSS/Tailwind·`cn()`(clsx+tw-merge)·React. Audit→**ui-engine**. **Flow**: Scan→❌→fix→verify→a11y→perf. Review:`/baseline-ui <file>`. **Offline-first**: pure static audit — needs NO network/Ollama; paired with `ui-specialist-pairing.ps1`, vision enhancement is optional and degrades gracefully if Ollama/network is down.
@@ -22,6 +22,9 @@ Anti-slop audit&cleanup: layout·typography·responsive·animation·tokens. **St
 `UI-CLEANUP:<file>—<date> CRITICAL:[a11y|contrast]<issue>→<fix> HIGH:[layout|responsive]<issue>→<fix> MEDIUM:[tokens|anim]<issue>→<fix> VERIFY:[a11y|perf]→<pass/fail>`
 ## Anti-Patterns
 Fixed width·h-screen·dense interactive·Fixed font·transition:all·>500ms·No reduced-motion·HSL/RGB·No contrast·cqi outside container
+## Examples
+1. Audit: `/baseline-ui src/components/Button.tsx` → `UI-CLEANUP:Button—2026-08-27 CRITICAL:[contrast]→ HIGH:[layout]→ VERIFY:[axe]`
+2. Token: `oklch(55% .18 255)` → `--primary:var(--blue-500)` → verify 4.5:1
 ## Cross-Refs: ui-engine | accessibility | performance | web-quality-audit
 > docs/skills/baseline-ui/reference.md
 
