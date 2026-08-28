@@ -273,7 +273,7 @@ export const tui = async (api: any) => {
 export default {
   name: PLUGIN_NAME,
   version: PLUGIN_VERSION,
-  plugin: CollapsibleHistoryPlugin,
+  server: CollapsibleHistoryPlugin,
   tui,
   // Helpers exposed for unit tests without importing internals
   _helpers: {
