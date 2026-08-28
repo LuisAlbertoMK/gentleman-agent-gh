@@ -60,17 +60,62 @@ param(
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+
+function Redact-Secrets {
+    [CmdletBinding()]
+    param(
+        [string]$Text
+    )
+    if ([string]::IsNullOrEmpty($Text)) { return $Text }
+    $redacted = $Text
+    # Generic key=value secrets: api_key, api-key, token, password, secret, credential
+    $redacted = $redacted -replace '(?i)(api[_-]?key|token|password|secret|credential)(\s*[:=]\s*)\S+', '$1$2[REDACTED]'
+    # Bearer tokens
+    $redacted = $redacted -replace '(?i)bearer\s+[A-Za-z0-9\-_\.=]+', 'bearer [REDACTED]'
+    # AWS keys
+    $redacted = $redacted -replace '(?i)aws[_-]?secret[_-]?access[_-]?key(\s*[:=]\s*)\S+', 'aws_secret_access_key$1[REDACTED]'
+    $redacted = $redacted -replace '(?i)aws[_-]?access[_-]?key[_-]?id(\s*[:=]\s*)\S+', 'aws_access_key_id$1[REDACTED]'
+    # OpenAI / GitHub / generic prefixed secrets
+    $redacted = $redacted -replace 'sk-[A-Za-z0-9]{20,}', '[REDACTED]'
+    $redacted = $redacted -replace 'sk-proj-[A-Za-z0-9\-_]{20,}', '[REDACTED]'
+    $redacted = $redacted -replace 'gh[oprs]_[A-Za-z0-9_]{20,}', '[REDACTED]'
+    $redacted = $redacted -replace 'ghu_[A-Za-z0-9_]{20,}', '[REDACTED]'
+    # Fallback: any remaining (?i)(api[_-]?key|token|password|secret|credential)\s*[:=]\s*\S+ whole match redacted
+    $redacted = $redacted -replace '(?i)(api[_-]?key|token|password|secret|credential)\s*[:=]\s*\S+', '[REDACTED]'
+    return $redacted
+}
+
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $checkpointDir = Join-Path -Path $repoRoot -ChildPath ".opencode\session-checkpoints"
 
 # --- Ensure checkpoint dir exists ---
 if (-not (Test-Path -LiteralPath $checkpointDir)) {
-    $null = New-Item -ItemType Directory -Path $checkpointDir -Force -ErrorAction SilentlyContinue
+    try {
+        $null = New-Item -ItemType Directory -Path $checkpointDir -Force -ErrorAction Stop
+    } catch {
+        Write-Warning "Failed to create checkpoint dir '$checkpointDir': $($_.Exception.Message)"
+        throw
+    }
 }
 
 # --- Step 1: Get context zone from ctx-watchdog ---
-$watchdogResult = & "$PSScriptRoot\ctx-watchdog.ps1" -UsagePercent $UsagePercent -Json 2>$null | ConvertFrom-Json -ErrorAction SilentlyContinue
-if (-not $watchdogResult) {
+$watchdogResult = $null
+try {
+    $watchdogRaw = & "$PSScriptRoot\ctx-watchdog.ps1" -UsagePercent $UsagePercent -Json -ErrorAction Stop 2>&1 | Out-String
+    if (-not [string]::IsNullOrWhiteSpace($watchdogRaw)) {
+        $parsed = $watchdogRaw | ConvertFrom-Json -ErrorAction Stop
+        if ($null -ne $parsed -and $null -ne $parsed.zone) {
+            $watchdogResult = $parsed
+        } else {
+            Write-Warning "ctx-watchdog returned invalid JSON or missing zone: $watchdogRaw"
+        }
+    } else {
+        Write-Warning "ctx-watchdog returned empty output"
+    }
+} catch {
+    Write-Warning "ctx-watchdog failed: $($_.Exception.Message)"
+}
+if (-not $watchdogResult -or -not $watchdogResult.zone) {
     $watchdogResult = [PSCustomObject]@{
         zone   = "UNKNOWN"
         percent = $UsagePercent
@@ -93,22 +138,67 @@ $zoneNeedsCheckpoint = switch ($contextZone) {
 # --- Step 2: Decide checkpoint action ---
 $checkpointNeeded = $zoneNeedsCheckpoint -or $Force -or $Discoveries.Count -gt 0 -or $Decisions.Count -gt 0
 
+# --- Sanitize Decisions/Discoveries before persistence (P0 secrets guard) ---
+$sanitizedDecisions = @($Decisions | ForEach-Object { Redact-Secrets -Text $_ })
+$sanitizedDiscoveries = @($Discoveries | ForEach-Object { Redact-Secrets -Text $_ })
+
 # --- Step 3: If checkpoint needed and mode is mark/full, create it ---
+$gitFilesTouched = @()
+$gitBranch = "unknown"
+try {
+    $gitStatusRaw = & git -C $repoRoot status --porcelain 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($gitStatusRaw) {
+            $gitFilesTouched = @($gitStatusRaw -split "`n" | Where-Object { $_ -match '\S' })
+        }
+    } else {
+        Write-Warning "git status failed with exit code $LASTEXITCODE : $gitStatusRaw"
+        $gitFilesTouched = @()
+        $gitBranch = "unknown"
+    }
+} catch {
+    Write-Warning "git status failed: $($_.Exception.Message)"
+    $gitFilesTouched = @()
+}
+try {
+    $gitBranchRaw = & git -C $repoRoot rev-parse --abbrev-ref HEAD 2>&1
+    if ($LASTEXITCODE -eq 0 -and $gitBranchRaw) {
+        $tmpBranch = ($gitBranchRaw | Out-String).Trim()
+        if (-not [string]::IsNullOrWhiteSpace($tmpBranch)) {
+            $gitBranch = $tmpBranch
+        } else {
+            Write-Warning "git rev-parse returned empty branch name"
+            $gitBranch = "unknown"
+        }
+    } else {
+        Write-Warning "git rev-parse failed with exit code $LASTEXITCODE : $gitBranchRaw"
+        $gitBranch = "unknown"
+    }
+} catch {
+    Write-Warning "git rev-parse failed: $($_.Exception.Message)"
+    $gitBranch = "unknown"
+}
+
 $checkpointData = [PSCustomObject]@{
     timestamp      = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
     session_id     = "session-$((Get-Date).ToString('yyyyMMdd-HHmmss'))"
     context_zone   = $contextZone
     context_percent = $watchdogResult.percent
     compression_level = $contextLevel
-    decisions      = $Decisions
-    discoveries    = $Discoveries
-    files_touched  = @((git -C $repoRoot status --porcelain 2>$null) -split "`n" | Where-Object { $_ -match '\S' })
-    branch         = (git -C $repoRoot rev-parse --abbrev-ref HEAD 2>$null)
+    decisions      = $sanitizedDecisions
+    discoveries    = $sanitizedDiscoveries
+    files_touched  = $gitFilesTouched
+    branch         = $gitBranch
     recommendation = $watchdogResult.recommendation
 }
 
 $checkpointPath = Join-Path -Path $checkpointDir -ChildPath "$($checkpointData.session_id).json"
-$checkpointData | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $checkpointPath -Encoding UTF8
+$tmpPath = "$checkpointPath.tmp"
+$checkpointData | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $tmpPath -Encoding UTF8 -ErrorAction Stop
+Move-Item -LiteralPath $tmpPath -Destination $checkpointPath -Force -ErrorAction Stop
+if (-not (Test-Path -LiteralPath $checkpointPath)) {
+    throw "Atomic write failed: checkpoint not found at $checkpointPath"
+}
 
 # --- Step 4: Validate before mem_save (poisoning guard) ---
 $validated = $true
@@ -118,7 +208,8 @@ if (-not $NoValidate) {
         $contentSummary = "**What**: Session checkpoint at $contextZone zone ($($watchdogResult.percent)% context). " +
                          "**Why**: Proactive capture to prevent memory loss across compaction cycles. " +
                          "**Where**: .opencode/session-checkpoints/$($checkpointData.session_id).json. " +
-                         "**Learned**: Zone=$contextZone, decisions=$($Decisions.Count), discoveries=$($Discoveries.Count)."
+                         "**Learned**: Zone=$contextZone, decisions=$($sanitizedDecisions.Count), discoveries=$($sanitizedDiscoveries.Count)."
+        $contentSummary = Redact-Secrets -Text $contentSummary
         $validationParams = @{
             Content = $contentSummary
             Title = "checkpoint:session-state:$($checkpointData.session_id)"
@@ -126,8 +217,30 @@ if (-not $NoValidate) {
             PassThru = $true
             Quiet = $true
         }
-        $validationResult = & $validatorPath @validationParams 2>$null
-        $validated = $null -ne $validationResult -or $LASTEXITCODE -eq 0
+        try {
+            $validationResult = & $validatorPath @validationParams -ErrorAction Stop 2>&1
+            $exitCode = $LASTEXITCODE
+            $hasErrorFlag = $false
+            if ($null -eq $validationResult) {
+                $hasErrorFlag = $true
+            } elseif ($validationResult -is [string] -and $validationResult -match '(?i)error|invalid|injection') {
+                $hasErrorFlag = $true
+            } elseif ($validationResult -is [PSCustomObject] -and $null -ne $validationResult.valid -and -not $validationResult.valid) {
+                $hasErrorFlag = $true
+            } elseif ($validationResult -is [PSCustomObject] -and $null -ne $validationResult.errors -and $validationResult.errors.Count -gt 0) {
+                $hasErrorFlag = $true
+            }
+            # Strict: require exit 0, non-null result, no error flag
+            if ($null -ne $validationResult -and $exitCode -eq 0 -and -not $hasErrorFlag) {
+                $validated = $true
+            } else {
+                Write-Warning "engram-validate failed or returned invalid content (exit=$exitCode, hasError=$hasErrorFlag, resultNull=$($null -eq $validationResult))"
+                $validated = $false
+            }
+        } catch {
+            Write-Warning "engram-validate execution failed: $($_.Exception.Message)"
+            $validated = $false
+        }
     }
 }
 
@@ -135,7 +248,8 @@ if (-not $NoValidate) {
 $memSaved = $false
 $memSaveDirective = $null
 if ($Mode -in @('mark', 'full') -and $checkpointNeeded -and $validated) {
-    $memContent = "**What**: Session checkpoint at $contextZone zone ($($watchdogResult.percent)% context used). Captured $($Decisions.Count) decisions and $($Discoveries.Count) discoveries proactively. **Why**: Prevent memory loss across compaction cycles — medium-term conversational context is lost without explicit persistence. **Where**: .opencode/session-checkpoints/ + Engram checkpoint/session-state. **Learned**: This bridge connects ctx-watchdog zone detection → engram-validate → mem_save → ctx_index. Without it, mid-session decisions vanish at compaction."
+    $memContentRaw = "**What**: Session checkpoint at $contextZone zone ($($watchdogResult.percent)% context used). Captured $($sanitizedDecisions.Count) decisions and $($sanitizedDiscoveries.Count) discoveries proactively. **Why**: Prevent memory loss across compaction cycles — medium-term conversational context is lost without explicit persistence. **Where**: .opencode/session-checkpoints/ + Engram checkpoint/session-state. **Learned**: This bridge connects ctx-watchdog zone detection → engram-validate → mem_save → ctx_index. Without it, mid-session decisions vanish at compaction."
+    $memContent = Redact-Secrets -Text $memContentRaw
     $topicKey = "checkpoint/session-state"
     # G7 fix: mem_save is an MCP tool call, not available in this .ps1 context.
     # Emit a mem_save directive for the orchestrator (which holds the MCP tool)
@@ -159,15 +273,19 @@ if ($checkpointData.recommendation -and $checkpointData.recommendation.Length -g
 
 # --- Step 7: Optionally trigger session-miner ---
 $minerResult = $null
-if ($Mode -eq 'full' -and ($Discoveries -or $Decisions)) {
+if ($Mode -eq 'full' -and ($sanitizedDiscoveries -or $sanitizedDecisions)) {
     $minerPath = Join-Path -Path $PSScriptRoot -ChildPath "session-miner.ps1"
     if (Test-Path -LiteralPath $minerPath) {
         try {
             $minerParams = @{ Mode = "populate"; Json = $true }
-            if ($Discoveries) { $minerParams.PatternKeys = $Discoveries }
-            if ($Decisions) { $minerParams.ErrorEntries = $Decisions }
-            $minerResult = & $minerPath @minerParams 2>$null | ConvertFrom-Json -ErrorAction SilentlyContinue
+            if ($sanitizedDiscoveries) { $minerParams.PatternKeys = $sanitizedDiscoveries }
+            if ($sanitizedDecisions) { $minerParams.ErrorEntries = $sanitizedDecisions }
+            $minerRaw = & $minerPath @minerParams -ErrorAction Stop 2>&1
+            if ($minerRaw) {
+                $minerResult = $minerRaw | Out-String | ConvertFrom-Json -ErrorAction Stop
+            }
         } catch {
+            Write-Warning "session-miner failed: $($_.Exception.Message)"
             Write-Debug "session-miner skipped: $($_.Exception.Message)"
         }
     }
