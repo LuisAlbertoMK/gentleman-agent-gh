@@ -7,7 +7,9 @@
     Fully self-contained — no PS7-only lib dependencies, runs on PS 5.1.
 .PARAMETER DryRun  Show what would be done without making changes.
 #>
-param([switch]$DryRun)
+param([switch]$DryRun,
+    [switch]$Quiet,
+    [switch]$Json)
 
 function Get-GlobalConfigDir {
     $base = if ($env:OS -eq 'Windows_NT') { $env:USERPROFILE } else { $HOME }

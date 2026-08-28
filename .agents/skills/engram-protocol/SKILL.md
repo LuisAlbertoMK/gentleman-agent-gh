@@ -1,4 +1,4 @@
----
+﻿---
 name: engram-protocol
 description: "Persistent memory protocol — save, search, dreaming, session lifecycle via Engram MCP"
 triggers: "remember, recall, engram, mem_save, mem_search, session close, dreaming, memory, token budget, compression, L1 L2 L3, capture pipeline, project score, bias calibration"
@@ -25,3 +25,5 @@ Gate: `close-session.ps1` verifies summary called. `!score`/`!dream`. Mandatory 
 ---
 docs/skills/engram-protocol/reference.md
 ---
+## Refs
+Cross-Refs: dreaming | session-resume

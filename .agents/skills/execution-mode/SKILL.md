@@ -1,4 +1,4 @@
----
+﻿---
 name: execution-mode
 description: "Auto-detect task execution mode - QUICK/THOROUGH/DRAFT - from scope/risk/familiarity. Not resource optimization."
 triggers: "Execution mode, quick/thorough/draft, resource adaptive, zone green/yellow/orange/red"
@@ -26,3 +26,5 @@ THOROUGH: Init→Propose→Spec→Design→Tasks→Apply→Verify→Quality Gate
 ## Anti-Patterns
 DRAFT when asked THOROUGH · Skip zone re-eval · Ignore RED · One mode all session · Auto-detect without explaining · THOROUGH for single-line typo · DRAFT for destructive ops
 > docs/skills/execution-mode/reference.md
+## Refs
+Cross-Refs: sdd | sdd-apply

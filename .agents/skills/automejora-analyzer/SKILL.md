@@ -1,4 +1,4 @@
----
+﻿---
 name: automejora-analyzer
 description: "Analyzes auto-mejora cycles — detects patterns, scores improvements, validates SkillOpt gates, surfaces drift."
 triggers: "auto-mejora, automejora, improvement analysis, cycle analysis, SkillOpt validation, improvement scoring"
@@ -32,3 +32,5 @@ Consult these when the skill needs detailed worked examples or guardrails:
   → docs/skills/automejora-analyzer/reference.md
 
 ---
+## Refs
+Cross-Refs: self-improvement | metricas

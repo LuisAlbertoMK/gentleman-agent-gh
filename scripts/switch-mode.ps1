@@ -53,7 +53,9 @@ param(
     [switch]$Help,
     [switch]$Force,
     [switch]$DryRun
-)
+,
+    [switch]$Quiet,
+    [switch]$Json)
 Set-StrictMode -Version Latest
 
 # --- Legacy 'semi' handling (DEPRECATED per ADR-033) ---

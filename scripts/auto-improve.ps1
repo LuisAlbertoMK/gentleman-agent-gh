@@ -30,7 +30,9 @@ param(
     [string]$CodeRoot = ".",
 
     [int]$MaxIterations = 3
-)
+,
+    [switch]$Quiet,
+    [switch]$Json)
 Set-StrictMode -Version Latest
 
 # Guardrails -- fail-closed

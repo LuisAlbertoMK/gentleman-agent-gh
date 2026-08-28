@@ -1,4 +1,4 @@
----
+﻿---
 name: sdd-explore
 description: "Explore SDD ideas before committing to a change. Trigger: orchestrator launches exploration or requirement clarification."
 triggers: "SDD explore, explore ideas, investigation, discovery, SDD exploration"
@@ -40,3 +40,5 @@ Explore codebase for a topic/feature, compare approaches, return structured anal
 
 docs/skills/sdd-explore/reference.md
 ---
+## Refs
+Cross-Refs: sdd | sdd-propose

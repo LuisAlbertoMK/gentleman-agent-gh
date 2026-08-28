@@ -1,4 +1,4 @@
----
+﻿---
 name: skill-graph
 description: "Sparse loading — resolve only relevant skills + dependencies, digest per context budget"
 triggers: "sparse loading, skill resolution, relevant skills, which skill, skill-graph"
@@ -44,3 +44,5 @@ hop 2: command-wrapper      → [bash-safe]
 ---
 
 > See [reference.md](docs/skills/skill-graph/reference.md) for extended details, examples, and detailed patterns.
+## Refs
+Cross-Refs: skill-registry | cross-project-forge

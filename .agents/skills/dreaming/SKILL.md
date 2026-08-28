@@ -1,4 +1,4 @@
----
+﻿---
 name: dreaming
 description: "Cross-session pattern extraction via Engram. Run via !dream — not automatic."
 triggers: "!dream, dreaming, patrones, memory review, session end, !close, pattern extraction"
@@ -41,3 +41,5 @@ Consult these when the skill needs detailed worked examples or guardrails:
   → docs/skills/dreaming/reference.md
 
 ---
+## Refs
+Cross-Refs: engram-protocol | session-resume

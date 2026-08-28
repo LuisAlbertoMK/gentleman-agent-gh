@@ -1,4 +1,4 @@
----
+﻿---
 name: immune-system
 description: "Immunity against repeated errors - detect, diagnose, document to anti-pattern catalog, immunize in AGENTS.md rules."
 triggers: "Immune System, anti-pattern, permanent immunity"
@@ -37,3 +37,5 @@ Root cause: Context miss | Pattern miss | Knowledge gap | Tool misuse | Hallucin
 
 docs/skills/immune-system/reference.md
 ---
+## Refs
+Cross-Refs: security-scanner | best-practices

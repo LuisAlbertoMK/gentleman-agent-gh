@@ -1,6 +1,8 @@
 #requires -Version 7
 [CmdletBinding(SupportsShouldProcess=$true)]
-param()
+param(
+    [switch]$Quiet,
+    [switch]$Json)
 Set-StrictMode -Version Latest
 <#
 .SYNOPSIS

@@ -1,4 +1,4 @@
----
+﻿---
 name: sdd-design
 description: Create the SDD technical design and architecture approach. Trigger: orchestrator launches design for a change.
 delegate_only: true
@@ -31,3 +31,5 @@ Unit plan (key edge cases) · integration plan (boundaries) · risk-based covera
 7. Error path / exception handling
 ---
 > See [reference.md](docs/skills/sdd-design/reference.md) for extended details, examples, and patterns.
+## Refs
+Cross-Refs: sdd | sdd-propose

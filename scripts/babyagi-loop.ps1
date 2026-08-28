@@ -51,7 +51,9 @@ param(
     [switch]$DryRun,
 
     [switch]$Force
-)
+,
+    [switch]$Quiet,
+    [switch]$Json)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"

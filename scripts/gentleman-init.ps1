@@ -1,5 +1,7 @@
 #requires -Version 5.1
-param()
+param(
+    [switch]$Quiet,
+    [switch]$Json)
 Set-StrictMode -Version Latest
 <#
 .SYNOPSIS

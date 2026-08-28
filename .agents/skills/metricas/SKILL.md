@@ -1,4 +1,4 @@
----
+﻿---
 name: metricas
 description: Before/after delta + % comparison — git diff or bookmark mode, tokenization-aware, multi-language
 triggers:
@@ -47,3 +47,5 @@ Modes: git-diff (default) | bookmark
 
 ## Reference
 Worked examples, testing patterns, edge cases, anti-patterns → docs/skills/metricas/reference.md
+## Refs
+Cross-Refs: auto-metrics | performance-tracker

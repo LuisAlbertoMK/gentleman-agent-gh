@@ -36,7 +36,9 @@ param(
 
     [Parameter()]
     [string]$Path = (Join-Path (Split-Path -Parent $PSScriptRoot) 'coverage.xml')
-)
+,
+    [switch]$Quiet,
+    [switch]$Json)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'

@@ -27,7 +27,9 @@
 param(
     [string]$ConfigPath = $null,
     [switch]$DryRun
-)
+,
+    [switch]$Quiet,
+    [switch]$Json)
 Set-StrictMode -Version Latest
 
 # --- Resolve the global opencodec.json path (auto-discover candidates) ---

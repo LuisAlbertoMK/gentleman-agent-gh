@@ -1,4 +1,4 @@
----
+﻿---
 name: sdd-verify
 description: "Execute tests and prove implementation matches specs, design, and tasks. Trigger: SDD verification phase."
 triggers: "SDD verify, verification, test verification, verify change, SDD verification"
@@ -26,6 +26,10 @@ Run when orchestrator launches verification. Prove completion via source inspect
 5. Run test/build/typecheck/coverage.
 6. Build compliance matrix from test results.
 7. Persist report with skipped dims.
-Return `## Verification Report`: change, mode, completeness, build/test/coverage, compliance matrix, correctness, design coherence, issues (CRITICAL/WARNING/SUGGESTION), verdict (`PASS`/`PASS WITH WARNINGS`/`FAIL`).
+Return `
+## Refs
+Cross-Refs: sdd | sdd-apply
+
+## Verification Report`: change, mode, completeness, build/test/coverage, compliance matrix, correctness, design coherence, issues (CRITICAL/WARNING/SUGGESTION), verdict (`PASS`/`PASS WITH WARNINGS`/`FAIL`).
 ## Reference
 Conditions & Actions matrix → docs/skills/sdd-verify/reference.md

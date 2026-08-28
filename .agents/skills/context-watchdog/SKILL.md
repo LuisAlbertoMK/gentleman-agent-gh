@@ -1,4 +1,4 @@
----
+﻿---
 name: context-watchdog
 description: "Monitor context window — Recursive Summary Compression (L1/L2/L3), YELLOW/RED zones, hallucination detection"
 triggers: "Context explosion, compress, compression schedule, session break"
@@ -32,3 +32,5 @@ Monitor context window — Recursive Summary Compression (L1/L2/L3), YELLOW/RED 
 Compress at RED (recovery > savings; rule 1) · Jump to L3 skipping L1 (destroys chain) · Summarize stale instead of pruning (compounds drift)
 ## Reference
 > docs/skills/context-watchdog/reference.md
+## Refs
+Cross-Refs: skill-graph | performance

@@ -1,4 +1,4 @@
----
+﻿---
 name: bitacora
 description: "Historical log of user requests per session — auto-append to BITACORA.md, search, date filtering"
 triggers: "Bitacora, historial, histórico, qué pedí, request log"
@@ -34,3 +34,5 @@ After session end: prepend new entry to `BITACORA.md`.
 
 docs/skills/bitacora/reference.md
 ---
+## Refs
+Cross-Refs: engram-protocol | session-resume

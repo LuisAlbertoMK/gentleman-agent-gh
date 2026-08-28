@@ -1,4 +1,4 @@
----
+﻿---
 name: opencode-model-router
 description: "Route tasks by model strength — specialized agents for analysis, implementer for execution"
 triggers: "model router, routing, delegate or direct, model decision, specialized agent, implementer"
@@ -26,3 +26,5 @@ token_budget: 1908
 | Default | DIRECT | `gentleman-vMK` | — | — |
 ## Reference
 > docs/skills/opencode-model-router/reference.md
+## Refs
+Cross-Refs: skill-graph | skill-registry

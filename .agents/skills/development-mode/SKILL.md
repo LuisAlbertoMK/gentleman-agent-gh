@@ -1,4 +1,4 @@
----
+﻿---
 name: development-mode
 description: "System resource prioritization — RAM/CPU/GPU/file I/O optimization. NOT task execution mode (see execution-mode)."
 triggers: "modo desarrollo, dev mode, development mode, performance mode, resource priority"
@@ -38,3 +38,5 @@ System resource prioritization — RAM/CPU/GPU/file I/O optimization. NOT task e
 
 docs/skills/development-mode/reference.md
 ---
+## Refs
+Cross-Refs: performance | execution-mode

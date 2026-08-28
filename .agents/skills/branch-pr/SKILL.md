@@ -1,4 +1,4 @@
----
+﻿---
 name: branch-pr
 description: "Create Gentle AI pull requests with issue-first checks. Trigger: creating, opening, or preparing PRs for review."
 triggers: "pull request, create PR, open PR, branch naming, PR creation, review PR, github pull request"
@@ -33,3 +33,5 @@ Add `!` after type/scope. `BREAKING CHANGE:` in footer. Maps to `type:breaking-c
 
 ## Reference
 > docs/skills/branch-pr/reference.md
+## Refs
+Cross-Refs: chained-pr | issue-creation

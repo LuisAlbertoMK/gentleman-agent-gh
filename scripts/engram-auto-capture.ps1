@@ -55,7 +55,9 @@ param(
     [switch]$Force,
 
     [int]$WindowSize = 10
-)
+,
+    [switch]$Quiet,
+    [switch]$Json)
 
 Set-StrictMode -Version Latest
 

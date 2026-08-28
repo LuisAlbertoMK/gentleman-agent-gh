@@ -1,4 +1,4 @@
----
+﻿---
 name: adversarial-breaker
 description: "Adversarial verification — fixer→breaker chain. Independent offensive agent."
 triggers: "adversarial, breaker, !breaker, verify fix, romper, verificar fix, try to break, offensive verification"
@@ -31,3 +31,5 @@ Projects:`.agents/attack-surface.{project}.md`+`.agents/breaker-profiles/{projec
 ## Anti-Patterns
 Breaker trusts fixer·No attempts·3+r·Before QG·4R review·Happy path·Non-code/tiny diffs·No pre-reg·No test cases·Generic surface
 > docs/skills/adversarial-breaker/reference.md
+## Refs
+Cross-Refs: security-scanner | best-practices

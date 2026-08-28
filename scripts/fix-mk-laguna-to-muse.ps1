@@ -16,7 +16,9 @@
     Built-in pwsh only, ASCII only.
 #>
 [CmdletBinding()]
-param([switch]$WhatIf)
+param([switch]$WhatIf,
+    [switch]$Quiet,
+    [switch]$Json)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 

@@ -1,4 +1,4 @@
----
+﻿---
 name: e2e-testing
 description: "E2E testing - hybrid: e2e-test.js smoke checks + Playwright for flows, assertions, visual regression, Ollama AI analysis."
 triggers: test, e2e, playwright, browser testing, interactive testing, form testing
@@ -37,3 +37,5 @@ Run: `npx playwright test` · single file · `--ui` · `show-report`.
 Playwright: `npm i -D playwright` · Chromium: `npx playwright install chromium` · Ollama (optional): AI analysis.
 ## Reference
 Worked examples, testing patterns, edge cases, anti-patterns → docs/skills/e2e-testing/reference.md
+## Refs
+Cross-Refs: testing-strategy | api-testing

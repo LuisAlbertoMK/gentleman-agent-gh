@@ -28,7 +28,9 @@ Write-Output "## Metrics"
 Write-Output "| Metric | First | Current | Delta | Trend |"
 Write-Output "|--------|-------|---------|-------|-------|"
 $metrics=@(
-@{N="AGENTS Size";F={param($v)FB$v};B=$false;V1={$fst.system.AgentsMdBytes};V2={$lst.system.AgentsMdBytes}}
+@{N="AGENTS Size";F={param($v,
+    [switch]$Quiet,
+    [switch]$Json)FB$v};B=$false;V1={$fst.system.AgentsMdBytes};V2={$lst.system.AgentsMdBytes}}
 @{N="AGENTS Lines";F={param($v)FI$v};B=$false;V1={$fst.system.AgentsMdLines};V2={$lst.system.AgentsMdLines}}
 @{N="Total Skills";F={param($v)FI$v};B=$true;V1={$fst.system.TotalSkills};V2={$lst.system.TotalSkills}}
 @{N="Total Skill Size";F={param($v)FB$v};B=$false;V1={$fst.system.TotalSkillBytes};V2={$lst.system.TotalSkillBytes}}

@@ -29,7 +29,9 @@ param(
     [string]$Path = (Join-Path $PSScriptRoot 'tests'),
     [string]$OutputDir = (Join-Path (Split-Path $PSScriptRoot -Parent) 'test-results'),
     [switch]$WithCoverage
-)
+,
+    [switch]$Quiet,
+    [switch]$Json)
 Set-StrictMode -Version Latest
 
 $ErrorActionPreference = 'Stop'

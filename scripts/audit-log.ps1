@@ -47,7 +47,9 @@ param(
     [string]$FilterAgent = "*",
     [int]$Last = 50,
     [datetime]$Since
-)
+,
+    [switch]$Quiet,
+    [switch]$Json)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Continue"

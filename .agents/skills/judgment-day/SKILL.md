@@ -1,4 +1,4 @@
----
+﻿---
 name: judgment-day
 description: "Dual adversarial review orchestrator — 2 profile-scoped code-review-agent instances, verdict synthesis"
 triggers: "Judgment day, JD, dual review, juzgar, adversarial review"
@@ -56,3 +56,5 @@ Consult these when the skill needs detailed worked examples or guardrails:
   → docs/skills/judgment-day/reference.md
 
 ---
+## Refs
+Cross-Refs: code-review-agent | testing-strategy

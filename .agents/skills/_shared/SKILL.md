@@ -1,4 +1,4 @@
----
+﻿---
 name: _shared
 description: "Internal shared references for SDD skills. Not an invokable skill."
 triggers:
@@ -16,3 +16,5 @@ This directory stores shared reference documents consumed by real SDD skills
 ## Not Invokable
 
 `_shared` is a support package only. Do not invoke it as a skill.
+## Refs
+Cross-Refs: sdd | sdd-init

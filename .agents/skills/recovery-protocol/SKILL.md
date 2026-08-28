@@ -1,4 +1,4 @@
----
+﻿---
 name: recovery-protocol
 description: "Stop-diagnose-correct-learn protocol — handle agent errors and frustration systematically"
 triggers: "Recovery, 'no es eso', frustration, error correction"
@@ -39,3 +39,5 @@ STOP code → Ask "¿Podés mostrarme exactamente qué esperás?" → Offer rest
 
 docs/skills/recovery-protocol/reference.md
 ---
+## Refs
+Cross-Refs: deep-debugging | engram-protocol
