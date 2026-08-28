@@ -3,7 +3,7 @@ name: image-pipeline
 description: "Image optimization — compress, convert WebP/AVIF, resize, describe. Single-file atomic edits, batch processing, metadata extraction."
 triggers: "compress, convert WebP/AVIF, resize, describe"
 changelog: docs/ciclos/cycle28-20260816.md
-token_budget: 601
+token_budget: 2000
 ---
 
 ## When to Use

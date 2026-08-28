@@ -170,3 +170,10 @@ scripts/tests/_coverage/
 # MK local backup (not tracked)
 docs/compar_code.zip
 docs/compar_code/
+
+# ============================================
+# Session checkpoints (runtime, not tracked)
+# ============================================
+.opencode/session-checkpoints/
+.opencode/session-checkpoints/*.json
+docs/agentes/*/05-implementacion-completada.md
