@@ -79,16 +79,16 @@ try {
                 if ($Json -or $Quiet) {
                     # Reconstruct minimal result for JSON output
                     $tsStr = if ($cached.ts -is [string]) { $cached.ts.Substring(0,10) } else { "$($cached.ts)".Substring(0,10) }
-                    @{ score = @{ current = $cached.score; trend = $cached.trend; last_updated = $tsStr } } | ConvertTo-Json -Depth 5
+                    $bp = Get-Content (Join-Path $PSScriptRoot "../.project.json") -Raw | ConvertFrom-Json; @{ score = @{ current = $cached.score; trend = $cached.trend; last_updated = $tsStr }; subdimensions = $bp.dimensions_detail.SD.e; SD_detail = $bp.dimensions_detail.SD.r } | ConvertTo-Json -Depth 5
                 } else {
                     Write-Host "Score: $($cached.score)/10 (cached at $($cached.ts))" -ForegroundColor DarkGray
                 }
             } else {
                 # v1 legacy: full result available
                 if ($Json) {
-                    $cached.result | ConvertTo-Json -Depth 5
+                    $cached.result | Add-Member -NotePropertyName subdimensions -NotePropertyValue $cached.result.dimensions_detail.SD.e -Force; $cached.result | Add-Member -NotePropertyName SD_detail -NotePropertyValue $cached.result.dimensions_detail.SD.r -Force; $cached.result | ConvertTo-Json -Depth 5
                 } elseif ($Quiet) {
-                    $cached.result | ConvertTo-Json -Depth 5
+                    $cached.result | Add-Member -NotePropertyName subdimensions -NotePropertyValue $cached.result.dimensions_detail.SD.e -Force; $cached.result | Add-Member -NotePropertyName SD_detail -NotePropertyValue $cached.result.dimensions_detail.SD.r -Force; $cached.result | ConvertTo-Json -Depth 5
                 } else {
                     Write-Host "Score: $($cached.result.score.current)/10 (cached at $($cached.timestamp))" -ForegroundColor DarkGray
                 }
@@ -317,9 +317,9 @@ Pop-Location
 # ============================================================
 
 if ($Json) {
-    $result | ConvertTo-Json -Depth 5
+    # Json output deferred to SD breakdown block at end (15 lines)
 } elseif ($Quiet) {
-    $result | ConvertTo-Json -Depth 5
+    # Quiet output deferred to SD breakdown block at end
 } else {
     Write-Host "$($result.score.last_updated) | $finalScore/10 ($($result.score.trend))" -ForegroundColor Cyan
     Write-Host "Dimensions:" -ForegroundColor Yellow
@@ -350,6 +350,21 @@ $currentCommit = (git rev-parse HEAD).Substring(0,8)
 $delta = [math]::Abs($proj.score.current - $lastScore)
 if($delta -gt 0.2 -or $currentCommit -ne $lastCommit -or $Force){ @{"date"=(Get-Date -Format yyyy-MM-dd);"commit"=$currentCommit;"score"=$proj.score.current;"gate"="25/25";"trend"=$proj.score.trend;"dimensions"=@{"Score Depth"=$proj.score.dimensions."Score Depth"}} | ConvertTo-Json -Compress | Add-Content -Path $historyPath }
 
+# --- SD sub-dimension breakdown (early regression detection) ---
+if ($Json) {
+    try {
+        $proj = Get-Content $projectJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+        $sdE = $proj.dimensions_detail.SD.e
+        $sdR = $proj.dimensions_detail.SD.r
+        $result.subdimensions = $sdE
+        $result.SD_detail = $sdR
+        $result | ConvertTo-Json -Depth 5
+    } catch {
+        $result | ConvertTo-Json -Depth 5
+    }
+} elseif ($Quiet) {
+    $result | ConvertTo-Json -Depth 5
+}
 # Explicit success exit — native calls inside (git update-index) may leave
 # $LASTEXITCODE dirty; the contract is exit 0 on success (score-cache exit 0 parity)
 exit 0
