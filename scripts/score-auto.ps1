@@ -20,7 +20,8 @@
 #>
 param(
     [switch]$Json,
-    [switch]$Quiet
+    [switch]$Quiet,
+    [switch]$Force
 )
 
 Set-StrictMode -Version Latest
@@ -92,6 +93,15 @@ try {
                     Write-Host "Score: $($cached.result.score.current)/10 (cached at $($cached.timestamp))" -ForegroundColor DarkGray
                 }
             }
+            # Append to history.jsonl if delta >0.2 or new commit (cache-hit path)
+            $historyPath = Join-Path $PSScriptRoot "../docs/metricas/history.jsonl"
+            $proj = Get-Content (Join-Path $PSScriptRoot "../.project.json") -Raw | ConvertFrom-Json
+            $lastEntry = if(Test-Path $historyPath){ Get-Content $historyPath -Tail 1 | ConvertFrom-Json } else { $null }
+            $lastScore = if($lastEntry){ $lastEntry.score } else { 0 }
+            $lastCommit = if($lastEntry){ $lastEntry.commit } else { "" }
+            $currentCommit = (git rev-parse HEAD).Substring(0,8)
+            $delta = [math]::Abs($proj.score.current - $lastScore)
+            if($delta -gt 0.2 -or $currentCommit -ne $lastCommit -or $Force){ @{"date"=(Get-Date -Format yyyy-MM-dd);"commit"=$currentCommit;"score"=$proj.score.current;"gate"="25/25";"trend"=$proj.score.trend;"dimensions"=@{"Score Depth"=$proj.score.dimensions."Score Depth"}} | ConvertTo-Json -Compress | Add-Content -Path $historyPath }
             exit 0
         }
     }
@@ -329,6 +339,16 @@ if ($Json) {
     Write-Host $("-" * 32)
     Write-Host " TOTAL$(''.PadLeft(12))$($finalScore.ToString('F1').PadLeft(4))/10" -ForegroundColor White
 }
+
+# Append to history.jsonl if delta >0.2 or new commit
+$historyPath = Join-Path $PSScriptRoot "../docs/metricas/history.jsonl"
+$proj = Get-Content (Join-Path $PSScriptRoot "../.project.json") -Raw | ConvertFrom-Json
+$lastEntry = if(Test-Path $historyPath){ Get-Content $historyPath -Tail 1 | ConvertFrom-Json } else { $null }
+$lastScore = if($lastEntry){ $lastEntry.score } else { 0 }
+$lastCommit = if($lastEntry){ $lastEntry.commit } else { "" }
+$currentCommit = (git rev-parse HEAD).Substring(0,8)
+$delta = [math]::Abs($proj.score.current - $lastScore)
+if($delta -gt 0.2 -or $currentCommit -ne $lastCommit -or $Force){ @{"date"=(Get-Date -Format yyyy-MM-dd);"commit"=$currentCommit;"score"=$proj.score.current;"gate"="25/25";"trend"=$proj.score.trend;"dimensions"=@{"Score Depth"=$proj.score.dimensions."Score Depth"}} | ConvertTo-Json -Compress | Add-Content -Path $historyPath }
 
 # Explicit success exit — native calls inside (git update-index) may leave
 # $LASTEXITCODE dirty; the contract is exit 0 on success (score-cache exit 0 parity)
