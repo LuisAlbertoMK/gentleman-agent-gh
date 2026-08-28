@@ -5,7 +5,7 @@ triggers:
   - sdd shared references
   - internal shared docs
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 451
+token_budget: 459
 ---
 
 ## Purpose
