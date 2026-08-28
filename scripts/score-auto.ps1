@@ -77,9 +77,20 @@ try {
             # For display, reconstruct minimal result from cached fields
             if ($cached.v -eq 2) {
                 if ($Json -or $Quiet) {
-                    # Reconstruct minimal result for JSON output
+                    # Reconstruct full result for JSON output from .project.json (single source of truth)
                     $tsStr = if ($cached.ts -is [string]) { $cached.ts.Substring(0,10) } else { "$($cached.ts)".Substring(0,10) }
-                    $bp = Get-Content (Join-Path $PSScriptRoot "../.project.json") -Raw | ConvertFrom-Json; @{ score = @{ current = $cached.score; trend = $cached.trend; last_updated = $tsStr }; subdimensions = $bp.dimensions_detail.SD.e; SD_detail = $bp.dimensions_detail.SD.r } | ConvertTo-Json -Depth 5
+                    $bp = Get-Content (Join-Path $PSScriptRoot "../.project.json") -Raw | ConvertFrom-Json
+                    @{
+                        score = @{
+                            current      = $cached.score
+                            trend        = $cached.trend
+                            last_updated = $tsStr
+                            dimensions   = $bp.score.dimensions
+                        }
+                        dimensions_detail = $bp.dimensions_detail
+                        subdimensions     = $bp.dimensions_detail.SD.e
+                        SD_detail         = $bp.dimensions_detail.SD.r
+                    } | ConvertTo-Json -Depth 5
                 } else {
                     Write-Host "Score: $($cached.score)/10 (cached at $($cached.ts))" -ForegroundColor DarkGray
                 }

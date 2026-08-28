@@ -1,151 +1,151 @@
 {
   "score": {
-    "last_updated": "2026-08-27",
-    "current": 10.0,
+    "last_updated": "2026-08-28",
     "trend": "stable",
     "dimensions": {
-      "Skill Effectiveness": 10.0,
       "Orthography": 10.0,
-      "Bitacora": 10.0,
-      "Metrics": 10.0,
-      "Security": 10.0,
-      "Score Depth": 10.0,
-      "Script Performance": 10.0,
-      "Clean Code": 10.0,
+      "Skill Effectiveness": 10.0,
       "Backlog Integrity": 10.0,
-      "Cycle Activity": 10.0,
+      "Script Performance": 10.0,
+      "Bitacora": 10.0,
       "Dead Code": 10.0,
+      "Clean Code": 10.0,
+      "Cycle Activity": 10.0,
       "Best Practices": 10.0,
-      "Project Artifacts": 10.0
-    }
+      "Project Artifacts": 10.0,
+      "Score Depth": 9.7,
+      "Security": 10.0,
+      "Metrics": 10.0
+    },
+    "current": 10.0
   },
   "dimensions_detail": {
-    "SD": {
+    "SG": {
       "s": 10.0,
+      "r": "SSoT age: 1d",
       "e": {
-        "subd": 42
-      },
-      "r": "Depth: 42 sub-dims: 10/10"
-    },
-    "SE": {
-      "s": 10.0,
-      "e": {
-        "bytes": 170252.0,
-        "avg": 1.8,
-        "o3": 0,
-        "total": 92,
-        "prO3": 1,
-        "prO5": 0,
-        "cmdO3": 0,
-        "cmdO5": 0,
-        "o5": 0
-      },
-      "r": "T:92 >3:0 >5:0 avg:1.8KB cmdO3:0 cmdO5:0 prO3:1 prO5:0"
-    },
-    "Or": {
-      "s": 10.0,
-      "e": {
-        "corrupted": 0,
-        "scanned": 93
-      },
-      "r": "Corruption: 0/93"
-    },
-    "BI2": {
-      "s": 10.0,
-      "e": {
-        "passed": 8,
-        "total": 8
-      },
-      "r": "8/8 items"
-    },
-    "SP": {
-      "s": 10.0,
-      "e": {
-        "sc": 120,
-        "huge": 0,
-        "thresh": 120,
-        "avg": 7.1
-      },
-      "r": "S:120 avg:7.1KB threshold:120 (ADR-047)"
+        "days_old": 1,
+        "last_updated": "2026-08-28"
+      }
     },
     "Bi": {
       "s": 10.0,
+      "r": "BI: True",
       "e": {
         "exists": true,
-        "lines": 187
-      },
-      "r": "BI: True"
+        "lines": 188
+      }
     },
     "DC": {
       "s": 10.0,
+      "r": "Orphans: 0, dead junctions: 0",
       "e": {
-        "orphans": 0,
+        "dead_junctions": 0,
         "commented_out": 0,
-        "dead_junctions": 0
-      },
-      "r": "Orphans: 0, dead junctions: 0"
+        "orphans": 0
+      }
     },
-    "SG": {
+    "SP": {
       "s": 10.0,
+      "r": "S:120 avg:7.2KB threshold:120 (ADR-047)",
       "e": {
-        "days_old": 1,
-        "last_updated": "2026-08-27"
-      },
-      "r": "SSoT age: 1d"
-    },
-    "CC": {
-      "s": 10.0,
-      "e": {
-        "total_scripts": 120,
-        "with_strictmode": 120,
-        "with_params": 120,
-        "with_help": 120
-      },
-      "r": "S:120 H:120 P:120 S:120"
-    },
-    "PA": {
-      "s": 10.0,
-      "e": {
-        "skills": 92,
-        "readme": true,
-        "project_json": true,
-        "cross_ref": true
-      },
-      "r": "X-ref True, 92 skills"
+        "avg": 7.2,
+        "sc": 120,
+        "thresh": 120,
+        "huge": 0
+      }
     },
     "CA": {
       "s": 10.0,
+      "r": "IC:29/30",
       "e": {
-        "ic": 30,
-        "it": 30
-      },
-      "r": "IC:30/30"
-    },
-    "Sec": {
-      "s": 10.0,
-      "e": {
-        "weak_crypto": false,
-        "secrets": false
-      },
-      "r": "Weak crypto: False, secrets: False"
+        "it": 30,
+        "ic": 29
+      }
     },
     "Me": {
       "s": 10.0,
+      "r": "MD:True EJ:True",
       "e": {
-        "rp": true,
-        "md": true,
         "ed": true,
-        "ej": true
-      },
-      "r": "MD:True EJ:True"
+        "ej": true,
+        "rp": true,
+        "md": true
+      }
+    },
+    "BI2": {
+      "s": 10.0,
+      "r": "8/8 items",
+      "e": {
+        "total": 8,
+        "passed": 8
+      }
+    },
+    "SD": {
+      "s": 9.7,
+      "r": "Depth: 42 sub-dims: 9.7/10",
+      "e": {
+        "subd": 42
+      }
+    },
+    "PA": {
+      "s": 10.0,
+      "r": "X-ref True, 92 skills",
+      "e": {
+        "skills": 92,
+        "readme": true,
+        "cross_ref": true,
+        "project_json": true
+      }
     },
     "BP": {
       "s": 10.0,
+      "r": "P:120/120 T:97/120",
       "e": {
         "param_cov": 120,
         "trycatch": 97
-      },
-      "r": "P:120/120 T:97/120"
+      }
+    },
+    "SE": {
+      "s": 10.0,
+      "r": "T:92 >3:0 >5:0 avg:1.8KB cmdO3:0 cmdO5:0 prO3:1 prO5:0",
+      "e": {
+        "o3": 0,
+        "bytes": 170488.0,
+        "prO5": 0,
+        "prO3": 1,
+        "total": 92,
+        "cmdO5": 0,
+        "avg": 1.8,
+        "cmdO3": 0,
+        "o5": 0
+      }
+    },
+    "Or": {
+      "s": 10.0,
+      "r": "Corruption: 0/93",
+      "e": {
+        "scanned": 93,
+        "corrupted": 0
+      }
+    },
+    "Sec": {
+      "s": 10.0,
+      "r": "Weak crypto: False, secrets: False",
+      "e": {
+        "weak_crypto": false,
+        "secrets": false
+      }
+    },
+    "CC": {
+      "s": 10.0,
+      "r": "S:120 H:120 P:120 S:120",
+      "e": {
+        "with_strictmode": 120,
+        "with_help": 120,
+        "total_scripts": 120,
+        "with_params": 120
+      }
     }
   }
 }
