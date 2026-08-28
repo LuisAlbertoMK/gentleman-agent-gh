@@ -11,13 +11,14 @@ BeforeAll {
     # Helper: run script with given flags, return parsed JSON object.
     # The script outputs pretty-printed (multi-line) JSON, so we join
     # all output lines before parsing.
+    # Runs IN-PROCESS (& $scriptPath) — `pwsh -NoProfile -Command` subprocess
+    # spawn is DENIED by permission policy; see docs/operations/RUNBOOK.md:64.
     function Invoke-DriftCheck {
         param([switch]$Json, [switch]$Quiet)
-        $flags = @()
-        if ($Json)  { $flags += '-Json' }
-        if ($Quiet) { $flags += '-Quiet' }
-        $cmd = "& '$scriptPath' $($flags -join ' ')"
-        $output = & pwsh -NoProfile -Command $cmd 2>&1
+        $invokeParams = @{}
+        if ($Json)  { $invokeParams['Json']  = $true }
+        if ($Quiet) { $invokeParams['Quiet'] = $true }
+        $output = & $scriptPath @invokeParams 2>&1
         # Join all lines into a single string for ConvertFrom-Json
         $joined = ($output | Where-Object { $_ -is [string] }) -join "`n"
         $joined | ConvertFrom-Json
@@ -44,8 +45,15 @@ Describe "check-config-drift.ps1 — output structure" -Skip:(($env:CI -eq 'true
 
     It "reports sections with OK or DRIFT status" {
         $json = Invoke-DriftCheck -Json
-        $statuses = $json.sections | ForEach-Object { $_.status }
-        $statuses | Should -Contain "OK"
+        # Every section must carry a status, and each status must be one of
+        # the two valid values. All-DRIFT is a legitimate state (e.g. when
+        # canonical and global diverge), so we assert membership, not the
+        # presence of a specific status.
+        $statuses = @($json.sections | ForEach-Object { $_.status })
+        $statuses | Should -Not -BeNullOrEmpty
+        foreach ($status in $statuses) {
+            $status | Should -BeIn @("OK", "DRIFT")
+        }
     }
 }
 
@@ -73,8 +81,7 @@ Describe "check-config-drift.ps1 — JSON output" {
 
 Describe "check-config-drift.ps1 — Quiet flag" {
     It "-Quiet suppresses non-JSON output" {
-        $flags = '-Quiet'
-        $output = & pwsh -NoProfile -Command "& '$scriptPath' $flags" 2>&1
+        $output = & $scriptPath -Quiet 2>&1
         $output | Should -Not -Match 'CONFIG DRIFT CHECK'
         $output | Should -Not -Match '═══'
         $output | Should -Not -Match 'Total drifts:'
@@ -100,6 +107,8 @@ Describe "check-config-drift.ps1 — exit code" -Skip:(($env:CI -eq 'true') -or 
         $json = Invoke-DriftCheck -Json
         $json.exitCode | Should -BeGreaterOrEqual 0
         $json.exitCode | Should -BeLessOrEqual 2
-        $json.exitCode | Should -Be $json.totalDrift
+        # Script caps exitCode at 2 via [Math]::Min($totalDrift, 2), so when
+        # totalDrift exceeds 2 the code must equal the cap, not the raw count.
+        $json.exitCode | Should -Be ([Math]::Min($json.totalDrift, 2))
     }
 }
