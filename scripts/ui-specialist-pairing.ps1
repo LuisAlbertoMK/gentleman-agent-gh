@@ -60,7 +60,8 @@ param(
     # Ollama endpoint. Defaults to local. Cloud-ready via existing ollama-cloud-investigation.md
     # (2026-08-27) — NOT enabled now; a future cloud provider can override this base URL without
     # touching the check below or the 100%-local vision-analyze privacy rule.
-    [string]$OllamaBaseUrl = "127.0.0.1:11434"
+    [string]$OllamaBaseUrl = "127.0.0.1:11434",
+    [string]$OllamaApiKey = ""
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -98,8 +99,7 @@ function Test-OllamaBaseUrlAllowlist {
         return $false
     }
 }
-# Placeholder futuro: OllamaApiKey (no implementar ahora per docs/mejoras/2026-08-27-ollama-cloud-investigation.md opciones 1/2)
-# Si se habilita autenticación cloud, añadir param [string]$OllamaApiKey y header: @{ Authorization = "Bearer $OllamaApiKey" }
+# OllamaApiKey: optional Bearer token for cloud (Option 1 — Ollama Cloud). Empty = local/offline-first.
 
 # --- Step 1: baseline-ui audit (inline rules replication) ---
 # Mirrors baseline-ui/SKILL.md rules: layout, typography, animation, tokens, design
@@ -224,8 +224,9 @@ if ($Mode -eq 'full' -and $Vision) {
     if (Test-Path -LiteralPath $analyzerPath) {
         # SSRF mitigation + offline-first: validar allowlist antes de request.
         # Timeout: 5s local, 8s si OLLAMA_CLOUD=1 (ver docs/mejoras/2026-08-27-ollama-cloud-investigation.md latencia cloud 500-1500ms)
-        # Placeholder futuro: OllamaApiKey header si cloud requiere auth (no implementar ahora)
         $ollamaTimeoutSec = if ($env:OLLAMA_CLOUD -eq '1') { 8 } else { 5 }
+        $headers = @{}
+        if ($OllamaApiKey) { $headers.Authorization = "Bearer $OllamaApiKey" }
         if (-not (Test-OllamaBaseUrlAllowlist -BaseUrl $OllamaBaseUrl)) {
             Write-Warning "OllamaBaseUrl not in allowlist — skipping Ollama check (offline-first fallback)"
             $visionResult = [PSCustomObject]@{
@@ -234,7 +235,13 @@ if ($Mode -eq 'full' -and $Vision) {
             }
         } else {
             try {
-                $null = Invoke-RestMethod -Uri "http://$OllamaBaseUrl/api/version" -TimeoutSec $ollamaTimeoutSec -ErrorAction Stop
+                $invokeParams = @{
+                    Uri = "http://$OllamaBaseUrl/api/version"
+                    TimeoutSec = $ollamaTimeoutSec
+                    ErrorAction = "Stop"
+                }
+                if ($headers.Count -gt 0) { $invokeParams.Headers = $headers }
+                $null = Invoke-RestMethod @invokeParams
                 $visionResult = [PSCustomObject]@{
                     available      = $true
                     model          = "moondream:latest"  # or llava:7b

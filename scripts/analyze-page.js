@@ -57,7 +57,10 @@ const userModel = getArg(['--model', '-l'], null);
 const output = getArg(['--output', '-o'], null);
 const wait = parseInt(getArg(['--wait', '-w'], '2000'), 10);
 const fullPage = hasFlag(['--full', '-f']);
-const ollamaUrl = getArg(['--ollama', '-u'], 'http://127.0.0.1:11434');
+const baseUrl = process.env.OLLAMA_BASE_URL || getArg(['--ollama', '-u'], 'http://127.0.0.1:11434');
+const ollamaUrl = baseUrl;
+const ollamaHeaders = {};
+if (process.env.OLLAMA_API_KEY) ollamaHeaders.Authorization = "Bearer " + process.env.OLLAMA_API_KEY;
 const noAnalysis = hasFlag(['--no-analysis']);
 
 // --- Model selection ---
@@ -147,12 +150,14 @@ async function analyzeWithOllama(imagePath, model) {
 
   try {
     const result = await new Promise((resolve, reject) => {
-      const req = http.request(`${ollamaUrl}/api/chat`, {
+      const reqHeaders = {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(body),
+        ...ollamaHeaders
+      };
+      const req = http.request(`${baseUrl}/api/chat`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(body)
-        },
+        headers: reqHeaders,
         timeout: 300000 // 5 min timeout
       }, (res) => {
         let data = '';
