@@ -41,7 +41,7 @@ Describe "remove-semi-agents.ps1 — syntax validation" {
     It "script has no parse errors" {
         $tokens = $null; $errors = $null
         [System.Management.Automation.Language.Parser]::ParseFile($scriptPath, [ref]$tokens, [ref]$errors) | Out-Null
-        $errors.Count | Should -Be 0
+        @($errors).Count | Should -Be 0
     }
 }
 
@@ -60,13 +60,13 @@ Describe "remove-semi-agents.ps1 — DryRun mode" {
         $configPath = New-TempConfig -AgentSection $semiAgents
         try {
             $agentsBefore = Get-AgentNames $configPath
-            $agentsBefore.Count | Should -Be 8
+            @($agentsBefore).Count | Should -Be 8
 
             $null = & pwsh -NoProfile -Command "& '$scriptPath' -ConfigPath '$configPath' -DryRun" 2>&1
             $LASTEXITCODE | Should -Be 0
 
             $agentsAfter = Get-AgentNames $configPath
-            $agentsAfter.Count | Should -Be 8
+            @($agentsAfter).Count | Should -Be 8
             $agentsAfter | Should -Contain "gentleman-deep-semi"
             $agentsAfter | Should -Contain "gentleman-deep"
         }
@@ -107,7 +107,7 @@ Describe "remove-semi-agents.ps1 — actual removal" {
             $LASTEXITCODE | Should -Be 0
 
             $agentsAfter = Get-AgentNames $configPath
-            $agentsAfter.Count | Should -Be 3
+            @($agentsAfter).Count | Should -Be 3
             $agentsAfter | Should -Contain "gentleman-deep"
             $agentsAfter | Should -Contain "gentleman-quick"
             $agentsAfter | Should -Contain "gentleman-implementer"
@@ -142,7 +142,7 @@ Describe "remove-semi-agents.ps1 — idempotency" {
             $LASTEXITCODE | Should -Be 0
 
             $agents = Get-AgentNames $configPath
-            $agents.Count | Should -Be 1
+            @($agents).Count | Should -Be 1
             $agents | Should -Contain "gentleman-deep"
         }
         finally {

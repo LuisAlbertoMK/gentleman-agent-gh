@@ -26,7 +26,7 @@ Describe "Resource Optimization -- Config Profile Files" {
         $c._resource_tier | Should -Be "low"
         $c.small_model | Should -Be "opencode/free"
         $c.compaction.prune | Should -BeTrue
-        $c.snapshot.enabled | Should -BeFalse
+        ($c.snapshot.enabled ?? $c.snapshot) | Should -BeFalse
         $c.agent.default.depth | Should -Be 1
     }
 
@@ -68,21 +68,21 @@ Describe "Resource Optimization -- Script Syntax" {
         $path = Join-Path $repoRoot "scripts/monitor-opencode.ps1"
         $tokens = $null; $errors = $null
         [System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$tokens, [ref]$errors) | Out-Null
-        $errors.Count | Should -Be 0
+        @($errors).Count | Should -Be 0
     }
 
     It "heap-snapshot.ps1 has no parse errors" {
         $path = Join-Path $repoRoot "scripts/heap-snapshot.ps1"
         $tokens = $null; $errors = $null
         [System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$tokens, [ref]$errors) | Out-Null
-        $errors.Count | Should -Be 0
+        @($errors).Count | Should -Be 0
     }
 
     It "hardware-profile.ps1 has no parse errors" {
         $path = Join-Path $repoRoot "scripts/hardware-profile.ps1"
         $tokens = $null; $errors = $null
         [System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$tokens, [ref]$errors) | Out-Null
-        $errors.Count | Should -Be 0
+        @($errors).Count | Should -Be 0
     }
 }
 

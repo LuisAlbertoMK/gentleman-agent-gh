@@ -55,7 +55,7 @@ Describe "global-setup.ps1 — syntax validation" {
     It "script has no parse errors" {
         $tokens = $null; $errors = $null
         [System.Management.Automation.Language.Parser]::ParseFile($scriptPath, [ref]$tokens, [ref]$errors) | Out-Null
-        $errors.Count | Should -Be 0
+        @($errors).Count | Should -Be 0
     }
 }
 
@@ -72,7 +72,7 @@ Describe "global-setup.ps1 — -Json flag" {
     It "produces JSON with results array" {
         $parsedJson | Should -Not -BeNullOrEmpty
         $parsedJson.results | Should -Not -BeNullOrEmpty
-        $parsedJson.results.Count | Should -BeGreaterThan 0
+        @($parsedJson.results).Count | Should -BeGreaterThan 0
     }
 
     It "produces JSON with summary object" {
@@ -100,7 +100,7 @@ Describe "global-setup.ps1 — -Quiet flag" {
 
     It "produces parseable JSON output" {
         $parsedQuiet | Should -Not -BeNullOrEmpty
-        $parsedQuiet.results.Count | Should -BeGreaterThan 0
+        @($parsedQuiet.results).Count | Should -BeGreaterThan 0
     }
 }
 
@@ -111,11 +111,11 @@ Describe "global-setup.ps1 — -SkipMCP flag" {
 
     It "produces valid JSON" {
         $parsedSkipMcp | Should -Not -BeNullOrEmpty
-        $parsedSkipMcp.results.Count | Should -BeGreaterThan 0
+        @($parsedSkipMcp.results).Count | Should -BeGreaterThan 0
     }
 
     It "result count decreases (MCP entries skipped)" {
-        $parsedSkipMcp.results.Count | Should -BeLessThan 60
+        @($parsedSkipMcp.results).Count | Should -BeLessThan 60
     }
 }
 
@@ -124,13 +124,13 @@ Describe "global-setup.ps1 — status values" {
         $parsedJson | Should -Not -BeNullOrEmpty
         $validStatuses = @("OK", "SYNCED", "FAIL", "SKIP")
         $invalid = $parsedJson.results | Where-Object { $_.status -notin $validStatuses }
-        $invalid.Count | Should -Be 0
+        @($invalid).Count | Should -Be 0
     }
 
     It "all steps succeed (ok or synced, no failures)" {
         $parsedJson | Should -Not -BeNullOrEmpty
         $failures = $parsedJson.results | Where-Object { $_.status -eq "FAIL" }
-        $failures.Count | Should -Be 0
+        @($failures).Count | Should -Be 0
     }
 }
 

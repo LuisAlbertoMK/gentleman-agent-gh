@@ -46,13 +46,9 @@ Describe 'README.md count drift' -Tag 'docs', 'drift' {
 
     Context 'Script count' {
         It 'README script count matches filesystem' {
-            $scriptsDir = Join-Path $RepoRoot 'scripts'
-            $actualPsCount = (Get-ChildItem $scriptsDir -Filter '*.ps1' |
-                Where-Object { $_.Directory.Name -eq 'scripts' } |
-                Measure-Object).Count
-            $actualShCount = (Get-ChildItem $scriptsDir -Filter '*.sh' |
-                Where-Object { $_.Directory.Name -eq 'scripts' } |
-                Measure-Object).Count
+            # Dynamic count — prevents drift when scripts are added/removed (Pattern 2 quick win)
+            $actualPsCount = (Get-ChildItem (Join-Path $RepoRoot 'scripts/*.ps1') -File | Measure-Object).Count
+            $actualShCount = (Get-ChildItem (Join-Path $RepoRoot 'scripts/*.sh') -File | Measure-Object).Count
             $actualTotal = $actualPsCount + $actualShCount
 
             $match = [regex]::Match($ReadmeContent, '(\d+)\s+top-level scripts\s*\((\d+)\s+PowerShell\s+\+\s+(\d+)\s+shell\)')

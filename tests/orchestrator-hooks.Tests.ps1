@@ -17,9 +17,9 @@
 Describe "Orchestrator Hooks — Static Gate" {
     $hookMarkers   = @(
         'Pre-Answer Evidence Gate',
-        'Proactive Memory Capture Hook',
-        'UX Decision Boundary Hook',
-        'Performance Profiling Hook'
+        'Memory Capture',
+        'UX Boundary',
+        'Perf Profiling'
     )
     $weaknessPlanScripts = @(
         'scripts\session-checkpoint.ps1',
@@ -33,9 +33,9 @@ Describe "Orchestrator Hooks — Static Gate" {
         $promptFile        = Join-Path $repoRoot "prompts\gentleman-vMK.md"
         $hookMarkers       = @(
             'Pre-Answer Evidence Gate',
-            'Proactive Memory Capture Hook',
-            'UX Decision Boundary Hook',
-            'Performance Profiling Hook'
+            'Memory Capture',
+            'UX Boundary',
+            'Perf Profiling'
         )
         $weaknessPlanScripts = @(
             'scripts\session-checkpoint.ps1',

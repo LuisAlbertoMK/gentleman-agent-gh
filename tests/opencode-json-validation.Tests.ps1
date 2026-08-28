@@ -20,20 +20,20 @@ Describe "opencode.json Configuration Validation" {
 
     Context "Agent Definitions" {
         It "Contains at least 40 agent definitions" {
-            $agentCount = ($config.agent | Get-Member -MemberType NoteProperty).Count
+            $agentCount = @($config.agent | Get-Member -MemberType NoteProperty).Count
             $agentCount | Should -BeGreaterOrEqual 40
         }
 
         It "All agents have 'model' field" {
             $agents = $config.agent | Get-Member -MemberType NoteProperty | ForEach-Object { $config.agent.$($_.Name) }
             $agentsWithoutModel = $agents | Where-Object { -not $_.model }
-            $agentsWithoutModel.Count | Should -Be 0
+            @($agentsWithoutModel).Count | Should -Be 0
         }
 
         It "All agents have 'prompt' field or 'instructions'" {
             $agents = $config.agent | Get-Member -MemberType NoteProperty | ForEach-Object { $config.agent.$($_.Name) }
             $agentsWithoutPrompt = $agents | Where-Object { -not ($_.prompt -or $_.instructions) }
-            $agentsWithoutPrompt.Count | Should -Be 0
+            @($agentsWithoutPrompt).Count | Should -Be 0
         }
 
         It "Orchestrator agent (gentleman-vMK) exists" {
@@ -90,7 +90,7 @@ Describe "opencode.json Configuration Validation" {
         It "MCP servers have 'command' or 'type' field" {
             $servers = $config.mcp | Get-Member -MemberType NoteProperty | ForEach-Object { $config.mcp.$($_.Name) }
             $serversWithoutCommand = $servers | Where-Object { -not ($_.command -or $_.type) }
-            $serversWithoutCommand.Count | Should -Be 0
+            @($serversWithoutCommand).Count | Should -Be 0
         }
     }
 
@@ -98,7 +98,7 @@ Describe "opencode.json Configuration Validation" {
         It "No duplicate agent definitions" {
             $agentNames = $config.agent | Get-Member -MemberType NoteProperty | ForEach-Object { $_.Name }
             $uniqueNames = $agentNames | Select-Object -Unique
-            $agentNames.Count | Should -Be $uniqueNames.Count
+            @($agentNames).Count | Should -Be @($uniqueNames).Count
         }
 
         It "Agent mode variants follow naming convention (-semi, -auto)" {

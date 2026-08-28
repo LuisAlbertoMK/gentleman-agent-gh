@@ -1,13 +1,18 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
 # Enforces PS version declaration matches reality (dot-sources must not pull PS7-only libs)
-$repoScripts = Get-ChildItem (Join-Path (Split-Path $PSScriptRoot -Parent) '*.ps1') -File
-$repoLibs    = Get-ChildItem (Join-Path (Split-Path $PSScriptRoot -Parent) 'lib\*.ps1') -File
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 Describe 'PS version declaration consistency' {
+    BeforeAll {
+        $script:RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+        $script:repoScripts = Get-ChildItem (Join-Path $script:RepoRoot "scripts") -Filter *.ps1 -File
+        $script:repoLibs = Get-ChildItem (Join-Path $script:RepoRoot "scripts/lib") -Filter *.ps1 -File
+    }
+
     It 'every scripts/*.ps1 declares #requires -Version (5.1|7) in first 3 lines' {
         $missing = @()
-        foreach ($s in $repoScripts) {
+        foreach ($s in $script:repoScripts) {
             $head = (Get-Content $s.FullName -TotalCount 3) -join "`n"
             if ($head -notmatch '#requires -Version (5\.1|7)') { $missing += $s.Name }
         }
@@ -16,7 +21,7 @@ Describe 'PS version declaration consistency' {
 
     It 'every lib/*.ps1 declares #requires -Version (5.1|7)' {
         $bad = @()
-        foreach ($l in $repoLibs) {
+        foreach ($l in $script:repoLibs) {
             $head = (Get-Content $l.FullName -TotalCount 3) -join "`n"
             if ($head -notmatch '#requires -Version (5\.1|7)') { $bad += $l.Name }
         }
@@ -25,7 +30,7 @@ Describe 'PS version declaration consistency' {
 
     It 'a 5.1-declared script must not dot-source a 7-declared lib' {
         $violations = @()
-        foreach ($s in $repoScripts) {
+        foreach ($s in $script:repoScripts) {
             $head = (Get-Content $s.FullName -TotalCount 3) -join "`n"
             if ($head -match '#requires -Version 5\.1') {
                 $body = Get-Content $s.FullName -Raw

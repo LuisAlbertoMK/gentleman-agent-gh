@@ -26,7 +26,7 @@ Describe "Permission Rules Consistency" {
 
         It "Contains at least 50 deny rules" {
             $denyRules = Get-Content $denyRulesPath -Raw | ConvertFrom-Json
-            $ruleCount = ($denyRules | Get-Member -MemberType NoteProperty).Count
+            $ruleCount = @($denyRules | Get-Member -MemberType NoteProperty).Count
             $ruleCount | Should -BeGreaterOrEqual 50
         }
 
@@ -34,7 +34,7 @@ Describe "Permission Rules Consistency" {
             $denyRules = Get-Content $denyRulesPath -Raw | ConvertFrom-Json
             $rules = $denyRules | Get-Member -MemberType NoteProperty | ForEach-Object { $denyRules.$($_.Name) }
             $invalidRules = $rules | Where-Object { $_ -notin @('deny', 'ask', 'allow') }
-            $invalidRules.Count | Should -Be 0
+            @($invalidRules).Count | Should -Be 0
         }
 
         It "Includes critical network commands (curl, wget, ssh)" {
@@ -99,7 +99,7 @@ Describe "Permission Rules Consistency" {
 
             # At least 10 rules should be present (both use shared-deny-rules.json as SSoT)
             $matchedRules = $jsonRuleNames | Where-Object { $opencodePermNames -contains $_ }
-            $matchedRules.Count | Should -BeGreaterOrEqual 10
+            @($matchedRules).Count | Should -BeGreaterOrEqual 10
         }
 
         It "No conflicting rules (same command, different verdicts)" {
@@ -113,7 +113,7 @@ Describe "Permission Rules Consistency" {
                 # This is a simple check - more sophisticated validation would parse patterns
             }
 
-            $conflicts.Count | Should -Be 0
+            @($conflicts).Count | Should -Be 0
         }
     }
 
