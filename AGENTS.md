@@ -80,3 +80,6 @@ Claims without confidence: marker are Default-FAIL. Unvalidated claims flagged. 
 
 ## Delegation Rules
 Partition independent work → one subagent per item → parallel isolated → each returns Decision + Files + Findings + Nuance → merge → verify coherence → log to bitacora + inter-track++.
+## Orchestrator Guard (immune-system)
+T2+ (>1 file o >20 líneas) nunca a `gentleman-quick` — descomponer en clusters ≤10 files vía `delivery-harness` con fallback model pre-validado (`muse-spark-1.2`/`big-pickle` si `laguna` 404). Re-validar `git diff --stat` + `check-token-budget -Json` post-subagente, no solo 4-field. (catalogado 2026-08-29: B 93 files a quick → STOP `tool_04f4cc7` + deep 404 `ses_fb038747`)
+
