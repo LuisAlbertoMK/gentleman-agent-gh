@@ -38,10 +38,16 @@
 .PARAMETER WriteProfile
     Write the profile to scripts/opencode-configs/.
 
+.PARAMETER Apply
+    Auto-apply the detected/selected tier to opencode.json (watcher, compaction,
+    mcp, subagent_depth, model). Never overwrites an existing custom opencode.json:
+    emits a reference config to opencode.configs/<tier>-opencode.json instead.
+
 .EXAMPLE
     .\scripts\hardware-profile.ps1
     .\scripts\hardware-profile.ps1 -OutputProfile all
     .\scripts\hardware-profile.ps1 -OutputProfile low -Json
+    .\scripts\hardware-profile.ps1 -Apply
 #>
 param(
     [ValidateSet("detect","low","medium","high","all")]
@@ -51,10 +57,17 @@ param(
 
     [switch]$WriteProfile,
 
-    [string]$CurrentConfig = ""
+    [string]$CurrentConfig = "",
+
+    [switch]$Apply
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+
+if ($Apply -and $OutputProfile -eq "all") {
+    Write-Error "-Apply requires a single tier (detect, low, medium, high). Use -OutputProfile detect (default)."
+    exit 1
+}
 
 # --- Constants ---
 $ByteMB = 1048576
@@ -198,6 +211,60 @@ function Get-ProfileHigh {
     }
 }
 
+# --- Auto-apply tier to opencode.json (startup) ---
+function Invoke-HardwareProfileApply {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Tier,
+
+        [Parameter(Mandatory = $true)]
+        [object]$TierProfile,
+
+        [string]$RepoRoot = ""
+    )
+
+    if (-not $RepoRoot) { $RepoRoot = Split-Path $PSScriptRoot -Parent }
+    if (-not $RepoRoot) { $RepoRoot = (Get-Location).Path }
+
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+
+    # 1. Emit a reference config for this tier (always - works even when opencode.json is custom)
+    $refDir = Join-Path $RepoRoot "opencode.configs"
+    if (-not (Test-Path $refDir)) { New-Item -ItemType Directory -Path $refDir -Force | Out-Null }
+    $refPath = Join-Path $refDir "$($Tier)-opencode.json"
+
+    $settings = @{
+        watcher           = $TierProfile.watcher
+        compaction        = $TierProfile.compaction
+        mcp               = $TierProfile.mcp
+        agent             = @{ default = @{ depth = $TierProfile.agent.default.depth } }
+        model             = $TierProfile.model
+        small_model       = $TierProfile.small_model
+        memory_monitoring = $TierProfile.memory_monitoring
+    }
+    $settingsJson = $settings | ConvertTo-Json -Depth 10
+
+    [System.IO.File]::WriteAllText($refPath, $settingsJson, $utf8NoBom)
+
+    # 2. Apply to opencode.json ONLY if absent or previously managed by this script
+    #    (sidecar marker: .opencode-hw-tier). A custom opencode.json is never overwritten.
+    $opencodeJson = Join-Path $RepoRoot "opencode.json"
+    $tierMarker   = Join-Path $RepoRoot ".opencode-hw-tier"
+
+    $applyToJson = $true
+    if (Test-Path $opencodeJson) {
+        $applyToJson = Test-Path $tierMarker
+    }
+
+    if ($applyToJson) {
+        [System.IO.File]::WriteAllText($opencodeJson, $settingsJson, $utf8NoBom)
+        $Tier | Set-Content -Path $tierMarker -Encoding ascii
+        return "Applied tier '$Tier' to opencode.json (watcher=$($TierProfile.watcher.enabled), subagent_depth=$($TierProfile.agent.default.depth)). Reference: $refPath"
+    }
+
+    return "Custom opencode.json detected - skipped overwrite (marker '$tierMarker' absent). Reference config: $refPath - review it, then Copy-Item $refPath $opencodeJson to apply."
+}
+
 # --- Detect and recommend ---
 $cpu = Get-CPUInfo
 $ram = Get-RAMInfo
@@ -278,6 +345,12 @@ if ($WriteProfile) {
     $profilePath = Join-Path $configDir "$OutputProfile-resource.json"
     $activeProfile | ConvertTo-Json -Depth 10 | Set-Content -Path $profilePath -Encoding utf8
     if (-not $Json) { Write-Output "Profile written to: $profilePath" }
+}
+
+if ($Apply) {
+    $applyResult = Invoke-HardwareProfileApply -Tier $OutputProfile -TierProfile $activeProfile
+    Write-Output $applyResult
+    exit 0
 }
 
 if ($Json) {
