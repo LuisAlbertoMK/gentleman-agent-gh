@@ -101,7 +101,7 @@
   },
   "gentleman-codex-semi": {
     "description": "Code generation — SEMI mode (safe commands auto, writes/commits ask)",
-    "model": "opencode/laguna-s-2.1-free",
+    "model": "opencode/muse-spark-1.2-contributor-free",
     "mode": "primary",
     "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
     "permission": {
@@ -152,7 +152,7 @@
   },
   "gentleman-implementer-semi": {
     "description": "Plan executor — SEMI mode (safe commands auto, writes/commits ask)",
-    "model": "opencode/laguna-s-2.1-free",
+    "model": "opencode/muse-spark-1.2-contributor-free",
     "mode": "primary",
     "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
     "permission": {

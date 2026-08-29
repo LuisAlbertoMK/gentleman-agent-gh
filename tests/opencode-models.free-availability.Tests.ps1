@@ -23,8 +23,7 @@
     Replacement models (verified available, 0 cost):
       opencode/big-pickle            -> pi.dev 200, cost 0, reasoning, 200K ctx
       opencode/nemotron-3-ultra-free -> pi.dev 200, cost 0, reasoning, 1M ctx
-      opencode/laguna-s-2.1-free     -> runtime ground-truth (serving this session;
-        pi.dev 404 = catalog lag, NOT removal). confidence: medium-high
+      opencode/muse-spark-1.2-contributor-free -> pi.dev 200, cost 0, code generation, 1M ctx (replaces retired laguna-s-2.1-free as of 2026-08-29, Model not found verified)
 
     NOTE (Pester 6 scoping): variables used inside It blocks MUST live in
     BeforeAll — Describe-scope assignment is invisible to It at run time.
@@ -49,7 +48,8 @@ Describe "OpenCode free-model availability — anti-regression guard" {
             'opencode/mimo-v2.5-free',
             'opencode/deepseek-v4-flash-free',
             'opencode/nemotron-3-super-free',
-            'opencode/kimi-k2.5-free'
+            'opencode/kimi-k2.5-free',
+            'opencode/laguna-s-2.1-free'
         )
         # NOTE: opencode.json (root config) was EDIT-DENIED by the Edit tool
         # (AGENTS.md `edit opencode.json deny` rule), but it STILL held ~23 retired
@@ -92,8 +92,8 @@ Describe "OpenCode free-model availability — anti-regression guard" {
     }
 
     # --- Positive guards: replacement IDs MUST appear (proves the fix shipped) ---
-    It "Replacement model opencode/laguna-s-2.1-free IS present (proves deepseek->laguna mapping)" {
-        $hits = Select-String -Path $configFiles -Pattern ([regex]::Escape('opencode/laguna-s-2.1-free')) -AllMatches -ErrorAction SilentlyContinue
+    It "Replacement model opencode/muse-spark-1.2-contributor-free IS present (proves laguna->muse-spark mapping as of 2026-08-29)" {
+        $hits = Select-String -Path $configFiles -Pattern ([regex]::Escape('opencode/muse-spark-1.2-contributor-free')) -AllMatches -ErrorAction SilentlyContinue
         ($hits | Measure-Object).Count | Should -BeGreaterThan 0
     }
 

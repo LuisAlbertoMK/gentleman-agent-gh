@@ -639,7 +639,7 @@
     },
     "gentleman-codex": {
       "description": "Code generation - convention mirroring, defensive coding, new files/scripts/boilerplate",
-      "model": "opencode/laguna-s-2.1-free",
+      "model": "opencode/muse-spark-1.2-contributor-free",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -653,7 +653,7 @@
     },
     "gentleman-codex-auto": {
       "description": "Code generation — AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode/laguna-s-2.1-free",
+      "model": "opencode/muse-spark-1.2-contributor-free",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -773,7 +773,7 @@
     },
     "gentleman-codex-sub": {
       "description": "Code generation subagent — convention mirroring, defensive coding, new files/scripts/boilerplate (delegable via Task tool, returns via {file:prompts/shared/_return-contract.md})",
-      "model": "opencode/laguna-s-2.1-free",
+      "model": "opencode/muse-spark-1.2-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -837,7 +837,7 @@
     },
     "gentleman-infra": {
       "description": "Infrastructure specialist - container security, K8s reliability, IaC quality, CI/CD security, dependency graphs (FREE TIER)",
-      "model": "opencode/laguna-s-2.1-free",
+      "model": "opencode/muse-spark-1.2-contributor-free",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-infra.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
@@ -934,7 +934,7 @@
     },
     "gentleman-infra-sub": {
       "description": "Infrastructure subagent — container security, K8s reliability, IaC quality, CI/CD security (delegable via Task tool, read-only)",
-      "model": "opencode/laguna-s-2.1-free",
+      "model": "opencode/muse-spark-1.2-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-infra.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -1019,7 +1019,7 @@
     },
     "gentleman-implementer": {
       "description": "Plan executor specialist — implements plans from specialized agents, no deviations (FREE TIER)",
-      "model": "opencode/laguna-s-2.1-free",
+      "model": "opencode/muse-spark-1.2-contributor-free",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -1033,7 +1033,7 @@
     },
     "gentleman-implementer-sub": {
       "description": "Plan executor subagent — implements plans from specialized agents, no deviations (delegable via Task tool)",
-      "model": "opencode/laguna-s-2.1-free",
+      "model": "opencode/muse-spark-1.2-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -1154,7 +1154,7 @@
     },
     "gentleman-codex-sub-auto": {
       "description": "Code generation subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
-      "model": "opencode/laguna-s-2.1-free",
+      "model": "opencode/muse-spark-1.2-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -1208,7 +1208,7 @@
     },
     "gentleman-implementer-sub-auto": {
       "description": "Plan executor subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
-      "model": "opencode/laguna-s-2.1-free",
+      "model": "opencode/muse-spark-1.2-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -1262,7 +1262,7 @@
     },
     "gentleman-implementer-auto": {
       "description": "Plan executor — AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode/laguna-s-2.1-free",
+      "model": "opencode/muse-spark-1.2-contributor-free",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -1382,7 +1382,7 @@
     },
     "sdd-apply": {
       "description": "Implement code changes from task definitions",
-      "model": "opencode/laguna-s-2.1-free",
+      "model": "opencode/muse-spark-1.2-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-apply.md}",
@@ -1394,7 +1394,7 @@
     },
     "sdd-archive": {
       "description": "Archive completed change artifacts",
-      "model": "opencode/laguna-s-2.1-free",
+      "model": "opencode/muse-spark-1.2-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-archive.md}",
@@ -1430,7 +1430,7 @@
     },
     "sdd-init": {
       "description": "Bootstrap SDD context and project configuration",
-      "model": "opencode/laguna-s-2.1-free",
+      "model": "opencode/muse-spark-1.2-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-init.md}",
@@ -1499,7 +1499,7 @@
     },
     "sdd-tasks": {
       "description": "Break down specs and designs into implementation tasks",
-      "model": "opencode/laguna-s-2.1-free",
+      "model": "opencode/muse-spark-1.2-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-tasks.md}",
