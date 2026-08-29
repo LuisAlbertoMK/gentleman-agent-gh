@@ -184,6 +184,26 @@ $hasProjectJson = Test-Path $projectJsonPath  # C4c: use single path definition
 
 . "$repoRoot\scripts\lib\score-dims.ps1"
 
+# --- U5: SP offline fallback (PS 5.1 / pwsh7 unavailable) ---
+# score-dims.ps1 requires pwsh7. On PowerShell 5.1, fall back to the offline
+# perf proxy (perf-offline-fallback.ps1 — PS 5.1 safe: no Start-ThreadJob, no
+# ForEach-Object -Parallel). Contract: JSON { score, tokenBudget, scriptCount }.
+# Gate on PS host version so the pwsh7 path (SP 9.9) is never touched.
+if ($PSVersionTable.PSVersion.Major -lt 7) {
+    try {
+        $offline = & "$repoRoot\scripts\perf-offline-fallback.ps1" -Json | ConvertFrom-Json
+        if ($null -ne $offline.score -and $null -ne $offline.scriptCount) {
+            $dimensions["SP"] = @{
+                s = $math::Max(0, $math::Min(10, [double]$offline.score))
+                e = @{ sc = [int]$offline.scriptCount; tb = $offline.tokenBudget; src = $offline.source }
+                r = "Offline proxy (PS 5.1, no pwsh7): score=$($offline.score) scripts=$($offline.scriptCount) budget=$($offline.tokenBudget)"
+            }
+        }
+    } catch {
+        Write-Debug "SP fallback: $($_.Exception.Message)"
+    }
+}
+
 # Bias calibration data (persist to .project.json, not just display)
 $biasCalPath = ".learnings/bias-calibration.json"
 $biasAdjusted = $null

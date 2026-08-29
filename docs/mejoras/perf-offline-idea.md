@@ -1,7 +1,7 @@
 # Perf Offline Fallback — Idea
 
-**Date**: 2026-08-27
-**Branch**: experimento/weak-point-fix-2026-08-27
+**Date**: 2026-08-29
+**Branch**: improve/quick-win-U5-G2-20260829
 **Status**: Implemented
 
 ## Problem
@@ -44,7 +44,11 @@ The I/O proxy is a **reasonable approximation** because:
 
 ## Integration Points
 
-- `score-auto.ps1` SP dimension could call this as fallback when pwsh7 is absent
+- `score-auto.ps1` SP block calls this as fallback when pwsh7 is unavailable — **wired in U5**:
+  - Gate: `$PSVersionTable.PSVersion.Major -lt 7` (PS 5.1 host only)
+  - Synchronous invoke (`& perf-offline-fallback.ps1 -Json`), no `Start-ThreadJob`
+  - Parses JSON contract `{ score, tokenBudget, scriptCount }` and overrides `$dimensions["SP"]`
+  - pwsh7 path untouched — SP score of 9.9 preserved
 - `hardware-profile.ps1` output could be cached and read by this script
 - Could feed into OpenCode resource profile selection for locked environments
 
