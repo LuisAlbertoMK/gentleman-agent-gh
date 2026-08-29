@@ -248,6 +248,37 @@ for (const [agentName, agentDef] of Object.entries(base.agent)) {
   stats.total++;
 }
 
+// --- Enfoque A (experimento/token-reduction-config-2026-08-29): delta-permissions ---
+// Reference: the SSoT top-level `permission` (opencode-base.json) carries the
+// curated common rules (default for all agents). Emitting full copies per agent
+// duplicates those bytes 49x. Strip from each agent every sub-key/array whose
+// value is byte-identical to the SSoT root default; the remaining delta is
+// behavior-neutral under per-key override merge (root default + agent delta
+// reconstructs the exact same effective permission — re-verified against the
+// pre-change effective permissions). Non-matching values stay as agent deltas.
+const permNames = Object.keys(orderedAgents);
+const rootPerm = base.permission || {};
+if (permNames.length > 0 && Object.keys(rootPerm).length > 0) {
+  let stripped = 0;
+  for (const n of permNames) {
+    const perm = orderedAgents[n].permission;
+    for (const [k, sub] of Object.entries(rootPerm)) {
+      if (!perm[k]) continue;
+      if (Array.isArray(sub)) {
+        if (Array.isArray(perm[k]) && JSON.stringify(perm[k]) === JSON.stringify(sub)) { delete perm[k]; stripped++; }
+      } else if (sub && typeof sub === 'object') {
+        for (const sk of Object.keys(sub)) {
+          if (perm[k][sk] !== undefined && JSON.stringify(perm[k][sk]) === JSON.stringify(sub[sk])) { delete perm[k][sk]; stripped++; }
+        }
+        if (Object.keys(perm[k]).length === 0) delete perm[k];
+      }
+    }
+  }
+  if (stripped > 0) {
+    console.log(`  Delta-permissions: stripped ${stripped} per-agent rule(s) matching SSoT root permission (default), agents keep deltas only.`);
+  }
+}
+
 base.agent = orderedAgents;
 
 console.log(`  Orchestrator:     ${stats.orchestrator} agent(s)`);
