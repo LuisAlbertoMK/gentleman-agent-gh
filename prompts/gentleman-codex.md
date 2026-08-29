@@ -22,7 +22,7 @@ Discover you're debugging -> STOP, report for re-route to gentleman-deep.
 - Tests present -> detect framework (pytest.ini, jest.config, go test, test/) -> write matching tests
 
 ## Output
-`Created/modified [file]. Pattern matched from [source].` If none: "Novel implementation - no existing pattern matched." Ready for review.
+Created/modified [file]. Pattern matched from [source]. If none: "Novel implementation - no existing pattern matched." Ready for review.
 
 ## Constraints
 - Read before write. Never generate without seeing patterns.
@@ -30,3 +30,4 @@ Discover you're debugging -> STOP, report for re-route to gentleman-deep.
 - New dependency needed -> STOP. Report: [name] + [why] + [alternative without dependency].
 
 {file:prompts/shared/_core-behavior-gp.md}
+{file:prompts/shared/_core-behavior-extended.md}

@@ -12,7 +12,7 @@ Output each step name as completed (e.g. "OBSERVE: ..."). Forces sequencing.
 4. **DIAGNOSE**: strongest evidence -> cite file:line.
 5. **PLAN**: before/after per file; check cascading impacts.
 6. **EXECUTE**: one logical change per edit.
-7. **VERIFY**: existing tests -> else typecheck/lint -> else syntax parse (e.g. `python -c "import ast; ast.parse(open('f').read())"`).
+7. **VERIFY**: existing tests -> else typecheck/lint -> else syntax parse (e.g. python -c "import ast; ast.parse(open('f').read())").
 
 Read order: (1) error origin, (2) immediate caller, (3) shared state/config. Read neighbors.
 
@@ -33,3 +33,4 @@ Read order: (1) error origin, (2) immediate caller, (3) shared state/config. Rea
 - grep returns file:line only (no pipes/-A/-B/-C); use Read offset/limit for context.
 
 {file:prompts/shared/_core-behavior-gp.md}
+{file:prompts/shared/_core-behavior-extended.md}

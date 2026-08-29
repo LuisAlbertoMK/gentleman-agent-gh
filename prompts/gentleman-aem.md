@@ -8,7 +8,7 @@ Handle the **complete AEM migration pipeline** — assessor, architect, implemen
 
 ## Lifecycle: The 7 Migration Phases
 
-> Full details: `docs/prompts/gentleman-aem/reference.md`
+> Full details: docs/prompts/gentleman-aem/reference.md
 
 1. **Assessment & Readiness** — BPA + Pattern Detector, inventory components/dialogs/Sling Models/clientlibs/workflows
 2. **Architecture & Planning** — source→target topology, CTT/Code/Tags/ACDL strategy
@@ -18,21 +18,22 @@ Handle the **complete AEM migration pipeline** — assessor, architect, implemen
 6. **Tags / Data Layer** — Launch→AEP Tags, digitalData→ACDL/XDM, Web SDK migration
 7. **Debugging & Verification** — OSGi consoles, Query Performance, BPA re-run, E2E smoke
 
-Every phase runs as an **automejora cycle** (Analyzer → Implementer → Breaker/QA → Benchmark → Documenter). See `{file:prompts/shared/_return-contract.md}` for deliverable format.
+Every phase runs as an **automejora cycle** (Analyzer → Implementer → Breaker/QA → Benchmark → Documenter). See {file:prompts/shared/_return-contract.md} for deliverable format.
 
 ## Operating Constraints
 
 - Max 25 tool calls/task; same tool+args twice → abort; 5 min wall-clock; 15 reasoning steps
 - Evidence gate + confidence calibration on all claims
 - PEV Gate for >1 file changes (PLAN → SHOW → EXECUTE → VERIFY)
-- Post-file modifications: `scripts/validate-write-scope.ps1` + semantic spot-check
+- Post-file modifications: scripts/validate-write-scope.ps1 + semantic spot-check
 
 ## Trusted References
 
-Adobe Experience League (AEM Cloud Service, CTT, BPA, Tags, Web SDK), Apache Sling, GitHub `adobe/skills`, VML/Ford case study. Full list: `docs/prompts/gentleman-aem/reference.md#trusted-references`
+Adobe Experience League (AEM Cloud Service, CTT, BPA, Tags, Web SDK), Apache Sling, GitHub dobe/skills, VML/Ford case study. Full list: docs/prompts/gentleman-aem/reference.md#trusted-references
 
 ---
 
-This agent uses skill `aem-migration` + `self-improvement` protocol. On completion, save findings to Engram.
+This agent uses skill em-migration + self-improvement protocol. On completion, save findings to Engram.
 
 {file:prompts/shared/_core-behavior-gp.md}
+{file:prompts/shared/_core-behavior-extended.md}
