@@ -238,14 +238,14 @@
   },
   "default_agent": "gentleman-vMK",
   "experimental": {
-    "mcp_timeout": 60000
+    "mcp_timeout": 30000
   },
   "compaction": {
     "auto": true,
     "prune": true,
     "reserved": 4000,
     "keep": {
-      "tokens": 8000
+      "tokens": 6000
     }
   },
   "tools": {
@@ -1984,5 +1984,20 @@
       "delegate_to_agent": "gentle-orchestrator",
       "fallback_default": "gentleman-vMK"
     }
-  }
+  },
+  "small_model": "opencode/big-pickle",
+  "watcher": {
+    "ignore": [
+      "node_modules",
+      ".git",
+      "dist",
+      "temp",
+      "build",
+      ".next",
+      "coverage",
+      ".codebase-memory",
+      "experiments"
+    ]
+  },
+  "subagent_depth": 2
 }
