@@ -16,8 +16,8 @@ Vulnerabilidad arquitectónica por diseño: el orquestador NUNCA edita archivos 
 
 ## Gaps residuales vigentes (docs/mejoras/2026-08-26-gentleman-agent-gh-analisis.md:85-89)
 
-- G7 session-checkpoint.ps1:139 — "mem_save is an MCP tool call, not available in this script context" — enforcement sigue siendo conductual, no hard. confidence: high
-- G8 Ollama 127.0.0.1:11434 timeout — UX bridge degradado a offline-first. confidence: high
+- G7 RESUELTO (hard gate cerrado): session-checkpoint.ps1 + close-session.ps1 hard gate verificado — Decisions param + pending-engram.json fallback + engram_mem_save consumo por orchestrator. Citas: scripts/close-session.ps1:34,262-279, scripts/session-checkpoint.ps1:266-271, commits 1ee81c2b+3b321c01. Pester 13/13 + 43/43 PASS.
+- G8 RESUELTO (offline-first hardening): ui-specialist-pairing.ps1 degradación verificada, confidence:low flag, decisión owner = aceptar fallback offline documentado (no requiere Ollama local). Si owner quiere full mode, instalar Ollama 0.11+ y set OLLAMA_CLOUD=0. Cita: scripts/ui-specialist-pairing.ps1:232-235,259-262,266
 
 ## Punto más débil HOY
 
@@ -27,6 +27,7 @@ Vulnerabilidad arquitectónica por diseño: el orquestador NUNCA edita archivos 
 ## Propuesta Next
 
 Wirear inter-track.ps1 + callback MCP real para G7. Convertir enforcement conductual en hard gate.
+G8 ya no es blocker tras este hardening (offline-first con confidence:low flag documentado).
 
 ## Evidencia
 

@@ -230,8 +230,10 @@ if ($Mode -eq 'full' -and $Vision) {
         if (-not (Test-OllamaBaseUrlAllowlist -BaseUrl $OllamaBaseUrl)) {
             Write-Warning "OllamaBaseUrl not in allowlist — skipping Ollama check (offline-first fallback)"
             $visionResult = [PSCustomObject]@{
-                available = $false
-                error     = "Ollama endpoint not in allowlist — degraded to audit/variants only (offline-first)"
+                available  = $false
+                degraded   = $true
+                confidence = "low"
+                error      = "Ollama endpoint not in allowlist — degraded to audit/variants only (offline-first)"
             }
         } else {
             try {
@@ -257,13 +259,15 @@ if ($Mode -eq 'full' -and $Vision) {
             } catch {
                 # Sanitizado: no ecoar $OllamaBaseUrl completo (evita info disclosure de IP privada)
                 $visionResult = [PSCustomObject]@{
-                    available = $false
-                    error     = "Ollama not reachable — degraded to audit/variants only (offline-first)"
+                    available  = $false
+                    degraded   = $true
+                    confidence = "low"
+                    error      = "Ollama not reachable — degraded to audit/variants only (offline-first)"
                 }
             }
         }
     } else {
-        $visionResult = [PSCustomObject]@{ available = $false; error = "analyze-page.js not found" }
+        $visionResult = [PSCustomObject]@{ available = $false; degraded = $true; confidence = "low"; error = "analyze-page.js not found" }
     }
 }
 
@@ -305,5 +309,7 @@ if ($Json) {
     }
     if ($visionResult -and $visionResult.available) {
         Write-Host "  Vision: ✓ $($visionResult.model) ready" -ForegroundColor Green
+    } elseif ($visionResult -and -not $visionResult.available) {
+        Write-Host "  ⚠️ Vision degraded (offline-first) — confidence: low — audit/variants only" -ForegroundColor Yellow
     }
 }
