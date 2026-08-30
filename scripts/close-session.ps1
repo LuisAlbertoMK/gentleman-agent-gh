@@ -34,6 +34,7 @@ param(
     [switch]$SkipSummaryGate,
     [switch]$Checkpoint,
     [string[]]$Discoveries,
+    [string[]]$Decisions,
     [string[]]$Errors,
     [string]$BitacoraPath
 )
@@ -261,8 +262,24 @@ if ($Quiet) {
             $cpParams = @("-Mode", "full", "-Quiet")
             if ($Discoveries) { $cpParams += "-Discoveries"; $cpParams += $Discoveries }
             if ($Decisions) { $cpParams += "-Decisions"; $cpParams += $Decisions }
+            if ($Errors) { $cpParams += "-Errors"; $cpParams += $Errors }
             $cpRaw = & "$PSScriptRoot/session-checkpoint.ps1" @cpParams 2>&1 | Out-String
-            $cpResult = $null; try { $cpResult = $cpRaw | ConvertFrom-Json -ErrorAction Stop } catch {}
+            $cpResult = $null
+            try {
+                $cpResult = $cpRaw | ConvertFrom-Json -ErrorAction Stop
+            } catch {
+                # Fallback: read pending-engram.json if JSON parse failed
+                $pendingPath = Join-Path $PSScriptRoot "..\.opencode\session-checkpoints\pending-engram.json"
+                if (Test-Path -LiteralPath $pendingPath) {
+                    try {
+                        $pendingContent = Get-Content -LiteralPath $pendingPath -Raw -ErrorAction Stop
+                        $cpResult = $pendingContent | ConvertFrom-Json -ErrorAction Stop
+                        $cpResult.checkpoint_created = $true  # we know it was created since file exists
+                    } catch {
+                        Write-Debug "Checkpoint bridge: fallback read of pending-engram.json failed: $($_.Exception.Message)"
+                    }
+                }
+            }
             if ($cpResult -and $cpResult.checkpoint_created) {
                 Write-Host "💾 Checkpoint saved (zone: $($cpResult.zone), $($cpResult.percent)%)" -ForegroundColor Cyan
                 if ($cpResult.mem_save_directive) {
