@@ -46,7 +46,6 @@ $ErrorActionPreference = "Stop"
 
 # --- Constants ---
 $ByteMB = 1048576
-$ByteGB = 1073741824
 
 # --- Platform detection ---
 $isLinuxHost = $IsLinux -or ($env:OS -ne 'Windows_NT' -and $PSVersionTable.Platform -ne 'Win32NT')
@@ -68,7 +67,8 @@ function Get-AccurateRSS {
 
     # macOS fallback
     if ($isMacOSHost) {
-        $result = ps -o rss= -p $SessionId 2>$null
+        $psCmd = "ps"
+        $result = & $psCmd -o rss= -p $SessionId 2>$null
         if ($result) { return [int64]$result.Trim() * 1024 }
     }
 
@@ -98,11 +98,12 @@ function Get-TotalMemory {
 }
 
 # --- Find OpenCode/Bun processes ---
-function Get-OpenCodeProcesses {
+function Get-OpenCodeProcess {
     $procs = @()
 
     if ($isLinuxHost -or $isMacOSHost) {
-        $raw = ps aux 2>$null | Select-String "opencode" | Where-Object { $_ -notmatch "grep" }
+        $psCmd = "ps"
+        $raw = & $psCmd aux 2>$null | Select-String "opencode" | Where-Object { $_ -notmatch "grep" }
         foreach ($line in $raw) {
             $parts = $line -split '\s+'
             if ($parts.Count -ge 11) {
@@ -119,7 +120,7 @@ function Get-OpenCodeProcesses {
         }
     }
     else {
-        $procs = Get-Process -Name "opencode" -ErrorAction SilentlyContinue | % {
+        $procs = Get-Process -Name "opencode" -ErrorAction SilentlyContinue | ForEach-Object {
             [PSCustomObject]@{
                 Pid     = $_.Id
                 CpuPct  = 0
@@ -135,7 +136,7 @@ function Get-OpenCodeProcesses {
 
 # --- Trigger heap snapshot ---
 function Invoke-HeapSnapshot {
-    param([int]$SessionId, [string]$LogDir)
+    param([int]$SessionId)
 
     if ($env:OPENCODE_AUTO_HEAP_SNAPSHOT -eq "1") {
         Write-Warning "OPENCODE_AUTO_HEAP_SNAPSHOT=1 set - OpenCode handles snapshots internally"
@@ -145,8 +146,9 @@ function Invoke-HeapSnapshot {
     if ($env:OPENCODE_DIAGNOSTICS -eq "1") {
         # Send SIGUSR1 to trigger diagnostic capture
         if ($isLinuxHost -or $isMacOSHost) {
+            $killCmd = "kill"
             try {
-                & kill -USR1 $SessionId 2>$null
+                & $killCmd -USR1 $SessionId 2>$null
                 Write-Output "Sent SIGUSR1 to PID $SessionId for heap snapshot capture"
             } catch {
                 Write-Warning "Could not send SIGUSR1: $_"
@@ -159,11 +161,10 @@ function Invoke-HeapSnapshot {
 $totalMem = Get-TotalMemory
 $samples = 0
 $exceeded = $false
-$ByteGB = 1073741824
 $ByteMB = 1048576
 
 while ($true) {
-    $procs = Get-OpenCodeProcesses
+    $procs = Get-OpenCodeProcess
 
     if ($procs.Count -eq 0) {
         if ($Json -and -not $Quiet) {
@@ -194,7 +195,7 @@ while ($true) {
     $exceeded = $totalPct -gt $Threshold
 
     if ($Json) {
-        $procData = $procs | % {
+        $procData = $procs | ForEach-Object {
             [PSCustomObject]@{
                 pid  = $_.Pid
                 cpu  = $_.CpuPct
@@ -216,7 +217,7 @@ while ($true) {
     elseif (-not $Quiet) {
         $header = "=== OpenCode Resource Monitor ($(Get-Date -Format 'HH:mm:ss')) ==="
         Write-Output $header
-        $procs | % {
+        $procs | ForEach-Object {
             $rssMB = [math]::Round($_.Rss / $ByteMB, 0)
             Write-Output ("PID: {0} CPU: {1:N1}%  MEM: {2:N1}%  RSS: {3}MB  {4}" -f $_.Pid, $_.CpuPct, $_.MemPct, $rssMB, $_.Command)
         }
@@ -232,7 +233,7 @@ while ($true) {
     if ($HeapSnapshotMb -gt 0 -and ($procs | Measure-Object -Property Rss -Maximum).Maximum -gt ($HeapSnapshotMb * $ByteMB)) {
         $logDir = Join-Path $env:LOCALAPPDATA "opencode\logs"
         if (-not (Test-Path $logDir)) { $logDir = $env:TEMP }
-        Invoke-HeapSnapshot -SessionId $procs[0].Pid -LogDir $logDir
+        Invoke-HeapSnapshot -SessionId $procs[0].Pid
     }
 
     Start-Sleep -Seconds $Interval

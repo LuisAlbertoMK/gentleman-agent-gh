@@ -67,7 +67,8 @@ function Get-AccurateRSS {
         }
     }
     if ($IsMacOS) {
-        $result = ps -o rss= -p $ProcessId 2>$null
+        $psCmd = "ps"
+        $result = & $psCmd -o rss= -p $ProcessId 2>$null
         if ($result) { return [int64]$result.Trim() * 1024 }
     }
 
@@ -92,13 +93,10 @@ function Get-TotalMemory {
     return 0
 }
 
-function Find-OpenCodePids {
+function Find-OpenCodePid {
     if ($isLinuxHost) {
-        $lines = ps aux 2>$null | Select-String "opencode" | Where-Object { $_ -notmatch "grep" }
-        return @($lines | % {
-            $parts = $_ -split '\s+'
-            if ($parts.Count -ge 2) { [int]$parts[1] }
-        })
+        $procs = Get-Process -Name "opencode" -ErrorAction SilentlyContinue
+        return @($procs | ForEach-Object { $_.Id })
     }
     return @((Get-Process -Name "opencode" -ErrorAction SilentlyContinue).Id)
 }
@@ -182,10 +180,11 @@ if ($Action -eq "kill-if-exceeded") {
         }
         Write-Warning ("{0:N2}GB RSS exceeds threshold ({1:N2}GB) - killing PID {2}" -f ($rss / $ByteGB), ($killThreshold / $ByteGB), $SessionId)
         if ($isLinuxHost) {
-            & kill -TERM $SessionId 2>$null
+            $killCmd = "kill"
+            & $killCmd -TERM $SessionId 2>$null
             Start-Sleep -Seconds 2
-            $alive = & kill -0 $SessionId 2>$null
-            if ($alive) { & kill -KILL $SessionId 2>$null }
+            $alive = & $killCmd -0 $SessionId 2>$null
+            if ($alive) { & $killCmd -KILL $SessionId 2>$null }
         }
         else {
             Stop-Process -Id $SessionId -Force
@@ -207,8 +206,9 @@ if ($Action -eq "kill-if-exceeded") {
 if ($Action -eq "snapshot") {
     # Method 1: SIGUSR1 (Linux/macOS with diagnostics)
     if ($isLinuxHost) {
+        $killCmd = "kill"
         try {
-            & kill -USR1 $SessionId 2>$null
+            & $killCmd -USR1 $SessionId 2>$null
             if ($LASTEXITCODE -eq 0) {
                 if ($Json) {
                     [PSCustomObject]@{ action="snapshot_triggered"; method="SIGUSR1"; pid=$SessionId; output_dir=$OutputDir } | ConvertTo-Json -Compress
@@ -217,7 +217,7 @@ if ($Action -eq "snapshot") {
                 exit 0
             }
         }
-        catch { }
+        catch { Write-Warning "Failed to send SIGUSR1: $_" }
     }
 
     # Method 2: OPENCODE_AUTO_HEAP_SNAPSHOT env var
