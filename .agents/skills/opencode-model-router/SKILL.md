@@ -1,6 +1,7 @@
 ﻿---
 name: opencode-model-router
 description: "Route tasks by model strength — specialized agents for analysis, implementer for execution"
+changelog: "2026-08-31 — SD 9.9→10 fix"
 token_budget: 820
 ---
 

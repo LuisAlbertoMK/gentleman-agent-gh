@@ -16,9 +16,10 @@
     Built-in pwsh only, ASCII only.
 #>
 [CmdletBinding()]
-param([switch]$WhatIf)
+param([switch]$WhatIf, [switch]$Quiet)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+if ($Quiet) { $VerbosePreference = 'SilentlyContinue' }
 
 # 1. Paths
 $globalPath = "$env:USERPROFILE\.config\opencode\opencode.jsonc"

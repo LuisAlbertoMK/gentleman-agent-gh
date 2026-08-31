@@ -1,6 +1,7 @@
 ﻿---
 name: automejora-analyzer
 description: "Analyzes auto-mejora cycles — detects patterns, scores improvements, validates SkillOpt gates, surfaces drift."
+changelog: "2026-08-31 — SD 9.9→10 fix"
 triggers: "auto-mejora, automejora, improvement analysis, cycle analysis, SkillOpt validation, improvement scoring"
 token_budget: 1818
 ---

@@ -16,10 +16,12 @@
 #>
 param(
   [string]$ModelQ4 = 'qwen2.5:3b',
-  [string]$ModelFP16 = 'opencode/big-pickle'
+  [string]$ModelFP16 = 'opencode/big-pickle',
+  [switch]$Quiet
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+if ($Quiet) { $VerbosePreference = 'SilentlyContinue' }
 
 # --- 1. Ollama model list (solo lectura) ---
 $ollamaUrl = 'http://127.0.0.1:11434'

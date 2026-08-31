@@ -1,6 +1,7 @@
 ﻿---
 name: metricas
 description: Before/after delta + % comparison — git diff or bookmark mode, tokenization-aware, multi-language
+changelog: "2026-08-31 — SD 9.9→10 fix"
 triggers:
   - "!metricas"
   - "!metrics"
