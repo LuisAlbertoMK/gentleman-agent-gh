@@ -55,3 +55,82 @@ jobs:
           }
           if ($hits.Count -gt 0) { $hits | ForEach-Object { Write-Host "::error:: hardcoded machine path: $_" }; exit 1 }
           Write-Host "[path-scan] clean"
+
+  coverage-gate:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    needs: pester-tests
+    env:
+      CI: 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache PowerShell modules
+        uses: actions/cache@v4
+        with:
+          path: ~\Documents\PowerShell\Modules
+          key: psmodules-${{ hashFiles('scripts/tests/*.Tests.ps1') }}
+          restore-keys: psmodules-
+
+      - name: Run coverage gate (20% floor, ratcheting)
+        shell: pwsh
+        run: |
+          ./scripts/tests/Coverage.ps1 -Strict -MinimumCoverage 20
+
+      - name: Upload JaCoCo coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: scripts/tests/_coverage/coverage.xml
+
+      - name: Upload coverage summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-summary
+          path: scripts/tests/_coverage/summary.json
+
+  perf-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run performance regression gate (sync-vmk.ps1 -DryRun)
+        run: |
+          $result = & ./scripts/benchmark-regression.ps1 `
+            -Command "sync-vmk.ps1 -DryRun -Json" `
+            -Runs 10 `
+            -Threshold 15 `
+            -Json 2>&1
+          Write-Output "BENCHMARK_JSON: $result"
+
+          $parsed = $result | ConvertFrom-Json -ErrorAction SilentlyContinue
+          if (-not $parsed) {
+            Write-Error "Benchmark produced no JSON output"
+            exit 1
+          }
+
+          Write-Output "Median: $($parsed.median_ms)ms"
+          Write-Output "Baseline: $($parsed.baseline_median_ms)ms"
+          Write-Output "Regression: $($parsed.regression_percent)%"
+
+          if ($parsed.regression -eq $true) {
+            Write-Error "PERFORMANCE REGRESSION: $($parsed.median_ms)ms exceeds baseline $($parsed.baseline_median_ms)ms by $($parsed.regression_percent)% (threshold: 15%)"
+            exit 1
+          }
+
+          Write-Output "OK: No performance regression (IQR: $($parsed.iqr_ms)ms)"
+
+      - name: Upload benchmark artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: |
+            docs/mejoras/benchmark-baseline.json
+            scripts/opencode-configs/

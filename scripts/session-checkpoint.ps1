@@ -49,7 +49,7 @@
     # → {"zone":"YELLOW","percent":65,"level":"L1","checkpoint_needed":true,"action":"checkpoint_recommended"}
 #>
 param(
-    [ValidateSet('check','mark','full')]
+    [ValidateSet('check','mark','full','process-pending')]
     [string]$Mode = 'full',
     [int]$UsagePercent = -1,
     [string[]]$Discoveries = @(),
@@ -247,6 +247,51 @@ if (-not $NoValidate) {
 # --- Step 5: Persist to Engram (if checkpoint needed and validated) ---
 $memSaved = $false
 $memSaveDirective = $null
+
+# --- Mode: process-pending — read pending-engram.json and emit directive for orchestrator ---
+if ($Mode -eq 'process-pending') {
+    $pendingPath = Join-Path $checkpointDir "pending-engram.json"
+    if (Test-Path -LiteralPath $pendingPath) {
+        try {
+            $pendingContent = Get-Content -LiteralPath $pendingPath -Raw -ErrorAction Stop
+            $pendingDirective = $pendingContent | ConvertFrom-Json -ErrorAction Stop
+            if ($pendingDirective -and $pendingDirective.topic_key) {
+                $memSaveDirective = $pendingDirective
+                $memSaved = $true
+                if (-not $Quiet) {
+                    Write-Host "🔄 PROCESS-PENDING: Found pending directive for topic_key=$($pendingDirective.topic_key)" -ForegroundColor Cyan
+                }
+            } else {
+                Write-Warning "process-pending: pending-engram.json missing topic_key"
+            }
+        } catch {
+            Write-Warning "process-pending: failed to read pending-engram.json: $($_.Exception.Message)"
+        }
+    } else {
+        if (-not $Quiet) {
+            Write-Host "🔄 PROCESS-PENDING: No pending-engram.json found" -ForegroundColor DarkGray
+        }
+    }
+    # Output result and exit early for process-pending mode
+    $result = [PSCustomObject]@{
+        zone              = "N/A"
+        percent           = 0
+        compression_level = ""
+        checkpoint_needed = $false
+        checkpoint_created = $false
+        checkpoint_file   = $null
+        validated         = $true
+        mem_saved         = $memSaved
+        mem_save_directive = $memSaveDirective
+        indexed           = $false
+        miner_patterns    = 0
+        recommendation    = "Processed pending engram directive"
+        action            = if ($memSaved) { "pending_directive_emitted" } else { "no_pending" }
+    }
+    if ($Quiet) { $result | ConvertTo-Json -Compress -Depth 3 } else { $result }
+    exit 0
+}
+
 if ($Mode -in @('mark', 'full') -and $checkpointNeeded -and $validated) {
     $memContentRaw = "**What**: Session checkpoint at $contextZone zone ($($watchdogResult.percent)% context used). Captured $($sanitizedDecisions.Count) decisions and $($sanitizedDiscoveries.Count) discoveries proactively. **Why**: Prevent memory loss across compaction cycles — medium-term conversational context is lost without explicit persistence. **Where**: .opencode/session-checkpoints/ + Engram checkpoint/session-state. **Learned**: This bridge connects ctx-watchdog zone detection → engram-validate → mem_save → ctx_index. Without it, mid-session decisions vanish at compaction."
     $memContent = Redact-Secrets -Text $memContentRaw

@@ -1,3 +1,6 @@
+2026-08-31 - Verify all scripts
+2026-08-31 - Test hard gate
+2026-08-31 - Syntax check
 2026-08-26 — Gap analysis post-Cycle-30 verificado (8 gaps G1-G8, todos tool-backed): permisos runtime anulan ADR-046, junction trial-verify, gh repo equivocado, inter-track stale, 31 fails, SP cap 112 scripts, mem_save bridge, Ollama down → docs/mejoras/2026-08-26-gentleman-agent-gh-analisis.md
 2026-08-26 — Git pull analisis + sync-all: revisión cambios repo, git pull main (30 commits, Cycle 28-30, v9.9-verified), sync-all OK
 2026-08-26 - Session close
