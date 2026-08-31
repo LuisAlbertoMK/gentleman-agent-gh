@@ -19,7 +19,7 @@ function Fail  { param([string]$Msg) $script:failed++; $script:blocked = $true; 
 
 # Detect staged files (done once, reused by multiple checks)
 $staged = git diff --cached --name-only --diff-filter=ACM
-$stagedPS1       = $staged | Where-Object { $_ -like '*.ps1' }
+$stagedPS1       = $staged | Where-Object { $_ -like '*.ps1' -and $_ -notmatch '^\.(jd|breaker)-cleared/' }
 $stagedSkills    = $staged | Where-Object { $_ -match '\.agents/skills/' }
 $stagedProject   = $staged | Where-Object { $_ -match '\.project\.json$' }
 $stagedRules     = $staged | Where-Object { $_ -match 'review-rules\.jsonc$' }

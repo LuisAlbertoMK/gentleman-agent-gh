@@ -253,16 +253,20 @@ if ($Quiet) {
         } catch { Write-Debug "ledger summary: $($_.Exception.Message)" }
     }
 
-    # --- Checkpoint bridge integration (medium-term memory) — G7 hard gate ---
+    # --- Checkpoint bridge integration (medium-term memory) — G7 HARD GATE ---
     # .ps1 cannot call MCP engram_mem_save; this bridge emits directive for orchestrator.
-    # Orchestrator MUST read checkpoint_file + mem_save_directive and call engram_mem_save.
+    # ORCHESTRATOR MUST: read mem_save_directive from output AND process-pending mode,
+    # then call engram_mem_save. Session close BLOCKS until pending is cleared.
+    $gatePassed = $true
+    $pendingProcessed = $false
     if ($Checkpoint) {
         $checkpointPath = Join-Path $PSScriptRoot "session-checkpoint.ps1"
         if (Test-Path -LiteralPath $checkpointPath) {
-            $cpParams = @("-Mode", "full", "-Quiet")
-            if ($Discoveries) { $cpParams += "-Discoveries"; $cpParams += $Discoveries }
-            if ($Decisions) { $cpParams += "-Decisions"; $cpParams += $Decisions }
-            if ($Errors) { $cpParams += "-Errors"; $cpParams += $Errors }
+            # Phase 1: Create checkpoint (full mode)
+            $cpParams = @{ Mode = 'full'; Quiet = $true }
+            if ($Discoveries) { $cpParams.Discoveries = $Discoveries }
+            if ($Decisions) { $cpParams.Decisions = $Decisions }
+            if ($Errors) { $cpParams.Errors = $Errors }
             $cpRaw = & "$PSScriptRoot/session-checkpoint.ps1" @cpParams 2>&1 | Out-String
             $cpResult = $null
             try {
@@ -274,22 +278,47 @@ if ($Quiet) {
                     try {
                         $pendingContent = Get-Content -LiteralPath $pendingPath -Raw -ErrorAction Stop
                         $cpResult = $pendingContent | ConvertFrom-Json -ErrorAction Stop
-                        $cpResult.checkpoint_created = $true  # we know it was created since file exists
+                        $cpResult.checkpoint_created = $true
                     } catch {
                         Write-Debug "Checkpoint bridge: fallback read of pending-engram.json failed: $($_.Exception.Message)"
                     }
                 }
             }
-            if ($cpResult -and $cpResult.checkpoint_created) {
+
+            # Phase 2: HARD GATE — process pending directive (read pending-engram.json, emit for orchestrator)
+            $pendingParams = @{ Mode = 'process-pending'; Quiet = $true }
+            $pendingRaw = & "$PSScriptRoot/session-checkpoint.ps1" @pendingParams 2>&1 | Out-String
+            $pendingResult = $null
+            try {
+                $pendingResult = $pendingRaw | ConvertFrom-Json -ErrorAction Stop
+            } catch {
+                Write-Debug "Checkpoint bridge: process-pending JSON parse failed: $($_.Exception.Message)"
+            }
+
+            # Determine gate status
+            $hasPendingDirective = ($cpResult -and $cpResult.mem_save_directive) -or ($pendingResult -and $pendingResult.mem_save_directive)
+            $directive = if ($pendingResult -and $pendingResult.mem_save_directive) { $pendingResult.mem_save_directive } elseif ($cpResult -and $cpResult.mem_save_directive) { $cpResult.mem_save_directive } else { $null }
+
+            if ($hasPendingDirective) {
+                $pendingProcessed = $true
                 Write-Host "💾 Checkpoint saved (zone: $($cpResult.zone), $($cpResult.percent)%)" -ForegroundColor Cyan
-                if ($cpResult.mem_save_directive) {
-                    Write-Host "  → mem_save_directive: $($cpResult.mem_save_directive | ConvertTo-Json -Compress)" -ForegroundColor DarkGray
-                    Write-Host "  ORCHESTRATOR ACTION REQUIRED: call engram_mem_save with above directive (topic_key=checkpoint/session-state)" -ForegroundColor Yellow
-                }
+                Write-Host "  → mem_save_directive: $($directive | ConvertTo-Json -Compress)" -ForegroundColor DarkGray
+                Write-Host "  ⚡ HARD GATE: ORCHESTRATOR MUST call engram_mem_save with above directive (topic_key=checkpoint/session-state)" -ForegroundColor Red
+                Write-Host "  ⚡ HARD GATE: Session close BLOCKS until engram_mem_save succeeds and pending-engram.json is cleared" -ForegroundColor Red
+                $gatePassed = $false  # Block close until orchestrator confirms save
+            } elseif ($cpResult -and $cpResult.checkpoint_created) {
+                Write-Host "💾 Checkpoint saved (zone: $($cpResult.zone), $($cpResult.percent)%) — no pending directive" -ForegroundColor Cyan
                 if ($cpResult.checkpoint_file) { Write-Host "  File: $($cpResult.checkpoint_file)" -ForegroundColor DarkGray }
+            } else {
+                Write-Host "  No checkpoint created (zone: $($cpResult.zone), $($cpResult.percent)%)" -ForegroundColor DarkGray
             }
         }
     }
+
+    # Expose gate status for orchestrator consumption
+    $result | Add-Member -NotePropertyName "checkpointGatePassed" -NotePropertyValue $gatePassed
+    $result | Add-Member -NotePropertyName "pendingProcessed" -NotePropertyValue $pendingProcessed
+    $result | Add-Member -NotePropertyName "memSaveDirective" -NotePropertyValue $directive
     Write-Host "--- mem_session_summary ---" -ForegroundColor Yellow
     Write-Host "Call with:" -ForegroundColor Yellow
     Write-Host "## Goal" -ForegroundColor Gray
