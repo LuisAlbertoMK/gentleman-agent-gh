@@ -7,6 +7,7 @@
 
 | Date | File | Domain | Key Finding | Status |
 |------|------|--------|-------------|--------|
+| 2026-08-29 | [`orchestrator-weakness`](2026-08-29-orchestrator-weakness-analysis.md) | Meta-Architecture | Punto más débil = enforcement: orquestador 100% delegación, G7 conductual + G8 Ollama residuales. Catalogado B 93 files a quick (tool_04f4cc7 + ses_fb038747). | 📄 Disponible |
 | 2026-08-28 | [`pester-17-fails`](2026-08-28-pester-17-fails.md) | Testing | G5 closure — 17 Pester fails → 0 fixed (dc8bb74c + bde9e720). Gate 25/25, Pester 24/24 (3 suites). | ✅ resolved |
 | 2026-08-04 | [`analysis-08-04`](2026-08-04-structural-gaps-post-cycles.md) | Multi-dimension | 15 findings: 5 enforcement (CRÍTICO/Alto), benchmark gate, tokenize-all roto, 7 docs "numbers that lie". R1-R5 completado (92f848aa, gate 16/16); R10 docs cleanup. | 🏁 active (plan) |
 | 2026-08-03 | [`analysis-08-03`](2026-08-03-security-infra-dx-perf-audit.md) | Multi-dimension | Veredictos por audit (PASS / PASS-WITH-NOTES). Findings verificados como arreglados en trend 08-04 (SEC-1/2/5, INFRA-1/3, DX-1..4, DOCS-1 4/5). | ✅ completed |
@@ -69,7 +70,7 @@
 
 ## Trend Summary
 
-- **Total documents**: 58 (57 analyses + 1 performance plan, all indexed above)
+- **Total documents**: 59 (58 analyses + 1 performance plan, all indexed above)
 - **Completed**: 6 (tdd-testing, orchestrator, permission-modes, execution-report, PERFORMANCE-PLAN 9/9, resource-optimization)
 - **Current**: 2026-08-04 analysis — R1-R5 completed (commit 92f848aa, gate 16/16); R10 docs cleanup in progress
 

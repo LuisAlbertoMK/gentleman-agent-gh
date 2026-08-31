@@ -104,6 +104,8 @@ After EVERY delegation that modifies files:
 
 Runtime enforcement — not advisory. Catches ~30% of subtle bugs in ~10 seconds.
 
+**Orchestrator Guard (immune-system 2026-08-29)**: T2+ (>1 file or >20 lines) NEVER to gentleman-quick — decompose into clusters ≤10 files via delivery-harness with fallback model muse-spark-1.2/big-pickle if laguna 404. Re-validate git diff --stat + check-token-budget -Json post-subagent, not just 4-field. (cataloged: B 93 files → STOP tool_04f4cc7 + deep 404 ses_fb038747)
+
 ## Post-Delegation Output Verification (MANDATORY for ALL delegations)
 
 Before trusting ANY subagent output — ALWAYS verify the work was actually done:

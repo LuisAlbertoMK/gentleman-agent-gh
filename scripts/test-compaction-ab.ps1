@@ -55,7 +55,7 @@ $ErrorActionPreference = "Stop"
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $configPath = Join-Path $repoRoot "opencode.json"
 $backupPath = Join-Path $repoRoot ".test-compaction-ab.bak.json"
-$benchScript = Join-Path $PSScriptRoot "benchmark-regression.ps1"
+$benchScript = Join-Path $PSScriptRoot "benchmark-core.ps1"
 $budgetScript = Join-Path $PSScriptRoot "check-token-budget.ps1"
 
 function Write-Result {
@@ -69,7 +69,7 @@ if (-not (Test-Path -LiteralPath $configPath)) {
     throw "opencode.json not found at $configPath"
 }
 if (-not (Test-Path -LiteralPath $benchScript)) {
-    throw "benchmark-regression.ps1 missing: $benchScript"
+    throw "benchmark-core.ps1 missing: $benchScript"
 }
 if (-not (Test-Path -LiteralPath $budgetScript)) {
     throw "check-token-budget.ps1 missing: $budgetScript"

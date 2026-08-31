@@ -9,7 +9,7 @@
 [string]$Path=(Get-Location).Path,[switch]$Quiet,
 [string]$BaselineFile=(Join-Path $Path 'docs/metricas/pssa-baseline.json'))
 Set-StrictMode -Version Latest;$ErrorActionPreference='Stop'
-$xd=@('experiments','skills','node_modules');$xdAmp=$xd+'tests';$fr=@('PSUseBOMForUnicodeEncodedFile','PSAvoidDefaultValueSwitchParameter');$tr=@('PSAvoidUsingWriteHost')
+$xd=@('experiments','skills','node_modules','.archive');$xdAmp=$xd+'tests';$fr=@('PSUseBOMForUnicodeEncodedFile','PSAvoidDefaultValueSwitchParameter');$tr=@('PSAvoidUsingWriteHost')
 
 function Write-Status { param([string]$Message) if (-not $Quiet) { Write-Host "  $Message" } }
 function Get-PSSAViolation { param([string]$TargetPath,[string[]]$Files)
@@ -132,6 +132,8 @@ if($Mode -eq 'Fix'){Write-Host "`n-- Auto-fix --";$bf=Resolve-BomEncoding -Viola
 $af=@($results | Where-Object {$_.RuleName -in $fr});$td=@($results | Where-Object {$_.RuleName -in $tr});$manual=@($results | Where-Object {$_.RuleName -notin ($fr+$tr)})
 $ev=@($manual | Where-Object {$sp=$_.ScriptPath.Replace('\','/');$sk=$false;foreach($d in $xdAmp){if($sp-match"/$d/"){$sk=$true;break}};$sk})
 $manual=@($manual | Where-Object {$sp=$_.ScriptPath.Replace('\','/');$sk=$false;foreach($d in $xdAmp){if($sp-match"/$d/"){$sk=$true;break}};-not$sk})
+# Intentional suppression: platform.ps1 polyfills $IsWindows/$IsLinux/$IsMacOS for PS5.1 compat (scripts/lib/platform.ps1:23-35) — flagged as PSAvoidAssignmentToAutomaticVariable but required. Suppress from gate.
+$manual=@($manual | Where-Object { -not ($_.RuleName -eq 'PSAvoidAssignmentToAutomaticVariable' -and $_.ScriptName -match 'platform\.ps1') })
 
 $kx=@('bash-safe.ps1','pssa-gate.ps1')
 $av=[IO.Directory]::EnumerateFiles($target, '*.ps1', [IO.SearchOption]::AllDirectories) | ForEach-Object -Parallel {

@@ -261,6 +261,14 @@ if ($Mode -in @('mark', 'full') -and $checkpointNeeded -and $validated) {
         content   = $memContent
     }
     $memSaved = $true  # directive prepared — orchestrator calls engram_mem_save with $memSaveDirective
+
+    # Persist directive to file for hard-gate recovery (orchestrator reads this even if stdout missed)
+    if ($memSaveDirective) {
+        $pendingPath = Join-Path $checkpointDir "pending-engram.json"
+        $pendingTmp = "$pendingPath.tmp"
+        $memSaveDirective | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $pendingTmp -Encoding UTF8 -ErrorAction SilentlyContinue
+        if (Test-Path -LiteralPath $pendingTmp) { Move-Item -LiteralPath $pendingTmp -Destination $pendingPath -Force -ErrorAction SilentlyContinue }
+    }
 }
 
 # --- Step 6: Index large output via ctx_index (for cross-session recovery) ---

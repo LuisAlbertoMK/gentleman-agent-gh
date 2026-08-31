@@ -16,9 +16,7 @@
     Built-in pwsh only, ASCII only.
 #>
 [CmdletBinding()]
-param([switch]$WhatIf,
-    [switch]$Quiet,
-    [switch]$Json)
+param([switch]$WhatIf)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
@@ -49,7 +47,7 @@ function Get-Count {
     if ($null -eq $hits) { return 0 }
     return [int](($hits | ForEach-Object { $_.Matches.Count } | Measure-Object -Sum).Sum)
 }
-function Test-Json {
+function Test-JsonConfig {
     param([string]$Path)
     if (-not (Test-Path -LiteralPath $Path)) { return $false }
     try {
@@ -147,11 +145,11 @@ else { Write-Host 'Nothing to replace (already migrated?).' -ForegroundColor Dar
 # 6. Count after + validate
 Write-Host "== Count after + validate ==" -ForegroundColor Cyan
 $globLagunaA, $globMuseA, $globPickleA = Show-Counts 'global' $globalPath
-$globJsonOk = Test-Json $globalPath
+$globJsonOk = Test-JsonConfig $globalPath
 Write-Host ('global json valid : {0}' -f $globJsonOk) -ForegroundColor Gray
 if ($repoExists) {
     $repoLagunaA, $repoMuseA, $repoPickleA = Show-Counts 'repo' $repoPath
-    $repoJsonOk = Test-Json $repoPath
+    $repoJsonOk = Test-JsonConfig $repoPath
     Write-Host ('repo json valid   : {0}' -f $repoJsonOk) -ForegroundColor Gray
 }
 $ok = $true
@@ -178,7 +176,7 @@ Write-Host '      Close all OpenCode sessions; config is loaded at startup.' -Fo
 # 8. git diff --stat (only if inside a git work tree) with timeout
 Write-Host "== git diff --stat ==" -ForegroundColor Cyan
 try {
-    $job = Start-Job -ScriptBlock { param($root) git -C $root rev-parse --show-toplevel 2>$null } -ArgumentList $PSScriptRoot
+    $job = Start-Job -ScriptBlock { git -C $using:PSScriptRoot rev-parse --show-toplevel 2>$null }
     $completed = Wait-Job -Job $job -Timeout 10
     if (-not $completed) {
         Stop-Job -Job $job | Out-Null
@@ -188,7 +186,7 @@ try {
         $gitRoot = ([string](Receive-Job -Job $job)).Trim()
         Remove-Job -Job $job -Force | Out-Null
         if ($gitRoot -ne '') {
-            $diffJob = Start-Job -ScriptBlock { param($gr) git -C $gr diff --stat -- opencode.json } -ArgumentList $gitRoot
+            $diffJob = Start-Job -ScriptBlock { git -C $using:gitRoot diff --stat -- opencode.json }
             $diffCompleted = Wait-Job -Job $diffJob -Timeout 10
             if (-not $diffCompleted) {
                 Stop-Job -Job $diffJob | Out-Null

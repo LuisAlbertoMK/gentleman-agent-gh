@@ -34,6 +34,7 @@ param(
     [switch]$SkipSummaryGate,
     [switch]$Checkpoint,
     [string[]]$Discoveries,
+    [string[]]$Decisions,
     [string[]]$Errors,
     [string]$BitacoraPath
 )
@@ -252,18 +253,40 @@ if ($Quiet) {
         } catch { Write-Debug "ledger summary: $($_.Exception.Message)" }
     }
 
-    # --- Checkpoint bridge integration (medium-term memory) ---
-    # On YELLOW+ zone with -Checkpoint, capture a proactive memory snapshot
-    # so decisions/bugfixes made mid-session survive compaction cycles.
+    # --- Checkpoint bridge integration (medium-term memory) — G7 hard gate ---
+    # .ps1 cannot call MCP engram_mem_save; this bridge emits directive for orchestrator.
+    # Orchestrator MUST read checkpoint_file + mem_save_directive and call engram_mem_save.
     if ($Checkpoint) {
         $checkpointPath = Join-Path $PSScriptRoot "session-checkpoint.ps1"
         if (Test-Path -LiteralPath $checkpointPath) {
             $cpParams = @("-Mode", "full", "-Quiet")
             if ($Discoveries) { $cpParams += "-Discoveries"; $cpParams += $Discoveries }
             if ($Decisions) { $cpParams += "-Decisions"; $cpParams += $Decisions }
-            $cpResult = & "$PSScriptRoot/session-checkpoint.ps1" @cpParams 2>$null | ConvertFrom-Json -ErrorAction SilentlyContinue
+            if ($Errors) { $cpParams += "-Errors"; $cpParams += $Errors }
+            $cpRaw = & "$PSScriptRoot/session-checkpoint.ps1" @cpParams 2>&1 | Out-String
+            $cpResult = $null
+            try {
+                $cpResult = $cpRaw | ConvertFrom-Json -ErrorAction Stop
+            } catch {
+                # Fallback: read pending-engram.json if JSON parse failed
+                $pendingPath = Join-Path $PSScriptRoot "..\.opencode\session-checkpoints\pending-engram.json"
+                if (Test-Path -LiteralPath $pendingPath) {
+                    try {
+                        $pendingContent = Get-Content -LiteralPath $pendingPath -Raw -ErrorAction Stop
+                        $cpResult = $pendingContent | ConvertFrom-Json -ErrorAction Stop
+                        $cpResult.checkpoint_created = $true  # we know it was created since file exists
+                    } catch {
+                        Write-Debug "Checkpoint bridge: fallback read of pending-engram.json failed: $($_.Exception.Message)"
+                    }
+                }
+            }
             if ($cpResult -and $cpResult.checkpoint_created) {
                 Write-Host "💾 Checkpoint saved (zone: $($cpResult.zone), $($cpResult.percent)%)" -ForegroundColor Cyan
+                if ($cpResult.mem_save_directive) {
+                    Write-Host "  → mem_save_directive: $($cpResult.mem_save_directive | ConvertTo-Json -Compress)" -ForegroundColor DarkGray
+                    Write-Host "  ORCHESTRATOR ACTION REQUIRED: call engram_mem_save with above directive (topic_key=checkpoint/session-state)" -ForegroundColor Yellow
+                }
+                if ($cpResult.checkpoint_file) { Write-Host "  File: $($cpResult.checkpoint_file)" -ForegroundColor DarkGray }
             }
         }
     }

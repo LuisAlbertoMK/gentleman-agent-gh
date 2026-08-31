@@ -57,8 +57,6 @@ param(
 
     [switch]$WriteProfile,
 
-    [string]$CurrentConfig = "",
-
     [switch]$Apply
 )
 Set-StrictMode -Version Latest
@@ -85,7 +83,7 @@ function Get-CPUInfo {
                 if ($model -match "model name.*: (.+)") { $model = $matches[1] }
                 $cores = ($cpuinfo | Select-String "processor" | Measure-Object).Count
             }
-        } catch {}
+        } catch { Write-Warning "Failed to read /proc/cpuinfo: $_" }
     }
     elseif ($IsMacOS) {
         $model = (sysctl -n machdep.cpu.brand_string 2>$null)
@@ -382,6 +380,6 @@ else {
     Write-Output "  snapshot: $($activeProfile.snapshot.enabled)"
     Write-Output ""
     Write-Output "Notes:"
-    $activeProfile.notes | % { Write-Output "  $_" }
+    $activeProfile.notes | ForEach-Object { Write-Output "  $_" }
 }
 exit 0
