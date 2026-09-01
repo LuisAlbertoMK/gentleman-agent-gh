@@ -80,6 +80,18 @@ if (Test-Path -LiteralPath "$PSScriptRoot/inter-track.ps1") {
         if (-not $Quiet -and $itNew -ne $itPrev) {
             Write-Host "  📊 inter-track: $itPrev → $itNew (IC/IT)" -ForegroundColor Cyan
         }
+        # G7 fix: auto-reset inter-track when target met so cycle id advances (cycle-29 → cycle-30)
+        if (-not $env:PESTER_TEST -and $itNew -ne $itPrev) {
+            $itTarget = if (Test-Path ".learnings\inter-track.json") {
+                (Get-Content ".learnings\inter-track.json" -Raw | ConvertFrom-Json -EA SilentlyContinue).cycle.target
+            } else { 0 }
+            if ($itTarget -gt 0 -and [int]$itNew -ge [int]$itTarget) {
+                & "$PSScriptRoot/inter-track.ps1" -Reset -Quiet
+                if (-not $Quiet) {
+                    Write-Host "  🔄 inter-track: target met ($itNew/$itTarget) — cycle advanced" -ForegroundColor Green
+                }
+            }
+        }
     } catch {
         Write-Debug "close-session: inter-track increment skipped ($($_.Exception.Message))"
     }
