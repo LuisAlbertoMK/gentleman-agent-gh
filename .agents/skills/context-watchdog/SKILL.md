@@ -2,8 +2,8 @@
 name: context-watchdog
 description: "Monitor context window — Recursive Summary Compression (L1/L2/L3), YELLOW/RED zones, hallucination detection"
 triggers: "Context explosion, compress, compression schedule, session break"
-changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1618
+changelog: "2026-09-01 P0-1 — DAG wiring (parts 1-3): hierarchical summary DAG + check integration"
+token_budget: 2600
 ---
 
 ## When to Use
@@ -30,7 +30,15 @@ Monitor context window — Recursive Summary Compression (L1/L2/L3), YELLOW/RED 
 
 ## Anti-Patterns
 Compress at RED (recovery > savings; rule 1) · Jump to L3 skipping L1 (destroys chain) · Summarize stale instead of pruning (compounds drift)
+## DAG Wiring (P0-1 — Hierarchical Summary DAG, parte 3/3)
+
+**Escalation** delegates to `scripts/lcm-dag.ps1` + `scripts/context-watchdog-check.ps1`:
+- `Invoke-LcmEscalation` thresholds aligned to zones: `NONE<40% L1 40-60 L2 60-80 L3>80` (compact at 70%).
+- Auto-creates DAG node in `.learnings/lcm-dag.json` with lossless `Pointer` (L3). `PESTER_TEST=1` dry-runs.
+- **3-boundary rule** (Zylos): call `context-watchdog-check.ps1` (a) before user output, (b) before `git push`/Write, (c) on Engram writes. Hook point for part 3: `session-checkpoint.ps1` at YELLOW/ORANGE.
+- Storage: `.learnings/lcm-dag.json {nodes, edges, meta{cycle,budget}}` — per-cycle DAG (from `inter-track.json`).
+
 ## Reference
-> docs/skills/context-watchdog/reference.md
+> docs/skills/context-watchdog/reference.md · docs/mejoras/2026-09-01-lcm-dag-design.md
 ## Refs
 Cross-Refs: skill-graph | performance
