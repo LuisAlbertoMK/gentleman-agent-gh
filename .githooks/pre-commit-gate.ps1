@@ -114,7 +114,16 @@ if ($stagedAgents) {
     else { $benchOut.Trim() -split "`n" | ForEach-Object { Write-Host "    $_" }; Pass }
 } else { Pass }
 
-# [9/13] JD review check — respects .jd-cleared/<path> markers or FORCE_SHIP env
+# [9/14] MCP security audit (KB r2-mcp-security-bestpractices 2026-07-28: SSRF allowlist, version pin, env secrets, disabled hygiene)
+Write-Host "[9/14] MCP security audit..."
+$mcpStaged = $staged | Where-Object { $_ -match 'opencode\.json|security-audit-mcp\.ps1' }
+if ($mcpStaged) {
+    $mcpOut = & "$RepoRoot/scripts/security-audit-mcp.ps1" *>&1 | Out-String
+    if ($mcpOut -match '\[FAIL\]') { Fail "MCP security audit FAIL`n$mcpOut" }
+    else { $mcpOut.Trim() -split "`n" | ForEach-Object { Write-Host "    $_" }; Pass }
+} else { Pass }
+
+# [10/14] JD review check — respects .jd-cleared/<path> markers or FORCE_SHIP env
 # Clears the recurring Warn for files already cleared via `!judgment-day`.
 # Marker naming: path separators -> underscores (scripts/foo.ps1 -> .jd-cleared/scripts_foo.ps1)
 Write-Host "[9/13] JD review check (ROZA zone)..."
