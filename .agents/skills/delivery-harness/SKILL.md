@@ -3,7 +3,7 @@ name: delivery-harness
 description: "Orchestrate multi-agent work — break goals into work units, delegate with isolation, collect results, handle failures"
 triggers: "Coordinate, orchestrate, multi-agent, delegate work"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2500
+token_budget: 2700
 ---
 
 ## When to Use
