@@ -68,3 +68,19 @@
 ## Relación con plan v3 (cola existente)
 
 Este scan no duplica el plan de mejora: GAP-1..3 son **nuevos** (no estaban en el plan); GAP-4..9 son hygiene. El plan v3 sigue vigente para las oportunidades (P0-2, R2-4, P0-1, etc.).
+
+---
+
+## Resolución 2026-09-01 (post-scan)
+
+| Gap | Estado | Commit |
+|-----|--------|--------|
+| GAP-1 laguna-404 ×14 | ✅ RESUELTO vía SSoT (opencode-base 16→0, semi-agents 2→0) + regen validada 9/9 + sync-global propagó a config global (49 agentes) | 94e6a454 |
+| GAP-2 gate hook | ✅ RESUELTO — causa real: ref stale a benchmark.ps1 (consolidado 5c503d68) → benchmark-core.ps1 + README agents sync + router skill bajo budget. Gate 25/25 ALL CLEAR con hook | 2bb36f94 |
+| GAP-3 push | ✅ RESUELTO — c7ed972e..3260b08b (9 commits) | 3260b08b |
+| GAP-4 Pester muta estado | 🔲 PENDIENTE (1-2 sesiones) — PESTER_TEST no gated en metrics writes | — |
+| GAP-5 BITACORA | ✅ RESUELTO | 5d291a62 |
+| GAP-6 reparar/ | ✅ RESUELTO — gitignored | 3260b08b |
+| GAP-7 drift global | ✅ RESUELTO — sync-global ok (93 junctions, 49 agentes) | 3260b08b |
+| GAP-8 branches | ✅ RESUELTO — 3 deleted | 3260b08b |
+| GAP-9 índice README | ✅ RESUELTO — 81 docs | 3260b08b |
