@@ -3,7 +3,7 @@ name: context-watchdog
 description: "Monitor context window — Recursive Summary Compression (L1/L2/L3), YELLOW/RED zones, hallucination detection"
 triggers: "Context explosion, compress, compression schedule, session break"
 changelog: "2026-09-01 P0-1 — DAG wiring (parts 1-3): hierarchical summary DAG + check integration"
-token_budget: 2600
+token_budget: 3200
 ---
 
 ## When to Use
@@ -30,6 +30,22 @@ Monitor context window — Recursive Summary Compression (L1/L2/L3), YELLOW/RED 
 
 ## Anti-Patterns
 Compress at RED (recovery > savings; rule 1) · Jump to L3 skipping L1 (destroys chain) · Summarize stale instead of pruning (compounds drift)
+
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Still under 60%, keep going" | Ignoring YELLOW at 40-60% | `context-watchdog-check.ps1 -CurrentTokens X -Budget Y` — if L1, run L1 now |
+| "One more edit before compacting" | ORANGE 60-80% without L2+L3 | `Invoke-LcmEscalation` must return L2/L3 — escalate before next tool call |
+| "Hallucination is just a glitch" | Same point 2× or "as I mentioned" unseen | Force RED → `mem_save` → `session_summary` → new session immediately |
+
+## Red Flags
+- Context rot: performance degrades before nominal limit (paper LCM) — measure via re-read of same file twice
+- `git diff --stat` after L1 shows no file pruning → L1 was summarization, not compression
+
+## Verification
+- Post-L1: token count drops >20% and next tool call succeeds without re-read
+- Post-L3: DAG node has lossless Pointer; `Get-LcmNode -Id <id>` resolves
 ## DAG Wiring (P0-1 — Hierarchical Summary DAG, parte 3/3)
 
 **Escalation** delegates to `scripts/lcm-dag.ps1` + `scripts/context-watchdog-check.ps1`:
