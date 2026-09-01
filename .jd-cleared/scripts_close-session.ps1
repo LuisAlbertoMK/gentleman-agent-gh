@@ -1,2 +1,1 @@
-#requires -Version 7
-cleared — close-session ledger summary (+7 lines), low risk, bounded read
+firewall-cleared 2026-09-01 — R2-6 wiring post-close hook

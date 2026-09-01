@@ -3,7 +3,7 @@ name: ralph-loop
 description: Start Ralph Loop - auto-continues until task completion
 triggers: "ralph, ralph loop, auto-continue, iterative loop, /ralph-loop, continuous task, autonomous loop"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2290
+token_budget: 3000
 ---
 
 ## When to Use
@@ -51,6 +51,16 @@ The loop can only be stopped by:
 1. Truthful completion promise
 2. Max iterations reached
 3. User running `/cancel-ralph`
+
+## Lifecycle Hooks (R2-6 — wiggumdev/ralph + dynamic-workflows crash-resume)
+
+| Hook | When | What |
+|------|------|------|
+| `pre-close` | before `close-session.ps1` | flush batch, validate `mem_save` |
+| `post-close` | after close | if `<promise>DONE</promise>` → `inter-track -Reset` (explicit COMPLETE) |
+| `check-complete` | on demand | checks `.opencode/ralph-loop.local.md`, last commit, `.ralph/promise` |
+
+Wired: `close-session.ps1` calls `& scripts/ralph-lifecycle.ps1 -Hook post-close` after G7 auto-reset.
 
 ## Checking Status
 

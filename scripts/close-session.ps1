@@ -92,6 +92,8 @@ if (Test-Path -LiteralPath "$PSScriptRoot/inter-track.ps1") {
                 }
             }
         }
+        # R2-6: Ralph lifecycle post-close hook (COMPLETE → inter-track reset, explicit promise)
+        try { & "$PSScriptRoot/ralph-lifecycle.ps1" -Hook post-close | Out-Null } catch { Write-Debug "ralph lifecycle post-close: $_" }
     } catch {
         Write-Debug "close-session: inter-track increment skipped ($($_.Exception.Message))"
     }
