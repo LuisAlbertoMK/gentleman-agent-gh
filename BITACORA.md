@@ -1,3 +1,4 @@
+2026-09-01 - Sesion: fix(g7) auto-reset inter-track 2777202b + plan mejora agente v1/v2/v3 (e55f306a, de7e61aa, 07233950) + P0-3 reasoning tier f8d6e8fe + gap scan repo (GAP-1: 14 agentes laguna 404, GAP-2: hook PS5.1 vs PS7, GAP-3: 5 commits sin push, ver docs/mejoras/2026-09-01-gap-scan-repo.md)
 2026-08-31 - Verify all scripts
 2026-08-31 - Test hard gate
 2026-08-31 - Syntax check
