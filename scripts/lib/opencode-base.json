@@ -807,6 +807,38 @@
     "codebase-memory*": true,
     "engram*": true
    }
+  },
+  "gentleman-initializer": {
+   "description": "Harness initializer — different prompt for first window, arms environment with all context before delegating (Anthropic Effective Harnesses 2025-11-26, R2-5)",
+   "model": "opencode/nemotron-3-ultra-free",
+   "mode": "primary",
+   "prompt": "{file:prompts/gentleman-initializer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+   "tools": {
+    "codebase-memory*": true,
+    "engram*": true
+   }
+  },
+  "gentleman-initializer-sub": {
+   "description": "Initializer subagent — first-window setup, delegable via Task tool (R2-5)",
+   "model": "opencode/nemotron-3-ultra-free",
+   "mode": "subagent",
+   "hidden": true,
+   "prompt": "{file:prompts/gentleman-initializer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
+   "tools": {
+    "codebase-memory*": true,
+    "engram*": true
+   }
+  },
+  "gentleman-initializer-sub-auto": {
+   "description": "Initializer subagent — AUTO mode (first-window setup, zero ask) — delegable via Task tool (R2-5)",
+   "model": "opencode/nemotron-3-ultra-free",
+   "mode": "subagent",
+   "hidden": true,
+   "prompt": "{file:prompts/gentleman-initializer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
+   "tools": {
+    "codebase-memory*": true,
+    "engram*": true
+   }
   }
  },
  "plugin": [

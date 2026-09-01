@@ -1,1 +1,1 @@
-firewall-cleared 2026-09-01 — TEMPLATE_MAP code-review
+firewall-cleared 2026-09-01 — TEMPLATE_MAP initializer

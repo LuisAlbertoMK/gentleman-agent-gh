@@ -89,6 +89,7 @@ const TEMPLATE_MAP = {
    // Read/write agents — bash ask, full edit/write with deny rules
    'gentleman-deep': 'readwrite',
    'gentleman-code-review': 'readwrite',
+   'gentleman-initializer': 'readwrite',
    'gentleman-reasoning': 'readwrite',
    'gentleman-quick': 'readwrite',
    'gentleman-codex': 'readwrite',
