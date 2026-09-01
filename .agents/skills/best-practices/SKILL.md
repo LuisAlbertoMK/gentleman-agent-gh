@@ -3,7 +3,7 @@ name: best-practices
 description: Apply modern web development best practices for security, compatibility, and code quality.
 triggers: "best practices, security audit, modernize code, code quality, check vulnerabilities"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1973
+token_budget: 2500
 ---
 
 ## When to Use
@@ -21,6 +21,22 @@ Deps: npm audit | structuredClone() for untrusted merges | textContent over inne
 Valid HTML(no dup IDs) | Semantic HTML5 | Explicit img dims | Event delegation | Memory cleanup via AbortController+useEffect return
 ## Permissions: Request geo/camera/mic after user action+explanation. Permissions-Policy restricts by default.
 ## Tools: npm audit | SecurityHeaders.com | W3C Validator | Lighthouse | Mozilla Observatory
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Best practices are overkill here" | Skipping audit for small project | Even small project → `web-quality-audit` checklist (perf/accessibility/SEO) |
+| "It works, so it's secure" | No `npm audit` / `SecurityHeaders.com` check | `npm audit --json` + `SecurityHeaders.com` + W3C Validator before ship |
+| "Copy headers blindly" | Headers without verifying FP alerts | Context7 current API versions + `Mozilla Observatory` score |
+
+## Red Flags
+- `npm audit` alone without supply-chain check (postinstall/typosquat)
+- Permissions requested before user action without explanation
+
+## Verification
+- `web-quality-audit` skill checklist PASS + Lighthouse score
+- Headers verified via `SecurityHeaders.com` + OWASP Top 10 mapping
+
 ## Refs: MDN Web Security | OWASP Top 10 | web-quality-audit skill
 
 ## Anti-Patterns

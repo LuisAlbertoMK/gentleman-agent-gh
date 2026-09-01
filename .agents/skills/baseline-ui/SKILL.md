@@ -3,7 +3,7 @@ name: baseline-ui
 description: "Anti-slop UI — layout, typography, responsive, animation, tokens. Use for cleanup or polish."
 triggers: "ui cleanup, polish interface, fix layout, ui slop, generic ui, design review, anti-slop, ui polish, polish ui"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2400
+token_budget: 3100
 ---
 ## When to Use
 Anti-slop audit&cleanup: layout·typography·responsive·animation·tokens. **Stack**: CSS/Tailwind·`cn()`(clsx+tw-merge)·React. Audit→**ui-engine**. **Flow**: Scan→❌→fix→verify→a11y→perf. Review:`/baseline-ui <file>`. **Offline-first**: pure static audit — needs NO network/Ollama; paired with `ui-specialist-pairing.ps1`, vision enhancement is optional and degrades gracefully if Ollama/network is down.
@@ -25,6 +25,22 @@ Fixed width·h-screen·dense interactive·Fixed font·transition:all·>500ms·No
 ## Examples
 1. Audit: `/baseline-ui src/components/Button.tsx` → `UI-CLEANUP:Button—2026-08-27 CRITICAL:[contrast]→ HIGH:[layout]→ VERIFY:[axe]`
 2. Token: `oklch(55% .18 255)` → `--primary:var(--blue-500)` → verify 4.5:1
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "AI can do UI, just prompt it" | Generic AI slop (no tokens, no @layer) | Check `baseline-ui` tokens OKLCH + Grid/Flex + container queries |
+| "One CSS file is fine" | 500+ line CSS without @layer | Use `@layer` + compositor-only animation + OKLCH tokens |
+| "Responsive is optional" | Fixed px widths | Container queries + Flex/Grid + spacing tokens |
+
+## Red Flags
+- Hardcoded `#fff`/`#000`/px without tokens → slop
+- Animation on `width`/`height` → compositor violation
+
+## Verification
+- `vision-analyze` or Playwright screenshot before ship
+- Tokens resolve via `baseline-ui` spec, not ad-hoc hex
+
 ## Cross-Refs: ui-engine | accessibility | performance | web-quality-audit
 > docs/skills/baseline-ui/reference.md
 

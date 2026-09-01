@@ -3,7 +3,7 @@ name: bitacora
 description: "Historical log of user requests per session — auto-append to BITACORA.md, search, date filtering"
 triggers: "Bitacora, historial, histórico, qué pedí, request log"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1395
+token_budget: 1900
 ---
 
 Historical log of user requests per session. Auto-append on session end.
@@ -34,5 +34,21 @@ After session end: prepend new entry to `BITACORA.md`.
 
 docs/skills/bitacora/reference.md
 ---
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "No need to log, I'll remember" | BITACORA not updated after session work | `mem_save` + BITACORA append every YELLOW/RED or session end (protocol) |
+| "One line is enough" | Vague entry without file:line | Every entry must have `{file:prompts/shared/_return-contract.md}` contract + `confidence:` |
+| "Duplicate entries are fine" | >80% similarity duplicate across concurrent sessions | C28 idempotent check: last entry date+description similarity before append |
+
+## Red Flags
+- BITACORA missing or 0 bytes → create with `# Bitácora` header (not silent continue)
+- Output >10 lines on resume → spamming session start
+
+## Verification
+- `git log --oneline -10` + `git status` before/after match BITACORA description
+- `mem_search` returns expected prior context for next session
+
 ## Refs
 Cross-Refs: engram-protocol | session-resume
