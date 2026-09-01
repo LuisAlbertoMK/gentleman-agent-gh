@@ -150,3 +150,94 @@ Si la ejecución se interrumpe, retomar desde aquí:
 - Los ctx_index sources tienen el texto completo indexado — usar `ctx_search(queries: [...], source: "research-2026-09-01-fase{N}-*")`.
 - Confidence markers: HIGH = fuente oficial/fechada con fetch primario. MEDIUM = excerpt/search, no fetch (verificar antes de implementar). SPECULATIVE = inferido, no confirmado.
 - **Auditoría 2026-09-01**: `practical-devsecops` descartado (landing curso, 0 hits CVE) y `awesome-mcp-servers-2026` descartado (LOW). Ver `mem 853` para trazabilidad cross-sesión.
+
+---
+
+# RONDA 2 — Investigación profunda adicional (2026-09-01 tarde)
+
+> **Método**: re-validación con `ctx_fetch_and_index` persistente (fuentes quedan en KB consultable) + búsquedas dirigidas de novedades. Todo checkpointeado en Engram ids 855-858.
+> **Estado**: solo INVESTIGACIÓN — sin implementación. v1/v2 preservados arriba sin modificaciones de contenido histórico.
+
+## Fuentes nuevas persistidas en KB (ronda 2)
+
+| ctx_index source | Qué | Verificación |
+|------------------|-----|--------------|
+| r2-codersera-llm-landscape | landscape LLM open-source completo (36 secciones) | fetch primario ✅ |
+| r2-ralph-wiggum-repo | wiggumdev/ralph features reales | fetch primario ✅ |
+| r2-mslearn-mcp | Microsoft Learn MCP overview | fetch primario ✅ (page auth-gated parcial) |
+| r2-zylos-llm-judge | LLM-as-judge 6 patrones producción | fetch primario ✅ |
+| r2-anthropic-harnesses | Effective Harnesses paper (2025-11-26) | fetch primario ✅ |
+| r2-opencode-plugins-docs | plugin system OFICIAL OpenCode | fetch primario ✅ |
+| r2-awesome-opencode-registry | awesome-opencode (8,947★, 643 forks) | fetch primario ✅ |
+| r2-opencode-checkpoint-plugin | plugin checkpoint comunitario (0★) | fetch primario ✅ |
+| r2-mcp-security-bestpractices | Security Best Practices MCP OFICIAL (2026-07-28, 11 secciones) | fetch primario ✅ |
+| r2-fundesk-skills-guide | guía skills 2026 + tabla repos con stars | fetch primario ✅ |
+| r2-hn-agents-truths | 4 verdades HN sobre agents | fetch primario ✅ |
+
+## Re-validación de hallazgos ronda 1 (viabilidad)
+
+| Item r1 | Antes | Ahora | Evidencia |
+|---------|-------|-------|-----------|
+| P0-1 LCM | HIGH | **HIGH confirmado** | arxiv fetch previo: Hierarchical DAG + Volt fork de OpenCode |
+| P0-2 MCP audit | HIGH (fuente falsa) | **HIGH re-encaminado** | 0 GHSA bajo `ecosystem:mcp` (fetch 2026-09-01); evidencia oficial = Security Best Practices MCP (2026-07-28): Confused Deputy, prompt injection, OAuth static client ID |
+| P0-3 Reasoning tier | HIGH | **IMPLEMENTADO** `f8d6e8fe` | gentleman-reasoning + sub + sub-auto (nemotron) |
+| P1-1 Skills spec audit | HIGH | **HIGH + ampliado** | Anthropic open standard Dec 2025 + ecosistema Q1 2026 (fundesk fetch) |
+| P1-2 Qwen 73.4% | MEDIUM | **MEDIUM-HIGH** | codersera full-text fetch confirma el número; alternativa: Qwen3.8-27B (mejor calidad), Gemma 4 31B (80% LiveCodeBench) |
+| P1-3 Zep temporal | HIGH | HIGH sin cambios | comparison 2026, patrón válido |
+| P2-2 Harnesses paper | HIGH | **SUBE a P1-4** | paper fetch: initializer-agent pattern ("different prompt for first context window") directamente aplicable a nuestro ciclo |
+| P2-3 DeepSeek V4 CSA | HIGH | HIGH + matiz | full-text: V4-Flash dentro de 1.6pts de V4-Pro a 1/5 params — mejor candidato práctico |
+| P3-1 marketplace | SPECULATIVE | **CONFIRMADO** | plugin system oficial (docs 2026-09-01) + awesome-opencode registry (8,947★) |
+| P3-2 native checkpointing | SPECULATIVE | **sigue SPECULATIVE** | no aparece en docs/commands; existe plugin comunitario (0★, PROBABILIDAD) |
+
+## Nuevas oportunidades (ronda 2)
+
+#### R2-1. Estructura addyosmani para nuestras skills — `confidence: high`
+- **Qué**: Adoptar estructura de `addyosmani/agent-skills` (18.1k★, v0.5.0 MIT): anti-rationalization tables, red flags, verification steps por skill.
+- **Por qué**: Es la estructura que la comunidad consagró; nuestras skills no tienen anti-rationalization ni red flags.
+- **Esfuerzo**: 2-3 sesiones (93 skills, incremental). **NUEVO — insertar en cola tras P1-1.**
+
+#### R2-2. Publicar skills en skills.sh / directorios — `confidence: high`
+- **Qué**: Listar nuestras mejores skills en vercel-labs/skills.sh (directorio abierto, 19 agentes soportados) y awesome-opencode (PR).
+- **Por qué**: Distribución gratuita + validación externa del ecosistema.
+- **Esfuerzo**: 1 sesión. **NUEVO.**
+
+#### R2-3. Minar awesome-opencode registry (8,947★) — `confidence: medium-high`
+- **Qué**: Evaluar plugins de memory persistence + multi-agent orchestration del registro para adoptar/mejorar.
+- **Esfuerzo**: 1-2 sesiones. **NUEVO.**
+
+#### R2-4. Judge patterns zylos → judgment-day — `confidence: high`
+- **Qué**: Adoptar los 6 patrones formales (offline eval, online runtime verifier 76-162ms budget, self-consistency, Reflexion, constitutional, IRM) en nuestro judgment-day skill.
+- **Por qué**: >50% de production teams usan judges en runtime; nuestro judgment-day implementa 1 patrón de 6.
+- **Esfuerzo**: 1-2 sesiones. **NUEVO — prioridad alta.**
+
+#### R2-5. Initializer-agent pattern (harnesses paper) → ciclo auto-mejora — `confidence: high`
+- **Qué**: Implementar "different prompt for first context window" del paper Anthropic (2025-11-26): agente inicializador que arma el entorno con todo el contexto necesario antes de delegar a coding agents.
+- **Esfuerzo**: 1-2 sesiones. **NUEVO — refuerza delivery-harness.**
+
+#### R2-6. Lifecycle hooks + completion signal (Ralph) → close-session — `confidence: medium-high`
+- **Qué**: Adoptar patrón `<promise>COMPLETE</promise>` + lifecycle hooks de wiggumdev/ralph para detección explícita de fin de ciclo.
+- **Esfuerzo**: 1 sesión. **NUEVO — PROBABILIDAD (patrón verificado en repo, aplicación nuestra es diseño propio).**
+
+## Cola de ejecución ACTUALIZADA (v3)
+
+1. ~~P0-3~~ ✅ implementado (`f8d6e8fe`)
+2. **P0-2** MCP config-hardening vs Security Best Practices oficial (evidencia lista en KB)
+3. **R2-4** Judge patterns → judgment-day (1-2 sesiones, quick win conceptual)
+4. **P0-1** LCM DAG → context-watchdog (2-3 sesiones, mayor impacto)
+5. **P1-1 + R2-1** Skills spec audit + estructura addyosmani (2-4 sesiones, incremental)
+6. **R2-5** Initializer-agent → delivery-harness (1-2 sesiones)
+7. **R2-2** skills.sh + awesome-opencode listing (1 sesión)
+8. **P1-2** Qwen/Qwen3.8/Gemma4 code review routing (verificar benchlm primero)
+9. **P1-3** Zep temporal edges (2-3 sesiones)
+10. **R2-3, R2-6, P2-*** según tiempo
+
+## Trazabilidad ronda 2
+
+| Parte | Engram | ctx_index |
+|-------|--------|-----------|
+| P1 re-validación | 855 | r2-codersera, r2-ralph, r2-mslearn, r2-zylos, r2-harnesses |
+| P2 P3-speculativos | 856 | r2-opencode-plugins, r2-awesome-registry, r2-checkpoint-plugin |
+| P3 seguridad MCP | 857 | r2-github-advisories, r2-mcp-security-bestpractices |
+| P4 novedades | 858 | r2-fundesk-skills-guide, r2-hn-agents-truths |
+
+> **Regla de fuentes para el ejecutor**: HIGH = fetch primario persistido en KB (tabla arriba). MEDIUM-HIGH = blog full-text sin benchmark oficial cruzado. PROBABILIDAD = patrón verificado pero aplicación propia sin validar. SPECULATIVE = no confirmado. No implementar nada sin su fuente HIGH/MEDIUM-HIGH correspondiente.
