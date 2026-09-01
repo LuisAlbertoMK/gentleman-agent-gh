@@ -3,7 +3,7 @@ name: ci-cd
 description: "CI/CD pipeline setup — GitHub Actions, local pre-push quality gate, auto-detect test runner, SDD spec coverage"
 triggers: "CI/CD pipeline, GitHub Actions, quality gate"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1853
+token_budget: 2445
 ---
 ## When to Use
 CI setup, failed PR checks, pipeline config.
@@ -33,6 +33,21 @@ strategy:{matrix:{os:[ubuntu,windows,macos]-latest}}
 steps:{uses:actions/checkout@v4;run:./scripts/quality-gate.ps1;if:${{!inputs.skip_tests}},run:go test./...-race-cover}
 ```
 
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 quality-gate·triple-verify·security-scanner·project-mapper·execution-mode·infra-audit
 
@@ -40,3 +55,4 @@ quality-gate·triple-verify·security-scanner·project-mapper·execution-mode·i
 Gate after tests·Block lint·Ignore monorepo·Hardcode runner·Hardcode OS·Skip coverage·Push-only triggers
 ## Reference
 > docs/skills/ci-cd/reference.md
+

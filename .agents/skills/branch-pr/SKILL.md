@@ -1,9 +1,9 @@
-﻿---
+---
 name: branch-pr
 description: "Create Gentle AI pull requests with issue-first checks. Trigger: creating, opening, or preparing PRs for review."
 triggers: "pull request, create PR, open PR, branch naming, PR creation, review PR, github pull request"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1923
+token_budget: 2578
 ---
 
 ## When to Use
@@ -33,5 +33,21 @@ Add `!` after type/scope. `BREAKING CHANGE:` in footer. Maps to `type:breaking-c
 
 ## Reference
 > docs/skills/branch-pr/reference.md
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: chained-pr | issue-creation
+

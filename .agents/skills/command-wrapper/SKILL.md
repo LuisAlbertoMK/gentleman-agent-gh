@@ -3,7 +3,7 @@ name: command-wrapper
 description: "Run commands safely — description, error handling, output parsing, and safety wrappers for destructive operations"
 triggers: "Command wrapper, error handling, output parsing"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1981
+token_budget: 2580
 ---
 
 ## When to Use
@@ -35,6 +35,21 @@ Destructive commands → BLOCK (ask required): `git push --force`, `rm -rf`. `gi
 ## LOGGING (post-command)
 After critical commands, log to Engram: `title:"Command: {summary}" type:discovery|config content:"**What**: command | **Exit code**: N | **Output**: summary | **Learned**: gotchas"`
 
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 security-scanner · delivery-harness · subagent-isolation · recovery-protocol · context-watchdog
 
@@ -43,3 +58,4 @@ Skip description · Ignore stderr · Parse output by eye · Raw bash for destruc
 
 ## Reference
 > docs/skills/command-wrapper/reference.md
+

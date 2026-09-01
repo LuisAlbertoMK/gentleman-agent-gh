@@ -3,7 +3,7 @@ name: comment-writer
 description: "Write warm, direct collaboration comments. Trigger: PR feedback, issue replies, reviews, Slack messages, GitHub."
 triggers: "comments, PR feedback, review comment, GitHub comment, write feedback"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1689
+token_budget: 2293
 ---
 
 ## When to Use
@@ -33,6 +33,21 @@ Whenever you write a comment another human will read: GitHub PR/issue comments, 
 ## Commands
 `gh pr view <PR_NUMBER> --json title,body,additions,deletions,changedFiles`
 
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 code-review-agent . comment-writer . branch-pr
 
@@ -40,3 +55,4 @@ code-review-agent . comment-writer . branch-pr
 Write before reading the PR · Recapitulate entire diff
 ## Reference
 > docs/skills/comment-writer/reference.md
+

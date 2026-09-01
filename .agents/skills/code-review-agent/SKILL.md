@@ -3,7 +3,7 @@ name: code-review-agent
 description: "4R code review - Risk/Readability/Reliability/Resilience with evidence gates and actionable fixes"
 triggers: "Code review, CR, revisar codigo, criticar"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1763
+token_budget: 2381
 ---
 4R: each R scored independently->verdict+fixes.
 ## When to Use
@@ -24,7 +24,23 @@ mem_search("review-profile/{p}")->load->adjust lens->Run 4R->mem_save(title:"CR 
 | Rubber-stamp | Missing `### 4R|Risk:` | Reject; require template |
 | Bikeshedding | Nits>3 && Risk>=7 unchanged | "Focus Risk/Rel first" |
 | Cargo-cult | Fixes lack `Evidence:`/`Ref:` | "Add evidence per Rule 3" |
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 judgment-day*skill-improver*quality-gate*triple-verify*engram-protocol
 ## Reference
 Examples (5) + Testing (3) → docs/skills/code-review-agent/reference.md
+
