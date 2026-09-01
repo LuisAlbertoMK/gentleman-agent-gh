@@ -1,10 +1,10 @@
-﻿---
+---
 name: sdd-design
 description: Create the SDD technical design and architecture approach. Trigger: orchestrator launches design for a change.
 delegate_only: true
 triggers: "SDD design, design phase, technical design, architecture design, sdd-design"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1766
+token_budget: 2408
 ---
 # SDD — Design Phase
 Creates the technical design and architecture approach for a change. Triggered by the orchestrator when moving from proposal to implementation.
@@ -31,5 +31,21 @@ Unit plan (key edge cases) · integration plan (boundaries) · risk-based covera
 7. Error path / exception handling
 ---
 > See [reference.md](docs/skills/sdd-design/reference.md) for extended details, examples, and patterns.
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: sdd | sdd-propose
+

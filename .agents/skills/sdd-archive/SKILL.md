@@ -1,9 +1,9 @@
-﻿---
+---
 name: sdd-archive
 description: "Archive completed SDD change by syncing delta specs. Trigger: orchestrator launches archive after implement+verify."
 triggers: "SDD archive, archive SDD, close SDD, persist artifacts"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1992
+token_budget: 2615
 ---
 Mode per `sdd-status-contract.md`:
 | Mode | Action |
@@ -23,5 +23,21 @@ Mode per `sdd-status-contract.md`:
 - Archive = AUDIT TRAIL — never modify archived changes; create `openspec/changes/archive/` if missing
 ## Reference
 Return summary template + extended details → docs/skills/sdd-archive/reference.md
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: sdd | sdd-verify
+

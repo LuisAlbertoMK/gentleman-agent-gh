@@ -1,10 +1,10 @@
-﻿---
+---
 name: sdd-explore
 description: "Explore SDD ideas before committing to a change. Trigger: orchestrator launches exploration or requirement clarification."
 triggers: "SDD explore, explore ideas, investigation, discovery, SDD exploration"
 delegate_only: true
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1797
+token_budget: 2440
 ---
 
 ## Executor Override
@@ -40,5 +40,21 @@ Explore codebase for a topic/feature, compare approaches, return structured anal
 
 docs/skills/sdd-explore/reference.md
 ---
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: sdd | sdd-propose
+

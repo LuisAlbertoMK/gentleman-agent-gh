@@ -1,9 +1,9 @@
-﻿---
+---
 name: sdd-propose
 description: "Create SDD change proposal with intent, scope, approach. Trigger: orchestrator launches proposal work."
 triggers: "SDD propose, proposal, intent, approach, change proposal"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1694
+token_budget: 2322
 ---
 Input: change name, exploration analysis OR user description, store mode (`engram|openspec|hybrid|none`).
 | Mode | Behavior |
@@ -26,5 +26,21 @@ openspec/hybrid: `openspec/changes/{change}/proposal.md` · engram/none: skip
 - **Vague scope**: In/Out must list concrete paths — "Improve auth" unverifiable vs "JWT issuer, refresh flow, rate limiting"
 ## Reference
 Shaping questions + proposal template + return envelope → docs/skills/sdd-propose/reference.md
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: sdd | sdd-spec
+

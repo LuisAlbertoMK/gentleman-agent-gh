@@ -3,7 +3,7 @@ name: sdd-quick
 description: "3-phase fast SDD for LOW-risk - Propose->Apply->Verify. Use when 1-3 files, known codebase, no schema/auth/API changes."
 triggers: "SDD quick, fast path, quick SDD, low risk SDD, simple change SDD"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1199
+token_budget: 1793
 ---
 # SDD Quick — 3-Phase Fast Path
 ```
@@ -26,7 +26,23 @@ Phase detail (relaxations, gates, skips) → reference. All phases persist via `
 - No Spec phase → proposal is the spec
 - No Design phase → code patterns from codebase are the design
 - Persist proposal + verify report only (skip intermediate artifacts)
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 sdd · execution-mode · quality-gate · commit-crafter
 ## Reference
 Phase 1-3 detail → docs/skills/sdd-quick/reference.md
+

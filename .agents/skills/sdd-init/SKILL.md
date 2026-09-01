@@ -1,10 +1,10 @@
-﻿---
+---
 name: sdd-init
 description: "Initialize SDD context, testing capabilities, registry, persistence. Trigger: sdd init, iniciar sdd, openspec init."
 triggers: "SDD init, initialize SDD, bootstrap SDD, SDD context setup"
 delegate_only: true
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1672
+token_budget: 2327
 ---
 
 ## Activation
@@ -34,5 +34,21 @@ Generated artifacts default to English. Spanish: neutral/professional unless reg
 
 ## Reference
 > docs/skills/sdd-init/reference.md
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: sdd | sdd-explore
+
