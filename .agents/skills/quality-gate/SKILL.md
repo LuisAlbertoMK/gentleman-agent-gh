@@ -3,7 +3,7 @@ name: quality-gate
 description: "Pre-commit gate — TDD + Pester tests pass, secrets scan, conventional commit, PSSA gate"
 triggers: "Quality gate, pre-commit, PSSA gate"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1977
+token_budget: 2532
 ---
 
 ## When to Use
@@ -34,9 +34,25 @@ Launch subagent. Parse 4-field min3 attacks.
 APPROVED→push|FIX→R2(new diff). R2✅→push. R2❌→STOP|BLOCK→STOP escalate|ESCALATE→STOP partial.
 Max2 rounds. Record Engram per breaker schema.
 
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 security-scanner·triple-verify·commit-crafter·ci-cd·code-review-agent·adversarial-breaker
 ---
 
 docs/skills/quality-gate/reference.md
 ---
+

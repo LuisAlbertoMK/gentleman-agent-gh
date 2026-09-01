@@ -3,7 +3,7 @@ name: project-mapper
 description: "Scan project structure, detect tech stack, classify architecture, generate dependency map; auto-chains to gap-analysis."
 triggers: "Mapear, project map, estructura, tech stack, arquitectura"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1904
+token_budget: 2489
 ---
 # Project Mapper
 Scan project structure, detect stack, classify architecture. Auto-link to gap-analysis.
@@ -17,7 +17,23 @@ Reference: gap-analysis skill (Phase 0.1) for classification tables. Avoid dupli
 After map: "Project classified as {tech layer}/{business type}. Run gap-analysis with {template}? (Y/n)". Only auto-execute on explicit confirm or `--auto`.
 ## Rules
 1. Start root `ls`/`Get-ChildItem` → top-level detection. 2. Classify from signals (multiple passes if ambiguous). 3. Drill 2-3 levels for architecture. 4. Validate: test count, coverage, lint, Docker size. 5. >50 files → summary counts per layer. 6. Adapt output to project size. 7. Suggest gap-analysis. 8. Save to engram `topic_key: architecture/project-map:{name}`.
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 gap-analysis · research · execution-mode · sdd · skill-graph · engram-protocol
 ## Reference
 Architecture Detection table + Output Format → docs/skills/project-mapper/reference.md
+

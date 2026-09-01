@@ -3,7 +3,7 @@ name: refactoring-planner
 description: "Plan refactoring with impact analysis, dependency mapping, and step-by-step migration with test baseline"
 triggers: "Refactor, refactoring, reestructurar, migrate"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1911
+token_budget: 2507
 ---
 
 ## When to Use
@@ -41,6 +41,21 @@ Refactoring: impact analysis, dependency mapping, migration. Test baseline manda
 ### Acceptance: after each step -> tests pass
 ```
 
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 metricas · quality-gate · sdd · code-review-agent · triple-verify
 
@@ -48,3 +63,4 @@ metricas · quality-gate · sdd · code-review-agent · triple-verify
 Refactor without baseline · Batch steps before testing · Skip impact analysis · No rollback plan · Change API in same refactor
 ## Reference
 > docs/skills/refactoring-planner/reference.md
+

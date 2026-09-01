@@ -1,9 +1,9 @@
-﻿---
+---
 name: performance-tracker
 description: "Score and track app performance — 6 dims, continuous scoring, trend analysis"
 triggers: "performance score, mobile perf, desktop perf, rendimiento, app score, benchmark, perf tracking, performance trend"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1986
+token_budget: 2739
 ---
 ## When to Use
 Score and track app performance — 6 dims, continuous scoring. App PERFORMANCE only (agent perf → `auto-metrics`). Mobile, Desktop, Web.
@@ -25,6 +25,21 @@ Load|Render|Memory|Network|Bundle|Energy — thresholds, quick checks → refere
 Score without real data · cross-platform in same trend · skip bundle/cache · score once
 ## Reference
 Thresholds table + quick checks + worked examples (5) → docs/skills/performance-tracker/reference.md
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Optimize without profiling" | No baseline measurement | benchmark-core.ps1 -Gate before/after |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- No baseline measurement → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- benchmark-core.ps1 -Gate before/after
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: performance | auto-metrics
 
@@ -34,3 +49,4 @@ Cross-Refs: performance | auto-metrics
 - frontmatter: name, description, triggers, token_budget present and stable
 - cross-refs: each referenced skill exists
 - anti-patterns: none of the listed anti-patterns reintroduced
+

@@ -1,9 +1,9 @@
-﻿---
+---
 name: performance
 description: "Web performance — CWV/INP, compositor animation, scroll-driven, content-visibility."
 triggers: "performance, speed up, load time, slow loading, page speed, performance audit, INP, animation performance, scroll performance, compositor"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2320
+token_budget: 3099
 ---
 <!-- karpathy-compressed: 2026-07-10 -->
 ## Budget
@@ -45,6 +45,21 @@ Animate ONLY `transform`+`opacity`. One layout prop → poisons to main thread.
 `PERF-AUDIT:<url>—<date> CRITICAL:[LCP\|CLS\|FCP\|TBT\|INP]<actual>/<budget>→<fix> HIGH:[img\|font\|JS\|CSS]<kb>→<fix> INP:<ms>→<proc>/<present> VERIFY:[lighthouse\|web-vitals]→PASS/FAIL`
 ## Reference
 > docs/skills/performance/reference.md
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Optimize without profiling" | No baseline measurement | benchmark-core.ps1 -Gate before/after |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- No baseline measurement → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- benchmark-core.ps1 -Gate before/after
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: performance-tracker | baseline-ui
 
@@ -54,3 +69,4 @@ Cross-Refs: performance-tracker | baseline-ui
 - frontmatter: name, description, triggers, token_budget present and stable
 - cross-refs: each referenced skill exists
 - anti-patterns: none of the listed anti-patterns reintroduced
+

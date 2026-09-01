@@ -3,7 +3,7 @@ name: quick-executor
 description: "Trigger: quick edit, single file, atomic edit, fast fix, one-line fix. Single-file low-risk changes."
 triggers: "quick edit, single file, atomic edit, fast fix, one-line fix, small change, quick fix"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1955
+token_budget: 2555
 ---
 ## When to Use
 1 file, clear before/after, low risk. SCOPE GUARD: >1 file → STOP, report to orchestrator or delegate to plan-execution.
@@ -41,6 +41,21 @@ Changed [file] (lines N-M). Verified: [pass/fail].
 3. No new dependencies.
 4. Risk heuristic: size + complexity + deps → if any borderline → STOP.
 
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 code-generation · commit-crafter · deep-debugging
 
@@ -50,3 +65,4 @@ Multi-file scope creep · Refactor adjacent code · Add dependencies · Skip ver
 ---
 
 > See [reference.md](docs/skills/quick-executor/reference.md) for extended details, examples, and detailed patterns.
+

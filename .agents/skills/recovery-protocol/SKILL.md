@@ -1,9 +1,9 @@
-﻿---
+---
 name: recovery-protocol
 description: "Stop-diagnose-correct-learn protocol — handle agent errors and frustration systematically"
 triggers: "Recovery, 'no es eso', frustration, error correction"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1766
+token_budget: 2374
 ---
 
 ## When to Use
@@ -39,5 +39,21 @@ STOP code → Ask "¿Podés mostrarme exactamente qué esperás?" → Offer rest
 
 docs/skills/recovery-protocol/reference.md
 ---
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: deep-debugging | engram-protocol
+
