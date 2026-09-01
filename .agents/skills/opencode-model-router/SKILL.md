@@ -25,6 +25,7 @@ Route to 78 specialists via domain→agent table. Truth: `scripts/lib/opencode-b
 | accessibility | gentleman-frontend |
 | container | gentleman-infra |
 | deep-debug | gentleman-deep |
+| reasoning | gentleman-reasoning | # P0-3 reasoning tier (nemotron-3-ultra-free, chain-of-thought) |
 | quick-edit | gentleman-quick |
 | default | gentleman-vMK |
 
