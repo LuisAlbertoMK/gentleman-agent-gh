@@ -3,7 +3,7 @@ name: opencode-skill-creator
 description: "Create, test, evaluate, and iterate OpenCode skills with mandatory intake interview."
 triggers: "create skill, edit skill, opencode skill, skill eval, evaluate prompt, benchmark skill, iterate skill, skill testing, skill creation"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1679
+token_budget: 2200
 ---
 
 ## When to Use
@@ -22,6 +22,22 @@ Loop: Decide → Draft → Test prompts → Run (with-skill & baseline) → Revi
 
 ## Installation: Copy to `.opencode/skills/<name>/` (project) or `~/.config/opencode/skills/<name>/` (global). Validate with `skill_validate`.
 ## Plugin tools: skill_validate · skill_parse · skill_eval · skill_aggregate_benchmark · skill_serve_review · skill_stop_review
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "One skill fits all" | Skill with >3 responsibilities | Skill = single capability (SRP) — split, don't bloat |
+| "Copy-paste is faster" | Creating skill without intake interview | Mandatory intake: trigger × description × example × budget (spec 5-4-09) |
+| "Testing can wait" | Skill without iteration benchmark | `skill_serve_review` + `iteration-N+1/` until done before ship |
+
+## Red Flags
+- Skill description contains `MUST`/`ALWAYS` without explanation → overfit (prefer explanation over MUST)
+- Token budget not bumped after adding capability → regression gate will block
+
+## Verification
+- `skill_validate` + `skill_aggregate_benchmark` pass before publish
+- Test skill via subagent with real task before marking complete
+
 ## Refs: opencode-skill-creator · skill-testing · skill-registry · skill-improver · karpathy-loop
 ---
 

@@ -3,7 +3,7 @@ name: delivery-harness
 description: "Orchestrate multi-agent work — break goals into work units, delegate with isolation, collect results, handle failures"
 triggers: "Coordinate, orchestrate, multi-agent, delegate work"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1930
+token_budget: 2500
 ---
 
 ## When to Use
@@ -32,6 +32,22 @@ Trigger: Multi-step tasks, parallel subagent work, complex deliverables.
 - Failure at any unit → either retry with fixed prompt OR rollback ALL
 - NEVER share subagent internal state between units
 - After collection: summarize results, preserve the 4-field contract AS-IS (never summarize: Decision Taken, Files Changed, Key Findings, Nuance)
+
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "One agent can do it all" | Single agent for >5 files / >20 lines | Decompose into clusters ≤10 files via delivery-harness, verify no file overlap before parallel delegation |
+| "Parallel is always faster" | Independent edits sharing file overlap | Collect File overlap check — if overlap, serialize: read-only → independent → dependent → verify |
+| "4-field summary is optional" | Squeezing Findings/Nuance into one line | Each subagent returns Decision + Files + Findings + Nuance — merge preserves AS-IS, never summarize away |
+
+## Red Flags
+- Post-delegation file overlap detected → STOP, re-partition
+- Subagent reports >5 files changed without work-unit split → split via `chained-pr`
+
+## Verification
+- `scripts/validate-write-scope.ps1 -AllowedPaths "pattern" -BaseRef HEAD` after delegation
+- `git diff --stat` no silent failures; empty+completed → retry narrower scope
 
 ## Refs
 subagent-isolation · work-unit-commits · command-wrapper · execution-mode · chained-pr
