@@ -198,7 +198,7 @@ jobs:
           python-version: '3.x'
 
       - name: trufflehog — deep secrets scan
-        uses: trufflesecurity/trufflehog@27b0417c16317ca9a472a9a8092acce143b49c55 # v3.95.9
+        uses: trufflesecurity/trufflehog@20652fbbdefffcdaa493a5bf57ab2ac6b1db715b # v3.97.1
         with:
           path: ./
           # NOTE: the action already adds --fail; repeating it aborts ("flag 'fail' cannot be repeated").
