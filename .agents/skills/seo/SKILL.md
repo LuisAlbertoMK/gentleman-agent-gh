@@ -3,7 +3,7 @@ name: seo
 description: "Search engine visibility & ranking — technical SEO, on-page, structured data, E-E-A-T, AI Overviews"
 triggers: "seo, search engine, meta tags, structured data, sitemap, search optimization, ranking, schema, robots.txt, meta description, EEAT, E-E-A-T, AI Overview, SGE, AI Mode, generative search, AEO, GEO, Google Core Update, GA4, topical authority, content cluster"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2320
+token_budget: 3088
 ---
 ## When to Use
 SEO audit/meta/sitemap/Core Update/AI Overviews/E-E-A-T/CWV/INP. NOT: content/link building/PPC/social. Pre-reqs: GSC·PageSpeed·RichResultsTest.
@@ -24,6 +24,21 @@ Keyword-stuff·Dup titles·No schema·Skip mobile·Missing robots/sitemap·Incom
 ## Examples
 1. Audit: `/seo https://example.com/blog` → `SEO-AUDIT:... CRITICAL:[title,canonical]→ HIGH:[sitemap]→ VERIFY:[GSC]`
 2. Schema: `ProfilePage + Person sameAs` → verify with Rich Results Test
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "SEO can wait" | No structured data / E-E-A-T | seo skill checklist + Lighthouse SEO |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- No structured data / E-E-A-T → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- seo skill checklist + Lighthouse SEO
+- cross-ref-check.ps1 → SKILL.md OK
 ## Cross-Refs: web-quality-audit | performance | baseline-ui | docs-audit
 > docs/skills/seo/reference.md
 
@@ -33,3 +48,4 @@ Keyword-stuff·Dup titles·No schema·Skip mobile·Missing robots/sitemap·Incom
 - frontmatter: name, description, triggers, token_budget present and stable
 - cross-refs: each referenced skill exists
 - anti-patterns: none of the listed anti-patterns reintroduced
+

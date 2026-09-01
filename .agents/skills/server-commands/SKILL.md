@@ -1,9 +1,9 @@
-﻿---
+---
 name: server-commands
 description: "Run long-lived server processes safely — dev-server.ps1, port detection, background management"
 triggers: "server, ng serve, npm run dev, dotnet run, python -m http.server, dev server, background process, long-lived, !dev"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1693
+token_budget: 2385
 ---
 
 ## When to Use
@@ -37,5 +37,21 @@ Consult these when the skill needs detailed worked examples or guardrails:
   → docs/skills/server-commands/reference.md
 
 ---
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: infra-audit | performance
+

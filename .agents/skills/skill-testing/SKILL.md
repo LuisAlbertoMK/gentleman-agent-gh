@@ -3,7 +3,7 @@ name: skill-testing
 description: "Test and verify skill quality — syntax, coverage, integration, and token budget assessment before production use"
 triggers: "Test/verify skill, coverage"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1592
+token_budget: 2168
 ---
 Trigger: After creating/modifying skill, before production use.
 ## When to Use
@@ -30,8 +30,24 @@ After new/edited skill · pre-critical-task verification · periodic active skil
 ## Skill Test Report | {name} | {version}| Test | Status || Syntax | ✅/❌ |
 ### Verdict: ✅ APPROVED / ⚠ NEEDS WORK / ❌ REJECTED
 ```
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 skill-registry · opencode-skill-creator · skill-improver · quality-gate · karpathy-loop
 ## Reference
 Checklist by type (Prompt/Workflow/Template) + per-type extras → docs/skills/skill-testing/reference.md
 ---
+

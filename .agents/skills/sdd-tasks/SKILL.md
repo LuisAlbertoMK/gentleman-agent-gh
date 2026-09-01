@@ -1,9 +1,9 @@
-﻿---
+---
 name: sdd-tasks
 description: "Break SDD change into implementation tasks. Trigger: orchestrator launches task planning."
 triggers: "SDD tasks, task planning, implementation tasks, work breakdown"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1682
+token_budget: 2300
 ---
 Input: change name, artifact store (`engram|openspec|hybrid|none`), delivery strategy (`ask-on-risk|auto-chain|single-pr|exception-ok`).
 | Mode | Read | Save |
@@ -22,5 +22,21 @@ Input: change name, artifact store (`engram|openspec|hybrid|none`), delivery str
 Implementation-ready (sdd-apply consumes directly) · No implementation code — breakdown only · Flag unknowns, don't assume · tasks.md ≤ 530 words (excl. templates) · 1h max (escalate if exceeded) · RED test task before every production task (threat-matrix ≥80%) · Work units independently verifiable (test cmd + harness + rollback).
 ## Reference
 Task Rules + Workload Forecast + Guard contract → docs/skills/sdd-tasks/reference.md
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: sdd | sdd-apply
+

@@ -1,10 +1,10 @@
-﻿---
+---
 name: sdd-verify
 description: "Execute tests and prove implementation matches specs, design, and tasks. Trigger: SDD verification phase."
 triggers: "SDD verify, verification, test verification, verify change, SDD verification"
 delegate_only: true
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1935
+token_budget: 2574
 ---
 Run when orchestrator launches verification. Prove completion via source inspection + real execution. Use status from `sdd-status-contract.md`.
 - Read all `contextFiles` before judging. Full: proposal + specs + design + tasks. Partial degrades.
@@ -27,9 +27,25 @@ Run when orchestrator launches verification. Prove completion via source inspect
 6. Build compliance matrix from test results.
 7. Persist report with skipped dims.
 Return `
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: sdd | sdd-apply
 
 ## Verification Report`: change, mode, completeness, build/test/coverage, compliance matrix, correctness, design coherence, issues (CRITICAL/WARNING/SUGGESTION), verdict (`PASS`/`PASS WITH WARNINGS`/`FAIL`).
 ## Reference
 Conditions & Actions matrix → docs/skills/sdd-verify/reference.md
+
