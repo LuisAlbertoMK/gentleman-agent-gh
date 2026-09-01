@@ -105,6 +105,8 @@ try {
                 }
             }
             # Append to history.jsonl if delta >0.2 or new commit (cache-hit path)
+            # GAP-4 fix: skip repo mutation in test mode (Pester/gate contexts must not dirty the worktree)
+            if ($env:PESTER_TEST -eq '1') { Write-Debug "score-auto: PESTER_TEST=1 — skipping history.jsonl append (cache-hit path)"; exit 0 }
             $historyPath = Join-Path $PSScriptRoot "../docs/metricas/history.jsonl"
             $proj = Get-Content (Join-Path $PSScriptRoot "../.project.json") -Raw | ConvertFrom-Json
             $lastEntry = if(Test-Path $historyPath){ Get-Content $historyPath -Tail 1 | ConvertFrom-Json } else { $null }
@@ -112,7 +114,10 @@ try {
             $lastCommit = if($lastEntry){ $lastEntry.commit } else { "" }
             $currentCommit = (git rev-parse HEAD).Substring(0,8)
             $delta = [math]::Abs($proj.score.current - $lastScore)
-            if($delta -gt 0.2 -or $currentCommit -ne $lastCommit -or $Force){ @{"date"=(Get-Date -Format yyyy-MM-dd);"commit"=$currentCommit;"score"=$proj.score.current;"gate"="25/25";"trend"=$proj.score.trend;"dimensions"=@{"Score Depth"=$proj.score.dimensions."Score Depth"}} | ConvertTo-Json -Compress | Add-Content -Path $historyPath }
+if($delta -gt 0.2 -or $currentCommit -ne $lastCommit -or $Force){ @{"date"=(Get-Date -Format yyyy-MM-dd);"commit"=$currentCommit;"score"=$proj.score.current;"gate"="25/25";"trend"=$proj.score.trend;"dimensions"=@{"Score Depth"=$proj.score.dimensions."Score Depth"}} | ConvertTo-Json -Compress | Add-Content -Path $historyPath }
+
+# GAP-4 fix: skip .project.json + cache persistence in test mode
+$isTestMode = ($env:PESTER_TEST -eq '1')
             exit 0
         }
     }
@@ -306,11 +311,15 @@ try {
     if ($finalScore -lt 0 -or $finalScore -gt 10 -or $dimCount -lt 11) {
         Write-Debug "score-auto: validation failed — score=$finalScore, dims=$dimCount (expected: 0-10, >=11 dims). Skipping .project.json write."
     } else {
-        if (Test-Path $pjPath) {
-            & "git" "-C" $repoRoot "update-index", "--no-skip-worktree", ".project.json" 2>$null
-            $skipWorktreeRemoved = $true
+        if ($isTestMode) {
+            Write-Debug "score-auto: PESTER_TEST=1 — skipping .project.json write (test mode)"
+        } else {
+            if (Test-Path $pjPath) {
+                & "git" "-C" $repoRoot "update-index", "--no-skip-worktree", ".project.json" 2>$null
+                $skipWorktreeRemoved = $true
+            }
+            $result | ConvertTo-Json -Depth 5 | Set-Content $pjPath -Encoding UTF8
         }
-        $result | ConvertTo-Json -Depth 5 | Set-Content $pjPath -Encoding UTF8
     }
 } catch {
     Write-Debug "score-auto: .project.json sync failed ($($_.Exception.Message))"
@@ -352,6 +361,10 @@ if ($Json) {
 }
 
 # Append to history.jsonl if delta >0.2 or new commit
+# GAP-4 fix: skip repo mutation in test mode (Pester/gate contexts must not dirty the worktree)
+if ($env:PESTER_TEST -eq '1') {
+    Write-Debug "score-auto: PESTER_TEST=1 — skipping history.jsonl append (main path)"
+} else {
 $historyPath = Join-Path $PSScriptRoot "../docs/metricas/history.jsonl"
 $proj = Get-Content (Join-Path $PSScriptRoot "../.project.json") -Raw | ConvertFrom-Json
 $lastEntry = if(Test-Path $historyPath){ Get-Content $historyPath -Tail 1 | ConvertFrom-Json } else { $null }
@@ -360,6 +373,7 @@ $lastCommit = if($lastEntry){ $lastEntry.commit } else { "" }
 $currentCommit = (git rev-parse HEAD).Substring(0,8)
 $delta = [math]::Abs($proj.score.current - $lastScore)
 if($delta -gt 0.2 -or $currentCommit -ne $lastCommit -or $Force){ @{"date"=(Get-Date -Format yyyy-MM-dd);"commit"=$currentCommit;"score"=$proj.score.current;"gate"="25/25";"trend"=$proj.score.trend;"dimensions"=@{"Score Depth"=$proj.score.dimensions."Score Depth"}} | ConvertTo-Json -Compress | Add-Content -Path $historyPath }
+}
 
 # --- SD sub-dimension breakdown (early regression detection) ---
 if ($Json) {
