@@ -26,6 +26,7 @@ Route via table. Truth: `scripts/lib/opencode-base.json`.
 | accessibility | gentleman-frontend |
 | container | gentleman-infra |
 | deep-debug | gentleman-deep |
+| code-review | gentleman-code-review | # Qwen 73.4% → muse-spark → default |
 | reasoning | gentleman-reasoning |
 | quick-edit | gentleman-quick |
 | default | gentleman-vMK |

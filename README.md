@@ -72,6 +72,7 @@ Switch modes:
 | `gentleman-vMK` | default | Senior Architect mentor — main orchestrator |
 | `gentleman-deep` | nemotron-3-ultra-free | Architecture, design, complex code |
 | `gentleman-reasoning` | nemotron-3-ultra-free | Deep chain-of-thought debugging, multi-step synthesis |
+| `gentleman-code-review` | qwen3.6-35b-a3b | Code review 73.4% SWE-bench → fallback muse-spark → default |
 | `gentleman-codex` | muse-spark-1.2-contributor-free | Code generation, boilerplate |
 | `gentleman-quick` | mimo-v2.5-free | Fast tasks, review, simple edits |
 | `gentleman-security` | nemotron-3-ultra-free | Vulnerability analysis, secure code (FREE TIER) |
@@ -107,7 +108,9 @@ Switch modes:
 | `gentleman-aem-auto` | nemotron-3-ultra-free | — AUTO mode (Adobe Experience Manager migration) |
 | `gentleman-deep-sub-auto` | nemotron-3-ultra-free | — AUTO sub agent (same model, `*: allow`) |
 | `gentleman-reasoning-sub` | nemotron-3-ultra-free | Reasoning subagent — delegable via Task tool |
+| `gentleman-code-review-sub` | qwen3.6-35b-a3b | Code review subagent — delegable via Task tool |
 | `gentleman-reasoning-sub-auto` | nemotron-3-ultra-free | — AUTO reasoning sub agent (same model, `*: allow`) |
+| `gentleman-code-review-sub-auto` | qwen3.6-35b-a3b | — AUTO code review sub agent (Qwen → fallback muse-spark, `*: allow`) |
 | `gentleman-quick-sub-auto` | mimo-v2.5-free | — AUTO sub agent (same model, `*: allow`) |
 | `gentleman-codex-sub-auto` | muse-spark-1.2-contributor-free | — AUTO sub agent (same model, `*: allow`) |
 | `gentleman-implementer-sub-auto` | muse-spark-1.2-contributor-free | — AUTO sub agent (same model, `*: allow`) |
