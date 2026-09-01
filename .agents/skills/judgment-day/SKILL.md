@@ -3,7 +3,7 @@ name: judgment-day
 description: "Dual adversarial review orchestrator — 2 profile-scoped code-review-agent instances, verdict synthesis"
 triggers: "Judgment day, JD, dual review, juzgar, adversarial review, LLM-as-judge, judge patterns, online verifier"
 changelog: "2026-09-01 R2-4 — add Zylos 6-pattern taxonomy + small/large judge guidance (KB r2-zylos-llm-judge)"
-token_budget: 3600
+token_budget: 4200
 ---
 
 ## When to Use
@@ -52,6 +52,22 @@ FIX/BLOCKER → `external-auditor` on diff. Gap >1.5 severity → `immune-system
 > **3-boundary rule** (Zylos): instrument judges before (a) user-facing output, (b) irreversible tool exec (`git push`, file Write), (c) persistent memory writes (Engram). Skip per-step judging to manage cost. Our gate covers (a)+(b); (c) is future.
 
 **Small vs Large judges:** large proprietary (GPT-4o, Claude 3.7) for high-stakes ROJA; small distilled for throughput inline. JD's two profiles should diverge on that axis when one is "reasoning" tier.
+
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "One reviewer is enough for ROJA" | Single perspective on ROJA diff | Must run 2× blind code-review-agent — any less is AMARILLA pattern |
+| "Re-judge 3rd time will pass" | Re-judge count >2 | Max 2 → ASK user (rule 3); >2 means synthesis failed, not review |
+| "External auditor not needed" | FIX/BLOCKER without `external-auditor` | `external-auditor` on diff before APPROVED (rule 5) |
+
+## Red Flags
+- Profiles not blind (second sees first's output) → cross-contamination, verdict invalid
+- Verdict without `review-rules.jsonc` zone filter → zone misclassification
+
+## Verification
+- Synthesize table: Both CLEAN or Same root-cause (±5 lines) → Confirmed; else Triage→fix→re-judge
+- `BLOCKER` without `.breaker-cleared` → gate blocks push until clearance
 
 ## Pipeline
 `review-pipeline` Phase 2b for ROJA. Pre-commit #9: warn ROJA without JD.
