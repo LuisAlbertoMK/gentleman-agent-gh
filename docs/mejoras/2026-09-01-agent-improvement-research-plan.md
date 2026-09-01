@@ -16,10 +16,11 @@
 | Anthropic engineering blog (agents + skills) | 2024-12 / 2025-10 | HIGH |
 | arxiv 2605.04050 (LCM paper) | 2026 | HIGH |
 | benchlm.ai SWE-bench Verified | 2026-09-01 (hoy) | HIGH |
-| codersera.com open-source LLM landscape | 2026-08-18 | HIGH |
-| practical-devsecops MCP security report | 2026-06-26 | HIGH |
+| codersera.com open-source LLM landscape | 2026-08-18 | MEDIUM (excerpt, no fetch primario — verificar en benchlm.ai) |
+| practical-devsecops MCP security report | 2026-06-26 | ❌ NO VERÍDICO — landing de curso, no reporte CVEs (reemplazado por NVD + GitHub advisories modelcontextprotocol) |
+| NVD + GitHub Advisory DB (modelcontextprotocol org) | 2026 (verificar) | HIGH (fuente primaria pendiente fetch) |
 | zylos.ai LLM-as-judge production | 2026-04-10 | HIGH |
-| awesome-mcp-servers-2026 (community) | 2026 | MEDIUM |
+| awesome-mcp-servers-2026 (community) | 2026 | LOW — descartado, no confiable |
 | Udemy Claude Code course | 2026-06-21 | MEDIUM (maturity signal) |
 
 ---
@@ -36,13 +37,13 @@
 - **Esfuerzo**: 2-3 sesiones. Impacto: elimina context rot (nuestro YELLOW>40% → RED>80% problem).
 - **Confianza**: HIGH (arxiv paper).
 
-#### P0-2. MCP Security Audit contra CVEs 2026
-- **Qué**: Auditar nuestros 5 MCP servers (codebase-memory, engram, context7, headroom, chrome-devtools) contra la lista de CVEs 2026 del reporte practical-devsecops.
-- **Por qué**: MCP CVEs documentados en 2026: prompt injection via tool responses, SSRF via remote servers, credential exposure via env vars.
-- **Evidencia**: practical-devsecops.com/mcp-security-statistics-2026-report (2026-06-26).
+#### P0-2. MCP Security Audit contra CVEs 2026 [CORREGIDO — fuente reemplazada]
+- **Qué**: Auditar nuestros 5 MCP servers (codebase-memory, engram, context7, headroom, chrome-devtools) contra NVD + GitHub Advisory DB (org modelcontextprotocol).
+- **Por qué**: Riesgo real verificado en docs oficiales MCP (prompt injection vía tool responses, SSRF vía remote servers, credential exposure vía env vars — ver modelcontextprotocol.io/docs).
+- **Evidencia**: NVD (nvd.nist.gov) + GitHub Advisory DB filter `ecosystem:mcp` + MCP spec security section. ⚠️ Fuente original `practical-devsecops.com` descartada 2026-09-01: era landing de curso ($699), no reporte estadístico (0 hits "CVE" en fetch).
 - **Archivos**: `opencode.json` (MCP section), `scripts/security-scanner` o nuevo script.
 - **Esfuerzo**: 1 sesión. Impacto: cierra vector de ataque real.
-- **Confianza**: HIGH (security report).
+- **Confianza**: HIGH (concepto verificado en MCP docs) — fuente primaria NVD pendiente fetch puntual antes de ejecutar.
 
 #### P0-3. Reasoning model tier para debugging complejo
 - **Qué**: Agregar un tier de "reasoning" en el model router usando DeepSeek-R1 o Qwen3.6 reasoning para debugging multi-paso.
@@ -62,13 +63,13 @@
 - **Esfuerzo**: 2 sesiones (93 skills). Impacto: compliance + discoverability.
 - **Confianza**: HIGH (Anthropic official).
 
-#### P1-2. Qwen 3.6-35B-A3B para code review routing
-- **Qué**: Evaluar routing de code review tasks a Qwen 3.6-35B-A3B (73.4% SWE-bench Verified, self-hosted economics).
-- **Por qué**: Nuestros modelos free-tier no están benchmarked. Qwen 3.6 tiene el mejor costo/calidad para code review self-hosted.
-- **Evidencia**: codersera 2026-08-18 + benchlm.ai SWE-bench leaderboard.
+#### P1-2. Qwen 3.6-35B-A3B para code review routing [MEDIUM — verificar antes de instalar]
+- **Qué**: Evaluar routing de code review tasks a Qwen 3.6-35B-A3B (73.4% SWE-bench Verified según codersera 2026-08-18 — excerpt, no fetch primario).
+- **Por qué**: Nuestros modelos free-tier no están benchmarked. Qwen 3.6 tendría el mejor costo/calidad para code review self-hosted *si el 73.4% se confirma*.
+- **Evidencia**: codersera 2026-08-18 (MEDIUM) + benchlm.ai SWE-bench leaderboard (HIGH, verificado 96% Opus 5 pero no Qwen puntual). ⚠️ Acción requerida: `webfetch benchlm.ai/models/qwen-3-...` para confirmar score antes de implementar.
 - **Archivos**: `opencode.json` (model config), skill `opencode-model-router`.
 - **Esfuerzo**: 1 sesión evaluación + 1 implementación. Impacto: code review quality.
-- **Confianza**: HIGH (SWE-bench leaderboard).
+- **Confianza**: MEDIUM (excerpt, no fetch primario) — no bloquear P0 por esto.
 
 #### P1-3. Zep-style temporal edges en Engram
 - **Qué**: Agregar edges temporales a Engram para razonamiento sobre tiempo (qué decisión precedió a cuál, qué cambió entre sesiones).
@@ -130,13 +131,13 @@ Si la ejecución se interrumpe, retomar desde aquí:
 
 ---
 
-## Orden de ejecución recomendado
+## Orden de ejecución recomendado [ACTUALIZADO 2026-09-01 — quick wins primero]
 
-1. **P0-2** (MCP security audit) — 1 sesión, cierra riesgo real
-2. **P0-3** (Reasoning model tier) — 1 sesión, quick win
-3. **P0-1** (LCM context upgrade) — 2-3 sesiones, mayor impacto
-4. **P1-2** (Qwen code review routing) — 2 sesiones
-5. **P1-1** (Skills spec audit) — 2 sesiones
+1. **P0-3** (Reasoning model tier) — 1 sesión, quick win, HIGH verificado — **ARRANCA ACÁ**
+2. **P0-2 corregido** (MCP security audit con NVD) — 1 sesión, cierra riesgo real (fuente reemplazada, pendiente fetch NVD puntual)
+3. **P0-1** (LCM context upgrade) — 2-3 sesiones, mayor impacto (ataca context rot, punto débil YELLOW/RED)
+4. **P1-1** (Skills spec audit Anthropic 2025-10-16) — 2 sesiones, HIGH verificado
+5. **P1-2** (Qwen) — 2 sesiones, MEDIUM — solo tras verificar benchlm.ai puntual
 6. **P1-3** (Zep temporal edges) — 2-3 sesiones
 7. **P2-*** — exploración según tiempo disponible
 
@@ -145,6 +146,7 @@ Si la ejecución se interrumpe, retomar desde aquí:
 ## Notas para el ejecutor
 
 - Cada P0/P1 tiene evidencia file:line o URL con fecha. No implementar P3 sin verificación adicional.
-- Los Engram checkpoints (847-851) tienen el detalle completo de cada fase — usar `mem_get_observation` para recuperar.
+- Los Engram checkpoints (847-851) tienen el detalle completo de cada fase — usar `mem_get_observation` para recuperar. Snapshot v1 preservado en ctx_index `research-2026-09-01-plan-v1-snapshot` + Engram id 853 + commit `e55f306a`.
 - Los ctx_index sources tienen el texto completo indexado — usar `ctx_search(queries: [...], source: "research-2026-09-01-fase{N}-*")`.
-- Confidence markers: HIGH = fuente oficial/fechada. MEDIUM = community/secondary. SPECULATIVE = inferido, no confirmado.
+- Confidence markers: HIGH = fuente oficial/fechada con fetch primario. MEDIUM = excerpt/search, no fetch (verificar antes de implementar). SPECULATIVE = inferido, no confirmado.
+- **Auditoría 2026-09-01**: `practical-devsecops` descartado (landing curso, 0 hits CVE) y `awesome-mcp-servers-2026` descartado (LOW). Ver `mem 853` para trazabilidad cross-sesión.
