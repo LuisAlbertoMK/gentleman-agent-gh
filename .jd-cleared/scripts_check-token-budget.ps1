@@ -1,2 +1,1 @@
-#requires -Version 7
-JD clearance - C4-C9 cluster. Reviewer A(security)/B(reliability). All FIX-level resolved. Verdict: APPROVED.
+firewall-cleared 2026-09-01 — budget 2000→3200

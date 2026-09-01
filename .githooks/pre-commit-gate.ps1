@@ -290,7 +290,7 @@ if (Test-Path -LiteralPath $backlogScript) {
 
 # [19/19] Token budget check (C9)
 # Runs check-token-budget.ps1 to audit skill/prompt file sizes against
-# the 2,000-byte average target (ADR-007). Uses Warn (not Fail) since
+# the 3,200-byte average target (ADR-048 — was 2,000B ADR-007; bumped for bulk R2-1 81×400). Uses Warn (not Fail) since
 # oversize skills are a known condition under ADR-018.
 Write-Host "[19/19] Token budget check..."
 $budgetScript = Join-Path $RepoRoot 'scripts/check-token-budget.ps1'

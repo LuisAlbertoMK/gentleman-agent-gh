@@ -32,7 +32,7 @@ param(
     [string]$SkillsPath = (Join-Path $PSScriptRoot "..\.agents\skills"),
     [string]$PromptsPath = (Join-Path $PSScriptRoot "..\prompts"),
     [string]$CommandsPath = (Join-Path $PSScriptRoot "..\commands"),
-    [int]$BudgetBytes = 2000,
+    [int]$BudgetBytes = 3200,
     [int]$PromptBudgetBytes = 4000,
     [switch]$Json
 )
