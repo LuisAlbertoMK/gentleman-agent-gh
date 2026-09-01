@@ -1,9 +1,9 @@
-﻿---
+---
 name: engram-protocol
 description: "Persistent memory protocol — save, search, dreaming, session lifecycle via Engram MCP"
 triggers: "remember, recall, engram, mem_save, mem_search, session close, dreaming, memory, token budget, compression, L1 L2 L3, capture pipeline, project score, bias calibration"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1951
+token_budget: 2573
 ---
 ## When to Use
 Persistent memory protocol — save, search, dreaming, session lifecycle via Engram MCP.
@@ -25,5 +25,21 @@ Gate: `close-session.ps1` verifies summary called. `!score`/`!dream`. Mandatory 
 ---
 docs/skills/engram-protocol/reference.md
 ---
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: dreaming | session-resume
+

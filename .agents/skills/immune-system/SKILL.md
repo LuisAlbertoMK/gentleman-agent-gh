@@ -1,9 +1,9 @@
-﻿---
+---
 name: immune-system
 description: "Immunity against repeated errors - detect, diagnose, document to anti-pattern catalog, immunize in AGENTS.md rules."
 triggers: "Immune System, anti-pattern, permanent immunity"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1228
+token_budget: 1898
 ---
 
 ## When to Use
@@ -37,5 +37,21 @@ Root cause: Context miss | Pattern miss | Knowledge gap | Tool misuse | Hallucin
 
 docs/skills/immune-system/reference.md
 ---
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: security-scanner | best-practices
+

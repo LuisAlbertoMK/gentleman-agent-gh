@@ -3,7 +3,7 @@ name: image-pipeline
 description: "Image optimization — compress, convert WebP/AVIF, resize, describe. Single-file atomic edits, batch processing, metadata extraction."
 triggers: "compress, convert WebP/AVIF, resize, describe"
 changelog: docs/ciclos/cycle28-20260816.md
-token_budget: 2000
+token_budget: 2783
 ---
 
 ## When to Use
@@ -36,6 +36,21 @@ IMG-PIPELINE:<file> STATUS:<ok|warn|error> FORMAT:<fmt> SIZE:<before->after> RAT
 ## Anti-Patterns
 Upscaling beyond source | hardpx width on responsive | metadata not stripped | lossy on SVG | no SSIM gate | missing alt-text
 
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Cross-Refs: visual-testing | vision-analyze | web-quality-audit | performance
 
 ## Verification
@@ -48,3 +63,4 @@ Upscaling beyond source | hardpx width on responsive | metadata not stripped | l
 ---
 
 > See [reference.md](docs/skills/image-pipeline/reference.md) for extended details, examples, and detailed patterns.
+

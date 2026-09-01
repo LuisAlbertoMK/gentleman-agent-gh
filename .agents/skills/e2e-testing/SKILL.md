@@ -1,9 +1,9 @@
-﻿---
+---
 name: e2e-testing
 description: "E2E testing - hybrid: e2e-test.js smoke checks + Playwright for flows, assertions, visual regression, Ollama AI analysis."
 triggers: test, e2e, playwright, browser testing, interactive testing, form testing
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1925
+token_budget: 2530
 ---
 ## When to Use
 Browser-level verification of user flows: smoke, forms, login/dashboard, visual regression. Quick Mode = fast smoke; Full Mode = CI pipelines, assertions, screenshots.
@@ -37,5 +37,21 @@ Run: `npx playwright test` · single file · `--ui` · `show-report`.
 Playwright: `npm i -D playwright` · Chromium: `npx playwright install chromium` · Ollama (optional): AI analysis.
 ## Reference
 Worked examples, testing patterns, edge cases, anti-patterns → docs/skills/e2e-testing/reference.md
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: testing-strategy | api-testing
+

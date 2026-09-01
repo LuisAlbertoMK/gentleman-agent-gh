@@ -1,9 +1,9 @@
-﻿---
+---
 name: execution-mode
 description: "Auto-detect task execution mode - QUICK/THOROUGH/DRAFT - from scope/risk/familiarity. Not resource optimization."
 triggers: "Execution mode, quick/thorough/draft, resource adaptive, zone green/yellow/orange/red"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1634
+token_budget: 2254
 ---
 ## When to Use
 Auto-detect task execution mode — QUICK/THOROUGH/DRAFT — from scope, risk, familiarity. Not resource optimization.
@@ -26,5 +26,21 @@ THOROUGH: Init→Propose→Spec→Design→Tasks→Apply→Verify→Quality Gate
 ## Anti-Patterns
 DRAFT when asked THOROUGH · Skip zone re-eval · Ignore RED · One mode all session · Auto-detect without explaining · THOROUGH for single-line typo · DRAFT for destructive ops
 > docs/skills/execution-mode/reference.md
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: sdd | sdd-apply
+

@@ -3,7 +3,7 @@ name: external-improvement
 description: "5-phase improvement cycle for external projects — 3+ subagents per phase."
 triggers: "improve external project, mejora proyecto, proyecto externo, 5-phase cycle, ciclo 5 fases, analizá este proyecto, corré el ciclo, revisame el proyecto, !5fases, !extimprove, aplicá las 5 fases"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1729
+token_budget: 2300
 ---
 
 ## When to Use
@@ -33,8 +33,24 @@ docs/external/<project>/
 └── P5-REPORT.md
 ```
 
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Cross-Refs: delivery-harness | project-mapper | gap-analysis | sdd-propose | sdd-verify | triple-verify | bitacora | commit-crafter
 ---
 
 docs/skills/external-improvement/reference.md
 ---
+
