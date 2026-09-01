@@ -29,7 +29,7 @@ $stagedSkillMds  = $staged | Where-Object { $_ -match '\.agents/skills/[^/]+/SKI
 $stagedTests     = $staged | Where-Object { $_ -match '\.Tests\.ps1$' -and $_ -notmatch '^\.(jd|breaker)-cleared/' } # clearance markers are prose, not Pester suites
 $stagedConfig    = $staged | Where-Object { $_ -match 'scripts/opencode-config/' }
 
-# Fast path (Go) — single --gate invocation replaces [3/13] + [19/19] (~4.9s PS → ~0.4s Go)
+# Fast path (Go) — single --gate invocation replaces [3/26] + [20/26] (~4.9s PS → ~0.4s Go)
 $script:fastGate = $null
 $fastExe = Join-Path $RepoRoot 'bin/fast.exe'
 if (Test-Path -LiteralPath $fastExe) {
@@ -44,15 +44,15 @@ if (Test-Path -LiteralPath $fastExe) {
 
 Write-Host "`n=== Gentleman Quality Gate ==="
 
-# [1/13] Trailing whitespace
-Write-Host "[1/13] Trailing whitespace..."
+# [1/26] Trailing whitespace
+Write-Host "[1/26] Trailing whitespace..."
 $wsOut = git diff --cached --check 2>&1
 $wsLines = $wsOut | Where-Object { $_ -notmatch '^\s*$' }
 if ($wsLines) { $wsLines -join "`n" | ForEach-Object { Write-Host "    $_" }; Warn "fix trailing whitespace before push" }
 else { Pass }
 
-# [2/13] #requires Version check
-Write-Host "[2/13] #requires Version check (staged .ps1)..."
+# [2/26] #requires Version check
+Write-Host "[2/26] #requires Version check (staged .ps1)..."
 if ($stagedPS1) {
     $missing = $stagedPS1 | Where-Object {
         $full = Join-Path $RepoRoot $_
@@ -63,8 +63,8 @@ if ($stagedPS1) {
     else { Pass }
 } else { Pass }
 
-# [3/13] Cross-ref check
-Write-Host "[3/13] Cross-ref check..."
+# [3/26] Cross-ref check
+Write-Host "[3/26] Cross-ref check..."
 if ($stagedSkills) {
     if ($null -ne $script:fastGate -and $null -ne $script:fastGate.crossRef) {
         $cr = $script:fastGate.crossRef
@@ -80,15 +80,15 @@ if ($stagedSkills) {
     }
 } else { Pass }
 
-# [4/13] Skill drift
-Write-Host "[4/13] Skill drift..."
+# [4/26] Skill drift
+Write-Host "[4/26] Skill drift..."
 if ($stagedSkills) {
     & "$RepoRoot/scripts/check-skill-drift.ps1" -Quiet -ErrorAction SilentlyContinue 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) { Pass } else { Warn "skill drift detected (non-blocking)" }
 } else { Pass }
 
-# [5/13] Improvement cycle — overweight skills
-Write-Host "[5/13] Improvement cycle..."
+# [5/26] Improvement cycle — overweight skills
+Write-Host "[5/26] Improvement cycle..."
 $canonical = "$RepoRoot/.agents/skills"
 $overweight = if (Test-Path $canonical) {
     Get-ChildItem $canonical -Directory | Where-Object { $_.Name -ne '_shared' } | ForEach-Object {
@@ -98,8 +98,8 @@ $overweight = if (Test-Path $canonical) {
 }
 if ($overweight) { Warn "skills >3KB (consider improvement cycle):`n$($overweight -join "`n")" } else { Pass }
 
-# [6/13] .project.json integrity
-Write-Host "[6/13] .project.json integrity..."
+# [6/26] .project.json integrity
+Write-Host "[6/26] .project.json integrity..."
 if ($stagedProject) {
     try {
         $json = Get-Content "$RepoRoot/.project.json" -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -111,8 +111,8 @@ if ($stagedProject) {
     } catch { Fail ".project.json parse error: $_" }
 } else { Pass }
 
-# [7/13] review-rules.jsonc integrity
-Write-Host "[7/13] review-rules.jsonc integrity..."
+# [7/26] review-rules.jsonc integrity
+Write-Host "[7/26] review-rules.jsonc integrity..."
 if ($stagedRules) {
     try {
         $raw = Get-Content "$RepoRoot/review-rules.jsonc" -Raw -Encoding UTF8
@@ -129,16 +129,16 @@ if ($stagedRules) {
     } catch { Fail "review-rules.jsonc parse error: $_" }
 } else { Pass }
 
-# [8/13] Benchmark check
-Write-Host "[8/13] Benchmark check..."
+# [8/26] Benchmark check
+Write-Host "[8/26] Benchmark check..."
 if ($stagedAgents) {
     $benchOut = & "$RepoRoot/scripts/benchmark-core.ps1" -Gate 2>&1 | Out-String
     if ($benchOut -match 'REGRESSIONS') { Warn "benchmark regressions detected`n$benchOut" }
     else { $benchOut.Trim() -split "`n" | ForEach-Object { Write-Host "    $_" }; Pass }
 } else { Pass }
 
-# [9/14] MCP security audit (KB r2-mcp-security-bestpractices 2026-07-28: SSRF allowlist, version pin, env secrets, disabled hygiene)
-Write-Host "[9/14] MCP security audit..."
+# [9/26] MCP security audit (KB r2-mcp-security-bestpractices 2026-07-28: SSRF allowlist, version pin, env secrets, disabled hygiene)
+Write-Host "[9/26] MCP security audit..."
 $mcpStaged = $staged | Where-Object { $_ -match 'opencode\.json|security-audit-mcp\.ps1' }
 if ($mcpStaged) {
     $mcpOut = & "$RepoRoot/scripts/security-audit-mcp.ps1" *>&1 | Out-String
@@ -146,10 +146,10 @@ if ($mcpStaged) {
     else { $mcpOut.Trim() -split "`n" | ForEach-Object { Write-Host "    $_" }; Pass }
 } else { Pass }
 
-# [10/14] JD review check — respects .jd-cleared/<path> markers or FORCE_SHIP env
+# [10/26] JD review check — respects .jd-cleared/<path> markers or FORCE_SHIP env
 # Clears the recurring Warn for files already cleared via `!judgment-day`.
 # Marker naming: path separators -> underscores (scripts/foo.ps1 -> .jd-cleared/scripts_foo.ps1)
-Write-Host "[9/13] JD review check (ROZA zone)..."
+Write-Host "[10/26] JD review check (ROZA zone)..."
 if ($stagedRoja) {
     $uncleared = @()
     foreach ($f in $stagedRoja) {
@@ -165,8 +165,8 @@ if ($stagedRoja) {
     }
 } else { Pass }
 
-# [10/13] Secrets scan — parse diff to get real filenames (not "InputStream")
-Write-Host "[10/13] Secrets scan..."
+# [11/26] Secrets scan — parse diff to get real filenames (not "InputStream")
+Write-Host "[11/26] Secrets scan..."
 $diffLines = git diff --cached --diff-filter=ACM -- ':!.githooks' ':!*.Tests.ps1' ':!scripts/check-mcp-security.ps1' ':!.agents/skills/*/references/*' ':!.gitleaks.toml' ':!docs/mejoras/*'
 $secrets = @(); $currentFile = ""; $lineInFile = 0
 foreach ($dl in $diffLines) {
@@ -189,8 +189,8 @@ if ($secrets) {
     Fail "potential secrets found in staged diff"
 } else { Pass }
 
-# [11/13] SKILL.md frontmatter completeness
-Write-Host "[11/13] Taste invariant: SKILL.md frontmatter..."
+# [12/26] SKILL.md frontmatter completeness
+Write-Host "[12/26] Taste invariant: SKILL.md frontmatter..."
 if ($stagedSkillMds) {
     $fmFail = $false
     foreach ($sf in $stagedSkillMds) {
@@ -205,8 +205,8 @@ if ($stagedSkillMds) {
     if ($fmFail) { Fail "frontmatter issues" } else { Pass }
 } else { Pass }
 
-# [12/13] Pester tests
-Write-Host "[12/13] Pester tests..."
+# [13/26] Pester tests
+Write-Host "[13/26] Pester tests..."
 if ($stagedTests) {
     try {
         # Strip hook-exported GIT_* overrides before running test suites: git sets
@@ -244,26 +244,26 @@ if ($stagedTests) {
     } catch { Warn "Pester not available: $_" }
 } else { Pass }
 
-# [13/13] Config expansion check
-Write-Host "[13/13] Config expansion check..."
+# [14/26] Config expansion check
+Write-Host "[14/26] Config expansion check..."
 if ($stagedConfig) {
     $importMarkers = git show :opencode.json 2>$null | Select-String -Pattern '\$import'
     if ($importMarkers) { Fail "Config sources changed but opencode.json has unresolved `$import markers" }
     else { Pass }
 } else { Pass }
 
-# [14/14] opencode.json sync with SSoT (scripts/lib/*)
-Write-Host "[14/14] opencode.json sync with SSoT..."
+# [15/26] opencode.json sync with SSoT (scripts/lib/*)
+Write-Host "[15/26] opencode.json sync with SSoT..."
 $stagedLib = $staged | Where-Object { $_ -match '^(scripts/lib/|opencode\.json$)' }
 if ($stagedLib) {
     & "$RepoRoot/scripts/regenerate-opencode.ps1" -Quiet -ErrorAction SilentlyContinue 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) { Pass } else { Fail "opencode.json out of sync with SSoT — run scripts/regenerate-opencode.ps1 -Yes" }
 } else { Pass }
 
-# [15/15] Write-scope enforcement (OPT-IN via .gentleman/write-scope.json)
+# [16/26] Write-scope enforcement (OPT-IN via .gentleman/write-scope.json)
 # Absent file => no constraint, pass. Present => staged changes outside
 # allowed_paths fail the gate (wired in as a follow-up to INFRA-I6).
-Write-Host "[15/15] Write-scope check..."
+Write-Host "[16/26] Write-scope check..."
 $scopeFile = Join-Path $RepoRoot '.gentleman\write-scope.json'
 if (Test-Path -LiteralPath $scopeFile) {
     try {
@@ -277,11 +277,11 @@ if (Test-Path -LiteralPath $scopeFile) {
     } catch { Fail "write-scope.json parse error: $_" }
 } else { Pass }
 
-# [16/16] Config drift check (repo opencode.json vs global opencode.json(c))
+# [17/26] Config drift check (repo opencode.json vs global opencode.json(c))
 # Runs ONLY when a global config exists (developer machines synced via
 # sync-global.ps1). Machines without one (fresh clones, CI runners) skip —
 # wiring this into quality-gate.yml would false-fail every CI run.
-Write-Host "[16/16] Config drift check..."
+Write-Host "[17/26] Config drift check..."
 $globalDir = Join-Path $env:USERPROFILE '.config\opencode'
 $globalConf = @("$globalDir\opencode.json", "$globalDir\opencode.jsonc") | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
 if ($globalConf) {
@@ -289,10 +289,10 @@ if ($globalConf) {
     if ($LASTEXITCODE -eq 0) { Pass } else { Warn "config drift vs global — run scripts/sync-global.ps1" }
 } else { Pass }
 
-# [17/17] Config size budget (ADR-007)
+# [18/26] Config size budget (ADR-007)
 # Enforces opencode.json ≤ 65,536 B so config growth cannot silently creep past
 # the budget. Mirrored in quality-gate.yml ("Config size budget" step).
-Write-Host "[17/17] Config size budget..."
+Write-Host "[18/26] Config size budget..."
 $configPath = Join-Path $RepoRoot 'opencode.json'
 if (Test-Path -LiteralPath $configPath) {
     $configSize = (Get-Item -LiteralPath $configPath).Length
@@ -300,22 +300,22 @@ if (Test-Path -LiteralPath $configPath) {
     else { Pass }
 } else { Fail "opencode.json not found at $configPath" }
 
-# [18/18] Backlog integrity check
+# [19/26] Backlog integrity check
 # Verifies CYCLE.md backlog item status matches repo reality. Runs ALWAYS
 # (like [17/17]) and is fail-closed if the script is missing. Mirrored in
 # .github/workflows/quality-gate.yml ("Backlog integrity check" step).
-Write-Host "[18/18] Backlog integrity check..."
+Write-Host "[19/26] Backlog integrity check..."
 $backlogScript = Join-Path $RepoRoot 'scripts/check-backlog-integrity.ps1'
 if (Test-Path -LiteralPath $backlogScript) {
     & "$RepoRoot/scripts/check-backlog-integrity.ps1" *> $null
     if ($LASTEXITCODE -eq 0) { Pass } else { Fail "backlog integrity check failed — CYCLE.md status does not match repo reality" }
 } else { Fail "backlog-integrity.ps1 not found at $backlogScript" }
 
-# [19/19] Token budget check (C9)
+# [20/26] Token budget check (C9)
 # Runs check-token-budget.ps1 to audit skill/prompt file sizes against
 # the 3,200-byte average target (ADR-048 — was 2,000B ADR-007; bumped for bulk R2-1 81×400). Uses Warn (not Fail) since
 # oversize skills are a known condition under ADR-018.
-Write-Host "[19/19] Token budget check..."
+Write-Host "[20/26] Token budget check..."
 if ($null -ne $script:fastGate -and $null -ne $script:fastGate.tokenBudget) {
     $tb = $script:fastGate.tokenBudget
     if (-not $tb.passed) {
@@ -350,11 +350,11 @@ if ($null -ne $script:fastGate -and $null -ne $script:fastGate.tokenBudget) {
     }
 }
 
-# [20/20] Budget script validation (C6)
+# [21/26] Budget script validation (C6)
 # Verifies check-budget.ps1 is present and syntactically valid —
 # ensures the budget enforcement tool is available for runtime use
 # by the orchestrator during agent sessions.
-Write-Host "[20/20] Budget script validation..."
+Write-Host "[21/26] Budget script validation..."
 $budgetRuntime = Join-Path $RepoRoot 'scripts/check-budget.ps1'
 if (Test-Path -LiteralPath $budgetRuntime) {
     $btTokens = $null; $btErrors = $null
@@ -367,11 +367,11 @@ if (Test-Path -LiteralPath $budgetRuntime) {
     Warn "check-budget.ps1 not found"
 }
 
-# [21/21] Context watchdog validation (C8)
+# [22/26] Context watchdog validation (C8)
 # Verifies ctx-watchdog.ps1 is present and syntactically valid —
 # ensures the context-zone monitoring tool is available for runtime
 # use by the skill-graph during agent sessions.
-Write-Host "[21/21] Context watchdog validation..."
+Write-Host "[22/26] Context watchdog validation..."
 $watchdogScript = Join-Path $RepoRoot 'scripts/ctx-watchdog.ps1'
 if (Test-Path -LiteralPath $watchdogScript) {
     $wdTokens = $null; $wdErrors = $null
@@ -384,24 +384,24 @@ if (Test-Path -LiteralPath $watchdogScript) {
     Warn "ctx-watchdog.ps1 not found"
 }
 
-# [22/22] Adversarial-breaker profile scan — lightweight commit-time scan.
+# [23/26] Adversarial-breaker profile scan — lightweight commit-time scan.
 # Runs AFTER Verify ([12/13] Pester tests) — catches obvious security patterns.
 # The full adversarial-breaker skill (sub-agent deep analysis) is triggered
 # manually via `!breaker` or auto-triggered in SDD post-Verify for ROZA zone.
-Write-Host "[22/22] Adversarial-breaker profile scan..."
+Write-Host "[23/26] Adversarial-breaker profile scan..."
 $stagedSecurity = $staged | Where-Object { $_ -match '\.ps1$' }
 if ($stagedSecurity) {
     & "$RepoRoot/scripts/check-adversarial.ps1" -RepoRoot $RepoRoot -ErrorAction SilentlyContinue 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) { Pass } else { Fail "adversarial profile violations — see output above, touch .breaker-cleared/<file> markers or set FORCE_SHIP=1" }
 } else { Pass }
 
-# [23/23] Async-result verification — fail-closed on unresolved subagent failures
+# [24/26] Async-result verification — fail-closed on unresolved subagent failures
 # Scans for *.async-result.json produced by monitor-subagent.ps1 / post-delegation-check.ps1.
 # If ANY has .passed = $false, blocks commit — prevents silent-failure mode where LLM
 # forgets post-delegation verification (gap documented in mejora-log.md:775).
 # To unblock: fix the failed check(s) and re-run, or remove the stale result file
 # after manual confirmation.
-Write-Host "[23/23] Async-result verification..."
+Write-Host "[24/26] Async-result verification..."
 $staleResults = @()
 $asyncResults = Get-ChildItem -Path $RepoRoot -Filter '*.async-result.json' -ErrorAction SilentlyContinue
 foreach ($ar in $asyncResults) {
@@ -435,11 +435,11 @@ if ($staleResults) {
     Fail "unresolved subagent failure(s) — fix checks / re-run monitor or remove stale *.async-result.json"
 } else { Pass }
 
-# [24/24] Token budget regression (Pattern 3 — skill-testing)
+# [25/26] Token budget regression (Pattern 3 — skill-testing)
 # Reads `token_budget` frontmatter from SKILL.md files and asserts current
 # file size ≤ budget * 1.1 (10% drift). Skills without token_budget are
 # WARN (non-blocking) since not all skills declare budgets.
-Write-Host "[24/24] Token budget regression..."
+Write-Host "[25/26] Token budget regression..."
 $tbrScript = Join-Path $RepoRoot 'scripts\test-token-budget-regression.ps1'
 if (Test-Path -LiteralPath $tbrScript) {
     $tbrOut = & $tbrScript -SkillsPath (Join-Path $RepoRoot '.agents\skills') -Json -ErrorAction SilentlyContinue 2>&1 | Out-String
@@ -454,11 +454,11 @@ if (Test-Path -LiteralPath $tbrScript) {
     Warn "test-token-budget-regression.ps1 not found at $tbrScript"
 }
 
-# [25/25] Machine-specific path scan (V6 regression class — hardcoded
+# [26/26] Machine-specific path scan (V6 regression class — hardcoded
 # "D:/repo", "C:/Users/<someone>" inside scripts broke suites on other
 # machines). Scans staged .ps1 for absolute drive paths outside comments.
 # Verified winner P3 (trial 2, ADR-044 era): local hook + CI backstop.
-Write-Host "[25/25] Machine-specific path scan..."
+Write-Host "[26/26] Machine-specific path scan..."
 $machPathHits = @()
 foreach ($sf in $staged) {
     if ($sf -notmatch '\.ps1$') { continue }
