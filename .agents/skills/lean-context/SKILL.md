@@ -3,7 +3,7 @@ name: lean-context
 description: "Unified compression levels — LEAN, ULTRA, and CAVEMAN modes for token-efficient responses"
 triggers: "Ultra-lean default, compact responses, caveman, /caveman"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1729
+token_budget: 2328
 ---
 
 ## When to Use
@@ -44,6 +44,21 @@ CAVEMAN sub: lite (sentences) → full (fragments) → ultra (abbr). Code/PRs �
 | <10 turns left | CAVEMAN lite |
 | RED zone | CAVEMAN ultra |
 
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 karpathy-loop · context-watchdog · execution-mode · skill-graph
 
@@ -53,3 +68,4 @@ CAVEMAN for code/PRs · Cut safety warnings · Apply ULTRA without checking cont
 ---
 
 > See [reference.md](docs/skills/lean-context/reference.md) for extended details, examples, and detailed patterns.
+

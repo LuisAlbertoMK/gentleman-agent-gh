@@ -3,7 +3,7 @@ name: llm-security
 description: "Trigger: LLM, AI, prompt injection, RAG, OpenAI, Anthropic, Ollama, LangChain, agent, tool use, data exfiltration."
 triggers: "LLM, AI, prompt injection, RAG, OpenAI, Anthropic, Ollama, LangChain, agent, tool use, data exfiltration, model"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1626
+token_budget: 2240
 ---
 
 ## When to Use
@@ -37,9 +37,25 @@ Review LLM integrations, RAG pipelines, AI features — "is this secure?"
 4. Output sanitization.
 5. "Remaining risk: NONE/LOW/MED/HIGH (why)"
 
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "No secrets in this repo" | Skipping secrets scan | grep -rn process.env + npm audit before commit |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Skipping secrets scan → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- grep -rn process.env + npm audit before commit
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 security-scanner · best-practices · quality-gate
 
 ---
 
 > See [reference.md](docs/skills/llm-security/reference.md) for extended details, examples, and detailed patterns.
+

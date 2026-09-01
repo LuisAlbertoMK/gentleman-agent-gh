@@ -3,7 +3,7 @@ name: infra-audit
 description: "Trigger: infrastructure audit, IaC, Terraform, Kubernetes, CI/CD, Docker, cloud, Helm, Ansible. Audit infra reliability."
 triggers: "infrastructure audit, IaC, Terraform, Kubernetes, CI/CD, Docker, cloud, deployment, Helm, Ansible, k8s"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1619
+token_budget: 2231
 ---
 
 ## When to Use
@@ -45,6 +45,21 @@ Reviewing infrastructure (Terraform, Docker, K8s, CI/CD, Helm, Ansible, CloudFor
 4. Pin everything.
 5. Both .yaml and .yml.
 
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Deploy without canary" | No rollback plan | infra-audit checklist + dry-run |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- No rollback plan → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- infra-audit checklist + dry-run
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 container-security · security-scanner · best-practices
 
@@ -54,3 +69,4 @@ Stop if no Terraform · Ignore .yml extensions · GitHub-only CI checks · Skip 
 ---
 
 > See [reference.md](docs/skills/infra-audit/reference.md) for extended details, examples, and detailed patterns.
+

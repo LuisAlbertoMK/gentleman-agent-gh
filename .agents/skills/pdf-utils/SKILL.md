@@ -1,9 +1,9 @@
-﻿---
+---
 name: pdf-utils
 description: "PDF processing — extract text, parse tables, generate reports"
 triggers: "PDF, extract PDF, parse PDF, merge PDF, generate PDF, PDF table, PDF invoice, read PDF, PDF to text, PDF to markdown"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1460
+token_budget: 2122
 ---
 
 ## When to Use
@@ -45,5 +45,21 @@ Consult these when the skill needs detailed worked examples or guardrails:
   → docs/skills/pdf-utils/reference.md
 
 ---
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: image-pipeline | data-quality
+

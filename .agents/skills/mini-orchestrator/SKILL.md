@@ -3,7 +3,7 @@ name: mini-orchestrator
 description: "BabyAGI loop (Execution→Task Creation→Prioritization) with async fire-and-forget handoff"
 triggers: "mini-orchestrator, BabyAGI, task loop, async delegation, fire-and-forget, background monitor, agent chain, dependent tasks"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1990
+token_budget: 2575
 ---
 # mini-orchestrator
 BabyAGI delegation loop: **EXECUTION → TASK CREATION → PRIORITIZATION**, async fire-and-forget.
@@ -20,9 +20,25 @@ Multi-step blocking-unacceptable work · dependent chains (N+1 needs N's output)
 Escalate: credentials, network egress, package installs, `git push --force`, destructive ops.
 ## Async handoff
 `post-delegation-check.ps1 -Async` returns immediately → writes `{BaseRef}.async-result.json`; read `.passed` first. `monitor-subagent.ps1` polls (15s) + write-scope validation; writes when git stable (2 polls) or 300s.
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 `adr/ADR-022`,`adr/ADR-024` deny floor · `adr/ADR-031` async delegation · `delivery-harness` fan-out · `ralph-loop` · `opencode-model-router` fallback
 ## Anti-Patterns
 Blocking when async available · ignoring `convergence_check` · not reading `{BaseRef}.async-result.json` · delegating sensitive data (security: DIRECT) · looping past `max_iterations`.
 ## Reference
 Async code + Examples + Testing → docs/skills/mini-orchestrator/reference.md
+

@@ -1,4 +1,4 @@
-﻿---
+---
 name: metricas
 description: Before/after delta + % comparison — git diff or bookmark mode, tokenization-aware, multi-language
 changelog: "2026-08-31 — SD 9.9→10 fix"
@@ -10,7 +10,7 @@ triggers:
   - "compare"
   - "token count"
   - "size change"
-token_budget: 1753
+token_budget: 2446
 ---
 
 # metricas — Before/After Delta + % Comparison
@@ -48,5 +48,21 @@ Modes: git-diff (default) | bookmark
 
 ## Reference
 Worked examples, testing patterns, edge cases, anti-patterns → docs/skills/metricas/reference.md
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: auto-metrics | performance-tracker
+
