@@ -1,9 +1,9 @@
-﻿---
+---
 name: data-quality
 description: "Trigger: data audit, pipeline audit, schema validation, data governance, ETL. Audit data quality and reliability."
 triggers: "data audit, data pipeline audit, schema validation, data governance, ETL audit, data quality check, data review"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1857
+token_budget: 2508
 ---
 ## When to Use
 Reviewing data pipelines, schemas, ETL, analytics. No data layer → report and stop.
@@ -20,5 +20,21 @@ Reviewing data pipelines, schemas, ETL, analytics. No data layer → report and 
 Skip schema validation · Ignore error handling · No profiling · Python-only bias · Skip dbt/YAML · Assume ingestion succeeds · Silent schema drift · No late-data strategy · Hard-delete in DW · Magic numbers in transforms
 ## Reference
 dbt/YAML + Profiling detail → docs/skills/data-quality/reference.md
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: perf-profiling | testing-strategy
+

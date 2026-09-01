@@ -1,9 +1,9 @@
-﻿---
+---
 name: dreaming
 description: "Cross-session pattern extraction via Engram. Run via !dream — not automatic."
 triggers: "!dream, dreaming, patrones, memory review, session end, !close, pattern extraction"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1918
+token_budget: 2553
 ---
 ## When to Use
 Only on explicit request (`!dream`) or user asking. Recommended weekly or after milestone.
@@ -41,5 +41,21 @@ Consult these when the skill needs detailed worked examples or guardrails:
   → docs/skills/dreaming/reference.md
 
 ---
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: engram-protocol | session-resume
+

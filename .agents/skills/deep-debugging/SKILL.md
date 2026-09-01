@@ -3,7 +3,7 @@ name: deep-debugging
 description: "Trigger: deep debug, root cause, hypothesis, multi-file bug, ambiguous failure. Hypothesis-driven debugging."
 triggers: "deep debug, root cause, hypothesis, multi-file bug, ambiguous failure, debug, RCA"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1941
+token_budget: 2523
 ---
 ## When to Use
 Multi-file bugs, ambiguous failures. NOT for 1-file edits (→ quick-executor), architecture decisions (→ sdd), or refactors (→ refactoring-planner).
@@ -22,6 +22,21 @@ Read order + OUTPUT template → reference.
 2. Unclear after 3 cycles → STOP, ask human.
 3. Never refactor during bug fix.
 4. Verify with evidence, not assumptions.
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 refactoring-planner · code-review-agent
 ## Anti-Patterns
@@ -29,3 +44,4 @@ Skip OBSERVE step · Refactor during fix · >3 cycles without diagnosis · Assum
 Chase symptoms not root cause · Add logging without hypothesis · Rewrite instead of bisect · Ignore shared state
 ## Reference
 Read order + OUTPUT template → docs/skills/deep-debugging/reference.md
+

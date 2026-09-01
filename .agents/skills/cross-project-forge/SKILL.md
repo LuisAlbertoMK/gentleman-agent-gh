@@ -1,9 +1,9 @@
-﻿---
+---
 name: cross-project-forge
 description: "Manual pipeline promoting a recurring pattern to an auto-generated skill when it hits severity threshold."
 triggers: "forge, promote pattern, auto-skill, forjar, convertir patrón, skill desde patrón, cross-project-forge"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1976
+token_budget: 2634
 ---
 ## When to Use
 Check severity threshold (ready to forge?):
@@ -47,5 +47,21 @@ Update pattern JSON:
 - Add `skill_ref: "cross-project-{name}"`
 ## Reference
 > docs/skills/cross-project-forge/reference.md
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: cross-project-wisdom | skill-registry
+

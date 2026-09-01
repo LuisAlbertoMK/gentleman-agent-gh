@@ -3,7 +3,7 @@ name: docs-audit
 description: "Trigger: documentation audit, README audit, API docs, onboarding docs, Diataxis. Audit docs quality and accuracy."
 triggers: "documentation audit, README audit, API docs, onboarding docs, Diátaxis, docs completeness, docs review, doc audit"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1225
+token_budget: 1834
 ---
 ## When to Use
 Reviewing documentation quality, README files, API docs, onboarding. If no docs → report and stop.
@@ -28,7 +28,23 @@ README/API/Onboarding/Standard Files/Links/Code greps + stale markers → refere
 - CRIT: [wrong docs]
 - MED: [missing docs]
 ```
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Docs are obvious, no audit needed" | README without Diataxis | docs-audit checklist |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- README without Diataxis → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- docs-audit checklist
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 code-generation · quality-gate
 ## Reference
 SCAN DIMENSIONS greps → docs/skills/docs-audit/reference.md
+

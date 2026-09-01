@@ -1,9 +1,9 @@
-﻿---
+---
 name: cross-project-wisdom
 description: "Prior-project patterns - advisory cross-repo knowledge. Trigger: patterns, wisdom, cross-project, retrospectiva"
 triggers: "patterns, wisdom, lesson learned, in another project I, last time this, cross-project, retrospectiva, experiencia previa, !wisdom, pattern guard"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1845
+token_budget: 2504
 ---
 
 ## When to Use
@@ -49,5 +49,21 @@ Each pattern JSON carries `hits` — increment on confirmed re-encounter.
 
 docs/skills/cross-project-wisdom/reference.md
 ---
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: cross-project-forge | gap-analysis
+
