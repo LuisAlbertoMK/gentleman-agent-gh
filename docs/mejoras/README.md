@@ -7,6 +7,8 @@
 
 | Date | File | Domain | Key Finding | Status |
 |------|------|--------|-------------|--------|
+| 2026-09-01 | [`gap-scan-repo`](2026-09-01-gap-scan-repo.md) | Multi-dimension | 9 gaps verificados: GAP-1 crítico (14 agentes laguna-404), GAP-2 gate benchmark stale ref, 5 hygiene. GAP-1/2/5/6/7/8 resueltos mismo día. | ✅ resolved |
+| 2026-09-01 | [`agent-improvement-research-plan`](2026-09-01-agent-improvement-research-plan.md) | Research | Plan v3 — ronda 1 (5 fases) + ronda 2 (re-validación + 6 oportunidades nuevas). P0-3 reasoning tier implementado. | 🏁 active (plan) |
 | 2026-08-29 | [`orchestrator-weakness`](2026-08-29-orchestrator-weakness-analysis.md) | Meta-Architecture | Punto más débil = enforcement: orquestador 100% delegación, G7 conductual + G8 Ollama residuales. Catalogado B 93 files a quick (tool_04f4cc7 + ses_fb038747). | 📄 Disponible |
 | 2026-08-28 | [`pester-17-fails`](2026-08-28-pester-17-fails.md) | Testing | G5 closure — 17 Pester fails → 0 fixed (dc8bb74c + bde9e720). Gate 25/25, Pester 24/24 (3 suites). | ✅ resolved |
 | 2026-08-04 | [`analysis-08-04`](2026-08-04-structural-gaps-post-cycles.md) | Multi-dimension | 15 findings: 5 enforcement (CRÍTICO/Alto), benchmark gate, tokenize-all roto, 7 docs "numbers that lie". R1-R5 completado (92f848aa, gate 16/16); R10 docs cleanup. | 🏁 active (plan) |
@@ -70,9 +72,9 @@
 
 ## Trend Summary
 
-- **Total documents**: 59 (58 analyses + 1 performance plan, all indexed above)
-- **Completed**: 6 (tdd-testing, orchestrator, permission-modes, execution-report, PERFORMANCE-PLAN 9/9, resource-optimization)
-- **Current**: 2026-08-04 analysis — R1-R5 completed (commit 92f848aa, gate 16/16); R10 docs cleanup in progress
+- **Total documents**: 81 (80 analyses + 1 performance plan, all indexed above)
+- **Completed**: 7 (+ gap-scan-repo 2026-09-01: GAP-1..2 críticos resueltos mismo día)
+- **Current**: plan 2026-09-01 v3 — P0-3 done; cola: P0-2 → R2-4 → P0-1 (LCM) → P1-*
 
 ## Quick Reference
 

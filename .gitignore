@@ -177,3 +177,6 @@ docs/compar_code/
 .opencode/session-checkpoints/
 .opencode/session-checkpoints/*.json
 docs/agentes/*/05-implementacion-completada.md
+
+# Local-only fix artifacts (cross-machine transfer, never commit)
+reparar/
