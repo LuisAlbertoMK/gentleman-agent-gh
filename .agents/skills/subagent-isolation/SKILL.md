@@ -3,7 +3,7 @@ name: subagent-isolation
 description: "Clean context boundaries between agents - prevent hallucination cascades, cross-contamination, enforce error isolation."
 triggers: "Subagent isolation, context boundaries"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1923
+token_budget: 2533
 ---
 
 ## When to Use
@@ -40,6 +40,21 @@ Every delegation output MUST include this 4-field block AS-IS (never summarized)
 | Wrong output | Log to Engram, re-delegate with corrected context |
 | Hallucinates | Flag as contamination -> check isolation rules |
 
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 delivery-harness · command-wrapper · lean-context · context-watchdog · execution-mode
 
@@ -49,3 +64,4 @@ Share state between subagents · Parallelize dependent tasks · Skip 4-field con
 ---
 
 > See [reference.md](docs/skills/subagent-isolation/reference.md) for extended details, examples, and detailed patterns.
+

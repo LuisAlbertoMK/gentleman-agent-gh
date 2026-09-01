@@ -1,9 +1,9 @@
-﻿---
+---
 name: workflow-optimizer
 description: "Optimize workflow patterns — faster info access, reduced token waste, smarter caching, auto-learning triggers."
 triggers: [optimize-workflow, faster-access, token-optimization, workflow-pattern, information-access, fluidez]
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1916
+token_budget: 2529
 ---
 ## When to Use
 Optimize workflow — info access, token economy, caching, auto-learning triggers.
@@ -21,5 +21,21 @@ Pipeline: Capture (mem_save every decision/bugfix/discovery) → Extract (dreami
 Fast recall: `mem_context` → `mem_search` → `mem_get_observation`. Proactive: project → `mem_search(project=...)`; feature → query; error → `mem_search(type=bugfix)`.
 ## Reference
 Extended details, examples, patterns → docs/skills/workflow-optimizer/reference.md
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: skill-graph | performance
+

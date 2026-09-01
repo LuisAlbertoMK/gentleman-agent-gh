@@ -3,7 +3,7 @@ name: ui-engine
 description: "UI system — Grid/Flexbox/@layer/:has(), container queries, compositor-only animation, OKLCH tokens, component patterns"
 triggers: "ui, layout, responsive, animation, design tokens, css, grid, flexbox, container query, dark mode, component layout, page layout, component patterns, hooks, compound components, state management"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1990
+token_budget: 2727
 ---
 ## When to Use
 UI: Grid/Flexbox/@layer/:has()·CQ·OKLCH·anim·patterns.
@@ -24,6 +24,21 @@ OKLCH>HSL: perceptual, dark, wide, ≥4.5:1. `vw`=page, `cqi`=container.
 `UI-IMPL:<component>—<date> PATTERN:[flex|grid|cq|tokens]<used> VERIFY:[a11y|contrast|reduced-motion|CQ]→<pass/fail>`
 ## Anti-Patterns
 Flex2D·Grid1D·!important vs @layer·flex:1 w/o min-inline-size:0·container-type:size w/o block-size·grid-auto-flow:dense·MQ for components·Decorative·>500ms·transition:all·HSL/RGB·Fixed font·cqi outside container·Prop drill>3L·Context high-freq
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Cross-Refs: baseline-ui | accessibility | performance
 > docs/skills/ui-engine/reference.md
 
@@ -33,3 +48,4 @@ Flex2D·Grid1D·!important vs @layer·flex:1 w/o min-inline-size:0·container-ty
 - frontmatter: name, description, triggers, token_budget present and stable
 - cross-refs: each referenced skill exists
 - anti-patterns: none of the listed anti-patterns reintroduced
+

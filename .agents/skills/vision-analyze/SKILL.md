@@ -3,7 +3,7 @@ name: vision-analyze
 description: "Local vision analysis - screenshots, UI review, error detection via Ollama. 100% local. NOT visual regression."
 triggers: [capture, vision, analyze-ui, visual-review, captura, analizar-imagen]
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2500
+token_budget: 3000
 ---
 ## When to Use
 Local vision analysis — screenshots, UI review, error detection.
@@ -20,6 +20,21 @@ Default: 100% local via 127.0.0.1:11434. Cloud allowed only if VISION_ANALYZE_OL
 - Verify server + models before any run
 ## Output
 `VISION:<target>—<date> MODE:[ui|error|design|a11y|perf] MODEL:<name> ISSUES:<n> TOP:<issue> VERIFY:[screenshot|ollama]→<ok/fail>`
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Cross-Refs: visual-testing | performance | accessibility | code-review-agent | self-improvement
 ## Anti-Patterns
 Use for pixel diffing/regression (visual-testing's job) · Force llava:7b with <8GB RAM (OOM) · Route unsanitized screenshots through external APIs without VISION_ANALYZE_OLLAMA_CLOUD=1
@@ -31,3 +46,4 @@ Use for pixel diffing/regression (visual-testing's job) · Force llava:7b with <
 - frontmatter: name, description, triggers, token_budget present and stable
 - cross-refs: each referenced skill exists
 - anti-patterns: none of the listed anti-patterns reintroduced
+

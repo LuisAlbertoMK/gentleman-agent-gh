@@ -3,7 +3,7 @@ name: visual-testing
 description: "Visual verification - screenshots, visual regression, UI bug detection via Playwright. See vision-analyze for LLM."
 triggers: "screenshot, visual diff, visual bug, regression test, VRT, UI broken, text overflow, layout shift, responsive test, visual regression"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2000
+token_budget: 2765
 ---
 
 ## When to Use
@@ -32,6 +32,21 @@ Text overflow:screenshot diff | Alignment:pixel | Z-index:element | Responsive:m
 ## Anti-Patterns
 No baseline·Threshold too strict(flaky)·No viewport reset·Skip anim freeze·No CI artifacts·Ignore theme·Mask nothing dynamic·Increase threshold instead of fix
 
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Cross-Refs: quality-gate | performance | baseline-ui | accessibility | ui-engine
 
 ## Reference
@@ -43,3 +58,4 @@ No baseline·Threshold too strict(flaky)·No viewport reset·Skip anim freeze·N
 - frontmatter: name, description, triggers, token_budget present and stable
 - cross-refs: each referenced skill exists
 - anti-patterns: none of the listed anti-patterns reintroduced
+

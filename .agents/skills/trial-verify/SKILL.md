@@ -1,8 +1,8 @@
-﻿---
+---
 name: trial-verify
 description: When facing >=2 viable options for a non-trivial reversible decision, implement/evaluate ALL of them, verify via independent subagent scoring, and PROCEED with the verified winner without asking the user to choose. Triggered by exception (d) of the 1-question rule.
 triggers: trial-verify, multi-option decision, which option, autonomous option resolution
-token_budget: 2600
+token_budget: 3421
 ---
 
 # Trial-Verify Protocol
@@ -58,5 +58,21 @@ quick-sub A=20/25; trial #2: P3 won 20/25, detection regex fixture-tested
 
 Every 10 ledgers run automejora-analyzer: an option-TYPE winning >70% within
 a domain becomes default-first-candidate — never bypassing Alto checkpoints.
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: triple-verify | testing-strategy
+

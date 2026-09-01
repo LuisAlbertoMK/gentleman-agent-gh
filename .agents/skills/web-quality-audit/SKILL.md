@@ -3,7 +3,7 @@ name: web-quality-audit
 description: "Comprehensive web audit: performance, a11y, SEO, responsive, animation, design tokens."
 triggers: "audit, review web quality, lighthouse, page quality, optimize website, design audit, ui audit, web audit, site review"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1650
+token_budget: 2387
 ---
 ## When to Use
 Full web audit: perf, a11y, SEO, responsive, anim. **Pre-req**: Target running+accessible. Public URL (no auth/CAPTCHA/WAF).
@@ -21,6 +21,21 @@ Pre-deploy CWV/a11y=0/CQ|Weekly INP/deps/motion|Monthly LH/token/theme. Targets:
 `AUDIT:<url>—<date> Scores:Perf=<n>A11y=<n>BP=<n>SEO=<n> CRITICAL:[cat]<issue>→<fix> HIGH:... MEDIUM:...`
 ## Anti-Patterns
 Lighthouse once·Skip a11y·No anim budget·Mix CQ/MQ without strategy·No token audit·No CI gate·Ignore theme a11y·Audit unreachable·Confuse Lighthouse/unlighthouse scales
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Cross-Refs: baseline-ui | accessibility | performance | seo | best-practices | ui-engine
 > docs/skills/web-quality-audit/reference.md
 
@@ -30,3 +45,4 @@ Lighthouse once·Skip a11y·No anim budget·Mix CQ/MQ without strategy·No token
 - frontmatter: name, description, triggers, token_budget present and stable
 - cross-refs: each referenced skill exists
 - anti-patterns: none of the listed anti-patterns reintroduced
+

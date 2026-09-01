@@ -1,9 +1,9 @@
-﻿---
+---
 name: triple-verify
 description: "Triple verification — 3 enfoques, thresholds por zona, modos !ship/!fast/!draft"
 triggers: "Triple verify, triangulate, 3 enfoques, !ship, !listo, !fast, !draft"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1916
+token_budget: 2543
 ---
 ## 3 Approaches
 | E1 — Testing | E2 — Static | E3 — Build/Runtime |
@@ -34,5 +34,21 @@ token_budget: 1916
 7. **Self-improvement override**: difficulty levels from CYCLE.md override verify depth
 ## Reference
 > docs/skills/triple-verify/reference.md
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: trial-verify | testing-strategy
+
