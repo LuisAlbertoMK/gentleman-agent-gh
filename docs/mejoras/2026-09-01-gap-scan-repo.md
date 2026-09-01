@@ -84,3 +84,8 @@ Este scan no duplica el plan de mejora: GAP-1..3 son **nuevos** (no estaban en e
 | GAP-7 drift global | ✅ RESUELTO — sync-global ok (93 junctions, 49 agentes) | 3260b08b |
 | GAP-8 branches | ✅ RESUELTO — 3 deleted | 3260b08b |
 | GAP-9 índice README | ✅ RESUELTO — 81 docs | 3260b08b |
+
+### Actualización GAP-4 (2026-09-01)
+
+✅ RESUELTO (82f9fd81): score-auto.ps1 persistencia (.project.json línea ~313 + history.jsonl rutas cache-hit ~115 y main ~362) gated detrás de PESTER_TEST. Verificado: test mode → worktree limpio (ScoreIntegration 11/11 PASS sin mutar); modo normal → persiste (history.jsonl append OK). Gap 0 abiertos.
+
