@@ -1,9 +1,9 @@
-﻿---
+---
 name: analysis-mode
 description: "Trigger: !analisis, !analysis, multi-agent analysis. Read-only 4-phase pipeline. Supports --meta for process/workflow analysis (bypasses scope guard)."
 triggers: "!analisis, !analysis, !analisis --meta, analysis mode, multi-agent analysis, smart analysis, process analysis"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2386
+token_budget: 3021
 ---
 ## When to Use
 Trigger: !analisis, !analysis, multi-agent analysis. Read-only 4-phase pipeline. `!analisis`/`!analysis` as first token. Loading + P1/P4 detail → reference.
@@ -28,5 +28,21 @@ Append cross-ref results as `## Evidence Check` block to the P3 synthesis in `do
 `docs/mejoras/YYYY-MM-DD-<project>-analisis.md` — Summary,Findings(8dims),Synthesis,RiskMatrix,Recs,Engram,Trend. Gate: Plan only — NO code/commit. Exit before implementing.
 ## Reference
 P1 ANALYZE + P4 PERSIST detail + loading → docs/skills/analysis-mode/reference.md
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: gap-analysis | project-mapper
+

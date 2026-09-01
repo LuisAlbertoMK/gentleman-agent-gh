@@ -1,9 +1,9 @@
-﻿---
+---
 name: automejora-analyzer
 description: "Analyzes auto-mejora cycles — detects patterns, scores improvements, validates SkillOpt gates, surfaces drift."
 changelog: "2026-08-31 — SD 9.9→10 fix"
 triggers: "auto-mejora, automejora, improvement analysis, cycle analysis, SkillOpt validation, improvement scoring"
-token_budget: 1818
+token_budget: 2500
 ---
 
 ## When to Use
@@ -33,5 +33,21 @@ Consult these when the skill needs detailed worked examples or guardrails:
   → docs/skills/automejora-analyzer/reference.md
 
 ---
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: self-improvement | metricas
+

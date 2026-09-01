@@ -3,7 +3,7 @@ name: auth-hardening
 description: "Trigger: auth, JWT, OAuth, RBAC, CSRF, session, login, password hashing. Audit and harden auth flows."
 triggers: "auth, authentication, authorization, JWT, OAuth, RBAC, CSRF, session, login, password hashing, token, cookie"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1788
+token_budget: 2380
 ---
 
 ## When to Use
@@ -32,6 +32,21 @@ MED: Session fixation (login doesn't regenerate ID)
 ## Rules
 1. JWT alg FIRST. 2. Role checks BEFORE data. 3. CSRF on ALL state-changing. 4. bcrypt/argon2 ONLY. 5. "Remaining risk: NONE/LOW/MED/HIGH (why)"
 
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 security-scanner · best-practices · quality-gate · code-review-agent
 
@@ -39,3 +54,4 @@ security-scanner · best-practices · quality-gate · code-review-agent
 Flag bcrypt weak · Skip JWT alg · Happy path only · Ignore refresh tokens · Client-side-only roles · Flag env vars hardcoded · Use `alg: none` for testing · Store JWT in localStorage
 ## Reference
 > docs/skills/auth-hardening/reference.md
+

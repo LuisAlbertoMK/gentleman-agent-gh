@@ -3,7 +3,7 @@ name: accessibility
 description: "WCAG 2.2 + EAA 2025 — audit and improve web accessibility."
 triggers: "a11y, accessibility, WCAG, screen reader, keyboard navigation, EAA, European Accessibility Act, contrast, focus, touch target"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1500
+token_budget: 2216
 ---
 
 ## When to Use
@@ -11,6 +11,21 @@ WCAG 2.2 + EAA 2025 — audit and improve web accessibility.
 
 ## Theme-Switching Contrast: Hero buttons on gradients → .hero .btn override (--clr-accent drops below 3:1 on dark). Footer spans on dark bg → --clr-white or test each theme. Verify getComputedStyle contrast ≥4.5:1 against bg AND text per theme.
 ## Grid A11y: NEVER grid-auto-flow: dense on interactive (breaks DOM tab flow). Preserve source order · TEST keyboard tab through every responsive variant.
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Cross-Refs: baseline-ui | web-quality-audit | ui-engine
 **Standards**: WCAG 2.2 (w3.org/TR/WCAG22) · EAA (digital-strategy.ec.europa.eu) · WAI-ARIA (w3.org/TR/wai-aria) · axe (deque.com/axe)
 ## Output
@@ -26,3 +41,4 @@ WCAG 2.2 + EAA 2025 — audit and improve web accessibility.
 ---
 
 > See [reference.md](docs/skills/accessibility/reference.md) for extended details, examples, and detailed patterns.
+

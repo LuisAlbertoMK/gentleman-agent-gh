@@ -1,9 +1,9 @@
-﻿---
+---
 name: adversarial-breaker
 description: "Adversarial verification — fixer→breaker chain. Independent offensive agent."
 triggers: "adversarial, breaker, !breaker, verify fix, romper, verificar fix, try to break, offensive verification"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1752
+token_budget: 2368
 ---
 ## When to Use
 fixer done+ROJA/AMARILLA(auth/storage/API)+not config-only. Skip:VERDE·non-code·comments·docs. Token-save:diff<10L+config/lock/docs.
@@ -31,5 +31,21 @@ Projects:`.agents/attack-surface.{project}.md`+`.agents/breaker-profiles/{projec
 ## Anti-Patterns
 Breaker trusts fixer·No attempts·3+r·Before QG·4R review·Happy path·Non-code/tiny diffs·No pre-reg·No test cases·Generic surface
 > docs/skills/adversarial-breaker/reference.md
+## Anti-Rationalization
+
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
+| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
+| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+
+## Red Flags
+- Doing work without checking output format → STOP, re-read skill
+- Second occurrence of same rationalization → force RED zone
+
+## Verification
+- Output matches skill ## Output contract + file:line citaton
+- cross-ref-check.ps1 → SKILL.md OK
 ## Refs
 Cross-Refs: security-scanner | best-practices
+
