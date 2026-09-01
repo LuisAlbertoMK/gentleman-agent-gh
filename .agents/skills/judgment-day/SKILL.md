@@ -1,9 +1,9 @@
 ﻿---
 name: judgment-day
 description: "Dual adversarial review orchestrator — 2 profile-scoped code-review-agent instances, verdict synthesis"
-triggers: "Judgment day, JD, dual review, juzgar, adversarial review"
-changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1942
+triggers: "Judgment day, JD, dual review, juzgar, adversarial review, LLM-as-judge, judge patterns, online verifier"
+changelog: "2026-09-01 R2-4 — add Zylos 6-pattern taxonomy + small/large judge guidance (KB r2-zylos-llm-judge)"
+token_budget: 3600
 ---
 
 ## When to Use
@@ -37,6 +37,21 @@ Parse `jd_profile_selector` (ordered, first-match): `match=path|basename|fallbac
 
 ### P3: Calibration
 FIX/BLOCKER → `external-auditor` on diff. Gap >1.5 severity → `immune-system` permanent fix.
+
+## Judge Patterns Taxonomy (R2-4 — Zylos 2026-04-10, 6 patterns)
+
+| # | Pattern | Latency/Cost | When (JD mapping) |
+|---|---------|--------------|-------------------|
+| 1 | Offline eval | async, large judge OK | This skill (ROJA dual blind) |
+| 2 | Online runtime verifier | 76–162ms budget, small judge (Luna-2 3–8B, Prometheus 7B, Lynx 8B ≈97% cheaper at 0.88–0.95 acc) | ROJA hotfix fast-path (optional, not default) |
+| 3 | Self-consistency / self-critique | Best-of-N + majority vote, cheapest, strongest in code/math | Our 2-profile blind → implicit majority-of-2 |
+| 4 | Reflexion | Only with external grounding (tests, git diff, retrieval) — intrinsic "check your work" degrades reasoning | Re-judge delta (max 2 rounds) already grounded on diff |
+| 5 | Constitutional / RLAIF | training-time; runtime = generate→critique against constitution→revise | Gap >1.5 → immune-system (constitution for ROJA repeats) |
+| 6 | Inference-time reward model | ranker over N samples, gated before output | Future: pre-push reward ranker (not yet wired) |
+
+> **3-boundary rule** (Zylos): instrument judges before (a) user-facing output, (b) irreversible tool exec (`git push`, file Write), (c) persistent memory writes (Engram). Skip per-step judging to manage cost. Our gate covers (a)+(b); (c) is future.
+
+**Small vs Large judges:** large proprietary (GPT-4o, Claude 3.7) for high-stakes ROJA; small distilled for throughput inline. JD's two profiles should diverge on that axis when one is "reasoning" tier.
 
 ## Pipeline
 `review-pipeline` Phase 2b for ROJA. Pre-commit #9: warn ROJA without JD.
