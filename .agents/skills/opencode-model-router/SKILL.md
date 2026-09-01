@@ -1,12 +1,13 @@
 ﻿---
 name: opencode-model-router
-description: "Route tasks by model strength — specialized agents for analysis, implementer for execution"
-changelog: "2026-08-31 — SD 9.9→10 fix"
+description: "Route tasks by model strength"
+triggers: "route, model router, which agent, delegate by domain"
+changelog: "2026-09-01 P0-3"
 token_budget: 820
 ---
 
 ## When to Use
-Route to 78 specialists via domain→agent table. Truth: `scripts/lib/opencode-base.json`.
+Route via table. Truth: `scripts/lib/opencode-base.json`.
 
 ## Routing Table
 
@@ -25,7 +26,7 @@ Route to 78 specialists via domain→agent table. Truth: `scripts/lib/opencode-b
 | accessibility | gentleman-frontend |
 | container | gentleman-infra |
 | deep-debug | gentleman-deep |
-| reasoning | gentleman-reasoning | # P0-3 reasoning tier (nemotron-3-ultra-free, chain-of-thought) |
+| reasoning | gentleman-reasoning |
 | quick-edit | gentleman-quick |
 | default | gentleman-vMK |
 

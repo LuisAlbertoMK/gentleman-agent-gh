@@ -109,7 +109,7 @@ if ($stagedRules) {
 # [8/13] Benchmark check
 Write-Host "[8/13] Benchmark check..."
 if ($stagedAgents) {
-    $benchOut = & "$RepoRoot/scripts/benchmark.ps1" -Gate 2>&1 | Out-String
+    $benchOut = & "$RepoRoot/scripts/benchmark-core.ps1" -Gate 2>&1 | Out-String
     if ($benchOut -match 'REGRESSIONS') { Warn "benchmark regressions detected`n$benchOut" }
     else { $benchOut.Trim() -split "`n" | ForEach-Object { Write-Host "    $_" }; Pass }
 } else { Pass }

@@ -71,25 +71,26 @@ Switch modes:
 |-------|-------|-----------|
 | `gentleman-vMK` | default | Senior Architect mentor — main orchestrator |
 | `gentleman-deep` | nemotron-3-ultra-free | Architecture, design, complex code |
-| `gentleman-codex` | deepseek-v4-flash-free | Code generation, boilerplate |
+| `gentleman-reasoning` | nemotron-3-ultra-free | Deep chain-of-thought debugging, multi-step synthesis |
+| `gentleman-codex` | muse-spark-1.2-contributor-free | Code generation, boilerplate |
 | `gentleman-quick` | mimo-v2.5-free | Fast tasks, review, simple edits |
 | `gentleman-security` | nemotron-3-ultra-free | Vulnerability analysis, secure code (FREE TIER) |
 | `gentleman-seo` | nemotron-3-super-free | SEO, GEO, keyword analysis (FREE TIER) |
-| `gentleman-infra` | deepseek-v4-flash-free | IaC, Kubernetes, CI/CD (FREE TIER) |
+| `gentleman-infra` | muse-spark-1.2-contributor-free | IaC, Kubernetes, CI/CD (FREE TIER) |
 | `gentleman-frontend` | kimi-k2.5-free | React, Tailwind, accessibility (FREE TIER) |
 | `gentleman-performance` | nemotron-3-ultra-free | Code optimization, bottlenecks (FREE TIER) |
 | `gentleman-datascience` | mimo-v2.5-free | Pandas, SQL, stats (FREE TIER) |
 | `gentleman-docs` | big-pickle | Technical writing, docs (FREE TIER) |
-| `gentleman-implementer` | deepseek-v4-flash-free | Plan executor (FREE TIER) |
+| `gentleman-implementer` | muse-spark-1.2-contributor-free | Plan executor (FREE TIER) |
 | `gentleman-reviewer` | nemotron-3-ultra-free | Code review — 4R (Risk/Readability/Reliability/Resilience) |
 | `gentleman-aem` | nemotron-3-ultra-free | Adobe Experience Manager migration specialist |
 | `gentleman-deep-sub` | nemotron-3-ultra-free | Deep reasoning subagent — delegable via Task tool |
-| `gentleman-codex-sub` | deepseek-v4-flash-free | Code generation subagent — delegable via Task tool |
+| `gentleman-codex-sub` | muse-spark-1.2-contributor-free | Code generation subagent — delegable via Task tool |
 | `gentleman-quick-sub` | mimo-v2.5-free | Fast executor subagent — delegable via Task tool |
-| `gentleman-implementer-sub` | deepseek-v4-flash-free | Plan executor subagent — delegable via Task tool |
+| `gentleman-implementer-sub` | muse-spark-1.2-contributor-free | Plan executor subagent — delegable via Task tool |
 | `gentleman-security-sub` | nemotron-3-ultra-free | Security audit subagent (read-only) — delegable via Task tool |
 | `gentleman-seo-sub` | nemotron-3-ultra-free | SEO/content audit subagent (read-only) — delegable via Task tool |
-| `gentleman-infra-sub` | deepseek-v4-flash-free | Infrastructure subagent (read-only) — delegable via Task tool |
+| `gentleman-infra-sub` | muse-spark-1.2-contributor-free | Infrastructure subagent (read-only) — delegable via Task tool |
 | `gentleman-frontend-sub` | kimi-k2.5-free | Frontend/UI subagent (read-only) — delegable via Task tool |
 | `gentleman-performance-sub` | nemotron-3-ultra-free | Performance subagent (read-only) — delegable via Task tool |
 | `gentleman-datascience-sub` | mimo-v2.5-free | Data science subagent (read-only) — delegable via Task tool |
@@ -100,20 +101,22 @@ Switch modes:
 | `gentle-orchestrator` | big-pickle | Bridge to global gentle-orchestrator for native review + SDD native |
 | `gentleman-deep-auto` | nemotron-3-ultra-free | — AUTO mode (same model, `*: allow`) |
 | `gentleman-quick-auto` | mimo-v2.5-free | — AUTO mode (same model, `*: allow`) |
-| `gentleman-codex-auto` | deepseek-v4-flash-free | — AUTO mode (same model, `*: allow`) |
-| `gentleman-implementer-auto` | deepseek-v4-flash-free | — AUTO mode (same model, `*: allow`) |
+| `gentleman-codex-auto` | muse-spark-1.2-contributor-free | — AUTO mode (same model, `*: allow`) |
+| `gentleman-implementer-auto` | muse-spark-1.2-contributor-free | — AUTO mode (same model, `*: allow`) |
 | `gentleman-vMK-auto` | default | — AUTO mode (orchestrator, `*: allow`) |
 | `gentleman-aem-auto` | nemotron-3-ultra-free | — AUTO mode (Adobe Experience Manager migration) |
 | `gentleman-deep-sub-auto` | nemotron-3-ultra-free | — AUTO sub agent (same model, `*: allow`) |
+| `gentleman-reasoning-sub` | nemotron-3-ultra-free | Reasoning subagent — delegable via Task tool |
+| `gentleman-reasoning-sub-auto` | nemotron-3-ultra-free | — AUTO reasoning sub agent (same model, `*: allow`) |
 | `gentleman-quick-sub-auto` | mimo-v2.5-free | — AUTO sub agent (same model, `*: allow`) |
-| `gentleman-codex-sub-auto` | deepseek-v4-flash-free | — AUTO sub agent (same model, `*: allow`) |
-| `gentleman-implementer-sub-auto` | deepseek-v4-flash-free | — AUTO sub agent (same model, `*: allow`) |
+| `gentleman-codex-sub-auto` | muse-spark-1.2-contributor-free | — AUTO sub agent (same model, `*: allow`) |
+| `gentleman-implementer-sub-auto` | muse-spark-1.2-contributor-free | — AUTO sub agent (same model, `*: allow`) |
 | `gentleman-aem-sub-auto` | nemotron-3-ultra-free | — AUTO sub agent (Adobe Experience Manager migration) |
 | `gentleman-deep-semi` | nemotron-3-ultra-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
 | `gentleman-quick-semi` | mimo-v2.5-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
-| `gentleman-codex-semi` | deepseek-v4-flash-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
+| `gentleman-codex-semi` | muse-spark-1.2-contributor-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
 | `gentleman-aem-semi` | nemotron-3-ultra-free | — SEMI mode (Adobe Experience Manager migration) |
-| `gentleman-implementer-semi` | deepseek-v4-flash-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
+| `gentleman-implementer-semi` | muse-spark-1.2-contributor-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
 | `gentleman-vMK-semi` | default | — SEMI mode (orchestrator, `"*": ask` + safe commands allow) |
 
 > **Auto/Semi modes**: Activated when `.gentleman-mode` is `auto` or `semi`. See [PROTOCOL.md](PROTOCOL.md) for mode behavior. Read-only specialists have no `-auto` or `-semi` variant.
@@ -133,7 +136,7 @@ Switch modes:
 | `sdd-verify` | Verify | inherits orchestrator | Validate implementation against specs |
 | `sdd-archive` | Archive | inherits orchestrator | Archive completed change artifacts |
 
-> **Cost**: All 10 SDD agents now use free-tier OpenCode models. The orchestrator uses `nemotron-3-ultra-free`; sub-agents have explicit free models (`deepseek-v4-flash-free`, `nemotron-3-ultra-free`, `big-pickle`) set in `opencode.json`.
+> **Cost**: All 10 SDD agents now use free-tier OpenCode models. The orchestrator uses `nemotron-3-ultra-free`; sub-agents have explicit free models (`muse-spark-1.2-contributor-free`, `nemotron-3-ultra-free`, `big-pickle`) set in `opencode.json`.
 
 ### Self-Improvement Cycle
 The project runs continuous improvement cycles (CYCLE.md):
