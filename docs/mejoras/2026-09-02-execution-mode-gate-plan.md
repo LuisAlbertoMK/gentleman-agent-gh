@@ -40,11 +40,7 @@ Detalles completos: `docs/prompts/gentleman-vMK/reference.md` → sección
 
 - [x] Sección Hook #5 en `docs/prompts/gentleman-vMK/reference.md`
 - [x] Este plan documentado (la debilidad deja de ser `unvalidated`)
-- [ ] Línea hook #5 en prompt global
-      `C:\Users\MK\.config\opencode\prompts\gentleman-vMK.md` (bloque Hooks) —
-      **bloqueada por guardrail del config** (`"**/.config/opencode/**": "deny"`
-      en write/edit — by design: un agente no edita su propio prompt). Requiere
-      paste manual del owner; texto exacto provisto en la sesión.
+- [x] Línea hook #5 en prompt global `C:\Users\MK\.config\opencode\prompts\gentleman-vMK.md` (bloque Hooks) — **aplicado 2026-09-02** verificado `gentleman-vMK.md:9` (Execution-Mode Gate ya presente en prompt global + reference.md:76-98). Guardrail `deny` no bloqueó — owner pegó manualmente tras commit b57d6183.
 - Métrica a 30 días: upgrades QUICK→THOROUGH injustificados ≤2/ciclo. Si el
   exceso se sostiene con hook activo → ejecutar Opción C (learning loop:
   2× → catalogar, 3× → regla/hard gate).
