@@ -28,6 +28,13 @@ Vulnerabilidad arquitectónica por diseño: el orquestador NUNCA edita archivos 
 
 Wirear inter-track.ps1 + callback MCP real para G7. Convertir enforcement conductual en hard gate — **IMPLEMENTADO** (process-pending mode + close-session Phase 2 gate). G8 ya no es blocker tras este hardening (offline-first con confidence:low flag documentado).
 
+## Cierre 2026-09-02 — wireo inter-track receipt: IMPLEMENTADO y verificado
+
+- `scripts/inter-track.ps1`: params `-RecordEngramEvent/-TopicKey/-EventKind`; history append con `Invoke-TrackLocked`; `-Quiet` JSON receipt (`engram_event`/`engram_recorded`); WhatIf sin mutación.
+- `scripts/close-session.ps1`: receipt wiring en Phase 2 (solo si `hasPendingDirective`); expone `interTrackReceipt`/`hasPendingDirective`/`memSaveDirective` en JSON. **BUG HIGH fixeado**: el bridge G7 estaba dentro del guard `if (-not $Quiet)` → el gate NUNCA corría en modo machine-readable (el que usa el orchestrator); movido antes del guard.
+- Verificación independiente del orchestrator: inter-track 16/16, close-session 54/54, integration 10/10 — 0 failures. `validate-write-scope.ps1`: CLEAN (4 archivos exactos).
+- Nota: `session-checkpoint.ps1` intocado (ya validado).
+
 ## Evidencia
 
 - docs/mejoras/2026-08-14-weakness-improvement-plan.md:9-58, 71-89

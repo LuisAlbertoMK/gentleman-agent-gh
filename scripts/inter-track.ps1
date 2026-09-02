@@ -24,13 +24,25 @@
 
 .PARAMETER Quiet
   Output JSON only (machine-readable).
+
+.PARAMETER RecordEngramEvent
+  Record a G7 engram directive consumption receipt in history (locked).
+
+.PARAMETER TopicKey
+  Topic key for the engram event (required with -RecordEngramEvent).
+
+.PARAMETER EventKind
+  Kind label for the engram event (default: pending-consumed).
 #>
 
 param(
     [switch]$Increment,
     [switch]$Reset,
     [int]$Target = 30,
-    [switch]$Quiet
+    [switch]$Quiet,
+    [switch]$RecordEngramEvent,
+    [string]$TopicKey = "",
+    [string]$EventKind = "pending-consumed"
 )
 
 Set-StrictMode -Version Latest
@@ -133,6 +145,48 @@ if ($Increment) {
     $dataRef.Value = $data
 }
 
+# G7: ensure Reset mutations are persisted via ref (object reference already covers it, but be explicit)
+if ($Reset) {
+    $dataRef.Value = $data
+}
+
+# G7 callback receipt: record engram directive consumption (locked, append to history)
+$recordedEvent = $null
+$engramRecorded = $false
+if ($RecordEngramEvent) {
+    if ([string]::IsNullOrWhiteSpace($TopicKey)) {
+        throw "RecordEngramEvent requires -TopicKey <string> (non-empty)"
+    }
+    $shouldProcessMsg = "Record engram event kind='$EventKind' topic_key='$TopicKey'"
+    if ($PSCmdlet.ShouldProcess($trackPath, $shouldProcessMsg)) {
+        $recordedEvent = [PSCustomObject]@{
+            kind      = $EventKind
+            topic_key = $TopicKey
+            timestamp = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssZ")
+            cycle_id  = $data.cycle.id
+        }
+        $data.history = @($data.history) + @($recordedEvent)
+        $dataRef.Value = $data
+        $engramRecorded = $true
+        if (-not $Quiet) {
+            Write-Host "[inter-track] Recorded engram event: $EventKind / $TopicKey (cycle: $($data.cycle.id))" -ForegroundColor Cyan
+        }
+    } else {
+        # WhatIf: do not mutate, but report what would happen
+        $recordedEvent = [PSCustomObject]@{
+            kind      = $EventKind
+            topic_key = $TopicKey
+            timestamp = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssZ")
+            cycle_id  = $data.cycle.id
+            whatIf    = $true
+        }
+        $engramRecorded = $false
+        if (-not $Quiet) {
+            Write-Host "[inter-track] WhatIf: would record engram event: $EventKind / $TopicKey" -ForegroundColor DarkGray
+        }
+    }
+}
+
 # Output
 $result = [PSCustomObject]@{
     cycleId  = $data.cycle.id
@@ -141,13 +195,17 @@ $result = [PSCustomObject]@{
     complete = ([int]$data.cycle.count -ge [int]$data.cycle.target)
     remaining = [Math]::Max(0, [int]$data.cycle.target - [int]$data.cycle.count)
 }
+if ($recordedEvent) {
+    $result | Add-Member -NotePropertyName "engram_event" -NotePropertyValue $recordedEvent -Force
+    $result | Add-Member -NotePropertyName "engram_recorded" -NotePropertyValue $engramRecorded -Force
+}
 
 if ($Quiet) {
-    $result | ConvertTo-Json
+    $result | ConvertTo-Json -Depth 4
 } else {
     Write-Host "  Cycle: $($data.cycle.id) | inter: $($data.cycle.count)/$($data.cycle.target)" -ForegroundColor Cyan
     # Show score when in Show mode (used by !cycle)
-    if (-not $Increment -and -not $Reset) {
+    if (-not $Increment -and -not $Reset -and -not $RecordEngramEvent) {
         $scorePath = Join-Path -Path $repoRoot -ChildPath ".project.json"
         if (Test-Path $scorePath) {
             try {

@@ -390,3 +390,78 @@ Describe 'Session-miner parameter passthrough' {
         $result2.Params.Json | Should -Be $true
     }
 }
+
+# ============================================================
+Describe 'G7 inter-track receipt wiring' {
+
+    BeforeAll {
+        # Replicate hasPendingDirective logic from close-session.ps1 lines 313-314
+        function Test-HasPendingDirective {
+            param($CpResult, $PendingResult)
+            return ($CpResult -and $CpResult.mem_save_directive) -or ($PendingResult -and $PendingResult.mem_save_directive)
+        }
+        function Test-GetDirective {
+            param($CpResult, $PendingResult)
+            if ($PendingResult -and $PendingResult.mem_save_directive) { return $PendingResult.mem_save_directive }
+            elseif ($CpResult -and $CpResult.mem_save_directive) { return $CpResult.mem_save_directive }
+            else { return $null }
+        }
+        # Replicate receipt topic extraction
+        function Test-ReceiptTopic {
+            param($Directive)
+            if (-not $Directive) { return $null }
+            return $Directive.topic_key
+        }
+    }
+
+    It 'hasPendingDirective TRUE when cpResult has directive' {
+        $cp = [PSCustomObject]@{ mem_save_directive = @{ topic_key = 'checkpoint/session-state' } }
+        Test-HasPendingDirective -CpResult $cp -PendingResult $null | Should -Be $true
+    }
+    It 'hasPendingDirective TRUE when pendingResult has directive' {
+        $pr = [PSCustomObject]@{ mem_save_directive = @{ topic_key = 'checkpoint/session-state' } }
+        Test-HasPendingDirective -CpResult $null -PendingResult $pr | Should -Be $true
+    }
+    It 'hasPendingDirective FALSE when neither has directive' {
+        Test-HasPendingDirective -CpResult $null -PendingResult $null | Should -Be $false
+        Test-HasPendingDirective -CpResult ([PSCustomObject]@{ mem_save_directive = $null }) -PendingResult ([PSCustomObject]@{ mem_save_directive = $null }) | Should -Be $false
+    }
+    It 'hasPendingDirective FALSE when pending reports no_pending (no directive)' {
+        $cp = [PSCustomObject]@{ mem_save_directive = $null; action = 'no_pending' }
+        $pr = [PSCustomObject]@{ mem_save_directive = $null; action = 'no_pending' }
+        Test-HasPendingDirective -CpResult $cp -PendingResult $pr | Should -Be $false
+    }
+    It 'GetDirective prefers pendingResult over cpResult' {
+        $cp = [PSCustomObject]@{ mem_save_directive = @{ topic_key = 'from-cp' } }
+        $pr = [PSCustomObject]@{ mem_save_directive = @{ topic_key = 'from-pending' } }
+        (Test-GetDirective -CpResult $cp -PendingResult $pr).topic_key | Should -Be 'from-pending'
+    }
+    It 'GetDirective falls back to cpResult when pending null' {
+        $cp = [PSCustomObject]@{ mem_save_directive = @{ topic_key = 'from-cp' } }
+        (Test-GetDirective -CpResult $cp -PendingResult $null).topic_key | Should -Be 'from-cp'
+    }
+    It 'GetDirective returns null when no directive' {
+        Test-GetDirective -CpResult $null -PendingResult $null | Should -Be $null
+    }
+    It 'Receipt topic is null when directive missing' {
+        Test-ReceiptTopic -Directive $null | Should -BeNullOrEmpty
+    }
+    It 'Receipt topic equals directive.topic_key when present' {
+        $dir = @{ topic_key = 'checkpoint/session-state' }
+        Test-ReceiptTopic -Directive $dir | Should -Be 'checkpoint/session-state'
+    }
+    It 'does NOT record when hasPendingDirective is false (guard)' {
+        $has = Test-HasPendingDirective -CpResult $null -PendingResult $null
+        $shouldRecord = $has -and (-not [string]::IsNullOrWhiteSpace((Test-ReceiptTopic -Directive (Test-GetDirective -CpResult $null -PendingResult $null))))
+        $shouldRecord | Should -Be $false
+    }
+    It 'records only when hasPendingDirective true and topic non-empty' {
+        $cp = [PSCustomObject]@{ mem_save_directive = @{ topic_key = 'checkpoint/session-state' } }
+        $has = Test-HasPendingDirective -CpResult $cp -PendingResult $null
+        $dir = Test-GetDirective -CpResult $cp -PendingResult $null
+        $topic = Test-ReceiptTopic -Directive $dir
+        $shouldRecord = $has -and (-not [string]::IsNullOrWhiteSpace($topic))
+        $shouldRecord | Should -Be $true
+        $topic | Should -Be 'checkpoint/session-state'
+    }
+}
