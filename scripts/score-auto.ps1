@@ -73,6 +73,28 @@ try {
         # v2 (slim): compare compact hash; v1 (legacy): compare full base64 hash
         $cachedHash = if ($cached.v -eq 2) { $cached.hash } else { $cached.hash }
         if ($cachedHash -eq $cacheHash) {
+            # Self-heal: cache/.project.json divergence check — extends $bp read to all cache-hit paths
+            $needsRecompute = $false
+            try {
+                $syncCheckPath = Join-Path $repoRoot ".project.json"
+                if (Test-Path -LiteralPath $syncCheckPath) {
+                    $bpSync = Get-Content -LiteralPath $syncCheckPath -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
+                    $pjScore = $bpSync.score.current
+                    $cs = if ($cached.v -eq 2) { $cached.score } else { $cached.result.score.current }
+                    if ($null -ne $pjScore -and $null -ne $cs -and ([double]$pjScore -ne [double]$cs)) {
+                        if ($env:PESTER_TEST -eq '1') {
+                            Write-Debug "score-auto: cache score $cs != .project.json $pjScore — invalidating cache (PESTER_TEST=1, recompute without persistence)"
+                        } else {
+                            Write-Warning "score-auto: cache score $cs != .project.json $pjScore — invalidating cache, recomputing"
+                        }
+                        try { Remove-Item -LiteralPath $cacheFile -Force -ErrorAction SilentlyContinue } catch { Write-Debug "score-auto: cache invalidation failed ($($_.Exception.Message))" }
+                        $needsRecompute = $true
+                    }
+                }
+            } catch {
+                Write-Debug "score-auto: cache self-heal check failed ($($_.Exception.Message))"
+            }
+            if (-not $needsRecompute) {
             # v2 slim: result not in cache, must recalculate (but hash matches = no change)
             # For display, reconstruct minimal result from cached fields
             if ($cached.v -eq 2) {
@@ -119,6 +141,7 @@ if($delta -gt 0.2 -or $currentCommit -ne $lastCommit -or $Force){ @{"date"=(Get-
 # GAP-4 fix: skip .project.json + cache persistence in test mode
 $isTestMode = ($env:PESTER_TEST -eq '1')
             exit 0
+            } # end if (-not $needsRecompute)
         }
     }
 } catch {
@@ -132,6 +155,8 @@ $isTestMode = ($env:PESTER_TEST -eq '1')
 Push-Location $repoRoot
 # C4c: Single path definition — CWD-independent .project.json reference
 $projectJsonPath = Join-Path $repoRoot ".project.json"
+# GAP-4: test-mode guard — defined once for main path (cache-hit also sets it before exit)
+$isTestMode = ($env:PESTER_TEST -eq '1')
 
 $math       = [math]
 $dimensions = @{}
@@ -309,7 +334,8 @@ try {
     # Validation: ensure score is sane before writing (ported from restore-project-score.ps1)
     $dimCount = @($dimensions.Keys).Count
     if ($finalScore -lt 0 -or $finalScore -gt 10 -or $dimCount -lt 11) {
-        Write-Debug "score-auto: validation failed — score=$finalScore, dims=$dimCount (expected: 0-10, >=11 dims). Skipping .project.json write."
+        $valMsg = "score-auto: validation failed — score=$finalScore, dims=$dimCount (expected: 0-10, >=11 dims). Skipping .project.json write."
+        if ($isTestMode) { Write-Debug $valMsg } else { Write-Warning $valMsg }
     } else {
         if ($isTestMode) {
             Write-Debug "score-auto: PESTER_TEST=1 — skipping .project.json write (test mode)"
