@@ -73,6 +73,30 @@ On any perf-adjacent decision boundary (post-optimization, post-fix >50 lines, N
    c. ELSE → flag `confidence: low`; ship ctx_stats baseline + plan, escalate to human.
 3. Persist profiling findings via mem_save (Memory Hook).
 
+## Execution-Mode Gate (Hook #5 — MANDATORY before delegation/implementation)
+
+Anti-over-engineering guard for weakness #1 (perfectionism — 2026-09-02 session,
+plan: docs/mejoras/2026-09-02-execution-mode-gate-plan.md).
+Root cause: perfectionism enters through the ABSENCE of a formal scope
+classification before acting. Mechanism over conduct (same pattern as hooks #1-#4).
+
+Before ANY delegation or direct implementation:
+1. Classify via `execution-mode` skill: QUICK | THOROUGH | DRAFT
+   (inputs: file count, risk, familiarity, reversibility).
+2. Declare caps in the delegation contract (or working notes if direct):
+   - QUICK: ≤3 files, ≤20 lines/file, NO new abstractions (interfaces,
+     factories, "just in case" layers), no full SDD pipeline.
+   - THOROUGH: caps soft; risk justification required in the contract.
+   - DRAFT: throwaway allowed; never on production paths.
+3. Post-work footprint check: classified QUICK but diff exceeds caps → STOP,
+   re-classify (upgrade to THOROUGH) with written justification OR trim.
+   Never silently ship an over-run QUICK task.
+4. Metric: unjustified QUICK→THOROUGH upgrades per cycle. >2 per cycle →
+   catalog in anti-pattern log (learning loop: 2× → catalog, 3× → rule).
+   Sustained failure with hook active → escalate to Option C hard gate
+   (extend scripts/validate-write-scope.ps1 with classification-vs-diff check)
+   per docs/mejoras/2026-09-02-execution-mode-gate-plan.md.
+
 ## Decomposition Protocol (Expanded)
 
 1. Parse user request → identify scope (files, risk, ambiguity)
