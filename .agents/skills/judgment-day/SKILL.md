@@ -2,7 +2,7 @@
 name: judgment-day
 description: "Dual adversarial review orchestrator — 2 profile-scoped code-review-agent instances, verdict synthesis"
 triggers: "Judgment day, JD, dual review, juzgar, adversarial review, LLM-as-judge, judge patterns, online verifier"
-changelog: "2026-09-01 R2-4 — add Zylos 6-pattern taxonomy + small/large judge guidance (KB r2-zylos-llm-judge)"
+changelog: "2026-09-01 R2-4 — add Zylos 6-pattern taxonomy + small/large judge guidance (KB r2-zylos-llm-judge); 2026-09-01 wiring jd-verifier.ps1 (p2/p4/p5 enforcement)"
 token_budget: 4200
 ---
 
@@ -25,6 +25,7 @@ Dual adversarial code review — 2× `code-review-agent`, blind, verdict synthes
 
 ### P1: Profiles → 2× code-review-agent
 Parse `jd_profile_selector` (ordered, first-match): `match=path|basename|fallback`. Missing→"architect". Identical→`[profile, "security"]`. 2 parallel, each `"## Profile Focus\n{instructions}"`. Blind. 120s timeout, retry once.
+P1 fast-path: `scripts/jd-verifier.ps1 -Zone <AMARILLA|ROJA> -FastPath` before deciding dual-judge → VERIFY-OK or ESCALATE; wiring `references/jd-patterns-wiring.md`.
 
 ### P2: Synthesize
 
@@ -34,6 +35,7 @@ Parse `jd_profile_selector` (ordered, first-match): `match=path|basename|fallbac
 | Same root-cause (file ±5 lines) | Confirmed |
 | Different findings | Triage → fix → re-judge |
 | Re-judge | Max 2 rounds (diff delta only) |
+P2 synthesize: `SELF-CONSISTENCY: profiles A/B = majority-of-2 (diverge → tie-break by higher severity)` per `scripts/jd-verifier.ps1`.
 
 ### P3: Calibration
 FIX/BLOCKER → `external-auditor` on diff. Gap >1.5 severity → `immune-system` permanent fix.
@@ -49,9 +51,9 @@ FIX/BLOCKER → `external-auditor` on diff. Gap >1.5 severity → `immune-system
 | 5 | Constitutional / RLAIF | training-time; runtime = generate→critique against constitution→revise | Gap >1.5 → immune-system (constitution for ROJA repeats) |
 | 6 | Inference-time reward model | ranker over N samples, gated before output | Future: pre-push reward ranker (not yet wired) |
 
-> **3-boundary rule** (Zylos): instrument judges before (a) user-facing output, (b) irreversible tool exec (`git push`, file Write), (c) persistent memory writes (Engram). Skip per-step judging to manage cost. Our gate covers (a)+(b); (c) is future.
+> **3-boundary rule** (Zylos): judges before (a) user output, (b) irreversible exec (`git push`/Write), (c) memory writes. Gate covers (a)+(b); (c) future.
 
-**Small vs Large judges:** large proprietary (GPT-4o, Claude 3.7) for high-stakes ROJA; small distilled for throughput inline. JD's two profiles should diverge on that axis when one is "reasoning" tier.
+**Small vs Large:** large for ROJA, small distilled inline.
 
 ## Anti-Rationalization
 
@@ -79,12 +81,7 @@ JD-{target} | Profiles: {A}/{B} | 4R | Confirmed:N | JDGMNT: APPROVED/ESCALATED 
 ---
 
 ## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-007).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Testing Patterns, Edge Cases, Anti-Patterns, Quick Reference**
-  → docs/skills/judgment-day/reference.md
+→ docs/skills/judgment-day/reference.md · wiring `references/jd-patterns-wiring.md`
 
 ---
 ## Refs
