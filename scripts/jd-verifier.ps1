@@ -61,7 +61,7 @@ function Invoke-FastGate {
         [void]$proc.Start()
         $exited = $proc.WaitForExit(5000)
         if (-not $exited) {
-            try { $proc.Kill() } catch {}
+            try { $proc.Kill() } catch { Write-Debug "what failed: $($_.Exception.Message)" }
             [Console]::Error.WriteLine('WARN: fast.exe timeout after 5000ms')
             return $null
         }

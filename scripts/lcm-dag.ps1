@@ -49,7 +49,7 @@ function Initialize-LcmDag {
     if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
     if (-not (Test-Path $Path)) {
         $cycleId = $null
-        try { $cycleId = (Get-Content (Join-Path $repoRoot '.learnings/inter-track.json') -Raw | ConvertFrom-Json).cycle.id } catch {}
+        try { $cycleId = (Get-Content (Join-Path $repoRoot '.learnings/inter-track.json') -Raw | ConvertFrom-Json).cycle.id } catch { Write-Debug "what failed: $($_.Exception.Message)" }
         $init = @{ nodes = @(); edges = @(); meta = @{ createdAt = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ss'); cycle = $cycleId; budget = $Budget } }
         if ($env:PESTER_TEST -ne '1') {
             $init | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $Path -Encoding UTF8

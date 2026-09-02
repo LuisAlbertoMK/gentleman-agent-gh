@@ -124,14 +124,14 @@ try {
                 # passed alias
                 if ($null -ne $j.passed) { $gatePassed = [bool]$j.passed }
                 elseif ($null -ne $j.pass) { $gatePassed = [bool]$j.pass }
-                try { if ($null -ne $j.elapsedMs) { $elapsedMs = [int]$j.elapsedMs; $gateDurationMs = $elapsedMs } } catch {}
-                try { if ($null -ne $j.crossRef.elapsedMs) { $crossRefMs = [int]$j.crossRef.elapsedMs } } catch {}
-                try { if ($null -ne $j.tokenBudget.elapsedMs) { $tokenBudgetMs = [int]$j.tokenBudget.elapsedMs } } catch {}
-                try { if ($null -ne $j.crossRef.canonicalSkills) { $crossRef = [int]$j.crossRef.canonicalSkills } } catch {}
-                try { if ($crossRef -eq 0 -and $null -ne $j.crossRef.agents) { $crossRef = [int]$j.crossRef.agents } } catch {}
-                try { if ($null -ne $j.tokenBudget.skills.budget) { $tokenBudgetTotal = [int]$j.tokenBudget.skills.budget } } catch {}
-                try { if ($null -ne $j.tokenBudget.budget) { $tokenBudgetTotal = [int]$j.tokenBudget.budget } } catch {}
-                try { if ($null -ne $j.tokenBudget.skills.overBudgetFiles) { $tokenBudgetOver = [int]$j.tokenBudget.skills.overBudgetFiles } } catch {}
+                try { if ($null -ne $j.elapsedMs) { $elapsedMs = [int]$j.elapsedMs; $gateDurationMs = $elapsedMs } } catch { Write-Debug "what failed: $($_.Exception.Message)" }
+                try { if ($null -ne $j.crossRef.elapsedMs) { $crossRefMs = [int]$j.crossRef.elapsedMs } } catch { Write-Debug "what failed: $($_.Exception.Message)" }
+                try { if ($null -ne $j.tokenBudget.elapsedMs) { $tokenBudgetMs = [int]$j.tokenBudget.elapsedMs } } catch { Write-Debug "what failed: $($_.Exception.Message)" }
+                try { if ($null -ne $j.crossRef.canonicalSkills) { $crossRef = [int]$j.crossRef.canonicalSkills } } catch { Write-Debug "what failed: $($_.Exception.Message)" }
+                try { if ($crossRef -eq 0 -and $null -ne $j.crossRef.agents) { $crossRef = [int]$j.crossRef.agents } } catch { Write-Debug "what failed: $($_.Exception.Message)" }
+                try { if ($null -ne $j.tokenBudget.skills.budget) { $tokenBudgetTotal = [int]$j.tokenBudget.skills.budget } } catch { Write-Debug "what failed: $($_.Exception.Message)" }
+                try { if ($null -ne $j.tokenBudget.budget) { $tokenBudgetTotal = [int]$j.tokenBudget.budget } } catch { Write-Debug "what failed: $($_.Exception.Message)" }
+                try { if ($null -ne $j.tokenBudget.skills.overBudgetFiles) { $tokenBudgetOver = [int]$j.tokenBudget.skills.overBudgetFiles } } catch { Write-Debug "what failed: $($_.Exception.Message)" }
             }
         }
     } else {

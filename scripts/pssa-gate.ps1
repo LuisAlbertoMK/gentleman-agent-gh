@@ -9,7 +9,7 @@
 [string]$Path=(Get-Location).Path,[switch]$Quiet,
 [string]$BaselineFile=(Join-Path $Path 'docs/metricas/pssa-baseline.json'))
 Set-StrictMode -Version Latest;$ErrorActionPreference='Stop'
-$xd=@('experiments','skills','node_modules','.archive');$xdAmp=$xd+'tests';$fr=@('PSUseBOMForUnicodeEncodedFile','PSAvoidDefaultValueSwitchParameter');$tr=@('PSAvoidUsingWriteHost')
+$xdEco=@('experiments','skills','node_modules','tests');$xdJunk=@('.archive','temp_code_clean','.breaker-cleared','.jd-cleared');$fr=@('PSUseBOMForUnicodeEncodedFile','PSAvoidDefaultValueSwitchParameter');$tr=@('PSAvoidUsingWriteHost')
 
 function Write-Status { param([string]$Message) if (-not $Quiet) { Write-Host "  $Message" } }
 function Get-PSSAViolation { param([string]$TargetPath,[string[]]$Files)
@@ -130,8 +130,8 @@ if($useCache -and $cacheFile -and $null -ne $manifest){Save-PSSACache -CacheFile
 if($Mode -eq 'Fix'){Write-Host "`n-- Auto-fix --";$bf=Resolve-BomEncoding -Violations ($results | Where-Object {$_.RuleName -eq 'PSUseBOMForUnicodeEncodedFile'});$sf=Resolve-SwitchDefault -Violations ($results | Where-Object {$_.RuleName -eq 'PSAvoidDefaultValueSwitchParameter'});Write-Host "  BOM: $bf | Switch: $sf";Write-Status "Re-scanning...";$results=Get-PSSAViolation -TargetPath $target -Files $scanFiles}
 
 $af=@($results | Where-Object {$_.RuleName -in $fr});$td=@($results | Where-Object {$_.RuleName -in $tr});$manual=@($results | Where-Object {$_.RuleName -notin ($fr+$tr)})
-$ev=@($manual | Where-Object {$sp=$_.ScriptPath.Replace('\','/');$sk=$false;foreach($d in $xdAmp){if($sp-match"/$d/"){$sk=$true;break}};$sk})
-$manual=@($manual | Where-Object {$sp=$_.ScriptPath.Replace('\','/');$sk=$false;foreach($d in $xdAmp){if($sp-match"/$d/"){$sk=$true;break}};-not$sk})
+$ev=@($manual | Where-Object {$sp=$_.ScriptPath.Replace('\','/');$rp=$_.ScriptPath.Replace($target.Path,'').TrimStart('\').TrimStart('/').Replace('\','/');$sk=$false;foreach($d in $xdEco){if($sp-match"/$d/"){$sk=$true;break}};if(-not$sk){foreach($d in $xdJunk){if($rp-match"^$d([\/]|$)"){$sk=$true;break}}};$sk})
+$manual=@($manual | Where-Object {$sp=$_.ScriptPath.Replace('\','/');$rp=$_.ScriptPath.Replace($target.Path,'').TrimStart('\').TrimStart('/').Replace('\','/');$sk=$false;foreach($d in $xdEco){if($sp-match"/$d/"){$sk=$true;break}};if(-not$sk){foreach($d in $xdJunk){if($rp-match"^$d([\/]|$)"){$sk=$true;break}}};-not$sk})
 # Intentional suppression: platform.ps1 polyfills $IsWindows/$IsLinux/$IsMacOS for PS5.1 compat (scripts/lib/platform.ps1:23-35) — flagged as PSAvoidAssignmentToAutomaticVariable but required. Suppress from gate.
 $manual=@($manual | Where-Object { -not ($_.RuleName -eq 'PSAvoidAssignmentToAutomaticVariable' -and $_.ScriptName -match 'platform\.ps1') })
 
@@ -140,7 +140,8 @@ $av=[IO.Directory]::EnumerateFiles($target, '*.ps1', [IO.SearchOption]::AllDirec
     $rp=$_.Replace($using:target,'').TrimStart('\')
     $sk=$false
     foreach($ex in $using:kx){if($rp-match[regex]::Escape($ex)){$sk=$true}}
-    foreach($d in $using:xdAmp){if($rp-match"(^|[\\/])$d[\\/]"){$sk=$true}}
+    foreach($d in $using:xdEco){if($rp-match"(^|[\\/])$d[\\/]"){$sk=$true}}
+    foreach($d in $using:xdJunk){if($rp-match"^$d([\\/]|$)"){$sk=$true}}
     if($sk){return}
     try{$ln=[IO.File]::ReadAllText($_)}catch{return}
     $ln=$ln -split '\r?\n'

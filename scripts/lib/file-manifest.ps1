@@ -23,10 +23,11 @@ function Get-FileManifest {
     $root = (Resolve-Path $Path).Path
 
     $rxExclude = '(^|[\\/])(node_modules|experiments|skills)([\\/]|$)'
+    $rxJunkRoot = '^(\.archive|temp_code_clean|\.breaker-cleared|\.jd-cleared)([\\/]|$)'
     $rxExt     = '\.(ps1|psm1)$'
 
     $scriptPaths = @(Get-ChildItem -LiteralPath $root -File -Recurse -EA SilentlyContinue |
-        Where-Object { $_.FullName -notmatch $rxExclude -and $_.FullName -match $rxExt })
+        Where-Object { $rel = $_.FullName.Substring($root.Length).TrimStart('\','/'); $_.FullName -notmatch $rxExclude -and $rel -notmatch $rxJunkRoot -and $_.FullName -match $rxExt })
 
     $skillPaths = @(Get-ChildItem -LiteralPath (Join-Path $root '.agents\skills') -File -Filter 'SKILL.md' -Recurse -EA SilentlyContinue)
 

@@ -35,7 +35,7 @@ function Test-RalphComplete {
     try {
         $msg = git log -1 --pretty=%B 2>$null | Out-String
         if ($msg -match '<promise>\s*(DONE|COMPLETE)\s*</promise>') { return @{ complete = $true; source = 'last commit promise' } }
-    } catch {}
+    } catch { Write-Debug "what failed: $($_.Exception.Message)" }
     # Check 3: .ralph/promise file (explicit)
     $promiseFile = Join-Path $repoRoot '.ralph/promise'
     if (Test-Path $promiseFile) { return @{ complete = $true; source = '.ralph/promise file' } }

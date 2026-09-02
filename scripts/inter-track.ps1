@@ -51,6 +51,13 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $trackPath = Join-Path -Path $repoRoot -ChildPath ".learnings\inter-track.json"
 
+# PSSA: explicit param usage at script scope (params are consumed inside Invoke-TrackLocked scriptblock; ScriptAnalyzer doesn't trace into it) — also enforces help-block contract
+if ($RecordEngramEvent -and [string]::IsNullOrWhiteSpace($TopicKey)) {
+    throw "RecordEngramEvent requires -TopicKey <string> (non-empty)"
+}
+# Reference remaining params so PSReviewUnusedParameter sees them as used (actual logic is inside the locked scriptblock)
+$null = $Increment; $null = $Reset; $null = $Target; $null = $Quiet; $null = $EventKind
+
 # Initialize if not exists
 if (-not (Test-Path -LiteralPath $trackPath)) {
     $init = @{
