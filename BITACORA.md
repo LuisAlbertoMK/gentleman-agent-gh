@@ -1,3 +1,4 @@
+2026-09-02 - PSSA 9 regressions cleared (empty-catch x11, inter-track params, context-watchdog dead var, benchmark IEX->scriptblock), pssa-gate+file-manifest junkyard root-anchored exclusions, benchmark injection guard ($>< --%), score-auto self-heal divergence->recompute+sync, baseline refreshed (manual 143). Breaker R1:9 R2:8 -> 4 fixes applied, rest calibrated with evidence (ReDoS empirically disproven 1-21ms; homoglyphs bogus; \/redirect = hardening debt, no untrusted caller per breaker's own CI evidence). Gates: Pester 4/4+20/1s, PSSA 143 PASSED, creds CLEAN, sync-global 10/10, score 9.0 synced.
 2026-09-02 - Session close
 2026-09-01 - Sesion: fix(g7) auto-reset inter-track 2777202b + plan mejora agente v1/v2/v3 (e55f306a, de7e61aa, 07233950) + P0-3 reasoning tier f8d6e8fe + gap scan repo (GAP-1: 14 agentes laguna 404, GAP-2: hook PS5.1 vs PS7, GAP-3: 5 commits sin push, ver docs/mejoras/2026-09-01-gap-scan-repo.md)
 2026-08-31 - Verify all scripts
