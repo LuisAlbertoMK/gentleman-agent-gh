@@ -86,3 +86,13 @@ changes:
       compliance documentation structure (docs/compliance/). Mapped
       GDPR principles to existing controls (data minimisation, storage
       limitation, accountability via audit gate, integrity via write-scope).
+
+  "gentleman-dashboard":
+    title: "Gentleman Dashboard"
+    status: in_progress
+    domains: ["dashboard", "ui"]
+    files: []
+    created: "2026-09-01"
+    description: >
+      Bootstrap for gentleman-dashboard change. Minimal structure created;
+      specs/designs/tasks pending subsequent phases.

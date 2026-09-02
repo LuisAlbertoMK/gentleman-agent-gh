@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gentleman Dashboard</title>
+<style>
+@layer base, layout, theme;
+@layer base{*{box-sizing:border-box;margin:0;padding:0}html{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5}body{min-height:100vh}}
+@layer layout{
+header{padding:1.2rem 1rem;border-bottom:1px solid oklch(0.3 0.02 260)}
+main{max-width:1100px;margin:0 auto;padding:1.2rem 1rem}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+.card{border:1px solid oklch(0.35 0.02 260);border-radius:12px;padding:1rem}
+.card h2{font-size:0.85rem;letter-spacing:0.04em;text-transform:uppercase;opacity:0.8}
+.card .val{font-size:1.9rem;font-weight:700;margin-top:0.3rem}
+.card .sub{font-size:0.85rem;opacity:0.75;margin-top:0.2rem}
+.badge{display:inline-block;padding:0.15rem 0.5rem;border-radius:999px;font-size:0.75rem;font-weight:700;letter-spacing:0.04em}
+.badge-pass{background:oklch(0.65 0.18 145);color:oklch(0.15 0.02 145)}
+.badge-fail{background:oklch(0.42 0.2 25);color:oklch(0.98 0 0)}
+table{width:100%;border-collapse:collapse;margin-top:0.6rem;font-size:0.9rem}
+th,td{padding:0.5rem 0.6rem;text-align:left;border-bottom:1px solid oklch(0.3 0.02 260)}
+th{cursor:pointer;user-select:none}
+th:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid oklch(0.7 0.15 260);outline-offset:2px}
+.table-wrap{overflow-x:auto}
+footer{padding:1rem;text-align:center;opacity:0.6;font-size:0.8rem;border-top:1px solid oklch(0.3 0.02 260);margin-top:1.5rem}
+#error{border:1px solid oklch(0.55 0.2 25);background:oklch(0.25 0.04 25);padding:1rem;border-radius:10px}
+}
+@layer theme{
+:root{color-scheme:dark}
+body{background:oklch(0.18 0.02 260);color:oklch(0.92 0.02 260)}
+.card{background:oklch(0.22 0.02 260)}
+a{color:oklch(0.75 0.12 260)}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header><h1>Gentleman Dashboard</h1><span class="subtitle" style="opacity:.7;font-size:.9rem;display:block">Agent &amp; skill health — fast.exe gate + token budgets</span></header>
+<main>
+<div id="error" role="alert" aria-live="assertive" hidden></div>
+<div id="cards" class="grid" aria-busy="true">
+<section class="card" aria-labelledby="gate-heading"><h2 id="gate-heading">Gate</h2><div class="val" id="gate-val">—</div><div class="sub" id="gate-sub"></div></section>
+<section class="card" aria-labelledby="fast-heading"><h2 id="fast-heading">Fast.exe</h2><div class="val" id="fast-val">—</div><div class="sub" id="fast-sub"></div></section>
+<section class="card" aria-labelledby="agents-heading"><h2 id="agents-heading">Agents</h2><div class="val" id="agents-val">—</div><div class="sub" id="agents-sub"></div></section>
+<section class="card" aria-labelledby="skills-heading"><h2 id="skills-heading">Skills</h2><div class="val" id="skills-val">—</div><div class="sub" id="skills-sub"></div></section>
+</div>
+<section aria-labelledby="table-heading" style="margin-top:1.2rem">
+<h2 id="table-heading" style="font-size:1rem">Over-budget skills</h2>
+<div class="table-wrap">
+<table id="skills-table" aria-label="Over-budget skills">
+<thead><tr>
+<th role="columnheader" tabindex="0" aria-sort="none" aria-label="Sort by Skill, currently none, press to sort" data-k="name">Skill</th>
+<th role="columnheader" tabindex="0" aria-sort="none" aria-label="Sort by Budget, currently none, press to sort" data-k="budget">Budget</th>
+<th role="columnheader" tabindex="0" aria-sort="none" aria-label="Sort by Actual, currently none, press to sort" data-k="actual">Actual</th>
+<th role="columnheader" tabindex="0" aria-sort="none" aria-label="Sort by Delta, currently none, press to sort" data-k="delta">Delta</th>
+</tr></thead>
+<tbody id="tbody"><tr><td colspan="4" style="opacity:.6">Loading…</td></tr></tbody>
+</table>
+</div>
+</section>
+</main>
+<footer><p><span id="generatedAt"></span> · <span id="score"></span></p></footer>
+<script>
+(function(){
+var errEl=document.getElementById('error'),cards=document.getElementById('cards');
+function showErr(msg){errEl.textContent=msg;errEl.hidden=false;cards.hidden=true;var tb=document.getElementById('tbody');tb.textContent='';var tr=document.createElement('tr');var td=document.createElement('td');td.colSpan=4;td.style.opacity='.6';td.textContent=msg;tr.appendChild(td);tb.appendChild(tr)}
+var rows=[],sortK='delta',sortDir=-1;
+function render(){
+ var tb=document.getElementById('tbody');
+ tb.textContent='';
+ if(!rows.length){var tr=document.createElement('tr');var td=document.createElement('td');td.colSpan=4;td.style.opacity='.6';td.textContent='No over-budget skills';tr.appendChild(td);tb.appendChild(tr);return}
+ var sorted=rows.slice().sort(function(a,b){
+  var av=a[sortK],bv=b[sortK];
+  if(typeof av==='string'){av=av.toLowerCase();bv=bv.toLowerCase();return sortDir*(av<bv?-1:av>bv?1:0)}
+  return sortDir*(av-bv);
+ });
+ sorted.forEach(function(r){var tr=document.createElement('tr');var a=document.createElement('td');a.textContent=r.name;tr.appendChild(a);var b=document.createElement('td');b.textContent=r.budget;tr.appendChild(b);var c=document.createElement('td');c.textContent=(r.actual||r.size);tr.appendChild(c);var d=document.createElement('td');d.textContent=r.delta;tr.appendChild(d);tb.appendChild(tr)});
+ document.querySelectorAll('th[role="columnheader"]').forEach(function(th){
+  var k=th.getAttribute('data-k'),active=k===sortK;
+  th.setAttribute('aria-sort',active?(sortDir===1?'ascending':'descending'):'none');
+  th.setAttribute('aria-label','Sort by '+(k.charAt(0).toUpperCase()+k.slice(1))+', currently '+(active?(sortDir===1?'ascending':'descending'):'none')+', press to reverse');
+ });
+}
+document.querySelectorAll('th[role="columnheader"]').forEach(function(th){
+ function toggle(){
+  var k=th.getAttribute('data-k');
+  if(sortK===k)sortDir*=-1;else{sortK=k;sortDir=k==='name'?1:-1}
+  render();
+ }
+ th.addEventListener('click',toggle);
+ th.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}});
+});
+fetch('./data.json').then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(d){
+ cards.setAttribute('aria-busy','false');
+ var g=d.gate||{},f=d.fast||{},a=d.agents||{},s=d.skills||{};
+ var passed=(g.passed!==undefined?g.passed:g.pass);
+ var total=g.total||0, dur=g.durationMs!==undefined?g.durationMs:g.elapsedMs||0;
+ var cross=g.crossRef||0, tbTot=g.tokenBudget?g.tokenBudget.total:0, tbOver=g.tokenBudget?g.tokenBudget.overBudgetFiles:0;
+  var gv=document.getElementById('gate-val');gv.textContent='';var badge=document.createElement('span');badge.className='badge '+(passed?'badge-pass':'badge-fail');badge.textContent=passed?'PASS':'FAIL';gv.appendChild(badge);gv.appendChild(document.createTextNode(' '));var ds=document.createElement('span');ds.style.fontSize='1rem';ds.style.opacity='.8';ds.textContent=dur+' ms';gv.appendChild(ds);
+ document.getElementById('gate-sub').textContent='crossRef '+cross+' · tokenBudget '+tbOver+' over · total '+total;
+ var fastMs=f.elapsedMs||dur;
+ document.getElementById('fast-val').textContent=fastMs+' ms';
+ document.getElementById('fast-sub').textContent='crossRef '+(f.crossRefMs||0)+' ms · tokenBudget '+(f.tokenBudgetMs||0)+' ms';
+ document.getElementById('agents-val').textContent=a.total||0;
+ document.getElementById('agents-sub').textContent='total agents';
+ document.getElementById('skills-val').textContent=s.total||0;
+ document.getElementById('skills-sub').textContent=(s.budgeted||0)+' budgeted · '+(s.overBudget||0)+' over · avg '+(s.avgBudget||0);
+ rows=(s.overBudgetSkills||s.overBudget||[]).slice(0,20).map(function(x){
+  if(typeof x==='object'&&x.name) return {name:x.name,budget:x.budget,actual:x.actual||x.size,size:x.size||x.actual,delta:x.delta||((x.actual||x.size)-x.budget)};
+  return x;
+ });
+ // if overBudget was int, rows already set; ensure array
+ if(!Array.isArray(rows)) rows=[];
+ render();
+ document.getElementById('generatedAt').textContent=d.generatedAt?('Generated '+new Date(d.generatedAt).toLocaleString()):'';
+ var sc=d.score!==undefined?d.score:d.projectScore;
+ document.getElementById('score').textContent=sc!==undefined?'Score '+sc:'';
+}).catch(function(e){showErr('Failed to load dashboard data. Run generator script.')});
+})();
+</script>
+</body>
+</html>

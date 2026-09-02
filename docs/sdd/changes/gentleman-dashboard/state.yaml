@@ -1,0 +1,18 @@
+change: gentleman-dashboard
+project: gentleman-agent-gh
+status: in_progress
+phase: init
+artifact_store: hybrid
+created: "2026-09-01"
+updated: "2026-09-01"
+strict_tdd: true
+testing:
+  runner: pester
+  command: 'pwsh -NoProfile -Command "Import-Module Pester; Invoke-Pester ./scripts/tests/"'
+  pattern: "scripts/tests/*.Tests.ps1"
+persistence:
+  mode: hybrid
+  registry: docs/sdd/registry.yaml
+  specs: docs/sdd/specs/
+  archive: docs/sdd/archive/
+  skill_registry: .atl/skill-registry.md
