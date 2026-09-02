@@ -1,6 +1,6 @@
 ---
 name: sdd-design
-description: Create the SDD technical design and architecture approach. Trigger: orchestrator launches design for a change.
+description: "Create the SDD technical design and architecture approach. Trigger: orchestrator launches design for a change."
 delegate_only: true
 triggers: "SDD design, design phase, technical design, architecture design, sdd-design"
 changelog: docs/ciclos/cycle28-20260815.md
