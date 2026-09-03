@@ -25,9 +25,9 @@ Extended details, examples, patterns → docs/skills/workflow-optimizer/referenc
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "Caching no aplica aquí" | Recomputing instead of reusing mem_search | Check pre-flight `mem_search` cache — saves 2-5K/task if skipped |
+| "Paralelizar es overkill" | Serial gather for >3 files | >3 files → delegate explore parallel — verify batch vs sequential cost |
+| "Auto-learning después" | Deferring mem_save after decision/bugfix | Capture→Extract→Evaluate — `mem_save` every decision/bugfix now |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -37,5 +37,5 @@ Extended details, examples, patterns → docs/skills/workflow-optimizer/referenc
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-Cross-Refs: skill-graph | performance
+Cross-Refs: skill-graph | performance | context-watchdog | lean-context | karpathy-loop
 

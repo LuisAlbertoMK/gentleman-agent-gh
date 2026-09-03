@@ -29,7 +29,6 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$repoRoot = Split-Path $PSScriptRoot -Parent
 $_savedTokens = $CurrentTokens; $_savedBudget = $Budget
 . (Join-Path $PSScriptRoot 'lcm-dag.ps1')
 $CurrentTokens = $_savedTokens; $Budget = $_savedBudget

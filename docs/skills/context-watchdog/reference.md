@@ -1,6 +1,14 @@
 # context-watchdog - Reference Materials
 
-> **Externalized from** .agents/skills/context-watchdog/SKILL.md to keep the skill under the 2KB token budget (ADR-007).
+> **Externalized from** .agents/skills/context-watchdog/SKILL.md to keep the skill under the 3KB token budget (ADR-048).
+
+## DAG Wiring (P0-1 — Hierarchical Summary DAG, parte 3/3)
+
+**Escalation** delegates to `scripts/lcm-dag.ps1` + `scripts/context-watchdog-check.ps1`:
+- `Invoke-LcmEscalation` thresholds aligned to zones: `NONE<40% L1 40-60 L2 60-80 L3>80` (compact at 70%).
+- Auto-creates DAG node in `.learnings/lcm-dag.json` with lossless `Pointer` (L3). `PESTER_TEST=1` dry-runs.
+- **3-boundary rule** (Zylos): call `context-watchdog-check.ps1` (a) before user output, (b) before `git push`/Write, (c) on Engram writes. Hook point for part 3: `session-checkpoint.ps1` at YELLOW/ORANGE.
+- Storage: `.learnings/lcm-dag.json {nodes, edges, meta{cycle,budget}}` — per-cycle DAG (from `inter-track.json`).
 
 ## Examples
 "compress" → `ctx_stats` → map % to zone → compress at 70% max, never RED. Same point restated 2x → force RED.
@@ -11,7 +19,7 @@
 
 
 
-## Externalized Sections (ADR-007 compression)
+## Externalized Sections (ADR-048 compression)
 ## Compression Levels
 | L | Trigger | Action | Savings |
 |---|---|---|---|
