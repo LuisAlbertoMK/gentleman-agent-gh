@@ -27,4 +27,18 @@ Describe 'sync-global-ps5.ps1' {
     It 'contains no Stop-Process' {
         $raw | Should -Not -Match 'Stop-Process'
     }
+    It '$configFiles array does NOT contain opencode.json' {
+        $cfgLine = ($raw -split "`n" | Where-Object { $_ -match '\$configFiles\s*=' })
+        $cfgLine | Should -Not -Match 'opencode\.json'
+    }
+    It 'contains bootstrap-only guard pattern' {
+        $raw | Should -Match '-not\s*\(Test-Path \$dst\)'
+        $idx = $raw.IndexOf('bootstrap-only')
+        $idx | Should -BeGreaterThan -1
+        $region = $raw.Substring($idx, [Math]::Min(800, $raw.Length - $idx))
+        $region | Should -Match '-not\s*\(Test-Path \$dst\)'
+    }
+    It 'contains bootstrap-only comment marker' {
+        $raw | Should -Match 'bootstrap-only'
+    }
 }

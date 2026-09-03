@@ -78,9 +78,16 @@ Write-Host "  Scripts: $scriptsCopied/$scriptsTotal" -Fore Green
 
 # Step 3: Config files
 Write-Host "`n[3] Config sync" -ForegroundColor Cyan
-$configFiles = @("AGENTS.md","ANTI-PATTERN-CATALOG.md","SKILLS-INDEX.md","CYCLE.md","BITACORA.md","review-rules.jsonc","PROJECT-SCORE.md","skills-lock.json","opencode.json","opencode.jsonc")
+$configFiles = @("AGENTS.md","ANTI-PATTERN-CATALOG.md","SKILLS-INDEX.md","CYCLE.md","BITACORA.md","review-rules.jsonc","PROJECT-SCORE.md","skills-lock.json")
 $configCopied = 0
 foreach ($cfgFile in $configFiles) { Sync-SingleFile -Src (Join-Path $repoRoot $cfgFile) -Dst (Join-Path $globalCfg $cfgFile) -IsDryRun:$DryRun -Count ([ref]$configCopied) }
+# opencode.json/.jsonc: bootstrap-only — plant repo config ONLY if global target missing (never overwrite accumulated global settings; PS7 sync-global.ps1 owns updates, step [8] owns autoupdate)
+foreach ($cfgFile in @("opencode.json","opencode.jsonc")) {
+    $src = Join-Path $repoRoot $cfgFile; $dst = Join-Path $globalCfg $cfgFile
+    if ((Test-Path $src -PathType Leaf) -and -not (Test-Path $dst)) {
+        if ($DryRun) { Write-Host "  [dry-run] bootstrap $cfgFile" -Fore Yellow } else { Copy-Item -LiteralPath $src -Destination $dst -Force; Write-Host "  [bootstrapped] $cfgFile" -Fore Green; $configCopied++ }
+    }
+}
 Write-Host "  Config: $configCopied/$($configFiles.Count)" -Fore Green
 
 # Steps 4-6: Commands, Prompts, Plugins (identical pattern)
