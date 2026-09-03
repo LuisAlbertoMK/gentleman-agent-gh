@@ -194,3 +194,8 @@
 2026-08-31 — audit: SD 9.9→10 verification (tool hygiene 115/115, test coverage 115/115, audit fresh)
 2026-09-02 - Hook #5 Execution-Mode Gate (b57d6183) + G7 inter-track receipt wire into close-session hard gate (cad0b093) — verify close-session BUG HIGH fix (move bridge before Quiet guard) + inter-track 16/16, close-session 54/54, integration 10/10, validate-write-scope CLEAN; prompt global gentleman-vMK.md:9 verificado aplicado (owner paste) + plan DoD 3/3 closed — docs/mejoras/2026-09-02-execution-mode-gate-plan.md:42-44 + docs/mejoras/2026-08-29-orchestrator-weakness-analysis.md:31-35
 2026-09-02 - Skill expansion: +state-reconcile (stale-plan-doc reconciliation, incident Engram 532) +ps-compat (PS5.1/7+encoding checklist, anti-patterns #10/#13/#14/#16/#20) — 95 skills, R2-1 structure, frontmatter P1-1 spec
+## 2026-09-02 - automejora opencode-binary-selfheal (7 delegaciones, por partes)
+- P1 update-opencode.ps1: analysis 15 findings -> gate 3 accepted (postinstall_path, timeout 180s, corrupt-path tests) | 12 rejected (C1 hallucination)
+- P2 sync-global.ps1: G1 CRITICAL JSON contamination fixed (pure -Json stdout), G2 Depth 100, G3 enforce autoupdate true->false | real non-dry run exit 0
+- P3 ADR-048 realineado a convencion ##Status + runtime proof true->false | PSSA close-out (empty catch, $using) | junk $( / $(npm deleted
+- Final: Pester 15/15, DryRun 8/8, score-auto 9.1 sin regresiones, live cfg autoupdate=False
