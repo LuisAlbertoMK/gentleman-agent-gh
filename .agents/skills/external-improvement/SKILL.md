@@ -3,7 +3,7 @@ name: external-improvement
 description: "5-phase improvement cycle for external projects — 3+ subagents per phase."
 triggers: "improve external project, mejora proyecto, proyecto externo, 5-phase cycle, ciclo 5 fases, analizá este proyecto, corré el ciclo, revisame el proyecto, !5fases, !extimprove, aplicá las 5 fases"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2300
+token_budget: 2850
 ---
 
 ## When to Use
@@ -37,9 +37,9 @@ docs/external/<project>/
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "3 subagentes por fase es overkill en proyectos chicos" | Reducir a 1-2 subagentes por fase | Protocolo fijo: cada fase 3+ subagents vía task()/delivery-harness; P2 ≥3 reports, P3 ≥1 batch I/R≥1.0 |
+| "adaptar el proyecto externo a nuestras convenciones primero" | Reformatear antes de diagnosticar | P1 EXPLORE primero: entender estructura/arch/deps del proyecto externo antes de proponer cambios |
+| "saltar research si el repo es conocido" | Omitir P1 y asumir diagnóstico | Ejecutar P1→P5 secuencial; P1 gate: 3 reports deben existir antes de P2 |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

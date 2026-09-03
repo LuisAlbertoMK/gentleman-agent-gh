@@ -3,7 +3,7 @@ name: plan-execution
 description: "Trigger: execute plan, implement plan, step-by-step execution, plan completion. Execute plans with rollback."
 triggers: "execute plan, implement plan, step-by-step execution, task execution, plan completion, run plan, do plan"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2303
+token_budget: 2850
 ---
 ## When to Use
 Executing a multi-step plan (from agent, spec, or task list). NOT for 1-file edits (→ quick-executor) or single-concept changes.
@@ -53,9 +53,9 @@ Executing a multi-step plan (from agent, spec, or task list). NOT for 1-file edi
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "saltar rollback si el paso parece simple" | Ejecutar sin rama ni baseline para revertir | Step 0 ISOLATE: git checkout -b plan/<name> + baseline commit; fallo→git checkout -- <files> y BLOCKED |
+| "ejecutar pasos en paralelo aunque el plan sea secuencial" | Paralelizar sin respetar dependencias | Step 2 ORDER: grafo A→B serial vs A∥B paralelo; solo paralelizar si independencia verificada |
+| "marcar step done sin evidencia" | Done sin verificar gate del step | Step 3 VERIFY por task: implement→verify gate→rollback si fail→BLOCKED; nunca done sin evidencia |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

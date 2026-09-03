@@ -3,7 +3,7 @@ name: mini-orchestrator
 description: "BabyAGI loop (Execution→Task Creation→Prioritization) with async fire-and-forget handoff"
 triggers: "mini-orchestrator, BabyAGI, task loop, async delegation, fire-and-forget, background monitor, agent chain, dependent tasks"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2575
+token_budget: 3200
 ---
 # mini-orchestrator
 BabyAGI delegation loop: **EXECUTION → TASK CREATION → PRIORITIZATION**, async fire-and-forget.
@@ -24,9 +24,9 @@ Escalate: credentials, network egress, package installs, `git push --force`, des
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "BabyAGI puede correr sin límite de iteraciones, convergerá solo" | Loop sin max_iterations ni convergence_check | Enforce max_iterations=10 hard cap + convergence_check delta<threshold OR queue empty + dedup hash |
+| "prioritización manual es más rápida que el loop" | Bypass de rank impact×effort×risk elegido a ojo | Usar PRIORITIZATION: rank impacto×esfuerzo×riesgo, top-1 automático |
+| "fire-and-forget sin post-delegation-check es suficiente" | Delegar async sin leer {BaseRef}.async-result.json | Ejecutar post-delegation-check.ps1 -Async + monitor-subagent.ps1 poll 15s, leer .passed antes de continuar |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

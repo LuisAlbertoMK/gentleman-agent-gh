@@ -3,7 +3,7 @@ name: karpathy-loop
 description: "Iterative prompt optimization — write, measure, cut, repeat with progressive compression"
 triggers: "Karpathy loop, optimize prompt, measure tokens"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2541
+token_budget: 3050
 ---
 
 ## When to Use
