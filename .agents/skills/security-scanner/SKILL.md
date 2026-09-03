@@ -3,7 +3,7 @@ name: security-scanner
 description: "Pre-commit security scan - secrets, injection patterns, dependency vulnerabilities, supply chain risks, API usage."
 triggers: "Security, seguridad, vulnerabilidad, auditar, safe check, harden"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2300
+token_budget: 2750
 ---
 ## When to Use
 Pre-commit, pre-deploy, or "is this secure?"

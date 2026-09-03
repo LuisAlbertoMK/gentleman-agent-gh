@@ -3,7 +3,7 @@ name: subagent-isolation
 description: "Clean context boundaries between agents - prevent hallucination cascades, cross-contamination, enforce error isolation."
 triggers: "Subagent isolation, context boundaries"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2533
+token_budget: 3100
 ---
 
 ## When to Use
@@ -44,9 +44,9 @@ Every delegation output MUST include this 4-field block AS-IS (never summarized)
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "compartir contexto entre subagentes ahorra tokens" | Reutilizar historial completo entre delegations | Cada delegate arranca CLEAN: solo paths + Engram IDs necesarios, nunca historial completo |
+| "hallucination cascade se detecta sola" | No aislar, asumir errores no se propagan | Aplicar isolation rules: no shared state, error boundaries (timeout→retry once, hallucinate→flag contamination) |
+| "un subagente puede editar archivos de otro sin coordinar" | Overlap de escritura sin dependency graph | Verificar no file overlap antes de paralelizar; si B depende de A → serial, conflictos → escalar a orchestrator |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

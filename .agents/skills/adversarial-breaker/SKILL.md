@@ -3,7 +3,7 @@ name: adversarial-breaker
 description: "Adversarial verification — fixer→breaker chain. Independent offensive agent."
 triggers: "adversarial, breaker, !breaker, verify fix, romper, verificar fix, try to break, offensive verification"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2368
+token_budget: 3000
 ---
 ## When to Use
 fixer done+ROJA/AMARILLA(auth/storage/API)+not config-only. Skip:VERDE·non-code·comments·docs. Token-save:diff<10L+config/lock/docs.
@@ -35,9 +35,9 @@ Breaker trusts fixer·No attempts·3+r·Before QG·4R review·Happy path·Non-co
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "el breaker ya pasó el profile scan, no hace falta re-verificar" | Reuse de profile sin fresh scan por cambio | Re-ejecutar attack-surface.{project}.md injection + mem_search breaker/{target} por cada diff |
+| "breaker y fixer pueden ser el mismo agente, es más eficiente" | Mismo agente verifica su propio fix | Delegar breaker independiente vía subagent-isolation con bundle separado, nunca reutilizar fixer context |
+| "clearance permanente tras un PASS" | Asumir aprobación vale para cambios futuros | Clearance es por-cambio: nuevo diff → nuevo ciclo breaker con verdict fresco AB-{t} |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -47,5 +47,5 @@ Breaker trusts fixer·No attempts·3+r·Before QG·4R review·Happy path·Non-co
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-Cross-Refs: security-scanner | best-practices
+Cross-Refs: security-scanner | best-practices | judgment-day
 
