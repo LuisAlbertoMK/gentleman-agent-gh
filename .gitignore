@@ -184,3 +184,7 @@ reparar/
 
 # Playwright artifacts
 test-results/
+
+# Crush local artifacts
+.crush/crush.db*
+.crush/logs/
