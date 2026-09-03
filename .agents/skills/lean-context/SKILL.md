@@ -48,9 +48,9 @@ CAVEMAN sub: lite (sentences) → full (fragments) → ultra (abbr). Code/PRs �
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "CAVEMAN también para código/docs" | CAVEMAN on code/PRs or docs artifacts | Code/PRs → always normal — verify LEVEL SELECT excludes code/docs |
+| "ULTRA sin chequear context %" | Cutting to ULTRA below 40% budget | `ctx_stats` → >40% or RED zone required for ULTRA |
+| "CAVEMAN ultra ahorra siempre" | Using CAVEMAN ultra as default | Default is LEAN — CAVEMAN only on-demand or <10 turns left |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -60,7 +60,7 @@ CAVEMAN sub: lite (sentences) → full (fragments) → ultra (abbr). Code/PRs �
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-karpathy-loop · context-watchdog · execution-mode · skill-graph
+karpathy-loop · context-watchdog · execution-mode · skill-graph · session-resume
 
 ## Anti-Patterns
 CAVEMAN for code/PRs · Cut safety warnings · Apply ULTRA without checking context %

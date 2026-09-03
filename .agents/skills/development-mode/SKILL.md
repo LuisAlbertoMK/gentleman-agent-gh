@@ -42,9 +42,9 @@ docs/skills/development-mode/reference.md
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "Modo dev = modo de ejecución" | Confusing dev-mode (RAM/CPU) with execution-mode (QUICK/THOROUGH) | dev-mode=PriorityClass/powercfg, execution-mode=SDD pipeline — check Refs |
+| "Siempre High priority" | Activating for <1MB files | WHEN TO ACTIVATE: >10MB→always, <1MB→no benefit — check size first |
+| "Admin innecesario" | Skipping optimize-system.ps1 prereq | Run `optimize-system.ps1` once — verify registry keys before power plan |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
