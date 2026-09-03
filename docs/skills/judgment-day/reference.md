@@ -174,3 +174,25 @@ test('Full pipeline: different findings → fix → re-judge → APPROVED', asyn
 
 ## Refs
 - [code-review-agent](../code-review-agent/SKILL.md) · [external-auditor](../external-auditor/SKILL.md) · [immune-system](../immune-system/SKILL.md) · [quality-gate](../quality-gate/SKILL.md) · `review-rules.jsonc`
+
+## Judge Pattern Taxonomy — Extended (movido por ADR-048, cycle32-p2)
+
+> Fuente: Zylos 2026-04-10 — 6 patterns. Detalle movido de .agents/skills/judgment-day/SKILL.md líneas 41-55 para cumplir ≤3200B.
+
+| # | Pattern | Latency/Cost | When (JD mapping) |
+|---|---------|--------------|-------------------|
+| 1 | Offline eval | async, large judge OK | This skill (ROJA dual blind) |
+| 2 | Online runtime verifier | 76–162ms budget, small judge (Luna-2 3–8B, Prometheus 7B, Lynx 8B ≈97% cheaper at 0.88–0.95 acc) | ROJA hotfix fast-path (optional, not default) — **gated-optional**: small judge, opcional pre-output. Ver Pattern 2 en SKILL.md |
+| 3 | Self-consistency / self-critique | Best-of-N + majority vote, cheapest, strongest in code/math | Our 2-profile blind → implicit majority-of-2 |
+| 4 | Reflexion | Only with external grounding (tests, git diff, retrieval) — intrinsic "check your work" degrades reasoning | Re-judge delta (max 2 rounds) already grounded on diff |
+| 5 | Constitutional / RLAIF | training-time; runtime = generate→critique against constitution→revise | Gap >1.5 → immune-system (constitution for ROJA repeats) — **gated-optional**: trigger immune-system si gap>1.5 existe ya |
+| 6 | Inference-time reward model | ranker over N samples, gated before output | Future: pre-push reward ranker (not yet wired) — **gated-optional**: future/pre-push |
+
+> **3-boundary rule** (Zylos): instrument judges before (a) user-facing output, (b) irreversible tool exec (git push, file Write), (c) persistent memory writes (Engram). Skip per-step judging to manage cost. Our gate covers (a)+(b); (c) is future.
+
+**Small vs Large judges:** large proprietary (GPT-4o, Claude 3.7) for high-stakes ROJA; small distilled for throughput inline. JD two profiles should diverge on that axis when one is "reasoning" tier. Small judges (Luna-2, Prometheus, Lynx ~97% cheaper) para Pattern 2; large judges para Pattern 1/3. Gated-optional patterns 2/5/6 — detalle aquí, SKILL.md deja 1 línea cada una apuntando aquí.
+
+**Gated-optional guidance:**
+- Pattern 2 (online verifier 76–162ms): small judge opcional pre-output — activar solo en hotfix ROJA donde latencia <200ms importa; default OFF.
+- Pattern 5 (constitutional/RLAIF): extensión documentada aquí; runtime trigger ya existe (gap>1.5 → immune-system).
+- Pattern 6 (reward model): future/pre-push — ranker over N samples gated before output; no wire aún.

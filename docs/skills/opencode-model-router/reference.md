@@ -128,3 +128,30 @@ assert_direct "Nightly cron job"            # → DIRECT forced
 ## 🔧 IMPLEMENTER
 `gentleman-implementer-sub` (DeepSeek V4 Flash Free) — precise execution. No unrequested changes.
 **Avoid**: Qwen3.7 Max (re-plans, paid), Nemotron 3 Ultra (over-analyzes).
+
+## Extended — Security Gate, Strategy y notas de catálogo (movido por ADR-048, cycle32-p2)
+
+> Contenido externalizado de .agents/skills/opencode-model-router/SKILL.md para cumplir ≤3200B. Core queda con routing table, IMPLEMENTER, CONTEXT->ACTION.
+
+### Security Gate (movido de SKILL.md)
+1. Credentials/secrets/PII? -> **DIRECT**
+2. Recurring task (cron/CI)? -> **DIRECT**
+3. Context >150K? -> **DIRECT**
+4. Otherwise -> route a tabla.
+
+### Strategy (FREE — 2026-09-02, 8 ids)
+- **100% Free**: Solo 8 ids free vigentes en GET /zen/v1/models (ningún retired: kimi-k2.5-free y nemotron-3-super-free fuera de catálogo)
+- **1M context**: Nemotron 3 Ultra Free, Ling 3.0 Flash Fin Free (DeepSeek V4 Flash Free 1M como alt)
+- **Vision**: MiMo V2.5 Free (212K, reemplaza Kimi K2.5 retirado); Big Pickle reasoning para docs/general
+- **Code-gen**: Muse Spark 1.2 Contributor Free (200K) para implement/quick/script
+- **Fallback universal**: Big Pickle (always free) — Laguna S 2.1 Free como segundo fallback si se estabiliza pi.dev
+
+### Notas de catálogo (ground truth 2026-09-02 movido)
+Ground truth 2026-09-02: opencode/big-pickle (200K reasoning), opencode/mimo-v2.5-free (212K vision, limited-time free), opencode/ling-3.0-flash-fin-free (1M), opencode/nemotron-3-ultra-free (1M reasoning), opencode/nemotron-3.5-lightning-free (sucesor de super-free), opencode/muse-spark-1.2-contributor-free (200K code-gen), opencode/deepseek-v4-flash-free (volvió en /models), opencode/laguna-s-2.1-free (Zen 200, pi.dev 404 por lag — vigente hasta prueba contraria). Pricing table confirma 6 free explícitos; Laguna y DeepSeek tratados como Free vigentes por /models.
+
+* Nemotron 3.5 Lightning Free ctx no publicado en pricing table; estimado heredado de familia Nemotron 3.x (256K–1M). Todos los modelos en tabla pertenecen al set 8 vigente — ningún retired.
+
+> Nota Laguna S 2.1 Free: disponible como fallback general adicional (Zen 200, medium-high confidence). No asignado a dominio específico por lag en pi.dev, pero válido como Free vigente.
+
+### Changelog (movido)
+- 3.1 (2026-09-02): Sync catálogo free vigente (8 ids). Reemplaza nemotron-3-super-free->3.5-lightning-free, kimi-k2.5-free->mimo-v2.5-free, deepseek->ling/muse-spark según dominio. Añade columna Ctx y nota vigencia. Drift fix cycle32-p2: gentleman-seo -> Nemotron 3 Ultra Free (SSoT opencode.json), gentleman-datascience -> Big Pickle (SSoT opencode.json).

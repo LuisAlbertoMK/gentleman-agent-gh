@@ -1,52 +1,48 @@
-﻿---
+---
 name: opencode-model-router
-description: "Route tasks by model strength"
-triggers: "route, model router, which agent, delegate by domain"
-changelog: "2026-09-01 P0-3"
-token_budget: 1700
+description: "Route tasks by model strength — specialized agents for analysis, implementer for execution"
+triggers: "model router, routing, delegate or direct, model decision, specialized agent, implementer"
+license: Apache-2.0
+metadata:
+  tags: [engineering, routing, orchestration, multi-model]
+  author: gentleman-vMK
+  version: "3.1"
+token_budget: 3200
 ---
 
-## When to Use
-Route via table. Truth: `scripts/lib/opencode-base.json`.
+## Routing Table (FREE 2026-09-02, 8 ids free — extended -> docs/skills/opencode-model-router/reference.md)
 
-## Routing Table
+> See reference.md for Security Gate, Strategy, notas Laguna y ground truth 2026-09-02.
 
-| Domain | Agent |
-|--------|-------|
-| security | gentleman-security |
-| seo | gentleman-seo |
-| infra | gentleman-infra |
-| frontend | gentleman-frontend |
-| performance | gentleman-performance |
-| datascience | gentleman-datascience |
-| docs | gentleman-docs |
-| aem | gentleman-aem |
-| vision | gentleman-vision |
-| api | gentleman-datascience |
-| accessibility | gentleman-frontend |
-| container | gentleman-infra |
-| deep-debug | gentleman-deep |
-| harness-init | gentleman-initializer | # different prompt first window (Anthropic 2025-11-26) |
-| code-review | gentleman-code-review | # Qwen 73.4% → muse-spark → default |
-| reasoning | gentleman-reasoning |
-| quick-edit | gentleman-quick |
-| default | gentleman-vMK |
+| Task | Action | Agent | Model (Free vigente) | Ctx | Fallback |
+|------|--------|-------|----------------------|-----|----------|
+| Security/vulnerability | DELEGATE | `gentleman-security` | Nemotron 3 Ultra Free | 1M | `gentleman-deep` -> `gentleman-vMK` (Big Pickle) |
+| SEO/content | DELEGATE | `gentleman-seo` | Nemotron 3 Ultra Free | 1M | `gentleman-vMK` (Big Pickle) |
+| Infrastructure/K8s/Terraform | DELEGATE | `gentleman-infra` | Ling 3.0 Flash Fin Free — elegido sobre DeepSeek V4 Flash Free (ambos en /models, pero Ling está en pricing table como Free explícito; DeepSeek queda como alt vigente) | 1M | `gentleman-deep` -> `gentleman-vMK` (Big Pickle) |
+| Frontend/UI/a11y | DELEGATE | `gentleman-frontend` | MiMo V2.5 Free (vision) — reemplaza Kimi K2.5 Free retirado | 212K | `gentleman-quick` -> `gentleman-vMK` (Big Pickle) |
+| Performance/profiling | DELEGATE | `gentleman-performance` | Nemotron 3 Ultra Free | 1M | `gentleman-deep` -> `gentleman-vMK` |
+| Data/SQL/Python | DELEGATE | `gentleman-datascience` | Big Pickle | 200K | `gentleman-codex` -> `gentleman-vMK` (Big Pickle) |
+| Documentation | DELEGATE | `gentleman-docs` | Big Pickle (always free, reasoning) | 200K | `gentleman-vMK` |
+| Implement plan | DELEGATE | `gentleman-implementer` | Muse Spark 1.2 Contributor Free (code-gen) — reemplaza DeepSeek V4 Flash Free | 200K | `gentleman-vMK` (Big Pickle) — alt DeepSeek V4 Flash Free vigente |
+| Architecture/code review | DIRECT | `gentleman-vMK` | — | — | — |
+| Quick edit | DIRECT | `gentleman-quick` | Big Pickle — alt MiMo V2.5 Free | 200K | `gentleman-codex` |
+| Script generation | DIRECT | `gentleman-codex` | Muse Spark 1.2 Contributor Free — alt Big Pickle | 200K | `gentleman-quick` (Big Pickle) |
+| Default | DIRECT | `gentleman-vMK` | — | — | — |
 
-## Anti-Rationalization
+## Implementer
+`gentleman-implementer` (Muse Spark 1.2 Contributor Free — 200K, code-gen) — precise plan execution. No unrequested changes. Alt: DeepSeek V4 Flash Free vigente.
+Avoid: Qwen3.7 Max (re-plans, paid), Nemotron 3 Ultra (over-analyzes).
 
-| Rationalization | Red Flag | Verification |
-|-----------------|----------|--------------|
-| "Use vMK for everything" | Routing everything to one agent | Check table first — if domain matches, use specialist |
-| "Save tokens with quick" | Skipping deep for complex task | Scope>2 files or risk>medium → deep/reasoning, not quick |
-| "Fallback to default is fine" | `default` used for known domain | `default` only when table has no match |
+## Context -> Action
+| Context | Action |
+|---------|--------|
+| <50K | Normal routing |
+| 50K-100K | Prefer fast models |
+| >150K | Direct forced |
 
-## Red Flags
-- Routing without reading `opencode-base.json` truth (drift risk)
-- Using `laguna` family agents (404 — must be muse-spark)
-
-## Verification
-- After routing: `git diff --stat` confirms no cross-agent file overlap before parallel delegation
-- Spot-check: 1 critical file semantic coherence before commit
-
+---
+## Reference Materials
+Security Gate, Strategy, notas catálogo y detalle extendido -> docs/skills/opencode-model-router/reference.md (ADR-048, cycle32-p2)
+---
 ## Refs
-Cross-Refs: skill-graph | skill-registry
+Cross-Refs: delivery-harness | opencode-model-router
