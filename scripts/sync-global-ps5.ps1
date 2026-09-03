@@ -97,6 +97,18 @@ $broken = 0
 Get-ChildItem $dstSkills -Directory -EA SilentlyContinue | ForEach-Object { $t = Get-Item $_.FullName -Force -EA SilentlyContinue; if ($t.Target -and -not (Test-Path $t.Target)) { Write-Host "  [broken] $($_.Name)" -Fore Red; $broken++ } }
 if ($broken -eq 0) { Write-Host "  All junctions valid" -Fore Green } else { Write-Host "  $broken broken junctions!" -Fore Red }
 
+# [8] opencode binary health (ADR-048)
+Write-Host "`n[8] opencode binary health" -ForegroundColor Cyan
+$prefix=$null; try{ $r=& npm prefix -g 2>$null | Select-Object -First 1; if($r){ $prefix=$r.Trim() } if(-not $prefix){ throw "empty" } }catch{ $prefix=Join-Path $env:APPDATA "npm" }
+$exe=Join-Path $prefix "node_modules\opencode-ai\bin\opencode.exe"; $postinstall=Join-Path $prefix "node_modules\opencode-ai\postinstall.mjs"
+$ver=$null; $status="ok"
+if(-not (Test-Path -LiteralPath $exe)){ $status="corrupt/missing" } else { try{ $o=& $exe --version 2>&1 | Out-String; $t=$o.Trim(); if($LASTEXITCODE -ne 0 -or $t -notmatch '^\d+\.\d+\.\d+'){ $status="corrupt/missing" } else { $m=[regex]::Match($t,'\d+\.\d+\.\d+'); if($m.Success){ $ver=$m.Value } else { $ver=$t } } }catch{ $status="corrupt/missing" } }
+if($DryRun){ try{ $cp=Join-Path $globalCfg "opencode.json"; if(Test-Path $cp){ $gc=Get-Content $cp -Raw | ConvertFrom-Json; if($gc.PSObject.Properties.Match('autoupdate').Count -eq 0 -or $gc.autoupdate -eq $true){ Write-Host "  [dry-run] would patch autoupdate=false" -Fore Yellow } } }catch{ Write-Warning "  Could not check autoupdate: $_" }
+} else { try{ $cp=Join-Path $globalCfg "opencode.json"; if(Test-Path $cp){ $gcRaw=Get-Content $cp -Raw | ConvertFrom-Json; if($gcRaw.PSObject.Properties.Match('autoupdate').Count -eq 0 -or $gcRaw.autoupdate -eq $true){ $gcRaw | Add-Member -MemberType NoteProperty -Name 'autoupdate' -Value $false -Force; $gcRaw | ConvertTo-Json -Depth 100 | Set-Content $cp -Encoding UTF8; Write-Host "  Patched autoupdate=false" -Fore Green } } }catch{ Write-Warning "  Could not patch autoupdate: $_" } }
+if($status -eq "ok"){ Write-Host "  opencode: $ver" -Fore Green } else { Write-Host "  opencode: $status" -Fore Red }
+if($status -ne "ok" -and -not $DryRun){ if(Get-Command pwsh -EA SilentlyContinue){ Write-Host "  healing via pwsh..." -Fore Yellow; try{ & pwsh -NoProfile -File (Join-Path $srcScripts "update-opencode.ps1") -HealOnly; if($LASTEXITCODE -eq 0){ Write-Host "  heal: ok" -Fore Green } else { Write-Host "  heal: failed (exit $LASTEXITCODE)" -Fore Red } }catch{ Write-Warning "  heal failed: $_" } } else { Write-Warning "  binary corrupt and pwsh not available — run: node `"$postinstall`"" }
+} elseif($status -ne "ok" -and $DryRun){ if(Get-Command pwsh -EA SilentlyContinue){ Write-Host "  [dry-run] would heal via pwsh" -Fore Yellow } else { Write-Host "  [dry-run] would heal via node postinstall (pwsh not available)" -Fore Yellow } }
+
 # Summary
 Write-Host "`n=== Summary ===" -Fore Cyan
 Write-Host "  Skills: $skillsCreated new | Scripts: $scriptsCopied | Config: $configCopied | Status: OK" -Fore Green

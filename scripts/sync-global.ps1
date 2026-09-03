@@ -94,6 +94,12 @@ function Write-Step([string]$N,[scriptblock]$B) {
                     if($bad.Count -gt 0){ $drift=$true; $driftDetail="$($bad.Count) broken junctions" }
                 }
                 "MCP availability" { if(-not (Get-Command engram -EA SilentlyContinue)){ $drift=$true; $driftDetail="engram not in PATH" } }
+                "opencode binary health" {
+                    $pfx=$null; try{ $raw=& npm prefix -g 2>$null | Select-Object -Last 1; if($raw){ $pfx=$raw.Trim() } if(-not $pfx){ throw "empty" } }catch{ $pfx=Join-Path $env:APPDATA "npm" }
+                    $ex=Join-Path $pfx "node_modules\opencode-ai\bin\opencode.exe"
+                    if(-not (Test-Path -LiteralPath $ex)){ $drift=$true; $driftDetail="opencode.exe corrupt or missing — would heal via postinstall" }
+                    else { try{ $o=& $ex --version 2>&1 | Out-String; $t=$o.Trim(); if($LASTEXITCODE -ne 0 -or $t -notmatch '^\d+\.\d+\.\d+'){ $drift=$true; $driftDetail="opencode.exe corrupt or missing — would heal via postinstall" } }catch{ $drift=$true; $driftDetail="opencode.exe corrupt or missing — would heal via postinstall" } }
+                }
                 default { $drift=$false }
             }
             if($drift){ $report.steps[$N]="dry-run-drift"; $report.warnings+="$N drift: $driftDetail"; Write-Host "  [drift] $driftDetail" -Fore Yellow }
@@ -151,7 +157,8 @@ Write-Step "Global config" {
         if($null -eq $mcpCfg){
             $mcpCfg=@{context7=@{enabled=$true;type="remote";url="https://mcp.context7.com/mcp"};engram=@{command=@("engram","mcp","--tools=mem_save,mem_search,mem_context,mem_session_summary,mem_get_observation,mem_save_prompt,mem_current_project,mem_judge");type="local"}}
         }
-        $cfg=@{'$schema'="https://opencode.ai/config.json";mcp=$mcpCfg;permission=@{bash=@{"*"="allow";"git commit *"="ask";"git push *"="ask";"git push --delete *"="ask";"git rebase *"="ask";"git reset *"="ask";"git merge *"="ask";"git branch -D *"="ask";"git stash drop *"="ask";"gh pr merge *"="ask";"git push --force *"="deny"};read=@{"*"="allow";"**/.env"="deny";"**/.env.*"="deny";"**/.env*"="deny";"**/credentials.json"="deny";"**/secrets/**"="deny";"**/*secret*"="deny";"**/.ssh/**"="deny";"**/*.key"="deny";"**/*.pem"="deny"}};agent=$existingAgents}
+        # ADR-048: disable startup auto-upgrade — npm binary replacement races running instances (incident 2026-09-02)
+        $cfg=@{'$schema'="https://opencode.ai/config.json";'autoupdate'=$false;mcp=$mcpCfg;permission=@{bash=@{"*"="allow";"git commit *"="ask";"git push *"="ask";"git push --delete *"="ask";"git rebase *"="ask";"git reset *"="ask";"git merge *"="ask";"git branch -D *"="ask";"git stash drop *"="ask";"gh pr merge *"="ask";"git push --force *"="deny"};read=@{"*"="allow";"**/.env"="deny";"**/.env.*"="deny";"**/.env*"="deny";"**/credentials.json"="deny";"**/secrets/**"="deny";"**/*secret*"="deny";"**/.ssh/**"="deny";"**/*.key"="deny";"**/*.pem"="deny"}};agent=$existingAgents}
         # SEC-F2: port the project deny floor (scripts/opencode-config/shared-deny-rules.json)
         # into the global bash map so dangerous commands are denied even outside this repo.
         try {
@@ -193,6 +200,26 @@ Write-Step "MCP availability" {
     if($engramPath){Write-Host "  engram: $engramPath" -Fore Green;$report.steps["mcp_engram"]="found"}
     else{Write-Warning "  engram: not in PATH";$report.warnings+="engram not in PATH";$report.steps["mcp_engram"]="missing"}
     Write-Host "  context7: remote (verified at runtime)" -Fore Gray
+}
+
+# Step 7: opencode binary health (ADR-048 self-heal)
+Write-Step "opencode binary health" {
+    try{
+        if(Test-Path $globalCfg){
+            $gcRaw=Get-Content $globalCfg -Raw -EA Stop | ConvertFrom-Json -EA Stop
+            if($gcRaw.PSObject.Properties.Match('autoupdate').Count -eq 0 -or $gcRaw.autoupdate -eq $true){
+                $gcRaw | Add-Member -MemberType NoteProperty -Name 'autoupdate' -Value $false -Force
+                $gcRaw | ConvertTo-Json -Depth 100 | Set-Content $globalCfg -Encoding UTF8 -Force
+                Write-Host "  Patched live config autoupdate=false (added or corrected)" -Fore Green
+            }
+        }
+    }catch{ Write-Warning "  Could not patch live config autoupdate: $_"; $report.warnings+="live patch autoupdate failed: $_" }
+    $healScript=Join-Path $PSScriptRoot "update-opencode.ps1"
+    $jOut=& $healScript -HealOnly -Json 2>&1 | Out-String
+    $j=$null; try{ $j=$jOut | ConvertFrom-Json -EA Stop }catch{ throw "update-opencode.ps1 failed to return JSON: $jOut -- $_" }
+    if($j.status -ne "ok"){ throw "opencode_binary heal failed: $($j.errors -join '; ') manual: node `"$($j.postinstall_path)`"" }
+    $report.steps["opencode_binary"]=@{version=$j.after_version;healed=$j.healed}
+    Write-Host "  opencode_binary: $($j.after_version) healed=$($j.healed)" -Fore Green
 }
 
 # Report
