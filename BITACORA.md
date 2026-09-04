@@ -190,3 +190,4 @@
 2026-08-27 — [close] Cycle 30 9.9 verified per protocols — ship v9.9-verified, sync-all, close. CC10 BP10 SD9.2 SP9 SE10 CA10. Branch experimento/mejora-autonoma-2026-08-27 -> main 4e5ebcb4. Punto seguridad punto-seguridad-2026-08-26-cycle28 intacto.
 2026-08-28 — G8 Option 1 — Ollama cloud with offline-first fallback: vision-analyze SKILL default local + VISION_ANALYZE_OLLAMA_CLOUD=1 gate, RUNBOOK Local vs Cloud (G8) + allowlist SSRF, analyze-page.js OLLAMA_BASE_URL/API_KEY, ui-specialist-pairing.ps1 cloud wiring. Commits 3d103fc3 (feat) + 97c43db3 (chore bump 1945->2500). Gate 25/25, 92/92 budget OK, write-scope CLEAN. Push --no-verify (1ro) + clean (2do).
 2026-08-31 — audit: SD 9.9→10 verification (tool hygiene 115/115, test coverage 115/115, audit fresh)
+2026-09-04 - Cycle32 P9 cerrado en rama automejora/componentes-20260902: chore 14813675 + fix c85d4c49 + feat 8390c6e5, V1/V2/V3 PASS, pendiente sync-real + push (ask)
