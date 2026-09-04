@@ -400,13 +400,13 @@
   },
   "gentleman-infra": {
    "description": "Infrastructure specialist - container security, K8s reliability, IaC quality, CI/CD security, dependency graphs (FREE TIER)",
-   "model": "opencode/muse-spark-1.2-contributor-free",
+   "model": "opencode/ling-3.0-flash-fin-free",
    "mode": "primary",
    "prompt": "{file:prompts/gentleman-infra.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}"
   },
   "gentleman-frontend": {
    "description": "Frontend auditor - WCAG 2.2 AA (POUR), component architecture, design tokens, performance indicators (FREE TIER)",
-   "model": "opencode/big-pickle",
+   "model": "opencode/mimo-v2.5-free",
    "mode": "primary",
    "prompt": "{file:prompts/gentleman-frontend.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}"
   },
@@ -437,14 +437,14 @@
   },
   "gentleman-infra-sub": {
    "description": "Infrastructure subagent — container security, K8s reliability, IaC quality, CI/CD security (delegable via Task tool, read-only)",
-   "model": "opencode/muse-spark-1.2-contributor-free",
+   "model": "opencode/ling-3.0-flash-fin-free",
    "hidden": true,
    "mode": "subagent",
    "prompt": "{file:prompts/gentleman-infra.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}"
   },
   "gentleman-frontend-sub": {
    "description": "Frontend subagent — WCAG 2.2 AA, component architecture, design tokens (delegable via Task tool, read-only)",
-   "model": "opencode/big-pickle",
+   "model": "opencode/mimo-v2.5-free",
    "hidden": true,
    "mode": "subagent",
    "prompt": "{file:prompts/gentleman-frontend.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}"
