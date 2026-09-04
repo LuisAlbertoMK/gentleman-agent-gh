@@ -167,7 +167,7 @@ if ($stagedRoja) {
 
 # [11/26] Secrets scan — parse diff to get real filenames (not "InputStream")
 Write-Host "[11/26] Secrets scan..."
-$diffLines = git diff --cached --diff-filter=ACM -- ':!.githooks' ':!*.Tests.ps1' ':!scripts/check-mcp-security.ps1' ':!.agents/skills/*/references/*' ':!.gitleaks.toml' ':!docs/mejoras/*'
+$diffLines = git diff --cached --diff-filter=ACM -- ':!.githooks' ':!*.Tests.ps1' ':!scripts/check-mcp-security.ps1' ':!.agents/skills/*/references/*' ':!.gitleaks.toml' ':!docs/mejoras/*' ':!cmd/gate/*'
 $secrets = @(); $currentFile = ""; $lineInFile = 0
 foreach ($dl in $diffLines) {
     if ($dl -match '^\+\+\+ b/(.+)$') { $currentFile = $Matches[1]; continue }

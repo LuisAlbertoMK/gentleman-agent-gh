@@ -1,8 +1,8 @@
 ﻿---
 name: ps-compat
 description: "PowerShell 5.1/7 compatibility + encoding pre-write checklist - consolidates anti-patterns #10/#13/#14/#16/#20, GAP-2 hook incident, P1-1 CRLF false positives"
-triggers: "powershell 5.1, ps5, ps7, ps compatibility, encoding, CRLF, BOM, PSSA, Join-Path, cmatch, requires, bash-safe, script authoring"
-changelog: "2026-09-02 — created: consolidates ANTI-PATTERN-CATALOG #10/#13/#14/#16/#20 + GAP-2 (2026-09-01-gap-scan-repo.md) + P1-1 CRLF regex trap (2026-09-01-p1-1-spec-audit.md:46)"
+triggers: "powershell 5.1, ps5, ps7, ps compatibility, encoding, CRLF, BOM, PSSA, Join-Path, cmatch, requires, bash-safe"
+changelog: "2026-09-02 — created: consolidates ANTI-PATTERN-CATALOG #10/#13/#14/#16/#20 + GAP-2 + P1-1 CRLF trap"
 token_budget: 3000
 ---
 
@@ -16,11 +16,10 @@ token_budget: 3000
 ## Rules
 
 1. Declare runtime: `#requires -Version 7.0` if PS7-only;
-   if PS5.1-compatible required, avoid PS7-only syntax
+   for PS5.1 compat avoid PS7-only syntax
    (ternary `? :`, `&&`/`||`, `??`).
-2. PS5.1 rejects `&&` and `||` as pipeline chain operators -
-   use `if`/`then` or the Invoke-Bash wrapper
-   (`scripts/bash-safe.ps1`).
+2. PS5.1 rejects `&&`/`||` as pipeline chain operators -
+   use `if`/`then` or Invoke-Bash (`scripts/bash-safe.ps1`).
 3. Join-Path: named params only (`-Path`/`-ChildPath`),
    never >2 positional args (anti-pattern #10).
 4. Initialize accumulators before first `+=`:
@@ -28,22 +27,17 @@ token_budget: 3000
 5. `-match` is case-INSENSITIVE in PS;
    use `-cmatch` when casing matters (anti-pattern #14).
 6. Encoding: write `.ps1` ASCII-only when possible;
-   if Unicode needed use UTF-8 with BOM;
-   always pass `-Encoding UTF8` to
-   `Get-Content`/`Set-Content`/`Out-File`
-   (anti-pattern #16).
+   Unicode → UTF-8 with BOM; always pass `-Encoding UTF8` to
+   `Get-Content`/`Set-Content`/`Out-File` (anti-pattern #16).
 7. Regex vs Windows files: use `\r?\n` not `\n`;
-   multiline `(?m)^`;
-   CRLF breaks `^key:` anchored scans
-   (P1-1 audit produced ~10 false positives,
-   doc:31-46).
+   multiline `(?m)^` — CRLF breaks `^key:` anchored scans
+   (P1-1: ~10 false positives, doc:31-46).
 8. In regex alternation write `[|]` not escaped `\|` -
    quality gates raw-scan for `||` and false-positive
    (anti-pattern #20).
-9. Mojibake in tool output (e.g. git diff showing
-   em-dash as mojibake) may be console codepage display,
-   NOT file corruption - verify file bytes
-   (hex/UTF8 read) before claiming corruption;
+9. Mojibake in tool output may be console codepage
+   display, NOT file corruption — verify file bytes
+   (hex/UTF8) before claiming corruption;
    do not "fix" clean files.
 
 ## Verification
@@ -60,8 +54,8 @@ token_budget: 3000
 
 | Rationalization | Red Flag | Verification |
 |---|---|---|
-| "This repo runs PS7, PS5.1 rules are legacy" | Skipping chain-operator/encoding rules | git hooks and CI may execute PS5.1 - GAP-2 incident 2026-09-01 (gap-scan-repo.md:17-21) |
-| "One regex \\n works fine locally" | Unanchored LF-only scans | Windows files are CRLF - P1-1 audit doc:46 documents the false-positive cost |
+| "This repo runs PS7, PS5.1 rules are legacy" | Skipping chain-operator/encoding rules | git hooks and CI may execute PS5.1 - GAP-2 incident 2026-09-01 |
+| "One regex \\n works fine locally" | Unanchored LF-only scans | Windows files are CRLF - P1-1 audit:46 documents the cost |
 | "Small script, skip #requires" | Missing version declaration | Gate + cross-ref check flag it; consistency beats size |
 
 ## Red Flags

@@ -15,6 +15,7 @@
     "backups/*",
     "benchmarks/*",
     "commands/*",
+    "cmd/*",
     "data/*",
     "docs/*",
     "plugins/*",

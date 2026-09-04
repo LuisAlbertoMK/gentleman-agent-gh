@@ -8,6 +8,41 @@
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
 [ -z "$REPO_ROOT" ] && REPO_ROOT="."
 
+# Determine gate binary path (Windows -> gate.exe, POSIX -> gate)
+GATE_BIN="$REPO_ROOT/bin/gate.exe"
+if command -v uname >/dev/null 2>&1; then
+  _uname_s=$(uname -s 2>/dev/null)
+  case "$_uname_s" in
+    MINGW*|MSYS*|CYGWIN*|Windows_NT) GATE_BIN="$REPO_ROOT/bin/gate.exe" ;;
+    *) GATE_BIN="$REPO_ROOT/bin/gate" ;;
+  esac
+fi
+
+# Fast path: Go gate shim (ADR-049) — eliminates unconditional 1355ms pwsh spawn
+if [ -f "$GATE_BIN" ]; then
+  exec "$GATE_BIN" --hook
+fi
+
+# Attempt silent one-time build if Go toolchain and source present
+if command -v go >/dev/null 2>&1 && [ -f "$REPO_ROOT/cmd/gate/main.go" ]; then
+  BUILD_OUT="$REPO_ROOT/bin/gate.exe"
+  if command -v uname >/dev/null 2>&1; then
+    _uname_s2=$(uname -s 2>/dev/null)
+    case "$_uname_s2" in
+      MINGW*|MSYS*|CYGWIN*|Windows_NT) BUILD_OUT="$REPO_ROOT/bin/gate.exe" ;;
+      *) BUILD_OUT="$REPO_ROOT/bin/gate" ;;
+    esac
+  fi
+  # shellcheck disable=SC2046
+  mkdir -p "$(dirname "$BUILD_OUT")" 2>/dev/null
+  if go build -o "$BUILD_OUT" ./cmd/gate 2>/dev/null; then
+    if [ -f "$BUILD_OUT" ]; then
+      exec "$BUILD_OUT" --hook
+    fi
+  fi
+fi
+
+# Fallback: PS gate (ADR-049 mandatory fallback)
 if command -v pwsh >/dev/null 2>&1; then
   exec pwsh -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/.githooks/pre-commit-gate.ps1" -RepoRoot "$REPO_ROOT"
 else

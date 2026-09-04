@@ -42,7 +42,7 @@ foreach($s in $cs){
   $cp=Join-Path $s.FullName "SKILL.md"
   if(-not (Test-Path $cp)){$e+=[PSCustomObject]@{Skill=$sn;Status="CANON_MISSING";Detail="No SKILL.md"};continue}
   $gi=Get-Item (Join-Path $gd $sn) -EA SilentlyContinue
-  if(-not $gi){$e+=[PSCustomObject]@{Skill=$sn;Status="GLOBAL_MISSING";Detail="No global dir"};continue}
+  if(-not $gi -or -not (Test-Path (Join-Path $gd "$sn\SKILL.md"))){$e+=[PSCustomObject]@{Skill=$sn;Status="GLOBAL_MISSING";Detail="No global dir or SKILL.md"};continue}
   if($gi.LinkType -notin @("Junction", "SymbolicLink")){$w+=[PSCustomObject]@{Skill=$sn;Status="GLOBAL_NOT_JUNCTION";Detail="Real file, not junction"}}
   if($gi.LinkType -notin @("Junction", "SymbolicLink")){
     if($Thorough){$m=(Get-FileHash $cp).Hash -eq (Get-FileHash (Join-Path $gd "$sn\SKILL.md")).Hash}
