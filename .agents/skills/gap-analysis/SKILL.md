@@ -3,7 +3,7 @@ name: gap-analysis
 description: "Complete gap analysis — 8-dim quality framework, project intake, priority scoring"
 triggers: "Gap analysis, system audit, identificar gaps, project intake"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2211
+token_budget: 2573
 ---
 
 ## When to Use
@@ -24,9 +24,10 @@ docs/skills/gap-analysis/reference.md
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "8 dims por intuición" | Scores 1-10 sin evidencia Intake | Verificar 8 dims con evidencia Intake: ROADMAP.md | git log | PRD | README | tests | CI/CD | monitoring file:line |
+| "prioridad sin scoring" | Prioridad sin fórmula (10-Score)×Impact×Urgency | Verificar Priority = (10-Score)×Impact×Urgency (Impact 1.0/0.7/0.4/0.1 Urgency 2.0/1.0/0.5) calculado |
+| "intake saltado" | Clasificación Tech/Biz sin verificar artefactos | Verificar Intake: Classify Tech (Frontend/Backend/DB/Mobile/Desktop/Infra/Full-stack) | Biz (SaaS/ERP/E-com/CMS/API) file:line |
+
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

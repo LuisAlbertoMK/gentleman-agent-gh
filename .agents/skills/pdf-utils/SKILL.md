@@ -3,7 +3,7 @@ name: pdf-utils
 description: "PDF processing — extract text, parse tables, generate reports"
 triggers: "PDF, extract PDF, parse PDF, merge PDF, generate PDF, PDF table, PDF invoice, read PDF, PDF to text, PDF to markdown"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2122
+token_budget: 2400
 ---
 
 ## When to Use
@@ -49,9 +49,9 @@ Consult these when the skill needs detailed worked examples or guardrails:
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "parsear sin verificar encodings" | Garbled/encoding sin check | Mode 1 pdf-parse + validar `d.text` + encoding |
+| "tablas complejas a ojo" | Tablas merged cells a ojo | Mode 2 pdf2json / Mode 3 MinerU 86-95% accuracy |
+| "extraer sin validar output" | Output sin file:line/citación | Verification: Output matches contract + file:line |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

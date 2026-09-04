@@ -3,7 +3,7 @@ name: recovery-protocol
 description: "Stop-diagnose-correct-learn protocol — handle agent errors and frustration systematically"
 triggers: "Recovery, 'no es eso', frustration, error correction"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2374
+token_budget: 2850
 ---
 
 ## When to Use
@@ -43,9 +43,9 @@ docs/skills/recovery-protocol/reference.md
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "reintentar sin diagnóstico" | nuevo intento con mismo error sin root cause | STOP + DIAGNOSE file:line antes de CORRECT |
+| "saltar catalogación del error" | error repetido 2x sin ANTI-PATTERN-CATALOG.md | catalogar en 2ª ocurrencia, AGENTS.md rule en 3ª file:line |
+| "frustración → cambio de scope" | redefinir tarea para evitar frustración | ACK específico + re-leer requerimiento original sin alterar scope |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -55,5 +55,5 @@ docs/skills/recovery-protocol/reference.md
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-Cross-Refs: deep-debugging | engram-protocol
+Cross-Refs: deep-debugging | engram-protocol | self-improvement | metricas
 

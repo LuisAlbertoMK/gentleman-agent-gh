@@ -10,7 +10,7 @@ triggers:
   - "compare"
   - "token count"
   - "size change"
-token_budget: 2446
+token_budget: 2900
 ---
 
 # metricas — Before/After Delta + % Comparison
@@ -52,9 +52,9 @@ Worked examples, testing patterns, edge cases, anti-patterns → docs/skills/met
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "delta sin tokenización aware" | conteo por bytes/chars en vez de tokens AST/lexical | usar tokenizer por lenguaje (ast/acorn/go-token) excluyendo whitespace/comments |
+| "comparar bookmarks con diff mezclados" | bookmark vs git diff sin aislar baseline | modo bookmark solo vs baseline guardado, git diff solo vs commits |
+| "porcentajes sin base" | delta % sin base definida o base 0 | verificar base ≠0 y reportar base/head explícitos file:line |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -64,5 +64,5 @@ Worked examples, testing patterns, edge cases, anti-patterns → docs/skills/met
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-Cross-Refs: auto-metrics | performance-tracker
+Cross-Refs: auto-metrics | performance-tracker | automejora-analyzer | recovery-protocol | bitacora
 

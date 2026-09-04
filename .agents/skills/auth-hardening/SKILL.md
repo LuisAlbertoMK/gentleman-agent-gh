@@ -3,7 +3,7 @@ name: auth-hardening
 description: "Trigger: auth, JWT, OAuth, RBAC, CSRF, session, login, password hashing. Audit and harden auth flows."
 triggers: "auth, authentication, authorization, JWT, OAuth, RBAC, CSRF, session, login, password hashing, token, cookie"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2380
+token_budget: 2750
 ---
 
 ## When to Use
@@ -36,9 +36,9 @@ MED: Session fixation (login doesn't regenerate ID)
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "JWT HS256 default porque es fácil" | HS256 sin rotación/`alg=none` permitido | JWT alg FIRST + test `alg=none`→401, `expiresIn` check |
+| "PKCE opcional" | OAuth `auth_code` sin `code_verifier` | CHECKLIST PKCE HIGH + grep `code_verifier` |
+| "CSRF solo para cookies" | POST/PUT sin token CSRF | Rule 3 CSRF on ALL state-changing + grep `csrf` |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -48,7 +48,7 @@ MED: Session fixation (login doesn't regenerate ID)
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-security-scanner · best-practices · quality-gate · code-review-agent
+security-scanner · best-practices · quality-gate · code-review-agent · llm-security · container-security · infra-audit
 
 ## Anti-Patterns (8)
 Flag bcrypt weak · Skip JWT alg · Happy path only · Ignore refresh tokens · Client-side-only roles · Flag env vars hardcoded · Use `alg: none` for testing · Store JWT in localStorage

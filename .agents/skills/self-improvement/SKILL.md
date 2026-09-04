@@ -3,7 +3,7 @@ name: self-improvement
 description: "Continuous improvement cycle - macro + micro, self-reflection merge, inter(30) minimum, SkillOpt gated validation."
 triggers: "Self-improvement, improvement cycle, auto-mejora, ciclo de mejora, comienza ciclo, self-reflection, Hermes, reflexioná"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2537
+token_budget: 3100
 ---
 ## When to Use
 Macro (cycle) + micro (per-task reflection).
@@ -25,9 +25,9 @@ Schemas: `.learnings/rejected-edits.json` (id/timestamp/target/edit/reason/delta
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "saltar SkillOpt gate por urgencia" | fix aplicado sin validar size/syntax/config | re-ejecutar gate per fix: size ≤20%/3KB + syntax parse + config trivial file:line |
+| "editar CYCLE.md durante ciclo" | CYCLE.md modificado fuera de Propagate/Epoch Review | git diff CYCLE.md file:line — solo cambios en fase habilitada |
+| "score auto-incrementado sin evidencia" | dim score sube sin auto-metrics JSON ni file:line | auto-metrics !score JSON + file:line cita antes de aceptar delta ≥+0.1 |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -36,7 +36,7 @@ Schemas: `.learnings/rejected-edits.json` (id/timestamp/target/edit/reason/delta
 ## Verification
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
-## Cross-Refs: recovery-protocol | external-improvement | immune-system | auto-metrics | security-scanner | quality-gate | external-auditor | opencode-skill-creator
+## Cross-Refs: recovery-protocol | external-improvement | immune-system | auto-metrics | security-scanner | quality-gate | external-auditor | opencode-skill-creator | automejora-analyzer
 ---
 docs/skills/self-improvement/reference.md
 ---

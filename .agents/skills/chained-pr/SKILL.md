@@ -3,7 +3,7 @@ name: chained-pr
 description: "Split oversized changes into chained PRs that protect review focus."
 triggers: "chained PR, stacked PR, sequential branches, PR chain, stacked branches, PR stack, oversized PR, 400 lines, review slices"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2612
+token_budget: 2995
 ---
 
 ## When to Use
@@ -43,9 +43,10 @@ docs/skills/chained-pr/reference.md
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "chain sin base común" | Chain sin tracker draft o mezclando estrategias | Verificar Execution Steps: tracker draft/no-merge + child #1→tracker + resto→parent + no mix strategies |
+| "PR gigante disfrazado de chained" | PR >400 líneas sin split o sin diagrama dependencia 📍 | Verificar Rules: ≤400 líneas + Chain Context + diagrama dependencia con 📍 por PR + ≤60 min review |
+| "polluted diff sin rebase" | Diff con cambios no del work unit actual | Verificar base bug: retarget/rebase hasta diff limpio + Verify each PR independiente CI/tests/docs/rollback |
+
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -55,5 +56,5 @@ docs/skills/chained-pr/reference.md
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-Cross-Refs: branch-pr | work-unit-commits
+Cross-Refs: branch-pr | work-unit-commits | commit-crafter
 

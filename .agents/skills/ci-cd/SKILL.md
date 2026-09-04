@@ -3,7 +3,7 @@ name: ci-cd
 description: "CI/CD pipeline setup — GitHub Actions, local pre-push quality gate, auto-detect test runner, SDD spec coverage"
 triggers: "CI/CD pipeline, GitHub Actions, quality gate"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2445
+token_budget: 2886
 ---
 ## When to Use
 CI setup, failed PR checks, pipeline config.
@@ -37,9 +37,10 @@ steps:{uses:actions/checkout@v4;run:./scripts/quality-gate.ps1;if:${{!inputs.ski
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "pipeline sin auto-detect de test runner" | Pipeline hardcode go test/npm sin Test-Path | Verificar CI Pipeline: if(Test-Path go.mod){go test ./...} elseif(Test-Path package.json){npm test} auto-detect |
+| "specs SDD sin cobertura en CI" | PR checks sin spec coverage si SDD | Verificar Rules: SDD CI valida spec coverage + PR→CI→quality gate→tests→lint + Integration SDD file:line |
+| "gate después de tests o push-only" | Gate después de tests o triggers solo push | Verificar LOCAL PRE-PUSH: quality gate before tests + on:[push,pull_request] + workflow_dispatch + Lint advisory |
+
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -49,7 +50,8 @@ steps:{uses:actions/checkout@v4;run:./scripts/quality-gate.ps1;if:${{!inputs.ski
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-quality-gate·triple-verify·security-scanner·project-mapper·execution-mode·infra-audit
+Cross-Refs: quality-gate | triple-verify | security-scanner | project-mapper | execution-mode | infra-audit | testing-strategy
+
 
 ## Anti-Patterns
 Gate after tests·Block lint·Ignore monorepo·Hardcode runner·Hardcode OS·Skip coverage·Push-only triggers

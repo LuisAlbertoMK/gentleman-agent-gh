@@ -3,7 +3,7 @@ name: research
 description: "Structured research workflow - define scope, gather evidence, synthesize findings, document decisions."
 triggers: "Research task, technical investigation, investigar, research, learn new tech, compare solutions, evaluate options"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2013
+token_budget: 2349
 ---
 
 Structured research: scope, gather, synthesize, decide.
@@ -39,9 +39,10 @@ Consult these when the skill needs detailed worked examples or guardrails:
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "saltar definición de scope" | Scope sin goal/constraints/output/deadline | Verificar Workflow §1 Scope: goal 1 frase + constraints + output + deadline file:line |
+| "fuentes sin fecha ni fetch primario" | Gather <3 fuentes o sin fecha/fetch primario citado | Verificar §2 Gather ≥3 fuentes (docs oficiales + community reciente + benchmark) con fecha y fetch primario |
+| "síntesis sin evidencia citada" | Tabla pros/cons sin file:line ni confidence 1-5 | Verificar §3 Synthesize: option table con evidencia file:line + confidence 1-5 citado |
+
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

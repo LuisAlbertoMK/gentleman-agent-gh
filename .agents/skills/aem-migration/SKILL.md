@@ -3,7 +3,7 @@ name: aem-migration
 description: "Adobe Experience Manager site migrations — assessment, content transfer, component/dialog/HTL/Sling-Models migration, Tags/Launch data-layer, Analytics/Target/Campaign integration, AEM debugging."
 triggers: "aem migration, adobe experience manager migration, migration aem, aem cloud service, adobe launch tags migration, data layer migration, digitaldata, appmeasurement to web sdk, aep web sdk, adobe analytics migration, adobe target migration, content transfer tool, best practices analyzer, extjs to coral3, sling model, datasource migration, aem debugging"
 changelog: docs/agentes/aem-migration/automejora-cycle-log.md
-token_budget: 2555
+token_budget: 2900
 ---
 # AEM Migration Skill
 > Domain expertise for `gentleman-aem`. Compact per ADR-007.
@@ -21,9 +21,9 @@ CTT does NOT analyze content; published/unpublished NOT preserved→filter manua
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "AEM migration is copy-paste" | No component/dialog mapping | aem-migration skill checklist |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "migrar componentes sin mapeo de dialogs" | ExtJS→Coral sin mapping multifield→composite | Workflow 3 ExtJS→Coral checklist + Gap inventory |
+| "tags/launch al final" | Launch→AEP Tags postergado, mixed mode | Workflow 4 Launch→AEP Tags + no mixed mode |
+| "Sling Models copy-paste" | @Model/injectors sin register resourceTypes | Workflow 3 Sling Models @Model+injectors rule |
 
 ## Red Flags
 - No component/dialog mapping → STOP, re-read skill

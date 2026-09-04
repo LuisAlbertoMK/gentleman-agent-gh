@@ -21,3 +21,13 @@ Pre-deploy: index+title+H1+canonical+HTTPS+JSON-LD+robots+sitemap | Monthly: AI+
 
 ## Testing
 1. RichResultsTest: Article JSON-LD → 0 errors. 2. GSC post-deploy → "Submitted and indexed"; monthly CTR↓+impressions↑ = AI impact. 3. Sitemap: `grep -c "<lastmod>"` == url count; ≤50K/50MB.
+
+---
+
+## Extended — (movido por ADR-048, cycle32-p2/p7)
+
+Detalle E-E-A-T + AI Overviews externalizado (core resume → referencia):
+
+**AI Overviews Win=cited**: 1 Answer-first 40-60w · 2 Info gain único · 3 Clean H2/lists/table · 4 Comparison · 5 Step-by-step · 6 E-E-A-T signals. Don't: llms.txt/chunking/AI-specific schema/inauthentic. Monitor: GSC monthly CTR↓+impressions↑ = impacto AI.
+
+**E-E-A-T Profundo**: Experience (first-hand case studies) | Expertise (author bio + credentials + ProfilePage) | Authoritativeness (backlinks, Wikipedia, press) | Trustworthiness (dates, corrections, contact/privacy/ToS, HTTPS).

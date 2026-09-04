@@ -3,7 +3,7 @@ name: llm-security
 description: "Trigger: LLM, AI, prompt injection, RAG, OpenAI, Anthropic, Ollama, LangChain, agent, tool use, data exfiltration."
 triggers: "LLM, AI, prompt injection, RAG, OpenAI, Anthropic, Ollama, LangChain, agent, tool use, data exfiltration, model"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2240
+token_budget: 2550
 ---
 
 ## When to Use
@@ -41,9 +41,9 @@ Review LLM integrations, RAG pipelines, AI features — "is this secure?"
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "No secrets in this repo" | Skipping secrets scan | grep -rn process.env + npm audit before commit |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "prompt injection es teórico" | User input en system prompt sin delimiters | Rule 1 Prompt injection FIRST + delimiters check |
+| "tool responses son confiables" | LLM llama tools admin sin boundary | CHECKLIST Tool no privilege boundary HIGH |
+| "RAG sin per-user isolation" | Vector search sin filtro/namespace | CHECKLIST RAG no per-user filter HIGH + namespace |
 
 ## Red Flags
 - Skipping secrets scan → STOP, re-read skill
@@ -53,7 +53,7 @@ Review LLM integrations, RAG pipelines, AI features — "is this secure?"
 - grep -rn process.env + npm audit before commit
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-security-scanner · best-practices · quality-gate
+security-scanner · best-practices · quality-gate · auth-hardening · container-security · infra-audit
 
 ---
 

@@ -3,7 +3,7 @@ name: command-wrapper
 description: "Run commands safely — description, error handling, output parsing, and safety wrappers for destructive operations"
 triggers: "Command wrapper, error handling, output parsing"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2580
+token_budget: 3000
 ---
 
 ## When to Use
@@ -39,9 +39,9 @@ After critical commands, log to Engram: `title:"Command: {summary}" type:discove
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "destructivo sin -WhatIf" | rm -rf / git push --force sin safety wrapper | bloquear destructivo o usar -WhatIf + quality gate file:line |
+| "output sin parsear se pierde" | output con warnings+results sin parsear | trim + parse JSON/table + extraer warnings y results file:line |
+| "ignorar exit code" | exit code ≠0 sin diagnosticar stderr | check exit code + parse stderr patterns file:line |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -51,7 +51,7 @@ After critical commands, log to Engram: `title:"Command: {summary}" type:discove
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-security-scanner · delivery-harness · subagent-isolation · recovery-protocol · context-watchdog
+security-scanner · delivery-harness · subagent-isolation · recovery-protocol · context-watchdog · quick-executor · server-commands
 
 ## Anti-Patterns
 Skip description · Ignore stderr · Parse output by eye · Raw bash for destructive ops · No timeout

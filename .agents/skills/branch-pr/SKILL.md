@@ -3,7 +3,7 @@ name: branch-pr
 description: "Create Gentle AI pull requests with issue-first checks. Trigger: creating, opening, or preparing PRs for review."
 triggers: "pull request, create PR, open PR, branch naming, PR creation, review PR, github pull request"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2578
+token_budget: 3006
 ---
 
 ## When to Use
@@ -37,9 +37,10 @@ Add `!` after type/scope. `BREAKING CHANGE:` in footer. Maps to `type:breaking-c
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "PR sin checks issue-first" | PR sin Closes/Fixes/Resolves #N o issue sin status:approved | Verificar Workflow §1: gh issue view status:approved + body Closes #N + CI check-issue-approved file:line |
+| "commit mixto de work units" | Commit mezcla work units o >400 líneas sin chain | Verificar work-unit-commits: 1 commit=1 work unit + tests/docs con su code + ≤400 líneas o size:exception |
+| "branch/type label sin verificar" | Branch sin regex o sin exactamente un type:* label | Verificar Branch Naming ^(feat|fix|...)/[a-z0-9._-]+$ + exactamente un type:* label + CI check-type-label |
+
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -49,5 +50,5 @@ Add `!` after type/scope. `BREAKING CHANGE:` in footer. Maps to `type:breaking-c
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-Cross-Refs: chained-pr | issue-creation
+Cross-Refs: chained-pr | issue-creation | work-unit-commits | commit-crafter
 

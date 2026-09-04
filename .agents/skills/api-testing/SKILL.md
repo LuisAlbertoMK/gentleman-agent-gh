@@ -3,7 +3,7 @@ name: api-testing
 description: "API endpoint testing - REST + GraphQL, contract/schema validation, collection & response testing, auth flows, mocks."
 triggers: "api testing, API test, REST test, GraphQL test, endpoint test, contract test, schema validation, response validation, auth test, API mock, collection test, Postman, Bruno, insomnia, OpenAPI validation"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2072
+token_budget: 2265
 ---
 ## When to Use
 API endpoint testing — REST+GraphQL contract validation, schema assertion, response validation, auth flows, mock integration. READ-ONLY/test-gen only—NEVER production. Output: plan/collection w/ assertions.
@@ -17,12 +17,11 @@ API endpoint testing — REST+GraphQL contract validation, schema assertion, res
 Test prod·Hardcoded creds·No rate-limit delays·No schema first·One giant file(split by group)
 > docs/skills/api-testing/reference.md
 ## Anti-Rationalization
-
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "GraphQL sin contract validation" | Query sin schema assertion | JSON Schema Draft2020-12 / OpenAPI3.1 por endpoint, .bru collection |
+| "Mocks que nunca expiran" | Token mock eterno sin refresh | Mocks con expiry; 401→refresh→retry once, 429→Retry-After backoff |
+| "Test en prod con creds reales" | Prod/creds hardcode | Mock/localhost only + env vars; nunca prod/unknown |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

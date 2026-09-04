@@ -3,7 +3,7 @@ name: best-practices
 description: Apply modern web development best practices for security, compatibility, and code quality.
 triggers: "best practices, security audit, modernize code, code quality, check vulnerabilities"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 3000
+token_budget: 2807
 ---
 
 ## When to Use
@@ -22,12 +22,11 @@ Valid HTML(no dup IDs) | Semantic HTML5 | Explicit img dims | Event delegation |
 ## Permissions: Request geo/camera/mic after user action+explanation. Permissions-Policy restricts by default.
 ## Tools: npm audit | SecurityHeaders.com | W3C Validator | Lighthouse | Mozilla Observatory
 ## Anti-Rationalization
-
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Best practices are overkill here" | Skipping audit for small project | Even small project → `web-quality-audit` checklist (perf/accessibility/SEO) |
-| "It works, so it's secure" | No `npm audit` / `SecurityHeaders.com` check | `npm audit --json` + `SecurityHeaders.com` + W3C Validator before ship |
-| "Copy headers blindly" | Headers without verifying FP alerts | Context7 current API versions + `Mozilla Observatory` score |
+| "Compat como afterthought" | Headers/features sin verificar Context7 | Context7 current API + W3C Validator + Mozilla Observatory |
+| "Security checklist solo al final" | Audit solo pre-deploy | `npm audit --json` + SecurityHeaders.com + OWASP Top 10 continuo |
+| "Copy headers blindly" | Headers sin verificar FP / SRI faltante | SRI `openssl dgst -sha384` + CSP nonce + Permissions-Policy verify |
 
 ## Red Flags
 - `npm audit` alone without supply-chain check (postinstall/typosquat)

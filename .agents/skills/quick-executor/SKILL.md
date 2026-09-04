@@ -3,7 +3,7 @@ name: quick-executor
 description: "Trigger: quick edit, single file, atomic edit, fast fix, one-line fix. Single-file low-risk changes."
 triggers: "quick edit, single file, atomic edit, fast fix, one-line fix, small change, quick fix"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2555
+token_budget: 3000
 ---
 ## When to Use
 1 file, clear before/after, low risk. SCOPE GUARD: >1 file → STOP, report to orchestrator or delegate to plan-execution.
@@ -45,9 +45,9 @@ Changed [file] (lines N-M). Verified: [pass/fail].
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "T2+ disfrazado de quick edit" | >1 file o >20 líneas como quick → STOP | reportar a orchestrator, delegar a plan-execution file:line |
+| "multi-file en una pasada sin validación" | varios files editados sin verify por file | 1 file max + syntax check + test por file file:line |
+| "skip verification por ser quick" | quick sin test/build/syntax check | ejecutar verification workflow file:line antes de REPORT |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -57,7 +57,7 @@ Changed [file] (lines N-M). Verified: [pass/fail].
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-code-generation · commit-crafter · deep-debugging
+code-generation · commit-crafter · deep-debugging · command-wrapper · server-commands
 
 ## Anti-Patterns
 Multi-file scope creep · Refactor adjacent code · Add dependencies · Skip verification · Create files (delegate to code-generation)

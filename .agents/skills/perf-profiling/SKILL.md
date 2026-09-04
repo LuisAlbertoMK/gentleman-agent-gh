@@ -3,7 +3,7 @@ name: perf-profiling
 description: "Trigger: performance profiling, slow queries, N+1, memory leak, CPU hotspot, query optimization. Audit with measurement."
 triggers: "performance profiling, slow queries, N+1, memory leak, CPU hotspot, profiling, query optimization"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2166
+token_budget: 2473
 ---
 ## When to Use
 Performance profiling, slow queries, memory leaks, CPU bottlenecks. No perf issue → report and stop.
@@ -26,9 +26,10 @@ Performance profiling, slow queries, memory leaks, CPU bottlenecks. No perf issu
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "optimizar sin medir" | Optimizar sin profiler (grep-only) | Verificar STEP 1 MEASURE: go test -bench/-cpuprofile / py-spy / clinic flame antes de grep + perf-offline-fallback |
+| "N+1 a ojo sin trace" | N+1 diagnosticado a ojo sin trace | Verificar ROI MATRIX + Rules: every finding file:line+evidence + Focus P1s + PERF-AUDIT output |
+| "sin benchmark before/after" | Optimizar sin benchmark before/after | Verificar benchmark-core.ps1 -Gate before/after + no grep-only anti-pattern + file:line evidencia |
+
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

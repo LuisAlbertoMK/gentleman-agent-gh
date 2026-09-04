@@ -3,7 +3,7 @@ name: comment-writer
 description: "Write warm, direct collaboration comments. Trigger: PR feedback, issue replies, reviews, Slack messages, GitHub."
 triggers: "comments, PR feedback, review comment, GitHub comment, write feedback"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2293
+token_budget: 2619
 ---
 
 ## When to Use
@@ -37,9 +37,10 @@ Whenever you write a comment another human will read: GitHub PR/issue comments, 
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "tono robot" | Comentario corporativo/bot sin warmth | Verificar Voice Rules: warm+direct + useful fast + 1-3 párrafos cortos + explain why file:line |
+| "responder sin leer el feedback completo" | Write before reading PR/feedback completo | Verificar Commands (gh pr view) primero + Comment Formula 3-part file:line |
+| "pile-on o em dashes" | Comentar cada preferencia o usar em dashes | Verificar Avoid pile-ons (highest-value only) + No em dashes + Match target context language |
+
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -49,7 +50,7 @@ Whenever you write a comment another human will read: GitHub PR/issue comments, 
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-code-review-agent . comment-writer . branch-pr
+code-review-agent . branch-pr
 
 ## Anti-Patterns
 Write before reading the PR · Recapitulate entire diff

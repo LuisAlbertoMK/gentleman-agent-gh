@@ -3,7 +3,7 @@ name: automejora-analyzer
 description: "Analyzes auto-mejora cycles — detects patterns, scores improvements, validates SkillOpt gates, surfaces drift."
 changelog: "2026-08-31 — SD 9.9→10 fix"
 triggers: "auto-mejora, automejora, improvement analysis, cycle analysis, SkillOpt validation, improvement scoring"
-token_budget: 2500
+token_budget: 2900
 ---
 
 ## When to Use
@@ -37,9 +37,9 @@ Consult these when the skill needs detailed worked examples or guardrails:
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "análisis sin file:line" | pattern/drift reportado sin cita file:line | cada hallazgo con file:line y confidence: unvalidated si falta evidencia |
+| "gate validado de memoria" | SkillOpt PASS sin re-ejecutar validación | re-validar gate con syntax parse + size check real file:line |
+| "drift no reportado por comodidad" | delta regresivo oculto para evitar revert | reportar todo dim ≤-0.3 aunque implique revert del fix |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
