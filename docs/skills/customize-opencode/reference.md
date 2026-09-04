@@ -44,13 +44,13 @@
   }
 }
 
-// After
+// After — 2026-09-02 Free vigente (muse-spark reemplaza gpt-4o-mini no-free)
 {
   "modelRouter": {
     "default": "opencode/nemotron-3-ultra-free",
     "routes": [
       { "pattern": "analysis|debug|review", "model": "opencode/nemotron-3-ultra-free" },
-      { "pattern": "implement|generate|code", "model": "opencode/gpt-4o-mini" }
+      { "pattern": "implement|generate|code", "model": "opencode/muse-spark-1.2-contributor-free" }
     ]
   }
 }
