@@ -1,10 +1,8 @@
 {
  "model": "opencode/big-pickle",
- "skills": {
-  "paths": [
-   ".agents/skills"
-  ]
- },
+ "skills": [
+  ".agents/skills"
+ ],
  "permission": {
   "bash": {
    "*": "allow",

@@ -113,6 +113,9 @@ const TEMPLATE_MAP = {
    'gentleman-codex-sub': 'readwrite',
    'gentleman-security-sub': 'readonly',
    'gentleman-aem-sub': 'readwrite',
+   'gentleman-code-review-sub': 'readwrite',
+   'gentleman-initializer-sub': 'readwrite',
+   'gentleman-reasoning-sub': 'readwrite',
 
   // Read-only specialist twins — delegable via Task tool (previously ⚠️ fallback to general)
   'gentleman-seo-sub': 'readonly',
@@ -128,12 +131,17 @@ const TEMPLATE_MAP = {
   'gentleman-quick-auto': 'auto',
   'gentleman-codex-auto': 'auto',
   'gentleman-implementer-auto': 'auto',
+  'gentleman-aem-auto': 'auto',
+  'gentleman-initializer-auto': 'auto',
 
   // Mode variants — AUTO subagent twins (zero-ask, delegable via Task tool in auto mode)
   'gentleman-deep-sub-auto': 'auto-sub',
   'gentleman-quick-sub-auto': 'auto-sub',
   'gentleman-codex-sub-auto': 'auto-sub',
   'gentleman-implementer-sub-auto': 'auto-sub',
+  'gentleman-aem-sub-auto': 'auto-sub',
+  'gentleman-code-review-sub-auto': 'auto-sub',
+  'gentleman-reasoning-sub-auto': 'auto-sub',
 
   // Mode variants — SEMI (safe commands auto, writes/commits ask)
   'gentleman-vMK-semi': 'semi',
@@ -141,6 +149,7 @@ const TEMPLATE_MAP = {
   'gentleman-quick-semi': 'semi',
   'gentleman-codex-semi': 'semi',
   'gentleman-implementer-semi': 'semi',
+  'gentleman-aem-semi': 'semi',
 
   // Independent evaluator — bash ask, no edit/write
   'gentleman-reviewer': 'reviewer',

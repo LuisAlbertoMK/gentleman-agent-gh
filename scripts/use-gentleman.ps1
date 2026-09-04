@@ -144,7 +144,17 @@ function Convert-ConfigFileRef {
         return Convert-FileRefsToAbsolute $Value $Root
     }
     if ($Value -is [System.Management.Automation.PSCustomObject]) {
-        foreach ($p in $Value.PSObject.Properties) { $p.Value = Convert-ConfigFileRef $p.Value $Root }
+        foreach ($p in $Value.PSObject.Properties) {
+            $v = $p.Value
+            if ($v -is [System.Collections.IList]) {
+                # FIX: mutate array items in place — passing the array as a parameter
+                # lets PowerShell unwrap 1-element arrays to a scalar, which replaced
+                # skills.paths arrays with strings in generated configs.
+                for ($i = 0; $i -lt $v.Count; $i++) { $v[$i] = Convert-ConfigFileRef $v[$i] $Root }
+            } else {
+                $p.Value = Convert-ConfigFileRef $v $Root
+            }
+        }
         return $Value
     }
     if ($Value -is [System.Collections.IList]) {

@@ -40,6 +40,9 @@ $TemplateMap = @{
     'gentleman-implementer'   = 'readwrite'
     'gentleman-aem'           = 'readwrite'
     'gentleman-aem-sub'       = 'readwrite'
+    'gentleman-code-review'   = 'readwrite'
+    'gentleman-initializer'   = 'readwrite'
+    'gentleman-reasoning'     = 'readwrite'
 
     # Subagent twins (mode: subagent, hidden: true)
     'gentleman-deep-sub'          = 'readwrite'
@@ -54,6 +57,9 @@ $TemplateMap = @{
     'gentleman-datascience-sub'   = 'readonly'
     'gentleman-docs-sub'          = 'readonly'
     'gentleman-reviewer-sub'      = 'reviewer'    # FIX: was missing from PS map
+    'gentleman-code-review-sub'   = 'readwrite'
+    'gentleman-initializer-sub'   = 'readwrite'
+    'gentleman-reasoning-sub'     = 'readwrite'
 
     # SDD agents
     'sdd-apply'     = 'readwrite'
@@ -73,18 +79,24 @@ $TemplateMap = @{
     'gentleman-quick-auto'         = 'auto'
     'gentleman-codex-auto'         = 'auto'
     'gentleman-implementer-auto'   = 'auto'
+    'gentleman-aem-auto'           = 'auto'
+    'gentleman-initializer-auto'   = 'auto'
 
     # Mode variants — AUTO-SUB (zero-ask, subagent)
     'gentleman-deep-sub-auto'          = 'auto-sub'   # FIX: was 'auto' (drift)
     'gentleman-quick-sub-auto'         = 'auto-sub'   # FIX: was 'auto' (drift)
     'gentleman-codex-sub-auto'         = 'auto-sub'   # FIX: was 'auto' (drift)
     'gentleman-implementer-sub-auto'   = 'auto-sub'   # FIX: was 'auto' (drift)
+    'gentleman-aem-sub-auto'           = 'auto-sub'
+    'gentleman-code-review-sub-auto'   = 'auto-sub'
+    'gentleman-reasoning-sub-auto'     = 'auto-sub'
 
     # Mode variants — SEMI
     'gentleman-deep-semi'        = 'semi'
     'gentleman-quick-semi'       = 'semi'
     'gentleman-codex-semi'       = 'semi'
     'gentleman-implementer-semi' = 'semi'
+    'gentleman-aem-semi'         = 'semi'
 
     # Reviewer
     'gentleman-reviewer' = 'reviewer'
