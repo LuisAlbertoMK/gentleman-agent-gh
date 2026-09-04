@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 7
 [CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
@@ -12,12 +12,14 @@ $ErrorActionPreference='Stop'
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 
 # ── Adaptive polling cache ─────────────────────────────────────────────
-# ponytail: unified cache
-$cacheScript=Join-Path $PSScriptRoot "lib/cache.ps1"
+# ponytail: unified cache. Dot-sourced (defines Get-Cache/Set-Cache; the
+# module's param-switch no-ops on empty $Action) — direct function calls
+# instead of call-operator-on-variable, which adversarial PS-CI-03 flags.
+. (Join-Path (Join-Path $PSScriptRoot "lib") "cache.ps1")
 if ($env:SKILL_DRIFT_CACHE_TTL) { $cacheTtl=[int]$env:SKILL_DRIFT_CACHE_TTL } else { $cacheTtl=300 }  # seconds, configurable via env var (default 5min, was 30s)
 $skipCache=$Thorough -or $AutoFix -or $SyncAgents
 if(-not $skipCache){
-  $cached=& $cacheScript -Action get -Key "skill-drift" -TtlSeconds $cacheTtl
+  $cached=Get-Cache -Key "skill-drift" -TtlSeconds $cacheTtl
   if($cached){
     if($Json -and $cached.lastJson){Write-Output $cached.lastJson;return}
     else{if(-not $Quiet){Write-Output "OK (cached) ALL $($cached.totalSkills) skills in sync! ($($cached.junctionSkills) junctions, $($cached.realFileSkills) real files)"};return}
@@ -83,7 +85,7 @@ $cacheEntry=@{
   allSynced=$r.allSynced
   lastJson=$jsonOut
 }
-& $cacheScript -Action set -Key "skill-drift" -Data $cacheEntry
+Set-Cache -Key "skill-drift" -Data $cacheEntry
 
 if($Json){Write-Output $jsonOut}else{
   $wc=@($r.warnings);$dc=@($d);$ec=@($e)
