@@ -3,7 +3,7 @@ name: data-quality
 description: "Trigger: data audit, pipeline audit, schema validation, data governance, ETL. Audit data quality and reliability."
 triggers: "data audit, data pipeline audit, schema validation, data governance, ETL audit, data quality check, data review"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2508
+token_budget: 2850
 ---
 ## When to Use
 Reviewing data pipelines, schemas, ETL, analytics. No data layer → report and stop.
@@ -24,9 +24,9 @@ dbt/YAML + Profiling detail → docs/skills/data-quality/reference.md
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "validar schema al inicio basta" | Schema solo al inicio, drift ignorado | Rule Schema BEFORE ingestion + `alembic check`/`prisma validate` + profiling |
+| "nulls tolerables sin política" | `fillna`/`coalesce` sin política | SCAN Transformation null handling + `df.dtypes` verify |
+| "lineage es nice-to-have" | Sin linaje dbt/YAML | SCAN dbt/YAML + reference lineage check |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

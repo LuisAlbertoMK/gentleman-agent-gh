@@ -3,7 +3,7 @@ name: infra-audit
 description: "Trigger: infrastructure audit, IaC, Terraform, Kubernetes, CI/CD, Docker, cloud, Helm, Ansible. Audit infra reliability."
 triggers: "infrastructure audit, IaC, Terraform, Kubernetes, CI/CD, Docker, cloud, deployment, Helm, Ansible, k8s"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2231
+token_budget: 2500
 ---
 
 ## When to Use
@@ -49,9 +49,9 @@ Reviewing infrastructure (Terraform, Docker, K8s, CI/CD, Helm, Ansible, CloudFor
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Deploy without canary" | No rollback plan | infra-audit checklist + dry-run |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "IaC drift es cosmético" | `terraform plan` omitido, drift sin diff | CHECKLIST remote state + `terraform plan` dry-run |
+| "saltar checksum de módulos" | Módulos sin pin/checksum | Rule Pin everything + `latest`/`unpinned` checks |
+| "RBAC broad por comodidad" | RBAC/NetworkPolicy amplio | CHECKLIST NetworkPolicy HIGH + least-privilege review |
 
 ## Red Flags
 - No rollback plan → STOP, re-read skill
@@ -61,7 +61,7 @@ Reviewing infrastructure (Terraform, Docker, K8s, CI/CD, Helm, Ansible, CloudFor
 - infra-audit checklist + dry-run
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-container-security · security-scanner · best-practices
+container-security · security-scanner · best-practices · auth-hardening · llm-security
 
 ## Anti-Patterns
 Stop if no Terraform · Ignore .yml extensions · GitHub-only CI checks · Skip NetworkPolicy · Subjective risk scoring

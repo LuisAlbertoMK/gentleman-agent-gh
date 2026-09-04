@@ -3,7 +3,7 @@ name: ralph-loop
 description: "Start Ralph Loop - auto-continues until task completion"
 triggers: "ralph, ralph loop, auto-continue, iterative loop, /ralph-loop, continuous task, autonomous loop"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 3000
+token_budget: 3200
 ---
 
 ## When to Use
@@ -73,9 +73,9 @@ grep '^iteration:' .opencode/ralph-loop.local.md
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "maxIterations infinitos" | maxIterations sin límite o >100 sin justificación | fijar maxIterations 100 por defecto y validar file:line |
+| "COMPLETE sin evidencia de criterios" | <promise>DONE</promise> sin verificar criterios de tarea | verificar task completeness file:line + check-complete hook |
+| "saltar lifecycle hooks" | pre-close/post-close/check-complete omitidos | ejecutar ralph-lifecycle.ps1 hooks file:line antes de close |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

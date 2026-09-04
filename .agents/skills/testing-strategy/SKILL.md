@@ -3,7 +3,7 @@ name: testing-strategy
 description: "Test strategy - pyramid analysis, coverage gaps, risk-based prioritization, test debt, ROI-driven investment."
 triggers: "testing strategy, test plan, test coverage, test pyramid, test debt, test gap, test priority, test audit, quality strategy"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 3100
+token_budget: 3147
 ---
 ## When to Use
 Test strategy & planning — pyramid analysis, coverage gaps, risk-based prioritization, test debt, ROI-driven investment. Scope: strategy only — NOT execution (`e2e-testing`, `api-testing`, `quality-gate`). READ-ONLY — recommend, don't implement.
@@ -21,9 +21,10 @@ CRITICAL (auth, payments, data integrity, security): 80%+ E2E + contract + mutat
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "We need 100% coverage" | Target >80% without ROI | ROI est required (rule 4): est cost vs bug cost; >80% diminishing |
-| "Add E2E for everything" | E2E proposed for unit-testable logic | Check pyramid rule 1: if behavior isolable → unit, not E2E |
-| "Quick plan without steps" | Plan w/o numbered steps + owners | Every plan must have `## Steps` with owner + estimate |
+| "cobertura como meta" | Target >80% sin ROI o coverage theater assert true | Verificar ROI est required (rule 4): cost vs bug cost + >80% diminishing + Anti-Patterns file:line |
+| "priorizar tests por facilidad no riesgo" | Priorizar por facilidad vs risk-based P0→LOW | Verificar Risk-Based Prioritization: money/identity→CRITICAL 80%+ + Risk=(freq×criticality)/coverage |
+| "E2E para todo / plan sin steps" | E2E para lógica unit-testeable o plan sin numbered steps+owner | Verificar Pyramid 60-80/15-25/5-10 + plan con ## Steps owner+estimate + git log --name-only gap |
+
 
 ## Red Flags
 - 100% coverage theater (`assert true`) or mock-everything → no bug caught
@@ -38,4 +39,4 @@ CRITICAL (auth, payments, data integrity, security): 80%+ E2E + contract + mutat
 ## Reference
 ROI (sec 5) + Testing Patterns (sec 6) + Edge Cases (sec 7) → docs/skills/testing-strategy/reference.md
 ## Refs
-Cross-Refs: e2e-testing | api-testing
+Cross-Refs: e2e-testing | api-testing | ci-cd

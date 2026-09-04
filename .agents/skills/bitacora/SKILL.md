@@ -38,9 +38,9 @@ docs/skills/bitacora/reference.md
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "No need to log, I'll remember" | BITACORA not updated after session work | `mem_save` + BITACORA append every YELLOW/RED or session end (protocol) |
-| "One line is enough" | Vague entry without file:line | Every entry must have `{file:prompts/shared/_return-contract.md}` contract + `confidence:` |
-| "Duplicate entries are fine" | >80% similarity duplicate across concurrent sessions | C28 idempotent check: last entry date+description similarity before append |
+| "entrada genérica sin subagentes" | BITACORA 1 línea sin reflejar delegation/parallel units | cita archivos + subagentes si hubo delegation file:line |
+| "append post-hoc de sesiones viejas" | re-escribir entradas pasadas en vez de solo prepend | solo prepend nueva entrada, nunca editar pasadas — git log file:line |
+| "skip si sesión corta" | sesión <YELLOW sin BITACORA aunque hubo git diff | si git diff ≠0 → BITACORA obligatoria aunque ctx<40% |
 
 ## Red Flags
 - BITACORA missing or 0 bytes → create with `# Bitácora` header (not silent continue)
@@ -51,4 +51,4 @@ docs/skills/bitacora/reference.md
 - `mem_search` returns expected prior context for next session
 
 ## Refs
-Cross-Refs: engram-protocol | session-resume
+Cross-Refs: engram-protocol | session-resume | metricas

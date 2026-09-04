@@ -3,7 +3,7 @@ name: image-pipeline
 description: "Image optimization — compress, convert WebP/AVIF, resize, describe. Single-file atomic edits, batch processing, metadata extraction."
 triggers: "compress, convert WebP/AVIF, resize, describe"
 changelog: docs/ciclos/cycle28-20260816.md
-token_budget: 2783
+token_budget: 2947
 ---
 
 ## When to Use
@@ -37,12 +37,11 @@ IMG-PIPELINE:<file> STATUS:<ok|warn|error> FORMAT:<fmt> SIZE:<before->after> RAT
 Upscaling beyond source | hardpx width on responsive | metadata not stripped | lossy on SVG | no SSIM gate | missing alt-text
 
 ## Anti-Rationalization
-
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "WebP sin fallback" | Solo WebP sin `<picture>` srcset | `<picture>` AVIF→WebP→PNG + srcset + fallback verify |
+| "Describir imágenes con inventado" | alt inventado sin metadata | Strip EXIF unless needed; describe desde metadata + SSIM≥0.95 |
+| "Batch sin atomic edits" | Batch sobrescribe sin verify | Single-file atomic + `compare` SSIM/PSNR ≥0.95 gate |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

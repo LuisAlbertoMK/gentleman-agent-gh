@@ -3,7 +3,7 @@ name: docs-audit
 description: "Trigger: documentation audit, README audit, API docs, onboarding docs, Diataxis. Audit docs quality and accuracy."
 triggers: "documentation audit, README audit, API docs, onboarding docs, Diátaxis, docs completeness, docs review, doc audit"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1834
+token_budget: 2159
 ---
 ## When to Use
 Reviewing documentation quality, README files, API docs, onboarding. If no docs → report and stop.
@@ -32,9 +32,10 @@ README/API/Onboarding/Standard Files/Links/Code greps + stale markers → refere
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Docs are obvious, no audit needed" | README without Diataxis | docs-audit checklist |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "audit desde el README solo" | Solo README sin SCAN DIMENSIONS completas | Verificar SCAN DIMENSIONS: README/API/Onboarding/Standard Files/Links/Code greps + stale markers completo |
+| "Diataxis como religión no como guía" | Diátaxis aplicado sin criterio invirtiendo Accuracy BEFORE completeness | Verificar Rule 1: Accuracy BEFORE completeness + Diátaxis categories con severity file:line |
+| "no checar stale refs" | Links/code greps sin chequeo stale markers | Verificar Stale Content: file:line por hallazgo + greps reference.md + action plan priorizado |
+
 
 ## Red Flags
 - README without Diataxis → STOP, re-read skill
@@ -44,7 +45,9 @@ README/API/Onboarding/Standard Files/Links/Code greps + stale markers → refere
 - docs-audit checklist
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-code-generation · quality-gate
+Cross-Refs: research | gap-analysis | project-mapper
+
+
 ## Reference
 SCAN DIMENSIONS greps → docs/skills/docs-audit/reference.md
 

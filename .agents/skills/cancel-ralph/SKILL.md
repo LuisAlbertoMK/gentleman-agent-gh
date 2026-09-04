@@ -3,7 +3,7 @@ name: cancel-ralph
 description: "Cancel active Ralph Loop"
 triggers: "cancel ralph, stop loop, cancel loop, ralph stop, end loop"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2454
+token_budget: 2850
 ---
 
 ## When to Use
@@ -52,9 +52,9 @@ Note: Prefer completing tasks properly with `<promise>DONE</promise>` when possi
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "cancelar sin confirmación del estado" | cancelar sin verificar si loop activo | test -f .opencode/ralph-loop.local.md + grep iteration file:line |
+| "asumir que el loop se detiene solo" | borrar state sin reportar iteration ni notify | leer iteration, rm -f state, notificar usuario con última iteration |
+| "cancelar durante write operation" | cancelar en medio de escritura → corrupción parcial | esperar boundary/checkpoint file:line antes de rm |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -64,5 +64,5 @@ Note: Prefer completing tasks properly with `<promise>DONE</promise>` when possi
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-ralph-loop · recovery-protocol
+ralph-loop · recovery-protocol · help
 

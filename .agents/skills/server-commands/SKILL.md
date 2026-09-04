@@ -3,7 +3,7 @@ name: server-commands
 description: "Run long-lived server processes safely — dev-server.ps1, port detection, background management"
 triggers: "server, ng serve, npm run dev, dotnet run, python -m http.server, dev server, background process, long-lived, !dev"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2385
+token_budget: 2750
 ---
 
 ## When to Use
@@ -41,9 +41,9 @@ Consult these when the skill needs detailed worked examples or guardrails:
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "matar puerto sin verificar dueño" | kill port sin Get-NetTCPConnection / Test-PortInUse | verificar dueño con Get-NetTCPConnection file:line antes de Kill |
+| "background sin log" | background process sin Logs tail | dev-server.ps1 -Action Logs -Tail 10 file:line |
+| "reinstalar en vez de reusar" | reinstalar server en vez de Status/Logs | dev-server.ps1 -Action Status antes de Start file:line |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -53,5 +53,5 @@ Consult these when the skill needs detailed worked examples or guardrails:
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-Cross-Refs: infra-audit | performance
+Cross-Refs: infra-audit | performance | quick-executor | command-wrapper
 
