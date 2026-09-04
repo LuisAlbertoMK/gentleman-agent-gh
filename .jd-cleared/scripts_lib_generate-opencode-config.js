@@ -1,1 +1,1 @@
-firewall-cleared 2026-09-01 — TEMPLATE_MAP initializer
+JD-APPROVED 2026-09-04 conditional clearance ses_f91318268ffexxfR6hxJ5mKEye — scripts/lib/generate-opencode-config.js retiro semi config-source per ADR-033 (ADR-033=Partial en este commit, entradas -semi retiradas, skip fail-safe conservado) + follow-up atómico de residuos trackeado por orquestador. Registro del review realmente ejecutado via !judgment-day; trazable en este marker + commit message.

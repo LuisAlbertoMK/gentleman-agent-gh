@@ -143,13 +143,10 @@ const TEMPLATE_MAP = {
   'gentleman-code-review-sub-auto': 'auto-sub',
   'gentleman-reasoning-sub-auto': 'auto-sub',
 
-  // Mode variants — SEMI (safe commands auto, writes/commits ask)
-  'gentleman-vMK-semi': 'semi',
-  'gentleman-deep-semi': 'semi',
-  'gentleman-quick-semi': 'semi',
-  'gentleman-codex-semi': 'semi',
-  'gentleman-implementer-semi': 'semi',
-  'gentleman-aem-semi': 'semi',
+  // Mode variants — SEMI RETIRED (ADR-033 implemented 2026-09-04):
+  // explicit '-semi' entries removed; '-semi' suffix below + skip still
+  // handle the 6 legacy definitions in opencode-base.json until base is
+  // cleaned (JD follow-up). Do NOT re-add entries here.
 
   // Independent evaluator — bash ask, no edit/write
   'gentleman-reviewer': 'reviewer',
@@ -198,8 +195,12 @@ const orderedAgents = {};
 for (const [agentName, agentDef] of Object.entries(base.agent)) {
   const templateName = detectTemplate(agentName);
 
-  // ADR-033: 'semi' mode DEPRECATED (simplified to manual|auto) — -semi agents are
-  // removed from the canonical config. opencode.json carries the 49 post-ADR-033 agents.
+  // ADR-033 IMPLEMENTED 2026-09-04 (simplified to manual|auto): 'semi' skipped
+  // at build so opencode.json carries 0 *-semi agents. Skip KEPT (not dead-code):
+  // opencode-base.json still defines the 6 legacy -semi agents + permission-
+  // templates.json still carries the 'semi' template; removing this skip would
+  // reintroduce/mis-map them (vMK-semi → orchestrator via keyword). Remove this
+  // skip only together with base + template cleanup (JD follow-up).
   if (templateName === 'semi') continue;
 
   const template = templates[templateName];

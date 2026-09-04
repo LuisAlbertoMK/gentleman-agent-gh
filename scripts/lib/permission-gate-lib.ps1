@@ -10,10 +10,11 @@
     - Get-ConfiguredMode: mode-file resolution with 'manual' fallback
 .NOTES
     This file is NOT meant to be invoked directly.
-    scripts/cross-ref-check.ps1 [10/9] TEXT-SCANS scripts/permission-gate.ps1
-    for single-quoted '^cmd' pattern literals to keep semi-agents.json in sync
-    with the gate. The production script therefore keeps a comment mirror of the
-    arrays below. Keep that mirror in sync when editing the patterns here.
+    scripts/cross-ref-check.ps1 [10/9] RETIRED (ADR-033 implemented 2026-09-04:
+    semi-agents.json deleted, allowlist sync no longer applicable). The production
+    script therefore keeps a comment mirror of the arrays below. Keep that mirror
+    in sync when editing the patterns here. Runtime 'semi' branch below is legacy
+    backward-compat (mode-gate remaps semi→auto) — JD follow-up decides removal.
 #>
 
 # ===== COMMAND CLASSIFICATION RULES =====

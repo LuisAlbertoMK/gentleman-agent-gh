@@ -1,0 +1,1 @@
+JD-APPROVED 2026-09-04 conditional clearance ses_f91318268ffexxfR6hxJ5mKEye — scripts/opencode-config/expand-config.ps1 retiro semi config-source per ADR-033 (ADR-033=Partial en este commit) + follow-up atómico de residuos trackeado por orquestador. Registro del review realmente ejecutado via !judgment-day; trazable en este marker + commit message.

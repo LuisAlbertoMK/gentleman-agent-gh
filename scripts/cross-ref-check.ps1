@@ -300,52 +300,9 @@ try {
     if (-not $Json -and -not $Quiet) { Write-Host " WARN (parse: $($_.Exception.Message))" }
 }
 
-# [10/9] semi-agents.json vs permission-gate.ps1 allowlist
-if (-not $Json -and -not $Quiet) { Write-Host "[10/9] semi allowlist sync..." -N }
-try {
-    $semiPath = Join-Path $RepoRoot "scripts\opencode-config\semi-agents.json"
-    $gatePath = Join-Path $RepoRoot "scripts\permission-gate.ps1"
-
-    if ((Test-Path $semiPath) -and (Test-Path $gatePath)) {
-        $semiContent = Get-Content $semiPath -Raw -Encoding UTF8
-        $gateContent = Get-Content $gatePath -Raw -Encoding UTF8
-
-        # Extract semi-agent allows: "xxx *" → xxx; "exact": "allow" → exact command
-        # NOTE: linear-time pattern (no nested quantifier) — avoids catastrophic backtracking on long lines
-        $semiAllow = @(
-            [regex]::Matches($semiContent, '"([A-Za-z0-9_.-]+(?: [A-Za-z0-9_.-]+)*) \*":\s*"allow"') | ForEach-Object { $_.Groups[1].Value }
-            [regex]::Matches($semiContent, '"([A-Za-z0-9_.-]+(?: [A-Za-z0-9_.-]+)*)":\s*"allow"')   | ForEach-Object { $_.Groups[1].Value }
-        )
-        # Extract gate patterns: command name after '^ (word chars, dots, hyphens)
-        $gatePatterns = [regex]::Matches($gateContent, "'\^([a-zA-Z][a-zA-Z0-9._-]+)") | ForEach-Object { $_.Groups[1].Value }
-
-        # Normalize: add test runners using spaces in the name
-        $gateCommands = @($gatePatterns | Where-Object { $_ -ne '' } | ForEach-Object { $_.ToLower() } | Sort-Object)
-        $semiCommands = @($semiAllow | ForEach-Object { $_.ToLower() } | Sort-Object)
-
-        # Check: every semi allow must exist in gate patterns (or be a superset)
-        $missingInGate = @()
-        $checked = @{}  # deduplicate
-        foreach ($cmd in $semiCommands) {
-            if ($checked.ContainsKey($cmd)) { continue }
-            $checked[$cmd] = $true
-            if ($cmd -notin $gateCommands -and $cmd -notmatch '^(Get-|Test-Path)') {
-                $hasMatch = $gateCommands | Where-Object { $cmd -match "^$_" }
-                if (-not $hasMatch) { $missingInGate += $cmd }
-            }
-        }
-
-        $dedupedSemi = $checked.Keys.Count
-        if ($missingInGate.Count -eq 0) {
-            if (-not $Json -and -not $Quiet) { Write-Host " OK ($dedupedSemi unique semi allows across $($semiCommands.Count) entries, $($gateCommands.Count) gate patterns)" }
-        } else {
-            $warnings += "semi-agents.json allows missing from permission-gate.ps1: $($missingInGate -join ', ')"
-            if (-not $Json -and -not $Quiet) { Write-Host " WARN ($($missingInGate.Count) mismatches)" }
-        }
-    }
-} catch {
-    if (-not $Json -and -not $Quiet) { Write-Host " WARN (check: $($_.Exception.Message))" }
-}
+# [10/9] RETIRED (ADR-033 implemented 2026-09-04): semi-agents.json deleted,
+# semi allowlist sync no longer applicable. Stub kept to preserve check numbering.
+if (-not $Json -and -not $Quiet) { Write-Host "[10/9] semi retired (ADR-033)..." -N; Write-Host " SKIP (template deleted)" }
 
 # Output
 $result = @{

@@ -1,14 +1,12 @@
 #requires -Version 7
 <#
 .SYNOPSIS
-  Expand $import markers in opencode.json — resolves shared deny rules inline
-  and injects -semi agents from semi-agents.json.
+  Expand $import markers in opencode.json — resolves shared deny rules inline.
+  (ADR-033 implemented 2026-09-04: -semi injector retired.)
 .DESCRIPTION
   Reads opencode.json, finds all "$import" keys in permission.bash blocks,
   reads the referenced JSON files, merges their properties into the parent,
   and writes the expanded result back to opencode.json.
-  Also checks if -semi agents exist and injects them from semi-agents.json
-  if they are missing.
   Safe to run repeatedly — already-expanded files are left unchanged.
 .EXAMPLE
   .\scripts\opencode-config\expand-config.ps1
@@ -79,87 +77,12 @@ while ($match.Success) {
     $match = $importPattern.Match($content)
 }
 
-# --- Inject -semi agents (if not already present) ---
-$semiConfigPath = Join-Path $repoRoot "scripts\opencode-config\semi-agents.json"
-$semiMarker = '"gentleman-vMK-semi"'
-
-if (Test-Path -LiteralPath $semiConfigPath) {
-    if ($content -notmatch [regex]::Escape($semiMarker)) {
-        $semiRaw = Get-Content -LiteralPath $semiConfigPath -Raw
-
-        # Find insertion point: at the line of "gentleman-reviewer"
-        $afterPattern = [regex]::new('(?m)^    "gentleman-reviewer"')
-        $afterMatch = $afterPattern.Match($content)
-
-        if ($afterMatch.Success) {
-            # Strip outer { } from semi-agents.json
-            $innerSemi = $semiRaw -replace '(?s)^\s*\{\s*\r?\n', '' -replace '(?s)\r?\n\s*\}\s*$', ''
-            # Re-indent from 2-space to 4-space (agents object indent level)
-            $reindented = $innerSemi -replace '(?m)^(\s+)', '  $1'
-            # Ensure last entry has trailing comma (it will be mid-object)
-            $reindented = $reindented.TrimEnd() -replace '\}\s*$', '},'
-
-            # Insert after the 4-space indent to avoid doubling it
-            # $afterMatch.Index points to first space of indent
-            $insertPoint = $afterMatch.Index + 4
-            $insertion = "`r`n${reindented}`r`n    "
-            $content = $content.Substring(0, $insertPoint) + $insertion + $content.Substring($insertPoint)
-            $modified = $true
-
-            if (-not $Quiet) {
-                Write-Host "  injected: 5 -semi agents -> will expand imports below" -ForegroundColor Green
-            }
-
-            # Re-run expand loop for the newly injected $import markers
-            $match = $importPattern.Match($content)
-            while ($match.Success) {
-                $importPath = $match.Groups[2].Value
-                $indent = $match.Groups[1].Value
-
-                $absPath = if ([System.IO.Path]::IsPathRooted($importPath)) {
-                    $importPath
-                } else {
-                    Join-Path $repoRoot $importPath
-                }
-
-                if (-not (Test-Path -LiteralPath $absPath)) {
-                    Write-Warning "Import not found: $importPath (resolved: $absPath)"
-                    $match = $match.NextMatch()
-                    continue
-                }
-
-                $imported = Get-Content -LiteralPath $absPath -Raw | ConvertFrom-Json
-                if (-not $imported) {
-                    $match = $match.NextMatch()
-                    continue
-                }
-
-                $props = @($imported.PSObject.Properties)
-                $ruleCount = $props.Count
-                $ruleLines = @()
-                for ($i = 0; $i -lt $ruleCount; $i++) {
-                    $prop = $props[$i]
-                    $comma = if ($i -lt $ruleCount - 1) { "," } else { "" }
-                    $ruleLines += "$indent`"$($prop.Name)`": `"$($prop.Value)`"$comma"
-                }
-                $replacement = $ruleLines -join "`r`n"
-
-                $content = $content.Remove($match.Index, $match.Length).Insert($match.Index, $replacement)
-                $modified = $true
-                if (-not $Quiet) {
-                    Write-Host "  expanded: $importPath -> $ruleCount rules (semi agent)" -ForegroundColor Green
-                }
-                $match = $importPattern.Match($content)
-            }
-        } else {
-            Write-Warning "Could not find insertion point for -semi agents"
-        }
-    } else {
-        if (-not $Quiet) {
-            Write-Host "`u{2139} -semi agents already present" -ForegroundColor Yellow
-        }
-    }
-}
+# --- ADR-033 implemented (2026-09-04): -semi injector RETIRED ---
+# scripts/opencode-config/semi-agents.json deleted; opencode.json is now
+# solely the output of scripts/lib/generate-opencode-config.js (which skips
+# 'semi' at build). This script only expands $import markers. Any legacy
+# *-semi keys found in opencode.json are left untouched (stale) — regen
+# via the generator to remove them.
 
 if ($modified) {
     # Validate JSON before writing

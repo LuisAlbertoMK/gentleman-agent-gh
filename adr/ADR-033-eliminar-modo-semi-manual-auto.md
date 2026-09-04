@@ -1,8 +1,10 @@
 # ADR-033: Simplificar modos de permiso — eliminar `semi`, quedar `manual` + `auto`
 
-- **Status**: Proposed (pending benchmark E2E + user apply to opencode.json)
-- **Deciders**: gentleman-vMK (propuesta autónoma)
+- **Status**: Partial (config-source retirado 2026-09-04; pendiente base/template/runtime/docs)
+- **Deciders**: gentleman-vMK (propuesta autónoma) + dueño (decisión 2026-08-19, autorización limpieza total 2026-09-04)
 - **Date**: 2026-08-19
+- **Implemented**: 2026-09-04 — 6 agentes (no 5; `aem` descubierto post-análisis, ver amend abajo)
+- **Scope-note (2026-09-04, JD ses_f91318268ffexxfR6hxJ5mKEye)**: retiro parcial — solo config-source (semi-agents.json D + expand/cross-ref/generate/permission-gate-lib); residuos deliberados para follow-up atómico: base 6 defs en opencode-base.json, permission-templates.json (template semi + _used_by.semi), template-detection.ps1 (-semi map), runtime-compat semi→auto como deuda documentada (mode-gate/permission-gate/route-agent/switch-mode), orphan scripts/opencode-config/semi-allow-classification.json, docs vivas (README/PROTOCOL/SHORTCUTS/QUICKSTART/commands/semi.md); cuerpo abajo STALE (asume limpieza total) a enmendar en follow-up.
 - **Tier**: T2 — permission-mode architecture, multi-file (config + gate + switch)
 - **Confidence**: high (evidencia en `docs/mejoras/2026-07-28-permission-modes-analysis.md` L27-L101; `docs/mejoras/2026-07-30-auto-permission-analysis.md` H1-H8; benchmark 60-point full historical)
 

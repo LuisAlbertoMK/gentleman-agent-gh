@@ -1,0 +1,1 @@
+JD-APPROVED 2026-09-04 conditional clearance ses_f91318268ffexxfR6hxJ5mKEye — scripts/cross-ref-check.ps1 retiro semi config-source per ADR-033 (ADR-033=Partial en este commit, check [10/9] retirado a stub) + follow-up atómico de residuos trackeado por orquestador. Registro del review realmente ejecutado via !judgment-day; trazable en este marker + commit message.
