@@ -3,7 +3,7 @@ name: skill-testing
 description: "Test and verify skill quality — syntax, coverage, integration, and token budget assessment before production use"
 triggers: "Test/verify skill, coverage"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2168
+token_budget: 2600
 ---
 Trigger: After creating/modifying skill, before production use.
 ## When to Use
@@ -34,9 +34,9 @@ After new/edited skill · pre-critical-task verification · periodic active skil
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "saltarse integration test si syntax-pass" | Syntax ✅ pero Integration no corrida | Framework Test 3: Load→Apply→Verify output obligatorio |
+| "aceptar cobertura sin casos edge" | Coverage alto sin edge/templates | Scoring Coverage 30% incluye primary+edge+templates |
+| "token budget es detalle de implementación" | Pattern 3: budget ignorado/template >Y | Tokens check avg <X / longest <Y + decision tree legible |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -46,7 +46,7 @@ After new/edited skill · pre-critical-task verification · periodic active skil
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-skill-registry · opencode-skill-creator · skill-improver · quality-gate · karpathy-loop
+skill-registry · opencode-skill-creator · skill-improver · quality-gate · karpathy-loop · skill-graph
 ## Reference
 Checklist by type (Prompt/Workflow/Template) + per-type extras → docs/skills/skill-testing/reference.md
 ---

@@ -53,9 +53,9 @@ docs/skills/cross-project-wisdom/reference.md
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "cargar patterns sin chequeo de relevancia" | Patterns cargados sin score tech/domain | Pattern Load steps 3-4: score tech×0.4+domain×0.3+... |
+| "omitir el disclaimer advisory" | Output sin 'These are advisory — use judgment' | Step 6 Always state advisory disclaimer |
+| "ignorar lifecycle del pattern (active/demoted)" | Pattern demoted/forged aún consultado | Lifecycle check + wisdom-demote.ps1 monthly review |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

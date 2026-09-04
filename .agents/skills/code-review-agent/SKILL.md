@@ -3,7 +3,7 @@ name: code-review-agent
 description: "4R code review - Risk/Readability/Reliability/Resilience with evidence gates and actionable fixes"
 triggers: "Code review, CR, revisar codigo, criticar"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2381
+token_budget: 2900
 ---
 4R: each R scored independently->verdict+fixes.
 ## When to Use
@@ -12,6 +12,7 @@ User asks CR*pre-commit complex*pre-merge high-impact PRs
 R Risk(err/edge/nil/rollback/monitor)30%|Read(naming/struct/load/patterns)20%|Rel(retry/timeout/consistency/data/err-prop)25%|Res(fault-iso/backpressure/cb/degradation/recovery)25%
 ## Workflow: `read diff->score 4R->verdict->fixes->evidence`. 200-400L sweet spot.
 PASS all R>=7 | WARN any 4-6 | FAIL any <4
+Patterns: Verifier-in-the-Loop (actor→judge) y Debate cross-profile se orquestan vía judgment-day; este skill es el judge individual 4R.
 ## Output: `## CR:sum ### 4R|Risk:X|Read:X|Rel:X|Res:X|Score:X.X|Verdict:P/W/F ### Fixes:1.f:L-fix`
 Ex: auth nil check+no rate limit -> Risk:3|Read:7|Rel:5|Res:4|Score:4.8|FAIL BLOCKER
 ## Adaptive Profile
@@ -28,9 +29,9 @@ mem_search("review-profile/{p}")->load->adjust lens->Run 4R->mem_save(title:"CR 
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "rubber-stamp review (aprobar sin evidencia 4R)" | Verdict PASS sin `### 4R|Risk:` ni file:line | Exigir score 4R + evidencia por R<6 (Rule 3/4) |
+| "bikeshedding nits en vez de riesgo" | Nits>3 con Risk>=7 sin cambio | Priorizar Risk/Rel; Rule 7 diff size + ≥1 fix por R<6 |
+| "cargo-cult fixes sin entender el porqué" | Fixes sin Evidence/Ref ni trace (a)-(d) | BLOCKER chain (a)line (b)trace (c)ref (d)fix + WHY |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
