@@ -3,7 +3,7 @@ name: dreaming
 description: "Cross-session pattern extraction via Engram. Run via !dream — not automatic."
 triggers: "!dream, dreaming, patrones, memory review, session end, !close, pattern extraction"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2553
+token_budget: 3000
 ---
 ## When to Use
 Only on explicit request (`!dream`) or user asking. Recommended weekly or after milestone.
@@ -45,9 +45,9 @@ Consult these when the skill needs detailed worked examples or guardrails:
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "correr !dream sin contexto Engram" | mem_search/mem_context no ejecutado | Modes: mem_search + mem_context + auto-pattern-detector obligatorio |
+| "saltearse extracción en !close" | Harvest !close sin mem_session_summary | Harvest: mem_session_summary + extract patterns |
+| "ignorar el auto-pattern detector de 5º self-check" | same error 3x sin detector → anti-pattern | Auto-pattern: same error 3× → detector → immune-system |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

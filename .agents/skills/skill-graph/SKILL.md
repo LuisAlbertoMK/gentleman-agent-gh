@@ -61,4 +61,4 @@ hop 2: command-wrapper      → [bash-safe]
 - `ctx_search(source: "<skill>")` returns expected indexed sections
 
 ## Refs
-Cross-Refs: skill-registry | cross-project-forge
+Cross-Refs: skill-registry | cross-project-forge | skill-testing | skill-improver
