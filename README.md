@@ -30,6 +30,7 @@ Suite of **92 skills** (+ `_shared`) + **128 top-level scripts** (121 PowerShell
 - **PowerShell 7+** (Windows) / **bash** (Linux/macOS) — required for scripts & tests
 - **PowerShell 5.1** (Windows) — orchestrator host shell; scripts declare `#requires -Version (5.1|7)` (see [docs/operations/RUNBOOK.md](docs/operations/RUNBOOK.md))
 - **Node.js** — for npm-based tools
+- **Go** (optional) — rebuilds `bin/fast.exe` (fast gate: cross-ref + token-budget). Without it, the pre-commit gate falls back to PowerShell automatically.
 
 ## Quick Start
 
@@ -240,6 +241,16 @@ The project uses two MCPs for cross-session memory:
 | `trend.ps1` | Scoring trend analysis |
 | `health-check-system.ps1` | System health check (MCP, disk, git, permissions) |
 | `setup-install.ps1` / `install.sh` | Multi-platform installer (Windows/Linux/macOS) |
+
+### Fast gate binary (`bin/fast.exe`)
+
+`bin/fast.exe` is a **build artifact, not committed**. All consumers degrade gracefully without it (PS fallback / `WARN` + escalate). To rebuild from source after cloning or after changing `cmd/fast/main.go`:
+
+```sh
+go build -o bin/fast.exe ./cmd/fast
+```
+
+Source: [`cmd/fast/main.go`](cmd/fast/main.go) — hot-path checks: `--cross-ref` (<300ms), `--token-budget` (<80ms), `--gate` combined (<150ms).
 
 ---
 

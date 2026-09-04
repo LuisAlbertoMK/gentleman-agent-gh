@@ -96,8 +96,10 @@ coverage.xml
 .turbo/
 *.tsbuildinfo
 
-# Go compiled binaries (from scripts/gentle-batch-edit.go)
+# Go compiled binaries — build artifacts, do NOT commit. Rebuild from source:
+#   go build -o bin/fast.exe ./cmd/fast
 gentle-batch-edit.exe
+bin/*.exe
 
 # Generated reports
 docs/health-report.html
