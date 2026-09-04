@@ -3,7 +3,7 @@ name: quality-gate
 description: "Pre-commit gate — TDD + Pester tests pass, secrets scan, conventional commit, PSSA gate"
 triggers: "Quality gate, pre-commit, PSSA gate"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2532
+token_budget: 2950
 ---
 
 ## When to Use
@@ -38,9 +38,9 @@ Max2 rounds. Record Engram per breaker schema.
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "saltar adversarial-breaker en !ship" | ROJA/AMARILLA sin breaker + push | §6 breaker gate → APPROVED o STOP según zone |
+| "ignorar gate PSSA faltante" | [SKIP] PSSA tratado como pass silencioso | §4 pssa-gate.ps1 existe→Check/Fix else [SKIP]+warn |
+| "diferir secrets medios" | MEDIUM pospuesto, HIGH sin fix previo | Rule2: CRITICAL+HIGH fix now, MEDIUM→suggest now |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -50,7 +50,7 @@ Max2 rounds. Record Engram per breaker schema.
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-security-scanner·triple-verify·commit-crafter·ci-cd·code-review-agent·adversarial-breaker
+security-scanner·triple-verify·commit-crafter·ci-cd·code-review-agent·adversarial-breaker·auto-metrics·external-auditor·immune-system
 ---
 
 docs/skills/quality-gate/reference.md

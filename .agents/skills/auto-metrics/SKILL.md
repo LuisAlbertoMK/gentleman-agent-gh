@@ -3,7 +3,7 @@ name: auto-metrics
 description: "Self-evaluation scoring. Trigger via !score or !metrics — not automatic."
 triggers: "!score, !metrics, explicit score/metric request, session end via !close"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2387
+token_budget: 2800
 ---
 ## When to Use
 Only on explicit request (!score, !metrics, !close). NOT automatic after every task.
@@ -34,9 +34,9 @@ docs/skills/auto-metrics/reference.md
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "score sin audit cuando hay bias" | bias-calibration.json samples≥2 sin [audit] | PRE-FLIGHT: [audit] hoy o FAIL→!audit primero |
+| "ignorar bias calibration" | offset no restado antes de thresholds | CORRECTION: restar offset por dim + log bias |
+| "auto-score sin verificación externa" | self-score sin contraste auditor | gaps>1.5→immune/full-stop per external-auditor |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -46,5 +46,5 @@ docs/skills/auto-metrics/reference.md
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-Cross-Refs: performance-tracker | metricas
+Cross-Refs: performance-tracker | metricas | quality-gate | security-scanner | external-auditor | immune-system
 
