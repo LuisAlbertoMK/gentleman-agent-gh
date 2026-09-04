@@ -21,9 +21,9 @@ Rolling from `.learnings/bias-calibration.json`:
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "saltarse audit en cambios complejos" | diff toca scanner/gate/metrics sin audit | When to Use: HIGH/protected → audit obligatorio |
+| "aceptar output no parseable del auditor" | regex <4 dims sin retry/abort | FLOW §3-4: retry1, abort2nd, regex 4 dims |
+| "ignorar gaps de bias calibration" | gap>1.5 sin immune/stop | FLOW §7: gaps≤1.5 PASSED, >1.5 immune/stop |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -33,7 +33,7 @@ Rolling from `.learnings/bias-calibration.json`:
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-auto-metrics · immune-system · bitacora · session-resume · quality-gate
+auto-metrics · immune-system · bitacora · session-resume · quality-gate · security-scanner
 ## Reference
 > docs/skills/external-auditor/reference.md
 

@@ -41,9 +41,9 @@ docs/skills/immune-system/reference.md
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "no catalogar tras el 2º error" | mismo error 2x sin entrada en catálogo | §3 DOCUMENT→ANTI-PATTERN-CATALOG.md mandatorio |
+| "saltar inmunización en AGENTS.md" | catálogo sin regla AGENTS.md | DOCUMENT+IMMUNIZE: catálogo + AGENTS.md rule |
+| "ignorar near-misses" | near-miss no documentado como asset | §1 DETECT near-miss → doc anyway |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -53,5 +53,5 @@ docs/skills/immune-system/reference.md
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-Cross-Refs: security-scanner | best-practices
+Cross-Refs: security-scanner | best-practices | quality-gate | auto-metrics | external-auditor
 

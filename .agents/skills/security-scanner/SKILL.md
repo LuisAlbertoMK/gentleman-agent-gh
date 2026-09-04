@@ -16,7 +16,7 @@ Go: `grep -rn "apiKey\|password\|secret\|sql\.Exec\|os/exec" --include="*.go"` �
 ## Rules
 1. Tool first, then manual. 2. Critical+High fix before commit; Medium→suggest. 3. Verify FPs — don't auto-flag env vars. 4. Always provide fix, not just warning. 5. End with risk summary: NONE/LOW/MED/HIGH (why)
 ## Refs
-quality-gate · best-practices · command-wrapper · research · code-review-agent · llm-security
+quality-gate · best-practices · command-wrapper · research · code-review-agent · llm-security · auto-metrics · external-auditor · immune-system
 ## Anti-Rationalization
 
 | Rationalization | Red Flag | Verification |
