@@ -92,3 +92,51 @@ PS fallback equivalent: ≥1355 ms spawn + interpretation ≈ 2–4 s → **~95�
 Full migration: **NO** (91 PS orchestration scripts stay — they glue Windows/git/hooks where PS is
 domain-king and the bottleneck is IO/process spawn, not language). Surgical: **YES** — any new or
 measured-hot file/CPU path goes to Go behind the existing mega-CLI, with PS fallback, source in git.
+
+---
+
+## Phase 2 — Spawn reduction: Go pre-gate shim (same day)
+
+Finding: the 26-check quality gate (`pre-commit-gate.ps1`) was **never wired locally**
+(no `core.hooksPath`, no `.git/hooks` shim, no installer wiring) — local commits ran
+ungated. Enabling it as-is would tax every commit with one pwsh spawn (1355 ms) + full
+gate even for docs-only commits whose PS checks are all staging-skipped.
+
+Implementation (commit d3fdbe66):
+
+- `cmd/gate/main.go` — Go shim: runs repo-portable checks natively (fast-gate via
+  `bin/fast.exe --gate`, trailing whitespace, secrets scan, config size budget,
+  async-result fail-closed), classifies staged paths against the PS-gate trigger
+  regexes, escalates to the full PS gate ONLY when PS-only checks are relevant, and
+  falls back to pwsh on any error/missing exe (fail-safe, never blocks silently).
+- `.githooks/pre-commit` — prefers `bin/gate(.exe)`, one-time silent `go build`
+  self-heal, pwsh fallback preserved.
+- Gate enablement: `git config core.hooksPath .githooks` (local — installer wiring
+  still pending, see follow-ups).
+- Latent defects surfaced by the now-live gate, fixed in the same commit:
+  `check-skill-drift.ps1` crashed on partial global skill dirs (dir without SKILL.md);
+  `ps-compat` skill 231 B over its token budget (trimmed to 3283 B ≤ 3300);
+  `cmd/*` missing from write-scope allowed_paths; self-scan exclusion for the
+  secrets-scanner's own regex definition (`cmd/gate/*` pathspec, mirrors the
+  existing `.githooks` exclusion convention).
+
+Measured (this machine, warm cache):
+
+| Path | Before | After | Gain |
+|---|---|---|---|
+| Docs-class commit (no PS triggers) | ~3.4 s (spawn 1355 + full gate) | **254–317 ms** | **~11x (-90%)** |
+| PS-triggered commit | ~3.4 s + full gate | full gate + ~200 ms shim overhead | ~unchanged (correct: those need PS) |
+| Empty staging | n/a (paid full spawn) | **~230 ms** internal | — |
+
+Escalation verified live: staged `.ps1`/skills → shim printed `Escalating to PS gate
+(3 trigger(s))`, ran 26/26 checks, commit accepted. Blocking semantics verified:
+secrets regex hit → exit 1; async-result `passed:false` → exit 1.
+
+Follow-ups (next session candidates):
+1. Installer wiring: `setup-install.ps1`/`install.sh` must set `core.hooksPath .githooks`
+   (+ one-time `go build ./cmd/gate`) — fresh clones are currently ungated.
+2. Pre-push gate spawns pwsh unconditionally — same shim pattern applies.
+3. `check-skill-drift.ps1:20,86` `& $cacheScript` (PS-CI-03): refactor to direct
+   invocation to drop the breaker marker dependency.
+4. Global skills dir drift: `accessibility` exists globally without SKILL.md (check
+   now reports GLOBAL_MISSING instead of crashing; re-sync pending).
