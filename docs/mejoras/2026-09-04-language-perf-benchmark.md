@@ -134,18 +134,34 @@ secrets regex hit → exit 1; async-result `passed:false` → exit 1.
 
 Follow-ups status (updated same day):
 
-1. ~~Installer wiring~~ **DONE** — `setup-install.ps1` + `install.sh` now wire
-   `core.hooksPath .githooks` + build the gate binary (Go present) or announce
-   pwsh fallback (ADR-049). Fresh clones are gated from install.
-2. ~~Pre-push gate spawns pwsh unconditionally~~ **RESOLVED by inspection** —
-   pre-push re-executes `.githooks/pre-commit`, which now prefers `gate.exe`
-   (fast path) and escalates only on PS triggers. No separate spawn.
-3. Correction to an earlier claim: `post-commit` already had skill-trigger
-   classification (diff-tree + grep before pwsh). Measured no-op cost is
-   ~885 ms — that is the `sh.exe` spawn tax itself on this machine (Windows
-   process creation + AV scan), not pwsh. Follow-up candidate (low priority):
-   consolidate hook entrypoints natively if commit latency ever dominates.
-4. `check-skill-drift.ps1:20,86` `& $cacheScript` (PS-CI-03): refactor to direct
-   invocation to drop the breaker marker dependency.
-5. Global skills dir drift: `accessibility` exists globally without SKILL.md (check
-   now reports GLOBAL_MISSING instead of crashing; re-sync pending).
+1. ~~Installer wiring~~ **DONE** (confidence: high) — `scripts/setup-install.ps1:42`
+   and `scripts/install.sh:51` wire `core.hooksPath .githooks` (build the gate
+   binary when Go is present, else announce pwsh fallback, ADR-049). Fresh clones
+   are gated from install.
+2. ~~Pre-push gate spawns pwsh unconditionally~~ **RESOLVED by inspection**
+   (confidence: high) — `.githooks/pre-push:38-40` re-runs pre-commit, which
+   prefers `bin/gate(.exe)` (`.githooks/pre-commit:22-24`); no unconditional pwsh
+   spawn.
+3. Post-commit ~885 ms no-op: **NOT REMEDIATED**, exact figure not re-measured
+   (measuring would require a real commit) — low priority. Structure verified:
+   `.githooks/post-commit:21-29` classifies skill triggers before spawning pwsh.
+   confidence: low (number) / high (structure).
+4. ~~PS-CI-03~~ **CLOSED** (confidence: high) — commit 24200d2d dot-sources
+   `Get-Cache`/`Set-Cache` directly (`scripts/check-skill-drift.ps1:18,22,88`),
+   dropping the breaker-marker dependency.
+5. Global skills dir drift — **EVOLVED** (confidence: high): `accessibility` is no
+   longer GLOBAL_MISSING. Current state: 95 global vs 94 canonical skills; the only
+   global skill without SKILL.md is `_shared` (by design,
+   `scripts/check-skill-drift.ps1:41`); 4 GLOBAL_NOT_JUNCTION (warn):
+   `accessibility`, `cancel-ralph`, `help`, `ralph-loop`. Re-junction only with an
+   explicit decision — do NOT run sync.
+6. **NEW gap** (confidence: medium): the Go fast path skips the PS gate's
+   always-run checks — `cmd/gate/main.go:548-564` (9 triggers) vs
+   `pre-commit-gate.ps1:303-312`: [19/26] backlog Runs ALWAYS, and [16/26], [24/26],
+   [25/26] have no staged guard — so docs-only commits bypass
+   backlog/write-scope/async/token-regression checks. Recommendation: document as
+   an accepted gap, or escalate if CYCLE.md/scope changes.
+7. `checkpoint/harness-2026-09-01` (confidence: high): single commit e51f40cc,
+   superseded by 29 commits on main (merge-base 44214d05) — keep as archive, do
+   NOT merge (binary must not enter the repo, `.gitignore:102`), do NOT delete
+   without an explicit decision.
