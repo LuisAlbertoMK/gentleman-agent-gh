@@ -132,11 +132,20 @@ Escalation verified live: staged `.ps1`/skills → shim printed `Escalating to P
 (3 trigger(s))`, ran 26/26 checks, commit accepted. Blocking semantics verified:
 secrets regex hit → exit 1; async-result `passed:false` → exit 1.
 
-Follow-ups (next session candidates):
-1. Installer wiring: `setup-install.ps1`/`install.sh` must set `core.hooksPath .githooks`
-   (+ one-time `go build ./cmd/gate`) — fresh clones are currently ungated.
-2. Pre-push gate spawns pwsh unconditionally — same shim pattern applies.
-3. `check-skill-drift.ps1:20,86` `& $cacheScript` (PS-CI-03): refactor to direct
+Follow-ups status (updated same day):
+
+1. ~~Installer wiring~~ **DONE** — `setup-install.ps1` + `install.sh` now wire
+   `core.hooksPath .githooks` + build the gate binary (Go present) or announce
+   pwsh fallback (ADR-049). Fresh clones are gated from install.
+2. ~~Pre-push gate spawns pwsh unconditionally~~ **RESOLVED by inspection** —
+   pre-push re-executes `.githooks/pre-commit`, which now prefers `gate.exe`
+   (fast path) and escalates only on PS triggers. No separate spawn.
+3. Correction to an earlier claim: `post-commit` already had skill-trigger
+   classification (diff-tree + grep before pwsh). Measured no-op cost is
+   ~885 ms — that is the `sh.exe` spawn tax itself on this machine (Windows
+   process creation + AV scan), not pwsh. Follow-up candidate (low priority):
+   consolidate hook entrypoints natively if commit latency ever dominates.
+4. `check-skill-drift.ps1:20,86` `& $cacheScript` (PS-CI-03): refactor to direct
    invocation to drop the breaker marker dependency.
-4. Global skills dir drift: `accessibility` exists globally without SKILL.md (check
+5. Global skills dir drift: `accessibility` exists globally without SKILL.md (check
    now reports GLOBAL_MISSING instead of crashing; re-sync pending).

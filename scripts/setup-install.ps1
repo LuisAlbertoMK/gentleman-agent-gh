@@ -34,7 +34,33 @@ try {
     Write-Host "       Continuing with partial setup..." -ForegroundColor Yellow
 }
 
-# ── Step 2: Optional gentle-ai CLI ──────────────────────────────────
+# ── Step 2: Wire git hooks + build Go gate ──────────────────────────
+# Without core.hooksPath, local commits run ungated (the quality gate is
+# dead code). Without a gate binary, the hook falls back to pwsh (slower
+# but still enforced) — see ADR-049 (PS fallback mandatory).
+try {
+    git -C $repoDir config core.hooksPath .githooks
+    Write-Host "[ok] git hooks wired: core.hooksPath = .githooks" -ForegroundColor Green
+    if (Get-Command go -ErrorAction SilentlyContinue) {
+        Push-Location $repoDir
+        try {
+            & go build -o (Join-Path $repoDir 'bin\gate.exe') ./cmd/gate 2>$null
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "[ok] gate.exe built — fast pre-commit path active" -ForegroundColor Green
+            } else {
+                Write-Host "[warn] gate build failed — pre-commit falls back to pwsh" -ForegroundColor Yellow
+            }
+        } finally {
+            Pop-Location
+        }
+    } else {
+        Write-Host "[info] Go not found — hooks fall back to pwsh (slower, still enforced)" -ForegroundColor Yellow
+    }
+} catch {
+    Write-Host "[warn] hook wiring failed: $_" -ForegroundColor Yellow
+}
+
+# ── Step 3: Optional gentle-ai CLI ──────────────────────────────────
 # NOTE: This repo (gentleman-agent-gh) does NOT install gentle-ai by default.
 # The -InstallGentleAI switch is deprecated and now throws an error to prevent
 # accidentally shadowing the local environment with a different upstream tool.

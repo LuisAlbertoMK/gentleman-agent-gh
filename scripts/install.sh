@@ -44,7 +44,28 @@ if ! "${REPO_DIR}/scripts/setup-machine.sh" --repo-dir "${REPO_DIR}" ${SETUP_ARG
     warn "setup-machine.sh reported warnings — continuing with partial setup..."
 fi
 
-# ── Step 2: Optional gentle-ai CLI ────────────────────────────────────
+# ── Step 2: Wire git hooks + build Go gate ────────────────────────────
+# Without core.hooksPath, local commits run ungated (the quality gate is
+# dead code). Without a gate binary, the hook falls back to pwsh (slower
+# but still enforced) — see ADR-049 (PS fallback mandatory).
+if git -C "${REPO_DIR}" config core.hooksPath .githooks; then
+    ok "git hooks wired: core.hooksPath = .githooks"
+else
+    warn "hook wiring failed — commits will run ungated"
+fi
+GATE_BIN="bin/gate"
+case "$(uname -s)" in CYGWIN*|MINGW*|MSYS*) GATE_BIN="bin/gate.exe" ;; esac
+if command -v go >/dev/null 2>&1; then
+    if (cd "${REPO_DIR}" && go build -o "${GATE_BIN}" ./cmd/gate 2>/dev/null); then
+        ok "gate binary built — fast pre-commit path active"
+    else
+        warn "gate build failed — pre-commit falls back to pwsh"
+    fi
+else
+    info "Go not found — hooks fall back to pwsh (slower, still enforced)"
+fi
+
+# ── Step 3: Optional gentle-ai CLI ────────────────────────────────────
 # NOTE: This repo (gentleman-agent-gh) does NOT install gentle-ai by default.
 # The --install-gentle-ai flag is deprecated to prevent accidentally shadowing
 # the local environment with a different upstream tool.
