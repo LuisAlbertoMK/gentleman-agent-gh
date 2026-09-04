@@ -1,0 +1,1 @@
+JD-APPROVED 2026-09-04 profiles security+reliability (dual-lens per review-rules.jsonc:154) — scripts/inter-track.ps1 self-heal diff (+13, id lazy-assign, count intacto, 80/80 Pester como dato). Registro del review realmente ejecutado via !judgment-day (via "Run !judgment-day" de la regla, NO via "touch markers" sin review); trazable en este marker + commit message.

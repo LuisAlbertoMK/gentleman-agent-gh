@@ -115,6 +115,19 @@ Invoke-TrackLocked -Action {
         }
     }
 
+    # Self-heal: init creates cycle with id="" (see lines 62-73); Reset is the
+    # only writer of id, but it runs solely manually or on target-met. Any
+    # -Increment calls (e.g. via close-session) before the first Reset leave
+    # id="" with count>0. Heal lazily: first invocation seeing empty id
+    # assigns one — count semantics untouched (no gaming per R3).
+    if ([string]::IsNullOrWhiteSpace($data.cycle.id)) {
+        $data.cycle.id = "CYC-" + (Get-Date -Format "yyyyMMdd") + "-" + (Get-Random -Minimum 100 -Maximum 999)
+        if ([string]::IsNullOrWhiteSpace($data.cycle.start)) {
+            $data.cycle.start = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssZ")
+        }
+        $dataRef.Value = $data
+    }
+
 if ($Reset) {
     $cycleId = "CYC-" + (Get-Date -Format "yyyyMMdd") + "-" + (Get-Random -Minimum 100 -Maximum 999)
     # Archive current cycle to history
