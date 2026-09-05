@@ -159,6 +159,12 @@ Write-Step "Global config" {
         }
         # ADR-048: disable startup auto-upgrade — npm binary replacement races running instances (incident 2026-09-02)
         $cfg=@{'$schema'="https://opencode.ai/config.json";'autoupdate'=$false;mcp=$mcpCfg;permission=@{bash=@{"*"="allow";"git commit *"="ask";"git push *"="ask";"git push --delete *"="ask";"git rebase *"="ask";"git reset *"="ask";"git merge *"="ask";"git branch -D *"="ask";"git stash drop *"="ask";"gh pr merge *"="ask";"git push --force *"="deny"};read=@{"*"="allow";"**/.env"="deny";"**/.env.*"="deny";"**/.env*"="deny";"**/credentials.json"="deny";"**/secrets/**"="deny";"**/*secret*"="deny";"**/.ssh/**"="deny";"**/*.key"="deny";"**/*.pem"="deny"}};agent=$existingAgents}
+        # FIX-C(a/b): propagate skills + full permission map (bash/read/write/edit) from project SSoT; hardcoded literal above stays as fallback
+        try{
+            $pj2=Get-Content $projectCfg -Raw | ConvertFrom-Json
+            if($pj2.PSObject.Properties.Match('skills').Count -gt 0 -and $null -ne $pj2.skills){ $cfg.skills=@($pj2.skills) }else{ $cfg.skills=@(".agents/skills") }
+            if($pj2.PSObject.Properties.Match('permission').Count -gt 0 -and $null -ne $pj2.permission){ $pc=@{}; foreach($kp in $pj2.permission.PSObject.Properties){ if($kp.Value -is [System.Management.Automation.PSCustomObject]){ $in=@{}; foreach($ip in $kp.Value.PSObject.Properties){ $in[$ip.Name]=$ip.Value }; $pc[$kp.Name]=$in }else{ $pc[$kp.Name]=$kp.Value } }; $cfg.permission=$pc }
+        }catch{ Write-Warning "  skills/permission propagate failed, kept fallback: $_"; $report.warnings+="skills/permission propagate failed: $_"; if($null -eq $cfg.skills){ $cfg.skills=@(".agents/skills") } }
         # SEC-F2: port the project deny floor (scripts/opencode-config/shared-deny-rules.json)
         # into the global bash map so dangerous commands are denied even outside this repo.
         try {
@@ -181,9 +187,12 @@ if(-not $NoAgentSync){Write-Step "Agent sync" {
     if($glob.PSObject.Properties.Match('agent').Count-eq 0){$glob|Add-Member -Name agent -Value @{} -MemberType NoteProperty -Force}
     if($proj.PSObject.Properties.Match('agent').Count-eq 0){Write-Warning "  No project agents";$report.steps["agent_sync"]=@{added=0;note="no project agents"}}
     else{$added=0;$updated=0; foreach($n in $agentNames){$sp=$proj.agent.PSObject.Properties[$n]; if($null-eq$sp){continue};$gh=$glob.agent.PSObject.Properties.Match($n).Count-gt 0;$glob.agent|Add-Member -Name $n -Value $sp.Value -MemberType NoteProperty -Force;if($gh){$updated++}else{$added++}}
+        # FIX-C(c): prune *-semi absent from canonical (ADR-033). Criterion: name -like '*-semi' AND absent from opencode.json:agent. No allowlist in config -> narrow *-semi only; a future legit global *-semi would be pruned (known limitation).
+        $pruned=0; foreach($gp in @($glob.agent.PSObject.Properties.Name)){ if($gp -like '*-semi' -and $proj.agent.PSObject.Properties.Match($gp).Count -eq 0){ $glob.agent.PSObject.Properties.Remove($gp); $pruned++ } }
+        Write-Verbose "prune *-semi absent-from-canonical: $pruned (ADR-033)"
         if(-not$NoAgentsMd){$src=Join-Path (Split-Path $projectCfg -Parent) "AGENTS.md";$dst=Join-Path (Split-Path $globalCfg -Parent) "AGENTS.md";if(Test-Path $src -PathType Leaf){Copy-Item -LiteralPath $src -Destination $dst -Force}}
         $glob|ConvertTo-Json -Depth 10|Set-Content $globalCfg -Encoding UTF8 -Force
-        Write-Host "  ${added} added, ${updated} updated" -Fore Green;$report.steps["agent_sync"]=@{added=$added;updated=$updated}}
+        Write-Host "  ${added} added, ${updated} updated, ${pruned} pruned (*-semi)" -Fore Green;$report.steps["agent_sync"]=@{added=$added;updated=$updated;pruned=$pruned}}
 }}
 
 # Step 5: Junction verification
