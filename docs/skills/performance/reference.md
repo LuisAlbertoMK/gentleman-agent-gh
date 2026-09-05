@@ -139,6 +139,29 @@ No yields = input delay + processing + presentation all in one frame = INP failu
 
 ## Cross-Refs: web-quality-audit | ui-engine | baseline-ui
 
+## Extended — (movido por ADR-048, cycle32-p2/p7)
+
+Tablas detalle externalizadas del core para ≤3200B:
+
+| Resource | Budget | | Resource | Budget |
+|---|---|---|---|---|
+| Total | <1.5MB | | JS (gz) | <300KB |
+| CSS | <100KB | | Images | <500KB |
+| Fonts | <100KB | | 3rd-party | <200KB |
+
+| Phase | Target | How |
+|---|---|---|
+| Input Delay | <50ms | Reduce main thread blocking |
+| Processing | <100ms | `scheduler.yield()` |
+| Presentation | <50ms | Compositor anim, `content-visibility:auto` |
+
+| Property | Thread | OK? |
+|---|---|---|
+| `transform`, `opacity` | Compositor GPU 60fps | ✅ |
+| `filter` | Compositor GPU | ⚠️ |
+| `width/height/top/left` | Main Layout+Paint | ❌ |
+| `margin/padding` | Main Layout+cascades | ❌ |
+
 ## Externalized Sections (ADR-007 compression)
 ## Scroll-Driven + Visibility (0KB)
 ```css

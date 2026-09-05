@@ -3,7 +3,7 @@ name: work-unit-commits
 description: "Plan commits as reviewable work units."
 triggers: "work unit, commit splitting, commit organization, reviewable commits, split commit, stacked PR, chained PR commits"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2338
+token_budget: 2722
 ---
 ## When to Use
 Splitting feature into reviewable work units · preparing commits before PR · large change into chained/stacked PRs · healthy reviewer cognitive load · SDD tasks without exceeding 400 lines.
@@ -35,9 +35,10 @@ git log --oneline -5
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "code sin su test en el mismo unit" | Commit de code sin tests que lo verifican | Verificar Rules: Tests with code en mismo commit + checklist repo works after commit + rollback sin revert unrelated |
+| "docs post-hoc" | Docs en commit separado post-hoc | Verificar Rules: Docs with change en mismo commit que feature/workflow + Tell a story + Chained PR slice |
+| "commit por file type o >400 sin chain" | Commit por tipo archivo models→services→tests o >400 sin chain | Verificar NOT by file type + SDD guard >400-line forecast → chain + future PR-ready por commit |
+
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

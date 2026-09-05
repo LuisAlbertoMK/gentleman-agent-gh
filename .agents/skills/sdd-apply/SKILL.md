@@ -3,7 +3,7 @@ name: sdd-apply
 description: "Implement SDD tasks from specs and design."
 triggers: "SDD apply, implement SDD, code change"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2424
+token_budget: 2950
 ---
 Input + store modes → reference. Status (sdd-status-contract.md), delivery (ask-on-risk|auto-chain|single-pr|exception-ok), PR slice / size:exception.
 | State | Action |
@@ -19,6 +19,7 @@ Input + store modes → reference. Status (sdd-status-contract.md), delivery (as
 - **2b Prior Progress** — see reference
 - **3 Resolve Mode** — strict_tdd (true+runner) → STRICT TDD → load skills/sdd-apply/strict-tdd.md; else Standard. Evidence (all modes): Work Unit Evidence (focused test + result cmd/exit/counts; runtime harness; rollback boundary) + threat-matrix → RED test before prod. Strict TDD: TDD Cycle Evidence (RED→GREEN→REFACTOR per task) mandatory; missing = FAILED.
 - **4 Implement** — task → spec scenarios → design → patterns → code → [x] → note issues
+- Implementation may delegate to agent `gentleman-implementer` (defined in opencode.json) when workload requires isolation.
 - **5 Persist + Return** — §C; save apply-progress (topic_key: sdd/{change}/apply-progress); confirm [x]. Return §D: Completed, Files Changed, TDD Evidence, Deviations, Issues, Remaining, Workload/PR Boundary, Status
 - Artifacts: English; specs = acceptance criteria; follow design (freelancing → deviation); match patterns; stop on blocked.
 ## Reference
@@ -39,5 +40,5 @@ Input/store modes + 2a/2b detail → docs/skills/sdd-apply/reference.md
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-Cross-Refs: sdd | sdd-verify
+Cross-Refs: sdd | sdd-verify | plan-execution
 

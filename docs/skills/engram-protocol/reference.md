@@ -4,6 +4,22 @@
 > token budget (ADR-007). Contains worked examples, testing patterns, edge cases,
 > anti-patterns, and quick-reference cards.
 > **Consumable by**: $Skill sub-agent when producing output.
+## Extended — Temporal Edges (sección movida por ADR-048, cycle32-p2)
+
+> Detail moved from SKILL.md to keep core ≤3200B. Core retains summary pointer; full table below is canonical.
+
+| Question | Temporal query | Verification |
+|----------|----------------|--------------|
+| What preceded decision X? | `scripts/engram-temporal.ps1 -TopicKey "decision/<key>" -Limit 5` | Chain sorted by `createdAt`, edge `deltaHours` shows gap |
+| What changed between sessions? | `engram search --topic-key "batch/<session>" --sort timeline` | Compare `edges` from→to topic_keys |
+| Is this a repeat of prior error? | `mem_search(type="bugfix", sort="timeline")` | If `deltaHours <24h` and same file:line → same error 2× pattern |
+
+- **Build**: `Get-TemporalChain` (engram CLI) → sort `createdAt` → edges `from→to` + `deltaHours`
+- **Use**: re-rank `mem_search` results by `topic_key` recency before answering "what's missing" (Pre-Answer Evidence Gate)
+- **Ref**: Zep vs Letta vs Mem0 comparison (KB `r2-fundesk` no, `niteagent` 2026-05-17, `aiworkflowlab` 2026-06-02) - Zep wins for temporal reasoning
+
+---
+
 ## Examples (4-5)
 
 ### Example 1: Bug Fix Persistence

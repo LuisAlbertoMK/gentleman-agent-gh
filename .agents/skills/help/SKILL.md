@@ -3,7 +3,7 @@ name: help
 description: "Explain Ralph Loop plugin and available commands"
 triggers: "help, ralph help, commands, available commands, what can you do, /help"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2078
+token_budget: 2500
 ---
 
 ## When to Use
@@ -32,9 +32,9 @@ Explain Ralph Loop plugin and available commands
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "explicar comandos sin SHORTCUTS.md" | comando descrito sin verificar SHORTCUTS.md file:line | validar cada comando contra SHORTCUTS.md + SKILL.md trigger file:line |
+| "inventar shortcuts" | shortcut no existe en SHORTCUTS.md sugerido como real | grep SHORTCUTS.md file:line antes de listar cualquier shortcut |
+| "asumir routing sin verificar T-level" | T1-T4 routing descrito sin cotejar help ## Routing | verificar T-level con help ## Routing + execution-mode file:line |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

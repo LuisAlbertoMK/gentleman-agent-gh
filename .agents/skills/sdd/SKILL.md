@@ -51,5 +51,5 @@ Examples (1) + Testing Patterns (3) + Edge Cases (4) → docs/skills/sdd/referen
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-Cross-Refs: sdd-quick | sdd-init
+Cross-Refs: sdd-quick | sdd-init | delivery-harness
 

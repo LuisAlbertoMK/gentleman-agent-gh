@@ -3,7 +3,7 @@ name: code-generation
 description: "Trigger: new file, function, code generation, script, boilerplate, scaffold. Write code matching codebase patterns."
 triggers: "new file, new function, code generation, script, boilerplate, scaffold, create code, write code"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2545
+token_budget: 2850
 ---
 ## When to Use
 New files, new functions, scripts, boilerplate. NOT for debugging (→ deep-debugging) or single-line fixes on existing files (→ quick-executor).
@@ -32,9 +32,9 @@ Created/modified [file]. Pattern matched from [source]. Ready for review.
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "boilerplate sin leer patrones del repo" | Generar sin leer 2-3 archivos vecinos | WORKFLOW CONTEXT: Read target dir + match patterns |
+| "un archivo gigante en vez de módulos" | Monolito sin `one clear purpose` | STANDARDS one purpose + patch-first rule |
+| "tests después si queda tiempo" | Tests postergados | WORKFLOW VALIDATE + Rule Tests detect framework |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

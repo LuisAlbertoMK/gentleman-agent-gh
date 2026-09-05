@@ -38,9 +38,9 @@ Build and maintain skill registry — scan, dedupe, compact, persist. Trigger: "
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "saltearse dedupe scan" | Registry con duplicados cross-source | Steps 1 Scan all sources + dedupe project wins |
+| "no persistir registry a engram" | mem_save omitido | Rules: ALWAYS mem_save + .atl/skill-registry.md |
+| "compact rules >15 líneas" | Compact rules >15 líneas con fluff | Compact 5-15 líneas actionable, NO fluff (Steps 2) |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -50,5 +50,5 @@ Build and maintain skill registry — scan, dedupe, compact, persist. Trigger: "
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-Cross-Refs: skill-graph | cross-project-forge
+Cross-Refs: skill-graph | cross-project-forge | skill-testing | skill-improver
 

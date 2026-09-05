@@ -3,7 +3,7 @@ name: triple-verify
 description: "Triple verification — 3 enfoques, thresholds por zona, modos !ship/!fast/!draft"
 triggers: "Triple verify, triangulate, 3 enfoques, !ship, !listo, !fast, !draft"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2543
+token_budget: 3150
 ---
 ## 3 Approaches
 | E1 — Testing | E2 — Static | E3 — Build/Runtime |
@@ -38,9 +38,9 @@ token_budget: 2543
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "2 de 3 enfoques bastan si coinciden" | Omitir un enfoque porque otros dos pasaron | Exigir SIEMPRE E1+E2+E3 distintos (behavior+quality+compilation), Default-FAIL si falta uno |
+| "E2 static es suficiente para refactors" | Solo lint/4R sin tests ni build | Rojo/Amarilla >10L → E1+E2+E3 en paralelo; build mandatory si compilable, tests de repro obligatorios |
+| "thresholds iguales para todas las zonas" | Misma profundidad verify para Verde y Rojo | Zone routing: Verde→SKIP, Amarilla ≤10L→quality-gate, Rojo/Amarilla >10L→TRIPLE VERIFY; quality-gate siempre en !ship |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

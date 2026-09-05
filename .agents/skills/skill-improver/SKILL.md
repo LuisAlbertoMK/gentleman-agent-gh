@@ -46,9 +46,9 @@ Audit and improve skills — preserve author intent, fix frontmatter, convert tu
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "reescribir en vez de audit-fix preservando intención" | Rewrite completo borra intent original | Regla 1 Preserve intent + audit-fix gaps only |
+| "borrar en vez de archivar" | Contenido eliminado sin mover a references/ | Regla 3 Never delete → references/ + changelog |
+| "añadir triggers no solicitados" | Triggers nuevos no pedidos en spec | Regla 4 Don't invent triggers — mark ambiguous |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -58,7 +58,7 @@ Audit and improve skills — preserve author intent, fix frontmatter, convert tu
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-karpathy-loop · opencode-skill-creator · skill-testing · immune-system · dreaming
+karpathy-loop · opencode-skill-creator · skill-testing · immune-system · dreaming · skill-registry · skill-graph
 
 ## Reference
 > docs/skills/skill-improver/reference.md

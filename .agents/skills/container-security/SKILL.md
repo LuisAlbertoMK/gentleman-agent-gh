@@ -3,7 +3,7 @@ name: container-security
 description: "Trigger: Dockerfile, docker-compose, Kubernetes, k8s, pod, deployment, helm. Audit container security hardening."
 triggers: "Dockerfile, docker-compose, container, image, Kubernetes, k8s, pod, deployment, helm, docker, orchestration"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2179
+token_budget: 2500
 ---
 ## When to Use
 Reviewing Dockerfiles, docker-compose, K8s manifests, Helm charts, or "is this container secure"
@@ -41,9 +41,9 @@ Reviewing Dockerfiles, docker-compose, K8s manifests, Helm charts, or "is this c
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "No secrets in this repo" | Skipping secrets scan | grep -rn process.env + npm audit before commit |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "root user en dev está OK" | Dockerfile sin `USER` / `runAsUser: 0` | CHECKLIST CRIT Runs as root + Rule USER FIRST |
+| "latest tag en prod es práctico" | `latest`/`:` sin pin | CHECKLIST `latest` tag MED + Rule Pin versions |
+| "secrets en env vars es suficiente" | Secrets en ENV/ARG visibles en history | CHECKLIST CRIT Secrets in ENV/ARG + grep `ENV.*SECRET` |
 
 ## Red Flags
 - Skipping secrets scan → STOP, re-read skill
@@ -53,7 +53,7 @@ Reviewing Dockerfiles, docker-compose, K8s manifests, Helm charts, or "is this c
 - grep -rn process.env + npm audit before commit
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-security-scanner · best-practices · quality-gate
+security-scanner · best-practices · quality-gate · auth-hardening · llm-security · infra-audit
 ---
 
 docs/skills/container-security/reference.md

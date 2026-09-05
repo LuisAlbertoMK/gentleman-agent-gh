@@ -43,7 +43,7 @@ Return `
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-Cross-Refs: sdd | sdd-apply
+Cross-Refs: sdd | sdd-apply | triple-verify
 
 ## Verification Report`: change, mode, completeness, build/test/coverage, compliance matrix, correctness, design coherence, issues (CRITICAL/WARNING/SUGGESTION), verdict (`PASS`/`PASS WITH WARNINGS`/`FAIL`).
 ## Reference

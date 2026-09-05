@@ -3,7 +3,7 @@ name: issue-creation
 description: "Create Gentle AI issues with issue-first checks."
 triggers: "create issue, GitHub issue, bug report, feature request, open issue, issue creation, report bug"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2563
+token_budget: 2956
 ---
 ## When to Use
 Bug in `gga`·Feature/enhancement·Gentleman-Programming/gentle-ai·Triaging
@@ -48,9 +48,10 @@ Consult these when the skill needs detailed worked examples or guardrails:
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "issue sin checks issue-first" | Crear issue sin buscar dupes ni usar bug_report.yml/feature_request.yml | Verificar Workflow: search dupes + template requerido + Labels bug/enhancement + status:needs-review file:line |
+| "status:approved sin review" | PR vinculado sin issue status:approved | Verificar Rule 3: status:approved REQUIRED antes de PR + Closes #N + gh issue view file:line |
+| "pregunta como issue / blank issue" | Blank issue o pregunta sin ir a Discussions | Verificar Rules: no blank issues + Questions→Discussions + no Co-Authored-By + template pre-flight |
+
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

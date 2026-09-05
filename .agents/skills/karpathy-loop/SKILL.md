@@ -3,7 +3,7 @@ name: karpathy-loop
 description: "Iterative prompt optimization — write, measure, cut, repeat with progressive compression"
 triggers: "Karpathy loop, optimize prompt, measure tokens"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2541
+token_budget: 3050
 ---
 
 ## When to Use
@@ -37,9 +37,9 @@ Tokens <50 + works · 3 iterations no improvement · Fits in 1 line. **NEVER**: 
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "3 iteraciones bastan, corto en T2" | Stopping at T2 in THOROUGH/complex prompt | Measure T3 — revert only if score drops (e.g., 7.3→5.3), must measure first |
+| "Tokens ya <300, no medir" | Skipping MEASURE after CUT | tokens≈chars/4 + correctness/conciseness/robustness score each loop |
+| "Quito constraints para ahorrar" | Removing FORMAT=INSTRUCT to save tokens | Verify output still matches JSON/schema without constraint — keep if drift |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -49,7 +49,7 @@ Tokens <50 + works · 3 iterations no improvement · Fits in 1 line. **NEVER**: 
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-lean-context · skill-improver · metricas · code-review-agent
+lean-context · skill-improver · metricas · code-review-agent · context-watchdog · execution-mode
 
 ## Reference
 Worked examples, testing patterns, edge cases, anti-patterns → docs/skills/karpathy-loop/reference.md

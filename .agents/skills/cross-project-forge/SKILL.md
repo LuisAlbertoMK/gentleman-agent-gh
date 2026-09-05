@@ -51,9 +51,9 @@ Update pattern JSON:
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "forjar skill bajo el threshold de severidad" | Pipeline inicia sin threshold met | When to Use table: min occurrences/projects verificado |
+| "saltarse quality gates por urgencia" | SKILL.md sin frontmatter/parses o gates unchecked | Quality Gates 9 checks mandatory (YAML, prefix, ≤120ch...) |
+| "hardcodear paths absolutos" | Paths absolutos en rules/triggers | Gate: No secrets, no absolute paths + skill-graph resolves |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

@@ -3,7 +3,7 @@ name: performance-tracker
 description: "Score and track app performance — 6 dims, continuous scoring, trend analysis"
 triggers: "performance score, mobile perf, desktop perf, rendimiento, app score, benchmark, perf tracking, performance trend"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2739
+token_budget: 3080
 ---
 ## When to Use
 Score and track app performance — 6 dims, continuous scoring. App PERFORMANCE only (agent perf → `auto-metrics`). Mobile, Desktop, Web.
@@ -29,9 +29,10 @@ Thresholds table + quick checks + worked examples (5) → docs/skills/performanc
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Optimize without profiling" | No baseline measurement | benchmark-core.ps1 -Gate before/after |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "score sin 6 dims" | Score sin 6 dims o dimensión adivinada | Verificar Hard Rules: Score EVERY dimension medición real + neutral 7 si unavailable + thresholds file:line |
+| "trend sin historial" | Trend sin N≥5 historial | Verificar Score Storage: mem_save perf-score:{app}-{platform} + mem_search prev5 vs recent5 + Trend cada 10 |
+| "mix plataformas o single run" | Trend mezclando plataformas o single lighthouse | Verificar NEVER mix platforms + median-of-3 lighthouse + regression >0.5→gap-analysis + never crash no process |
+
 
 ## Red Flags
 - No baseline measurement → STOP, re-read skill
@@ -41,7 +42,8 @@ Thresholds table + quick checks + worked examples (5) → docs/skills/performanc
 - benchmark-core.ps1 -Gate before/after
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-Cross-Refs: performance | auto-metrics
+Cross-Refs: performance | auto-metrics | perf-profiling
+
 
 ## Verification
 - Output: response matches the ## Output contract format exactly

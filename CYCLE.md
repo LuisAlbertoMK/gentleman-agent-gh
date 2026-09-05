@@ -6,7 +6,9 @@
 
 ## Objective
 
-**Cycle 31** (ACTIVE): CA fidelity + G4-G8 remediation — wire inter-track to close-session, fix gh CLI context, resolve 31 test fails, script count penalty, Ollama UX bridge. **Target**: 9.4→9.7/10 (current: 9.6/10 post-G6 resolution).
+**Cycle 31** (COMPLETED): CA fidelity + G4-G8 remediation — wire inter-track to close-session, fix gh CLI context, resolve 31 test fails, script count penalty, Ollama UX bridge. **Result**: CERRADO (9.6/10 post-G6, G4-G8 done).
+
+**Cycle 32 P9** (COMPLETADO-VERIFICADO en rama automejora/componentes-20260902): 10 commits main..HEAD = 6 Cycle32 (82a89992..8e6d8aa5) + 3 P9 (14813675, c85d4c49, 8390c6e5) + 1 docs (fc03b658); base 44214d05 en main, fuera del diff, V1/V2/V3 PASS (93/93 budget, 10/10 cross-ref, DryRun 2 drifts MCP+agent), pendiente sync-real + push (ask). **Target**: 9.7→10.0/10 (current: 10.0/10 SD 9.7).
 
 **Cycle 30** (COMPLETED): SD sub-dim remediation — ToolHygiene 7.4→10 (add -Quiet/-Json to all scripts) and Delegation 2→10 (enrich BITACORA with subagent mentions). **Result**: SUCCESS (9.4/10, CA 3→4 via inter-track sync, PA 8→10 via trial-verify junction).
 
@@ -170,7 +172,8 @@ LOOP:
 | 28 | CI Resurrection & Toolchain Freedom | 9.9/10 | quality-gate 24d startup_failure fixed, ADR-046 toolchain freedom, benchmark-regression revived, permission suites unified 157/157 |
 | 29 | SE + CA remediation | 9.4/10 | inter-track.json creation, SSoT freshness, close-session checkpoint bridge |
 | 30 | SD sub-dim remediation | 9.4/10 | PSSA gate fixes, BITACORA subagent enrichment, score cache invalidation |
-| 31 | CA fidelity + G4-G8 remediation | (active) | inter-track wiring, junction fix, gh CLI fix, score 9.4→9.7 target |
+| 31 | CA fidelity + G4-G8 remediation | 9.6/10 CERRADO | inter-track wiring, junction fix, gh CLI fix, score 9.4→9.6 |
+| 32 | Componentes P9 verificado en rama | 10.0/10 P9 PASS | 10 commits (6 Cycle32+3 P9+1 docs), base 44214d05 en main fuera del diff, V1/V2/V3 PASS 93/93 10/10 DryRun 2 drifts, freeze-models 367L |
 
 ## Archived Cycles
 

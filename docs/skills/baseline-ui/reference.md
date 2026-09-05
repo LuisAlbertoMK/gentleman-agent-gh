@@ -15,3 +15,14 @@
 7. CQ card `.card{container-type:inline-size}.card-inner{display:grid;gap:1rem}@container(min-width:400px){.card-inner{grid-template-columns:240px 1fr}}`
 8. Subgrid `.rows{display:grid}.rows>*{display:grid;grid-template-rows:subgrid;grid-row:span 2}`
 9. Stack/center `.stack{display:grid;gap:1rem}.center{place-items:center}`
+
+---
+
+## Extended — (movido por ADR-048, cycle32-p2/p7)
+
+**Ejemplos verbosos externalizados** (core ≤3200B):
+
+1. Audit: `/baseline-ui src/components/Button.tsx` → `UI-CLEANUP:Button—2026-08-27 CRITICAL:[contrast]→ HIGH:[layout]→ VERIFY:[axe]`
+2. Token: `oklch(55% .18 255)` → `--primary:var(--blue-500)` → verify 4.5:1
+
+Anti-Rationalization extendida previa → 3 filas contextuales en core; detalles completos aquí para auditoría.

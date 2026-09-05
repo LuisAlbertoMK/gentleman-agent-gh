@@ -3,7 +3,7 @@ name: execution-mode
 description: "Auto-detect task execution mode - QUICK/THOROUGH/DRAFT - from scope/risk/familiarity. Not resource optimization."
 triggers: "Execution mode, quick/thorough/draft, resource adaptive, zone green/yellow/orange/red"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2254
+token_budget: 2700
 ---
 ## When to Use
 Auto-detect task execution mode — QUICK/THOROUGH/DRAFT — from scope, risk, familiarity. Not resource optimization.
@@ -30,9 +30,9 @@ DRAFT when asked THOROUGH · Skip zone re-eval · Ignore RED · One mode all ses
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "QUICK para todo porque es más rápido" | Bypassing THOROUGH on risky/complex task | Risk/scope gate — complex/risky→THOROUGH 9-phase + quality-gate |
+| "Un modo toda la sesión" | No zone re-eval after 5 tools | Re-evaluate every 5 tools — GREEN/YELLOW/ORANGE/RED dictates depth |
+| "DRAFT no necesita permiso" | Committing from DRAFT without user OK | DRAFT→notes only — verify no commit without explicit user approval |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -42,5 +42,5 @@ DRAFT when asked THOROUGH · Skip zone re-eval · Ignore RED · One mode all ses
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-Cross-Refs: sdd | sdd-apply
+Cross-Refs: sdd | sdd-apply | development-mode
 

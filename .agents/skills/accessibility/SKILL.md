@@ -3,7 +3,7 @@ name: accessibility
 description: "WCAG 2.2 + EAA 2025 — audit and improve web accessibility."
 triggers: "a11y, accessibility, WCAG, screen reader, keyboard navigation, EAA, European Accessibility Act, contrast, focus, touch target"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2216
+token_budget: 2461
 ---
 
 ## When to Use
@@ -12,12 +12,11 @@ WCAG 2.2 + EAA 2025 — audit and improve web accessibility.
 ## Theme-Switching Contrast: Hero buttons on gradients → .hero .btn override (--clr-accent drops below 3:1 on dark). Footer spans on dark bg → --clr-white or test each theme. Verify getComputedStyle contrast ≥4.5:1 against bg AND text per theme.
 ## Grid A11y: NEVER grid-auto-flow: dense on interactive (breaks DOM tab flow). Preserve source order · TEST keyboard tab through every responsive variant.
 ## Anti-Rationalization
-
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "Audit solo con Lighthouse" | Lighthouse 100 pero tab order roto | Lighthouse + axe + keyboard tab through every responsive variant |
+| "ARIA como parche de HTML semántico mal usado" | div role=button sin keyboard/focus | Usa `<button>/<a>` nativo; ARIA solo si semántica falta + verify keyboard |
+| "EAA 2025 no aplica a proyectos chicos" | Skip contrast/focus por tamaño | WCAG 2.2 AA + EAA contrast ≥4.5:1 y focus visible siempre |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
