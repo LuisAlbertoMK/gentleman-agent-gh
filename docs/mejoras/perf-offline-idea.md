@@ -2,7 +2,7 @@
 
 **Date**: 2026-08-29
 **Branch**: improve/quick-win-U5-G2-20260829
-**Status**: Implemented
+**Status**: DONE (86297d4b feat perf offline fallback U5 de #28)
 
 ## Problem
 
