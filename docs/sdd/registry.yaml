@@ -119,5 +119,21 @@ changes:
       files per fix, known codebase, no schema/auth/API changes). Priority by
       I/R descending: inter-track increment (3.0), counter sync (3.0), skill
       compression (1.0), script consolidation (1.0), BITACORA entries (1.0),
-      score refresh (1.0). Rollback: git checkout 5 min. Gates: SkillOpt per
-      fix, protected-files audit (!audit) before commit.
+       score refresh (1.0). Rollback: git checkout 5 min. Gates: SkillOpt per
+       fix, protected-files audit (!audit) before commit.
+
+  "2026-09-08-hook-pwsh-no-bash":
+    title: "Hook pre-commit sin bash — shebang absoluto a sh.exe existente"
+    status: archived
+    archived: "2026-09-08"
+    domains: ["infra", "git-hooks", "dx"]
+    files:
+      - ".githooks/pre-commit"
+      - "docs/sdd/proposals/2026-09-08-hook-pwsh-no-bash.md"
+    created: "2026-09-08"
+    description: >
+      Fix hook pre-commit roto: #!/bin/sh sin /usr/bin/sh.exe en host obliga a
+      --no-verify. Primario: shebang absoluto a bin/sh.exe (1 linea, I/R 3.0),
+      fallback 8.3 si el espacio en ruta falla. Gate PS7-only excluye
+      powershell.exe 5.1. Rollback: git checkout -- .githooks/pre-commit.
+      Done: git commit real dispara el hook y pasa. Fast-path SDD-Quick.
