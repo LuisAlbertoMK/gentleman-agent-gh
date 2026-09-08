@@ -19,7 +19,7 @@ Multi-step blocking-unacceptable work · dependent chains (N+1 needs N's output)
 - **CONFIRM**: pause → human approval.
 Escalate: credentials, network egress, package installs, `git push --force`, destructive ops.
 ## Async handoff
-`post-delegation-check.ps1 -Async` returns immediately → writes `{BaseRef}.async-result.json`; read `.passed` first. `monitor-subagent.ps1` polls (15s) + write-scope validation; writes when git stable (2 polls) or 300s.
+`post-delegation-check.ps1 -Async` → `{BaseRef}.async-result.json`; read `.passed` first. `monitor-subagent.ps1` polls 15s; writes when git stable (2 polls) or 300s.
 ## Anti-Rationalization
 
 | Rationalization | Red Flag | Verification |

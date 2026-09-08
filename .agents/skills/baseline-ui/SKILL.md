@@ -6,9 +6,9 @@ changelog: docs/ciclos/cycle28-20260815.md
 token_budget: 3126
 ---
 ## When to Use
-Anti-slop audit&cleanup: layout·typography·responsive·animation·tokens. **Stack**: CSS/Tailwind·`cn()`(clsx+tw-merge)·React. Audit→**ui-engine**. **Flow**: Scan→❌→fix→verify→a11y→perf. Review:`/baseline-ui <file>`. Offline-first: pure static audit — needs NO network/Ollama.
+Anti-slop audit&cleanup: layout·typography·responsive·animation·tokens. Stack: CSS/Tailwind·`cn()`·React. Flow: Scan→fix→verify→a11y→perf. Review:`/baseline-ui <file>`. Offline-first, no network.
 ## Typography
-`text-balance`h·`text-pretty`body·`tabular-nums`data·Page→`clamp(1rem,1.5vw+.5rem,1.5rem)`
+`text-balance` headings · `text-pretty` body · `tabular-nums` data · Page→`clamp(1rem,1.5vw+.5rem,1.5rem)`
 ## Tokens OKLCH→Var
 1 Pick OKLCH `oklch(55% .18 255)`→2 primitive `--blue-500`→3 semantic `--primary:var(--blue-500)`→4 component `--btn-bg`→5 theme `:root{color-scheme:light dark}`→6 verify ≥4.5:1.
 ## Hard Rules
@@ -23,7 +23,7 @@ Anti-slop audit&cleanup: layout·typography·responsive·animation·tokens. **St
 ## Anti-Patterns
 Fixed width·h-screen·dense interactive·Fixed font·transition:all·>500ms·No reduced-motion·HSL/RGB·No contrast·cqi outside container
 ## Examples
-Audit: `/baseline-ui src/components/Button.tsx` → `UI-CLEANUP:Button—2026-08-27 CRITICAL:[contrast]→ HIGH:[layout]→ VERIFY:[axe]` · Details → reference.md
+`/baseline-ui src/components/Button.tsx` → `UI-CLEANUP:Button—<date> CRITICAL:[contrast]→ HIGH:[layout]→ VERIFY:[axe]` · Details → reference.md
 ## Anti-Rationalization
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
@@ -41,11 +41,5 @@ Audit: `/baseline-ui src/components/Button.tsx` → `UI-CLEANUP:Button—2026-08
 ---
 
 ## Reference Materials
-
-The following material is externalized to keep this skill under the 3KB token budget (ADR-048).
-Consult these when the skill needs detailed worked examples or guardrails:
-
-- **Worked Examples, Layout Patterns, Anti-Patterns, Quick Reference**
-  → docs/skills/baseline-ui/reference.md
-
----
+Externalized per ADR-048 (worked examples, patterns, quick ref):
+→ docs/skills/baseline-ui/reference.md

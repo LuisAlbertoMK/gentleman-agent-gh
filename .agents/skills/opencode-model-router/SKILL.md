@@ -10,9 +10,9 @@ metadata:
 token_budget: 3200
 ---
 
-## Routing Table (FREE 2026-09-02, 8 ids free — extended -> docs/skills/opencode-model-router/reference.md)
+## Routing Table (FREE 2026-09-02 → reference.md for Security Gate, Strategy, Laguna notes)
 
-> See reference.md for Security Gate, Strategy, notas Laguna y ground truth 2026-09-02.
+> Full detail → docs/skills/opencode-model-router/reference.md.
 
 | Task | Action | Agent | Model (Free vigente) | Ctx | Fallback |
 |------|--------|-------|----------------------|-----|----------|
@@ -42,7 +42,6 @@ Avoid: Qwen3.7 Max (re-plans, paid), Nemotron 3 Ultra (over-analyzes).
 
 ---
 ## Reference Materials
-Security Gate, Strategy, notas catálogo y detalle extendido -> docs/skills/opencode-model-router/reference.md (ADR-048, cycle32-p2)
+Security Gate, Strategy, catálogo → docs/skills/opencode-model-router/reference.md (ADR-048)
 ---
-## Refs
-Cross-Refs: delivery-harness | opencode-model-router
+## Refs: delivery-harness | opencode-model-router

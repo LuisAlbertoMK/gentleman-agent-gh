@@ -15,61 +15,28 @@ token_budget: 3000
 
 ## Rules
 
-1. Declare runtime: `#requires -Version 7.0` if PS7-only;
-   for PS5.1 compat avoid PS7-only syntax
-   (ternary `? :`, `&&`/`||`, `??`).
-2. PS5.1 rejects `&&`/`||` as pipeline chain operators -
-   use `if`/`then` or Invoke-Bash (`scripts/bash-safe.ps1`).
-3. Join-Path: named params only (`-Path`/`-ChildPath`),
-   never >2 positional args (anti-pattern #10).
-4. Initialize accumulators before first `+=`:
-   `$errors = @()` (anti-pattern #13).
-5. `-match` is case-INSENSITIVE in PS;
-   use `-cmatch` when casing matters (anti-pattern #14).
-6. Encoding: write `.ps1` ASCII-only when possible;
-   Unicode → UTF-8 with BOM; always pass `-Encoding UTF8` to
-   `Get-Content`/`Set-Content`/`Out-File` (anti-pattern #16).
-7. Regex vs Windows files: use `\r?\n` not `\n`;
-   multiline `(?m)^` — CRLF breaks `^key:` anchored scans
-   (P1-1: ~10 false positives, doc:31-46).
-8. In regex alternation write `[|]` not escaped `\|` -
-   quality gates raw-scan for `||` and false-positive
-   (anti-pattern #20).
-9. Mojibake in tool output may be console codepage
-   display, NOT file corruption — verify file bytes
-   (hex/UTF8) before claiming corruption;
-   do not "fix" clean files.
+1. Declare runtime: `#requires -Version 7.0` if PS7-only; PS5.1-compat → avoid ternary `? :`, `&&`/`||`, `??`.
+2. PS5.1 rejects `&&`/`||` — use `if`/`then` or Invoke-Bash (`scripts/bash-safe.ps1`).
+3. Join-Path: named params only (`-Path`/`-ChildPath`), never >2 positional (anti-pattern #10).
+4. Init accumulators before `+=`: `$errors = @()` (#13).
+5. `-match` is case-INSENSITIVE; use `-cmatch` when casing matters (#14).
+6. Write `.ps1` ASCII-only when possible; Unicode → UTF-8 with BOM; always `-Encoding UTF8` on `Get/Set-Content`/`Out-File` (#16).
+7. Windows files: `\r?\n` not `\n`; multiline `(?m)^` — CRLF breaks `^key:` scans (P1-1: ~10 FPs, doc:31-46).
+8. Regex alternation: `[|]` not `\|` — gates raw-scan `||` as FP (#20).
+9. Mojibake may be console codepage, NOT file corruption — verify bytes (hex/UTF8) before "fixing".
 
 ## Verification
-
-1. PSSA clean or documented baseline -
-   run `Invoke-ScriptAnalyzer` before commit.
-2. Parse test: AST parse of the file passes
-   (`[Parser]::ParseFile` or `pwsh -c "Parse"`).
-3. For encoding-sensitive edits, re-read with
-   `-Encoding UTF8` and confirm no U+FFFD.
-4. If regex, test against both LF and CRLF samples.
-
+1. PSSA clean or documented baseline before commit.
+2. AST parse passes (`[Parser]::ParseFile` or `pwsh -c "Parse"`).
+3. Encoding edits: re-read `-Encoding UTF8`, no U+FFFD.
+4. Regex: test LF + CRLF samples.
 ## Anti-Rationalization
-
-| Rationalization | Red Flag | Verification |
+| Rationalization | Red Flag | Check |
 |---|---|---|
-| "This repo runs PS7, PS5.1 rules are legacy" | Skipping chain-operator/encoding rules | git hooks and CI may execute PS5.1 - GAP-2 incident 2026-09-01 |
-| "One regex \\n works fine locally" | Unanchored LF-only scans | Windows files are CRLF - P1-1 audit:46 documents the cost |
-| "Small script, skip #requires" | Missing version declaration | Gate + cross-ref check flag it; consistency beats size |
-
+| "PS7-only, 5.1 rules legacy" | Skip chain/encoding rules | Hooks/CI may run PS5.1 (GAP-2 2026-09-01) |
+| "`\\n` works locally" | LF-only scans | Windows = CRLF (P1-1 audit:46) |
+| "Small script, skip #requires" | Missing version decl | Gate + cross-ref flag it |
 ## Red Flags
-
-- Scripts with no `#requires` header.
-- `Get-Content` without `-Encoding` on non-ASCII files.
-- `\n`-only regex in scans targeting Windows files.
-- `&&` inside strings destined for PS5.1 execution.
-- Empty `catch` blocks around encoding operations.
-
-## Refs
-
-Cross-Refs: quality-gate | command-wrapper | bash-safe (scripts/bash-safe.ps1) | ANTI-PATTERN-CATALOG.md:21,24,25,27,31 | docs/mejoras/2026-09-01-gap-scan-repo.md:17-21 | docs/mejoras/2026-09-01-p1-1-spec-audit.md:31-46
----
-
-docs/skills/ps-compat/reference.md
----
+- No `#requires` header; `Get-Content` w/o `-Encoding` on non-ASCII; `\n`-only scans on Windows files; `&&` for PS5.1; empty `catch` on encoding ops.
+## Refs: quality-gate | command-wrapper | bash-safe (scripts/bash-safe.ps1) | ANTI-PATTERN-CATALOG.md:21,24,25,27,31 | docs/mejoras/2026-09-01-gap-scan-repo.md:17-21 | docs/mejoras/2026-09-01-p1-1-spec-audit.md:31-46
+→ docs/skills/ps-compat/reference.md

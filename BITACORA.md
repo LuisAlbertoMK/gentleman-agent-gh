@@ -200,3 +200,6 @@
 - P2 sync-global.ps1: G1 CRITICAL JSON contamination fixed (pure -Json stdout), G2 Depth 100, G3 enforce autoupdate true->false | real non-dry run exit 0
 - P3 ADR-048 realineado a convencion ##Status + runtime proof true->false | PSSA close-out (empty catch, $using) | junk $( / $(npm deleted
 - Final: Pester 15/15, DryRun 8/8, score-auto 9.1 sin regresiones, live cfg autoupdate=False
+2026-09-04 - 17 commits: ADR-033 partial (score refresh 72823b12, semi prune ff373a23, models spark-1.3+qwen-plus 4aae297e), SP offline fallback U5 86297d4b, cycle32 port 79 files 3c454a56, Go pre-gate shim (ADR-049), 3 dependabot merges
+2026-09-05 - 2 commits: fix(sync) preserve skills/permissions prune *-semi ee3d84ba (sync-global.ps1+tests) + docs(mejoras) mark perf-offline U5 DONE via 86297d4b 49c95fc6
+2026-09-08 - ciclo 33 apply (CA sync 3→12, 10 skills <3KB, scripts 125→122, score 9.1→9.2)

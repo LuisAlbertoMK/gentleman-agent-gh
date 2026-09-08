@@ -10,7 +10,7 @@ token_budget: 3200
 Monitor context window — Recursive Summary Compression (L1/L2/L3), YELLOW/RED zones, hallucination detection.
 
 ## Rules
-1. Compress at ORANGE (60%), never RED (80%). 2. Always start L1 (60-70%) before escalating. 3. First drift → force YELLOW + L1 immediately. 4. 3+ edits same file → STOP, summarize, commit, re-read. 5. Every 25 calls → `mem_save(topic_key=checkpoint/session-state)`. 6. Same point 2x or hallucination → force RED, break session.
+1. Compress at ORANGE (60%), never RED (80%). 2. L1 first (60-70%) before escalating. 3. First drift → YELLOW + L1. 4. 3+ edits same file → STOP, summarize, commit, re-read. 5. Every 25 calls → `mem_save(checkpoint/session-state)`. 6. Same point 2×/hallucination → RED, break session.
 
 ## Budgets + Zones
 | Model | Total | YELLOW 40% | ORANGE 60% | RED 80% |
@@ -28,10 +28,9 @@ Monitor context window — Recursive Summary Compression (L1/L2/L3), YELLOW/RED 
 > L1@40% L2@60% L3@80% compact@70% — `scripts/lcm-dag.ps1` `Invoke-LcmEscalation` (see lcm-dag-design.md)
 
 ## Drift + Force-RED
-65% failures = drift: re-reads same content, re-states question, references unsaid → force YELLOW + L1. Force-RED: same point 2x · self-contradiction · "as I mentioned" referencing nothing.
-
+Drift (65% failures): re-reads, re-states, unsaid refs → YELLOW + L1. Force-RED: same point 2× · self-contradiction · "as I mentioned" w/o source.
 ## Anti-Patterns
-Compress at RED (recovery > savings; rule 1) · Jump to L3 skipping L1 (destroys chain) · Summarize stale instead of pruning (compounds drift)
+Compress at RED · skip L1→L3 · summarize stale vs prune
 
 ## Anti-Rationalization
 
@@ -52,13 +51,6 @@ Compress at RED (recovery > savings; rule 1) · Jump to L3 skipping L1 (destroys
 ---
 
 ## Reference Materials
-
-Externalized to keep skill ≤3KB (ADR-048). Consult for DAG wiring detail:
-
-- **DAG Wiring, Escalation, 3-Boundary Rule** → docs/skills/context-watchdog/reference.md
-- **LCM DAG Design** → docs/mejoras/2026-09-01-lcm-dag-design.md
-
----
-
-## Refs
-Cross-Refs: skill-graph | performance | session-resume | lean-context
+Externalized per ADR-048 (DAG wiring, escalation):
+→ docs/skills/context-watchdog/reference.md · docs/mejoras/2026-09-01-lcm-dag-design.md
+## Refs: skill-graph | performance | session-resume | lean-context

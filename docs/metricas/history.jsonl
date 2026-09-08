@@ -16,3 +16,4 @@
 {"gate":"25/25","trend":"stable","dimensions":{"Score Depth":9.1},"commit":"3b9a01cf","score":9.1,"date":"2026-09-02"}
 {"trend":"stable","gate":"25/25","dimensions":{"Score Depth":9.1},"date":"2026-09-04","commit":"24200d2d","score":9.1}
 {"gate":"25/25","date":"2026-09-04","commit":"4aae297e","dimensions":{"Score Depth":9.1},"trend":"stable","score":9.1}
+{"dimensions":{"Score Depth":9.2},"score":9.2,"gate":"25/25","commit":"ee3d84ba","trend":"up","date":"2026-09-08"}

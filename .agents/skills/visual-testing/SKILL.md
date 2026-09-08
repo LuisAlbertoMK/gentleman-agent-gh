@@ -44,17 +44,8 @@ No baseline·Threshold too strict(flaky)·No viewport reset·Skip anim freeze·N
 - Second occurrence of same rationalization → force RED zone
 
 ## Verification
-- Output matches skill ## Output contract + file:line citaton
-- cross-ref-check.ps1 → SKILL.md OK
+- Output matches ## Output contract + file:line; cross-ref-check.ps1 → OK
+- Frontmatter (name/description/triggers/token_budget) stable; cross-refs exist; no listed anti-patterns
 ## Cross-Refs: quality-gate | performance | baseline-ui | accessibility | ui-engine
-
-## Reference
 > docs/skills/visual-testing/reference.md
-
-## Verification
-- Output: response matches the ## Output contract format exactly
-- token_budget: total tokens within frontmatter token_budget
-- frontmatter: name, description, triggers, token_budget present and stable
-- cross-refs: each referenced skill exists
-- anti-patterns: none of the listed anti-patterns reintroduced
 

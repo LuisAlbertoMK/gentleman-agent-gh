@@ -96,3 +96,28 @@ changes:
     description: >
       Bootstrap for gentleman-dashboard change. Minimal structure created;
       specs/designs/tasks pending subsequent phases.
+
+  "2026-09-08-automejora-cycle-33":
+    title: "Automejora Cycle 33 — Score Recovery & Skill/Script Consolidation"
+    status: verifying
+    domains: ["self-improvement", "scripts", "skills", "metrics"]
+    files:
+      - "scripts/close-session.ps1"
+      - "scripts/inter-track.ps1"
+      - "BITACORA.md"
+      - ".project.json"
+      - ".agents/skills/*/SKILL.md (10 files TBD)"
+      - "scripts/*.ps1 (3+ files TBD)"
+    created: "2026-09-08"
+    description: >
+      Recover overall score from 9.1 to ≥9.5 by fixing three underperforming
+      dimensions: Cycle Activity (1.0→≥9.0 via inter-track counter fix),
+      Skill Effectiveness (8.0→10.0 via 10 skill compression), Script Performance
+      (9.0→10.0 via 3+ script consolidation to ADR-047 threshold). Also refresh
+      .project.json (stale 4 days) and close BITACORA traceability gap (missing
+      09/04, 09/05 entries). Fast-path SDD-Quick applicable (LOW risk, 1-3
+      files per fix, known codebase, no schema/auth/API changes). Priority by
+      I/R descending: inter-track increment (3.0), counter sync (3.0), skill
+      compression (1.0), script consolidation (1.0), BITACORA entries (1.0),
+      score refresh (1.0). Rollback: git checkout 5 min. Gates: SkillOpt per
+      fix, protected-files audit (!audit) before commit.
