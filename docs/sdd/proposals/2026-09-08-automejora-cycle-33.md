@@ -71,7 +71,7 @@ Priority order by I/R descending (CYCLE.md:55-63 scoring):
 
 ### Dependencies
 - `scripts/score-auto.ps1` for score refresh
-- `scripts/benchmark.ps1` for skill size verification
+- `scripts/benchmark-core.ps1` for skill size verification
 - `scripts/cross-ref-check.ps1` for skill integrity
 - `scripts/test-token-budget-regression.ps1` for SkillOpt gate
 - `security-scanner`, `quality-gate`, `external-auditor` — MUST pass per self-improvement:19 (protected files rule)
