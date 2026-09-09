@@ -173,11 +173,6 @@
     },
     {
       "rule": "PSReviewUnusedParameter",
-      "file": "intake-debug.ps1",
-      "count": 2
-    },
-    {
-      "rule": "PSReviewUnusedParameter",
       "file": "intake-verify.ps1",
       "count": 1
     },
@@ -378,11 +373,6 @@
     },
     {
       "rule": "PSUseSingularNouns",
-      "file": "fix-mk-laguna-to-muse.ps1",
-      "count": 1
-    },
-    {
-      "rule": "PSUseSingularNouns",
       "file": "session-checkpoint.ps1",
       "count": 1
     },
@@ -536,10 +526,6 @@
     {
       "file": "bench-compare.Tests.ps1",
       "count": 1
-    },
-    {
-      "file": "bench-q4.ps1",
-      "count": 3
     },
     {
       "file": "benchmark-async-push.ps1",
@@ -866,14 +852,6 @@
       "count": 1
     },
     {
-      "file": "fix-mk-laguna-to-muse.ps1",
-      "count": 37
-    },
-    {
-      "file": "fix-mk-laguna-to-muse.Tests.ps1",
-      "count": 1
-    },
-    {
       "file": "forge-rollback.Integration.Tests.ps1",
       "count": 2
     },
@@ -955,14 +933,6 @@
     },
     {
       "file": "help-contextual.Tests.ps1",
-      "count": 1
-    },
-    {
-      "file": "intake-debug.ps1",
-      "count": 3
-    },
-    {
-      "file": "intake-debug.Tests.ps1",
       "count": 1
     },
     {
@@ -1439,10 +1409,6 @@
     },
     {
       "file": "scripts_help-contextual.ps1",
-      "count": 1
-    },
-    {
-      "file": "scripts_intake-debug.ps1",
       "count": 1
     },
     {

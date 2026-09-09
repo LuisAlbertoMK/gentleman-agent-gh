@@ -39,4 +39,3 @@ token_budget: 3000
 ## Red Flags
 - No `#requires` header; `Get-Content` w/o `-Encoding` on non-ASCII; `\n`-only scans on Windows files; `&&` for PS5.1; empty `catch` on encoding ops.
 ## Refs: quality-gate | command-wrapper | bash-safe (scripts/bash-safe.ps1) | ANTI-PATTERN-CATALOG.md:21,24,25,27,31 | docs/mejoras/2026-09-01-gap-scan-repo.md:17-21 | docs/mejoras/2026-09-01-p1-1-spec-audit.md:31-46
-→ docs/skills/ps-compat/reference.md
