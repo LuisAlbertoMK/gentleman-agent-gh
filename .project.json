@@ -1,151 +1,151 @@
 {
   "score": {
-    "trend": "up",
-    "current": 9.2,
+    "last_updated": "2026-09-09",
     "dimensions": {
-      "Cycle Activity": 4.0,
       "Script Performance": 10.0,
-      "Project Artifacts": 10.0,
-      "Clean Code": 10.0,
-      "Bitacora": 10.0,
-      "Security": 10.0,
-      "Score Depth": 9.2,
-      "Best Practices": 10.0,
-      "Skill Effectiveness": 10.0,
       "Metrics": 10.0,
+      "Dead Code": 10.0,
+      "Score Depth": 9.3,
+      "Cycle Activity": 4.0,
+      "Clean Code": 10.0,
+      "Project Artifacts": 10.0,
       "Backlog Integrity": 10.0,
       "Orthography": 10.0,
-      "Dead Code": 10.0
+      "Bitacora": 10.0,
+      "Skill Effectiveness": 10.0,
+      "Best Practices": 10.0,
+      "Security": 10.0
     },
-    "last_updated": "2026-09-08"
+    "trend": "up",
+    "current": 9.5
   },
   "dimensions_detail": {
-    "DC": {
+    "SD": {
+      "s": 9.3,
       "e": {
-        "dead_junctions": 0,
-        "commented_out": 0,
-        "orphans": 0
+        "subd": 42
       },
-      "r": "Orphans: 0, dead junctions: 0",
-      "s": 10.0
-    },
-    "BI2": {
-      "e": {
-        "passed": 8,
-        "total": 8
-      },
-      "r": "8/8 items",
-      "s": 10.0
-    },
-    "Or": {
-      "e": {
-        "scanned": 95,
-        "corrupted": 0
-      },
-      "r": "Corruption: 0/95",
-      "s": 10.0
+      "r": "Depth: 42 sub-dims: 9.3/10"
     },
     "BP": {
+      "s": 10.0,
       "e": {
         "trycatch": 96,
         "param_cov": 122
       },
-      "r": "P:122/122 T:96/122",
-      "s": 10.0
+      "r": "P:122/122 T:96/122"
     },
-    "SD": {
+    "DC": {
+      "s": 10.0,
       "e": {
-        "subd": 42
+        "dead_junctions": 0,
+        "orphans": 0,
+        "commented_out": 0
       },
-      "r": "Depth: 42 sub-dims: 9.2/10",
-      "s": 9.2
+      "r": "Orphans: 0, dead junctions: 0"
     },
-    "SG": {
+    "Me": {
+      "s": 10.0,
       "e": {
-        "last_updated": "2026-09-04",
-        "days_old": 5
+        "ej": true,
+        "ed": true,
+        "md": true,
+        "rp": true
       },
-      "r": "SSoT age: 5d",
-      "s": 5.0
-    },
-    "CC": {
-      "e": {
-        "with_help": 121,
-        "total_scripts": 122,
-        "with_params": 122,
-        "with_strictmode": 122
-      },
-      "r": "S:122 H:121 P:122 S:122",
-      "s": 10.0
+      "r": "MD:True EJ:True"
     },
     "PA": {
+      "s": 10.0,
       "e": {
         "skills": 94,
         "readme": true,
-        "cross_ref": true,
-        "project_json": true
+        "project_json": true,
+        "cross_ref": true
       },
-      "r": "X-ref True, 94 skills",
-      "s": 10.0
+      "r": "X-ref True, 94 skills"
     },
-    "Sec": {
+    "CA": {
+      "s": 4.0,
       "e": {
-        "weak_crypto": false,
-        "secrets": false
+        "it": 30,
+        "ic": 13
       },
-      "r": "Weak crypto: False, secrets: False",
-      "s": 10.0
+      "r": "IC:13/30"
     },
-    "Me": {
+    "Or": {
+      "s": 10.0,
       "e": {
-        "ed": true,
-        "ej": true,
-        "rp": true,
-        "md": true
+        "scanned": 95,
+        "corrupted": 0
       },
-      "r": "MD:True EJ:True",
-      "s": 10.0
+      "r": "Corruption: 0/95"
+    },
+    "CC": {
+      "s": 10.0,
+      "e": {
+        "with_params": 122,
+        "with_strictmode": 122,
+        "with_help": 121,
+        "total_scripts": 122
+      },
+      "r": "S:122 H:121 P:122 S:122"
+    },
+    "SE": {
+      "s": 10.0,
+      "e": {
+        "avg": 2.6,
+        "total": 94,
+        "o5": 0,
+        "prO3": 0,
+        "prO5": 0,
+        "cmdO3": 0,
+        "bytes": 251251.0,
+        "cmdO5": 0,
+        "o3": 0
+      },
+      "r": "T:94 >3:0 >5:0 avg:2.6KB cmdO3:0 cmdO5:0 prO3:0 prO5:0"
+    },
+    "SG": {
+      "s": 10.0,
+      "e": {
+        "days_old": 1,
+        "last_updated": "2026-09-08"
+      },
+      "r": "SSoT age: 1d"
+    },
+    "BI2": {
+      "s": 10.0,
+      "e": {
+        "passed": 8,
+        "total": 8
+      },
+      "r": "8/8 items"
     },
     "Bi": {
+      "s": 10.0,
       "e": {
-        "lines": 205,
-        "exists": true
+        "exists": true,
+        "lines": 207
       },
-      "r": "BI: True",
-      "s": 10.0
+      "r": "BI: True"
     },
     "SP": {
+      "s": 10.0,
       "e": {
         "thresh": 122,
         "sc": 122,
         "huge": 0,
         "avg": 7.7
       },
-      "r": "S:122 avg:7.7KB threshold:122 (ADR-047)",
-      "s": 10.0
+      "r": "S:122 avg:7.7KB threshold:122 (ADR-047)"
     },
-    "CA": {
+    "Sec": {
+      "s": 10.0,
       "e": {
-        "ic": 12,
-        "it": 30
+        "weak_crypto": false,
+        "secrets": false
       },
-      "r": "IC:12/30",
-      "s": 4.0
-    },
-    "SE": {
-      "e": {
-        "prO3": 0,
-        "cmdO5": 0,
-        "total": 94,
-        "o3": 0,
-        "o5": 0,
-        "bytes": 251251.0,
-        "prO5": 0,
-        "cmdO3": 0,
-        "avg": 2.6
-      },
-      "r": "T:94 >3:0 >5:0 avg:2.6KB cmdO3:0 cmdO5:0 prO3:0 prO5:0",
-      "s": 10.0
+      "r": "Weak crypto: False, secrets: False"
     }
   }
 }
