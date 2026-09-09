@@ -41,6 +41,8 @@ if [ -f "$REPO_ROOT/.githooks/pre-commit" ]; then
   EXIT_CODE=$?
   if [ $EXIT_CODE -ne 0 ]; then
     echo ""
+    echo "$OUTPUT"
+    echo ""
     echo "BLOCKED: Quality gate failed. Fix issues before pushing."
     echo "Use 'git push --no-verify' ONLY if you understand the risks."
     echo ""

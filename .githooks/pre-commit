@@ -1,4 +1,4 @@
-#!C:/Program Files/Git/usr/bin/dash.exe
+#!/bin/sh
 #
 # Pre-commit hook — Gentleman Agent quality gate
 # All 21 checks run via pre-commit-gate.ps1 (single pwsh invocation).
