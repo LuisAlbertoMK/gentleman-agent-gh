@@ -52,10 +52,13 @@ function Invoke-E1Check{
 function Invoke-E2Check{
     $ps=Join-Path $Root 'scripts\pssa-gate.ps1'
     if(Test-Path $ps){
-        if(-not(Get-Module -ListAvailable PSScriptAnalyzer)){Add-Check 'PSSA Gate' $true 'PSScriptAnalyzer not installed (skipped)';return}
+        # PSSA skipped is accepted/documented: disk restriction forbids installing PSScriptAnalyzer (no installs allowed).
+        if(-not(Get-Module -ListAvailable PSScriptAnalyzer)){Add-Check 'PSSA Gate' $true 'PSScriptAnalyzer not installed (skipped)'}
+        else{
         $cmd=(Resolve-Path $ps).Path
         $scriptsDir=Join-Path $Root 'scripts'
         if($cmd.StartsWith($scriptsDir)){& $cmd -Mode Check -Path $Root;Add-Check 'PSSA Gate' ($LASTEXITCODE-eq0) "exit $LASTEXITCODE"}else{Add-Check 'PSSA Gate' $false 'path outside scripts dir'}
+        }
     }else{Add-Check 'PSSA Gate' $true 'not found (skipped)'}
     $sb_sf = [System.Text.StringBuilder]::new(65536)
     $sPat=@('password\s*=','secret\s*=','api[_-]?key\s*=','token\s*=','connection\s*string\s*=',
@@ -121,7 +124,7 @@ function Invoke-E3Check{
     $sb_mh = [System.Text.StringBuilder]::new(65536)
     [IO.Directory]::EnumerateFiles($sDir, '*.ps1') | ForEach-Object {
         $c=[IO.File]::ReadAllText($_)
-        if($c -notmatch '\.SYNOPSIS'){$null = $sb_mh.AppendLine($_.Name)}
+        if($c -notmatch '\.SYNOPSIS'){$null = $sb_mh.AppendLine((Split-Path -Path $_ -Leaf))}
     }
     $mh = @($sb_mh.ToString().Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries))
     if($mh.Count-eq0){Add-Check 'Script Help' $true 'All scripts have .SYNOPSIS'}else{Add-Check 'Script Help' $false "$($mh.Count) missing: $($mh -join ', ')"}

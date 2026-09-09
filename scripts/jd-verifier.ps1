@@ -1,4 +1,8 @@
 #requires -Version 7.0
+<#
+.SYNOPSIS
+    JD verifier — zone gate with fast-path and reflexion cap.
+#>
 [CmdletBinding()]
 param(
     [Parameter()][ValidateSet('ROJA','AMARILLA')]$Zone = 'ROJA',
