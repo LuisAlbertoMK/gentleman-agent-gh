@@ -60,6 +60,19 @@ Describe 'ConfigValidator' {
             $result = Test-SkillsPaths -Config $config
             $result | Should -BeNullOrEmpty
         }
+
+        It 'passes when skills is a top-level array (real opencode.json shape)' {
+            $config = [pscustomobject]@{ skills = @('.agents/skills') }
+            $result = Test-SkillsPaths -Config $config
+            $result | Should -BeNullOrEmpty
+        }
+
+        It 'fails when skills is a bare string (array unwrapping)' {
+            $config = [pscustomobject]@{ skills = '.agents/skills' }
+            $result = Test-SkillsPaths -Config $config
+            $result | Should -Not -BeNullOrEmpty
+            @($result)[0] | Should -Match 'STRING'
+        }
     }
 
     Context 'Test-PromptRefs' {

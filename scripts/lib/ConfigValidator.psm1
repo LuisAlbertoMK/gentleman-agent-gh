@@ -20,8 +20,11 @@
 function Test-SkillsPaths {
     <#
     .SYNOPSIS
-        Validates that skills.paths is an array of strings (G1: ConvertTo-Json
-        single-element array unwrapping would turn it into a bare string).
+        Validates the skills path list (G1: ConvertTo-Json single-element
+        array unwrapping would turn it into a bare string).
+        Accepts both the documented runtime shape (top-level array
+        `"skills": ["..."]`, as shipped in opencode.json since base) and
+        the legacy object shape (`skills.paths` array).
     .PARAMETER Config
         Parsed opencode.json (ConvertFrom-Json result).
     .OUTPUTS
@@ -34,12 +37,27 @@ function Test-SkillsPaths {
     )
     $failures = [System.Collections.Generic.List[string]]::new()
 
-    if ($null -eq $Config.skills -or $null -eq $Config.skills.paths) {
-        $failures.Add('skills.paths is missing')
+    $skillsNode = $Config.skills
+    if ($null -eq $skillsNode) {
+        $failures.Add('skills is missing')
         return @($failures)
     }
 
-    $paths = $Config.skills.paths
+    if ($skillsNode -is [string]) {
+        $failures.Add("skills is a STRING ('$skillsNode') — array unwrapping (G1). Expected an array.")
+        return @($failures)
+    }
+
+    if ($skillsNode -is [System.Array] -or $skillsNode -is [System.Collections.IList]) {
+        # Documented runtime shape: "skills": [".agents/skills"] (opencode.json
+        # ships this form since base — never reshape runtime to satisfy a guard).
+        $paths = $skillsNode
+    } elseif ($null -ne $skillsNode.paths) {
+        $paths = $skillsNode.paths
+    } else {
+        $failures.Add('skills.paths is missing')
+        return @($failures)
+    }
     if ($paths -is [string]) {
         $failures.Add("skills.paths is a STRING ('$paths') — array unwrapping (G1). Expected an array.")
     } elseif ($paths -isnot [System.Array] -and $paths -isnot [System.Collections.IList]) {
@@ -130,7 +148,7 @@ Validates the agent section contains the full expected set: gentleman-*,
     if ($gentleman.Count -eq 0) { $failures.Add('no gentleman-* agents found') }
     if ($sdd.Count -eq 0)       { $failures.Add('no sdd-* agents found (G3 regression — expected 10)') }
     if ($orch.Count -eq 0)      { $failures.Add('gentle-orchestrator agent missing (G3 regression)') }
-    if ($names.Count -ne 49)    { $failures.Add("expected 49 agents, found $($names.Count)") }
+    if ($names.Count -ne 58)    { $failures.Add("expected 58 agents, found $($names.Count)") }
 
     return @($failures)
 }

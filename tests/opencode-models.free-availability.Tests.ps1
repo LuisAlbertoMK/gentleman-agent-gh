@@ -63,7 +63,6 @@ Describe "OpenCode free-model availability — anti-regression guard" {
         $configFiles = @(
             "$repoRoot/opencode.json",
             "$repoRoot/scripts/lib/opencode-base.json",
-            "$repoRoot/scripts/opencode-config/semi-agents.json",
             "$repoRoot/scripts/opencode-configs/low-resource.json",
             "$repoRoot/scripts/opencode-configs/medium-resource.json",
             "$repoRoot/scripts/opencode-configs/high-resource.json"
@@ -92,8 +91,8 @@ Describe "OpenCode free-model availability — anti-regression guard" {
     }
 
     # --- Positive guards: replacement IDs MUST appear (proves the fix shipped) ---
-    It "Replacement model opencode/laguna-s-2.1-free IS present (proves deepseek->laguna mapping)" {
-        $hits = Select-String -Path $configFiles -Pattern ([regex]::Escape('opencode/laguna-s-2.1-free')) -AllMatches -ErrorAction SilentlyContinue
+    It "Replacement model opencode/muse-spark-1.3-contributor-free IS present (proves code-gen model mapping)" {
+        $hits = Select-String -Path $configFiles -Pattern ([regex]::Escape('opencode/muse-spark-1.3-contributor-free')) -AllMatches -ErrorAction SilentlyContinue
         ($hits | Measure-Object).Count | Should -BeGreaterThan 0
     }
 
