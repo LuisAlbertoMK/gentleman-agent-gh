@@ -139,8 +139,8 @@ if [ -f "$GLOBAL_CONFIG" ] && [ -f "$REPO_CONFIG" ]; then
         # default_agent
         current_agent
         current_agent=$(jq -r '.default_agent // ""' "$GLOBAL_CONFIG")
-        if [ "$current_agent" != "gentleman-vMK" ]; then
-            jq '.default_agent = "gentleman-vMK"' "$GLOBAL_CONFIG" > "${GLOBAL_CONFIG}.tmp" && mv "${GLOBAL_CONFIG}.tmp" "$GLOBAL_CONFIG"
+        if [ "$current_agent" != "gentleman-vMK-auto" ]; then
+            jq '.default_agent = "gentleman-vMK-auto"' "$GLOBAL_CONFIG" > "${GLOBAL_CONFIG}.tmp" && mv "${GLOBAL_CONFIG}.tmp" "$GLOBAL_CONFIG"
             updated=true
         fi
 

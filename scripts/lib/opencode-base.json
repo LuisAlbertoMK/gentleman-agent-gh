@@ -222,7 +222,7 @@
    "**/.gnupg/**": "deny"
   }
  },
- "default_agent": "gentleman-vMK",
+  "default_agent": "gentleman-vMK-auto",
  "experimental": {
   "mcp_timeout": 60000
  },
@@ -615,50 +615,6 @@
     "codebase-memory*": true
    }
   },
-  "gentleman-deep-semi": {
-   "description": "Deep reasoning — SEMI mode (safe commands auto, writes/commits ask)",
-   "model": "opencode/nemotron-3-ultra-free",
-   "mode": "primary",
-   "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
-   "tools": {
-    "codebase-memory*": true,
-    "engram*": true
-   }
-  },
-  "gentleman-quick-semi": {
-   "description": "Fast executor — SEMI mode (safe commands auto, writes/commits ask)",
-   "model": "opencode/big-pickle",
-   "mode": "primary",
-   "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}"
-  },
-  "gentleman-codex-semi": {
-   "description": "Code generation — SEMI mode (safe commands auto, writes/commits ask)",
-   "model": "opencode/muse-spark-1.3-contributor-free",
-   "mode": "primary",
-   "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
-   "tools": {
-    "codebase-memory*": true
-   }
-  },
-  "gentleman-implementer-semi": {
-   "description": "Plan executor — SEMI mode (safe commands auto, writes/commits ask)",
-   "model": "opencode/muse-spark-1.3-contributor-free",
-   "mode": "primary",
-   "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
-   "tools": {
-    "codebase-memory*": true
-   }
-  },
-  "gentleman-vMK-semi": {
-   "description": "Orchestrator — SEMI mode (safe commands auto, writes/commits ask)",
-   "model": "opencode/big-pickle",
-   "mode": "primary",
-   "prompt": "{file:prompts/gentleman-vMK.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
-   "tools": {
-    "engram*": true,
-    "codebase-memory*": true
-   }
-  },
   "gentleman-reviewer": {
    "description": "Code review specialist — 4R framework, independent evaluator, adversarial verification (STRONG model)",
    "model": "opencode/nemotron-3-ultra-free",
@@ -717,16 +673,6 @@
    "hidden": true,
    "mode": "subagent",
    "prompt": "{file:prompts/gentleman-aem.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
-   "tools": {
-    "engram*": true,
-    "codebase-memory*": true
-   }
-  },
-  "gentleman-aem-semi": {
-   "description": "AEM Migration Specialist — SEMI mode (safe commands auto, writes/commits ask)",
-   "model": "opencode/nemotron-3-ultra-free",
-   "mode": "primary",
-   "prompt": "{file:prompts/gentleman-aem.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
    "tools": {
     "engram*": true,
     "codebase-memory*": true
@@ -863,7 +809,7 @@
     "sdd-verify"
    ],
    "delegate_to_agent": "gentle-orchestrator",
-   "fallback_default": "gentleman-vMK"
+    "fallback_default": "gentleman-vMK-auto"
   }
  }
 }

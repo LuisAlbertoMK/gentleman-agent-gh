@@ -163,8 +163,8 @@ if ((Test-Path $globalConfigPath) -and (Test-Path $repoConfigPath)) {
         $globalConfig = Get-Content $globalConfigPath -Raw | ConvertFrom-Json
         $repoConfig = Get-Content $repoConfigPath -Raw | ConvertFrom-Json
         $synced = $Force
-        if (-not $globalConfig.default_agent -or $globalConfig.default_agent -ne "gentleman-vMK") {
-            $globalConfig | Add-Member -NotePropertyName "default_agent" -NotePropertyValue "gentleman-vMK" -Force
+        if (-not $globalConfig.default_agent -or $globalConfig.default_agent -ne "gentleman-vMK-auto") {
+            $globalConfig | Add-Member -NotePropertyName "default_agent" -NotePropertyValue "gentleman-vMK-auto" -Force
             $synced = $true
         }
         foreach ($section in @("mcp", "permission", "skills", "agent")) {

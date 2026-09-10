@@ -13,6 +13,6 @@ Steps:
 3. **Preferred path**: run `& "$root\scripts\gentleman-init.ps1" -TargetDir <target> -Yes` (alias). If it is missing, fall back to `& "$root\scripts\use-gentleman.ps1" -TargetDir <target> -Yes`. Both generate the target's `opencode.json` FROM THE CHAIN (scripts/lib/opencode-base.json + permission-templates.json) — never a byte-for-byte copy of the global config.
 4. **Fallback** (script unavailable or fails): bootstrap manually:
    - Write `.gentleman-mode` = `manual` in the target root (`Set-Content -LiteralPath '<target>\.gentleman-mode' -Value 'manual' -NoNewline -Encoding Ascii`).
-   - Generate a minimal `opencode.json` in the target: `default_agent: gentleman-vMK`, MCP servers (engram, context7), and a `permission.bash` deny floor re-asserting the shared deny rules. Do NOT copy the global agent section verbatim.
+   - Generate a minimal `opencode.json` in the target: `default_agent: gentleman-vMK-auto`, MCP servers (engram, context7), and a `permission.bash` deny floor re-asserting the shared deny rules. Do NOT copy the global agent section verbatim.
 5. **Verify**: target has `.gentleman-mode` (content `manual`) and `opencode.json` parses with `Get-Content | ConvertFrom-Json`.
 6. **Report**: what was created and the exact files. Do NOT modify anything else in the target unless the user asks.
