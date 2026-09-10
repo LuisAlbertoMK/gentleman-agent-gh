@@ -60,7 +60,7 @@ function Get-SectionHash {
 
 # mcp is machine-specific (local MCP servers, credentials, absolute paths)
 # and is deliberately NOT compared or synced — -Fix never touches it.
-$sectionKeys = @("agent", "skills", "permission")
+$sectionKeys = @("agent", "skills", "permission", "default_agent")
 $canonical = Get-SectionHash -Path $canonicalPath -SectionKeys $sectionKeys
 $global    = Get-SectionHash -Path $globalPath -SectionKeys $sectionKeys
 
