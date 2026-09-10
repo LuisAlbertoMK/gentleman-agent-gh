@@ -119,12 +119,7 @@ Switch modes:
 | `gentleman-codex-sub-auto` | muse-spark-1.2-contributor-free | — AUTO sub agent (same model, `*: allow`) |
 | `gentleman-implementer-sub-auto` | muse-spark-1.2-contributor-free | — AUTO sub agent (same model, `*: allow`) |
 | `gentleman-aem-sub-auto` | nemotron-3-ultra-free | — AUTO sub agent (Adobe Experience Manager migration) |
-| `gentleman-deep-semi` | nemotron-3-ultra-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
-| `gentleman-quick-semi` | mimo-v2.5-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
-| `gentleman-codex-semi` | muse-spark-1.2-contributor-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
-| `gentleman-aem-semi` | nemotron-3-ultra-free | — SEMI mode (Adobe Experience Manager migration) |
-| `gentleman-implementer-semi` | muse-spark-1.2-contributor-free | — SEMI mode (same model, `"*": ask` + safe commands allow) |
-| `gentleman-vMK-semi` | default | — SEMI mode (orchestrator, `"*": ask` + safe commands allow) |
+| ~~`gentleman-*-semi` (6 agents)~~ | — | — REMOVED (ADR-033/036): `gentleman-deep-semi`, `gentleman-quick-semi`, `gentleman-codex-semi`, `gentleman-aem-semi`, `gentleman-implementer-semi`, `gentleman-vMK-semi` |
 
 > **Auto/Semi modes**: Activated when `.gentleman-mode` is `auto` or `semi`. See [PROTOCOL.md](PROTOCOL.md) for mode behavior. Read-only specialists have no `-auto` or `-semi` variant.
 

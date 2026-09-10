@@ -4,6 +4,8 @@ description: Switch permission mode to SEMI-AUTO — safe commands auto-approved
 
 You are executing `!semi`. Switch the current project to SEMI-AUTO permission mode.
 
+> **Deprecated (ADR-033)**: `semi` mode is deprecated — runtime remaps to `auto`. This command is kept as a compat shim; prefer `!auto` / `!manual`.
+
 Steps:
 
 1. **Resolve script root**:

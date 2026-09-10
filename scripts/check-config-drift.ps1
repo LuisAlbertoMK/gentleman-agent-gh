@@ -90,7 +90,7 @@ if ($Fix -and $totalDrift -gt 0) {
   if (-not $Quiet) { Write-Output "[fix] Syncing global config from canonical..." }
   $canonicalContent = Get-Content -LiteralPath $canonicalPath -Raw -Encoding UTF8 | ConvertFrom-Json
   $globalContent = Get-Content -LiteralPath $globalPath -Raw -Encoding UTF8 | ConvertFrom-Json
-  $globalContent.default_agent = "gentleman-vMK-auto"
+  $globalContent.default_agent = $canonicalContent.default_agent
   $globalContent.agent = $canonicalContent.agent
   $globalContent.permission = $canonicalContent.permission
   $globalContent.skills = $canonicalContent.skills
