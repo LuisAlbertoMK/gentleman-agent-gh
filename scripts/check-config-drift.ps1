@@ -90,7 +90,11 @@ if ($Fix -and $totalDrift -gt 0) {
   if (-not $Quiet) { Write-Output "[fix] Syncing global config from canonical..." }
   $canonicalContent = Get-Content -LiteralPath $canonicalPath -Raw -Encoding UTF8 | ConvertFrom-Json
   $globalContent = Get-Content -LiteralPath $globalPath -Raw -Encoding UTF8 | ConvertFrom-Json
-  $globalContent.default_agent = $canonicalContent.default_agent
+  if ($null -eq $globalContent.PSObject.Properties["default_agent"]) {
+    $globalContent | Add-Member -NotePropertyName "default_agent" -NotePropertyValue $canonicalContent.default_agent -Force
+  } else {
+    $globalContent.default_agent = $canonicalContent.default_agent
+  }
   $globalContent.agent = $canonicalContent.agent
   $globalContent.permission = $canonicalContent.permission
   $globalContent.skills = $canonicalContent.skills
