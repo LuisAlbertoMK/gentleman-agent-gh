@@ -19,13 +19,13 @@ token_budget: 3200
 | Security/vulnerability | DELEGATE | `gentleman-security` | Nemotron 3 Ultra Free | 1M | `gentleman-deep` -> `gentleman-vMK` (Big Pickle) |
 | SEO/content | DELEGATE | `gentleman-seo` | Nemotron 3 Ultra Free | 1M | `gentleman-vMK` (Big Pickle) |
 | Infrastructure/K8s/Terraform | DELEGATE | `gentleman-infra` | Ling 3.0 Flash Fin Free — elegido sobre DeepSeek V4 Flash Free (ambos en /models, pero Ling está en pricing table como Free explícito; DeepSeek queda como alt vigente) | 1M | `gentleman-deep` -> `gentleman-vMK` (Big Pickle) |
-| Frontend/UI/a11y | DELEGATE | `gentleman-frontend` | MiMo V2.5 Free (vision) — reemplaza Kimi K2.5 Free retirado | 212K | `gentleman-quick` -> `gentleman-vMK` (Big Pickle) |
+| Frontend/UI/a11y | DELEGATE | `gentleman-frontend` | Big Pickle | 200K | `gentleman-quick` -> `gentleman-vMK` (Big Pickle) |
 | Performance/profiling | DELEGATE | `gentleman-performance` | Nemotron 3 Ultra Free | 1M | `gentleman-deep` -> `gentleman-vMK` |
 | Data/SQL/Python | DELEGATE | `gentleman-datascience` | Big Pickle | 200K | `gentleman-codex` -> `gentleman-vMK` (Big Pickle) |
 | Documentation | DELEGATE | `gentleman-docs` | Big Pickle (always free, reasoning) | 200K | `gentleman-vMK` |
-| Implement plan | DELEGATE | `gentleman-implementer` | Muse Spark 1.2 Contributor Free (code-gen) — reemplaza DeepSeek V4 Flash Free | 200K | `gentleman-vMK` (Big Pickle) — alt DeepSeek V4 Flash Free vigente |
+| Implement plan | DELEGATE | `gentleman-implementer` | Muse Spark 1.3 Contributor Free (code-gen) | 200K | `gentleman-vMK` (Big Pickle) |
 | Architecture/code review | DIRECT | `gentleman-vMK` | — | — | — |
-| Quick edit | DIRECT | `gentleman-quick` | Big Pickle — alt MiMo V2.5 Free | 200K | `gentleman-codex` |
+| Quick edit | DIRECT | `gentleman-quick` | Big Pickle | 200K | `gentleman-codex` |
 | Script generation | DIRECT | `gentleman-codex` | Muse Spark 1.2 Contributor Free — alt Big Pickle | 200K | `gentleman-quick` (Big Pickle) |
 | Default | DIRECT | `gentleman-vMK` | — | — | — |
 
