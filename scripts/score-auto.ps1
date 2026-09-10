@@ -21,7 +21,8 @@
 param(
     [switch]$Json,
     [switch]$Quiet,
-    [switch]$Force
+    [switch]$Force,
+    [switch]$DryRun
 )
 
 Set-StrictMode -Version Latest

@@ -258,7 +258,7 @@ if (-not $SkipMcp) {
             $binDir = "$env:APPDATA\npm"
             if (-not (Test-Path $binDir)) { New-Item -ItemType Directory -Path $binDir -Force | Out-Null }
             Copy-Item -Path $binary.FullName -Destination (Join-Path $binDir $exeName) -Force
-            Remove-Item -Path $tmpDir -Recurse -Force -EA SilentlyContinue
+            Remove-Item -Path $tmpDir -Recurse -Force -EA SilentlyContinue  # cleanup: temp download dir (best-effort; outer try/catch warns on failure)
             ok "engram v$version installed"; $anyMcp = $true
         } catch { warn "engram install failed — download manually from https://github.com/Gentleman-Programming/engram/releases" }
     }

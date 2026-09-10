@@ -28,6 +28,7 @@
   .\scripts\health-check.ps1 -AutoRepair  # fix broken junctions
   .\scripts\health-check.ps1 -Quiet       # exit code only
 #>
+[CmdletBinding(SupportsShouldProcess=$true)]
 param(
   [switch]$AutoRepair,      # Auto-fix broken junctions
   [switch]$Json,            # JSON output for agent consumption

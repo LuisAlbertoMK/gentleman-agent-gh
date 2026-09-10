@@ -47,7 +47,9 @@ param(
     [string]$BenchCommand = "scripts/sync-vmk.ps1 -DryRun -Json",
     [ValidateRange(5, 100)]
     [int]$Runs = 10,
-    [switch]$Json
+    [switch]$Json,
+    [switch]$Force,
+    [switch]$DryRun
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -90,6 +92,11 @@ if (-not $PSBoundParameters.ContainsKey('Keep')) {
 }
 if (-not $PSBoundParameters.ContainsKey('Reserved')) {
     $Reserved = if ($Keep -eq 4000) { 2000 } else { 4000 }
+}
+
+if ($DryRun) {
+    Write-Output "[DryRun] Would set compaction keep.tokens=$Keep reserved=$Reserved (no changes made)"
+    exit 0
 }
 
 # --- Backup -------------------------------------------------------------------

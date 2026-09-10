@@ -14,6 +14,7 @@ List snapshots only, no restore.
 Show what would be restored without applying.
 #>
 Set-StrictMode -Version Latest
+[CmdletBinding(SupportsShouldProcess=$true)]
 param([switch]$Quiet,[string]$Revision="",[switch]$List,[switch]$DryRun,[switch]$Force)
 $ErrorActionPreference='Stop'
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")

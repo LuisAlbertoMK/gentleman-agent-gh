@@ -321,7 +321,7 @@ if ($Command -eq 'AsyncPush') {
     Write-Verbose "[benchmark] Functional latency: signal file → detection"
 
     $testDir = Join-Path ([System.IO.Path]::GetTempPath()) ("gentleman-bench-{0}" -f [System.Diagnostics.Process]::GetCurrentProcess().Id)
-    if (Test-Path $testDir) { Remove-Item -Path $testDir -Recurse -Force -ErrorAction SilentlyContinue }
+    if (Test-Path $testDir) { try { Remove-Item -Path $testDir -Recurse -Force -ErrorAction Stop } catch { Write-Verbose "[benchmark] stale temp dir cleanup skipped: $($_.Exception.Message)" } }
     New-Item -ItemType Directory -Path $testDir -Force | Out-Null
 
     $taskId = "bench_test_$(Get-Random)"
@@ -381,7 +381,7 @@ if ($Command -eq 'AsyncPush') {
     Start-Sleep -Milliseconds 300
     $orphanedProcs = 0
     try { $check = Get-Process -Id $pidFromFile -ErrorAction SilentlyContinue; if ($check) { $orphanedProcs++ } } catch {}
-    Remove-Item -Path $pidFile -Force -ErrorAction SilentlyContinue
+    try { Remove-Item -Path $pidFile -Force -ErrorAction Stop } catch { Write-Verbose "[benchmark] pid file cleanup skipped: $($_.Exception.Message)" }
     if ($dummyProc -and -not $dummyProc.HasExited) { $dummyProc.Kill() }
 
     $legacyCancelMs = -1; $legacyOrphans = 1

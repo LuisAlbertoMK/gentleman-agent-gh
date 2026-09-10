@@ -25,7 +25,7 @@
 .NOTES
     Auto-detects package managers: scoop/choco (Windows), apt/brew (Linux/macOS).
 #>
-[CmdletBinding(SupportsShouldProcessing)]
+[CmdletBinding(SupportsShouldProcess)]
 param(
     [string]$RepoUrl = "https://github.com/Gentleman-Programming/gentleman-agent-gh.git",
     [string]$Branch = "master",

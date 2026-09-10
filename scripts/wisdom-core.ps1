@@ -362,8 +362,8 @@ if ($Command -eq 'Store') {
                 $rId = if ($result -and $result.ContainsKey('Id')) { $result.Id } else { "" }
                 $rPath = if ($result -and $result.ContainsKey('Path')) { $result.Path } else { "" }
                 if ($DryRun) { Write-Output "[DryRun] Would delete: $($file.FullName)" }
-                elseif ($rAction -in @("created", "updated")) { Remove-Item $file.FullName -Force }
-                elseif ($Force) { Remove-Item $file.FullName -Force; if (-not $Quiet) { Write-Warning "[Force] Deleted backlog despite failed save: $($file.Name)" } }
+                elseif ($rAction -in @("created", "updated")) { try { Remove-Item $file.FullName -Force -ErrorAction Stop } catch { Write-Warning "wisdom-core: failed to remove backlog file $($file.Name): $($_.Exception.Message)"; throw } }
+                elseif ($Force) { try { Remove-Item $file.FullName -Force -ErrorAction Stop } catch { Write-Warning "wisdom-core: failed to remove backlog file $($file.Name): $($_.Exception.Message)"; throw }; if (-not $Quiet) { Write-Warning "[Force] Deleted backlog despite failed save: $($file.Name)" } }
                 else {
                     if (-not $Quiet) { Write-Warning "Backlog preserved (save failed): $($file.Name) — retry or use -Force to delete anyway" }
                     $results += @{ File = $file.Name; Status = "preserved"; Id = $rId; Path = $rPath }
