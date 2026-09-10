@@ -14,7 +14,7 @@
 
 ### Example 2: Implement a Feature Plan
 **User**: "Execute the plan in SPEC-042: add rate limiting to API"
-**Route**: Implement plan → DELEGATE → `gentleman-implementer-sub` (DeepSeek V4 Flash Free)
+**Route**: Implement plan → DELEGATE → `gentleman-implementer-sub` (Muse Spark 1.3 Contributor Free)
 **Why**: Precise execution, no over-analysis, fast model for implementation
 **Fallback**: `gentleman-quick-sub` → `general`
 
@@ -26,7 +26,7 @@
 
 ### Example 4: Quick One-Line Fix
 **User**: "Fix typo in error message at src/api/errors.ts:47"
-**Route**: Quick edit → DELEGATE → `gentleman-quick-sub` (MiMo V2.5 Free)
+**Route**: Quick edit → DELEGATE → `gentleman-quick-sub` (Big Pickle)
 **Why**: Atomic edit, low risk, fast free model
 **Fallback**: `general`
 
@@ -82,7 +82,7 @@ assert_direct "Nightly cron job"            # → DIRECT forced
 
 ### Edge Case 2: Context Near Threshold (140K tokens)
 **Scenario**: Large codebase task at 140K context
-**Resolution**: Route to fast model (DeepSeek V4 Flash / MiMo) even if task type suggests Ultra
+**Resolution**: Route to fast model (Big Pickle / Muse Spark 1.3) even if task type suggests Ultra
 **Rule**: Context budget > model preference when 100K-150K
 
 ### Edge Case 3: Twin Exists But Hidden (Whitelist Mismatch)
@@ -126,7 +126,7 @@ assert_direct "Nightly cron job"            # → DIRECT forced
 
 
 ## 🔧 IMPLEMENTER
-`gentleman-implementer-sub` (DeepSeek V4 Flash Free) — precise execution. No unrequested changes.
+`gentleman-implementer-sub` (Muse Spark 1.3 Contributor Free) — precise execution. No unrequested changes.
 **Avoid**: Qwen3.7 Max (re-plans, paid), Nemotron 3 Ultra (over-analyzes).
 
 ## Extended — Security Gate, Strategy y notas de catálogo (movido por ADR-048, cycle32-p2)
@@ -142,7 +142,7 @@ assert_direct "Nightly cron job"            # → DIRECT forced
 ### Strategy (FREE — 2026-09-02, 8 ids)
 - **100% Free**: Solo 8 ids free vigentes en GET /zen/v1/models (ningún retired: kimi-k2.5-free y nemotron-3-super-free fuera de catálogo)
 - **1M context**: Nemotron 3 Ultra Free, Ling 3.0 Flash Fin Free (DeepSeek V4 Flash Free 1M como alt)
-- **Vision**: MiMo V2.5 Free (212K, reemplaza Kimi K2.5 retirado); Big Pickle reasoning para docs/general
+- **Vision**: MiMo V2.5 Free retirado 2026-09-10 (pi.dev 404) — sin vision free vigente; fallback Big Pickle para docs/general
 - **Code-gen**: Muse Spark 1.2 Contributor Free (200K) para implement/quick/script
 - **Fallback universal**: Big Pickle (always free) — Laguna S 2.1 Free como segundo fallback si se estabiliza pi.dev
 
@@ -155,3 +155,4 @@ Ground truth 2026-09-02: opencode/big-pickle (200K reasoning), opencode/mimo-v2.
 
 ### Changelog (movido)
 - 3.1 (2026-09-02): Sync catálogo free vigente (8 ids). Reemplaza nemotron-3-super-free->3.5-lightning-free, kimi-k2.5-free->mimo-v2.5-free, deepseek->ling/muse-spark según dominio. Añade columna Ctx y nota vigencia. Drift fix cycle32-p2: gentleman-seo -> Nemotron 3 Ultra Free (SSoT opencode.json), gentleman-datascience -> Big Pickle (SSoT opencode.json).
+- 3.2 (2026-09-10): Retiro MiMo V2.5 Free (pi.dev 404) — quick/datascience → Big Pickle (SSoT opencode.json/opencode-base.json); implementer prescriptivo → Muse Spark 1.3 Contributor Free. Solo prescriptivo actualizado; historial 2026-09-02 intacto.

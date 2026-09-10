@@ -88,7 +88,7 @@ Describe 'generate-opencode-config.js — fail-closed' {
         $repo = New-GenRepo 'collision'
         Set-GenFixture -Repo $repo `
             -Agent @{ 'gentleman-quick-sub-auto' = @{
-                description = 'Fast executor subagent'; model = 'opencode/mimo-v2.5-free';
+                description = 'Fast executor subagent'; model = 'opencode/big-pickle';
                 hidden = $true; mode = 'subagent'; prompt = '{file:prompts/gentleman-quick.md}' } } `
             -Templates @{ 'auto-sub' = $script:tmplAutoSub } `
             -Overrides @{ 'gentleman-quick-sub-auto' = @{ extraPermKeys = @{ bash = @{ '*' = 'allow' } } } }
@@ -104,7 +104,7 @@ Describe 'generate-opencode-config.js — fail-closed' {
         $repo = New-GenRepo 'collision-task'
         Set-GenFixture -Repo $repo `
             -Agent @{ 'gentleman-quick-sub-auto' = @{
-                description = 'Fast executor'; model = 'opencode/mimo-v2.5-free';
+                description = 'Fast executor'; model = 'opencode/big-pickle';
                 hidden = $true; mode = 'subagent'; prompt = '{file:prompts/gentleman-quick.md}' } } `
             -Templates @{ 'auto-sub' = $script:tmplAutoSub } `
             -Overrides @{ 'gentleman-quick-sub-auto' = @{ extraPermKeys = @{ task = @{ '*' = 'allow' } } } }
@@ -122,7 +122,7 @@ Describe 'generate-opencode-config.js — permission merge' {
         $repo = New-GenRepo 'auto-sub'
         Set-GenFixture -Repo $repo `
             -Agent @{ 'gentleman-quick-sub-auto' = @{
-                description = 'Fast executor subagent'; model = 'opencode/mimo-v2.5-free';
+                description = 'Fast executor subagent'; model = 'opencode/big-pickle';
                 hidden = $true; mode = 'subagent'; prompt = '{file:prompts/gentleman-quick.md}' } } `
             -Templates @{ 'auto-sub' = $script:tmplAutoSub }
 
@@ -166,7 +166,7 @@ Describe 'generate-opencode-config.js — validation & overrides' {
         $repo = New-GenRepo 'idem'
         Set-GenFixture -Repo $repo `
             -Agent @{
-                'gentleman-quick-sub-auto' = @{ description = 'Fast executor subagent'; model = 'opencode/mimo-v2.5-free'; hidden = $true; mode = 'subagent'; prompt = '{file:prompts/gentleman-quick.md}' }
+                'gentleman-quick-sub-auto' = @{ description = 'Fast executor subagent'; model = 'opencode/big-pickle'; hidden = $true; mode = 'subagent'; prompt = '{file:prompts/gentleman-quick.md}' }
                 'gentleman-security' = @{ description = 'Security specialist'; model = 'opencode/nemotron-3-ultra-free'; mode = 'primary'; prompt = '{file:prompts/gentleman-security.md}' }
             } `
             -Templates @{ 'auto-sub' = $script:tmplAutoSub; 'readonly' = $script:tmplReadonly }
@@ -183,7 +183,7 @@ Describe 'generate-opencode-config.js — validation & overrides' {
         $repo = New-GenRepo 'hidden'
         Set-GenFixture -Repo $repo `
             -Agent @{
-                'sdd-apply' = @{ description = 'Implement code changes from task definitions'; model = 'opencode/deepseek-v4-flash-free'; mode = 'subagent'; prompt = '{file:prompts/sdd/sdd-apply.md}' }
+                'sdd-apply' = @{ description = 'Implement code changes from task definitions'; model = 'opencode/muse-spark-1.3-contributor-free'; mode = 'subagent'; prompt = '{file:prompts/sdd/sdd-apply.md}' }
                 'gentleman-quick-sub-auto' = @{ description = 'Fast executor subagent'; mode = 'subagent' }
             } `
             -Templates @{ 'readwrite' = $script:tmplReadwrite; 'auto-sub' = $script:tmplAutoSub } `
