@@ -3,7 +3,7 @@ name: delivery-harness
 description: "Orchestrate multi-agent work — break goals into work units, delegate with isolation, collect results, handle failures"
 triggers: "Coordinate, orchestrate, multi-agent, delegate work"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2700
+token_budget: 3400
 ---
 
 ## When to Use
@@ -21,6 +21,7 @@ Trigger: Multi-step tasks, parallel subagent work, complex deliverables.
    - Success criteria per unit
    - **Request structured output**: each delegation MUST return 4-field block preserved as-is:
      `## Decision Taken | ## Files Changed | ## Key Findings | ## Nuance (what would be lost in summary)`
+   - First window of new chain → invoke `gentleman-initializer` (agent in opencode.json, f8d6e8fe) to arm env with full context before delegating to coding agents — "different prompt for first window" (Anthropic 2025-11-26).
 5. **Collect** — gather results, verify each meets criteria
 6. **Reconcile** — merge outputs, resolve conflicts (or escalate)
 7. **Report** — one status: units done, failures, rollback path

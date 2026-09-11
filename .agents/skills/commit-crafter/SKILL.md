@@ -3,7 +3,7 @@ name: commit-crafter
 description: "Craft conventional commit messages from diff analysis."
 triggers: "commit, mensaje, commit message, conventional commit, git commit, craft commit"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2501
+token_budget: 2869
 ---
 
 ## When to Use
@@ -35,9 +35,10 @@ Craft conventional commit messages from diff analysis.
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "mensaje sin analizar diff" | Craft sin git diff --stat previo | Verificar Format & Rules: git diff --stat antes + Body WHAT+WHY no HOW + file:line citado |
+| "type incorrecto por pereza" | Type contradice diff pattern (ej feat: fix bug) | Verificar Type Detection tabla + Scope por file pattern + Summary ≤50 chars imperativo |
+| "scope omitido / breaking sin footer" | Scope faltante o breaking sin ! + BREAKING CHANGE | Verificar <type>(<scope>): <summary> + breaking ! + BREAKING CHANGE footer + split si unrelated |
+
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill
@@ -47,7 +48,9 @@ Craft conventional commit messages from diff analysis.
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
 ## Refs
-judgment-day · quality-gate · work-unit-commits
+Cross-Refs: branch-pr | chained-pr | work-unit-commits | judgment-day | quality-gate
+
+
 ## Reference
 > docs/skills/commit-crafter/reference.md
 

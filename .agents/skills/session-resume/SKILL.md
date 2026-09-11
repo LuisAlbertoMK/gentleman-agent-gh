@@ -3,7 +3,7 @@ name: session-resume
 description: "Session continuity — save/restore state, git gate, sparse skill pre-load, Engram recall"
 triggers: "session resume, dónde lo dejamos, continuá, session start, code memory, memory, recordar, acordate, multi-session, donde quedamos, handoff"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1800
+token_budget: 2100
 ---
 ## When to Use
 1. Is git repo? NO → `mem_context` only. YES → check 2 states.

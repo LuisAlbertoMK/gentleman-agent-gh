@@ -1,9 +1,9 @@
-﻿---
+---
 name: skill-graph
 description: "Sparse loading — resolve only relevant skills + dependencies, digest per context budget"
 triggers: "sparse loading, skill resolution, relevant skills, which skill, skill-graph"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2300
+token_budget: 2600
 ---
 
 ## When to Use
@@ -61,4 +61,4 @@ hop 2: command-wrapper      → [bash-safe]
 - `ctx_search(source: "<skill>")` returns expected indexed sections
 
 ## Refs
-Cross-Refs: skill-registry | cross-project-forge
+Cross-Refs: skill-registry | cross-project-forge | skill-testing | skill-improver
