@@ -129,6 +129,7 @@ try {
             }
             # Append to history.jsonl if delta >0.2 or new commit (cache-hit path)
             # GAP-4 fix: skip repo mutation in test mode (Pester/gate contexts must not dirty the worktree)
+            if ($DryRun) { if ($env:PESTER_TEST -eq '1') { Write-Debug "score-auto: DryRun — skipping history.jsonl append (cache-hit path)" } else { Write-Warning "score-auto: DryRun — skipping history.jsonl append (cache-hit path)" }; exit 0 }
             if ($env:PESTER_TEST -eq '1') { Write-Debug "score-auto: PESTER_TEST=1 — skipping history.jsonl append (cache-hit path)"; exit 0 }
             $historyPath = Join-Path $PSScriptRoot "../docs/metricas/history.jsonl"
             $proj = Get-Content (Join-Path $PSScriptRoot "../.project.json") -Raw | ConvertFrom-Json
@@ -329,6 +330,10 @@ if (Test-Path $projectJsonPath) {
 # ============================================================
 
 try {
+    if ($DryRun) {
+        $dryCacheMsg = "score-auto: DryRun — skipping score-cache.json write"
+        if ($isTestMode) { Write-Debug $dryCacheMsg } else { Write-Warning $dryCacheMsg }
+    } else {
     if (-not (Test-Path $cacheDir)) {
         New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
     }
@@ -343,6 +348,7 @@ try {
         dims  = @($dimensions.Keys).Count
     }
     $cacheObject | ConvertTo-Json -Depth 5 | Set-Content $cacheFile -Encoding UTF8
+    }
 } catch {
     Write-Debug "score-cache save: $($_.Exception.Message)"
 }
@@ -358,7 +364,10 @@ try {
         $valMsg = "score-auto: validation failed — score=$finalScore, dims=$dimCount (expected: 0-10, >=11 dims). Skipping .project.json write."
         if ($isTestMode) { Write-Debug $valMsg } else { Write-Warning $valMsg }
     } else {
-        if ($isTestMode) {
+        if ($DryRun) {
+            $dryPjMsg = "score-auto: DryRun — skipping .project.json write"
+            if ($isTestMode) { Write-Debug $dryPjMsg } else { Write-Warning $dryPjMsg }
+        } elseif ($isTestMode) {
             Write-Debug "score-auto: PESTER_TEST=1 — skipping .project.json write (test mode)"
         } else {
             if (Test-Path $pjPath) {
@@ -409,7 +418,9 @@ if ($Json) {
 
 # Append to history.jsonl if delta >0.2 or new commit
 # GAP-4 fix: skip repo mutation in test mode (Pester/gate contexts must not dirty the worktree)
-if ($env:PESTER_TEST -eq '1') {
+if ($DryRun) {
+    if ($isTestMode) { Write-Debug "score-auto: DryRun — skipping history.jsonl append (main path)" } else { Write-Warning "score-auto: DryRun — skipping history.jsonl append (main path)" }
+} elseif ($env:PESTER_TEST -eq '1') {
     Write-Debug "score-auto: PESTER_TEST=1 — skipping history.jsonl append (main path)"
 } else {
 $historyPath = Join-Path $PSScriptRoot "../docs/metricas/history.jsonl"
