@@ -194,3 +194,5 @@ test-results/
 .crush/crush.db*
 .crush/logs/
 /.crushrc
+.model-cache.frozen
+.model-cache.unfrozen
