@@ -32,6 +32,11 @@ Every bash command MUST include: 1. **Description**: 5-10 words. 2. **Error hand
 ## SAFETY WRAPPERS
 Destructive commands → BLOCK (ask required): `git push --force`, `rm -rf`. `git commit` → quality gate first.
 
+## PRE-EXEC
+side-effects>scripts/pre-exec-review.ps1 -Command (-Mode strict)
+PASS>procede;WARN>procede+warn(strict>FAIL);FAIL(2)>no corre,reporta,sigue
+read-only>no;shell=bare pwsh
+
 ## LOGGING (post-command)
 After critical commands, log to Engram: `title:"Command: {summary}" type:discovery|config content:"**What**: command | **Exit code**: N | **Output**: summary | **Learned**: gotchas"`
 
