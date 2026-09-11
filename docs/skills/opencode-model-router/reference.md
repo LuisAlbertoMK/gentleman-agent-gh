@@ -139,19 +139,19 @@ assert_direct "Nightly cron job"            # → DIRECT forced
 3. Context >150K? -> **DIRECT**
 4. Otherwise -> route a tabla.
 
-### Strategy (FREE — 2026-09-02, 8 ids)
-- **100% Free**: Solo 8 ids free vigentes en GET /zen/v1/models (ningún retired: kimi-k2.5-free y nemotron-3-super-free fuera de catálogo)
-- **1M context**: Nemotron 3 Ultra Free, Ling 3.0 Flash Fin Free (DeepSeek V4 Flash Free 1M como alt)
-- **Vision**: MiMo V2.5 Free retirado 2026-09-10 (pi.dev 404) — sin vision free vigente; fallback Big Pickle para docs/general
-- **Code-gen**: Muse Spark 1.2 Contributor Free (200K) para implement/quick/script
-- **Fallback universal**: Big Pickle (always free) — Laguna S 2.1 Free como segundo fallback si se estabiliza pi.dev
+### Strategy (FREE — 2026-09-10, SSoT opencode.json — 4 ids free vigentes, 58 agents)
+- **100% Free**: SSoT opencode.json: 4 ids free vigentes (58 agents) — opencode/big-pickle (200K), opencode/muse-spark-1.3-contributor-free (200K code-gen), opencode/nemotron-3-ultra-free (1M), opencode/qwen3.6-plus. Sin mimo/ling/1.2 — todos retirados o actualizados a 1.3.
+- **1M context**: Nemotron 3 Ultra Free (1M) — único 1M vigente SSoT
+- **Vision**: MiMo V2.5 Free retirado 2026-09-10 (pi.dev 404) — sin vision free vigente; fallback Big Pickle para docs/general (SSoT)
+- **Code-gen**: Muse Spark 1.3 Contributor Free (200K) para implement/quick/script — SSoT opencode.json (actualizado desde 1.2)
+- **Fallback universal**: Big Pickle (always free) — SSoT
 
-### Notas de catálogo (ground truth 2026-09-02 movido)
-Ground truth 2026-09-02: opencode/big-pickle (200K reasoning), opencode/mimo-v2.5-free (212K vision, limited-time free), opencode/ling-3.0-flash-fin-free (1M), opencode/nemotron-3-ultra-free (1M reasoning), opencode/nemotron-3.5-lightning-free (sucesor de super-free), opencode/muse-spark-1.2-contributor-free (200K code-gen), opencode/deepseek-v4-flash-free (volvió en /models), opencode/laguna-s-2.1-free (Zen 200, pi.dev 404 por lag — vigente hasta prueba contraria). Pricing table confirma 6 free explícitos; Laguna y DeepSeek tratados como Free vigentes por /models.
+### Notas de catálogo (ground truth 2026-09-10 SSoT movido)
+Ground truth 2026-09-10 SSoT: opencode/big-pickle (200K reasoning), opencode/muse-spark-1.3-contributor-free (200K code-gen), opencode/nemotron-3-ultra-free (1M reasoning), opencode/qwen3.6-plus. Retirados: opencode/mimo-v2.5-free (404 pi.dev), opencode/ling-3.0-flash-fin-free (1M retirado), opencode/muse-spark-1.2-contributor-free (reemplazado por 1.3), opencode/nemotron-3.5-lightning-free (sucesor super-free pero no en SSoT final 4), opencode/deepseek-v4-flash-free y opencode/laguna-s-2.1-free (no SSoT final). Pricing table 6 free explícitos históricos consolidados a 4 SSoT.
 
-* Nemotron 3.5 Lightning Free ctx no publicado en pricing table; estimado heredado de familia Nemotron 3.x (256K–1M). Todos los modelos en tabla pertenecen al set 8 vigente — ningún retired.
+* Nemotron 3 Ultra Free es único 1M en SSoT final. Modelos históricos tabla 8 ids migrados/retirados — ningún retired activo en routing table.
 
-> Nota Laguna S 2.1 Free: disponible como fallback general adicional (Zen 200, medium-high confidence). No asignado a dominio específico por lag en pi.dev, pero válido como Free vigente.
+> Nota SSoT: 58 agents en opencode.json, 4 modelos free vigentes. Laguna/DeepSeek/MiMo/Ling no asignados — fallback Big Pickle si se estabiliza pi.dev, pero no SSoT.
 
 ### Changelog (movido)
 - 3.1 (2026-09-02): Sync catálogo free vigente (8 ids). Reemplaza nemotron-3-super-free->3.5-lightning-free, kimi-k2.5-free->mimo-v2.5-free, deepseek->ling/muse-spark según dominio. Añade columna Ctx y nota vigencia. Drift fix cycle32-p2: gentleman-seo -> Nemotron 3 Ultra Free (SSoT opencode.json), gentleman-datascience -> Big Pickle (SSoT opencode.json).

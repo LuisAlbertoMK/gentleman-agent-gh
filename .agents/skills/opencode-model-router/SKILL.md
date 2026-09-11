@@ -18,7 +18,7 @@ token_budget: 3200
 |------|--------|-------|----------------------|-----|----------|
 | Security/vulnerability | DELEGATE | `gentleman-security` | Nemotron 3 Ultra Free | 1M | `gentleman-deep` -> `gentleman-vMK` (Big Pickle) |
 | SEO/content | DELEGATE | `gentleman-seo` | Nemotron 3 Ultra Free | 1M | `gentleman-vMK` (Big Pickle) |
-| Infrastructure/K8s/Terraform | DELEGATE | `gentleman-infra` | Muse Spark 1.3 Contributor Free (code-gen) — SSoT opencode.json; alt Ling 3.0 Flash Fin Free (1M) | 200K | `gentleman-deep` -> `gentleman-vMK` (Big Pickle) |
+| Infrastructure/K8s/Terraform | DELEGATE | `gentleman-infra` | Muse Spark 1.3 Contributor Free (code-gen) — SSoT opencode.json | 200K | `gentleman-deep` -> `gentleman-vMK` (Big Pickle) |
 | Frontend/UI/a11y | DELEGATE | `gentleman-frontend` | Big Pickle | 200K | `gentleman-quick` -> `gentleman-vMK` (Big Pickle) |
 | Performance/profiling | DELEGATE | `gentleman-performance` | Nemotron 3 Ultra Free | 1M | `gentleman-deep` -> `gentleman-vMK` |
 | Data/SQL/Python | DELEGATE | `gentleman-datascience` | Big Pickle | 200K | `gentleman-codex` -> `gentleman-vMK` (Big Pickle) |
@@ -43,5 +43,7 @@ Avoid: Qwen3.7 Max (re-plans, paid), Nemotron 3 Ultra (over-analyzes).
 ---
 ## Reference Materials
 Security Gate, Strategy, catálogo → docs/skills/opencode-model-router/reference.md (ADR-048)
+Security Gate, Strategy, notas catálogo y detalle extendido -> docs/skills/opencode-model-router/reference.md (ADR-048, cycle32-p2)
 ---
-## Refs: delivery-harness | opencode-model-router
+## Refs
+Cross-Refs: delivery-harness | opencode-model-router

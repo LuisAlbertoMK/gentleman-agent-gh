@@ -36,8 +36,12 @@ Flex2D·Grid1D·!important vs @layer·flex:1 w/o min-inline-size:0·container-ty
 - Second occurrence of same rationalization → force RED zone
 
 ## Verification
-- Output matches ## Output contract + file:line; cross-ref-check.ps1 → OK
+- Output matches ## Output contract + file:line citation; cross-ref-check.ps1 → SKILL.md OK
 - Frontmatter (name/description/triggers/token_budget) stable; cross-refs exist; no listed anti-patterns
+- Output: response matches the ## Output contract format exactly
+- token_budget: total tokens within frontmatter token_budget
+- frontmatter: name, description, triggers, token_budget present and stable
+- cross-refs: each referenced skill exists
+- anti-patterns: none of the listed anti-patterns reintroduced
 ## Cross-Refs: baseline-ui | accessibility | performance | web-quality-audit | seo | visual-testing | vision-analyze
 > docs/skills/ui-engine/reference.md
-

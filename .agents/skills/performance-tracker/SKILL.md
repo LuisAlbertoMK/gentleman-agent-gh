@@ -6,11 +6,11 @@ changelog: docs/ciclos/cycle28-20260815.md
 token_budget: 3080
 ---
 ## When to Use
-App performance scoring — 6 dims, continuous. Agent perf → `auto-metrics`. Mobile/Desktop/Web.
+Score and track app performance — 6 dims, continuous scoring, trend analysis. App performance scoring — 6 dims, continuous. Agent perf → `auto-metrics`. Mobile, Desktop, Web.
 ## 6 Dimensions (1-10)
 Load|Render|Memory|Network|Bundle|Energy — thresholds + quick checks → reference.
 ## Score Storage & Trend
-`mem_save(learning,"perf-score:{app}-{platform}","Load:X|...|Avg:X.X|Platform|App")`. Trend every 10/session-end: `mem_search("perf-score:",20)` → prev5 vs recent5. Drop >0.5 → gap-analysis.
+`mem_save(type="learning", title="perf-score:{app}-{platform}", content="**Load**:X|...|**Avg**:X.X|**Platform**:{mob|desk|web}|**App**:{name}")`. Trend (every 10 / session end): `mem_search(query="perf-score:", limit=20)` → prev(5) vs recent(5). Drop >0.5 → gap-analysis. Compressed: `mem_save(learning,"perf-score:{app}-{platform}","Load:X|...|Avg:X.X|Platform|App")` → `mem_search("perf-score:",20)` → prev5 vs recent5.
 ## Action by Avg
 ≥8 Maintain · 6-7.9 Light review + profile · 4-5.9 gap-analysis + fix · <4 Critical perf sprint
 ## Hard Rules
@@ -39,7 +39,11 @@ Thresholds table + quick checks + worked examples (5) → docs/skills/performanc
 - Second occurrence of same rationalization → force RED zone
 
 ## Verification
-- benchmark-core.ps1 -Gate before/after; cross-ref-check.ps1 → OK
-- Output matches ## Output contract exactly; frontmatter (name/description/triggers/token_budget) stable; cross-refs exist; no listed anti-patterns
-## Refs: performance | auto-metrics | perf-profiling
-
+- benchmark-core.ps1 -Gate before/after; cross-ref-check.ps1 → SKILL.md OK
+- Output matches ## Output contract exactly — response matches the ## Output contract format exactly
+- frontmatter (name/description/triggers/token_budget) stable — name, description, triggers, token_budget present and stable
+- cross-refs: each referenced skill exists
+- anti-patterns: none of the listed anti-patterns reintroduced — none reintroduced
+- token_budget: total tokens within frontmatter token_budget
+## Refs
+Cross-Refs: performance | auto-metrics | perf-profiling

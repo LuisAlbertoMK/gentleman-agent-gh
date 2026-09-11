@@ -6,7 +6,7 @@ changelog: docs/ciclos/cycle28-20260815.md
 token_budget: 3126
 ---
 ## When to Use
-Anti-slop audit&cleanup: layout·typography·responsive·animation·tokens. Stack: CSS/Tailwind·`cn()`·React. Flow: Scan→fix→verify→a11y→perf. Review:`/baseline-ui <file>`. Offline-first, no network.
+Anti-slop audit&cleanup: layout·typography·responsive·animation·tokens. **Stack**: CSS/Tailwind·`cn()`(clsx+tw-merge)·React. Audit→**ui-engine**. **Flow**: Scan→❌→fix→verify→a11y→perf. Review:`/baseline-ui <file>`. Offline-first: pure static audit — needs NO network/Ollama.
 ## Typography
 `text-balance` headings · `text-pretty` body · `tabular-nums` data · Page→`clamp(1rem,1.5vw+.5rem,1.5rem)`
 ## Tokens OKLCH→Var
@@ -23,7 +23,7 @@ Anti-slop audit&cleanup: layout·typography·responsive·animation·tokens. Stac
 ## Anti-Patterns
 Fixed width·h-screen·dense interactive·Fixed font·transition:all·>500ms·No reduced-motion·HSL/RGB·No contrast·cqi outside container
 ## Examples
-`/baseline-ui src/components/Button.tsx` → `UI-CLEANUP:Button—<date> CRITICAL:[contrast]→ HIGH:[layout]→ VERIFY:[axe]` · Details → reference.md
+Audit: `/baseline-ui src/components/Button.tsx` → `UI-CLEANUP:Button—2026-08-27 CRITICAL:[contrast]→ HIGH:[layout]→ VERIFY:[axe]` · Details → reference.md
 ## Anti-Rationalization
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
@@ -41,5 +41,10 @@ Fixed width·h-screen·dense interactive·Fixed font·transition:all·>500ms·No
 ---
 
 ## Reference Materials
-Externalized per ADR-048 (worked examples, patterns, quick ref):
-→ docs/skills/baseline-ui/reference.md
+
+The following material is externalized to keep this skill under the 3KB token budget (ADR-048) — worked examples, patterns, quick ref. Consult these when the skill needs detailed worked examples or guardrails:
+
+- **Worked Examples, Layout Patterns, Anti-Patterns, Quick Reference**
+  → docs/skills/baseline-ui/reference.md
+
+---

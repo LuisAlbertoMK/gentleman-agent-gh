@@ -32,6 +32,15 @@ Build: `Get-TemporalChain` → sort `createdAt` → edges + `deltaHours`. Use: r
 `!close`→`mem_session_summary`(Goal/Discoveries/Accomplished/Next/Files)+flush batch+`!score`/`!dream`. Mandatory unless pure chat. Gate: `close-session.ps1`.
 ## After Compaction: 1)`mem_session_summary` 2)`mem_context` 3)Continue
 → docs/skills/engram-protocol/reference.md
+
+## Reference Materials
+The following material is externalized to keep this skill under the 3KB token budget (ADR-048).
+Consult these when detailed temporal reasoning is needed:
+
+- **Temporal Edges — Full Table, Build/Use/Refs**
+  → docs/skills/engram-protocol/reference.md
+
+---
 ## Anti-Rationalization
 | Rationalization | Red Flag | Check |
 |-----------------|----------|-------|
@@ -46,4 +55,3 @@ Build: `Get-TemporalChain` → sort `createdAt` → edges + `deltaHours`. Use: r
 - Match ## Output contract + file:line citation
 - cross-ref-check.ps1 → OK
 ## Refs: dreaming|session-resume
-

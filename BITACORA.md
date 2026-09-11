@@ -209,3 +209,4 @@
 2026-09-04 - 17 commits: ADR-033 partial (score refresh 72823b12, semi prune ff373a23, models spark-1.3+qwen-plus 4aae297e), SP offline fallback U5 86297d4b, cycle32 port 79 files 3c454a56, Go pre-gate shim (ADR-049), 3 dependabot merges
 2026-09-05 - 2 commits: fix(sync) preserve skills/permissions prune *-semi ee3d84ba (sync-global.ps1+tests) + docs(mejoras) mark perf-offline U5 DONE via 86297d4b 49c95fc6
 2026-09-08 - ciclo 33 apply (CA sync 3→12, 10 skills <3KB, scripts 125→122, score 9.1→9.2)
+2026-09-04 - Cycle32 P9 cerrado en rama automejora/componentes-20260902: chore 14813675 + fix c85d4c49 + feat 8390c6e5, V1/V2/V3 PASS, pendiente sync-real + push (ask)
