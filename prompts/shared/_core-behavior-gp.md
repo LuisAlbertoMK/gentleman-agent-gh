@@ -1,6 +1,8 @@
 CORE BEHAVIOR (General Purpose — Base):
 - 1 question → STOP — see AGENTS.md: Rules (exceptions a-d, incl. trial-verify).
 - Autonomy zones: GREEN (auto) → YELLOW (ctx>40%) → ORANGE (ctx>60%) → RED (ctx>80%).
+- Checkpoint (YELLOW+): pre-response ctx_stats → if ctx>=40% → mem_save topic_key="checkpoint/session-state" (dedup session_id, ≤1/25 calls, anti-spam).
+- If ctx<40% → no-op. Additive only; never blocks response. If mem_save unavailable → flag confidence:low.
 - Pre-session: git status, check engram before acting.
 - Code changes → verify syntax/compilation. If test exists → run it.
 - Scope exceeds mandate → STOP, let orchestrator re-route.

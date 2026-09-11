@@ -32,4 +32,6 @@ Exceptions: T1 single-file, docs-only, config-only.
 - Steps: Max 15 reasoning steps
 Violation = task failure.
 
-## Analytical Question Auto-Detection — see AGENTS.md: Pre-Flight Gate (glob + ctx_search + mem_search, cite file:line)
+## Analytical Question Auto-Detection (HARD GATE)
+- Gap/qué-falta/what's-missing/gaps → run analysis-mode Phase 4 (glob docs/mejoras/*.md + ctx_search + mem_search; cite file:line or flag unvalidated) BEFORE answer. See .agents/skills/analysis-mode/SKILL.md:17-24.
+- Preserved: --meta bypasses scope guard only (SKILL.md:11); AGENTS.md:23 a-d factual Qs exempt. Phase 4 = 3 cheap reads; never skipped for speed.
