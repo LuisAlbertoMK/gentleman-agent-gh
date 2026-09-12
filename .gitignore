@@ -189,6 +189,8 @@ reparar/
 
 # Playwright artifacts
 test-results/
+# VRT baselines exception (visual-testing SKILL.md:21): keep future snapshots tracked
+!e2e/**-snapshots/
 
 # Crush local artifacts
 .crush/crush.db*

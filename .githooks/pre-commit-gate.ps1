@@ -479,6 +479,20 @@ if ($machPathHits.Count -gt 0) {
     Fail "hardcoded machine paths in staged .ps1 (use PSScriptRoot / env vars)"
 } else { Pass }
 
+# [27/28] E2E smoke (dashboard) — bloqueante
+Write-Host "[27/28] E2E smoke..."
+$smoke = Join-Path $RepoRoot 'e2e\dashboard.smoke.js'
+if (Test-Path -LiteralPath $smoke) {
+    node $smoke 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 0) { Pass } else { Fail "e2e smoke failed — node e2e/dashboard.smoke.js" }
+} else { Warn "e2e smoke skipped (e2e/dashboard.smoke.js not found)" }
+
+# [28/28] Playwright headed INFO — nunca bloquea sin browser/display
+Write-Host "[28/28] Playwright headed (INFO)..."
+$hasDisplay = $env:DISPLAY -or $env:WAYLAND_DISPLAY -or ($IsWindows -and -not $env:CI)
+node -e "require('playwright')" 2>&1 | Out-Null
+if ($LASTEXITCODE -ne 0 -or -not $hasDisplay) { Warn "headed skipped (no display/Chromium)" } else { Pass }
+
 # Summary
 Write-Host "`n=== Gate: $passed/$($passed+$failed) passed ==="
 if ($blocked) { Write-Host "  $([char]0x1b)[31mBLOCKED$([char]0x1b)[0m" }

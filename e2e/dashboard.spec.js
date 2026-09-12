@@ -1,5 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
+test.use({ viewport: { width: 1280, height: 720 } });
+
 test.describe('Gentleman Dashboard', () => {
   test('renders 4 cards, table, no console errors, sort toggles aria-sort', async ({ page }) => {
     const errors = [];
@@ -28,6 +30,12 @@ test.describe('Gentleman Dashboard', () => {
     const firstText = (await rows.first().innerText()).trim();
     expect(firstText.length).toBeGreaterThan(0);
 
+    // no busy indicators pending (aria-busy false)
+    await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
+
+    // evidence: screenshot after render
+    await page.screenshot({ path: 'test-results/dashboard-render.png', fullPage: true });
+
     // no console errors
     expect(errors, `console errors: ${errors.join('; ')}`).toEqual([]);
 
@@ -47,5 +55,8 @@ test.describe('Gentleman Dashboard', () => {
     await page.keyboard.press('Enter');
     const afterKb = await deltaTh.getAttribute('aria-sort');
     expect(afterKb).not.toBeNull();
+
+    // evidence: screenshot after sort
+    await page.screenshot({ path: 'test-results/dashboard-sorted.png', fullPage: true });
   });
 });

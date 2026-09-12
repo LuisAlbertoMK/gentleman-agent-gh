@@ -30,6 +30,18 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
+// E2E_MODE env: visible=headed+slowMo 250, headless, smoke (headless fast)
+const E2E_MODE = process.env.E2E_MODE || '';
+const E2E_SPEC = process.env.E2E_SPEC || 'default';
+function evidencePath(name) {
+  const ts = new Date().toISOString().replace(/[:.]/g, '-');
+  const vp = process.env.E2E_VIEWPORT || '1280x720';
+  const dir = path.join('test-results', 'evidence', E2E_SPEC);
+  fs.mkdirSync(dir, { recursive: true });
+  const ext = path.extname(name) || '.png';
+  return path.join(dir, `${path.parse(name).name}-${ts}-${vp}${ext}`);
+}
+
 // Parse arguments
 function parseArgs() {
   const args = process.argv.slice(2);
@@ -139,7 +151,7 @@ async function executeAction(page, action) {
       break;
 
     case 'screenshot':
-      await page.screenshot({ path: action.filename, fullPage: true });
+      await page.screenshot({ path: evidencePath(action.filename), fullPage: true });
       console.log(`  ✓ Screenshot: ${action.filename}`);
       break;
 
@@ -210,7 +222,10 @@ async function main() {
   console.log(`Actions: ${actions.length}`);
   console.log('');
 
-  const browser = await chromium.launch({ headless: !config.headed });
+  const headed = config.headed || E2E_MODE === 'visible';
+  const slowMo = E2E_MODE === 'visible' ? 250 : 0;
+  const headless = E2E_MODE === 'headless' || E2E_MODE === 'smoke' ? true : !headed;
+  const browser = await chromium.launch({ headless, slowMo });
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -221,7 +236,7 @@ async function main() {
     console.log('  ✓ Page loaded');
 
     // Take initial screenshot
-    const initialScreenshot = 'e2e-initial.png';
+    const initialScreenshot = evidencePath('e2e-initial.png');
     await page.screenshot({ path: initialScreenshot, fullPage: true });
     console.log(`  ✓ Initial screenshot: ${initialScreenshot}`);
 
@@ -234,7 +249,7 @@ async function main() {
     }
 
     // Take final screenshot
-    const finalScreenshot = config.screenshot || 'e2e-final.png';
+    const finalScreenshot = evidencePath(config.screenshot || 'e2e-final.png');
     await page.screenshot({ path: finalScreenshot, fullPage: true });
     console.log(`\n  ✓ Final screenshot: ${finalScreenshot}`);
 
