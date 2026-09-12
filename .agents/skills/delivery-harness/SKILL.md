@@ -15,16 +15,17 @@ Trigger: Multi-step tasks, parallel subagent work, complex deliverables.
 1. **Analyze** — read goal, assess complexity (Low/Med/High → 1/3-5/5-10 units)
 2. **Break down** — split into independent work units (SDD: propose→spec→design→tasks→apply→verify)
 3. **Map deps** — build dependency graph: A→B (serial), A∥B (parallel)
-4. **Delegate** — launch each unit via `task(subagent_type=...)` with:
+4. **Pre-delegation fit gate (mandatory)** — before ANY subagent: & scripts/delegation-fit-gate.ps1 -AgentName <agent> -FileCount <n> -LineCount <n>; FAIL → re-partition ≤10 files or re-route, never delegate with FAIL (Orchestrator Guard)
+5. **Delegate** — launch each unit via `task(subagent_type=...)` with:
    - Clean context per delegation (subagent-isolation rule #1)
    - Exact file paths + Engram IDs for decisions
    - Success criteria per unit
    - **Request structured output**: each delegation MUST return 4-field block preserved as-is:
      `## Decision Taken | ## Files Changed | ## Key Findings | ## Nuance (what would be lost in summary)`
    - First window of new chain → invoke `gentleman-initializer` (agent in opencode.json, f8d6e8fe) to arm env with full context before delegating to coding agents — "different prompt for first window" (Anthropic 2025-11-26).
-5. **Collect** — gather results, verify each meets criteria
-6. **Reconcile** — merge outputs, resolve conflicts (or escalate)
-7. **Report** — one status: units done, failures, rollback path
+6. **Collect** — gather results, verify each meets criteria
+7. **Reconcile** — merge outputs, resolve conflicts (or escalate)
+8. **Report** — one status: units done, failures, rollback path
 
 ## Rules
 - Parallelize ONLY truly independent units
@@ -41,12 +42,15 @@ Trigger: Multi-step tasks, parallel subagent work, complex deliverables.
 | "One agent can do it all" | Single agent for >5 files / >20 lines | Decompose into clusters ≤10 files via delivery-harness, verify no file overlap before parallel delegation |
 | "Parallel is always faster" | Independent edits sharing file overlap | Collect File overlap check — if overlap, serialize: read-only → independent → dependent → verify |
 | "4-field summary is optional" | Squeezing Findings/Nuance into one line | Each subagent returns Decision + Files + Findings + Nuance — merge preserves AS-IS, never summarize away |
+| "Gate FAIL is advisory" | Delegating with delegation-fit-gate FAIL | Re-partition ≤10 files or re-route |
 
 ## Red Flags
 - Post-delegation file overlap detected → STOP, re-partition
 - Subagent reports >5 files changed without work-unit split → split via `chained-pr`
+- delegation-fit-gate FAIL ignored → STOP, re-partition or re-route
 
 ## Verification
+- scripts/delegation-fit-gate.ps1 PASS/WARN/FAIL pre-delegation; FAIL → re-partition
 - `scripts/validate-write-scope.ps1 -AllowedPaths "pattern" -BaseRef HEAD` after delegation
 - `git diff --stat` no silent failures; empty+completed → retry narrower scope
 
