@@ -33,6 +33,6 @@
   "devDependencies": {
     "@modelcontextprotocol/server-sequential-thinking": "2026.8.31",
     "@playwright/test": "^1.62.1",
-    "playwright": "1.61.1"
+    "playwright": "1.63.0"
   }
 }
