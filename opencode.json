@@ -1430,7 +1430,7 @@
     },
     "gentleman-code-review": {
       "description": "Code review specialist — Qwen 3.6-plus (successor to 3.6-35B-A3B, 73.4% SWE-bench) → fallback muse-spark → default; contracts, supply-chain, best-practices",
-      "model": "opencode/qwen3.6-plus",
+      "model": "opencode-go/qwen3.6-plus",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-code-review.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -1445,7 +1445,7 @@
     },
     "gentleman-code-review-sub": {
       "description": "Code review subagent — Qwen 73.4% → fallback muse-spark, delegable via Task tool (P1-2)",
-      "model": "opencode/qwen3.6-plus",
+      "model": "opencode-go/qwen3.6-plus",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-code-review.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -1461,7 +1461,7 @@
     },
     "gentleman-code-review-sub-auto": {
       "description": "Code review subagent — AUTO mode (Qwen → fallback muse-spark, zero ask) — delegable via Task tool (P1-2)",
-      "model": "opencode/qwen3.6-plus",
+      "model": "opencode-go/qwen3.6-plus",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-code-review.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",

@@ -140,14 +140,14 @@ assert_direct "Nightly cron job"            # → DIRECT forced
 4. Otherwise -> route a tabla.
 
 ### Strategy (FREE — 2026-09-10, SSoT opencode.json — 4 ids free vigentes, 58 agents)
-- **100% Free**: SSoT opencode.json: 4 ids free vigentes (58 agents) — opencode/big-pickle (200K), opencode/muse-spark-1.3-contributor-free (200K code-gen), opencode/nemotron-3-ultra-free (1M), opencode/qwen3.6-plus. Sin mimo/ling/1.2 — todos retirados o actualizados a 1.3.
+- **100% Free**: SSoT opencode.json: 4 ids free vigentes (58 agents) — opencode/big-pickle (200K), opencode/muse-spark-1.3-contributor-free (200K code-gen), opencode/nemotron-3-ultra-free (1M), opencode-go/qwen3.6-plus. Sin mimo/ling/1.2 — todos retirados o actualizados a 1.3.
 - **1M context**: Nemotron 3 Ultra Free (1M) — único 1M vigente SSoT
 - **Vision**: MiMo V2.5 Free retirado 2026-09-10 (pi.dev 404) — sin vision free vigente; fallback Big Pickle para docs/general (SSoT)
 - **Code-gen**: Muse Spark 1.3 Contributor Free (200K) para implement/quick/script — SSoT opencode.json (actualizado desde 1.2)
 - **Fallback universal**: Big Pickle (always free) — SSoT
 
 ### Notas de catálogo (ground truth 2026-09-10 SSoT movido)
-Ground truth 2026-09-10 SSoT: opencode/big-pickle (200K reasoning), opencode/muse-spark-1.3-contributor-free (200K code-gen), opencode/nemotron-3-ultra-free (1M reasoning), opencode/qwen3.6-plus. Retirados: opencode/mimo-v2.5-free (404 pi.dev), opencode/ling-3.0-flash-fin-free (1M retirado), opencode/muse-spark-1.2-contributor-free (reemplazado por 1.3), opencode/nemotron-3.5-lightning-free (sucesor super-free pero no en SSoT final 4), opencode/deepseek-v4-flash-free y opencode/laguna-s-2.1-free (no SSoT final). Pricing table 6 free explícitos históricos consolidados a 4 SSoT.
+Ground truth 2026-09-10 SSoT: opencode/big-pickle (200K reasoning), opencode/muse-spark-1.3-contributor-free (200K code-gen), opencode/nemotron-3-ultra-free (1M reasoning), opencode-go/qwen3.6-plus. Retirados: opencode/mimo-v2.5-free (404 pi.dev), opencode/ling-3.0-flash-fin-free (1M retirado), opencode/muse-spark-1.2-contributor-free (reemplazado por 1.3), opencode/nemotron-3.5-lightning-free (sucesor super-free pero no en SSoT final 4), opencode/deepseek-v4-flash-free y opencode/laguna-s-2.1-free (no SSoT final). Pricing table 6 free explícitos históricos consolidados a 4 SSoT.
 
 * Nemotron 3 Ultra Free es único 1M en SSoT final. Modelos históricos tabla 8 ids migrados/retirados — ningún retired activo en routing table.
 
