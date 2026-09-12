@@ -198,8 +198,8 @@
     }
   },
   "tools": {
-    "codebase-memory*": false,
-    "engram*": false
+    "codebase-memory*": true,
+    "engram*": true
   },
   "mcp": {
     "codebase-memory-mcp": {
