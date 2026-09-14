@@ -115,7 +115,7 @@ $domainSpecialists = @{
 $domainKey = $Domain.Trim().ToLowerInvariant()
 if ($domainKey -and $domainSpecialists.ContainsKey($domainKey)) {
     $specialist = $domainSpecialists[$domainKey]
-    $specialistPattern = '^gentleman-security(-sub)?(-auto)?$'
+    $specialistPattern = "^$([regex]::Escape($specialist))(-sub)?(-auto)?$"
     if ($AgentName -notmatch $specialistPattern) {
         $warnHits += 'domain-reroute'
         $warnReasons += ("domain '{0}' should route to {1} (or its -sub/-auto variant), not '{2}'" -f $domainKey, $specialist, $AgentName)
