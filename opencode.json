@@ -1,5 +1,5 @@
 {
-  "model": "opencode/big-pickle",
+  "model": "opencode-go/muse-spark-1.3-contributor",
   "skills": [
     ".agents/skills"
   ],
@@ -256,7 +256,7 @@
   "agent": {
     "gentleman-vMK": {
       "description": "Orchestrator - decomposes tasks, delegates to right agent, synthesizes results. Never implements directly.",
-      "model": "opencode/big-pickle",
+      "model": "opencode-go/muse-spark-1.3-contributor",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-vMK.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -296,7 +296,7 @@
     },
     "gentleman-deep": {
       "description": "Deep reasoning - hypothesis-driven debugging, root cause analysis, multi-file refactors with impact analysis",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -311,7 +311,7 @@
     },
     "gentleman-deep-auto": {
       "description": "Deep reasoning — AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -326,14 +326,19 @@
           "git rm *": "ask",
           "bun": "allow",
           "bun *": "allow",
+          "curl *": "deny",
           "docker *": "allow",
           "docker compose *": "allow",
           "docker-compose *": "allow",
+          "iex *": "deny",
+          "irm *": "deny",
+          "iwr *": "deny",
           "node *": "allow",
           "npm": "ask",
           "npm *": "ask",
           "npm add": "allow",
           "npm add *": "allow",
+          "npm exec *": "deny",
           "npm i": "allow",
           "npm i *": "allow",
           "npm install": "allow",
@@ -345,9 +350,21 @@
           "pip3 *": "allow",
           "pnpm": "allow",
           "pnpm *": "allow",
+          "powershell -c *": "deny",
+          "powershell -command *": "deny",
+          "powershell -enc *": "deny",
+          "powershell -File *": "deny",
+          "powershell.exe -c *": "deny",
+          "powershell.exe -command *": "deny",
+          "powershell.exe -enc *": "deny",
+          "powershell.exe -File *": "deny",
+          "pwsh *": "deny",
+          "pwsh.exe *": "deny",
           "Remove-Item *": "ask",
           "rm -rf *": "ask",
           "rm *": "ask",
+          "wget *": "deny",
+          "wsl *": "deny",
           "yarn": "allow",
           "yarn *": "allow"
         }
@@ -359,7 +376,7 @@
     },
     "gentleman-deep-sub": {
       "description": "Deep reasoning subagent — hypothesis-driven debugging, root cause analysis (delegable via Task tool)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -375,7 +392,7 @@
     },
     "gentleman-quick": {
       "description": "Fast executor - single-file atomic edits with immediate verification, scope-guarded",
-      "model": "opencode/big-pickle",
+      "model": "opencode-go/muse-spark-1.3-contributor",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -386,7 +403,7 @@
     },
     "gentleman-quick-auto": {
       "description": "Fast executor — AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode/big-pickle",
+      "model": "opencode-go/muse-spark-1.3-contributor",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -401,14 +418,19 @@
           "git rm *": "ask",
           "bun": "allow",
           "bun *": "allow",
+          "curl *": "deny",
           "docker *": "allow",
           "docker compose *": "allow",
           "docker-compose *": "allow",
+          "iex *": "deny",
+          "irm *": "deny",
+          "iwr *": "deny",
           "node *": "allow",
           "npm": "ask",
           "npm *": "ask",
           "npm add": "allow",
           "npm add *": "allow",
+          "npm exec *": "deny",
           "npm i": "allow",
           "npm i *": "allow",
           "npm install": "allow",
@@ -420,9 +442,21 @@
           "pip3 *": "allow",
           "pnpm": "allow",
           "pnpm *": "allow",
+          "powershell -c *": "deny",
+          "powershell -command *": "deny",
+          "powershell -enc *": "deny",
+          "powershell -File *": "deny",
+          "powershell.exe -c *": "deny",
+          "powershell.exe -command *": "deny",
+          "powershell.exe -enc *": "deny",
+          "powershell.exe -File *": "deny",
+          "pwsh *": "deny",
+          "pwsh.exe *": "deny",
           "Remove-Item *": "ask",
           "rm -rf *": "ask",
           "rm *": "ask",
+          "wget *": "deny",
+          "wsl *": "deny",
           "yarn": "allow",
           "yarn *": "allow"
         }
@@ -430,7 +464,7 @@
     },
     "gentleman-quick-sub": {
       "description": "Fast executor subagent — single-file atomic edits with immediate verification (delegable via Task tool)",
-      "model": "opencode/big-pickle",
+      "model": "opencode-go/muse-spark-1.3-contributor",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -442,7 +476,7 @@
     },
     "gentleman-codex": {
       "description": "Code generation - convention mirroring, defensive coding, new files/scripts/boilerplate",
-      "model": "opencode/muse-spark-1.3-contributor-free",
+      "model": "opencode-go/mimo-v2.5",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -456,7 +490,7 @@
     },
     "gentleman-codex-auto": {
       "description": "Code generation — AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode/muse-spark-1.3-contributor-free",
+      "model": "opencode-go/mimo-v2.5",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -471,14 +505,19 @@
           "git rm *": "ask",
           "bun": "allow",
           "bun *": "allow",
+          "curl *": "deny",
           "docker *": "allow",
           "docker compose *": "allow",
           "docker-compose *": "allow",
+          "iex *": "deny",
+          "irm *": "deny",
+          "iwr *": "deny",
           "node *": "allow",
           "npm": "ask",
           "npm *": "ask",
           "npm add": "allow",
           "npm add *": "allow",
+          "npm exec *": "deny",
           "npm i": "allow",
           "npm i *": "allow",
           "npm install": "allow",
@@ -490,9 +529,21 @@
           "pip3 *": "allow",
           "pnpm": "allow",
           "pnpm *": "allow",
+          "powershell -c *": "deny",
+          "powershell -command *": "deny",
+          "powershell -enc *": "deny",
+          "powershell -File *": "deny",
+          "powershell.exe -c *": "deny",
+          "powershell.exe -command *": "deny",
+          "powershell.exe -enc *": "deny",
+          "powershell.exe -File *": "deny",
+          "pwsh *": "deny",
+          "pwsh.exe *": "deny",
           "Remove-Item *": "ask",
           "rm -rf *": "ask",
           "rm *": "ask",
+          "wget *": "deny",
+          "wsl *": "deny",
           "yarn": "allow",
           "yarn *": "allow"
         }
@@ -503,7 +554,7 @@
     },
     "gentleman-codex-sub": {
       "description": "Code generation subagent — convention mirroring, defensive coding, new files/scripts/boilerplate (delegable via Task tool, returns via {file:prompts/shared/_return-contract.md})",
-      "model": "opencode/muse-spark-1.3-contributor-free",
+      "model": "opencode-go/mimo-v2.5",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -517,8 +568,8 @@
       }
     },
     "gentleman-security": {
-      "description": "Security specialist - STRIDE threat model, CVSS scoring, OWASP Top 10, injection/XSS/auth analysis (FREE TIER)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "description": "Security specialist - STRIDE threat model, CVSS scoring, OWASP Top 10, injection/XSS/auth analysis (GO)",
+      "model": "opencode-go/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-security.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
@@ -534,7 +585,7 @@
     },
     "gentleman-security-sub": {
       "description": "Security specialist subagent — STRIDE, CVSS, OWASP analysis (delegable via Task tool, read-only)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-security.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -550,8 +601,8 @@
       }
     },
     "gentleman-seo": {
-      "description": "Technical SEO analyst - three-pillar audit (Technical/On-Page/Content), E-E-A-T, GEO readiness, schema validation (FREE TIER)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "description": "Technical SEO analyst - three-pillar audit (Technical/On-Page/Content), E-E-A-T, GEO readiness, schema validation (GO)",
+      "model": "opencode-go/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-seo.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
@@ -566,8 +617,8 @@
       }
     },
     "gentleman-infra": {
-      "description": "Infrastructure specialist - container security, K8s reliability, IaC quality, CI/CD security, dependency graphs (FREE TIER)",
-      "model": "opencode/muse-spark-1.3-contributor-free",
+      "description": "Infrastructure specialist - container security, K8s reliability, IaC quality, CI/CD security, dependency graphs (GO)",
+      "model": "opencode-go/mimo-v2.5",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-infra.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
@@ -582,8 +633,8 @@
       }
     },
     "gentleman-frontend": {
-      "description": "Frontend auditor - WCAG 2.2 AA (POUR), component architecture, design tokens, performance indicators (FREE TIER)",
-      "model": "opencode/big-pickle",
+      "description": "Frontend auditor - WCAG 2.2 AA (POUR), component architecture, design tokens, performance indicators (GO)",
+      "model": "opencode-go/muse-spark-1.3-contributor",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-frontend.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
@@ -598,8 +649,8 @@
       }
     },
     "gentleman-performance": {
-      "description": "Performance specialist - Amdahl's Law, code complexity, N+1 detection, memory analysis, profiling-driven optimization (FREE TIER)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "description": "Performance specialist - Amdahl's Law, code complexity, N+1 detection, memory analysis, profiling-driven optimization (GO)",
+      "model": "opencode-go/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-performance.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
@@ -614,8 +665,8 @@
       }
     },
     "gentleman-datascience": {
-      "description": "Data science specialist - data quality framework, anti-patterns (apply/iterrows), SQL audit, statistical validity (FREE TIER)",
-      "model": "opencode/big-pickle",
+      "description": "Data science specialist - data quality framework, anti-patterns (apply/iterrows), SQL audit, statistical validity (GO)",
+      "model": "opencode-go/muse-spark-1.3-contributor",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-datascience.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
@@ -630,8 +681,8 @@
       }
     },
     "gentleman-docs": {
-      "description": "Documentation specialist - Diátaxis framework, completeness audit, content quality, cognitive load analysis (FREE TIER)",
-      "model": "opencode/big-pickle",
+      "description": "Documentation specialist - Diátaxis framework, completeness audit, content quality, cognitive load analysis (GO)",
+      "model": "opencode-go/muse-spark-1.3-contributor",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-docs.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}",
       "permission": {
@@ -647,7 +698,7 @@
     },
     "gentleman-seo-sub": {
       "description": "Technical SEO analyst subagent — three-pillar audit, E-E-A-T, schema validation (delegable via Task tool, read-only)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-seo.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -664,7 +715,7 @@
     },
     "gentleman-infra-sub": {
       "description": "Infrastructure subagent — container security, K8s reliability, IaC quality, CI/CD security (delegable via Task tool, read-only)",
-      "model": "opencode/muse-spark-1.3-contributor-free",
+      "model": "opencode-go/mimo-v2.5",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-infra.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -681,7 +732,7 @@
     },
     "gentleman-frontend-sub": {
       "description": "Frontend subagent — WCAG 2.2 AA, component architecture, design tokens (delegable via Task tool, read-only)",
-      "model": "opencode/big-pickle",
+      "model": "opencode-go/muse-spark-1.3-contributor",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-frontend.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -698,7 +749,7 @@
     },
     "gentleman-performance-sub": {
       "description": "Performance subagent — Amdahl's Law, N+1, complexity, profiling (delegable via Task tool, read-only)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-performance.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -715,7 +766,7 @@
     },
     "gentleman-datascience-sub": {
       "description": "Data science subagent — data quality, SQL audit, statistical validity (delegable via Task tool, read-only)",
-      "model": "opencode/big-pickle",
+      "model": "opencode-go/muse-spark-1.3-contributor",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-datascience.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -732,7 +783,7 @@
     },
     "gentleman-docs-sub": {
       "description": "Documentation subagent — Diátaxis framework, completeness audit (delegable via Task tool, read-only)",
-      "model": "opencode/big-pickle",
+      "model": "opencode-go/muse-spark-1.3-contributor",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-docs.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -748,8 +799,8 @@
       }
     },
     "gentleman-implementer": {
-      "description": "Plan executor specialist — implements plans from specialized agents, no deviations (FREE TIER)",
-      "model": "opencode/muse-spark-1.3-contributor-free",
+      "description": "Plan executor specialist — implements plans from specialized agents, no deviations (GO)",
+      "model": "opencode-go/mimo-v2.5",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -763,7 +814,7 @@
     },
     "gentleman-implementer-sub": {
       "description": "Plan executor subagent — implements plans from specialized agents, no deviations (delegable via Task tool)",
-      "model": "opencode/muse-spark-1.3-contributor-free",
+      "model": "opencode-go/mimo-v2.5",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -778,16 +829,22 @@
     },
     "gentleman-deep-sub-auto": {
       "description": "Deep reasoning subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
       "permission": {
         "bash": {
+          "npm": "deny",
           "npm *": "ask",
           "npm add *": "allow",
+          "npm exec *": "deny",
           "npm i *": "allow",
           "npm install *": "allow",
+          "npm publish *": "deny",
+          "npm remove *": "deny",
+          "npm uninstall *": "deny",
+          "npm update *": "deny",
           "pip": "allow",
           "pip *": "allow",
           "pip3": "allow",
@@ -814,16 +871,22 @@
     },
     "gentleman-quick-sub-auto": {
       "description": "Fast executor subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
-      "model": "opencode/big-pickle",
+      "model": "opencode-go/muse-spark-1.3-contributor",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
       "permission": {
         "bash": {
+          "npm": "deny",
           "npm *": "ask",
           "npm add *": "allow",
+          "npm exec *": "deny",
           "npm i *": "allow",
           "npm install *": "allow",
+          "npm publish *": "deny",
+          "npm remove *": "deny",
+          "npm uninstall *": "deny",
+          "npm update *": "deny",
           "pip": "allow",
           "pip *": "allow",
           "pip3": "allow",
@@ -846,16 +909,22 @@
     },
     "gentleman-codex-sub-auto": {
       "description": "Code generation subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
-      "model": "opencode/muse-spark-1.3-contributor-free",
+      "model": "opencode-go/mimo-v2.5",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
       "permission": {
         "bash": {
+          "npm": "deny",
           "npm *": "ask",
           "npm add *": "allow",
+          "npm exec *": "deny",
           "npm i *": "allow",
           "npm install *": "allow",
+          "npm publish *": "deny",
+          "npm remove *": "deny",
+          "npm uninstall *": "deny",
+          "npm update *": "deny",
           "pip": "allow",
           "pip *": "allow",
           "pip3": "allow",
@@ -881,16 +950,22 @@
     },
     "gentleman-implementer-sub-auto": {
       "description": "Plan executor subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
-      "model": "opencode/muse-spark-1.3-contributor-free",
+      "model": "opencode-go/mimo-v2.5",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
       "permission": {
         "bash": {
+          "npm": "deny",
           "npm *": "ask",
           "npm add *": "allow",
+          "npm exec *": "deny",
           "npm i *": "allow",
           "npm install *": "allow",
+          "npm publish *": "deny",
+          "npm remove *": "deny",
+          "npm uninstall *": "deny",
+          "npm update *": "deny",
           "pip": "allow",
           "pip *": "allow",
           "pip3": "allow",
@@ -916,7 +991,7 @@
     },
     "gentleman-implementer-auto": {
       "description": "Plan executor — AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode/muse-spark-1.3-contributor-free",
+      "model": "opencode-go/mimo-v2.5",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -931,14 +1006,19 @@
           "git rm *": "ask",
           "bun": "allow",
           "bun *": "allow",
+          "curl *": "deny",
           "docker *": "allow",
           "docker compose *": "allow",
           "docker-compose *": "allow",
+          "iex *": "deny",
+          "irm *": "deny",
+          "iwr *": "deny",
           "node *": "allow",
           "npm": "ask",
           "npm *": "ask",
           "npm add": "allow",
           "npm add *": "allow",
+          "npm exec *": "deny",
           "npm i": "allow",
           "npm i *": "allow",
           "npm install": "allow",
@@ -950,9 +1030,21 @@
           "pip3 *": "allow",
           "pnpm": "allow",
           "pnpm *": "allow",
+          "powershell -c *": "deny",
+          "powershell -command *": "deny",
+          "powershell -enc *": "deny",
+          "powershell -File *": "deny",
+          "powershell.exe -c *": "deny",
+          "powershell.exe -command *": "deny",
+          "powershell.exe -enc *": "deny",
+          "powershell.exe -File *": "deny",
+          "pwsh *": "deny",
+          "pwsh.exe *": "deny",
           "Remove-Item *": "ask",
           "rm -rf *": "ask",
           "rm *": "ask",
+          "wget *": "deny",
+          "wsl *": "deny",
           "yarn": "allow",
           "yarn *": "allow"
         }
@@ -963,7 +1055,7 @@
     },
     "sdd-apply": {
       "description": "Implement code changes from task definitions",
-      "model": "opencode/muse-spark-1.3-contributor-free",
+      "model": "opencode-go/mimo-v2.5",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-apply.md}",
@@ -975,7 +1067,7 @@
     },
     "sdd-archive": {
       "description": "Archive completed change artifacts",
-      "model": "opencode/muse-spark-1.3-contributor-free",
+      "model": "opencode-go/mimo-v2.5",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-archive.md}",
@@ -987,7 +1079,7 @@
     },
     "sdd-design": {
       "description": "Create technical design from proposals",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-design.md}",
@@ -999,7 +1091,7 @@
     },
     "sdd-explore": {
       "description": "Investigate codebase and think through ideas",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-explore.md}",
@@ -1011,7 +1103,7 @@
     },
     "sdd-init": {
       "description": "Bootstrap SDD context and project configuration",
-      "model": "opencode/muse-spark-1.3-contributor-free",
+      "model": "opencode-go/mimo-v2.5",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-init.md}",
@@ -1023,7 +1115,7 @@
     },
     "sdd-orchestrator": {
       "description": "SDD Orchestrator - coordinates sub-agents, never does work inline",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "mode": "primary",
       "permission": {
         "bash": {
@@ -1050,7 +1142,7 @@
     },
     "sdd-propose": {
       "description": "Create change proposals from explorations",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-propose.md}",
@@ -1062,7 +1154,7 @@
     },
     "sdd-spec": {
       "description": "Write detailed specifications from proposals",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-spec.md}",
@@ -1074,7 +1166,7 @@
     },
     "sdd-tasks": {
       "description": "Break down specs and designs into implementation tasks",
-      "model": "opencode/muse-spark-1.3-contributor-free",
+      "model": "opencode-go/mimo-v2.5",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-tasks.md}",
@@ -1086,7 +1178,7 @@
     },
     "sdd-verify": {
       "description": "Validate implementation against specs",
-      "model": "opencode/big-pickle",
+      "model": "opencode-go/muse-spark-1.3-contributor",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-verify.md}",
@@ -1098,7 +1190,7 @@
     },
     "gentleman-vMK-auto": {
       "description": "Orchestrator — AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode/big-pickle",
+      "model": "opencode-go/muse-spark-1.3-contributor",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-vMK.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -1113,14 +1205,19 @@
           "git rm *": "ask",
           "bun": "allow",
           "bun *": "allow",
+          "curl *": "deny",
           "docker *": "allow",
           "docker compose *": "allow",
           "docker-compose *": "allow",
+          "iex *": "deny",
+          "irm *": "deny",
+          "iwr *": "deny",
           "node *": "allow",
           "npm": "ask",
           "npm *": "ask",
           "npm add": "allow",
           "npm add *": "allow",
+          "npm exec *": "deny",
           "npm i": "allow",
           "npm i *": "allow",
           "npm install": "allow",
@@ -1132,9 +1229,21 @@
           "pip3 *": "allow",
           "pnpm": "allow",
           "pnpm *": "allow",
+          "powershell -c *": "deny",
+          "powershell -command *": "deny",
+          "powershell -enc *": "deny",
+          "powershell -File *": "deny",
+          "powershell.exe -c *": "deny",
+          "powershell.exe -command *": "deny",
+          "powershell.exe -enc *": "deny",
+          "powershell.exe -File *": "deny",
+          "pwsh *": "deny",
+          "pwsh.exe *": "deny",
           "Remove-Item *": "ask",
           "rm -rf *": "ask",
           "rm *": "ask",
+          "wget *": "deny",
+          "wsl *": "deny",
           "yarn": "allow",
           "yarn *": "allow"
         },
@@ -1163,7 +1272,7 @@
     },
     "gentleman-reviewer": {
       "description": "Code review specialist — 4R framework, independent evaluator, adversarial verification (STRONG model)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-reviewer.md}\n\n{file:prompts/shared/_return-contract.md}",
       "permission": {
@@ -1180,7 +1289,7 @@
     },
     "gentleman-reviewer-sub": {
       "description": "Code review subagent — 4R framework, independent evaluator, adversarial verification (delegable via Task tool, read-only)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-reviewer.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -1198,7 +1307,7 @@
     },
     "gentleman-aem": {
       "description": "AEM Migration Specialist — end-to-end Adobe Experience Manager site migrations: assessment, content transfer, component/datasource/HTL/Sling-Models migration, Adobe Tags/Launch data-layer migration, debugging",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-aem.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -1213,7 +1322,7 @@
     },
     "gentleman-aem-auto": {
       "description": "AEM Migration Specialist — AUTO mode (zero ask, bash.* allow except destructive/security-denied)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-aem.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -1228,14 +1337,19 @@
           "git rm *": "ask",
           "bun": "allow",
           "bun *": "allow",
+          "curl *": "deny",
           "docker *": "allow",
           "docker compose *": "allow",
           "docker-compose *": "allow",
+          "iex *": "deny",
+          "irm *": "deny",
+          "iwr *": "deny",
           "node *": "allow",
           "npm": "ask",
           "npm *": "ask",
           "npm add": "allow",
           "npm add *": "allow",
+          "npm exec *": "deny",
           "npm i": "allow",
           "npm i *": "allow",
           "npm install": "allow",
@@ -1247,9 +1361,21 @@
           "pip3 *": "allow",
           "pnpm": "allow",
           "pnpm *": "allow",
+          "powershell -c *": "deny",
+          "powershell -command *": "deny",
+          "powershell -enc *": "deny",
+          "powershell -File *": "deny",
+          "powershell.exe -c *": "deny",
+          "powershell.exe -command *": "deny",
+          "powershell.exe -enc *": "deny",
+          "powershell.exe -File *": "deny",
+          "pwsh *": "deny",
+          "pwsh.exe *": "deny",
           "Remove-Item *": "ask",
           "rm -rf *": "ask",
           "rm *": "ask",
+          "wget *": "deny",
+          "wsl *": "deny",
           "yarn": "allow",
           "yarn *": "allow"
         }
@@ -1261,7 +1387,7 @@
     },
     "gentleman-aem-sub": {
       "description": "AEM Migration Specialist subagent — full migration lifecycle (delegable via Task tool)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-aem.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -1277,16 +1403,22 @@
     },
     "gentleman-aem-sub-auto": {
       "description": "AEM Migration Specialist subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-aem.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
       "permission": {
         "bash": {
+          "npm": "deny",
           "npm *": "ask",
           "npm add *": "allow",
+          "npm exec *": "deny",
           "npm i *": "allow",
           "npm install *": "allow",
+          "npm publish *": "deny",
+          "npm remove *": "deny",
+          "npm uninstall *": "deny",
+          "npm update *": "deny",
           "pip": "allow",
           "pip *": "allow",
           "pip3": "allow",
@@ -1313,7 +1445,7 @@
     },
     "gentle-orchestrator": {
       "description": "Global gentle-orchestrator - bridges gentleman-agent-gh with native SDD review, receipt-driven authority, lossless prompts",
-      "model": "opencode/big-pickle",
+      "model": "opencode-go/muse-spark-1.3-contributor",
       "mode": "primary",
       "permission": {
         "bash": {
@@ -1363,7 +1495,7 @@
     },
     "gentleman-reasoning": {
       "description": "Reasoning specialist — deep chain-of-thought, hypothesis-driven debugging, multi-step synthesis (P0-3 reasoning tier)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_reasoning-tier.md}",
       "permission": {
@@ -1378,7 +1510,7 @@
     },
     "gentleman-reasoning-sub": {
       "description": "Reasoning subagent — chain-of-thought debugging, delegable via Task tool (P0-3)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_reasoning-tier.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -1394,16 +1526,22 @@
     },
     "gentleman-reasoning-sub-auto": {
       "description": "Reasoning subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool (P0-3)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_reasoning-tier.md}\n\n{file:prompts/shared/_return-contract.md}",
       "permission": {
         "bash": {
+          "npm": "deny",
           "npm *": "ask",
           "npm add *": "allow",
+          "npm exec *": "deny",
           "npm i *": "allow",
           "npm install *": "allow",
+          "npm publish *": "deny",
+          "npm remove *": "deny",
+          "npm uninstall *": "deny",
+          "npm update *": "deny",
           "pip": "allow",
           "pip *": "allow",
           "pip3": "allow",
@@ -1430,7 +1568,7 @@
     },
     "gentleman-code-review": {
       "description": "Code review specialist — Qwen 3.6-plus (successor to 3.6-35B-A3B, 73.4% SWE-bench) → fallback muse-spark → default; contracts, supply-chain, best-practices",
-      "model": "opencode-go/qwen3.6-plus",
+      "model": "opencode-go/qwen3.7-plus",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-code-review.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -1445,7 +1583,7 @@
     },
     "gentleman-code-review-sub": {
       "description": "Code review subagent — Qwen 73.4% → fallback muse-spark, delegable via Task tool (P1-2)",
-      "model": "opencode-go/qwen3.6-plus",
+      "model": "opencode-go/qwen3.7-plus",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-code-review.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -1461,16 +1599,22 @@
     },
     "gentleman-code-review-sub-auto": {
       "description": "Code review subagent — AUTO mode (Qwen → fallback muse-spark, zero ask) — delegable via Task tool (P1-2)",
-      "model": "opencode-go/qwen3.6-plus",
+      "model": "opencode-go/qwen3.7-plus",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-code-review.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
       "permission": {
         "bash": {
+          "npm": "deny",
           "npm *": "ask",
           "npm add *": "allow",
+          "npm exec *": "deny",
           "npm i *": "allow",
           "npm install *": "allow",
+          "npm publish *": "deny",
+          "npm remove *": "deny",
+          "npm uninstall *": "deny",
+          "npm update *": "deny",
           "pip": "allow",
           "pip *": "allow",
           "pip3": "allow",
@@ -1497,7 +1641,7 @@
     },
     "gentleman-initializer": {
       "description": "Harness initializer — different prompt for first window, arms environment with all context before delegating (Anthropic Effective Harnesses 2025-11-26, R2-5)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-initializer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -1512,7 +1656,7 @@
     },
     "gentleman-initializer-sub": {
       "description": "Initializer subagent — first-window setup, delegable via Task tool (R2-5)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-initializer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -1528,16 +1672,22 @@
     },
     "gentleman-initializer-sub-auto": {
       "description": "Initializer subagent — AUTO mode (first-window setup, zero ask) — delegable via Task tool (R2-5)",
-      "model": "opencode/nemotron-3-ultra-free",
+      "model": "opencode-go/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-initializer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
       "permission": {
         "bash": {
+          "npm": "deny",
           "npm *": "ask",
           "npm add *": "allow",
+          "npm exec *": "deny",
           "npm i *": "allow",
           "npm install *": "allow",
+          "npm publish *": "deny",
+          "npm remove *": "deny",
+          "npm uninstall *": "deny",
+          "npm update *": "deny",
           "pip": "allow",
           "pip *": "allow",
           "pip3": "allow",
