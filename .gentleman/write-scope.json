@@ -29,6 +29,8 @@
     "review-rules.jsonc",
     "package.json",
     "package-lock.json",
+    "projects.json",
+    "projects.json.example",
     "playwright.config.js",
     "Dockerfile",
     ".dockerignore",

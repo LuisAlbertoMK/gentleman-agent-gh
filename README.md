@@ -247,6 +247,74 @@ go build -o bin/fast.exe ./cmd/fast
 
 Source: [`cmd/fast/main.go`](cmd/fast/main.go) — hot-path checks: `--cross-ref` (<300ms), `--token-budget` (<80ms), `--gate` combined (<150ms).
 
+### Sync binary (`bin/sync.exe`)
+
+`bin/sync.exe` is a **build artifact, not committed**. It generates and updates `opencode.json` configs from the SSoT chain (`opencode-base.json` + `permission-templates.json` + `agent-overrides.json`), applying the security deny floor and CBM_ALLOWED_ROOT scoping.
+
+```sh
+go build -o bin/sync.exe ./cmd/sync
+```
+
+Commands:
+
+| Command | Flags | Purpose |
+|---------|-------|---------|
+| `sync install` | `--target <dir>` `--default-agent` `--chain-root` `--force` `--dry-run` `--json` | Install bootstrap — generate initial config in target dir |
+| `sync update` | `--project <dir>` `--chain-root` `--mode chain-wins\|project-wins` `--dry-run` `--json` | Update re-sync — reconcile one project against current chain |
+| `sync update-all` | `--manifest <projects.json>` `--chain-root` `--mode` `--parallel` `--dry-run` `--json` | Batch update — process all projects in a manifest |
+
+Exit codes: `0` = ok, `1` = failure.
+
+Source: [`cmd/sync/main.go`](cmd/sync/main.go).
+
+### Sync PowerShell wrapper (`scripts/sync-n-projects.ps1`)
+
+Syncs 1..N projects via a manifest file. If `bin/sync.exe` exists, delegates to `sync update-all --manifest`; otherwise falls back to `scripts/use-gentleman.ps1` per project (slower but functional).
+
+```powershell
+.\scripts\sync-n-projects.ps1 -Manifest ./projects.json -Mode chain-wins
+```
+
+Parameters:
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `-Manifest` | `./projects.json` | Path to manifest file |
+| `-Mode` | `chain-wins` | Conflict resolution: `chain-wins` or `project-wins` |
+| `-DryRun` | off | Show what would change without writing |
+| `-Json` | off | Output structured JSON instead of human-readable table |
+| `-AddProject` | — | Add a project path to the manifest before syncing |
+
+Exit codes: `0` = ok, `1` = failure, `2` = drift (some projects failed or drifted).
+
+### Manifest (`projects.json`)
+
+Minimal example:
+
+```json
+{
+  "version": 1,
+  "chainRoot": ".",
+  "defaultMode": "chain-wins",
+  "projects": [
+    {
+      "path": "../mi-api",
+      "defaultAgent": "gentleman-vMK"
+    }
+  ]
+}
+```
+
+Typical workflow — dry run first, then real sync:
+
+```sh
+# 1. Preview changes
+.\scripts\sync-n-projects.ps1 -DryRun
+
+# 2. Apply
+.\scripts\sync-n-projects.ps1
+```
+
 ---
 
 ## Architecture

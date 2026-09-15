@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "chainRoot": ".",
+  "defaultMode": "chain-wins",
+  "projects": [
+    {
+      "path": "../Ford-MYCO",
+      "defaultAgent": "gentleman-vMK"
+    }
+  ]
+}
