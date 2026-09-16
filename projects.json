@@ -4,7 +4,63 @@
   "defaultMode": "chain-wins",
   "projects": [
     {
-      "path": "../Ford-MYCO",
+      "path": "../arturo",
+      "defaultAgent": "gentleman-vMK"
+    },
+    {
+      "path": "../automatizacion",
+      "defaultAgent": "gentleman-vMK"
+    },
+    {
+      "path": "../clash",
+      "defaultAgent": "gentleman-vMK"
+    },
+    {
+      "path": "../control-pedidos",
+      "defaultAgent": "gentleman-vMK"
+    },
+    {
+      "path": "../conversor",
+      "defaultAgent": "gentleman-vMK"
+    },
+    {
+      "path": "../erp-talleres",
+      "defaultAgent": "gentleman-vMK"
+    },
+    {
+      "path": "../herramienta-tecnico",
+      "defaultAgent": "gentleman-vMK"
+    },
+    {
+      "path": "../huawei-unlock-agent",
+      "defaultAgent": "gentleman-vMK"
+    },
+    {
+      "path": "../kitchenos-full",
+      "defaultAgent": "gentleman-vMK"
+    },
+    {
+      "path": "../leandro",
+      "defaultAgent": "gentleman-vMK"
+    },
+    {
+      "path": "../monoMKservices",
+      "defaultAgent": "gentleman-vMK"
+    },
+    {
+      "path": "../musica",
+      "defaultAgent": "gentleman-vMK"
+    },
+    {
+      "path": "../Reportes-myco",
+      "defaultAgent": "gentleman-vMK"
+    },
+    {
+      "path": "../sushi",
+      "defaultAgent": "gentleman-vMK"
+    },
+    {
+      "path": "../youtube_transcription",
       "defaultAgent": "gentleman-vMK"
     }
   ]
