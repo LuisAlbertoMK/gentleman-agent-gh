@@ -464,7 +464,7 @@
     },
     "gentleman-quick-sub": {
       "description": "Fast executor subagent — single-file atomic edits with immediate verification (delegable via Task tool)",
-      "model": "opencode-go/muse-spark-1.3-contributor",
+      "model": "opencode/muse-spark-1.3-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -732,7 +732,7 @@
     },
     "gentleman-frontend-sub": {
       "description": "Frontend subagent — WCAG 2.2 AA, component architecture, design tokens (delegable via Task tool, read-only)",
-      "model": "opencode-go/muse-spark-1.3-contributor",
+      "model": "opencode/muse-spark-1.3-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-frontend.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -766,7 +766,7 @@
     },
     "gentleman-datascience-sub": {
       "description": "Data science subagent — data quality, SQL audit, statistical validity (delegable via Task tool, read-only)",
-      "model": "opencode-go/muse-spark-1.3-contributor",
+      "model": "opencode/muse-spark-1.3-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-datascience.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -783,7 +783,7 @@
     },
     "gentleman-docs-sub": {
       "description": "Documentation subagent — Diátaxis framework, completeness audit (delegable via Task tool, read-only)",
-      "model": "opencode-go/muse-spark-1.3-contributor",
+      "model": "opencode/muse-spark-1.3-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-docs.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -871,7 +871,7 @@
     },
     "gentleman-quick-sub-auto": {
       "description": "Fast executor subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
-      "model": "opencode-go/muse-spark-1.3-contributor",
+      "model": "opencode/muse-spark-1.3-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
