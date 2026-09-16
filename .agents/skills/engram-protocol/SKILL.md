@@ -41,12 +41,7 @@ Consult these when detailed temporal reasoning is needed:
   → docs/skills/engram-protocol/reference.md
 
 ---
-## Anti-Rationalization
-| Rationalization | Red Flag | Check |
-|-----------------|----------|-------|
-| "Skill without verification" | Work w/o output check | Match ## Output contract + file:line |
-| "Skip this skill to save time" | Direct use w/o deps | skill-graph + cross-ref check |
-| "Output is self-evident" | No file:line/confidence | Cite file:line or `confidence: unvalidated` |
+## Anti-Rationalization → docs/skills/engram-protocol/reference.md (tabla 3x3 en NOTA ciclo37-clusterB)
 
 ## Red Flags
 - Work w/o output-format check → STOP, re-read

@@ -24,12 +24,7 @@ Anti-slop audit&cleanup: layout·typography·responsive·animation·tokens. **St
 Fixed width·h-screen·dense interactive·Fixed font·transition:all·>500ms·No reduced-motion·HSL/RGB·No contrast·cqi outside container
 ## Examples
 Audit: `/baseline-ui src/components/Button.tsx` → `UI-CLEANUP:Button—2026-08-27 CRITICAL:[contrast]→ HIGH:[layout]→ VERIFY:[axe]` · Details → reference.md
-## Anti-Rationalization
-| Rationalization | Red Flag | Verification |
-|-----------------|----------|--------------|
-| "AI can do UI, just prompt it" | Generic AI slop (no tokens, no @layer) | Check `baseline-ui` tokens OKLCH + Grid/Flex + container queries |
-| "One CSS file is fine" | 500+ line CSS without @layer | Use `@layer` + compositor-only animation + OKLCH tokens |
-| "Responsive is optional" | Fixed px widths | Container queries + Flex/Grid + spacing tokens |
+## Anti-Rationalization → docs/skills/baseline-ui/reference.md (AI-prompt-slop · one-CSS-file · responsive-optional)
 ## Red Flags
 - Hardcoded `#fff`/`#000`/px without tokens → slop
 - Animation on `width`/`height` → compositor violation

@@ -17,13 +17,7 @@ Unit: throw/catch edges | Int: supertest/contract/pact | E2E: login/auth/journey
 1. Ratio test/src (>0.8). 2. High-change untested (`git log --name-only` − tests). 3. Risk=(freq×criticality)/coverage. 4. Highest first.
 ## 4. Risk-Based Prioritization
 CRITICAL (auth, payments, data integrity, security): 80%+ E2E + contract + mutation. HIGH (core, public APIs): 60%+ int. MEDIUM (features, internal): 40%+ unit. LOW (UI polish, admin, generated): smoke. **Rule**: money/identity/user data → CRITICAL.
-## Anti-Rationalization
-
-| Rationalization | Red Flag | Verification |
-|-----------------|----------|--------------|
-| "cobertura como meta" | Target >80% sin ROI o coverage theater assert true | Verificar ROI est required (rule 4): cost vs bug cost + >80% diminishing + Anti-Patterns file:line |
-| "priorizar tests por facilidad no riesgo" | Priorizar por facilidad vs risk-based P0→LOW | Verificar Risk-Based Prioritization: money/identity→CRITICAL 80%+ + Risk=(freq×criticality)/coverage |
-| "E2E para todo / plan sin steps" | E2E para lógica unit-testeable o plan sin numbered steps+owner | Verificar Pyramid 60-80/15-25/5-10 + plan con ## Steps owner+estimate + git log --name-only gap |
+## Anti-Rationalization → docs/skills/testing-strategy/reference.md (cobertura-meta · facilidad-vs-riesgo · E2E-todo-sin-steps)
 
 
 ## Red Flags

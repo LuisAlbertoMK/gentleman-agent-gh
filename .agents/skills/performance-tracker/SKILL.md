@@ -25,13 +25,7 @@ Load|Render|Memory|Network|Bundle|Energy — thresholds + quick checks → refer
 Score without real data · cross-platform in same trend · skip bundle/cache · score once
 ## Reference
 Thresholds table + quick checks + worked examples (5) → docs/skills/performance-tracker/reference.md
-## Anti-Rationalization
-
-| Rationalization | Red Flag | Verification |
-|-----------------|----------|--------------|
-| "score sin 6 dims" | Score sin 6 dims o dimensión adivinada | Verificar Hard Rules: Score EVERY dimension medición real + neutral 7 si unavailable + thresholds file:line |
-| "trend sin historial" | Trend sin N≥5 historial | Verificar Score Storage: mem_save perf-score:{app}-{platform} + mem_search prev5 vs recent5 + Trend cada 10 |
-| "mix plataformas o single run" | Trend mezclando plataformas o single lighthouse | Verificar NEVER mix platforms + median-of-3 lighthouse + regression >0.5→gap-analysis + never crash no process |
+## Anti-Rationalization → docs/skills/performance-tracker/reference.md (tabla 3x3 en NOTA ciclo37-clusterB)
 
 
 ## Red Flags

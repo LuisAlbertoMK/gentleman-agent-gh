@@ -24,12 +24,7 @@ OKLCH>HSL: perceptual, dark, wide, ≥4.5:1. `vw`=page, `cqi`=container.
 `UI-IMPL:<component>—<date> PATTERN:[flex|grid|cq|tokens]<used> VERIFY:[a11y|contrast|reduced-motion|CQ]→<pass/fail>`
 ## Anti-Patterns
 Flex2D·Grid1D·!important vs @layer·flex:1 w/o min-inline-size:0·container-type:size w/o block-size·grid-auto-flow:dense·MQ for components·Decorative·>500ms·transition:all·HSL/RGB·Fixed font·cqi outside container·Prop drill>3L·Context high-freq
-## Anti-Rationalization
-| Rationalization | Red Flag | Verification |
-|-----------------|----------|--------------|
-| "Grid cuando Flexbox basta" | 1D layout con Grid (span/area sobran) | Decision Tree: 1D→Flex 2D→Grid, verify `@layer`+CQ |
-| "Animar properties que disparan layout" | transition:all / width/height/top/left | Transform+opacity only 120/200/300ms + reduced-motion .01ms |
-| "Tokens ad-hoc fuera de OKLCH" | hex/HSL sin chain, sin contrast | PRIM→SEM→COMP OKLCH + verify ≥4.5:1 `color-scheme` |
+## Anti-Rationalization → docs/skills/ui-engine/reference.md (Grid-vs-Flex-1D · layout-anim · ad-hoc-tokens)
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

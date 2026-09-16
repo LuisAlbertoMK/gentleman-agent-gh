@@ -22,7 +22,7 @@ Trigger: Multi-step tasks, parallel subagent work, complex deliverables.
    - Success criteria per unit
    - **Request structured output**: each delegation MUST return 4-field block preserved as-is:
      `## Decision Taken | ## Files Changed | ## Key Findings | ## Nuance (what would be lost in summary)`
-   - First window of new chain → invoke `gentleman-initializer` (agent in opencode.json, f8d6e8fe) to arm env with full context before delegating to coding agents — "different prompt for first window" (Anthropic 2025-11-26).
+   - First window of new chain → invoke `gentleman-initializer` (opencode.json) before delegating to coding agents.
 6. **Collect** — gather results, verify each meets criteria
 7. **Reconcile** — merge outputs, resolve conflicts (or escalate)
 8. **Report** — one status: units done, failures, rollback path
@@ -35,14 +35,7 @@ Trigger: Multi-step tasks, parallel subagent work, complex deliverables.
 - NEVER share subagent internal state between units
 - After collection: summarize results, preserve the 4-field contract AS-IS (never summarize: Decision Taken, Files Changed, Key Findings, Nuance)
 
-## Anti-Rationalization
-
-| Rationalization | Red Flag | Verification |
-|-----------------|----------|--------------|
-| "One agent can do it all" | Single agent for >5 files / >20 lines | Decompose into clusters ≤10 files via delivery-harness, verify no file overlap before parallel delegation |
-| "Parallel is always faster" | Independent edits sharing file overlap | Collect File overlap check — if overlap, serialize: read-only → independent → dependent → verify |
-| "4-field summary is optional" | Squeezing Findings/Nuance into one line | Each subagent returns Decision + Files + Findings + Nuance — merge preserves AS-IS, never summarize away |
-| "Gate FAIL is advisory" | Delegating with delegation-fit-gate FAIL | Re-partition ≤10 files or re-route |
+## Anti-Rationalization → docs/skills/delivery-harness/reference.md (god-orchestrator · parallel-faster · 4-field-optional · gate-advisory)
 
 ## Red Flags
 - Post-delegation file overlap detected → STOP, re-partition

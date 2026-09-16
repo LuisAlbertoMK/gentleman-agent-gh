@@ -32,13 +32,7 @@ Monitor context window — Recursive Summary Compression (L1/L2/L3), YELLOW/RED 
 ## Anti-Patterns
 Compress at RED (recovery > savings; rule 1) · skip L1→L3 / Jump to L3 skipping L1 (destroys chain) · summarize stale vs prune / Summarize stale instead of pruning (compounds drift)
 
-## Anti-Rationalization
-
-| Rationalization | Red Flag | Verification |
-|-----------------|----------|--------------|
-| "Still under 60%, keep going" | Ignoring YELLOW at 40-60% | `context-watchdog-check.ps1 -CurrentTokens X -Budget Y` — if L1, run L1 now |
-| "One more edit before compacting" | ORANGE 60-80% without L2+L3 | `Invoke-LcmEscalation` must return L2/L3 — escalate before next tool call |
-| "Hallucination is just a glitch" | Same point 2× or "as I mentioned" unseen | Force RED → `mem_save` → `session_summary` → new session immediately |
+## Anti-Rationalization → docs/skills/context-watchdog/reference.md (under-60-keep-going · one-more-edit-orange · hallucination-glitch)
 
 ## Red Flags
 - Context rot: performance degrades before nominal limit (paper LCM) — measure via re-read of same file twice
