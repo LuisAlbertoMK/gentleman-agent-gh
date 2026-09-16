@@ -216,3 +216,4 @@
 2026-09-05 - 2 commits: fix(sync) preserve skills/permissions prune *-semi ee3d84ba (sync-global.ps1+tests) + docs(mejoras) mark perf-offline U5 DONE via 86297d4b 49c95fc6
 2026-09-08 - ciclo 33 apply (CA sync 3→12, 10 skills <3KB, scripts 125→122, score 9.1→9.2)
 2026-09-04 - Cycle32 P9 cerrado en rama automejora/componentes-20260902: chore 14813675 + fix c85d4c49 + feat 8390c6e5, V1/V2/V3 PASS, pendiente sync-real + push (ask)
+2026-09-15 - Perf C33-C37 cierre 150 exps (5x30): score 8.9→9.3 UP, top wins MCP-lazy +99.99%/Hashtable +97.3%/refs +99.6%/minify -15.75KB/path -40.3%, dietas PT-547B EP-282B (over 8→3), veredicto QUEDARSE PS+Go (sync.exe listo bloqueado toolchain, GPU 0); reglas sin delete/push cumplidas; ver docs/ciclos/cycle33-37-perf-20260915.md + NOTAs perf-ciclo37-clusterA/B/C
