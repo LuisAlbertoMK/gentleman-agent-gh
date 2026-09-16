@@ -77,17 +77,23 @@ $secScore      = 10
 $hasWeakCrypto = $false
 $hasSecrets    = $false
 
+# Check for hardcoded secrets across scripts, skills, workflows, config
+$secretPattern = [regex]::new("(?i)(api[_-]?key|secret|password|token|credential)\s*[=:]\s*['""][^'""]{8,}")
+$secretMatches = New-Object System.Collections.Generic.List[object]
+
 # Check for weak crypto patterns in scripts
+# E2: single line-split pass for weak-crypto + secrets (was 2 full passes)
 if ($hasScripts) {
-    $weakCryptoMatches = @()
+    # E5b: List.Add (was array += O(n^2))
+    $weakCryptoMatches = New-Object System.Collections.Generic.List[string]
     foreach ($sf in $scriptFiles) {
         $content = $scriptContentCache[$sf.FullName]
         if (-not $content) { continue }
-        $lines = $content -split "`n"
-        foreach ($line in $lines) {
+        foreach ($line in ($content -split "`n")) {
             if ($line -match "MD5|SHA1\b" -and $line -notmatch "SHA1ToSHA256|SHA256|#deprecat|#legacy|SHA1SHA256|Select-String.*MD5") {
-                $weakCryptoMatches += $line
+                $weakCryptoMatches.Add($line)
             }
+            if ($line -match $secretPattern) { $secretMatches.Add($line) }
         }
     }
 
@@ -97,31 +103,18 @@ if ($hasScripts) {
     }
 }
 
-# Check for hardcoded secrets across scripts, skills, workflows, config
-# Scripts are matched against $scriptContentCache (single read above) — the only
-# Select-String pass left is for the non-cached workflow/config files.
-$secretPattern = [regex]::new("(?i)(api[_-]?key|secret|password|token|credential)\s*[=:]\s*['""][^'""]{8,}")
-$secretMatches = @()
-
-if ($hasScripts) {
-    foreach ($sf in $scriptFiles) {
-        $content = $scriptContentCache[$sf.FullName]
-        if (-not $content) { continue }
-        foreach ($line in ($content -split "`n")) {
-            if ($line -match $secretPattern) { $secretMatches += $line }
-        }
-    }
-}
+# Script lines already scanned above (single pass) — only non-cached paths left.
 
 # Non-cached paths (workflow yml, opencode.json)
-$secretMatches += @(Select-String -Path @(".\.github\workflows\*.yml", ".\opencode.json") -Pattern $secretPattern -EA SilentlyContinue)
+# E5b: AddRange on List (was array +=)
+$secretMatches.AddRange([object[]]@(Select-String -Path @(".\.github\workflows\*.yml", ".\opencode.json") -Pattern $secretPattern -EA SilentlyContinue))
 
 # Skill files: regex against cached content (avoid re-reads)
 if ($hasSkills) {
     foreach ($cachedContent in $skillContentCache.Values) {
         if ($cachedContent -and $secretPattern.IsMatch($cachedContent)) {
             $match = $secretPattern.Match($cachedContent)
-            $secretMatches += [PSCustomObject]@{ Line = $match.Value; Path = $null }
+            $secretMatches.Add([PSCustomObject]@{ Line = $match.Value; Path = $null })
         }
     }
 }
@@ -182,7 +175,8 @@ if ($hasScripts) {
     $commentedPattern = '^\s*#\s*function\s+\w+|^\s*#\s*if\s*\(|^\s*#\s*foreach\s*\(|' +
         '^\s*#\s*for\s*\(|^\s*#\s*while\s*\(|^\s*#\s*switch\s*\(|' +
         '^\s*#\s*try\s*\{|^\s*#\s*catch\s*\{'
-    $commentedPatterns = @()
+    # E5b: List.Add (was array += O(n^2))
+    $commentedPatterns = New-Object System.Collections.Generic.List[string]
     foreach ($sf in $scriptFiles) {
         if ($sf.Name -eq "score-auto.ps1") { continue }
         $content = $scriptContentCache[$sf.FullName]
@@ -190,7 +184,7 @@ if ($hasScripts) {
         $lines = $content -split "`n"
         foreach ($line in $lines) {
             if ($line -match $commentedPattern) {
-                $commentedPatterns += $line
+                $commentedPatterns.Add($line)
             }
         }
     }
@@ -227,10 +221,14 @@ if ($hasScripts) {
         }
     }
 
-    $scriptsWithHelp       = @($scriptStats | Where-Object { $_.h }).Count
-    $scriptsWithParams     = @($scriptStats | Where-Object { $_.p }).Count
-    $scriptsWithStrictMode = @($scriptStats | Where-Object { $_.s }).Count
-    $scriptsWithTryCatch   = @($scriptStats | Where-Object { $_.t }).Count
+    # E3: single-pass counters (was 4x Where-Object pipeline passes)
+    $scriptsWithHelp = 0; $scriptsWithParams = 0; $scriptsWithStrictMode = 0; $scriptsWithTryCatch = 0
+    foreach ($st in $scriptStats) {
+        if ($st.h) { $scriptsWithHelp++ }
+        if ($st.p) { $scriptsWithParams++ }
+        if ($st.s) { $scriptsWithStrictMode++ }
+        if ($st.t) { $scriptsWithTryCatch++ }
+    }
 } else {
     $scriptsWithHelp = 0; $scriptsWithParams = 0; $scriptsWithStrictMode = 0; $scriptsWithTryCatch = 0
 }
@@ -404,8 +402,12 @@ if ($hasSkills) {
     $skillsNonShared = @($skillMdFiles | Where-Object { $_.Directory.Name -ne '_shared' })
     $totalSkills     = $skillsNonShared.Count
     if ($totalSkills -gt 0) {
-        $over3KBSkills   = @($skillsNonShared | Where-Object { $_.Length -gt 3072 }).Count
-        $over5KBSkills   = @($skillsNonShared | Where-Object { $_.Length -gt 5120 }).Count
+    # E4: single-pass overweight counters (was 2x Where-Object passes)
+        $over3KBSkills = 0; $over5KBSkills = 0
+        foreach ($sk in $skillsNonShared) {
+            if ($sk.Length -gt 3072) { $over3KBSkills++ }
+            if ($sk.Length -gt 5120) { $over5KBSkills++ }
+        }
         $totalSkillBytes = ($skillsNonShared | Measure-Object -Sum Length).Sum
         $avgSkillSizeKB  = $math::Round($totalSkillBytes / $totalSkills / 1KB, 1)
     }
@@ -415,10 +417,17 @@ if ($hasSkills) {
 $cmdFiles    = Get-ChildItem "commands\*.md" -EA SilentlyContinue
 $promptFiles = Get-ChildItem "prompts" -Recurse -File -EA SilentlyContinue
 
-$cmdOver3KB  = @($cmdFiles | Where-Object { $_.Length -gt 3072 }).Count
-$cmdOver5KB  = @($cmdFiles | Where-Object { $_.Length -gt 5120 }).Count
-$prOver3KB   = @($promptFiles | Where-Object { $_.Length -gt 3072 }).Count
-$prOver5KB   = @($promptFiles | Where-Object { $_.Length -gt 5120 }).Count
+# E4: single-pass overweight counters (was 4x Where-Object passes)
+$cmdOver3KB = 0; $cmdOver5KB = 0
+foreach ($cf in $cmdFiles) {
+    if ($cf.Length -gt 3072) { $cmdOver3KB++ }
+    if ($cf.Length -gt 5120) { $cmdOver5KB++ }
+}
+$prOver3KB = 0; $prOver5KB = 0
+foreach ($pf in $promptFiles) {
+    if ($pf.Length -gt 3072) { $prOver3KB++ }
+    if ($pf.Length -gt 5120) { $prOver5KB++ }
+}
 
 $overweightPenalty = 0
 if ($cmdOver5KB -gt 0 -or $prOver5KB -gt 0) {

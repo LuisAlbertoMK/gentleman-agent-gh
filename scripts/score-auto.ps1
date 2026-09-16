@@ -56,11 +56,18 @@ try {
     $skillMdFiles = @(Get-ChildItem "$repoRoot\.agents\skills\*\SKILL.md" -EA SilentlyContinue)
     $skillDirs    = @(Get-ChildItem -Directory "$repoRoot\.agents\skills" -EA SilentlyContinue | Select-Object -ExpandProperty Name)
 
-    $scriptsHash = ($manifest | Where-Object { $_.group -eq 'script' } | ForEach-Object { "$($_.relpath):$($_.sha256)" } | Sort-Object) -join "|"
-    $skillsHash  = ($manifest | Where-Object { $_.group -eq 'skill' }  | ForEach-Object { "$($_.relpath):$($_.sha256)" } | Sort-Object) -join "|"
+    # E9: single-pass manifest split (was 4x Where-Object passes)
+    $scriptManifestList = New-Object System.Collections.Generic.List[string]
+    $skillManifestList = New-Object System.Collections.Generic.List[string]
+    foreach ($m in $manifest) {
+        if ($m.group -eq 'script') { $scriptManifestList.Add("$($m.relpath):$($m.sha256)") }
+        elseif ($m.group -eq 'skill') { $skillManifestList.Add("$($m.relpath):$($m.sha256)") }
+    }
+    $scriptsHash = ($scriptManifestList | Sort-Object) -join "|"
+    $skillsHash = ($skillManifestList | Sort-Object) -join "|"
 
-    $manifestScriptCount = @($manifest | Where-Object { $_.group -eq 'script' }).Count
-    $manifestSkillCount  = @($manifest | Where-Object { $_.group -eq 'skill' }).Count
+    $manifestScriptCount = $scriptManifestList.Count
+    $manifestSkillCount = $skillManifestList.Count
     if ($manifestScriptCount -lt $scriptFiles.Count -or $manifestSkillCount -ne $skillMdFiles.Count) { $cacheHash = $null }
 
     $interHash = if (Test-Path ".learnings/inter-track.json") { (Get-FileHash ".learnings/inter-track.json" -Algorithm SHA256).Hash.Substring(0,8) } else { "no-inter" }
@@ -191,7 +198,9 @@ if ($env:PESTER_TEST -eq '1') {
 }
 $jobs += Start-ThreadJob -Name "backlog"  -ScriptBlock { & "$using:scriptLibRoot\check-backlog-integrity.ps1" -Json }
 
-$jobs | Wait-Job -Timeout 300 | Out-Null
+# E1 perf-ciclo37-clusterA (C36A/E1 + C34/E9): timeout 60 acota el peor-caso
+# (un PSSA colgado bloqueaba 300s); jobs rapidos completan igual (empate tecnico).
+$jobs | Wait-Job -Timeout 60 | Out-Null
 
 # Receive each job by name — handle failures gracefully with defaults
 $crossRefOutput = Receive-Job -Name "crossref" -ErrorAction SilentlyContinue

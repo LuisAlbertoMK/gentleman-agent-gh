@@ -85,7 +85,10 @@ $warnHits = @()
 $failReasons = @()
 $warnReasons = @()
 
-$isQuick = $AgentName -match '^gentleman-quick(-sub)?(-auto)?$'
+# E08 perf-ciclo34-clusterB: closed set of 4 literals needs no regex engine.
+# Semantics identical to '^gentleman-quick(-sub)?(-auto)?$' (anchored, optional
+# groups = exactly these 4 strings; -eq and -match are both case-insensitive).
+$isQuick = ($AgentName -eq 'gentleman-quick') -or ($AgentName -eq 'gentleman-quick-sub') -or ($AgentName -eq 'gentleman-quick-auto') -or ($AgentName -eq 'gentleman-quick-sub-auto')
 
 # ---------- FAIL PATTERNS (checked BEFORE warns) ----------
 

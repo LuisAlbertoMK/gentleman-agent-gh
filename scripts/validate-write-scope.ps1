@@ -97,13 +97,9 @@ $changedFiles = @($changedFiles | Where-Object { $_ -is [string] -and $_.Trim() 
 
 # Runtime state files auto-update every session (score, mode, bitacora) — not real
 # change units. Same allowlist as scripts/verify.ps1 Git Hygiene check (L77).
-$runtimeFiles = @('\.gentleman-mode$', '\.project\.json$', 'BITACORA\.md$')
-$changedFiles = @($changedFiles | Where-Object {
-    $file = $_
-    $skip = $false
-    foreach ($p in $runtimeFiles) { if ($file -match $p) { $skip = $true; break } }
-    -not $skip
-})
+# E10 perf-ciclo34-clusterB: 3 -match per file collapsed into 1 combined regex.
+$runtimeFilesRe = '(\.gentleman-mode$|\.project\.json$|BITACORA\.md$)'
+$changedFiles = @($changedFiles | Where-Object { $_ -is [string] -and $_.Trim() -and ($_ -notmatch $runtimeFilesRe) })
 
 if ($changedFiles.Count -eq 0) {
     if ($Json) {
@@ -136,21 +132,27 @@ function Convert-GlobToRegex {
     return "^$escaped$"
 }
 
+# E10 perf-ciclo34-clusterB: precompile glob regexes ONCE (was: Convert-GlobToRegex
+# per file x pattern inside the loop) + early-exit when a bare '*' matches all.
+$compiledPatterns = @($patterns | ForEach-Object { Convert-GlobToRegex -Glob $_ })
+$matchAll = $patterns -contains '*'
+
 foreach ($file in $changedFiles) {
-    $matched = $false
-    foreach ($pattern in $patterns) {
-        try {
-            $regex = Convert-GlobToRegex -Glob $pattern
-            if ($file -match $regex) {
-                $matched = $true
-                break
+    $matched = $matchAll
+    if (-not $matched) {
+        for ($pi = 0; $pi -lt $compiledPatterns.Count; $pi++) {
+            try {
+                if ($file -match $compiledPatterns[$pi]) {
+                    $matched = $true
+                    break
+                }
+            } catch {
+                # Invalid pattern -> fail CLOSED. A malformed pattern must never let a
+                # violating file through as CLEAN (silent skip was a fails-open risk).
+                $msg2 = "Invalid pattern '$($patterns[$pi])': $($_.Exception.Message)"
+                if ($Json) { @{ status = 'error'; message = $msg2 } | ConvertTo-Json } else { Write-Output "ERROR: $msg2" }
+                exit 1
             }
-        } catch {
-            # Invalid pattern -> fail CLOSED. A malformed pattern must never let a
-            # violating file through as CLEAN (silent skip was a fails-open risk).
-            $msg2 = "Invalid pattern '$pattern': $($_.Exception.Message)"
-            if ($Json) { @{ status = 'error'; message = $msg2 } | ConvertTo-Json } else { Write-Output "ERROR: $msg2" }
-            exit 1
         }
     }
     if ($matched) {

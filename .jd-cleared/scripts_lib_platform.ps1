@@ -1,0 +1,1 @@
+jd-cleared 2026-09-15 - dual blind A/B + auditor externo; hallazgos remediados (F1v2/F2/F3/G1) o refutados con evidencia; veredicto final APPROVED

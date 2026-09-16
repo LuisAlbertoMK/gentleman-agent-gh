@@ -80,17 +80,19 @@ if ($promptFiles.Count -gt 0) {
 
     # H-019 per-file overweight — mirrors scripts/lib/score-dims.ps1 (lines 414-428):
     # any cmd/prompt file >5120B → penalty 2; else cmdOver3KB>2 or prOver3KB>1 → penalty 1.
-    $cmdOver3KB = @($cmdFiles | Where-Object { $_.Length -gt 3072 }).Count
-    $cmdOver5KB = @($cmdFiles | Where-Object { $_.Length -gt 5120 }).Count
-    $prOver3KB  = @($promptFiles | Where-Object { $_.Length -gt 3072 }).Count
-    $prOver5KB  = @($promptFiles | Where-Object { $_.Length -gt 5120 }).Count
+    # E09 perf-ciclo34-clusterB (batch/cache): 4 Where-Object passes collapsed
+    # into 2 single-pass counting loops; (Get-Location) hoisted below (was per-file).
+    $cmdOver3KB = 0; $cmdOver5KB = 0; $prOver3KB = 0; $prOver5KB = 0
+    foreach ($f in $cmdFiles) { if ($f.Length -gt 3072) { $cmdOver3KB++ }; if ($f.Length -gt 5120) { $cmdOver5KB++ } }
+    foreach ($f in $promptFiles) { if ($f.Length -gt 3072) { $prOver3KB++ }; if ($f.Length -gt 5120) { $prOver5KB++ } }
     $overweightPenalty = 0
     if ($cmdOver5KB -gt 0 -or $prOver5KB -gt 0) {
         $overweightPenalty = 2
     } elseif ($cmdOver3KB -gt 2 -or $prOver3KB -gt 1) {
         $overweightPenalty = 1
     }
-    $overweightFiles = @($cmdFiles + $promptFiles | Where-Object { $_.Length -gt 3072 } | ForEach-Object { $_.FullName.Replace((Get-Location).Path + '\', '') })
+    $locPrefix = (Get-Location).Path + '\'
+    $overweightFiles = @($cmdFiles + $promptFiles | Where-Object { $_.Length -gt 3072 } | ForEach-Object { $_.FullName.Replace($locPrefix, '') })
 
     $stats.prompts = [PSCustomObject]@{
         count             = $promptFiles.Count

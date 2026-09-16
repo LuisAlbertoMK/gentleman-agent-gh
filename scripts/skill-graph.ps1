@@ -103,7 +103,8 @@ function Get-SkillRegistry {
     }
 
     # Cold parse (original pipe-delimited parsing)
-    $registry = foreach ($line in (Get-Content $CsvPath | Select-Object -Skip 1 | Where-Object { $_.Trim() })) {
+    # E6: reuse $csvRaw lines (was 2nd Get-Content of CSV on cold parse)
+    $registry = foreach ($line in ($csvRaw -split "`r?`n" | Select-Object -Skip 1 | Where-Object { $_.Trim() })) {
         $parts = $line.Split('|')
         $name = $parts[0]
         $len = $parts.Length

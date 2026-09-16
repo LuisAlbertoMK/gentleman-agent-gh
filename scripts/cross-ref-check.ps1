@@ -179,6 +179,7 @@ if ($missingShared.Count -eq 0) {
 if (-not $Json -and -not $Quiet) { Write-Host "[6/9] cross-refs..." -N }
 $allSkillNames = @($skillDirs.ForEach({ $_.Name.ToLower() }))
 $brokenRefs = [System.Collections.Generic.List[string]]::new()
+$missingConfigRefs = [System.Collections.Generic.List[string]]::new()
 $skillContentCache = @{}
 
 foreach ($skill in $skillDirs) {
@@ -201,6 +202,15 @@ foreach ($skill in $skillDirs) {
             $brokenRefs.Add("$($skill.Name) anti-refs '$ref' missing")
         }
     }
+
+    # E1: config_refs checked in the same pass (was a 2nd full loop over skills)
+    $configRefs = Get-ConfigRef $content 'config_refs:\s*(.+)'
+    foreach ($ref in $configRefs) {
+        $refPath = Join-Path $RepoRoot $ref
+        if (-not (Test-Path $refPath)) {
+            $missingConfigRefs.Add("$($skill.Name) config_refs '$ref' missing at $refPath")
+        }
+    }
 }
 
 if ($brokenRefs.Count -eq 0) {
@@ -210,22 +220,8 @@ if ($brokenRefs.Count -eq 0) {
     if (-not $Json -and -not $Quiet) { Write-Host " FAIL ($($brokenRefs.Count))" }
 }
 
-# [7/9] Config refs
+# [7/9] Config refs (evaluated in the [6/9] single pass above — E1)
 if (-not $Json -and -not $Quiet) { Write-Host "[7/9] config_refs..." -N }
-$missingConfigRefs = [System.Collections.Generic.List[string]]::new()
-
-foreach ($skill in $skillDirs) {
-    $content = $skillContentCache[$skill.Name]
-    if (-not $content) { continue }
-
-    $configRefs = Get-ConfigRef $content 'config_refs:\s*(.+)'
-    foreach ($ref in $configRefs) {
-        $refPath = Join-Path $RepoRoot $ref
-        if (-not (Test-Path $refPath)) {
-            $missingConfigRefs.Add("$($skill.Name) config_refs '$ref' missing at $refPath")
-        }
-    }
-}
 
 if ($missingConfigRefs.Count -eq 0) {
     if (-not $Json -and -not $Quiet) { Write-Host " OK" }

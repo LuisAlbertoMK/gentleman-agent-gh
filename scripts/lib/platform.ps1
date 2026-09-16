@@ -20,18 +20,24 @@
 # These auto-variables are PS6+ only. On PS 5.1 (Desktop edition) they are
 # undefined — we set them once using the .NET RuntimeInformation API which
 # works on both PS 5.1 and PS 7+. PSEdition 'Desktop' = always Windows.
+# E7: short-circuit IsOSPlatform (was 3 API calls per dot-source; now 1 on Windows)
 if (-not (Test-Path Variable:\IsWindows)) {
     $IsWindows = $PSVersionTable.PSEdition -eq 'Desktop' -or
                  [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
                      [System.Runtime.InteropServices.OSPlatform]::Windows)
 }
+if ($IsWindows) {
+    if (-not (Test-Path Variable:\IsLinux)) { $IsLinux = $false }
+    if (-not (Test-Path Variable:\IsMacOS)) { $IsMacOS = $false }
+} else {
 if (-not (Test-Path Variable:\IsLinux)) {
     $IsLinux = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
                 [System.Runtime.InteropServices.OSPlatform]::Linux)
 }
 if (-not (Test-Path Variable:\IsMacOS)) {
-    $IsMacOS = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
+    $IsMacOS = (-not $IsLinux) -and [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
                 [System.Runtime.InteropServices.OSPlatform]::OSX)
+}
 }
 
 function Get-GentlemanRoot {

@@ -76,6 +76,8 @@ if (-not (Test-Path -LiteralPath $trackPath)) {
 function Invoke-TrackLocked {
     param([scriptblock]$Action)
     $stream = $null
+    $reader = $null
+    $writer = $null
     try {
         $stream = [System.IO.FileStream]::new($trackPath, [System.IO.FileMode]::OpenOrCreate, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
         $reader = [System.IO.StreamReader]::new($stream, [System.Text.Encoding]::UTF8, $true, 1024, $true)
@@ -93,7 +95,12 @@ function Invoke-TrackLocked {
         $writer.Write(($data | ConvertTo-Json -Depth 4))
         $writer.Flush()
     } finally {
-        if ($stream) { $stream.Close() }
+        # E4 perf-ciclo37-clusterA (C36A/E4 anti-leak): Dispose reader/writer +
+        # Close/Dispose del stream (el lock FileShare::None se mantiene).
+        # Reversible: volver a Close solo.
+        try { if ($writer) { $writer.Dispose() } } catch { }
+        try { if ($reader) { $reader.Dispose() } } catch { }
+        if ($stream) { try { $stream.Close() } catch { }; try { $stream.Dispose() } catch { } }
     }
 }
 
@@ -121,15 +128,19 @@ Invoke-TrackLocked -Action {
     # id="" with count>0. Heal lazily: first invocation seeing empty id
     # assigns one — count semantics untouched (no gaming per R3).
     if ([string]::IsNullOrWhiteSpace($data.cycle.id)) {
-        $data.cycle.id = "CYC-" + (Get-Date -Format "yyyyMMdd") + "-" + (Get-Random -Minimum 100 -Maximum 999)
+        # E8: single Get-Date reuse (was 2 calls)
+        $healNow = Get-Date
+        $data.cycle.id = "CYC-" + $healNow.ToString("yyyyMMdd") + "-" + (Get-Random -Minimum 100 -Maximum 999)
         if ([string]::IsNullOrWhiteSpace($data.cycle.start)) {
-            $data.cycle.start = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssZ")
+            $data.cycle.start = $healNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
         }
         $dataRef.Value = $data
     }
 
 if ($Reset) {
-    $cycleId = "CYC-" + (Get-Date -Format "yyyyMMdd") + "-" + (Get-Random -Minimum 100 -Maximum 999)
+    # E8: single Get-Date reuse (was 3 calls)
+    $resetNow = Get-Date
+    $cycleId = "CYC-" + $resetNow.ToString("yyyyMMdd") + "-" + (Get-Random -Minimum 100 -Maximum 999)
     # Archive current cycle to history
     if ($data.cycle.count -gt 0) {
         $archived = [PSCustomObject]@{
@@ -137,13 +148,13 @@ if ($Reset) {
             start  = $data.cycle.start
             target = $data.cycle.target
             count  = $data.cycle.count
-            end    = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssZ")
+            end    = $resetNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
         }
         $data.history = @($data.history) + @($archived)
     }
     $data.cycle = @{
         id     = $cycleId
-        start  = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssZ")
+        start  = $resetNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
         target = $Target
         count  = 0
     }

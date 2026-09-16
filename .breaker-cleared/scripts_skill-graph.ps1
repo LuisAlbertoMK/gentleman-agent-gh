@@ -1,0 +1,1 @@
+adversarial-cleared 2026-09-15 - :18 NoCache opt-in documentado (no execpolicy) + :348 CSV stdout no-sensible tras -Format explicito; hunk E6 intacto

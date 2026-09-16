@@ -20,7 +20,13 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 function Get-Frontmatter {
-    param([string]$Content)
+    param(
+        [string]$Content,
+        # E1-C36C frontmatter-lazy: solo se parsea lo que consume el registry compacto
+        # (name/triggers/path). tags/dependencies se dropean en el compacto (lineas
+        # ~119-132) — parsearlos era trabajo muerto (2 regex x N skills).
+        [string[]]$Fields = @('name', 'triggers')
+    )
 
     $result = @{
         name         = ""
@@ -50,6 +56,8 @@ function Get-Frontmatter {
     }
 
     # Parse tags — inline array [tag1, tag2] or YAML list
+    # LAZY (E1-C36C): solo si el llamador lo pide; el registry compacto no lo usa.
+    if ($Fields -contains 'tags') {
     if ($fm -match "tags:\s*\[(.+?)\]") {
         # Inline array: [engineering, security]
         $result.tags = ($Matches[1] -split ",") | ForEach-Object { $_.Trim().ToLower() } | Where-Object { $_ }
@@ -62,6 +70,8 @@ function Get-Frontmatter {
     }
 
     # Parse dependencies — inline array or YAML list (in metadata or top-level)
+    # LAZY (E1-C36C): idem tags — el compacto no lo consume.
+    if ($Fields -contains 'dependencies') {
     if ($fm -match "dependencies:\s*\[(.+?)\]") {
         $result.dependencies = ($Matches[1] -split ",") | ForEach-Object { $_.Trim().ToLower() } | Where-Object { $_ }
     }
@@ -69,6 +79,8 @@ function Get-Frontmatter {
         $result.dependencies = ($Matches[1] -split "\r?\n") |
             Where-Object { $_ -match "^\s+-\s+(.+)" } |
             ForEach-Object { $Matches[1].Trim().ToLower() }
+    }
+    }
     }
 
     return $result

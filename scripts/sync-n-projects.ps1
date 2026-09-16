@@ -124,21 +124,71 @@ if ($invalidPaths) {
     Write-Error "Invalid manifest: each project must have a non-empty 'path'"
     exit 1
 }
+# E7/E8 perf-ciclo37-clusterA (C35A/E7 memo + E8 precomputado): manifestDir se
+# calcula 1 vez aqui; AddProject y el loop fallback lo reusan (antes: Split-Path
+# por proyecto).
+$manifestDir = Split-Path $manifestPath -Parent
+# F1v2 anchor: manifestDirFull still computed for the sibling-escape audit
+# warning. FullPath normalizes `..`/separators; trailing-sep StartsWith
+# rejects `/root-evil` style prefix siblings (same style as Join-PathSafe).
+$manifestDirFull = [System.IO.Path]::GetFullPath($manifestDir)
+$manifestSep = [System.IO.Path]::DirectorySeparatorChar
+$addEscapeDetail = $null
+# F1v2 protected-location gate (replaces F1 manifestDir FAIL): the manifest IS
+# the operator allowlist, so sibling layout (../x) is by-design. Only FAIL
+# (no throw) when the resolved target is a protected location: a drive root
+# ([IO.Path]::GetPathRoot($t) -eq $t, e.g. D:\ C:\) or inside SystemRoot,
+# SystemRoot\System32, ProgramFiles, ProgramFiles(x86). OrdinalIgnoreCase.
+function Test-ProtectedLocation {
+    param([string]$Full)
+    if ([string]::IsNullOrEmpty($Full)) { return $false }
+    try { if ([IO.Path]::GetPathRoot($Full) -eq $Full) { return $true } } catch { }
+    $protected = @()
+    if ($env:SystemRoot) {
+        $protected += [System.IO.Path]::GetFullPath($env:SystemRoot)
+        $protected += [System.IO.Path]::GetFullPath((Join-Path $env:SystemRoot "System32"))
+    }
+    if (${env:ProgramFiles}) { $protected += [System.IO.Path]::GetFullPath(${env:ProgramFiles}) }
+    if (${env:ProgramFiles(x86)}) { $protected += [System.IO.Path]::GetFullPath(${env:ProgramFiles(x86)}) }
+    foreach ($p in $protected) {
+        if ($Full -eq $p) { return $true }
+        if ($Full.StartsWith($p + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
+        if ($Full.Equals($p, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
+    }
+    return $false
+}
 
 # ── Add project (optional) ───────────────────────────────────────────
 if ($AddProject) {
     # Resolve relative to manifest directory first (CWD may diverge)
-    $addPath = Join-Path (Split-Path $manifestPath -Parent) $AddProject
+    $addPath = Join-Path $manifestDir $AddProject
     if (-not (Test-Path $addPath)) {
         $addPath = [System.IO.Path]::GetFullPath($AddProject)
     }
+    # F1v2 confinement: FAIL (no abort) only on protected locations.
+    $addFull = [System.IO.Path]::GetFullPath($addPath)
+    $addEscapes = -not ($addFull.StartsWith($manifestDirFull + $manifestSep, [System.StringComparison]::OrdinalIgnoreCase) -or $addFull -eq $manifestDirFull)
+    $addProtected = Test-ProtectedLocation $addFull
     # Normalize existing entries against manifest dir to avoid absolute-vs-relative false negatives
-    $manifestDir = Split-Path $manifestPath -Parent
     $existing = $manifestObj.projects | Where-Object {
         $resolved = if ([System.IO.Path]::IsPathRooted($_.path)) { $_.path } else { Join-Path $manifestDir $_.path }
         ([System.IO.Path]::GetFullPath($resolved)) -eq ([System.IO.Path]::GetFullPath($addPath))
     }
-    if ($existing) {
+    if ($addProtected) {
+        # F1v2+F3: record FAIL (visible even under -Quiet) and skip the add —
+        # the bulk sync below still runs. $results is recorded later (it is
+        # initialized after this block); the warning is emitted now.
+        # F3-purity: warnings surface on stdout on PS7 console hosts, so emit
+        # only in text mode — under -Json the FAIL already lives in $results.
+        if (-not $Json) { Write-Warning "add ${AddProject}: FAIL — protected location: $addPath" }
+        $addEscapeDetail = "protected location: $addPath"
+    } else {
+        if ($addEscapes) {
+            # Sibling layout is by-design (manifest is the allowlist): audit
+            # warning only, then continue normal (OK/WOULD según exista).
+            if (-not $Json) { Write-Warning "add ${AddProject}: target outside manifest root (sibling layout, manifest is allowlist): $addFull" }
+        }
+        if ($existing) {
         if (-not $Quiet) { Write-Output "[skip] $addPath already in manifest" }
     } else {
         $manifestObj.projects += @{ path = $addPath; defaultAgent = "gentleman-vMK" }
@@ -159,6 +209,7 @@ if ($AddProject) {
         } else {
             if (-not $Quiet) { Write-Output "[dry-run] Would add $addPath to manifest" }
         }
+    }
     }
 }
 
@@ -184,6 +235,10 @@ if (Test-Path $syncExe -PathType Leaf) {
 # ── Results collection ────────────────────────────────────────────────
 $results = [System.Collections.Generic.List[object]]::new()
 $hasDrift = $false
+if ($addEscapeDetail) {
+    $results.Add(@{ step = "add $AddProject"; status = "FAIL"; detail = $addEscapeDetail })
+    $hasDrift = $true
+}
 
 if ($useBinary) {
     # ── Binary path: update-all --manifest ──────────────────────────────
@@ -191,7 +246,8 @@ if ($useBinary) {
     if ($DryRun) { $binArgs += "--dry-run" }
     if ($Json)   { $binArgs += "--json" }
 
-    if (-not $Quiet) { Write-Host "Using sync binary: $syncExe" -ForegroundColor DarkGray }
+    # F3-purity (pre-existing): keep stdout JSON-clean in binary+Json mode.
+    if (-not $Quiet -and -not $Json) { Write-Host "Using sync binary: $syncExe" -ForegroundColor DarkGray }
 
     # Binary handshake: verify the binary is functional before trusting it with data.
     # bin/ is an artifact of the local operator (trusted-operator model) — not vendored code.
@@ -238,7 +294,9 @@ if ($useBinary) {
     }
 } else {
     # ── Fallback path: use-gentleman.ps1 per project ────────────────────
-    if (-not $Quiet) {
+    # F3-purity (pre-existing): Write-Host pollutes stdout, so stay silent
+    # under -Json — JSON consumers parse stdout strictly.
+    if (-not $Quiet -and -not $Json) {
         Write-Host "[warn] sync binary not found — falling back to use-gentleman.ps1 (slower)" -ForegroundColor Yellow
     }
 
@@ -260,22 +318,59 @@ if ($useBinary) {
                 if ([System.IO.Path]::IsPathRooted($projPath)) {
                     $targetDir = [System.IO.Path]::GetFullPath($projPath)
                 } else {
+                    # E8: $manifestDir precomputado (era Split-Path por proyecto)
                     $targetDir = [System.IO.Path]::GetFullPath(
-                        (Join-Path (Split-Path $manifestPath -Parent) $projPath)
+                        (Join-Path $manifestDir $projPath)
                     )
                 }
-                $guArgs = @("-TargetDir", $targetDir, "-DefaultAgent", $agent)
-                if ($DryRun) { $guArgs += "-DryRun" }
-                if ($Yes)    { $guArgs += "-Yes" }
-                & $useGentleman @guArgs
-                if ($null -ne $LASTEXITCODE -and $LASTEXITCODE -ne 0) {
-                    $results.Add(@{ step = $step; status = "FAIL"; detail = "use-gentleman exit $LASTEXITCODE" })
+                # F1v2 confinement: FAIL (no throw — bulk continues) only on
+                # protected locations. Sibling escape is by-design (manifest is
+                # the allowlist): audit warning, then normal flow.
+                $loopEscapes = -not ($targetDir.StartsWith($manifestDirFull + $manifestSep, [System.StringComparison]::OrdinalIgnoreCase) -or $targetDir -eq $manifestDirFull)
+                if (Test-ProtectedLocation $targetDir) {
+                    $results.Add(@{ step = $step; status = "FAIL"; detail = "protected location: $projPath" })
+                    if (-not $Json) { Write-Warning "${step}: FAIL — protected location: $projPath" }
                     $hasDrift = $true
+                    continue
+                }
+                if ($loopEscapes) {
+                    if (-not $Json) { Write-Warning "${step}: target outside manifest root (sibling layout, manifest is allowlist): $targetDir" }
+                }
+                if (-not (Test-Path $targetDir -PathType Container)) {
+                    if ($DryRun) {
+                        $results.Add(@{ step = $step; status = "OK"; detail = "WOULD sync $targetDir (target missing - would create)" })
+                    } else {
+                        $results.Add(@{ step = $step; status = "FAIL"; detail = "target missing: $targetDir" })
+                        if (-not $Json) { Write-Warning "${step}: FAIL — target missing: $targetDir" }
+                        $hasDrift = $true
+                    }
                 } else {
-                    $results.Add(@{ step = $step; status = "OK"; detail = $targetDir })
+                    $guArgs = @{ TargetDir = $targetDir; DefaultAgent = $agent }
+                    if ($DryRun) { $guArgs.DryRun = $true }
+                    if ($Yes) { $guArgs.Yes = $true }
+                    # E9 perf-ciclo37-clusterA (C35A/E9 Quiet bulk): en -Quiet se
+                    # silencia la salida por proyecto; el resumen final ya esta
+                    # condicionado a -not $Quiet (linea Output).
+                    # F2 stale-guard: use-gentleman.ps1 is a script, not a native
+                    # exe, so it never sets $LASTEXITCODE itself — reset it or a
+                    # leftover native exit code from the caller session fakes a FAIL.
+                    $global:LASTEXITCODE = 0
+                    if ($Json -or $Quiet) { $null = & $useGentleman @guArgs 6>$null } else { & $useGentleman @guArgs }
+                    # NOTE: use-gentleman.ps1 is a script, not a native exe, so it
+                    # never sets $LASTEXITCODE (unset until a native command runs).
+                    # Under Set-StrictMode reading it unset throws — guard it.
+                    $guExit = if (Test-Path variable:LASTEXITCODE) { $LASTEXITCODE } else { $null }
+                    if ($null -ne $guExit -and $guExit -ne 0) {
+                        $results.Add(@{ step = $step; status = "FAIL"; detail = "use-gentleman exit $LASTEXITCODE" })
+                        if (-not $Json) { Write-Warning "${step}: FAIL — use-gentleman exit $LASTEXITCODE" }
+                        $hasDrift = $true
+                    } else {
+                        $results.Add(@{ step = $step; status = "OK"; detail = $targetDir })
+                    }
                 }
             } catch {
                 $results.Add(@{ step = $step; status = "FAIL"; detail = $_.Exception.Message })
+                if (-not $Json) { Write-Warning "${step}: FAIL — $($_.Exception.Message)" }
                 $hasDrift = $true
             }
         } else {
