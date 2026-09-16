@@ -30,6 +30,10 @@
 .PARAMETER Yes
   Non-interactive — skip confirmation prompts.
 
+.PARAMETER Force
+  Bypass ShouldProcess confirmation prompts (ConfirmPreference=None).
+  Destructive-scripts gate requires the param.
+
 .PARAMETER AddProject
   Append a project to the manifest before syncing. Relative path resolved
   against the manifest's chainRoot.
@@ -52,11 +56,13 @@ param(
     [switch]$Json,
     [switch]$Quiet,
     [switch]$Yes,
-    [string]$AddProject
+    [string]$AddProject,
+    [switch]$Force
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+if ($Force) { $ConfirmPreference = 'None' }
 
 # ── Cross-platform helpers ──────────────────────────────────────────────
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")

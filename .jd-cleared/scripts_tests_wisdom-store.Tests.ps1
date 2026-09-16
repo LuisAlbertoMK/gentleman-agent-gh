@@ -1,0 +1,1 @@
+jd-cleared 2026-09-16 - fastpath VERIFY-OK plus Pester green; test-only stale-path/expectation update, minimal diff, re-auditable

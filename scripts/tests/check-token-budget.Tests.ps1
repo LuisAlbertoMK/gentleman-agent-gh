@@ -40,7 +40,8 @@ Describe "check-token-budget.ps1 — budget logic (C9)" {
         $json = $jsonLine | ConvertFrom-Json -ErrorAction SilentlyContinue
         $json | Should -Not -BeNull
         $json.stats.skills.count | Should -BeGreaterThan 0
-        $json.stats.skills.budget | Should -Be 2000
+        # ADR-048 (6289ff9c 2026-09-01): default skills budget bumped 2000->3200
+        $json.stats.skills.budget | Should -Be 3200
     }
 
     It "JSON includes prompts stats with overBudgetFiles (regression guard)" {

@@ -1,6 +1,6 @@
 #requires -Version 7
 BeforeAll {
-    $scriptPath = Join-Path (Split-Path $PSScriptRoot -Parent) 'wisdom-store.ps1'
+    $scriptPath = Join-Path (Split-Path $PSScriptRoot -Parent) 'archive/wisdom-store.ps1'
 }
 Describe 'wisdom-store.ps1' {
     It 'exists' {

@@ -107,7 +107,10 @@ Describe "Destructive Script Safety — <_.Name>" -ForEach (
             for ($i = 0; $i -lt $lines.Count; $i++) {
                 $line = $lines[$i]
                 if ($line -match 'Remove-Item.*-ErrorAction\s+SilentlyContinue' -and
-                    $line -notmatch '(cleanup|temp|tmp|AfterAll|finally|Remove-Item.*\.tmp)') {
+                    # Forense 2026-09-16: errFile es el temp de GetTempFileName
+                    # (sync-n-projects.ps1:271,277) removido en finally — cleanup
+                    # best-effort, misma clase que tmp/temp ya eximidos.
+                    $line -notmatch '(cleanup|temp|tmp|errFile|AfterAll|finally|Remove-Item.*\.tmp)') {
                     # Forense 2026-09-10: el SilentlyContinue acotado por try/catch con logging NO es
                     # supresión silenciosa (caso score-auto.ps1:90:
                     # `try { Remove-Item ... } catch { Write-Debug ... }`). Mirar contexto try/catch
@@ -177,8 +180,18 @@ Describe "Destructive Script Cross-Checks" {
             $execLines.Count -gt 0
         }
 
+        # Forense 2026-09-16: mismo filtro de líneas-ejecutables que el
+        # discovery y que git-push (ca7e4002) — el match raw incluía
+        # pre-exec-review.ps1, cuyos 'Remove-Item' viven solo en regex de
+        # detección entrecomillados y comentarios (nunca invoca). Solo cuentan
+        # líneas ejecutables: no-comentario, no entrecomilladas.
         $scriptsUsingRemoveItem = $allNonTest | Where-Object {
-            (Get-Content $_.FullName -Raw -ErrorAction SilentlyContinue) -match 'Remove-Item'
+            $execLines = @(Get-Content $_.FullName -ErrorAction SilentlyContinue | Where-Object {
+                $code = $_ -replace '"[^"]*"', '' -replace "'[^']*'", ''
+                $code = $code -replace '^\s*#.*$', ''
+                $code -match 'Remove-Item'
+            })
+            $execLines.Count -gt 0
         }
 
         $scriptsUnsafeRemove = @()

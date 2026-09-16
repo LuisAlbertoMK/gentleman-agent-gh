@@ -1,0 +1,1 @@
+adversarial-cleared 2026-09-16 - PS-BND-01 doc-word at :25 (.PARAMETER Force description); handling per repo convention ShouldProcess plus ConfirmPreference None on Force, cf wisdom-core:82; param demanded by destructive-scripts gate

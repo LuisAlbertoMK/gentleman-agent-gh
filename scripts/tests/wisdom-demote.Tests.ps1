@@ -1,6 +1,6 @@
 #requires -Version 7
 BeforeAll {
-    $scriptPath = Join-Path (Split-Path $PSScriptRoot -Parent) 'wisdom-demote.ps1'
+    $scriptPath = Join-Path (Split-Path $PSScriptRoot -Parent) 'archive/wisdom-demote.ps1'
 }
 Describe 'wisdom-demote.ps1' {
     It 'exists' {

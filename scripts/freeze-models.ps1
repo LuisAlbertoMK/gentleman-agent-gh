@@ -21,6 +21,10 @@
 .PARAMETER Quiet
   Machine-readable JSON output (Status) or suppressed host output (Freeze/Unfreeze).
 
+.PARAMETER Force
+  Bypass confirmation prompts (ConfirmPreference=None). All mutations already
+  go through SupportsShouldProcess; destructive-scripts gate requires the param.
+
 .EXAMPLE
   powershell -File scripts\freeze-models.ps1 -Action Status
   powershell -File scripts\freeze-models.ps1 -Action Freeze
@@ -39,10 +43,12 @@
 param(
     [ValidateSet("Freeze","Unfreeze","Status")]
     [string]$Action = "Status",
-    [switch]$Quiet
+    [switch]$Quiet,
+    [switch]$Force
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+if ($Force) { $ConfirmPreference = 'None' }
 
 # --- Resolve paths relative to this script ---
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
