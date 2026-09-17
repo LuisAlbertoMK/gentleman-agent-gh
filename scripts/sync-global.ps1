@@ -101,7 +101,7 @@ function Write-Step([string]$N,[scriptblock]$B) {
                     if($bad.Count -gt 0){ $drift=$true; $driftDetail="$($bad.Count) broken junctions" }
                     else {
                         $canonNorm=($RepoCanonical -replace '/','\').TrimEnd('\')
-                        $stale=@($skills | Where-Object{ $_ -is [System.IO.DirectoryInfo] -and $_.Target -and $($_.Target -replace '/','\').TrimEnd('\') -ne $canonNorm -and (Test-Path $_.Target) })
+                        $stale=@($skills | Where-Object{ $_ -is [System.IO.DirectoryInfo] -and $_.Target -and $($_.Target -replace '/','\').TrimEnd('\') -notlike "$canonNorm\*" -and (Test-Path $_.Target) })
                         if($stale.Count -gt 0){ $drift=$true; $driftDetail="$($stale.Count) stale junctions: $(($stale|ForEach-Object{$_.Name}) -join ', ')" }
                     }
                 }
