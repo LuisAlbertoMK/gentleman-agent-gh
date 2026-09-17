@@ -1,8 +1,8 @@
 # SKILLS INDEX (Compact)
 
-> Top-20 daily-use skills. Full table: all 94 skills — use `skill` tool or read this file for complete list.
+> Top-20 daily-use skills. Full table: all 96 skills — use `skill` tool or read this file for complete list.
 >
-> **Version**: 5.6 | **Changelog**: 5.6 (2026-09-02 — +state-reconcile +ps-compat (skill expansion); count 93→94 (excl. _shared per cross-ref Get-SkillDir)); 5.5 (2026-08-16: C28 auto-improvement cycle added depth to 90 skills; +2 new skills image-pipeline, customize-opencodec; count 89→90); 5.5.1 (2026-08-18: +1 new skill gentleman-aem; count 90→91); 5.4 (2026-08-13: count 87→88 per new automejora-analyzer skill); 5.3 (2026-08-12: count 78→87 per filesystem audit; README.md synced to current counts) 5.2 (archived 3 dead: cognitive-doc-design, prompt-engineering, senior-engineer → .archive/skills; count 81→78 per cross-ref-check; global discoverable 93→165 per FS scan: 78 project + 87 global, excl. _shared); 5.1 (sync count 93→81 per filesystem audit); 5.0 (compact top-20 table for token reduction); 4.7 (+1 new: adversarial-breaker; count 92→93); 4.6 (count corrected 80→92 per filesystem audit)
+> **Version**: 5.7 | **Changelog**: 5.7 (2026-09-17 — +odd +rdd (skill registration); count 94→96); 5.6 (2026-09-02 — +state-reconcile +ps-compat (skill expansion); count 93→94 (excl. _shared per cross-ref Get-SkillDir)); 5.5 (2026-08-16: C28 auto-improvement cycle added depth to 90 skills; +2 new skills image-pipeline, customize-opencodec; count 89→90); 5.5.1 (2026-08-18: +1 new skill gentleman-aem; count 90→91); 5.4 (2026-08-13: count 87→88 per new automejora-analyzer skill); 5.3 (2026-08-12: count 78→87 per filesystem audit; README.md synced to current counts) 5.2 (archived 3 dead: cognitive-doc-design, prompt-engineering, senior-engineer → .archive/skills; count 81→78 per cross-ref-check; global discoverable 93→165 per FS scan: 78 project + 87 global, excl. _shared); 5.1 (sync count 93→81 per filesystem audit); 5.0 (compact top-20 table for token reduction); 4.7 (+1 new: adversarial-breaker; count 92→93); 4.6 (count corrected 80→92 per filesystem audit)
 
 ## Top 20 Daily-Use Skills
 
@@ -34,11 +34,11 @@
 
 | Group | Skills |
 |-------|--------|
-| Quality | quality-gate, code-review-agent, triple-verify, auto-metrics, external-auditor, immune-system, testing-strategy |
+| Quality | quality-gate, code-review-agent, triple-verify, auto-metrics, external-auditor, immune-system, testing-strategy, rdd |
 | Code | commit-crafter, code-generation, quick-executor, refactoring-planner |
 | Security | security-scanner, auth-hardening, container-security, llm-security |
 | SDD | sdd (unified pipeline), sdd-quick, sdd-propose, sdd-design, sdd-apply, sdd-verify |
-| Coordination | delivery-harness, branch-pr, issue-creation, command-wrapper |
+| Coordination | delivery-harness, branch-pr, issue-creation, command-wrapper, odd |
 | Analysis | analysis-mode, deep-debugging |
 | Memory | session-resume, engram-protocol, dreaming, bitacora |
 | Skills meta | opencode-skill-creator, skill-registry, skill-graph |
