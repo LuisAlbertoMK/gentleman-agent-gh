@@ -1,4 +1,4 @@
-#requires -Version 7
+﻿#requires -Version 7
 [CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
@@ -6,15 +6,17 @@
 .DESCRIPTION
     One-shot pipeline: skill junctions, scripts junction, global opencode.jsonc with MCPs + permissions, agent sync, AGENTS.md, MCP verification.
 .PARAMETER DryRun  Show what would be done without making changes.
+.PARAMETER Repair  Re-point stale junctions to canonical repo (target != repo .agents/skills).
 .PARAMETER Force  Overwrite existing global opencode.jsonc.
 .PARAMETER NoAgentSync  Skip agent + AGENTS.md sync.
 .PARAMETER Json  Output status as JSON.
 #>
-param([switch]$DryRun,[switch]$Force,[switch]$NoAgentSync,[switch]$Json,[switch]$NoAgentsMd)
+param([switch]$DryRun,[switch]$Repair,[switch]$Force,[switch]$NoAgentSync,[switch]$Json,[switch]$NoAgentsMd)
 $ErrorActionPreference = "Stop"; Set-StrictMode -Version Latest
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 
 $srcSkills = Resolve-Path "$PSScriptRoot\..\.agents\skills" -EA Stop
+$RepoCanonical = $srcSkills.Path
 $dstSkills = Join-Path (Get-GlobalConfigDir) "skills"
 $srcScripts = Resolve-Path "$PSScriptRoot" -EA Stop
 $dstScripts = Join-Path (Get-GlobalConfigDir) "scripts"
@@ -41,6 +43,11 @@ function Write-Step([string]$N,[scriptblock]$B) {
                     else {
                         $bad=@(Get-ChildItem $dstSkills -Directory -EA SilentlyContinue | Where-Object{ $_.Target -and -not (Test-Path $_.Target) })
                         if($bad.Count -gt 0){ $drift=$true; $driftDetail="$($bad.Count) broken junctions" }
+                        else {
+                            $canonNorm=($RepoCanonical -replace '/','\').TrimEnd('\')
+                            $stale=@(Get-ChildItem $dstSkills -Directory -EA SilentlyContinue | Where-Object{ $_.Target -and $($_.Target -replace '/','\').TrimEnd('\') -notlike "$canonNorm\*" })
+                            if($stale.Count -gt 0){ $drift=$true; $driftDetail="$($stale.Count) stale junctions: $(($stale|ForEach-Object{$_.Name}) -join ', ')" }
+                        }
                     }
                 }
                 "Scripts junction" { if(-not (Test-Path $dstScripts)){ $drift=$true; $driftDetail="scripts junction missing" } }
@@ -92,6 +99,11 @@ function Write-Step([string]$N,[scriptblock]$B) {
                     $skills=Get-ChildItem $dstSkills -Directory -EA SilentlyContinue
                     $bad=@($skills | Where-Object{ $_ -is [System.IO.DirectoryInfo] -and $_.Target -and -not (Test-Path $_.Target) })
                     if($bad.Count -gt 0){ $drift=$true; $driftDetail="$($bad.Count) broken junctions" }
+                    else {
+                        $canonNorm=($RepoCanonical -replace '/','\').TrimEnd('\')
+                        $stale=@($skills | Where-Object{ $_ -is [System.IO.DirectoryInfo] -and $_.Target -and $($_.Target -replace '/','\').TrimEnd('\') -ne $canonNorm -and (Test-Path $_.Target) })
+                        if($stale.Count -gt 0){ $drift=$true; $driftDetail="$($stale.Count) stale junctions: $(($stale|ForEach-Object{$_.Name}) -join ', ')" }
+                    }
                 }
                 "MCP availability" { if(-not (Get-Command engram -EA SilentlyContinue)){ $drift=$true; $driftDetail="engram not in PATH" } }
                 "opencode binary health" {
@@ -114,7 +126,16 @@ function Write-Step([string]$N,[scriptblock]$B) {
 Write-Step "Skill junctions" {
     if (-not (Test-Path $dstSkills)) { New-Item -ItemType Directory -Path $dstSkills -Force | Out-Null }
     $count=0;$total=0; foreach ($skill in Get-ChildItem -Directory -Path $srcSkills) { $total++;$link=Join-Path $dstSkills $skill.Name; if(-not(Test-Path $link)){New-CrossPlatLink -Path $link -Target $skill.FullName;$count++} }
-    Write-Host "  $count new junctions (total: $total)" -Fore Green; $report.steps["skill_junctions"]=@{created=$count;total=$total}
+    Write-Host "  $count new junctions (total: $total)" -Fore Green
+    if($Repair){
+        $canonNorm=($RepoCanonical -replace '/','\').TrimEnd('\')
+        $stale=@(Get-ChildItem $dstSkills -Directory -EA SilentlyContinue | Where-Object{ $_.Target -and $($_.Target -replace '/','\').TrimEnd('\') -notlike "$canonNorm\*" })
+        if($stale.Count -gt 0){
+            $fixed=0; foreach($s in $stale){ $link=Join-Path $dstSkills $s.Name; $target=Join-Path $RepoCanonical $s.Name; Remove-Item -Path $link -Force; New-CrossPlatLink -Path $link -Target $target; $resolved=([System.IO.Path]::GetFullPath((Get-Item $link).Target)); if($resolved -eq [System.IO.Path]::GetFullPath($target)){ $fixed++; Write-Host "  [repair] $($s.Name)" -Fore Green } else { Write-Host "  [FAIL] $($s.Name) verify failed" -Fore Red } }
+            Write-Host "  $fixed/$($stale.Count) stale junctions repaired" -Fore Green
+        } else { Write-Host "  No stale junctions" -Fore Green }
+    }
+    $report.steps["skill_junctions"]=@{created=$count;total=$total}
 }
 
 # Step 2: Scripts junction
@@ -200,6 +221,9 @@ Write-Step "Verify junctions" {
     $skills=Get-ChildItem $dstSkills -Directory -EA SilentlyContinue
     $bad=@($skills|Where-Object{$_ -is [System.IO.DirectoryInfo] -and $_.Target -and -not(Test-Path $_.Target)})
     if($bad.Count-gt 0){$bad|ForEach-Object{Write-Host "  [broken] $($_.Name)" -Fore Red};throw "$($bad.Count) broken junctions"}
+    $canonNorm=($RepoCanonical -replace '/','\').TrimEnd('\')
+    $stale=@($skills|Where-Object{$_ -is [System.IO.DirectoryInfo] -and $_.Target -and $($_.Target -replace '/','\').TrimEnd('\') -notlike "$canonNorm\*" -and (Test-Path $_.Target)})
+    if($stale.Count-gt 0){$stale|ForEach-Object{Write-Host "  [stale] $($_.Name) -> $($_.Target)" -Fore Yellow};$report.warnings+="$($stale.Count) stale junctions (use -Repair to fix)"}
     Write-Host "  Skills: $($skills.Count) valid | Scripts: $(Test-Path $dstScripts)" -Fore Green
 }
 
