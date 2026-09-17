@@ -3,47 +3,42 @@ name: performance-tracker
 description: "Score and track app performance — 6 dims, continuous scoring, trend analysis"
 triggers: "performance score, mobile perf, desktop perf, rendimiento, app score, benchmark, perf tracking, performance trend"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 3080
+token_budget: 2200
 ---
-## When to Use
-Score and track app performance — 6 dims, continuous scoring, trend analysis. App performance scoring — 6 dims, continuous. Agent perf → `auto-metrics`. Mobile, Desktop, Web.
 ## 6 Dimensions (1-10)
-Load|Render|Memory|Network|Bundle|Energy — thresholds + quick checks → reference.
-## Score Storage & Trend
-`mem_save(type="learning", title="perf-score:{app}-{platform}", content="**Load**:X|...|**Avg**:X.X|**Platform**:{mob|desk|web}|**App**:{name}")`. Trend (every 10 / session end): `mem_search(query="perf-score:", limit=20)` → prev(5) vs recent(5). Drop >0.5 → gap-analysis. Compressed: `mem_save(learning,"perf-score:{app}-{platform}","Load:X|...|Avg:X.X|Platform|App")` → `mem_search("perf-score:",20)` → prev5 vs recent5.
+Load|Render|Memory|Network|Bundle|Energy — thresholds → reference.md.
+
+## Score Storage
+`mem_save(learning,"perf-score:{app}-{platform}","Load:X|...|Avg:X.X|Platform|App")`. Trend (every 10/session end): `mem_search("perf-score:",20)` → prev5 vs recent5. Drop>0.5→gap-analysis.
+
 ## Action by Avg
-≥8 Maintain · 6-7.9 Light review + profile · 4-5.9 gap-analysis + fix · <4 Critical perf sprint
+≥8 Maintain · 6-7.9 Light review+profile · 4-5.9 gap-analysis+fix · <4 Critical sprint
+
 ## Hard Rules
-- Score EVERY dimension from real measurement — NEVER guess ("feels fast")
-- Platform in title (`perf-score:{app}-{platform}`); NEVER mix platforms in one trend
-- NEVER skip a dimension — unavailable → neutral 7 + annotate
-- Trend only at N≥5; regression = drop >0.5 → gap-analysis; >0.2 → light review
-- CI: median-of-3 lighthouse; never crash on missing process — degrade to static-only
+- Score EVERY dimension from real measurement — NEVER guess
+- Platform in title; NEVER mix platforms in one trend
+- Unavailable→neutral 7+annotate; NEVER skip
+- Trend only N≥5; regression=drop>0.5→gap-analysis; >0.2→light review
+- CI: median-of-3 lighthouse; degrade gracefully on missing process
+
 ## Output
 `PERF-SCORE:<app>—<date> DIMS:[Load|Render|Memory|Network|Bundle|Energy]=<1-10> AVG=<n.n> PLATFORM:<mob|desk|web> TREND:<delta>→<stable|drift|regression>`
-## Anti-Patterns
-Score without real data · cross-platform in same trend · skip bundle/cache · score once
-## Reference
-Thresholds table + quick checks + worked examples (5) → docs/skills/performance-tracker/reference.md
-## Anti-Rationalization
 
+## Anti-Rationalization
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "score sin 6 dims" | Score sin 6 dims o dimensión adivinada | Verificar Hard Rules: Score EVERY dimension medición real + neutral 7 si unavailable + thresholds file:line |
-| "trend sin historial" | Trend sin N≥5 historial | Verificar Score Storage: mem_save perf-score:{app}-{platform} + mem_search prev5 vs recent5 + Trend cada 10 |
-| "mix plataformas o single run" | Trend mezclando plataformas o single lighthouse | Verificar NEVER mix platforms + median-of-3 lighthouse + regression >0.5→gap-analysis + never crash no process |
-
+| "score sin 6 dims" | Missing/guessed dimension | Real measurement + neutral 7 if unavailable |
+| "trend sin historial" | N<5 trend | mem_save perf-score + mem_search prev5 vs recent5 |
+| "mix plataformas" | Cross-platform trend | NEVER mix; median-of-3; regression>0.5→gap-analysis |
 
 ## Red Flags
-- No baseline measurement → STOP, re-read skill
-- Second occurrence of same rationalization → force RED zone
+- No baseline measurement → STOP
+- Same rationalization 2× → force RED
 
 ## Verification
-- benchmark-core.ps1 -Gate before/after; cross-ref-check.ps1 → SKILL.md OK
-- Output matches ## Output contract exactly — response matches the ## Output contract format exactly
-- frontmatter (name/description/triggers/token_budget) stable — name, description, triggers, token_budget present and stable
+- benchmark-core.ps1 -Gate before/after + cross-ref-check.ps1 → OK
+- Output matches ## Output contract exactly; frontmatter (name/description/triggers/token_budget) stable
+- token_budget: total tokens within frontmatter token_budget; no anti-patterns reintroduced
 - cross-refs: each referenced skill exists
-- anti-patterns: none of the listed anti-patterns reintroduced — none reintroduced
-- token_budget: total tokens within frontmatter token_budget
-## Refs
-Cross-Refs: performance | auto-metrics | perf-profiling
+
+→ docs/skills/performance-tracker/reference.md · Cross-Refs: performance | auto-metrics | perf-profiling

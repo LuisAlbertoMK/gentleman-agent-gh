@@ -3,45 +3,40 @@ name: ui-engine
 description: "UI system — Grid/Flexbox/@layer/:has(), container queries, compositor-only animation, OKLCH tokens, component patterns"
 triggers: "ui, layout, responsive, animation, design tokens, css, grid, flexbox, container query, dark mode, component layout, page layout, component patterns, hooks, compound components, state management"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 3027
+token_budget: 2200
 ---
-## When to Use
-UI: Grid/Flexbox/@layer/:has()·CQ·OKLCH·anim·patterns.
 ## Decision Tree
-`1D→Flex|2D→Grid|Child→Subgrid|Parent→:has()|Unknown→auto-fit,minmax(280px,1fr)|CQ(container-type:inline-size)|Page→MQ`
+1D→Flex | 2D→Grid | Child→Subgrid | Parent→:has() | Unknown→auto-fit,minmax(280px,1fr) | CQ(container-type:inline-size) | Page→MQ
+
 ## Layout
-`.flex{display:flex;flex-wrap:wrap;gap:1rem}.flex>*,.fi{flex:1 1 250px;min-inline-size:0}`
-`@layer base,components,utilities,overrides;`
-Flex:1|1 1 250px|auto|margin:auto|shrink:0. Grid:span2|area:hd|center. Max3nest.
+`@layer base,components,utilities,overrides;` Flex:1|1 1 250px|auto|shrink:0. Grid:span2|area:hd|center. Max3nest.
+
 ## Animation
-4p: State·Feedback·Attention·Spatial; else cut; only `transform`/`opacity`; 120/200/300ms hover/dropdown/modal; ≤500ms; <200ms/elem.
+4p: State·Feedback·Attention·Spatial; else cut. Only `transform`/`opacity`; 120/200/300ms; ≤500ms; <200ms/elem.
+
 ## Tokens
-PRIM→SEM→COMP:`--blue-500→--primary→--btn-bg`
-OKLCH>HSL: perceptual, dark, wide, ≥4.5:1. `vw`=page, `cqi`=container.
+PRIM→SEM→COMP: `--blue-500→--primary→--btn-bg`. OKLCH>HSL: perceptual, ≥4.5:1. `vw`=page, `cqi`=container.
+
 ## A11y
-`color-scheme:light dark`→native controls. `:focus-visible{outline:2px solid var(--pri);outline-offset:2px}` keyboard-only, never `outline:none`. Contrast ≥4.5:1→accessibility.
+`color-scheme:light dark`→native controls. `:focus-visible{outline:2px solid var(--pri);outline-offset:2px}`. Never `outline:none`. Contrast≥4.5:1.
+
 ## Output
 `UI-IMPL:<component>—<date> PATTERN:[flex|grid|cq|tokens]<used> VERIFY:[a11y|contrast|reduced-motion|CQ]→<pass/fail>`
+
 ## Anti-Patterns
-Flex2D·Grid1D·!important vs @layer·flex:1 w/o min-inline-size:0·container-type:size w/o block-size·grid-auto-flow:dense·MQ for components·Decorative·>500ms·transition:all·HSL/RGB·Fixed font·cqi outside container·Prop drill>3L·Context high-freq
+Flex2D · Grid1D · !important vs @layer · flex:1 w/o min-inline-size:0 · MQ for components · >500ms · transition:all · HSL/RGB · cqi outside container
+
 ## Anti-Rationalization
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Grid cuando Flexbox basta" | 1D layout con Grid (span/area sobran) | Decision Tree: 1D→Flex 2D→Grid, verify `@layer`+CQ |
-| "Animar properties que disparan layout" | transition:all / width/height/top/left | Transform+opacity only 120/200/300ms + reduced-motion .01ms |
-| "Tokens ad-hoc fuera de OKLCH" | hex/HSL sin chain, sin contrast | PRIM→SEM→COMP OKLCH + verify ≥4.5:1 `color-scheme` |
-
-## Red Flags
-- Doing work without checking output format → STOP, re-read skill
-- Second occurrence of same rationalization → force RED zone
+| "Grid cuando Flexbox basta" | 1D layout con Grid | Decision Tree: 1D→Flex 2D→Grid |
+| "Animar layout properties" | transition:all / width/height | Transform+opacity only + reduced-motion |
+| "Tokens ad-hoc" | hex/HSL sin chain | PRIM→SEM→COMP OKLCH + ≥4.5:1 |
 
 ## Verification
 - Output matches ## Output contract + file:line citation; cross-ref-check.ps1 → SKILL.md OK
-- Frontmatter (name/description/triggers/token_budget) stable; cross-refs exist; no listed anti-patterns
-- Output: response matches the ## Output contract format exactly
+- Frontmatter (name/description/triggers/token_budget) stable; cross-refs exist; no anti-patterns
 - token_budget: total tokens within frontmatter token_budget
-- frontmatter: name, description, triggers, token_budget present and stable
-- cross-refs: each referenced skill exists
 - anti-patterns: none of the listed anti-patterns reintroduced
-## Cross-Refs: baseline-ui | accessibility | performance | web-quality-audit | seo | visual-testing | vision-analyze
-> docs/skills/ui-engine/reference.md
+
+→ docs/skills/ui-engine/reference.md · Cross-Refs: baseline-ui | accessibility | performance | web-quality-audit | seo | visual-testing | vision-analyze
