@@ -6,7 +6,7 @@
 
 ## System Overview
 
-Gentleman Agent is a **multi-agent AI development team** for OpenCode. It provides 45 agents, 78 skills, and 91 top-level scripts (84 PowerShell + 7 shell) that work together to deliver verified, high-quality code changes.
+Gentleman Agent is a **multi-agent AI development team** for OpenCode. It provides 58 agents, 96 skills (+ `_shared`), and 135 top-level scripts (128 PowerShell + 7 shell) that work together to deliver verified, high-quality code changes.
 
 ### Core Principles
 
@@ -44,7 +44,7 @@ Gentleman Agent is a **multi-agent AI development team** for OpenCode. It provid
     ▼                    ▼                    ▼
 ┌─────────┐      ┌─────────────┐      ┌───────────┐
 │ Skills   │      │   Scripts   │      │  Memory   │
-│ (79 +    │      │  (91+ PS1)  │      │  (Engram) │
+│ (96 +    │      │  (135 PS1+) │      │  (Engram) │
 │  _shared)│      │             │      │           │
 └────┬─────┘      └──────┬──────┘      └─────┬─────┘
      │                   │                   │
@@ -73,7 +73,7 @@ Gentleman Agent is a **multi-agent AI development team** for OpenCode. It provid
 
 ### 2. Skill Layer (`.agents/skills/`)
 
-78 skills + `_shared` references. Organized by domain:
+96 skills + `_shared` references. Organized by domain:
 
 | Domain | Skills | Examples |
 |--------|--------|----------|
@@ -90,16 +90,16 @@ Gentleman Agent is a **multi-agent AI development team** for OpenCode. It provid
 
 ### 3. Script Layer (`scripts/`)
 
-91 top-level scripts (84 PowerShell + 7 shell) organized by function:
+135 top-level scripts (128 PowerShell + 7 shell) organized by function:
 
 | Category | Scripts | Key Files |
 |----------|---------|-----------|
 | Scoring | 3 | `score-auto.ps1`, `lib/score-dims.ps1`, `restore-project-score.ps1` |
-| Quality Gate | 5 | `quality-gate`, `pssa-gate`, `cross-ref-check`, `capture-errors`, `verify` |
+| Quality Gate | 4 | `pssa-gate`, `cross-ref-check`, `capture-errors`, `verify` (skill + CI workflow, no .ps1) |
 | Session | 4 | `close-session`, `inter-track`, `session-miner`, `health-check` |
 | Skills | 8 | `skill-graph`, `skill-resolver-fast`, `skill-validate`, `check-skill-drift` |
-| Sync | 5 | `sync-all`, `sync-vmk`, `pull-upstream`, `backup`, `restore` |
-| Learning | 6 | `wisdom-store`, `wisdom-loader`, `wisdom-forge`, `run-dreaming` |
+| Sync | 5 | `sync-all`, `sync-vmk`, `pull-upstream`, `archive/backup.ps1`, `restore` |
+| Learning | 5 | `wisdom-core`, `wisdom-maintenance`, `run-dreaming`, `wisdom-stats`, `wisdom-demote` |
 | Setup | 3 | `setup-machine.ps1/.sh`, `setup-install.ps1`/`install.sh`, `global-setup` |
 | Analysis | 5 | `pipeline-analyze`, `project-profile`, `trend`, `token-count` |
 
@@ -273,7 +273,7 @@ Fix applied
 
 ```
 gentleman-agent-gh/
-├── .agents/skills/          # 78 skills + _shared
+├── .agents/skills/          # 96 skills + _shared
 ├── .github/workflows/       # CI/CD (quality-gate, release)
 ├── docs/
 │   ├── ARCHITECTURE.md      # This file
@@ -288,7 +288,7 @@ gentleman-agent-gh/
 ├── scripts/
 │   ├── lib/                 # Shared libraries (score-dims.ps1)
 │   ├── tests/               # Pester tests
-│   └── *.ps1                # 84 operational PowerShell scripts (+ 7 .sh)
+│   └── *.ps1                # 128 operational PowerShell scripts (+ 7 .sh)
 ├── AGENTS.md                # Persona + project rules
 ├── PROTOCOL.md              # Operational workflows
 ├── opencode.json            # Agent definitions + permissions

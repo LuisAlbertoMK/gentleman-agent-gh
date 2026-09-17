@@ -50,7 +50,7 @@
 
 ## Load Rule
 
-1. `skill` tool with name (skills.paths registered in opencode.json — 165 skills globally discoverable: 78 project + 87 global)
+1. `skill` tool with name (skills.paths registered in opencode.json — 195 skills globally discoverable: 96 project + 99 global)
 2. Fallback: `read skills/{name}/SKILL.md` directly from disk
 3. Assets: `read skills/{name}/references/` or `skills/{name}/assets/` for templates
 
