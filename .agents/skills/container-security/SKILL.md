@@ -52,6 +52,12 @@ Reviewing Dockerfiles, docker-compose, K8s manifests, Helm charts, or "is this c
 ## Verification
 - grep -rn process.env + npm audit before commit
 - cross-ref-check.ps1 → SKILL.md OK
+## Containers/IaC Playbook
+Image: non-root USER 10001 + runAsNonRoot + readOnlyRootFilesystem
+Priv: privileged false | drop ALL + add min | no cap-add ALL | no hostNetwork/PID/sock
+Secrets: k8s Secret / mounts - never ENV/ARG (history) | tmpfs 0444
+Tags/Scan: pin @sha256 digest - never :latest | trivy/grype in CI fail CRIT/HIGH
+> changelog: odd/tasks/mejora-security.md (2026-09-18, slice 4)
 ## Refs
 security-scanner · best-practices · quality-gate · auth-hardening · llm-security · infra-audit
 ---
