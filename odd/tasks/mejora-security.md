@@ -67,6 +67,7 @@ afectado, precedente `e47d202f` ("bump budgets safely, not trim") — desvío re
 | Date | Slice | Reviewer | Notes |
 |------|-------|----------|-------|
 | 2026-09-18 | 1 (API REST playbook) | plan-execution + adversarial-breaker | freeze `HEAD-a77a2c4a-e69de29b`; commit `feat(skills): add API REST security playbook` (SHA en `git log`); 3 skills extendidos, frontmatter intacto salvo desvío documentado: `security-scanner` token_budget 2750→2950 (gate-forced, precedente e47d202f "bump budgets safely, not trim"); YAML OK; check-token-budget passed; regression 101/101; breaker: 5/5 ataques con file:line — APPROVED |
+| 2026-09-18 | 2 (frontend SPA playbook) | plan-execution + adversarial-breaker | freeze `HEAD-6631a2b2-e69de29b`; commit `feat(skills): add frontend SPA security playbook` (SHA en `git log`); 2 skills extendidos (auth-hardening: token storage/CSRF cookie-auth; best-practices: XSS/CSP/open-redirect/postMessage/deps); **desvío del plan**: no se tocó security-scanner (3199 B = 1 B del cap 3200) ni se creó reference — contenido SPA en otros skills por restricción heredada; frontmatter intacto salvo desvío gate-forced: auth-hardening token_budget 2750→3200, best-practices 2807→3450 (precedente e47d202f); YAML OK; check-token-budget passed; regression 101/101; breaker: 5/5 ataques SPA con file:line — APPROVED |
 
 ## Rollback
 

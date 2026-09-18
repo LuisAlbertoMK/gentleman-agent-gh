@@ -3,7 +3,7 @@ name: best-practices
 description: "Apply modern web development best practices for security, compatibility, and code quality."
 triggers: "best practices, security audit, modernize code, code quality, check vulnerabilities"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2807
+token_budget: 3450
 ---
 
 ## When to Use
@@ -40,6 +40,13 @@ Valid HTML(no dup IDs) | Semantic HTML5 | Explicit img dims | Event delegation |
 
 ## Anti-Patterns
 Blindly copy-paste headers without verifying · Ignore FP alerts · Apply all rules to every project · No Context7 check for current API versions · Skip audit step
+
+## SPA Playbook (web/XSS/deps)
+XSS: contextual encoding (HTML/attr/JS/URL) | NO dangerouslySetInnerHTML/v-html (DOMPurify + tag/attr allowlist if forced) | DOM clobbering: never trust window[userKey]/named-element lookups - use getElementById + validate id/name | textContent > innerHTML
+CSP essentials: default-src 'none'; script-src 'self' nonce (NO unsafe-inline/eval); object-src 'none'; base-uri 'self'; frame-ancestors 'self'; upgrade-insecure-requests | validate headers pre-deploy
+Open redirect: allowlist or same-origin prefix check on ?next=/returnUrl (reject //evil.com, protocol-relative), else 302 / | postMessage: verify event.origin === expected + message shape BEFORE use; never send auth tokens via postMessage
+Deps: npm audit --audit-level=high in CI (fail build) | lockfile committed + exact pin | overrides/resolutions for vulnerable transitive | npm ls typosquat check
+> changelog: odd/tasks/mejora-security.md (2026-09-18, slice 2)
 
 ---
 
