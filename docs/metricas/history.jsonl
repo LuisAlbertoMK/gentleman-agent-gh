@@ -24,3 +24,4 @@
 {"commit":"50602dfa","trend":"up","gate":"25/25","score":9.4,"date":"2026-09-15","dimensions":{"Score Depth":9.3}}{"gate":"25/25","date":"2026-09-17","commit":"861a75bd","trend":"up","dimensions":{"Score Depth":9.3},"score":9.8}
 {"score":10.0,"gate":"25/25","commit":"861a75bd","trend":"up","dimensions":{"Score Depth":9.5},"date":"2026-09-17"}
 {"commit":"d3560817","dimensions":{"Score Depth":9.5},"trend":"stable","date":"2026-09-18","score":10.0,"gate":"25/25"}
+{"score":9.5,"commit":"a77a2c4a","gate":"25/25","dimensions":{"Score Depth":9.4},"trend":"down","date":"2026-09-18"}
