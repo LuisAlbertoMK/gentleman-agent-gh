@@ -2,6 +2,8 @@
 param(
     [switch]$Help
 )
+
+Set-StrictMode -Version Latest
 <#
 .SYNOPSIS
     RDD freeze hash generator — HEAD-xxxxxxxx-hash format.

@@ -39,6 +39,8 @@ param(
   [switch]$Quiet
 )
 
+Set-StrictMode -Version Latest
+
 $failHits = @()
 $warnHits = @()
 $failReasons = @()
