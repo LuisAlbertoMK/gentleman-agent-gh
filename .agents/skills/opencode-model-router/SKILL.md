@@ -6,32 +6,33 @@ license: Apache-2.0
 metadata:
   tags: [engineering, routing, orchestration, multi-model]
   author: gentleman-vMK
-  version: "3.1"
+  version: "3.3"
 token_budget: 3200
 ---
 
-## Routing Table (FREE 2026-09-10 → reference.md for Security Gate, Strategy, Laguna notes)
+## Routing Table (SSoT opencode.json 2026-09-18 → reference.md for Security Gate, Strategy, Catalog)
 
+> ⚠️ **Skill is NOT SSoT** — opencode.json is the source of truth. This table reflects actual model assignments.
 > Full detail → docs/skills/opencode-model-router/reference.md.
 
-| Task | Action | Agent | Model (Free vigente) | Ctx | Fallback |
-|------|--------|-------|----------------------|-----|----------|
-| Security/vulnerability | DELEGATE | `gentleman-security` | Nemotron 3 Ultra Free | 1M | `gentleman-deep` -> `gentleman-vMK` (Big Pickle) |
-| SEO/content | DELEGATE | `gentleman-seo` | Nemotron 3 Ultra Free | 1M | `gentleman-vMK` (Big Pickle) |
-| Infrastructure/K8s/Terraform | DELEGATE | `gentleman-infra` | Muse Spark 1.3 Contributor Free (code-gen) — SSoT opencode.json | 200K | `gentleman-deep` -> `gentleman-vMK` (Big Pickle) |
-| Frontend/UI/a11y | DELEGATE | `gentleman-frontend` | Big Pickle | 200K | `gentleman-quick` -> `gentleman-vMK` (Big Pickle) |
-| Performance/profiling | DELEGATE | `gentleman-performance` | Nemotron 3 Ultra Free | 1M | `gentleman-deep` -> `gentleman-vMK` |
-| Data/SQL/Python | DELEGATE | `gentleman-datascience` | Big Pickle | 200K | `gentleman-codex` -> `gentleman-vMK` (Big Pickle) |
-| Documentation | DELEGATE | `gentleman-docs` | Big Pickle (always free, reasoning) | 200K | `gentleman-vMK` |
-| Implement plan | DELEGATE | `gentleman-implementer` | Muse Spark 1.3 Contributor Free (code-gen) | 200K | `gentleman-vMK` (Big Pickle) |
-| Architecture/code review | DIRECT | `gentleman-vMK` | — | — | — |
-| Quick edit | DIRECT | `gentleman-quick` | Big Pickle | 200K | `gentleman-codex` |
-| Script generation | DIRECT | `gentleman-codex` | Muse Spark 1.3 Contributor Free — alt Big Pickle | 200K | `gentleman-quick` (Big Pickle) |
-| Default | DIRECT | `gentleman-vMK` | — | — | — |
+| Task | Action | Agent | Model (SSoT opencode.json) | Ctx | Fallback |
+|------|--------|-------|----------------------------|-----|----------|
+| Security/vulnerability | DELEGATE | `gentleman-security` | DeepSeek V4 Flash (`opencode-go/deepseek-v4-flash`) | — | `gentleman-deep` -> `gentleman-vMK` |
+| SEO/content | DELEGATE | `gentleman-seo` | DeepSeek V4 Flash (`opencode-go/deepseek-v4-flash`) | — | `gentleman-vMK` |
+| Infrastructure/K8s/Terraform | DELEGATE | `gentleman-infra` | MiMo V2.5 (`opencode-go/mimo-v2.5`) | — | `gentleman-deep` -> `gentleman-vMK` |
+| Frontend/UI/a11y | DELEGATE | `gentleman-frontend` | Muse Spark 1.3 Contributor (`opencode-go/muse-spark-1.3-contributor`) | — | `gentleman-quick` -> `gentleman-vMK` |
+| Performance/profiling | DELEGATE | `gentleman-performance` | DeepSeek V4 Flash (`opencode-go/deepseek-v4-flash`) | — | `gentleman-deep` -> `gentleman-vMK` |
+| Data/SQL/Python | DELEGATE | `gentleman-datascience` | Muse Spark 1.3 Contributor (`opencode-go/muse-spark-1.3-contributor`) | — | `gentleman-codex` -> `gentleman-vMK` |
+| Documentation | DELEGATE | `gentleman-docs` | Muse Spark 1.3 Contributor (`opencode-go/muse-spark-1.3-contributor`) | — | `gentleman-vMK` |
+| Implement plan | DELEGATE | `gentleman-implementer` | MiMo V2.5 (`opencode-go/mimo-v2.5`) | — | `gentleman-vMK` |
+| Architecture/code review | DIRECT | `gentleman-vMK` | Muse Spark 1.3 Contributor (`opencode-go/muse-spark-1.3-contributor`) | — | — |
+| Quick edit | DIRECT | `gentleman-quick` | Muse Spark 1.3 Contributor (`opencode-go/muse-spark-1.3-contributor`) | — | `gentleman-codex` |
+| Script generation | DIRECT | `gentleman-codex` | MiMo V2.5 (`opencode-go/mimo-v2.5`) | — | `gentleman-quick` |
+| Default | DIRECT | `gentleman-vMK` | Muse Spark 1.3 Contributor (`opencode-go/muse-spark-1.3-contributor`) | — | — |
 
 ## Implementer
-`gentleman-implementer` (Muse Spark 1.3 Contributor Free — 200K, code-gen) — precise plan execution. No unrequested changes. Alt: Big Pickle.
-Avoid: Qwen3.7 Max (re-plans, paid), Nemotron 3 Ultra (over-analyzes).
+`gentleman-implementer` (MiMo V2.5 — `opencode-go/mimo-v2.5`) — precise plan execution. No unrequested changes.
+Avoid: Qwen 3.7 Plus (`opencode-go/qwen3.7-plus`, re-plans), DeepSeek V4 Flash (over-analyzes).
 
 ## Context -> Action
 | Context | Action |

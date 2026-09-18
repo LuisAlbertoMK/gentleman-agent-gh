@@ -8,26 +8,26 @@
 
 ### Example 1: Security Audit Request
 **User**: "Audit our JWT auth for vulnerabilities"
-**Route**: Security/vulnerability → DELEGATE → `gentleman-security-sub` (Nemotron 3 Ultra Free)
-**Why**: Security tasks need deep analysis; Ultra Free has 1M context for large codebases
+**Route**: Security/vulnerability → DELEGATE → `gentleman-security-sub` (DeepSeek V4 Flash)
+**Why**: Security tasks need deep analysis; DeepSeek V4 Flash provides strong reasoning
 **Fallback**: If twin unavailable → `gentleman-deep-sub` → `general`
 
 ### Example 2: Implement a Feature Plan
 **User**: "Execute the plan in SPEC-042: add rate limiting to API"
-**Route**: Implement plan → DELEGATE → `gentleman-implementer-sub` (Muse Spark 1.3 Contributor Free)
-**Why**: Precise execution, no over-analysis, fast model for implementation
+**Route**: Implement plan → DELEGATE → `gentleman-implementer-sub` (MiMo V2.5)
+**Why**: Precise execution, no over-analysis, strong code-gen model
 **Fallback**: `gentleman-quick-sub` → `general`
 
 ### Example 3: Deep Debugging Multi-File Bug
 **User**: "Root cause: intermittent 500s on /checkout, spans 3 services"
-**Route**: Deep debugging → DELEGATE → `gentleman-deep-sub` (Nemotron 3 Ultra Free)
-**Why**: Hypothesis-driven debugging needs reasoning depth + large context
+**Route**: Deep debugging → DELEGATE → `gentleman-deep-sub` (DeepSeek V4 Flash)
+**Why**: Hypothesis-driven debugging needs reasoning depth
 **Fallback**: `general` (no twin for deep-debugging beyond first fallback)
 
 ### Example 4: Quick One-Line Fix
 **User**: "Fix typo in error message at src/api/errors.ts:47"
-**Route**: Quick edit → DELEGATE → `gentleman-quick-sub` (Big Pickle)
-**Why**: Atomic edit, low risk, fast free model
+**Route**: Quick edit → DELEGATE → `gentleman-quick-sub` (Muse Spark 1.3 Contributor Free)
+**Why**: Atomic edit, low risk, fast model
 **Fallback**: `general`
 
 ### Example 5: Architecture Decision
@@ -82,7 +82,7 @@ assert_direct "Nightly cron job"            # → DIRECT forced
 
 ### Edge Case 2: Context Near Threshold (140K tokens)
 **Scenario**: Large codebase task at 140K context
-**Resolution**: Route to fast model (Big Pickle / Muse Spark 1.3) even if task type suggests Ultra
+**Resolution**: Route to fast model (Muse Spark 1.3 Contributor / MiMo V2.5) even if task type suggests stronger model
 **Rule**: Context budget > model preference when 100K-150K
 
 ### Edge Case 3: Twin Exists But Hidden (Whitelist Mismatch)
@@ -90,8 +90,8 @@ assert_direct "Nightly cron job"            # → DIRECT forced
 **Resolution**: Falls to `general` silently (per RUNTIME REALITY). Fix: regenerate opencode.json
 **Detection**: `scripts/regenerate-opencode.ps1 -Yes` then verify `gh api /repos/.../actions/runs`
 
-### Edge Case 4: Free Tier Exhausted Mid-Task
-**Scenario**: Nemotron 3 Ultra Free quota hit during `security-sub` delegation
+### Edge Case 4: Subagent Unavailable Mid-Task
+**Scenario**: Subagent delegation fails or times out during `security-sub` delegation
 **Resolution**: Automatic fallback chain triggers → `deep-sub` → `general`
 **Monitoring**: Check delegation logs for "fallback activated" pattern
 
@@ -102,7 +102,7 @@ assert_direct "Nightly cron job"            # → DIRECT forced
 1. **Route sensitive data to subagent** — Credentials, PII, secrets must stay in primary agent (DIRECT)
 2. **Delegate when context >150K** — Forces DIRECT regardless of task type
 3. **Skip fallback chain** — Always define fallback; twins can be unavailable
-4. **Pay when free covers it** — Qwen3.7 Max, paid Nemotron — free tier handles 95% of tasks
+4. **Pay when free covers it** — Qwen 3.7 Plus is paid; prefer Muse Spark 1.3 Contributor / MiMo V2.5 for most tasks
 5. **Forget security gate** — Check 3 conditions BEFORE consulting routing table
 6. **Combine analysis + execution in one delegation** — Split: analyzer understands, implementer executes
 
@@ -126,8 +126,8 @@ assert_direct "Nightly cron job"            # → DIRECT forced
 
 
 ## 🔧 IMPLEMENTER
-`gentleman-implementer-sub` (Muse Spark 1.3 Contributor Free) — precise execution. No unrequested changes.
-**Avoid**: Qwen3.7 Max (re-plans, paid), Nemotron 3 Ultra (over-analyzes).
+`gentleman-implementer-sub` (MiMo V2.5 — `opencode-go/mimo-v2.5`) — precise execution. No unrequested changes.
+**Avoid**: Qwen 3.7 Plus (re-plans, paid), DeepSeek V4 Flash (over-analyzes).
 
 ## Extended — Security Gate, Strategy y notas de catálogo (movido por ADR-048, cycle32-p2)
 
@@ -139,20 +139,36 @@ assert_direct "Nightly cron job"            # → DIRECT forced
 3. Context >150K? -> **DIRECT**
 4. Otherwise -> route a tabla.
 
-### Strategy (FREE — 2026-09-10, SSoT opencode.json — 4 ids free vigentes, 58 agents)
-- **100% Free**: SSoT opencode.json: 4 ids free vigentes (58 agents) — opencode/big-pickle (200K), opencode/muse-spark-1.3-contributor-free (200K code-gen), opencode/nemotron-3-ultra-free (1M), opencode-go/qwen3.6-plus. Sin mimo/ling/1.2 — todos retirados o actualizados a 1.3.
-- **1M context**: Nemotron 3 Ultra Free (1M) — único 1M vigente SSoT
-- **Vision**: MiMo V2.5 Free retirado 2026-09-10 (pi.dev 404) — sin vision free vigente; fallback Big Pickle para docs/general (SSoT)
-- **Code-gen**: Muse Spark 1.3 Contributor Free (200K) para implement/quick/script — SSoT opencode.json (actualizado desde 1.2)
-- **Fallback universal**: Big Pickle (always free) — SSoT
+### Strategy (SSoT opencode.json — 5 model ids, ~58 agents)
 
-### Notas de catálogo (ground truth 2026-09-10 SSoT movido)
-Ground truth 2026-09-10 SSoT: opencode/big-pickle (200K reasoning), opencode/muse-spark-1.3-contributor-free (200K code-gen), opencode/nemotron-3-ultra-free (1M reasoning), opencode-go/qwen3.6-plus. Retirados: opencode/mimo-v2.5-free (404 pi.dev), opencode/ling-3.0-flash-fin-free (1M retirado), opencode/muse-spark-1.2-contributor-free (reemplazado por 1.3), opencode/nemotron-3.5-lightning-free (sucesor super-free pero no en SSoT final 4), opencode/deepseek-v4-flash-free y opencode/laguna-s-2.1-free (no SSoT final). Pricing table 6 free explícitos históricos consolidados a 4 SSoT.
+> ⚠️ **Skill is NOT SSoT** — opencode.json is the source of truth. Model assignments below reflect actual config as of 2026-09-18.
 
-* Nemotron 3 Ultra Free es único 1M en SSoT final. Modelos históricos tabla 8 ids migrados/retirados — ningún retired activo en routing table.
+- **Model IDs (5 unique)**:
+  - `opencode-go/deepseek-v4-flash` — DeepSeek V4 Flash (security, seo, performance, deep, reviewer, aem, reasoning, initializer)
+  - `opencode-go/mimo-v2.5` — MiMo V2.5 (codex, infra, implementer, sdd-apply/archive/init/tasks)
+  - `opencode-go/muse-spark-1.3-contributor` — Muse Spark 1.3 Contributor (orchestrator, quick, frontend, datascience, docs, sdd-verify)
+  - `opencode-go/qwen3.7-plus` — Qwen 3.7 Plus (code-review specialist)
+  - `opencode/muse-spark-1.3-contributor-free` — Muse Spark 1.3 Contributor Free (subagents: quick-sub, frontend-sub, datascience-sub, docs-sub)
+- **No Nemotron** in current config — retired
+- **No big-pickle** in current config — `opencode/big-pickle` not found; docs referenced this as alias but it does not exist in opencode.json
+- **Subagent free tier**: `-sub` variants use `opencode/muse-spark-1.3-contributor-free`; primary agents use `opencode-go/` prefix models
+- **Vision**: No vision-specific model in current config
 
-> Nota SSoT: 58 agents en opencode.json, 4 modelos free vigentes. Laguna/DeepSeek/MiMo/Ling no asignados — fallback Big Pickle si se estabiliza pi.dev, pero no SSoT.
+### Notas de catálogo (ground truth SSoT 2026-09-18)
+Ground truth SSoT opencode.json: 5 model ids, ~58 agents. Actual:
+- `opencode-go/deepseek-v4-flash` — deep reasoning, security, seo, performance, aem, reviewer, initializer
+- `opencode-go/mimo-v2.5` — code-gen, infra, implementer, sdd
+- `opencode-go/muse-spark-1.3-contributor` — orchestrator, quick, frontend, datascience, docs, sdd-verify
+- `opencode-go/qwen3.7-plus` — code-review specialist
+- `opencode/muse-spark-1.3-contributor-free` — subagent free tier
+
+Retirados (no en config actual): `opencode/big-pickle`, `opencode/nemotron-3-ultra-free`, `opencode-go/qwen3.6-plus`, `opencode/mimo-v2.5-free`, `opencode/ling-3.0-flash-fin-free`, `opencode/muse-spark-1.2-contributor-free`, `opencode/nemotron-3.5-lightning-free`, `opencode/deepseek-v4-flash-free`, `opencode/laguna-s-2.1-free`. No vision free vigente.
+
+* Modelos históricos migrados/retirados — ningún retired activo en routing table.
+
+> Nota SSoT: 5 model ids en opencode.json. No hay free-tier distinction for `opencode-go/` prefix models (all require auth). Only `opencode/muse-spark-1.3-contributor-free` is explicitly free-tier.
 
 ### Changelog (movido)
 - 3.1 (2026-09-02): Sync catálogo free vigente (8 ids). Reemplaza nemotron-3-super-free->3.5-lightning-free, kimi-k2.5-free->mimo-v2.5-free, deepseek->ling/muse-spark según dominio. Añade columna Ctx y nota vigencia. Drift fix cycle32-p2: gentleman-seo -> Nemotron 3 Ultra Free (SSoT opencode.json), gentleman-datascience -> Big Pickle (SSoT opencode.json).
 - 3.2 (2026-09-10): Retiro MiMo V2.5 Free (pi.dev 404) — quick/datascience → Big Pickle (SSoT opencode.json/opencode-base.json); implementer prescriptivo → Muse Spark 1.3 Contributor Free. Solo prescriptivo actualizado; historial 2026-09-02 intacto.
+- 3.3 (2026-09-18): Documentation alignment with actual opencode.json. Removed stale "big-pickle", "Nemotron 3 Ultra Free", "qwen3.6-plus" references. Actual 5 model ids: deepseek-v4-flash, mimo-v2.5, muse-spark-1.3-contributor, qwen3.7-plus, muse-spark-1.3-contributor-free. Security/seo/performance → deepseek-v4-flash (was Nemotron); infra/implementer → mimo-v2.5 (was muse-spark-free/big-pickle); frontend/datascience/docs → muse-spark-1.3-contributor (was big-pickle).
