@@ -58,6 +58,14 @@ if ($RecordEngramEvent -and [string]::IsNullOrWhiteSpace($TopicKey)) {
 # Reference remaining params so PSReviewUnusedParameter sees them as used (actual logic is inside the locked scriptblock)
 $null = $Increment; $null = $Reset; $null = $Target; $null = $Quiet; $null = $EventKind
 
+# Slice 4: accept engram-saved kind after verification; pending-consumed remains as audit trail
+# NOTE (Slice 4): engram-saved es vocabulary-only / advisory — ningún productor verificado existe aún;
+# la verificación llega en Slice 2/3. Ningún consumidor debe tratar kind=engram-saved como prueba de persistencia hasta entonces.
+$validKinds = @("pending-consumed", "engram-saved")
+if ($RecordEngramEvent -and ($validKinds -notcontains $EventKind)) {
+    throw "EventKind '$EventKind' is not valid. Allowed kinds: $($validKinds -join ', ')"
+}
+
 # Initialize if not exists
 if (-not (Test-Path -LiteralPath $trackPath)) {
     $init = @{

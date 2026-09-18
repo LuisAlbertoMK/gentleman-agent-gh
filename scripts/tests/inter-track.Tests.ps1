@@ -79,12 +79,9 @@ Describe 'inter-track G7 receipt — event recorded + history appended (locked)'
         $result.engram_recorded | Should -Be $true
         $result.engram_event.topic_key | Should -Be "checkpoint/session-state"
     }
-    It 'supports custom EventKind' {
-        $result = Invoke-TrackQuiet -Params @{ RecordEngramEvent = $true; TopicKey = "custom/topic"; EventKind = "custom-kind" }
-        $after = Get-TrackData
-        $after.history[-1].kind | Should -Be "custom-kind"
-        $after.history[-1].topic_key | Should -Be "custom/topic"
-        $result.engram_event.kind | Should -Be "custom-kind"
+    It 'rejects custom EventKind (only pending-consumed and engram-saved allowed)' {
+        { Invoke-TrackQuiet -Params @{ RecordEngramEvent = $true; TopicKey = "custom/topic"; EventKind = "custom-kind" } } | Should -Throw -ExpectedMessage "*EventKind*not valid*"
+        (Get-TrackData).history.Count | Should -Be 0
     }
     It 'defaults EventKind to pending-consumed when not specified' {
         $result = Invoke-TrackQuiet -Params @{ RecordEngramEvent = $true; TopicKey = "checkpoint/session-state" }
@@ -213,5 +210,39 @@ Describe 'inter-track WhatIf support' {
         $after = Get-TrackData
         $after.history.Count | Should -Be 0
         $after.cycle.count | Should -Be $before2.cycle.count
+    }
+}
+
+Describe 'inter-track EventKind validation (Slice 4)' {
+    BeforeEach { Reset-TrackForTest -CycleId "CYC-KIND-001" -Count 10 }
+    It 'accepts engram-saved kind and records it' {
+        $result = Invoke-TrackQuiet -Params @{ RecordEngramEvent = $true; TopicKey = "checkpoint/session-state"; EventKind = "engram-saved" }
+        $after = Get-TrackData
+        $after.history.Count | Should -Be 1
+        $after.history[0].kind | Should -Be "engram-saved"
+        $after.history[0].topic_key | Should -Be "checkpoint/session-state"
+        $result.engram_recorded | Should -Be $true
+        $result.engram_event.kind | Should -Be "engram-saved"
+    }
+    It 'accepts pending-consumed kind (audit trail preserved)' {
+        $result = Invoke-TrackQuiet -Params @{ RecordEngramEvent = $true; TopicKey = "checkpoint/session-state"; EventKind = "pending-consumed" }
+        $after = Get-TrackData
+        $after.history.Count | Should -Be 1
+        $after.history[0].kind | Should -Be "pending-consumed"
+        $result.engram_recorded | Should -Be $true
+    }
+    It 'rejects invalid kind with descriptive error' {
+        { Invoke-TrackQuiet -Params @{ RecordEngramEvent = $true; TopicKey = "checkpoint/session-state"; EventKind = "invalid-kind" } } | Should -Throw -ExpectedMessage "*EventKind*not valid*"
+        (Get-TrackData).history.Count | Should -Be 0
+    }
+    It 'rejects empty kind' {
+        { Invoke-TrackQuiet -Params @{ RecordEngramEvent = $true; TopicKey = "checkpoint/session-state"; EventKind = "" } } | Should -Throw -ExpectedMessage "*EventKind*not valid*"
+        (Get-TrackData).history.Count | Should -Be 0
+    }
+    It 'defaults to pending-consumed when EventKind omitted' {
+        $result = Invoke-TrackQuiet -Params @{ RecordEngramEvent = $true; TopicKey = "checkpoint/session-state" }
+        $after = Get-TrackData
+        $after.history[0].kind | Should -Be "pending-consumed"
+        $result.engram_event.kind | Should -Be "pending-consumed"
     }
 }
