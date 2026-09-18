@@ -7,6 +7,8 @@ token_budget: 2664
 ---
 ## When to Use
 Local vision analysis — screenshots, UI review, error detection. Offline: if 127.0.0.1:11434 unreachable → degraded graceful, no crash (perf-offline-fallback.ps1).
+## Differentiation
+vision-analyze = local LLM analysis via Ollama (127.0.0.1:11434) — semantic/feel review, NOT visual regression. Visual regression/pixel diffing → `visual-testing` (Playwright `toHaveScreenshot`).
 ## Modes
 `ui` layout/contrast/broken | `error` msgs+components | `design` spacing/typo/color | `accessibility` WCAG contrast/touch | `performance` CLS/images/loading
 ## Security

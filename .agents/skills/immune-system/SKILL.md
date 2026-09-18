@@ -3,11 +3,11 @@ name: immune-system
 description: "Immunity against repeated errors - detect, diagnose, document to anti-pattern catalog, immunize in AGENTS.md rules."
 triggers: "Immune System, anti-pattern, permanent immunity"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 1898
+token_budget: 2000
 ---
 
 ## When to Use
-Permanent immunity against repeated errors — detect, diagnos
+Permanent immunity against repeated errors — detect, diagnose, document to anti-pattern catalog, immunize in AGENTS.md rules.
 
 ## Protocol — Every failure = asset. Once documented -> permanent immunity.
 
