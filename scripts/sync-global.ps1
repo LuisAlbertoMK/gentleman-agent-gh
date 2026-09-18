@@ -207,12 +207,14 @@ if(-not $NoAgentSync){Write-Step "Agent sync" {
     $agentNames=@($proj.agent.PSObject.Properties.Name | Where-Object { $_ -like 'gentleman-*' -or $_ -like 'gentle-*' -or $_ -like 'sdd-*' })
     if($glob.PSObject.Properties.Match('agent').Count-eq 0){$glob|Add-Member -Name agent -Value @{} -MemberType NoteProperty -Force}
     if($proj.PSObject.Properties.Match('agent').Count-eq 0){Write-Warning "  No project agents";$report.steps["agent_sync"]=@{added=0;note="no project agents"}}
-    else{$added=0;$updated=0; foreach($n in $agentNames){$sp=$proj.agent.PSObject.Properties[$n]; if($null-eq$sp){continue};$gh=$glob.agent.PSObject.Properties.Match($n).Count-gt 0;$glob.agent|Add-Member -Name $n -Value $sp.Value -MemberType NoteProperty -Force;if($gh){$updated++}else{$added++}}
+    else{$added=0;$updated=0; foreach($n in $agentNames){$sp=$proj.agent.PSObject.Properties[$n]; if($null-eq$sp){continue};$gh=$glob.agent.PSObject.Properties.Match($n).Count-gt 0;if($gh){$aJson=$proj.agent.$n|ConvertTo-Json -Depth 10 -Compress;$bJson=$glob.agent.$n|ConvertTo-Json -Depth 10 -Compress;if($aJson-ne$bJson){$updated++;$glob.agent|Add-Member -Name $n -Value $sp.Value -MemberType NoteProperty -Force}}else{$added++;$glob.agent|Add-Member -Name $n -Value $sp.Value -MemberType NoteProperty -Force}}
         # FIX-C(c): prune *-semi absent from canonical (ADR-033). Criterion: name -like '*-semi' AND absent from opencode.json:agent. No allowlist in config -> narrow *-semi only; a future legit global *-semi would be pruned (known limitation).
         $pruned=0; foreach($gp in @($glob.agent.PSObject.Properties.Name)){ if($gp -like '*-semi' -and $proj.agent.PSObject.Properties.Match($gp).Count -eq 0){ $glob.agent.PSObject.Properties.Remove($gp); $pruned++ } }
         Write-Verbose "prune *-semi absent-from-canonical: $pruned (ADR-033)"
-        if(-not$NoAgentsMd){$src=Join-Path (Split-Path $projectCfg -Parent) "AGENTS.md";$dst=Join-Path (Split-Path $globalCfg -Parent) "AGENTS.md";if(Test-Path $src -PathType Leaf){Copy-Item -LiteralPath $src -Destination $dst -Force}}
-        $glob|ConvertTo-Json -Depth 10|Set-Content $globalCfg -Encoding UTF8 -Force
+        if($added -gt 0 -or $updated -gt 0 -or $pruned -gt 0){
+            if(-not$NoAgentsMd){$src=Join-Path (Split-Path $projectCfg -Parent) "AGENTS.md";$dst=Join-Path (Split-Path $globalCfg -Parent) "AGENTS.md";if(Test-Path $src -PathType Leaf){Copy-Item -LiteralPath $src -Destination $dst -Force}}
+            $glob|ConvertTo-Json -Depth 10|Set-Content $globalCfg -Encoding UTF8 -Force
+        }
         Write-Host "  ${added} added, ${updated} updated, ${pruned} pruned (*-semi)" -Fore Green;$report.steps["agent_sync"]=@{added=$added;updated=$updated;pruned=$pruned}}
 }}
 
