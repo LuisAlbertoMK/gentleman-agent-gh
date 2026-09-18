@@ -14,7 +14,7 @@ so any edit here propagates globally at once — edits are surgical by design.
 | 2 | Gates medibles — X/Y numéricos en skill-testing / skill-improver | done (slice 1) | `fix(skills): define measurable token thresholds in testing/improver gates` |
 | 3 | Disambiguar `!metrics` — metricas vs auto-metrics | done (slice 2) | `fix(skills): disambiguate !metrics trigger to auto-metrics` |
 | 4 | Archivos duplicados entre skills | done (slice 3) | `chore(skills): archive duplicate skill-creator, keep opencode-skill-creator` |
-| 5 | Skills muertas (deletion candidates) | pending | candidate list |
+| 5 | Skills muertas (deletion candidates) | done (slice 4) | `chore(skills): archive 3 retired skills to .archive` |
 | 6 | Frontmatter consistency | pending | metadata normalizado |
 | 7 | Prosa → reglas accionables | pending | prose-to-rules pass |
 
@@ -43,6 +43,7 @@ so any edit here propagates globally at once — edits are surgical by design.
 | 2 | trigger grep + YAML validator | only auto-metrics retains `!metrics` | PASS |
 | 3 | grep `!metrics` across `.agents/skills` + YAML validator | residual declarations: auto-metrics only | PASS |
 | 4 | git mv + frontmatter check + refs grep | `skill-creator` → `.archive/skills/skill-creator` (plain-name pattern); `opencode-skill-creator` KEPT (8 triggers, agents/references/templates, ecosystem refs); sole live stale ref migrated: `commands/skill-creator.md` L2+L7 | PASS |
+| 5 | git mv ×3 + grep archived names in `.agents/skills` + index count | `.archive/skills/{cognitive-doc-design,prompt-engineering,senior-engineer}` slots replaced (old July copies recoverable @ `9f238a81`); residual refs in `.agents/skills`: only karpathy-loop cross-ref; active count 99→96; SKILLS-INDEX v5.9 | PASS |
 
 ## Guardrails
 - No skill deletion · no other skill triggers touched · no edits outside listed files.

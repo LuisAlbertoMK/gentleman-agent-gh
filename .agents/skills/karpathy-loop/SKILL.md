@@ -51,6 +51,8 @@ Tokens <50 + works · 3 iterations no improvement · Fits in 1 line. **NEVER**: 
 ## Refs
 lean-context · skill-improver · metricas · code-review-agent · context-watchdog · execution-mode
 
+**Absorbed (2026-09-18)**: `prompt-engineering` archived — its prompt-optimization/template workflows are covered by this skill.
+
 ## Reference
 Worked examples, testing patterns, edge cases, anti-patterns → docs/skills/karpathy-loop/reference.md
 

@@ -2,6 +2,8 @@
 name: cognitive-doc-design
 description: "Design docs that reduce cognitive load. Trigger: writing guides, READMEs, RFCs, onboarding, architecture, or review-facing docs."
 triggers: "design docs, documentation, cognitive load, writing guides, RFC, README"
+changelog: "2026-09-17"
+token_budget: 2630
 ---
 
 ## When to Use
@@ -76,9 +78,3 @@ git diff --name-only -- '*.md'
 # Inspect PR changed-line count for cognitive load
 gh pr view <PR_NUMBER> --json additions,deletions,changedFiles
 ```
-
-## Refs
-cross-project-wisdom · senior-engineer · comment-writer · branch-pr · chained-pr
-
-## Anti-Patterns
-Lead with context, bury the answer · No progressive disclosure · Walls of prose · Same doc template for PR and RFC
