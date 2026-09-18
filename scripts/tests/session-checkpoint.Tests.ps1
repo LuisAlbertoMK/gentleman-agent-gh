@@ -40,8 +40,11 @@ BeforeAll {
 }
 
 AfterAll {
-    # Cleanup checkpoint dir between test runs
+    # Robust cleanup: restore permissions before removing to handle interrupted tests
     if (Test-Path $script:checkpointDir) {
+        Get-ChildItem -LiteralPath $script:checkpointDir -Recurse -File -ErrorAction SilentlyContinue | ForEach-Object {
+            $_.IsReadOnly = $false
+        }
         Remove-Item -LiteralPath $script:checkpointDir -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
@@ -141,5 +144,139 @@ Describe "Session Checkpoint Bridge — Mode Behavior" {
         $out = & (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null
         $result = $out | ConvertFrom-Json -ErrorAction SilentlyContinue
         $result.checkpoint_created | Should -Be $true
+    }
+}
+
+Describe "Session Checkpoint Bridge — memSaved Flag Fidelity" {
+    It "mem_saved is false when no checkpoint needed (GREEN, no discoveries)" {
+        $result = Invoke-CheckpointCheck -Percent 10
+        $result.mem_saved | Should -Be $false
+    }
+
+    It "mem_saved is true after successful write (mark mode with Force)" {
+        $params = @{ Mode = "mark"; UsagePercent = 5; Force = $true; Quiet = $true }
+        $out = & (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null
+        $result = $out | ConvertFrom-Json -ErrorAction SilentlyContinue
+        $result.mem_saved | Should -Be $true
+    }
+
+    It "persisted field is false when no checkpoint needed" {
+        $result = Invoke-CheckpointCheck -Percent 10
+        $result.persisted | Should -Be $false
+    }
+
+    It "persisted field is true after successful write" {
+        $params = @{ Mode = "mark"; UsagePercent = 5; Force = $true; Quiet = $true }
+        $out = & (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null
+        $result = $out | ConvertFrom-Json -ErrorAction SilentlyContinue
+        $result.persisted | Should -Be $true
+    }
+
+    It "pending_file is null when no checkpoint needed" {
+        $result = Invoke-CheckpointCheck -Percent 10
+        $result.pending_file | Should -Be $null
+    }
+
+    It "pending_file is set after successful write" {
+        $params = @{ Mode = "mark"; UsagePercent = 5; Force = $true; Quiet = $true }
+        $out = & (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null
+        $result = $out | ConvertFrom-Json -ErrorAction SilentlyContinue
+        $result.pending_file | Should -Not -Be $null
+        Test-Path -LiteralPath $result.pending_file | Should -Be $true
+    }
+}
+
+Describe "Session Checkpoint Bridge — Failure Injection (F1 fix)" {
+    It "write failure (file locked) → mem_saved=false AND persisted=false" {
+        # Pre-create pending file with stale content
+        if (-not (Test-Path -LiteralPath $script:checkpointDir)) {
+            $null = New-Item -ItemType Directory -Path $script:checkpointDir -Force
+        }
+        $pendingPath = Join-Path $script:checkpointDir "pending-engram.json"
+        $staleContent = @{ topic_key = "stale/old"; type = "session_checkpoint"; title = "stale"; content = "old" }
+        $staleContent | ConvertTo-Json -Depth 3 | Set-Content -LiteralPath $pendingPath -Encoding UTF8 -Force
+
+        # Open exclusive lock on target to prevent Move-Item overwrite
+        # (PS7 -Force ignores IsReadOnly, so read-only is insufficient — FileStream locks the inode)
+        $lockedStream = [System.IO.File]::Open($pendingPath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
+        try {
+            $params = @{ Mode = "mark"; UsagePercent = 55; Force = $true; Quiet = $true }
+            $out = & (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null
+            $result = $out | ConvertFrom-Json -ErrorAction SilentlyContinue
+
+            # UNCONDITIONAL assertions — must fail in pre-fix code where $memSaved=true was set before write
+            $result.persisted | Should -Be $false
+            $result.mem_saved | Should -Be $false
+        } finally {
+            $lockedStream.Close()
+            $lockedStream.Dispose()
+            if (Test-Path -LiteralPath $pendingPath) {
+                Set-ItemProperty -LiteralPath $pendingPath -Name IsReadOnly -Value $false -ErrorAction SilentlyContinue
+                Remove-Item -LiteralPath $pendingPath -Force -ErrorAction SilentlyContinue
+            }
+        }
+    }
+}
+
+Describe "Session Checkpoint Bridge — Process-Pending Coverage (F2 fix)" {
+    It "process-pending with no pending file → mem_saved=false, pending_file=null" {
+        # Ensure no pending file exists
+        $pendingDir = Join-Path $script:checkpointDir "pending-engram.json"
+        if (Test-Path -LiteralPath $pendingDir) {
+            Remove-Item -LiteralPath $pendingDir -Force -ErrorAction SilentlyContinue
+        }
+        $params = @{ Mode = "process-pending"; Quiet = $true }
+        $out = & (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null
+        $result = $out | ConvertFrom-Json -ErrorAction SilentlyContinue
+        $result.mem_saved | Should -Be $false
+        $result.persisted | Should -Be $false
+        $result.pending_file | Should -Be $null
+    }
+
+    It "process-pending with valid pending → mem_saved=true, pending_file not null" {
+        # Create valid pending file
+        $pendingDir = Join-Path $script:checkpointDir "pending-engram.json"
+        if (-not (Test-Path -LiteralPath $script:checkpointDir)) {
+            $null = New-Item -ItemType Directory -Path $script:checkpointDir -Force
+        }
+        $valid = @{ topic_key = "checkpoint/session-state"; type = "session_checkpoint"; title = "test"; content = "test content" }
+        $valid | ConvertTo-Json -Depth 3 | Set-Content -LiteralPath $pendingDir -Encoding UTF8
+
+        try {
+            $params = @{ Mode = "process-pending"; Quiet = $true }
+            $out = & (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null
+            $result = $out | ConvertFrom-Json -ErrorAction SilentlyContinue
+            $result.mem_saved | Should -Be $true
+            $result.persisted | Should -Be $true
+            # F2: pending_file should be set (file exists AND mem_saved=true)
+            $result.pending_file | Should -Not -Be $null
+            Test-Path -LiteralPath $result.pending_file | Should -Be $true
+        } finally {
+            if (Test-Path -LiteralPath $pendingDir) {
+                Remove-Item -LiteralPath $pendingDir -Force -ErrorAction SilentlyContinue
+            }
+        }
+    }
+
+    It "process-pending with pending missing topic_key → mem_saved=false" {
+        $pendingDir = Join-Path $script:checkpointDir "pending-engram.json"
+        if (-not (Test-Path -LiteralPath $script:checkpointDir)) {
+            $null = New-Item -ItemType Directory -Path $script:checkpointDir -Force
+        }
+        $invalid = @{ type = "session_checkpoint"; title = "test"; content = "no topic_key" }
+        $invalid | ConvertTo-Json -Depth 3 | Set-Content -LiteralPath $pendingDir -Encoding UTF8
+
+        try {
+            $params = @{ Mode = "process-pending"; Quiet = $true }
+            $out = & (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null
+            $result = $out | ConvertFrom-Json -ErrorAction SilentlyContinue
+            $result.mem_saved | Should -Be $false
+            # F2: pending_file should be null (file exists but mem_saved=false)
+            $result.pending_file | Should -Be $null
+        } finally {
+            if (Test-Path -LiteralPath $pendingDir) {
+                Remove-Item -LiteralPath $pendingDir -Force -ErrorAction SilentlyContinue
+            }
+        }
     }
 }

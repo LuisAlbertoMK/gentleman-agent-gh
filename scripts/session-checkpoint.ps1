@@ -246,6 +246,8 @@ if (-not $NoValidate) {
 
 # --- Step 5: Persist to Engram (if checkpoint needed and validated) ---
 $memSaved = $false
+$persisted = $false
+$pendingFilePath = $null
 $memSaveDirective = $null
 
 # --- Mode: process-pending — read pending-engram.json and emit directive for orchestrator ---
@@ -273,6 +275,7 @@ if ($Mode -eq 'process-pending') {
         }
     }
     # Output result and exit early for process-pending mode
+    # F2 fix: emit pending_file only if file actually exists, else $null
     $result = [PSCustomObject]@{
         zone              = "N/A"
         percent           = 0
@@ -282,6 +285,8 @@ if ($Mode -eq 'process-pending') {
         checkpoint_file   = $null
         validated         = $true
         mem_saved         = $memSaved
+        persisted         = $memSaved
+        pending_file      = if ((Test-Path -LiteralPath $pendingPath) -and $memSaved) { $pendingPath } else { $null }
         mem_save_directive = $memSaveDirective
         indexed           = $false
         miner_patterns    = 0
@@ -305,15 +310,40 @@ if ($Mode -in @('mark', 'full') -and $checkpointNeeded -and $validated) {
         title     = "Session checkpoint at $contextZone zone ($($watchdogResult.percent)% context used)"
         content   = $memContent
     }
-    $memSaved = $true  # directive prepared — orchestrator calls engram_mem_save with $memSaveDirective
-
     # Persist directive to file for hard-gate recovery (orchestrator reads this even if stdout missed)
+    # F1 fix: use -ErrorAction Stop + try/catch; $persisted=true ONLY if write+move succeeded AND Test-Path confirms
+    $persisted = $false
+    $pendingFilePath = $null
     if ($memSaveDirective) {
         $pendingPath = Join-Path $checkpointDir "pending-engram.json"
         $pendingTmp = "$pendingPath.tmp"
-        $memSaveDirective | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $pendingTmp -Encoding UTF8 -ErrorAction SilentlyContinue
-        if (Test-Path -LiteralPath $pendingTmp) { Move-Item -LiteralPath $pendingTmp -Destination $pendingPath -Force -ErrorAction SilentlyContinue }
+        try {
+            $memSaveDirective | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $pendingTmp -Encoding UTF8 -ErrorAction Stop
+            Move-Item -LiteralPath $pendingTmp -Destination $pendingPath -Force -ErrorAction Stop
+            # F1: confirm write+move succeeded AND destination file exists
+            if (Test-Path -LiteralPath $pendingPath) {
+                # Clean .tmp if Move-Item left it behind
+                if (Test-Path -LiteralPath $pendingTmp) { Remove-Item -LiteralPath $pendingTmp -Force -ErrorAction SilentlyContinue }
+                $persisted = $true
+                $pendingFilePath = $pendingPath
+            }
+        } catch {
+            # F1: clean up stale .tmp on failure
+            if (Test-Path -LiteralPath $pendingTmp) { Remove-Item -LiteralPath $pendingTmp -Force -ErrorAction SilentlyContinue }
+            # F1-stale: quarantine stale pending to prevent process-pending re-emission
+            # Best-effort: rename fails silently if locked or permission denied (documented limitation)
+            try {
+                if (Test-Path -LiteralPath $pendingPath) {
+                    $staleQuarantine = Join-Path $checkpointDir "pending-stale-$(Get-Date -Format 'yyyyMMdd-HHmmss').json"
+                    Move-Item -LiteralPath $pendingPath -Destination $staleQuarantine -Force -ErrorAction Stop
+                }
+            } catch {
+                Write-Warning "Quarantine of stale pending-engram.json failed (best-effort): $($_.Exception.Message)"
+            }
+            Write-Warning "Failed to persist pending-engram.json: $($_.Exception.Message)"
+        }
     }
+    $memSaved = $persisted  # flag reflects actual persistence, not directive preparation
 }
 
 # --- Step 6: Index large output via ctx_index (for cross-session recovery) ---
@@ -354,6 +384,8 @@ $result = [PSCustomObject]@{
     checkpoint_file   = if ($checkpointNeeded) { $checkpointPath } else { $null }
     validated         = $validated
     mem_saved         = $memSaved
+    persisted         = $persisted
+    pending_file      = $pendingFilePath
     mem_save_directive = $memSaveDirective
     indexed           = $indexed
     miner_patterns    = if ($minerResult) { $minerResult.RepeatedPatterns } else { 0 }
