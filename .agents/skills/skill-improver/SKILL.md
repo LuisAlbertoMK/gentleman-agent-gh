@@ -3,7 +3,7 @@ name: skill-improver
 description: "Audit and improve skills - preserve intent, fix frontmatter, convert tutorial prose to actionable rules, track usage."
 triggers: "Skill improvement, audit skills, refactor skills, skill refresher, drift detection, auto-heal"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2540
+token_budget: 2600
 ---
 
 ## When to Use
@@ -17,7 +17,7 @@ Audit and improve skills — preserve author intent, fix frontmatter, convert tu
 |---|---|
 | Invalid frontmatter | Fix metadata |
 | Tutorial prose | Convert to rules, bg → `references/` |
-| Over budget | Rules stay, examples → `references/` |
+| Over budget (>3200 B — `check-token-budget.ps1 -Json`) | Rules stay, examples → `references/` |
 | Branching prose | Decision table |
 | Conflicting rules | Report both — escalate |
 
