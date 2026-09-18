@@ -133,7 +133,7 @@ function Test-PathInScope {
           continue
         }
       }
-    } catch { }
+    } catch { Write-Debug "Test-PathInScope: junction walk failed at '$ancestor': $($_.Exception.Message)" }
     $parent = Split-Path $ancestor -Parent
     if ($parent -eq $ancestor) { break }
     $ancestor = $parent
@@ -149,7 +149,7 @@ function Test-PathInScope {
 }
 
 $items = [System.Collections.ArrayList]::new()
-$aborted = $false
+$escapeReasons = [System.Collections.ArrayList]::new()
 
 # ---- scan 1: %TEMP%\opencode\* ----
 if (Test-Path -LiteralPath $tempRoot) {
@@ -165,7 +165,7 @@ if (Test-Path -LiteralPath $tempRoot) {
         })
       } else {
         Write-Warning "ABORT: path escapes allowed roots: $($_.FullName)"
-        $aborted = $true
+        [void]$escapeReasons.Add($_.FullName)
       }
     }
 }
@@ -188,7 +188,7 @@ foreach ($pattern in $tmpPatterns) {
         })
       } else {
         Write-Warning "ABORT: path escapes allowed roots: $($_.FullName)"
-        $aborted = $true
+        [void]$escapeReasons.Add($_.FullName)
       }
     }
 }
@@ -212,14 +212,14 @@ if ($IncludeToolOutput) {
           })
         } else {
           Write-Warning "ABORT: path escapes allowed roots: $($_.FullName)"
-          $aborted = $true
+          [void]$escapeReasons.Add($_.FullName)
         }
       }
   }
 }
 
 # ---- abort guard ----
-if ($aborted) {
+if ($escapeReasons.Count -gt 0) {
   $msg = "Aborted: one or more paths escaped the allowed root set. No files were removed."
   if ($Json) {
     Write-Output (@{ ok = $false; error = $msg; items = @() } | ConvertTo-Json -Compress)
@@ -248,7 +248,6 @@ if ($Apply -and $totalItems -gt 0) {
       # TOCTOU guard: re-validate path (junction may have been swapped since scan)
       if (-not (Test-PathInScope -FilePath $target)) {
         Write-Warning "ABORT: path escaped scope during apply: $target"
-        $aborted = $true
         break
       }
       try {
