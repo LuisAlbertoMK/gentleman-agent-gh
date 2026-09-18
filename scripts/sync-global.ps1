@@ -13,6 +13,10 @@
 #>
 param([switch]$DryRun,[switch]$Repair,[switch]$Force,[switch]$NoAgentSync,[switch]$Json,[switch]$NoAgentsMd)
 $ErrorActionPreference = "Stop"; Set-StrictMode -Version Latest
+# PSSA PSReviewUnusedParameter: DryRun/Repair/Force/NoAgentsMd are consumed inside
+# Write-Step scriptblocks (ScriptAnalyzer does not trace into them) — reference at
+# script scope so the rule counts them as used (same pattern as inter-track.ps1).
+$null = $DryRun; $null = $Repair; $null = $Force; $null = $NoAgentsMd
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 
 $srcSkills = Resolve-Path "$PSScriptRoot\..\.agents\skills" -EA Stop
@@ -66,7 +70,7 @@ function Write-Step([string]$N,[scriptblock]$B) {
                     }
                 }
                 "Global config" {
-                    $projMcp=$null; try{ $pj=Get-Content $projectCfg -Raw | ConvertFrom-Json; $projMcp=$pj.mcp }catch{}
+                    $projMcp=$null; try{ $pj=Get-Content $projectCfg -Raw | ConvertFrom-Json; $projMcp=$pj.mcp }catch{ Write-Debug "sync-global: project mcp read failed: $($_.Exception.Message)" }
                     if(-not (Test-Path $globalCfg)){ $drift=$true; $driftDetail="global config missing" }
                     elseif($Force){ $drift=$true; $driftDetail="-Force would overwrite" }
                     else {

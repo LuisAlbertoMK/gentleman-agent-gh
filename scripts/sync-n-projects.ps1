@@ -148,7 +148,7 @@ $addEscapeDetail = $null
 function Test-ProtectedLocation {
     param([string]$Full)
     if ([string]::IsNullOrEmpty($Full)) { return $false }
-    try { if ([IO.Path]::GetPathRoot($Full) -eq $Full) { return $true } } catch { }
+    try { if ([IO.Path]::GetPathRoot($Full) -eq $Full) { return $true } } catch { Write-Debug "Test-ProtectedLocation: GetPathRoot failed for '$Full': $($_.Exception.Message)" }
     $protected = @()
     if ($env:SystemRoot) {
         $protected += [System.IO.Path]::GetFullPath($env:SystemRoot)

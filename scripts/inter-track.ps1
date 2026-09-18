@@ -98,9 +98,9 @@ function Invoke-TrackLocked {
         # E4 perf-ciclo37-clusterA (C36A/E4 anti-leak): Dispose reader/writer +
         # Close/Dispose del stream (el lock FileShare::None se mantiene).
         # Reversible: volver a Close solo.
-        try { if ($writer) { $writer.Dispose() } } catch { }
-        try { if ($reader) { $reader.Dispose() } } catch { }
-        if ($stream) { try { $stream.Close() } catch { }; try { $stream.Dispose() } catch { } }
+        try { if ($writer) { $writer.Dispose() } } catch { Write-Debug "inter-track: writer dispose failed: $($_.Exception.Message)" }
+        try { if ($reader) { $reader.Dispose() } } catch { Write-Debug "inter-track: reader dispose failed: $($_.Exception.Message)" }
+        if ($stream) { try { $stream.Close() } catch { Write-Debug "inter-track: stream close failed: $($_.Exception.Message)" }; try { $stream.Dispose() } catch { Write-Debug "inter-track: stream dispose failed: $($_.Exception.Message)" } }
     }
 }
 
