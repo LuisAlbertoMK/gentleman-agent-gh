@@ -1,0 +1,26 @@
+{
+  "_description": "Zen (Free) profile — 19 non-zen-free subs → opencode/muse-spark-1.3-contributor-free",
+  "_generated": "2026-09-18",
+  "_note": "5 subs already on free (quick-sub, frontend-sub, datascience-sub, docs-sub, quick-sub-auto) + 2 qwen (code-review-sub, code-review-sub-auto) kept for consistency; 24 total in zen-free",
+  "mapping": {
+    "gentleman-deep-sub": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-security-sub": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-seo-sub": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-performance-sub": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-aem-sub": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-deep-sub-auto": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-aem-sub-auto": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-reviewer-sub": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-reasoning-sub": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-reasoning-sub-auto": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-initializer-sub": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-initializer-sub-auto": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-codex-sub": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-infra-sub": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-implementer-sub": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-codex-sub-auto": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-implementer-sub-auto": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-code-review-sub": "opencode/muse-spark-1.3-contributor-free",
+    "gentleman-code-review-sub-auto": "opencode/muse-spark-1.3-contributor-free"
+  }
+}

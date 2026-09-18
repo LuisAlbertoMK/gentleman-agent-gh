@@ -1,0 +1,24 @@
+{
+  "_description": "Go (Contributor) profile — all 17 mandatory subs → opencode-go/muse-spark-1.3-contributor",
+  "_generated": "2026-09-18",
+  "_doc": "docs/mejoras/2026-09-15-subagent-model-swap-proposal.md:119-138",
+  "mapping": {
+    "gentleman-deep-sub": "opencode-go/muse-spark-1.3-contributor",
+    "gentleman-security-sub": "opencode-go/muse-spark-1.3-contributor",
+    "gentleman-seo-sub": "opencode-go/muse-spark-1.3-contributor",
+    "gentleman-performance-sub": "opencode-go/muse-spark-1.3-contributor",
+    "gentleman-aem-sub": "opencode-go/muse-spark-1.3-contributor",
+    "gentleman-deep-sub-auto": "opencode-go/muse-spark-1.3-contributor",
+    "gentleman-aem-sub-auto": "opencode-go/muse-spark-1.3-contributor",
+    "gentleman-reviewer-sub": "opencode-go/muse-spark-1.3-contributor",
+    "gentleman-reasoning-sub": "opencode-go/muse-spark-1.3-contributor",
+    "gentleman-reasoning-sub-auto": "opencode-go/muse-spark-1.3-contributor",
+    "gentleman-initializer-sub": "opencode-go/muse-spark-1.3-contributor",
+    "gentleman-initializer-sub-auto": "opencode-go/muse-spark-1.3-contributor",
+    "gentleman-codex-sub": "opencode-go/muse-spark-1.3-contributor",
+    "gentleman-infra-sub": "opencode-go/muse-spark-1.3-contributor",
+    "gentleman-implementer-sub": "opencode-go/muse-spark-1.3-contributor",
+    "gentleman-codex-sub-auto": "opencode-go/muse-spark-1.3-contributor",
+    "gentleman-implementer-sub-auto": "opencode-go/muse-spark-1.3-contributor"
+  }
+}
