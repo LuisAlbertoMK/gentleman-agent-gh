@@ -461,7 +461,7 @@
     },
     "gentleman-codex": {
       "description": "Code generation - convention mirroring, defensive coding, new files/scripts/boilerplate",
-      "model": "opencode/big-pickle",
+      "model": "opencode/muse-spark-1.3-contributor-free",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -475,7 +475,7 @@
     },
     "gentleman-codex-auto": {
       "description": "Code generation — AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode/big-pickle",
+      "model": "opencode/muse-spark-1.3-contributor-free",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "permission": {
@@ -529,7 +529,7 @@
     },
     "gentleman-codex-sub": {
       "description": "Code generation subagent — convention mirroring, defensive coding, new files/scripts/boilerplate (delegable via Task tool, returns via {file:prompts/shared/_return-contract.md})",
-      "model": "opencode/big-pickle",
+      "model": "opencode/muse-spark-1.3-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -884,7 +884,7 @@
     },
     "gentleman-codex-sub-auto": {
       "description": "Code generation subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
-      "model": "opencode/big-pickle",
+      "model": "opencode/muse-spark-1.3-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
