@@ -3,7 +3,7 @@ name: auth-hardening
 description: "Trigger: auth, JWT, OAuth, RBAC, CSRF, session, login, password hashing. Audit and harden auth flows."
 triggers: "auth, authentication, authorization, JWT, OAuth, RBAC, CSRF, session, login, password hashing, token, cookie"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2750
+token_budget: 3471
 ---
 
 ## When to Use
@@ -47,6 +47,16 @@ MED: Session fixation (login doesn't regenerate ID)
 ## Verification
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
+## API REST Playbook
+JWT: alg allowlist HS256/RS256/ES256 - REJECT none/alg-confusion/symmetric+pubkey | exp required server-clock skew<=60s | aud+iss match else 401
+AuthZ: BOLA userA->/users/{B} 403/404 never 200 | bulk foreign ids per-item reject | BOPLA mass-assign strict allowlist (zod/joi/pydantic) | IDOR roles x endpoints no 500s
+JWT keys: jku/x5u REJECT unless explicit https allowlist (TLS verify, no user-controlled URL) | x5c/x5t: chain vs TRUST STORE + revocation - never self-declared | kid: server-side allowlist lookup only - no path/index traversal, no weak-key (alg-confusion) selection
+> changelog: odd/tasks/mejora-security.md (2026-09-18, slice 6)
+> changelog: odd/tasks/mejora-security.md (2026-09-18, slice 1)
+## SPA Playbook (token storage / cookie-auth CSRF)
+Token storage: httpOnly cookie=cookie-auth XSS-leak-proof (JS can't read) | sessionStorage=same-tab ephemeral only | localStorage NEVER for access/refresh tokens (any injected script reads it)
+Cookies: Secure+HttpOnly+SameSite=Lax (Strict for money) + Path=/ | CSRF: token header/double-submit on POST/PUT/DELETE when cookie-auth, fetch credentials:'include', logout=Max-Age 0
+> changelog: odd/tasks/mejora-security.md (2026-09-18, slice 2)
 ## Refs
 security-scanner · best-practices · quality-gate · code-review-agent · llm-security · container-security · infra-audit
 

@@ -15,6 +15,9 @@ API endpoint testing — REST+GraphQL contract validation, schema assertion, res
 1.Flaky→retry 3x w/ backoff (GET/idempotent only). 2.Token expiry mid-test→catch 401→refresh→retry once. 3.Cursor→loop while next_cursor, cap iterations. 4.429→honor Retry-After, backoff, fail after N.
 ## Anti-Patterns
 Test prod·Hardcoded creds·No rate-limit delays·No schema first·One giant file(split by group)
+## Security Tests (P0)
+BOLA userA->B 403/404 | 429 lockout | SSRF webhook deny non-allowlisted | pag cap 400, cursor rewind 403, bulk foreign ids reject
+> changelog: odd/tasks/mejora-security.md (2026-09-18, slice 1)
 > docs/skills/api-testing/reference.md
 ## Anti-Rationalization
 | Rationalization | Red Flag | Verification |
