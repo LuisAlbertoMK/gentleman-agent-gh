@@ -101,6 +101,14 @@ if ($script:denyPatterns.Count -eq 0) {
             '^npm\s+install\b', '^npm\si\b', '^npm\sadd\b'
         )
     }
+    # Explicit allow patterns — wrapper invocation + safe-path Remove-Item (temp only)
+    if (-not $script:allowPatterns) {
+        $script:allowPatterns = @(
+            '^pwsh\s+scripts/clean-worktree-temp\.ps1\b',
+            '^Remove-Item\s+-LiteralPath\s+.*\\opencode\\',
+            '^Remove-Item\s+-LiteralPath\s+.*\.tmp-\w'
+        )
+    }
 }
 
 # Destructive filesystem — DENY in manual/semi, ASK in auto (user confirms deletes)

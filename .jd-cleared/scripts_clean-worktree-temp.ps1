@@ -1,0 +1,1 @@
+JD clearance 2026-09-18 - dual review PASS (breaker: junction/reparse-point resolution at Test-PathInScope + TOCTOU re-validation at apply closed the scope escape; reviewer: no new blockers). Verdict: APPROVED. blob: 4815e8f59d

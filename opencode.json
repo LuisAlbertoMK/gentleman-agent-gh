@@ -8,6 +8,7 @@
       "*": "allow",
       "pwsh *": "allow",
       "pwsh.exe *": "allow",
+      "pwsh scripts/clean-worktree-temp.ps1 *": "allow",
       "powershell *": "allow",
       "powershell.exe *": "allow",
       "git commit *": "ask",
