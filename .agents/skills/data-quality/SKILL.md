@@ -3,7 +3,7 @@ name: data-quality
 description: "Trigger: data audit, pipeline audit, schema validation, data governance, ETL. Audit data quality and reliability."
 triggers: "data audit, data pipeline audit, schema validation, data governance, ETL audit, data quality check, data review"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2850
+token_budget: 3340
 ---
 ## When to Use
 Reviewing data pipelines, schemas, ETL, analytics. No data layer → report and stop.
@@ -35,6 +35,14 @@ dbt/YAML + Profiling detail → docs/skills/data-quality/reference.md
 ## Verification
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
+## Backend Security Playbook
+Secrets: env/vault only - never code/logs (grep src for `password|api[_-]?key|secret`, exclude tests) | vault runtime read (HashiCorp/AWS SM) | no default creds
+AuthZ: deny-by-default (403 unless allowlisted route) | scopes per endpoint (least-priv) | IDOR: ownership check per resource (`WHERE owner_id=session.id`) -> 403/404 never 200 | enforce server-side - never trust client role claims
+Injection: SQL/LDAP parameterized/prepared stmts only | OS cmd: exec list, no `shell=True`, no user-input concat | raw SQL via bind vars
+Logging: mask PII/creds (`token→redacted`, email `u***@`) | stack traces DEBUG-only | strip \n from user input (log forging)
+Errors: generic client msg (500 + req id) | full exception detail to server logs only
+Deps: lockfile committed + exact pin | CI audit (pip-audit/npm audit/osv-scanner) fail build | private scope/pkg index-url (dependency confusion)
+> changelog: odd/tasks/mejora-security.md (2026-09-18, slice 3)
 ## Refs
 Cross-Refs: perf-profiling | testing-strategy
 
