@@ -47,6 +47,10 @@ MED: Session fixation (login doesn't regenerate ID)
 ## Verification
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
+## API REST Playbook
+JWT: alg allowlist HS256/RS256/ES256 - REJECT none/alg-confusion/symmetric+pubkey | exp required server-clock skew<=60s | aud+iss match else 401
+AuthZ: BOLA userA->/users/{B} 403/404 never 200 | bulk foreign ids per-item reject | BOPLA mass-assign strict allowlist (zod/joi/pydantic) | IDOR roles x endpoints no 500s
+> changelog: odd/tasks/mejora-security.md (2026-09-18, slice 1)
 ## Refs
 security-scanner · best-practices · quality-gate · code-review-agent · llm-security · container-security · infra-audit
 
