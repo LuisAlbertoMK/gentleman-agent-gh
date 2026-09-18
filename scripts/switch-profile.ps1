@@ -227,37 +227,42 @@ $backupPath = Join-Path $ProjectRoot $backupName
 
 # --- Apply changes via ShouldProcess ---
 if ($PSCmdlet.ShouldProcess($OpencodeJsonPath, "Apply $Profile profile ($($changes.Count) model overrides)")) {
-    # Create backup
-    Copy-Item -LiteralPath $OpencodeJsonPath -Destination $backupPath -Force
-    if (-not $Quiet) {
-        Write-Host "Backup: $backupName" -ForegroundColor Gray
-    }
+    $backupCreated = $null
 
-    # Apply model overrides
-    foreach ($change in $changes) {
-        $config.agent.($change.agent).model = $change.to
-    }
-
-    # Write back
-    $config | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $OpencodeJsonPath -Encoding UTF8
-
-    # Post-write validation
-    try {
-        $verify = Get-Content $OpencodeJsonPath -Raw | ConvertFrom-Json
-        $verifyAgentKeys = @($verify.agent.PSObject.Properties.Name)
-        $verifySubagentKeys = $verifyAgentKeys | Where-Object { $_ -match '-sub(-auto)?$' }
-        $verifyFreeCount = ($verifySubagentKeys | Where-Object {
-            $m = $verify.agent.$_.model
-            $m -and $m -match 'contributor-free$'
-        }).Count
-        if ($Profile -eq 'zen' -and $verifyFreeCount -lt 19) {
-            Write-Warning "Post-write validation: expected >= 19 zen-free agents, found $verifyFreeCount"
+    if ($changes.Count -gt 0) {
+        # Create backup
+        Copy-Item -LiteralPath $OpencodeJsonPath -Destination $backupPath -Force
+        $backupCreated = $backupName
+        if (-not $Quiet) {
+            Write-Host "Backup: $backupName" -ForegroundColor Gray
         }
-    } catch {
-        Write-Warning "Post-write JSON validation failed: $_"
+
+        # Apply model overrides
+        foreach ($change in $changes) {
+            $config.agent.($change.agent).model = $change.to
+        }
+
+        # Write back
+        $config | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $OpencodeJsonPath -Encoding UTF8
+
+        # Post-write validation
+        try {
+            $verify = Get-Content $OpencodeJsonPath -Raw | ConvertFrom-Json
+            $verifyAgentKeys = @($verify.agent.PSObject.Properties.Name)
+            $verifySubagentKeys = $verifyAgentKeys | Where-Object { $_ -match '-sub(-auto)?$' }
+            $verifyFreeCount = ($verifySubagentKeys | Where-Object {
+                $m = $verify.agent.$_.model
+                $m -and $m -match 'contributor-free$'
+            }).Count
+            if ($Profile -eq 'zen' -and $verifyFreeCount -lt 19) {
+                Write-Warning "Post-write validation: expected >= 19 zen-free agents, found $verifyFreeCount"
+            }
+        } catch {
+            Write-Warning "Post-write JSON validation failed: $_"
+        }
     }
 
-    # Write sidecar marker
+    # Write sidecar marker (idempotent — safe even when 0 changes)
     $Profile | Set-Content -LiteralPath $MarkerPath -Encoding UTF8 -Force
 
     if ($Json) {
@@ -265,17 +270,21 @@ if ($PSCmdlet.ShouldProcess($OpencodeJsonPath, "Apply $Profile profile ($($chang
             profile  = $Profile
             changed  = $changes
             counts   = @{ expected = $ExpectedCounts[$Profile]; actual = $changes.Count }
-            backup   = $backupName
+            backup   = $backupCreated
             dry_run  = $false
-            message  = "Applied profile '$Profile' successfully"
+            message  = if ($changes.Count -gt 0) { "Applied profile '$Profile' successfully" } else { "Already on profile '$Profile' — no changes needed" }
         } | ConvertTo-Json -Depth 5
     } else {
-        Write-Host "`n=== Applied Profile: $Profile ===" -ForegroundColor Green
-        Write-Host "Changes applied: $($changes.Count) agents" -ForegroundColor White
-        foreach ($c in $changes) {
-            Write-Host "  $($c.agent): $($c.from) → $($c.to)" -ForegroundColor DarkGreen
+        if ($changes.Count -gt 0) {
+            Write-Host "`n=== Applied Profile: $Profile ===" -ForegroundColor Green
+            Write-Host "Changes applied: $($changes.Count) agents" -ForegroundColor White
+            foreach ($c in $changes) {
+                Write-Host "  $($c.agent): $($c.from) → $($c.to)" -ForegroundColor DarkGreen
+            }
+            Write-Host "Backup: $backupName" -ForegroundColor Gray
+        } else {
+            Write-Host "Already on profile '$Profile' — no changes needed." -ForegroundColor Cyan
         }
-        Write-Host "Backup: $backupName" -ForegroundColor Gray
         Write-Host "Marker: .opencode-profile → $Profile" -ForegroundColor Gray
     }
 }

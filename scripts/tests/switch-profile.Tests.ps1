@@ -195,13 +195,38 @@ Describe 'switch-profile.ps1' {
             }
         }
 
-        It '-Force overrides idempotency' {
+        It '-Force with 0 changes reports no changes needed and creates no backup' {
             $tempDir = New-TempOpencodeCopy
             try {
                 $env:GENTLEMAN_AGENT_ROOT = $tempDir
                 & $SwitchScript -Profile go -Force -Quiet
                 $output = & $SwitchScript -Profile go -Force -Json | ConvertFrom-Json
-                $output.message | Should -Match 'Applied'
+                $output.message | Should -Match 'no changes needed'
+                $output.backup | Should -BeNullOrEmpty
+                $output.changed | Should -BeNullOrEmpty
+            } finally {
+                Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
+            }
+        }
+
+        It 'second consecutive -Force apply with 0 changes creates no backup and keeps content intact' {
+            $tempDir = New-TempOpencodeCopy
+            try {
+                $env:GENTLEMAN_AGENT_ROOT = $tempDir
+                # First apply — creates backup + writes
+                & $SwitchScript -Profile go -Force -Quiet
+                $backupsAfterFirst = @(Get-ChildItem -Path $tempDir -Filter 'opencode.json.bak-*')
+                $contentAfterFirst = Get-Content (Join-Path $tempDir 'opencode.json') -Raw
+
+                # Second apply — 0 changes expected, no backup should be created
+                $output = & $SwitchScript -Profile go -Force -Json | ConvertFrom-Json
+                $backupsAfterSecond = @(Get-ChildItem -Path $tempDir -Filter 'opencode.json.bak-*')
+                $contentAfterSecond = Get-Content (Join-Path $tempDir 'opencode.json') -Raw
+
+                $backupsAfterSecond.Count | Should -Be $backupsAfterFirst.Count
+                $contentAfterSecond | Should -Be $contentAfterFirst
+                $output.backup | Should -BeNullOrEmpty
+                $output.changed | Should -BeNullOrEmpty
             } finally {
                 Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
             }
