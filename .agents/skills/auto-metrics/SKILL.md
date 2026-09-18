@@ -7,6 +7,7 @@ token_budget: 2800
 ---
 ## When to Use
 Only on explicit request (!score, !metrics, !close). NOT automatic after every task.
+> Migration: `!metrics` here = self-scoring — use `!metricas` for before/after deltas.
 ## PRE-FLIGHT (HARD GATE)
 If `.learnings/bias-calibration.json` exists with `samples >= 2`: check bitácora for `[audit] {today}`. None → **FAIL** — run !audit first. Never score without audit if biases exist.
 ## CORRECTION (if audit available)

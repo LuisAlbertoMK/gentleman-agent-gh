@@ -9,6 +9,9 @@ token_budget: 3016
 ## When to Use
 Visual verification — screenshots, visual regression, UI bug detection. **Tool**: Playwright — `npx playwright test --project=chromium`.
 
+## Differentiation
+visual-testing = screenshots/visual regression via Playwright (`toHaveScreenshot`) — NOT LLM analysis. Semantic/feel review → `vision-analyze` (Ollama).
+
 ## Automated
 ```typescript
 test('home',async({page})=>{await page.goto('/');await expect(page).toHaveScreenshot('home.png')});
@@ -46,6 +49,6 @@ No baseline·Threshold too strict(flaky)·No viewport reset·Skip anim freeze·N
 ## Verification
 - Output matches ## Output contract + file:line; cross-ref-check.ps1 → OK
 - Frontmatter (name/description/triggers/token_budget) stable; cross-refs exist; no listed anti-patterns
-## Cross-Refs: quality-gate | performance | baseline-ui | accessibility | ui-engine
+## Cross-Refs: quality-gate | performance | baseline-ui | accessibility | ui-engine | vision-analyze
 > docs/skills/visual-testing/reference.md
 
