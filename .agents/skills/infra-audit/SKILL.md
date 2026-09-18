@@ -63,6 +63,8 @@ Reviewing infrastructure (Terraform, Docker, K8s, CI/CD, Helm, Ansible, CloudFor
 ## K8s/IaC Playbook (limits + network)
 Limits: resources.requests/limits cpu+mem on every container (no node OOM)
 NetPol: default-deny ingress+egress - allowlist svc/ns (multi-tenant REQUIRED)
+Volumes: subPath with `..` = host traversal - reject | allowlist values
+> changelog: odd/tasks/mejora-security.md (2026-09-18, slice 6)
 > changelog: odd/tasks/mejora-security.md (2026-09-18, slice 4)
 ## Refs
 container-security · security-scanner · best-practices · auth-hardening · llm-security

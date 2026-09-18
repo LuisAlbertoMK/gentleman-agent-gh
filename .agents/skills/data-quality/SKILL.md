@@ -3,7 +3,7 @@ name: data-quality
 description: "Trigger: data audit, pipeline audit, schema validation, data governance, ETL. Audit data quality and reliability."
 triggers: "data audit, data pipeline audit, schema validation, data governance, ETL audit, data quality check, data review"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 3340
+token_budget: 3895
 ---
 ## When to Use
 Reviewing data pipelines, schemas, ETL, analytics. No data layer → report and stop.
@@ -42,6 +42,10 @@ Injection: SQL/LDAP parameterized/prepared stmts only | OS cmd: exec list, no `s
 Logging: mask PII/creds (`token→redacted`, email `u***@`) | stack traces DEBUG-only | strip \n from user input (log forging)
 Errors: generic client msg (500 + req id) | full exception detail to server logs only
 Deps: lockfile committed + exact pin | CI audit (pip-audit/npm audit/osv-scanner) fail build | private scope/pkg index-url (dependency confusion)
+SSTI: template engines sandboxed ONLY (Jinja2 sandbox / Twig sandbox) - user input is DATA, never template source | eval/exec/compile in templates = CRIT | {{ }} from user input = CRIT
+XXE: XML parsers disable external entities + DTD (defusedxml, lxml resolve_entities=False, FEATURE_SECURE_PROCESSING + disallow-doctype-decl) | no xinclude/external DTD (SSRF/file-read)
+Deserialization: pickle/yaml.load NEVER - yaml.safe_load only | JSON allowlist | reject __reduce__/gadget classes | no untrusted bytes to unserialize/ObjectInputStream/Marshal
+> changelog: odd/tasks/mejora-security.md (2026-09-18, slice 6)
 > changelog: odd/tasks/mejora-security.md (2026-09-18, slice 3)
 ## Refs
 Cross-Refs: perf-profiling | testing-strategy

@@ -3,7 +3,7 @@ name: project-mapper
 description: "Scan project structure, detect tech stack, classify architecture, generate dependency map; auto-chains to gap-analysis."
 triggers: "Mapear, project map, estructura, tech stack, arquitectura"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2916
+token_budget: 3157
 ---
 # Project Mapper
 Scan project structure, detect stack, classify architecture. Auto-link to gap-analysis.
@@ -36,6 +36,8 @@ After map: "Project classified as {tech layer}/{business type}. Run gap-analysis
 ## Security Playbook Dispatch
 API→auth-hardening | SPA→best-practices+auth-hardening | backend→data-quality | containers→container-security | IA→llm-security
 Monorepo/mixed: dispatch per package/target
+Hybrid single-repo (Next/Nuxt/Remix/SvelteKit): detect API routes (app/api, pages/api, server/api, src/server) + SPA -> apply BOTH playbooks (backend=data-quality + SPA=best-practices+auth-hardening), never one only
+> changelog: odd/tasks/mejora-security.md (2026-09-18, slice 6)
 > changelog: odd/tasks/mejora-security.md (2026-09-18, slice 5)
 ## Refs
 gap-analysis · research · execution-mode · sdd · skill-graph · engram-protocol

@@ -3,7 +3,7 @@ name: container-security
 description: "Trigger: Dockerfile, docker-compose, Kubernetes, k8s, pod, deployment, helm. Audit container security hardening."
 triggers: "Dockerfile, docker-compose, container, image, Kubernetes, k8s, pod, deployment, helm, docker, orchestration"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2500
+token_budget: 2807
 ---
 ## When to Use
 Reviewing Dockerfiles, docker-compose, K8s manifests, Helm charts, or "is this container secure"
@@ -19,7 +19,7 @@ Reviewing Dockerfiles, docker-compose, K8s manifests, Helm charts, or "is this c
 | Docker socket mount | CRIT | `/var/run/docker.sock` |
 | No securityContext | HIGH | K8s pod without securityContext |
 | hostPath volume | HIGH | Data exfil risk |
-| Dangerous caps | HIGH | SYS_ADMIN, NET_RAW, ALL |
+| Dangerous caps | HIGH | SYS_ADMIN, NET_ADMIN, SYS_MODULE, SYS_RAWIO, DAC_OVERRIDE, SYS_PTRACE, SYS_CHROOT, NET_RAW, ALL |
 | No health check | MED | Missing readiness/liveness |
 | No resource limits | MED | Pod can exhaust node |
 | `latest` tag | MED | Non-reproducible |
@@ -57,6 +57,8 @@ Image: non-root USER 10001 + runAsNonRoot + readOnlyRootFilesystem
 Priv: privileged false | drop ALL + add min | no cap-add ALL | no hostNetwork/PID/sock
 Secrets: k8s Secret / mounts - never ENV/ARG (history) | tmpfs 0444
 Tags/Scan: pin @sha256 digest - never :latest | trivy/grype in CI fail CRIT/HIGH
+Caps: drop ALL + add min | cap-add individual FORBIDDEN: NET_ADMIN, SYS_MODULE, SYS_RAWIO, DAC_OVERRIDE, SYS_PTRACE, SYS_CHROOT, SYS_BOOT, IPC_LOCK (any=HIGH) | SYS_MODULE = kernel module load = escape vector
+> changelog: odd/tasks/mejora-security.md (2026-09-18, slice 6)
 > changelog: odd/tasks/mejora-security.md (2026-09-18, slice 4)
 ## Refs
 security-scanner · best-practices · quality-gate · auth-hardening · llm-security · infra-audit

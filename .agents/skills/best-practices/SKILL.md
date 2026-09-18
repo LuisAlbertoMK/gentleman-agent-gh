@@ -3,7 +3,7 @@ name: best-practices
 description: "Apply modern web development best practices for security, compatibility, and code quality."
 triggers: "best practices, security audit, modernize code, code quality, check vulnerabilities"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 3450
+token_budget: 3992
 ---
 
 ## When to Use
@@ -46,6 +46,9 @@ XSS: contextual encoding (HTML/attr/JS/URL) | NO dangerouslySetInnerHTML/v-html 
 CSP essentials: default-src 'none'; script-src 'self' nonce (NO unsafe-inline/eval); object-src 'none'; base-uri 'self'; frame-ancestors 'self'; upgrade-insecure-requests | validate headers pre-deploy
 Open redirect: allowlist or same-origin prefix check on ?next=/returnUrl (reject //evil.com, protocol-relative), else 302 / | postMessage: verify event.origin === expected + message shape BEFORE use; never send auth tokens via postMessage
 Deps: npm audit --audit-level=high in CI (fail build) | lockfile committed + exact pin | overrides/resolutions for vulnerable transitive | npm ls typosquat check
+Service Workers: register ONLY same-origin exact URL (never remote/cross-origin) + explicit scope (no scope widening) | CSP worker-src 'self' (no blob:/data:) | SRI N/A on SW script -> pin immutable versioned path | audit existing SWs (devtools > Application > Service Workers): unregister unknown/3rd-party (persist after uninstall)
+DOM clobbering form/iframe: named <form>/<iframe> shadow window/document (form.action, iframe.name, attributes) - getElementById + id/name allowlist only, FormData over form.action/name lookups, never window[formName|iframeName]
+> changelog: odd/tasks/mejora-security.md (2026-09-18, slice 6)
 > changelog: odd/tasks/mejora-security.md (2026-09-18, slice 2)
 
 ---
