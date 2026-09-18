@@ -33,6 +33,10 @@ After map: "Project classified as {tech layer}/{business type}. Run gap-analysis
 ## Verification
 - Output matches skill ## Output contract + file:line citaton
 - cross-ref-check.ps1 → SKILL.md OK
+## Security Playbook Dispatch
+API→auth-hardening | SPA→best-practices+auth-hardening | backend→data-quality | containers→container-security | IA→llm-security
+Monorepo/mixed: dispatch per package/target
+> changelog: odd/tasks/mejora-security.md (2026-09-18, slice 5)
 ## Refs
 gap-analysis · research · execution-mode · sdd · skill-graph · engram-protocol
 ## Reference
