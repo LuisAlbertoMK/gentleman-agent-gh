@@ -13,7 +13,7 @@ so any edit here propagates globally at once — edits are surgical by design.
 | 1 | Spike — junctions/estructura (read-only) | done | Verificado: junctions → repo, sin escritura |
 | 2 | Gates medibles — X/Y numéricos en skill-testing / skill-improver | done (slice 1) | `fix(skills): define measurable token thresholds in testing/improver gates` |
 | 3 | Disambiguar `!metrics` — metricas vs auto-metrics | done (slice 2) | `fix(skills): disambiguate !metrics trigger to auto-metrics` |
-| 4 | Archivos duplicados entre skills | pending | dedupe plan |
+| 4 | Archivos duplicados entre skills | done (slice 3) | `chore(skills): archive duplicate skill-creator, keep opencode-skill-creator` |
 | 5 | Skills muertas (deletion candidates) | pending | candidate list |
 | 6 | Frontmatter consistency | pending | metadata normalizado |
 | 7 | Prosa → reglas accionables | pending | prose-to-rules pass |
@@ -42,7 +42,9 @@ so any edit here propagates globally at once — edits are surgical by design.
 | 1 | threshold line diff + validator | skill-testing L17 / skill-improver L20 | PASS |
 | 2 | trigger grep + YAML validator | only auto-metrics retains `!metrics` | PASS |
 | 3 | grep `!metrics` across `.agents/skills` + YAML validator | residual declarations: auto-metrics only | PASS |
+| 4 | git mv + frontmatter check + refs grep | `skill-creator` → `.archive/skills/skill-creator` (plain-name pattern); `opencode-skill-creator` KEPT (8 triggers, agents/references/templates, ecosystem refs); sole live stale ref migrated: `commands/skill-creator.md` L2+L7 | PASS |
 
 ## Guardrails
 - No skill deletion · no other skill triggers touched · no edits outside listed files.
+- Archive (git mv → `.archive/skills`, plain-name pattern) per precedent `9f238a81`; nothing destroyed — full recovery via git history.
 - No push, no PR, no merge (separate phase, explicitly NOT performed).
