@@ -12,7 +12,7 @@ so any edit here propagates globally at once — edits are surgical by design.
 |---|-------|--------|-------------|
 | 1 | Spike — junctions/estructura (read-only) | done | Verificado: junctions → repo, sin escritura |
 | 2 | Gates medibles — X/Y numéricos en skill-testing / skill-improver | done (slice 1) | `fix(skills): define measurable token thresholds in testing/improver gates` |
-| 3 | Disambiguar `!metrics` — metricas vs auto-metrics | planned (slice 2) | `fix(skills): disambiguate !metrics trigger to auto-metrics` |
+| 3 | Disambiguar `!metrics` — metricas vs auto-metrics | done (slice 2) | `fix(skills): disambiguate !metrics trigger to auto-metrics` |
 | 4 | Archivos duplicados entre skills | pending | dedupe plan |
 | 5 | Skills muertas (deletion candidates) | pending | candidate list |
 | 6 | Frontmatter consistency | pending | metadata normalizado |
@@ -41,6 +41,7 @@ so any edit here propagates globally at once — edits are surgical by design.
 |-------|----------|----------|---------|
 | 1 | threshold line diff + validator | skill-testing L17 / skill-improver L20 | PASS |
 | 2 | trigger grep + YAML validator | only auto-metrics retains `!metrics` | PASS |
+| 3 | grep `!metrics` across `.agents/skills` + YAML validator | residual declarations: auto-metrics only | PASS |
 
 ## Guardrails
 - No skill deletion · no other skill triggers touched · no edits outside listed files.
