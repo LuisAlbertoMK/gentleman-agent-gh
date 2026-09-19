@@ -335,8 +335,9 @@ if ($PSCmdlet.ShouldProcess($OpencodeJsonPath, "Apply $Profile profile ($($chang
                 if ($verifyQwenCount -ne 0) {
                     Write-Warning "Post-write validation: expected 0 qwen-sub agents for Go, found $verifyQwenCount"
                 }
-                if ($verifyContributorCount -lt 24) {
-                    Write-Warning "Post-write validation: expected >= 24 muse-spark-contributor-sub agents for Go, found $verifyContributorCount"
+                # 5 subs intentionally free-tier (quick/frontend/datascience/docs/quick-auto) per JD pto 1 + cost proposal
+                if ($verifyContributorCount -lt 19) {
+                    Write-Warning "Post-write validation: expected >= 19 muse-spark-contributor-sub agents for Go, found $verifyContributorCount"
                 }
             }
         } catch {
