@@ -6,7 +6,7 @@
 | topic_id | objetivo | fase | creado | actualizado | exploracion_paralela_intencional | ramas | dueno_sintesis |
 |---|---|---|---|---|---|---|---|
 | `experimento/perfiles-zen-go` | Aplicar permisos, sync-global y protocolo multiagente al repo | merged-to-main 2026-09-19 | 2026-09-19 | 2026-09-19 | false | `experimento/perfiles-zen-go` (merged) | orquestador |
-| `experimento/sync-global-audit` | Validar sync-global fixeado en copia + proponer cableado audit-log | real-apply done 2026-09-19 | 2026-09-19 | 2026-09-19 | false | `experimento/sync-global-audit` | orquestador |
+| `experimento/sync-global-audit` | Validar sync-global fixeado en copia + proponer cableado audit-log | audit-cableado done 2026-09-19 | 2026-09-19 | 2026-09-19 | false | `experimento/sync-global-audit` | orquestador |
 
 ---
 
@@ -18,3 +18,4 @@
 
 - 2026-09-19: Topic declarado — copy-test in-progress, audit-proposal in-progress, real-apply PENDIENTE de GO del owner.
 - 2026-09-19: `real-apply done` — sync-global.ps1 -Force ejecutado en config global. Invariantes verificados: 3 manual allows preservadas (allow), 58 agentes sin cambios, JSON válido, top-level keys order same. Deltas explicadas: MCPs sincronizados con project SSoT (codegraph removed, chrome-devtools-mcp+headroom added), permission.bash expanded 95→116 keys (SEC-F2 deny-floor ported), permission.read expanded 10→29 keys (full project SSoT). Backup manual en C:\Users\LUISOR~1\AppData\Local\Temp\opencode\presync-20260919\ (SHA-256: 533F5138...). Post SHA-256: 654A2CBF... (b) audit-cableado PENDIENTE.
+- 2026-09-19: `audit-cableado done` — hook de audit aplicado (commit 531f4e30: permission-gate + audit-log + tests). Pester gate 122/123 (1 fail pre-existente C4b), audit-log 13/13. Query de verificación OK.
