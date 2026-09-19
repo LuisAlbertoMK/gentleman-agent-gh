@@ -1,3 +1,4 @@
+#requires -Version 7
 <#
 .SYNOPSIS
     Switch between Zen (free) and Go (contributor) model profiles for opencode.json.
@@ -24,7 +25,6 @@
     .\switch-profile.ps1 -Profile go -DryRun -Json
     .\switch-profile.ps1 -Profile zen -Force
 #>
-#Requires -Version 7
 
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
@@ -273,7 +273,7 @@ if ($PSCmdlet.ShouldProcess($OpencodeJsonPath, "Apply $Profile profile ($($chang
 
         # Write back — targeted in-place replacement to preserve exact formatting/bytes
         # (ConvertTo-Json reformats JSON, breaking byte-identical round-trips)
-        $rawContent = [System.IO.File]::ReadAllText($OpencodeJsonPath)
+        $rawContent = [System.IO.File]::ReadAllText($OpencodeJsonPath) -replace "`r`n", "`n"
         $lines = $rawContent -split "`n"
         foreach ($change in $changes) {
             $agentPattern = '"' + [regex]::Escape($change.agent) + '":\s*\{'
