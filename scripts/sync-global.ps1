@@ -30,6 +30,29 @@ else { $globalCfg = $globalJson }
 $projectCfg = Resolve-Path "$PSScriptRoot\..\opencode.json" -EA Stop
 $report = @{timestamp=(Get-Date -Format "o");steps=@{};errors=@();warnings=@()}
 
+# ── MCP-reconcile: splice helpers (preserve file order + comments across writes) ──
+# SpliceJsonSection: replace a top-level "key": {…} section in raw JSON text
+# by counting brace depth — avoids full ConvertTo-Json re-serialization which
+# destroys key ordering and manual edits. Tradeoff: only handles top-level
+# object values (not arrays or scalars). See mcp-reconcile-force-20260918.md.
+function SpliceJsonSection([string]$T,[string]$K,[string]$V){
+    $ek=[regex]::Escape("`"$K`"")
+    $m=[regex]::Match($T,"(?s)($ek\s*:\s*)")
+    if(-not$m.Success){return $T}
+    $s=$m.Index+$m.Length;$d=0;$iStr=$false;$esc=$false
+    for($j=$s;$j-lt$T.Length;$j++){
+        $c=$T[$j]
+        if($esc){$esc=$false;continue}
+        if($c -eq '\'){$esc=$true;continue}
+        if($c -eq '"'){$iStr=-not$iStr;continue}
+        if($iStr){continue}
+        if($c -eq '{'){$d++}
+        if($c -eq '}'){$d--;if($d -eq 0){
+            return $T.Substring(0,$m.Index)+$m.Groups[1].Value+$V+$T.Substring($j+1)}}
+    }
+    return $T
+}
+
 function Write-Step([string]$N,[scriptblock]$B) {
     if($DryRun){
         Write-Host "[dry-run] $N -- checking drift (no writes)" -Fore Yellow
@@ -165,6 +188,19 @@ Write-Step "Commands sync" {
 
 # Step 3: Global config (MCPs + permissions + agents)
 Write-Step "Global config" {
+    # MCP-reconcile: capture existing bash allow rules BEFORE rebuild to preserve manual edits
+    # (Remove-Item *Temp*opencode*: allow, Remove-Item *.tmp-*: allow, etc.)
+    $existingBashAllows = @{}
+    if (Test-Path $globalCfg) {
+        try {
+            $eb = Get-Content $globalCfg -Raw | ConvertFrom-Json
+            if ($null -ne $eb.permission -and $null -ne $eb.permission.bash) {
+                foreach ($p in $eb.permission.bash.PSObject.Properties) {
+                    if ($p.Value -eq 'allow') { $existingBashAllows[$p.Name] = 'allow' }
+                }
+            }
+        } catch {}
+    }
     if ($Force -or -not (Test-Path $globalCfg)) {
         $existingAgents=@{}; if(Test-Path $globalCfg){try{$e=Get-Content $globalCfg -Raw|ConvertFrom-Json;if($e.PSObject.Properties.Match('agent').Count-gt 0){foreach($p in $e.agent.PSObject.Properties){$existingAgents[$p.Name]=$p.Value}}}catch{Write-Warning "  Could not read existing config"}}
         # P0.1: dynamic MCP merge -- read opencode.json:mcp, fallback to 2 hardcoded MCPs
@@ -194,8 +230,28 @@ Write-Step "Global config" {
             foreach ($dp in $denyFloorRaw.PSObject.Properties) { if ($dp.Value -eq 'deny') { $cfg.permission.bash[$dp.Name] = $dp.Value; $ported++ } }
             Write-Host "  Ported $ported deny-floor rules (SEC-F2)" -Fore Green
         } catch { Write-Warning "  Could not read shared-deny-rules.json: $_" }
+        # MCP-reconcile: re-apply existing bash allow rules lost by permission overwrite at :222
+        # Tradeoff: global-only allows (e.g. Remove-Item *Temp*opencode*) survive; project deny
+        # rules added by SEC-F2 above take precedence over re-applied allows.
+        $reApplied = 0
+        foreach ($key in $existingBashAllows.Keys) {
+            if (-not $cfg.permission.bash.ContainsKey($key) -or $cfg.permission.bash[$key] -ne 'allow') {
+                $cfg.permission.bash[$key] = 'allow'; $reApplied++
+            }
+        }
+        if ($reApplied -gt 0) { Write-Host "  Re-applied $reApplied manual bash allow rules (MCP-reconcile)" -Fore Green }
         if($cfg.agent.Keys.Count -eq 0){$cfg.agent=@{}}
-        $cfg|ConvertTo-Json -Depth 10|Set-Content $globalCfg -Encoding UTF8 -Force
+        # MCP-reconcile: splice mcp+permission+skills into existing file (preserve order + comments)
+        # instead of full ConvertTo-Json rewrite which reorders keys and drops manual edits.
+        if (Test-Path $globalCfg) {
+            $rawText = Get-Content $globalCfg -Raw
+            $rawText = SpliceJsonSection -T $rawText -K 'mcp' -V ($cfg.mcp | ConvertTo-Json -Depth 10 -Compress)
+            $rawText = SpliceJsonSection -T $rawText -K 'permission' -V ($cfg.permission | ConvertTo-Json -Depth 10 -Compress)
+            if ($cfg.ContainsKey('skills')) { $rawText = SpliceJsonSection -T $rawText -K 'skills' -V ($cfg.skills | ConvertTo-Json -Depth 10 -Compress) }
+            Set-Content $globalCfg -Value $rawText -Encoding UTF8 -Force
+        } else {
+            $cfg|ConvertTo-Json -Depth 10|Set-Content $globalCfg -Encoding UTF8 -Force
+        }
         Write-Host "  Written (preserved $($existingAgents.Keys.Count) agents, $($mcpCfg.Keys.Count) MCPs)" -Fore Green
     } else { Write-Host "  Exists, skipping (-Force to overwrite)" -Fore Yellow }
 }
@@ -213,7 +269,10 @@ if(-not $NoAgentSync){Write-Step "Agent sync" {
         Write-Verbose "prune *-semi absent-from-canonical: $pruned (ADR-033)"
         if($added -gt 0 -or $updated -gt 0 -or $pruned -gt 0){
             if(-not$NoAgentsMd){$src=Join-Path (Split-Path $projectCfg -Parent) "AGENTS.md";$dst=Join-Path (Split-Path $globalCfg -Parent) "AGENTS.md";if(Test-Path $src -PathType Leaf){Copy-Item -LiteralPath $src -Destination $dst -Force}}
-            $glob|ConvertTo-Json -Depth 10|Set-Content $globalCfg -Encoding UTF8 -Force
+            # MCP-reconcile: splice agent section only (preserve order + permission.bash + comments)
+            $rawText = Get-Content $globalCfg -Raw
+            $rawText = SpliceJsonSection -T $rawText -K 'agent' -V ($glob.agent | ConvertTo-Json -Depth 10 -Compress)
+            Set-Content $globalCfg -Value $rawText -Encoding UTF8 -Force
         }
         Write-Host "  ${added} added, ${updated} updated, ${pruned} pruned (*-semi)" -Fore Green;$report.steps["agent_sync"]=@{added=$added;updated=$updated;pruned=$pruned}}
 }}
@@ -243,8 +302,14 @@ Write-Step "opencode binary health" {
         if(Test-Path $globalCfg){
             $gcRaw=Get-Content $globalCfg -Raw -EA Stop | ConvertFrom-Json -EA Stop
             if($gcRaw.PSObject.Properties.Match('autoupdate').Count -eq 0 -or $gcRaw.autoupdate -eq $true){
-                $gcRaw | Add-Member -MemberType NoteProperty -Name 'autoupdate' -Value $false -Force
-                $gcRaw | ConvertTo-Json -Depth 100 | Set-Content $globalCfg -Encoding UTF8 -Force
+                # MCP-reconcile: patch autoupdate in-place (no full ConvertTo-Json rewrite)
+                $rawText = Get-Content $globalCfg -Raw
+                if ($rawText -match '"autoupdate"\s*:\s*true') {
+                    $rawText = $rawText -replace '("autoupdate"\s*:\s*)true', '$1false'
+                } else {
+                    $rawText = $rawText -replace '(\{)', "`$1`n  `"autoupdate`": false,"
+                }
+                Set-Content $globalCfg -Value $rawText -Encoding UTF8 -Force
                 Write-Host "  Patched live config autoupdate=false (added or corrected)" -Fore Green
             }
         }
