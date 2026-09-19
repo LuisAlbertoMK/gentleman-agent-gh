@@ -51,14 +51,15 @@ Describe 'sync-global.ps1 ADR-048 integration' {
     It 'contains opencode_binary report key' {
         $syncRaw | Should -Match 'opencode_binary'
     }
-    It 'Step 7 region enforces autoupdate guard and Depth 100 (ADR-048 region-bounded)' {
-        $start = $syncRaw.IndexOf('opencode binary health')
+    It 'Step 7 region enforces autoupdate guard and splice write (ADR-048 region-bounded)' {
+        $start = $syncRaw.IndexOf('# Step 7: opencode binary health')
         $start | Should -BeGreaterThan -1
         $end = $syncRaw.IndexOf('# Report', $start)
         $end | Should -BeGreaterThan $start
         $region = $syncRaw.Substring($start, $end - $start)
         $region | Should -Match '-or \$gcRaw\.autoupdate -eq \$true'
-        $region | Should -Match 'ConvertTo-Json -Depth 100'
+        $region | Should -Match 'Set-Content'
+        $region | Should -Match 'Get-Content \$globalCfg -Raw'
     }
 }
 Describe 'update-opencode.ps1 corrupt-binary heal path' {

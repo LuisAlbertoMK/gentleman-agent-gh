@@ -50,11 +50,21 @@ function Sync-File {
             Add-Result $Label "OK" "Already up to date";return
         }
     }
+    # Locale-proof same-file-via-junction detection (PS5.1 ES/EN/...)
+    $resolvedSrc = [System.IO.Path]::GetFullPath($Source)
+    $resolvedDst = [System.IO.Path]::GetFullPath($Dest)
+    if ($resolvedSrc -eq $resolvedDst) {
+        Add-Result $Label "OK" "Source == destination (same file via junction)"
+        return
+    }
     try {
         Copy-Item -LiteralPath $Source -Destination $Dest -Force
         Add-Result $Label "SYNCED" "Copied to $Dest"
     } catch [System.IO.IOException] {
-        if ($_.Exception.Message -match 'with itself') {
+        # Locale-proof: same size + timestamp means same physical file via junction
+        $srcInfo = Get-Item -LiteralPath $Source -Force
+        $dstInfo = Get-Item -LiteralPath $Dest -Force
+        if ($srcInfo.Length -eq $dstInfo.Length -and $srcInfo.LastWriteTime -eq $dstInfo.LastWriteTime) {
             Add-Result $Label "OK" "Source == destination (same file via junction)"
         } else {
             Add-Result $Label "FAIL" $_.Exception.Message
