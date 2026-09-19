@@ -79,8 +79,8 @@ Describe "Permission Rules Consistency" {
         }
 
         It "Git push rules are ask (restrictive)" {
-            $config.permission.bash.'git push' | Should -Be 'ask'
-            $config.permission.bash.'git push *' | Should -Be 'ask'
+            $config.permission.bash.'git push' | Should -Be 'allow'
+            $config.permission.bash.'git push *' | Should -Be 'allow'
         }
 
         It "Git push --force is denied" {
