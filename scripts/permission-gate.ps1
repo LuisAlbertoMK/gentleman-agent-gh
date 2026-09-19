@@ -39,8 +39,13 @@ param(
     [switch]$Json,
     [switch]$Force,
     [switch]$DryRun,
-    [string]$ModeFilePath
+    [string]$ModeFilePath,
+    [string]$Agent = "unknown",
+    [switch]$Audit
 )
+
+# -Audit defaults ON; pass -Audit:$false to disable logging for this invocation.
+if (-not $PSBoundParameters.ContainsKey('Audit')) { $Audit = $true }
 Set-StrictMode -Version Latest
 
 # --- Dot-source shared classification logic (single source of truth) ---
@@ -121,6 +126,23 @@ try {
     # -DryRun: pure evaluation mode — never applies the -Force override.
     if ($verdict -eq 'ask' -and $Force -and -not $DryRun) {
         $verdict = 'allow'
+    }
+
+    # --- Audit trail: log every real verdict (never blocks the gate) ---
+    # NOTE: $Command is verbatim; do not pass secrets here. The gate typically
+    # receives CLI commands, not credentials — but guard this assumption.
+    if ($Audit -and -not $DryRun -and $verdict -ne 'help') {
+        try {
+            $auditAction = switch ($verdict) {
+                'allow' { 'ALLOW' }
+                'ask'   { 'ASK_ALLOW' }
+                'deny'  { 'DENY' }
+            }
+            $auditScript = Join-Path $PSScriptRoot 'audit-log.ps1'
+            & $auditScript append -agent $Agent -mode $Mode -action $auditAction -detail $Command
+        } catch {
+            # Silent — audit log failure must never block the permission gate
+        }
     }
 
     if ($Json) {

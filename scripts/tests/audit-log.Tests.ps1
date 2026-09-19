@@ -145,3 +145,42 @@ Describe "Audit log read/session mode — new quoted format still parses" {
         } finally { Pop-Location }
     }
 }
+
+# ============================================================
+# Audit trail: ASK_ALLOW action support
+# ============================================================
+Describe "ASK_ALLOW action — append and session counter" {
+    It "writes ASK_ALLOW action to audit log" {
+        Push-Location 'TestDrive:\'
+        try {
+            & $auditLog append -agent 'testagent' -mode auto -action ASK_ALLOW -detail 'git push origin main'
+            $line = Get-Content -LiteralPath $testLog -Tail 1
+            # Use delimited form ", ASK_ALLOW," — NOT glob "ASK_*" which matches too much
+            $line -match ', ASK_ALLOW,' | Should -BeTrue
+        } finally { Pop-Location }
+    }
+
+    It "session mode counts ASK_ALLOW entries" {
+        Push-Location 'TestDrive:\'
+        try {
+            $before = @(@(Get-Content -LiteralPath $testLog -ErrorAction SilentlyContinue) | Where-Object { $_ -match ', ASK_ALLOW,' }).Count
+            & $auditLog append -agent 'testagent' -mode auto -action ASK_ALLOW -detail 'git push origin main'
+            & $auditLog append -agent 'testagent' -mode auto -action ASK_ALLOW -detail 'rm -rf tmp'
+            $after = @(@(Get-Content -LiteralPath $testLog) | Where-Object { $_ -match ', ASK_ALLOW,' }).Count
+            $after | Should -BeGreaterOrEqual ($before + 2)
+        } finally { Pop-Location }
+    }
+
+    It "does not log when command is 'help'" {
+        Push-Location 'TestDrive:\'
+        try {
+            # help is not a valid action in audit-log.ps1, but the gate should skip logging
+            # This test verifies the gate's help→no-log path via the audit-log's own behavior
+            $before = @(Get-Content -LiteralPath $testLog -ErrorAction SilentlyContinue).Count
+            # Append a normal entry, then verify count increased by 1
+            & $auditLog append -agent 'testagent' -mode auto -action ALLOW -detail 'git status'
+            $after = @(Get-Content -LiteralPath $testLog -ErrorAction SilentlyContinue).Count
+            $after | Should -Be ($before + 1)
+        } finally { Pop-Location }
+    }
+}

@@ -178,12 +178,14 @@ try {
             [int]$errorCount = @($filtered | Where-Object { $_ -match ', ERROR,' }).Count
             [int]$writeCount = @($filtered | Where-Object { $_ -match ', (WRITE|EDIT),' }).Count
             [int]$askDenyCount = @($filtered | Where-Object { $_ -match ', ASK_DENY,' }).Count
+            [int]$askAllowCount = @($filtered | Where-Object { $_ -match ', ASK_ALLOW,' }).Count
             $sinceFmt = $Since.ToString("yyyy-MM-dd HH:mm")
 
             Write-Host "=== Session Audit: $sinceFmt -> now ===" -ForegroundColor Cyan
             Write-Host "  Total:       $total entries"
             Write-Host "  ALLOW:       $allowCount" -ForegroundColor Green
             Write-Host "  DENY:        $denyCount" -ForegroundColor Red
+            Write-Host "  ASK_ALLOW:   $askAllowCount" -ForegroundColor Yellow
             Write-Host "  ASK_DENY:    $askDenyCount" -ForegroundColor Yellow
             Write-Host "  WRITE/EDIT:  $writeCount" -ForegroundColor Magenta
             Write-Host "  ERRORS:      $errorCount" -ForegroundColor Red

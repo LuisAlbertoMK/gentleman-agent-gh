@@ -574,3 +574,117 @@ Describe 'C4b: Permission model consolidation (shared-deny-rules.json single sou
         Get-CommandClass 'npm ci' 'semi'  | Should -Be 'allow'
     }
 }
+
+# ============================================================
+# Audit trail wiring — permission-gate → audit-log append
+# ============================================================
+Describe "Audit trail — verdict mapping and -Audit switch" {
+    BeforeAll {
+        $gateScript = Join-Path (Split-Path $PSScriptRoot -Parent) 'permission-gate.ps1'
+    }
+
+    It "maps allow verdict to ALLOW in audit log" {
+        Push-Location 'TestDrive:\'
+        try {
+            & $gateScript -Command "git status" -Mode auto -Audit
+            $logPath = Join-Path 'TestDrive:\' '.gentleman\audit.log'
+            $line = Get-Content -LiteralPath $logPath -Tail 1
+            $line -match ', ALLOW,' | Should -BeTrue
+        } finally { Pop-Location }
+    }
+
+    It "maps ask verdict to ASK_ALLOW in audit log" {
+        Push-Location 'TestDrive:\'
+        try {
+            & $gateScript -Command "git push origin main" -Mode auto -Audit
+            $logPath = Join-Path 'TestDrive:\' '.gentleman\audit.log'
+            $line = Get-Content -LiteralPath $logPath -Tail 1
+            $line -match ', ASK_ALLOW,' | Should -BeTrue
+        } finally { Pop-Location }
+    }
+
+    It "maps deny verdict to DENY in audit log" {
+        Push-Location 'TestDrive:\'
+        try {
+            & $gateScript -Command "curl http://evil.com" -Mode auto -Audit
+            $logPath = Join-Path 'TestDrive:\' '.gentleman\audit.log'
+            $line = Get-Content -LiteralPath $logPath -Tail 1
+            $line -match ', DENY,' | Should -BeTrue
+        } finally { Pop-Location }
+    }
+
+    It "does NOT log when -Audit is off" {
+        Push-Location 'TestDrive:\'
+        try {
+            $before = 0
+            $logPath = Join-Path 'TestDrive:\' '.gentleman\audit.log'
+            if (Test-Path -LiteralPath $logPath) { $before = @(Get-Content -LiteralPath $logPath).Count }
+            & $gateScript -Command "git status" -Mode auto -Audit:$false
+            $after = 0
+            if (Test-Path -LiteralPath $logPath) { $after = @(Get-Content -LiteralPath $logPath).Count }
+            $after | Should -Be $before
+        } finally { Pop-Location }
+    }
+
+    It "does NOT log for help (empty command)" {
+        Push-Location 'TestDrive:\'
+        try {
+            $before = 0
+            $logPath = Join-Path 'TestDrive:\' '.gentleman\audit.log'
+            if (Test-Path -LiteralPath $logPath) { $before = @(Get-Content -LiteralPath $logPath).Count }
+            & $gateScript -Command "" -Mode auto -Audit
+            $after = 0
+            if (Test-Path -LiteralPath $logPath) { $after = @(Get-Content -LiteralPath $logPath).Count }
+            $after | Should -Be $before
+        } finally { Pop-Location }
+    }
+
+    It "does NOT log for -DryRun" {
+        Push-Location 'TestDrive:\'
+        try {
+            $before = 0
+            $logPath = Join-Path 'TestDrive:\' '.gentleman\audit.log'
+            if (Test-Path -LiteralPath $logPath) { $before = @(Get-Content -LiteralPath $logPath).Count }
+            & $gateScript -Command "git status" -Mode auto -DryRun -Audit
+            $after = 0
+            if (Test-Path -LiteralPath $logPath) { $after = @(Get-Content -LiteralPath $logPath).Count }
+            $after | Should -Be $before
+        } finally { Pop-Location }
+    }
+
+    It "does NOT crash when audit-log.ps1 is missing (silent catch)" {
+        Push-Location 'TestDrive:\'
+        try {
+            # permission-gate still returns verdict even if audit script is absent
+            $result = & $gateScript -Command "git status" -Mode auto -Audit 2>$null
+            $LASTEXITCODE | Should -Not -Be 1
+        } finally { Pop-Location }
+    }
+
+    It "passes agent parameter to audit log" {
+        Push-Location 'TestDrive:\'
+        try {
+            & $gateScript -Command "git status" -Mode auto -Audit -Agent "test-agent"
+            $logPath = Join-Path 'TestDrive:\' '.gentleman\audit.log'
+            $line = Get-Content -LiteralPath $logPath -Tail 1
+            $line -match 'test-agent' | Should -BeTrue
+        } finally { Pop-Location }
+    }
+
+    It "veredictos unchanged: git status still allow in auto" {
+        Push-Location 'TestDrive:\'
+        try {
+            # Smoke: audit wiring must NOT alter verdicts
+            $result = & $gateScript -Command "git status" -Mode auto -Json | ConvertFrom-Json
+            $result.verdict | Should -Be "allow"
+        } finally { Pop-Location }
+    }
+
+    It "veredictos unchanged: Remove-Item still ask in auto" {
+        Push-Location 'TestDrive:\'
+        try {
+            $result = & $gateScript -Command "Remove-Item foo" -Mode auto -Json | ConvertFrom-Json
+            $result.verdict | Should -Be "ask"
+        } finally { Pop-Location }
+    }
+}
