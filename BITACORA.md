@@ -1,3 +1,4 @@
+2026-09-19 - Session close: sync-global-audit merge (7d549105), audit-log hook+counter+tests (ALLOW), branch cleanup local+remote, !ship SHIP-READY; gate+PSSA pre-existentes, cross-ref 9/9
 2026-09-19 - Merge experimento/perfiles-zen-go → main: 12 commits (docs, sync-global splice fix, permisos auto, tests, protocolo E1-E10 activo) + gate GO (Pester dirigidos verde, 17 fails pre-existentes documentados, #1 ambiental fixeado)
 2026-09-17 - Automejora C38-C39 (branch experimento/automejora-20260917): C38 SKILLS-INDEX count sync 96→100 (PA 8→10, score 9.8→10.0, commit bde2d0b2); C39 StrictMode completion 126→128 (CC 9.9→10.0, commit d3560817); .project.json updated (dfa0ac56); early stop after 2/5 cycles (delta 0% vs prev); score 10.0/10 final
 2026-09-14 - Migración 59 modelos free→Go verificada dual VALID + commit 0ac4ca5e + gate fix 99529d83 VALID (PSSA 0) — main ahead 2, pendiente push
