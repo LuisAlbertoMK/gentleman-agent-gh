@@ -78,7 +78,7 @@ $ProfileFiles = @{
 
 # --- Expected counts per profile ---
 $ExpectedCounts = @{
-    'go'  = 17   # 12 deepseek→contributor + 5 mimo→contributor
+    'go'  = 19   # 12 deepseek→contributor + 5 mimo→contributor + 2 qwen→contributor
     'zen' = 19   # 14 go-paid→free + 5 already-free (kept for consistency) + 2 qwen→free
 }
 
@@ -148,12 +148,19 @@ try {
     throw "opencode.json is not valid JSON: $_"
 }
 
-# 4. Dirty tree check
+# 4. Dirty tree check (opencode.json + profile JSONs)
 if (-not $Force) {
-    $gitStatus = & git -C $ProjectRoot status --porcelain opencode.json 2>&1
-    $gitStatusStr = if ($gitStatus -is [string]) { $gitStatus } elseif ($gitStatus -is [System.Management.Automation.ErrorRecord]) { '' } else { "$gitStatus" }
-    if ($gitStatusStr -and $gitStatusStr.Trim()) {
-        throw "opencode.json is dirty in git. Use -Force to override, or stash/commit first."
+    $dirtyTargets = @('opencode.json', 'scripts/opencode-configs/profile-go.json', 'scripts/opencode-configs/profile-zen.json')
+    $dirtyFiles = @()
+    foreach ($target in $dirtyTargets) {
+        $gitStatus = & git -C $ProjectRoot status --porcelain $target 2>&1
+        $gitStatusStr = if ($gitStatus -is [string]) { $gitStatus } elseif ($gitStatus -is [System.Management.Automation.ErrorRecord]) { '' } else { "$gitStatus" }
+        if ($gitStatusStr -and $gitStatusStr.Trim()) {
+            $dirtyFiles += $target
+        }
+    }
+    if ($dirtyFiles.Count -gt 0) {
+        throw "Dirty files in git: $($dirtyFiles -join ', '). Use -Force to override, or stash/commit first."
     }
 }
 
@@ -221,15 +228,37 @@ if ($DryRun) {
 }
 
 # --- Backup ---
-$timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-$backupName = "opencode.json.bak-$Profile-$timestamp"
-$backupPath = Join-Path $ProjectRoot $backupName
+$timestamp = Get-Date -Format 'yyyyMMdd-HHmmss-fff'
+$backupBase = "opencode.json.bak-$Profile-$timestamp"
+$backupPath = Join-Path $ProjectRoot $backupBase
+# Prevent collision: if name exists (extremely unlikely with ms), append incremental suffix
+$suffix = 1
+while (Test-Path $backupPath) {
+    $backupPath = Join-Path $ProjectRoot "$backupBase-$suffix"
+    $suffix++
+}
+$backupName = Split-Path -Leaf $backupPath
 
 # --- Apply changes via ShouldProcess ---
 if ($PSCmdlet.ShouldProcess($OpencodeJsonPath, "Apply $Profile profile ($($changes.Count) model overrides)")) {
     $backupCreated = $null
 
     if ($changes.Count -gt 0) {
+        # --- Allowlist validation: verify every overlay entry ---
+        $allowedModels = @(
+            'opencode-go/muse-spark-1.3-contributor',
+            'opencode/muse-spark-1.3-contributor-free'
+        )
+        $agentKeyRegex = '^gentleman-[a-z0-9-]+-sub(-auto)?$'
+        foreach ($prop in $mapping.PSObject.Properties) {
+            if ($prop.Name -notmatch $agentKeyRegex) {
+                throw "ALLOWLIST REJECTED: overlay key '$($prop.Name)' does not match $agentKeyRegex"
+            }
+            if ($prop.Value -notin $allowedModels) {
+                throw "ALLOWLIST REJECTED: model '$($prop.Value)' for agent '$($prop.Name)' is not in allowed list: $($allowedModels -join ', ')"
+            }
+        }
+
         # Create backup
         Copy-Item -LiteralPath $OpencodeJsonPath -Destination $backupPath -Force
         $backupCreated = $backupName
@@ -242,20 +271,73 @@ if ($PSCmdlet.ShouldProcess($OpencodeJsonPath, "Apply $Profile profile ($($chang
             $config.agent.($change.agent).model = $change.to
         }
 
-        # Write back
-        $config | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $OpencodeJsonPath -Encoding UTF8
+        # Write back — targeted in-place replacement to preserve exact formatting/bytes
+        # (ConvertTo-Json reformats JSON, breaking byte-identical round-trips)
+        $rawContent = [System.IO.File]::ReadAllText($OpencodeJsonPath)
+        $lines = $rawContent -split "`n"
+        foreach ($change in $changes) {
+            $agentPattern = '"' + [regex]::Escape($change.agent) + '":\s*\{'
+            $agentIdx = -1
+            for ($i = 0; $i -lt $lines.Count; $i++) {
+                if ($lines[$i] -match $agentPattern) {
+                    $agentIdx = $i
+                    break
+                }
+            }
+            if ($agentIdx -ge 0) {
+                for ($j = $agentIdx + 1; $j -lt [Math]::Min($agentIdx + 20, $lines.Count); $j++) {
+                    if ($lines[$j] -match '"model":\s*"') {
+                        $lines[$j] = $lines[$j].Replace($change.from, $change.to)
+                        break
+                    }
+                }
+            }
+        }
+        $newContent = $lines -join "`n"
+        $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+        [System.IO.File]::WriteAllText($OpencodeJsonPath, $newContent, $utf8NoBom)
 
-        # Post-write validation
+        # Post-write validation (symmetric: Go + Zen)
         try {
             $verify = Get-Content $OpencodeJsonPath -Raw | ConvertFrom-Json
             $verifyAgentKeys = @($verify.agent.PSObject.Properties.Name)
             $verifySubagentKeys = $verifyAgentKeys | Where-Object { $_ -match '-sub(-auto)?$' }
-            $verifyFreeCount = ($verifySubagentKeys | Where-Object {
+            $verifyFreeCount = @($verifySubagentKeys | Where-Object {
                 $m = $verify.agent.$_.model
                 $m -and $m -match 'contributor-free$'
             }).Count
+            $verifyContributorCount = @($verifySubagentKeys | Where-Object {
+                $m = $verify.agent.$_.model
+                $m -and $m -match 'muse-spark-1\.3-contributor$'
+            }).Count
+            $verifyDeepseekCount = @($verifySubagentKeys | Where-Object {
+                $m = $verify.agent.$_.model
+                $m -and $m -match 'deepseek'
+            }).Count
+            $verifyMimoCount = @($verifySubagentKeys | Where-Object {
+                $m = $verify.agent.$_.model
+                $m -and $m -match 'mimo'
+            }).Count
+            $verifyQwenCount = @($verifySubagentKeys | Where-Object {
+                $m = $verify.agent.$_.model
+                $m -and $m -match 'qwen'
+            }).Count
             if ($Profile -eq 'zen' -and $verifyFreeCount -lt 19) {
                 Write-Warning "Post-write validation: expected >= 19 zen-free agents, found $verifyFreeCount"
+            }
+            if ($Profile -eq 'go') {
+                if ($verifyDeepseekCount -ne 0) {
+                    Write-Warning "Post-write validation: expected 0 deepseek-sub agents for Go, found $verifyDeepseekCount"
+                }
+                if ($verifyMimoCount -ne 0) {
+                    Write-Warning "Post-write validation: expected 0 mimo-sub agents for Go, found $verifyMimoCount"
+                }
+                if ($verifyQwenCount -ne 0) {
+                    Write-Warning "Post-write validation: expected 0 qwen-sub agents for Go, found $verifyQwenCount"
+                }
+                if ($verifyContributorCount -lt 24) {
+                    Write-Warning "Post-write validation: expected >= 24 muse-spark-contributor-sub agents for Go, found $verifyContributorCount"
+                }
             }
         } catch {
             Write-Warning "Post-write JSON validation failed: $_"

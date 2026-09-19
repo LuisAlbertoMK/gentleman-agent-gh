@@ -60,7 +60,7 @@ Describe 'switch-profile.ps1' {
         It 'profile-go.json exists and is valid JSON' {
             $goProfile = Get-Content $GoProfilePath -Raw | ConvertFrom-Json
             $goProfile.mapping | Should -Not -BeNullOrEmpty
-            @($goProfile.mapping.PSObject.Properties.Name).Count | Should -Be 17
+            @($goProfile.mapping.PSObject.Properties.Name).Count | Should -Be 19
         }
 
         It 'profile-zen.json exists and is valid JSON' {
@@ -146,7 +146,7 @@ Describe 'switch-profile.ps1' {
                 & $SwitchScript -Profile go -Force -Quiet
                 $backups = Get-ChildItem -Path $tempDir -Filter 'opencode.json.bak-go-*'
                 $backups.Count | Should -BeGreaterOrEqual 1
-                $backups[0].Name | Should -Match 'opencode\.json\.bak-go-\d{8}-\d{6}'
+                $backups[0].Name | Should -Match 'opencode\.json\.bak-go-\d{8}-\d{6}-\d{3}'
             } finally {
                 Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
             }
@@ -260,12 +260,12 @@ Describe 'switch-profile.ps1' {
     }
 
     Context 'Counts per profile' {
-        It 'Go profile applies to exactly 17 subagent entries' {
+        It 'Go profile applies to exactly 19 subagent entries' {
             $tempDir = New-TempOpencodeCopy
             try {
                 $env:GENTLEMAN_AGENT_ROOT = $tempDir
                 $output = & $SwitchScript -Profile go -DryRun -Json | ConvertFrom-Json
-                $output.changed.Count | Should -Be 17
+                $output.changed.Count | Should -Be 19
             } finally {
                 Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
             }
@@ -292,6 +292,106 @@ Describe 'switch-profile.ps1' {
                 $marker = Join-Path $tempDir '.opencode-profile'
                 Test-Path $marker | Should -Be $true
                 (Get-Content $marker -Raw).Trim() | Should -Be 'go'
+            } finally {
+                Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
+            }
+        }
+    }
+
+    Context 'Round-trip Go→Zen→Go byte-identical' {
+        It 'go→zen→go produces byte-identical opencode.json (matches go state, not original mixed state)' {
+            $tempDir = New-TempOpencodeCopy
+            try {
+                $opencodePath = Join-Path $tempDir 'opencode.json'
+                $env:GENTLEMAN_AGENT_ROOT = $tempDir
+
+                # Apply GO first — establishes known state (all contributor models)
+                & $SwitchScript -Profile go -Force -Quiet
+                $afterGoSnapshot = Get-Content $opencodePath -Raw
+                $afterGoHash = (Get-FileHash -LiteralPath $opencodePath -Algorithm SHA256).Hash
+
+                # Go → Zen
+                & $SwitchScript -Profile zen -Force -Quiet
+                $afterZen = Get-Content $opencodePath -Raw
+                $afterZen | Should -Not -Be $afterGoSnapshot
+
+                # Zen → Go — must produce byte-identical result to the go snapshot
+                & $SwitchScript -Profile go -Force -Quiet
+                $afterGoHash2 = (Get-FileHash -LiteralPath $opencodePath -Algorithm SHA256).Hash
+
+                # Byte-identical to the go state (NOT to the original mixed state)
+                $afterGoHash2 | Should -Be $afterGoHash
+            } finally {
+                Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
+            }
+        }
+    }
+
+    Context 'Allowlist validation — rejects manipulated overlay' {
+        It 'rejects overlay with unknown model — no writes, no backups' {
+            $tempDir = New-TempOpencodeCopy
+            try {
+                $opencodePath = Join-Path $tempDir 'opencode.json'
+                $originalHash = (Get-FileHash -LiteralPath $opencodePath -Algorithm SHA256).Hash
+                $beforeBackups = @(Get-ChildItem -Path $tempDir -Filter 'opencode.json.bak-*').Count
+
+                # Tamper profile-go.json: replace model with unknown value
+                $goProfilePath = Join-Path $tempDir 'scripts' 'opencode-configs' 'profile-go.json'
+                $goProfile = Get-Content $goProfilePath -Raw | ConvertFrom-Json
+                $goProfile.mapping.'gentleman-deep-sub' = 'opencode-go/unknown-model'
+                $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+                [System.IO.File]::WriteAllText($goProfilePath, ($goProfile | ConvertTo-Json -Depth 10).Replace("`r`n", "`n"), $utf8NoBom)
+
+                $env:GENTLEMAN_AGENT_ROOT = $tempDir
+                { & $SwitchScript -Profile go -Force -Quiet -ErrorAction Stop } | Should -Throw '*ALLOWLIST REJECTED*'
+
+                # Verify nothing changed
+                $afterHash = (Get-FileHash -LiteralPath $opencodePath -Algorithm SHA256).Hash
+                $afterHash | Should -Be $originalHash
+                $afterBackups = @(Get-ChildItem -Path $tempDir -Filter 'opencode.json.bak-*').Count
+                $afterBackups | Should -Be $beforeBackups
+            } finally {
+                Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
+            }
+        }
+
+        It 'rejects overlay with invalid agent key pattern — no writes, no backups' {
+            $tempDir = New-TempOpencodeCopy
+            try {
+                $opencodePath = Join-Path $tempDir 'opencode.json'
+                $originalHash = (Get-FileHash -LiteralPath $opencodePath -Algorithm SHA256).Hash
+                $beforeBackups = @(Get-ChildItem -Path $tempDir -Filter 'opencode.json.bak-*').Count
+
+                # Tamper profile-go.json: add key with invalid pattern
+                $goProfilePath = Join-Path $tempDir 'scripts' 'opencode-configs' 'profile-go.json'
+                $goProfile = Get-Content $goProfilePath -Raw | ConvertFrom-Json
+                $goProfile.mapping | Add-Member -NotePropertyName 'invalid-key' -NotePropertyValue 'opencode-go/muse-spark-1.3-contributor'
+                $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+                [System.IO.File]::WriteAllText($goProfilePath, ($goProfile | ConvertTo-Json -Depth 10).Replace("`r`n", "`n"), $utf8NoBom)
+
+                $env:GENTLEMAN_AGENT_ROOT = $tempDir
+                { & $SwitchScript -Profile go -Force -Quiet -ErrorAction Stop } | Should -Throw '*ALLOWLIST REJECTED*'
+
+                # Verify nothing changed
+                $afterHash = (Get-FileHash -LiteralPath $opencodePath -Algorithm SHA256).Hash
+                $afterHash | Should -Be $originalHash
+                $afterBackups = @(Get-ChildItem -Path $tempDir -Filter 'opencode.json.bak-*').Count
+                $afterBackups | Should -Be $beforeBackups
+            } finally {
+                Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
+            }
+        }
+    }
+
+    Context 'No CRLF introduced' {
+        It 'opencode.json after apply has no CRLF line endings' {
+            $tempDir = New-TempOpencodeCopy
+            try {
+                $env:GENTLEMAN_AGENT_ROOT = $tempDir
+                & $SwitchScript -Profile go -Force -Quiet
+                $configPath = Join-Path $tempDir 'opencode.json'
+                $raw = [System.IO.File]::ReadAllText($configPath)
+                $raw.Contains("`r`n") | Should -Be $false
             } finally {
                 Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
             }
