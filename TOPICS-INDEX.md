@@ -6,9 +6,14 @@
 | topic_id | objetivo | fase | creado | actualizado | exploracion_paralela_intencional | ramas | dueno_sintesis |
 |---|---|---|---|---|---|---|---|
 | `experimento/perfiles-zen-go` | Aplicar permisos, sync-global y protocolo multiagente al repo | merged-to-main 2026-09-19 | 2026-09-19 | 2026-09-19 | false | `experimento/perfiles-zen-go` (merged) | orquestador |
+| `experimento/sync-global-audit` | Validar sync-global fixeado en copia + proponer cableado audit-log | copy-test in-progress | 2026-09-19 | 2026-09-19 | false | `experimento/sync-global-audit` | orquestador |
 
 ---
 
 ### Bitácora — experimento/perfiles-zen-go
 
 - 2026-09-19: Fase `merged-to-main 2026-09-19` — merge a main completado. Enmiendas E1-E10 del protocolo multiagente aplicadas y aprobadas por owner.
+
+### Bitácora — experimento/sync-global-audit
+
+- 2026-09-19: Topic declarado — copy-test in-progress, audit-proposal in-progress, real-apply PENDIENTE de GO del owner.
