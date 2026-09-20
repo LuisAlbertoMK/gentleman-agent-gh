@@ -87,16 +87,7 @@ function Redact-Secrets {
 
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $checkpointDir = Join-Path -Path $repoRoot -ChildPath ".opencode\session-checkpoints"
-
-# --- Ensure checkpoint dir exists ---
-if (-not (Test-Path -LiteralPath $checkpointDir)) {
-    try {
-        $null = New-Item -ItemType Directory -Path $checkpointDir -Force -ErrorAction Stop
-    } catch {
-        Write-Warning "Failed to create checkpoint dir '$checkpointDir': $($_.Exception.Message)"
-        throw
-    }
-}
+$fileWritten = $false
 
 # --- Step 1: Get context zone from ctx-watchdog ---
 $watchdogResult = $null
@@ -192,12 +183,46 @@ $checkpointData = [PSCustomObject]@{
     recommendation = $watchdogResult.recommendation
 }
 
-$checkpointPath = Join-Path -Path $checkpointDir -ChildPath "$($checkpointData.session_id).json"
-$tmpPath = "$checkpointPath.tmp"
-$checkpointData | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $tmpPath -Encoding UTF8 -ErrorAction Stop
-Move-Item -LiteralPath $tmpPath -Destination $checkpointPath -Force -ErrorAction Stop
-if (-not (Test-Path -LiteralPath $checkpointPath)) {
-    throw "Atomic write failed: checkpoint not found at $checkpointPath"
+# --- Check mode: detect pending directives even in GREEN (P2 YELLOW/RED hardening) ---
+$hasPendingDirective = $false
+$pendingDirectiveTopic = $null
+if ($Mode -eq 'check') {
+    $pendingPath = Join-Path $checkpointDir "pending-engram.json"
+    if (Test-Path -LiteralPath $pendingPath) {
+        try {
+            $pendingContent = Get-Content -LiteralPath $pendingPath -Raw -ErrorAction Stop
+            $pendingObj = $pendingContent | ConvertFrom-Json -ErrorAction Stop
+            if ($pendingObj -and $pendingObj.topic_key) {
+                $hasPendingDirective = $true
+                $pendingDirectiveTopic = $pendingObj.topic_key
+            }
+        } catch {
+            Write-Debug "check mode: failed to read pending-engram.json: $($_.Exception.Message)"
+        }
+    }
+}
+
+$checkpointPath = $null
+# H1 fix: gate file write on mode — check mode must be read-only (no file creation)
+# A1 fix: dir creation moved inside mark/full gate so check mode doesn't create empty dir
+if ($Mode -in @('mark', 'full')) {
+    if (-not (Test-Path -LiteralPath $checkpointDir)) {
+        try {
+            $null = New-Item -ItemType Directory -Path $checkpointDir -Force -ErrorAction Stop
+        } catch {
+            Write-Warning "Failed to create checkpoint dir '$checkpointDir': $($_.Exception.Message)"
+            throw
+        }
+    }
+    $checkpointPath = Join-Path -Path $checkpointDir -ChildPath "$($checkpointData.session_id).json"
+    $tmpPath = "$checkpointPath.tmp"
+    $checkpointData | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $tmpPath -Encoding UTF8 -ErrorAction Stop
+    Move-Item -LiteralPath $tmpPath -Destination $checkpointPath -Force -ErrorAction Stop
+    if (-not (Test-Path -LiteralPath $checkpointPath)) {
+        throw "Atomic write failed: checkpoint not found at $checkpointPath"
+    }
+    # A2 fix: track actual file write, not checkpointNeeded
+    $fileWritten = $true
 }
 
 # --- Step 4: Validate before mem_save (poisoning guard) ---
@@ -380,18 +405,24 @@ $result = [PSCustomObject]@{
     percent           = $watchdogResult.percent
     compression_level = $contextLevel
     checkpoint_needed = $checkpointNeeded
-    checkpoint_created = if ($checkpointNeeded) { $true } else { $false }
-    checkpoint_file   = if ($checkpointNeeded) { $checkpointPath } else { $null }
+    # A2 fix: checkpoint_created reflects REAL file existence, not checkpointNeeded
+    checkpoint_created = $fileWritten
+    checkpoint_file   = if ($fileWritten) { $checkpointPath } else { $null }
     validated         = $validated
     mem_saved         = $memSaved
     persisted         = $persisted
+    # A2: expose discrepancy between file write and engram persistence
+    created_vs_persisted = if ($fileWritten -and -not $persisted) { $true } else { $false }
     pending_file      = $pendingFilePath
     mem_save_directive = $memSaveDirective
     indexed           = $indexed
     miner_patterns    = if ($minerResult) { $minerResult.RepeatedPatterns } else { 0 }
+    has_pending_directive = $hasPendingDirective
+    pending_directive_topic = $pendingDirectiveTopic
     recommendation    = $watchdogResult.recommendation
-    action            = if ($checkpointNeeded) {
-        "checkpoint_created"
+    # A2 fix: action reflects actual outcome, not intent
+    action            = if ($fileWritten) {
+        if ($persisted) { "checkpoint_created" } else { "checkpoint_written_persist_pending" }
     } else {
         "none_needed"
     }
@@ -400,7 +431,7 @@ $result = [PSCustomObject]@{
 if ($Quiet) {
     $result | ConvertTo-Json -Compress -Depth 3
 } else {
-    if ($checkpointNeeded) {
+    if ($fileWritten) {
         Write-Host "✅ CHECKPOINT  $contextZone  $($watchdogResult.percent)% — $($result.action)" -ForegroundColor Cyan
         Write-Host "  File: $checkpointPath" -ForegroundColor DarkGray
     } else {

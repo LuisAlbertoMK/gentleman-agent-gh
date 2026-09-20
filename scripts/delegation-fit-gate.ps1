@@ -40,6 +40,11 @@
     Optional work domain. Recognized: security, seo, infra, performance,
     frontend, datascience, docs. Unrecognized values are ignored (no reroute).
 
+.PARAMETER PlannedPaths
+    Array of file/directory paths this cluster plans to touch. If any path
+    appears more than once, FAIL cluster-path-overlap (catches decompositions
+    that accidentally assign the same file to two clusters).
+
 .PARAMETER Json
     Print {"verdict":"...","reasons":[...],"patterns":[...]} on stdout.
 
@@ -72,6 +77,8 @@ param(
 
     [string]$Domain = '',
 
+    [string[]]$PlannedPaths = @(),
+
     [switch]$Json,
 
     [switch]$Quiet
@@ -85,10 +92,10 @@ $warnHits = @()
 $failReasons = @()
 $warnReasons = @()
 
-# E08 perf-ciclo34-clusterB: closed set of 4 literals needs no regex engine.
-# Semantics identical to '^gentleman-quick(-sub)?(-auto)?$' (anchored, optional
-# groups = exactly these 4 strings; -eq and -match are both case-insensitive).
-$isQuick = ($AgentName -eq 'gentleman-quick') -or ($AgentName -eq 'gentleman-quick-sub') -or ($AgentName -eq 'gentleman-quick-auto') -or ($AgentName -eq 'gentleman-quick-sub-auto')
+# BREAKER-A3 fix (2026-09-19): literal equality evaded by trailing spaces,
+# case variants, and unknown suffixes like -v2. Normalize then regex-match.
+$agentNorm = $AgentName.Trim().ToLowerInvariant()
+$isQuick = $agentNorm -match '(?i)^gentleman-quick(-.*)?$'
 
 # ---------- FAIL PATTERNS (checked BEFORE warns) ----------
 
@@ -100,6 +107,16 @@ if ($isQuick -and (($FileCount -gt 1) -or ($LineCount -gt 20))) {
 if ($FileCount -gt 10) {
     $failHits += 'cluster-over-10'
     $failReasons += 'cluster exceeds 10 files — split into clusters of <=10 files before delegating'
+}
+
+# P1: cluster-path-overlap — same path in PlannedPaths means two clusters share a file
+if ($PlannedPaths.Count -gt 0) {
+    $dups = $PlannedPaths | Group-Object | Where-Object { $_.Count -gt 1 }
+    if ($dups) {
+        $failHits += 'cluster-path-overlap'
+        $dupList = ($dups | ForEach-Object { $_.Name }) -join ', '
+        $failReasons += ("PlannedPaths overlap — duplicate entries detected: {0}. Each path must belong to exactly one cluster" -f $dupList)
+    }
 }
 
 # ---------- WARN PATTERNS ----------
@@ -132,7 +149,7 @@ if ($isQuick -and ($RiskLevel -eq 'high')) {
 
 if ($FileCount -gt 5) {
     $warnHits += 'over-5-files'
-    $warnReasons += 'cluster over 5 files — consider a chained-pr / work-unit-commits split'
+    $warnReasons += ('cluster over 5 files — split with chained-pr skill (≤400 LOC/conventional-commit unit) or work-unit-commits to keep each reviewable unit small' -f $FileCount)
 }
 
 # ---------- VERDICT (FAIL wins; FAIL output also carries warning patterns) ----------

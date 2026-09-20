@@ -9,6 +9,10 @@
   Handles: BITACORA log, git status check, protected files verification,
   external auditor gate (REQUIRED when code changes touch critical files).
   Outputs the structured info needed for the agent's Engram close protocol.
+
+  Gate behavior: gatePassed=false does NOT cause exit≠0 by default.
+  Use -FailOnGate (opt-in) to enforce non-zero exit on gate failure.
+  This preserves backward compat with all existing callers.
 .PARAMETER Goal
   What was the session goal? Pre-fills the summary template.
 .PARAMETER Description
@@ -33,6 +37,7 @@ param(
     [switch]$Force,
     [switch]$SkipSummaryGate,
     [switch]$Checkpoint,
+    [switch]$FailOnGate,
     [string[]]$Discoveries,
     [string[]]$Decisions,
     [string[]]$Errors,
@@ -111,7 +116,11 @@ try {
 $touchedProtected = @()
 if ($hasChanges) {
     $changedFiles = @($gitStatus | ForEach-Object {
-        if ($_ -match '^\s*[MADRCU\?]\s+(.+)$') { $matches[1] }
+        if ($_ -match '^\s*(?:[MADRCU?!?]{1,2})\s+(.+)$') {
+            $path = $matches[1]
+            # Handle rename: "R  old -> new" → take new
+            if ($_ -match '^\s*R\s+.+\s+->\s+(.+)$') { $matches[1] } else { $path }
+        }
     })
     foreach ($pf in $protectedFiles) {
         # Match both / and \ in paths
@@ -314,6 +323,14 @@ $result | Add-Member -NotePropertyName "memSaveDirective" -NotePropertyValue $di
 $result | Add-Member -NotePropertyName "interTrackReceipt" -NotePropertyValue $interTrackReceipt -Force
 $result | Add-Member -NotePropertyName "hasPendingDirective" -NotePropertyValue $hasPendingDirective -Force
 
+# --- Opt-in gate enforcement (-FailOnGate) ---
+$overallGatePassed = $auditGatePassed -and $summaryGatePassed -and $gatePassed
+if (-not $overallGatePassed -and $FailOnGate) {
+    $exitCode = 1
+} else {
+    $exitCode = 0
+}
+
 if ($Quiet) {
     $result | ConvertTo-Json -Depth 5
 } else {
@@ -360,6 +377,11 @@ if ($Quiet) {
         } catch { Write-Debug "ledger summary: $($_.Exception.Message)" }
     }
 
+    # Checkpoint: warn when skipped (no -Checkpoint switch)
+    if (-not $Checkpoint) {
+        Write-Host "⚠️  Phase 2 audit SKIPPED (no -Checkpoint)" -ForegroundColor Yellow
+    }
+
     # Checkpoint status output (verbose only)
     if ($Checkpoint) {
         if ($hasPendingDirective) {
@@ -392,3 +414,5 @@ if ($Quiet) {
     Write-Host "## Next Steps" -ForegroundColor Gray
     Write-Host "## Relevant Files" -ForegroundColor Gray
 }
+
+exit $exitCode

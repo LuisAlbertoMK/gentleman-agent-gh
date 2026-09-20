@@ -8,7 +8,7 @@
     Part of the reliability hardening for gentleman-agent-gh.
 .PARAMETER AllowedPaths
     Comma-separated list of allowed glob patterns (e.g., "src/auth/*,src/api/*").
-    Supports: *, ? (single char). Does NOT support: **, {a,b}, regex syntax.
+    Supports: *, ?, ** (recursive). Bare "*" is rejected unless -AllowBroad is set.
 .PARAMETER BaseRef
     Git ref to compare against (default: HEAD).
 
@@ -19,6 +19,9 @@
     Used by the pre-commit gate to scope-check what is about to be committed.
 .PARAMETER Json
     Output as JSON.
+.PARAMETER AllowBroad
+    Explicitly permit the overly permissive "*" pattern. Without this flag, a bare
+    "*" in AllowedPaths is rejected as fail-closed (exit 1).
 .EXAMPLE
     .\scripts\validate-write-scope.ps1 -AllowedPaths "src/auth/*,src/api/*"
     .\scripts\validate-write-scope.ps1 -AllowedPaths "scripts/*" -BaseRef "HEAD~1" -Json
@@ -31,7 +34,8 @@ param(
     [string]$BaseRef = "HEAD",
     [string]$RepoRoot   = $(try { (Get-Location).Path } catch { $PWD }),
     [switch]$Staged,
-    [switch]$Json
+    [switch]$Json,
+    [switch]$AllowBroad
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -42,6 +46,15 @@ $clean = @()
 # Validate AllowedPaths is not empty
 if (-not $AllowedPaths -or $AllowedPaths.Trim() -eq '') {
     $msg = "AllowedPaths cannot be empty - this would flag ALL files as violations"
+    if ($Json) { @{ status = "error"; message = $msg } | ConvertTo-Json } else { Write-Output "ERROR: $msg" }
+    exit 1
+}
+
+# Reject overly permissive patterns (bare "*" or empty after trim) unless -AllowBroad
+$parsedForBroad = @($AllowedPaths -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' })
+$broadPatterns = @($parsedForBroad | Where-Object { $_ -eq '*' })
+if ($broadPatterns.Count -gt 0 -and -not $AllowBroad) {
+    $msg = "AllowedPaths contains overly permissive '*' pattern - use -AllowBroad to explicitly permit, or narrow to subpaths"
     if ($Json) { @{ status = "error"; message = $msg } | ConvertTo-Json } else { Write-Output "ERROR: $msg" }
     exit 1
 }
@@ -61,12 +74,12 @@ if ($BaseRef -match '\s') {
 }
 
 # Run git diff with error checking
-$gitOutput = $null
+$gitOutput = @()
 try {
     if ($Staged) {
-        $gitOutput = & git -C $RepoRoot diff --cached --name-only $BaseRef 2>&1
+        $gitOutput = @(& git -C $RepoRoot diff --cached --name-only $BaseRef 2>&1)
     } else {
-        $gitOutput = & git -C $RepoRoot diff --name-only $BaseRef 2>&1
+        $gitOutput = @(& git -C $RepoRoot diff --name-only $BaseRef 2>&1)
     }
     $exitCode = $LASTEXITCODE
 } catch {
@@ -78,6 +91,20 @@ if ($exitCode -ne 0) {
     $msg = "git diff failed (exit $exitCode): $detail"
     if ($Json) { @{ status = "error"; message = $msg } | ConvertTo-Json } else { Write-Output "ERROR: $msg" }
     exit 1
+}
+
+# Also include untracked files (new files not yet committed) — same scope enforcement
+# applies: if a subagent creates a file outside AllowedPaths, it must be flagged.
+# Only for non-staged mode; staged mode implies intent to commit specific files.
+if (-not $Staged) {
+    try {
+        $untracked = @(& git -C $RepoRoot ls-files --others --exclude-standard 2>&1)
+        if ($LASTEXITCODE -eq 0 -and $untracked) {
+            $gitOutput = @($gitOutput) + @($untracked)
+        }
+    } catch {
+        # Non-fatal: untracked detection is best-effort
+    }
 }
 
 # Ensure $changedFiles is always an array (PS7 single-string quirk)
@@ -124,7 +151,10 @@ function Convert-GlobToRegex {
     param([string]$Glob)
     # Escape regex metacharacters (except * and ? which we handle as glob)
     $escaped = [regex]::Escape($Glob)
-    # Un-escape * (glob wildcard -> regex .*)
+    # Handle ** first: \*\* -> .* (recursive: zero-or-more path segments)
+    # Use .Replace() (literal) instead of -replace (regex) to avoid escaping pain
+    $escaped = $escaped.Replace('\*\*', '.*')
+    # Un-escape remaining single * (glob wildcard -> regex .*)
     $escaped = $escaped -replace '\\\*', '.*'
     # Un-escape ? (glob single char -> regex .)
     $escaped = $escaped -replace '\\\?', '.'
@@ -164,28 +194,49 @@ foreach ($file in $changedFiles) {
 
 $hasViolations = $violations.Count -gt 0
 
-if ($Json) {
-    @{
-        status = if ($hasViolations) { "VIOLATION" } else { "CLEAN" }
-        violations = $violations
-        clean = $clean
-        totalChanged = $changedFiles.Count
-        totalViolations = $violations.Count
-        patterns = $patterns
-    } | ConvertTo-Json -Depth 3
-} else {
-    if ($hasViolations) {
-        Write-Output "[VIOLATION] $($violations.Count) file(s) outside allowed scope:"
-        foreach ($v in $violations) {
-            Write-Output "  - $v"
-        }
-        Write-Output ""
-        Write-Output "Allowed patterns: $($patterns -join ', ')"
-        Write-Output "Clean files: $($clean.Count)"
+if (-not $hasViolations) {
+    # CLEAN path — no enrichment needed
+    if ($Json) {
+        @{ status = "CLEAN"; violations = @(); clean = $clean; totalChanged = $changedFiles.Count; totalViolations = 0; patterns = $patterns } | ConvertTo-Json -Depth 3
     } else {
         Write-Output "[CLEAN] All $($changedFiles.Count) changed file(s) within scope"
         Write-Output "Patterns: $($patterns -join ', ')"
     }
+    exit 0
 }
 
-if ($hasViolations) { exit 1 }
+# P3 actionable violation: explain WHY each file was denied + suggest AllowedPaths fix
+if ($Json) {
+    $enrichedViolations = @($violations | ForEach-Object {
+        $f = $_
+        $isUntracked = -not (& git -C $RepoRoot ls-files --error-unmatch $f 2>$null)
+        @{
+            file = $f
+            type = if ($isUntracked) { "untracked" } else { "modified" }
+            reason = "No AllowedPaths pattern matched '$f'"
+            suggestion = "Add pattern like '$(Split-Path $f -Parent)/*' to -AllowedPaths"
+        }
+    })
+    @{
+        status = "VIOLATION"
+        violations = $enrichedViolations
+        clean = $clean
+        totalChanged = $changedFiles.Count
+        totalViolations = $violations.Count
+        patterns = $patterns
+    } | ConvertTo-Json -Depth 4
+} else {
+    Write-Output "[VIOLATION] $($violations.Count) file(s) outside allowed scope:"
+    foreach ($v in $violations) {
+        $isUntracked = -not (& git -C $RepoRoot ls-files --error-unmatch $v 2>$null)
+        $typeLabel = if ($isUntracked) { "untracked (new)" } else { "modified" }
+        $dir = Split-Path $v -Parent
+        $suggestion = if ($dir) { "$dir/*" } else { $v }
+        Write-Output "  - $v [$typeLabel] — denied by patterns: $($patterns -join ', ')"
+        Write-Output "    Suggestion: add '$suggestion' to -AllowedPaths"
+    }
+    Write-Output ""
+    Write-Output "Allowed patterns: $($patterns -join ', ')"
+    Write-Output "Clean files: $($clean.Count)"
+}
+exit 1
