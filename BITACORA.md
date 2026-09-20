@@ -1,3 +1,5 @@
+2026-09-20 - test(delegation): fusiona T1-T12 HEAD con suite cluster-path-overlap + fix real PS-CI-03 (ruta literal); cobertura FileCount/LineCount/RiskLevel/Domain restaurada.
+2026-09-20 - docs(bitacora): session close — !close ejecutado desde plan-execution
 2026-09-20 - Rename orquestador gentleman-vMK*→gentle-MK: F1 tests dual + F2 runtime dual-read + F3 alias-add/regen + F4 cutover (22M+2N, 0 deletes, default gentle-MK-auto, Go build verde); Pester 94/95 (drift pre-existing :52); regen sincronizó hardening permission.bash (fuente STALE); shims legacy .bat+ValidateSet.
 2026-09-20 - Incidentes: 2 caídas API subagentes (reintento serie OK) + scratch eliminado (_check-drift.ps1, sync.exe); memoria #1127.
 2026-09-19 - Automejora orquestador P1-P3: fit-gate overlap FAIL (PlannedPaths) + checkpoint pending-directive + write-scope accionable; gates 12+87+6 PASS + breaker/auditor dual.
