@@ -103,16 +103,21 @@ if [ "$SKIP_SHORTCUTS" = false ]; then
     BIN_DIR="${HOME}/.local/bin"
     mkdir -p "$BIN_DIR"
 
-    # gentleman-vmk
-    if [ ! -f "${BIN_DIR}/gentleman-vmk" ]; then
-        cat > "${BIN_DIR}/gentleman-vmk" << 'SCRIPT'
+    # gentle-mk (legacy gentleman-vmk alias removed)
+    if [ -f "${BIN_DIR}/gentleman-vmk" ]; then
+        rm -f "${BIN_DIR}/gentleman-vmk" && ok "Removed legacy ${BIN_DIR}/gentleman-vmk"
+    fi
+
+    # gentle-mk
+    if [ ! -f "${BIN_DIR}/gentle-mk" ]; then
+        cat > "${BIN_DIR}/gentle-mk" << 'SCRIPT'
 #!/usr/bin/env bash
-exec opencode --agent gentleman-vMK "$@"
+exec opencode --agent gentle-MK "$@"
 SCRIPT
-        chmod +x "${BIN_DIR}/gentleman-vmk"
-        ok "Created ${BIN_DIR}/gentleman-vmk"
+        chmod +x "${BIN_DIR}/gentle-mk"
+        ok "Created ${BIN_DIR}/gentle-mk"
     else
-        skip "${BIN_DIR}/gentleman-vmk already exists"
+        skip "${BIN_DIR}/gentle-mk already exists"
     fi
 
     # Add ~/.local/bin to PATH if not already
@@ -139,8 +144,8 @@ if [ -f "$GLOBAL_CONFIG" ] && [ -f "$REPO_CONFIG" ]; then
         # default_agent
         current_agent
         current_agent=$(jq -r '.default_agent // ""' "$GLOBAL_CONFIG")
-        if [ "$current_agent" != "gentleman-vMK-auto" ]; then
-            jq '.default_agent = "gentleman-vMK-auto"' "$GLOBAL_CONFIG" > "${GLOBAL_CONFIG}.tmp" && mv "${GLOBAL_CONFIG}.tmp" "$GLOBAL_CONFIG"
+        if [ "$current_agent" != "gentle-MK-auto" ]; then
+            jq '.default_agent = "gentle-MK-auto"' "$GLOBAL_CONFIG" > "${GLOBAL_CONFIG}.tmp" && mv "${GLOBAL_CONFIG}.tmp" "$GLOBAL_CONFIG"
             updated=true
         fi
 
@@ -217,7 +222,7 @@ else
 fi
 
 # Step 7: Global AGENTS.md
-# {file:AGENTS.md} in gentleman-vMK agent prompt resolves relative to global config
+# {file:AGENTS.md} in gentle-MK agent prompt resolves relative to global config
 info "Copying AGENTS.md to global config"
 GLOBAL_AGENTS_MD="${HOME}/.config/opencode/AGENTS.md"
 REPO_AGENTS_MD="${REPO_DIR}/AGENTS.md"
@@ -332,17 +337,17 @@ else
     all_ok=false
 fi
 
-if command -v gentleman-vmk &>/dev/null; then
-    ok "Global shortcut: gentleman-vmk"
+if command -v gentle-mk &>/dev/null; then
+    ok "Global shortcut: gentle-mk"
 else
-    warn "Global shortcut: gentleman-vmk — not in PATH"
+    warn "Global shortcut: gentle-mk not in PATH"
     all_ok=false
 fi
 
 echo ""
 if [ "$all_ok" = true ]; then
     printf '%s✅ Machine setup COMPLETE%s\n' "$GREEN" "$NC"
-    printf "   %s→ Run 'gentleman-vmk' to launch%s\n" "$CYAN" "$NC"
+    printf "   %s→ Run 'gentle-mk' to launch%s\n" "$CYAN" "$NC"
 else
     printf '%s⚠️  Setup PARTIAL — review warnings above%s\n' "$YELLOW" "$NC"
 fi

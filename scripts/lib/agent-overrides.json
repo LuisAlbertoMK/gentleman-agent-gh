@@ -45,7 +45,7 @@
   "sdd-verify": {
     "hidden": true
   },
-  "gentleman-vMK-auto": {
+  "gentle-MK-auto": {
     "extraPermKeys": {
       "task": {
         "*": "deny",

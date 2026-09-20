@@ -185,7 +185,7 @@
       "**/.gnupg/**": "deny"
     }
   },
-  "default_agent": "gentleman-vMK-auto",
+  "default_agent": "gentle-MK-auto",
   "experimental": {
     "mcp_timeout": 60000
   },
@@ -254,11 +254,11 @@
   },
   "$schema": "https://opencode.ai/config.json",
   "agent": {
-    "gentleman-vMK": {
+    "gentle-MK": {
       "description": "Orchestrator - decomposes tasks, delegates to right agent, synthesizes results. Never implements directly.",
       "model": "opencode-go/muse-spark-1.3-contributor",
       "mode": "primary",
-      "prompt": "{file:prompts/gentleman-vMK.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "prompt": "{file:prompts/gentle-MK.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "tools": {
         "codebase-memory*": true,
         "engram*": true
@@ -568,11 +568,11 @@
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-verify.md}"
     },
-    "gentleman-vMK-auto": {
+    "gentle-MK-auto": {
       "description": "Orchestrator — AUTO mode (all auto-approve except push + destructive + network)",
       "model": "opencode-go/muse-spark-1.3-contributor",
       "mode": "primary",
-      "prompt": "{file:prompts/gentleman-vMK.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
+      "prompt": "{file:prompts/gentle-MK.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "tools": {
         "engram*": true,
         "codebase-memory*": true
@@ -772,7 +772,7 @@
         "sdd-verify"
       ],
       "delegate_to_agent": "gentle-orchestrator",
-      "fallback_default": "gentleman-vMK-auto"
+      "fallback_default": "gentle-MK-auto"
     }
   }
 }

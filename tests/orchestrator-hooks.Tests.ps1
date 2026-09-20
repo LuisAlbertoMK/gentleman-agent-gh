@@ -4,7 +4,7 @@
     Static gate for orchestrator enforcement hooks and weakness-plan artifacts.
 .DESCRIPTION
     Validates WITHOUT a runtime harness:
-    - T1: prompts/gentleman-vMK.md exists (fail-closed)
+    - T1: prompts/gentle-MK.md or prompts/gentleman-vMK.md exists (fail-closed)
     - T2: All four mandatory hook markers are present in the prompt
     - T3: Every script referenced by the 2026-08-14 weakness plan exists on disk
     - T4: Fail-closed negative — missing prompt file is detected, not silently ignored
@@ -30,7 +30,12 @@ Describe "Orchestrator Hooks — Static Gate" {
     )
     BeforeAll {
         $repoRoot          = Join-Path $PSScriptRoot ".."
-        $promptFile        = Join-Path $repoRoot "prompts\gentleman-vMK.md"
+        $promptFile = $null
+        foreach ($name in @('gentle-MK.md', 'gentleman-vMK.md')) {
+            $candidate = Join-Path $repoRoot "prompts\$name"
+            if (Test-Path $candidate) { $promptFile = $candidate; break }
+        }
+        if (-not $promptFile) { throw 'Neither prompts/gentle-MK.md nor prompts/gentleman-vMK.md found' }
         $hookMarkers       = @(
             'Pre-Answer Evidence Gate',
             'Memory Capture',
@@ -47,7 +52,7 @@ Describe "Orchestrator Hooks — Static Gate" {
     }
 
     Context "T1 — Prompt file existence" {
-        It "prompts/gentleman-vMK.md exists (fail-closed)" {
+        It "prompts/gentle-MK.md or prompts/gentleman-vMK.md exists (fail-closed)" {
             Test-Path $promptFile | Should -BeTrue
         }
     }

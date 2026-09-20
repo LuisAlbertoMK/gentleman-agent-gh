@@ -1,12 +1,12 @@
 @echo off
-REM gentleman-vmk.bat - CMD wrapper that auto-detects PowerShell version (LEGACY shim → gentle-MK)
+REM gentle-mk.bat - CMD wrapper that auto-detects PowerShell version
 REM   - Prefers pwsh.exe (PowerShell 7+) when available for full feature set
 REM   - Falls back to powershell.exe (Windows PowerShell 5.1) otherwise
 REM   - Both invoke: opencode --agent gentle-MK %*
 REM
 REM Usage:
-REM   gentleman-vmk            - launch agent interactively
-REM   gentleman-vmk "do X"     - ask agent to do something
+REM   gentle-mk            - launch agent interactively
+REM   gentle-mk "do X"     - ask agent to do something
 
 setlocal
 

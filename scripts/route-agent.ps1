@@ -51,7 +51,7 @@ $ErrorActionPreference = "Stop"
 
 # --- Agents that have -semi / -auto variants (per README + use-gentleman.ps1) ---
 # Only these 5 core agent families support mode-aware routing.
-$ModeAwareAgents = @('gentleman-vMK', 'gentleman-deep', 'gentleman-quick', 'gentleman-codex', 'gentleman-implementer')
+$ModeAwareAgents = @('gentleman-vMK', 'gentle-MK', 'gentleman-deep', 'gentleman-quick', 'gentleman-codex', 'gentleman-implementer')
 
 # --- Read-only specialists: NO suffix ever (per AGENTS.md: "always execute") ---
 $ReadOnlySpecialists = @(

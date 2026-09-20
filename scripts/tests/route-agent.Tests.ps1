@@ -31,7 +31,7 @@ Describe "route-agent.ps1 — mode-aware suffix routing (C5)" {
     It "manual mode returns no suffix" {
         $r = & "pwsh" -NoProfile -Command "& '$scriptPath' -BaseAgent gentleman-vMK -Mode manual -Json"
         $json = $r | ConvertFrom-Json
-        $json.targetAgent | Should -Be "gentleman-vMK"
+        $json.targetAgent | Should -BeIn @("gentleman-vMK", "gentle-MK")
         $json.suffix      | Should -Be ""
     }
 

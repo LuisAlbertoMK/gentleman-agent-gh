@@ -87,4 +87,4 @@ fi
 echo ""
 printf '%s✅ gentleman-agent-gh setup complete%s\n' "$GREEN" "$NC"
 echo ""
-echo "  Run 'gentleman-vmk' to launch"
+echo "  Run 'gentle-mk' to launch"

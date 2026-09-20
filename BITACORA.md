@@ -1,3 +1,5 @@
+2026-09-20 - Rename orquestador gentleman-vMK*→gentle-MK: F1 tests dual + F2 runtime dual-read + F3 alias-add/regen + F4 cutover (22M+2N, 0 deletes, default gentle-MK-auto, Go build verde); Pester 94/95 (drift pre-existing :52); regen sincronizó hardening permission.bash (fuente STALE); shims legacy .bat+ValidateSet.
+2026-09-20 - Incidentes: 2 caídas API subagentes (reintento serie OK) + scratch eliminado (_check-drift.ps1, sync.exe); memoria #1127.
 2026-09-19 - Automejora orquestador P1-P3: fit-gate overlap FAIL (PlannedPaths) + checkpoint pending-directive + write-scope accionable; gates 12+87+6 PASS + breaker/auditor dual.
 2026-09-19 - 4 clusters aislados: checkpoint dir+flag, write-scope wildcard+untracked, close-session regex+FailOnGate, fit-gate evasion. 32/32 PASS + breaker/auditor dual.
 2026-09-19 - Session close: sync-global-audit merge (7d549105), audit-log hook+counter+tests (ALLOW), branch cleanup local+remote, !ship SHIP-READY; gate+PSSA pre-existentes, cross-ref 9/9

@@ -5,63 +5,63 @@
   "projects": [
     {
       "path": "../arturo",
-      "defaultAgent": "gentleman-vMK"
+      "defaultAgent": "gentle-MK"
     },
     {
       "path": "../automatizacion",
-      "defaultAgent": "gentleman-vMK"
+      "defaultAgent": "gentle-MK"
     },
     {
       "path": "../clash",
-      "defaultAgent": "gentleman-vMK"
+      "defaultAgent": "gentle-MK"
     },
     {
       "path": "../control-pedidos",
-      "defaultAgent": "gentleman-vMK"
+      "defaultAgent": "gentle-MK"
     },
     {
       "path": "../conversor",
-      "defaultAgent": "gentleman-vMK"
+      "defaultAgent": "gentle-MK"
     },
     {
       "path": "../erp-talleres",
-      "defaultAgent": "gentleman-vMK"
+      "defaultAgent": "gentle-MK"
     },
     {
       "path": "../herramienta-tecnico",
-      "defaultAgent": "gentleman-vMK"
+      "defaultAgent": "gentle-MK"
     },
     {
       "path": "../huawei-unlock-agent",
-      "defaultAgent": "gentleman-vMK"
+      "defaultAgent": "gentle-MK"
     },
     {
       "path": "../kitchenos-full",
-      "defaultAgent": "gentleman-vMK"
+      "defaultAgent": "gentle-MK"
     },
     {
       "path": "../leandro",
-      "defaultAgent": "gentleman-vMK"
+      "defaultAgent": "gentle-MK"
     },
     {
       "path": "../monoMKservices",
-      "defaultAgent": "gentleman-vMK"
+      "defaultAgent": "gentle-MK"
     },
     {
       "path": "../musica",
-      "defaultAgent": "gentleman-vMK"
+      "defaultAgent": "gentle-MK"
     },
     {
       "path": "../Reportes-myco",
-      "defaultAgent": "gentleman-vMK"
+      "defaultAgent": "gentle-MK"
     },
     {
       "path": "../sushi",
-      "defaultAgent": "gentleman-vMK"
+      "defaultAgent": "gentle-MK"
     },
     {
       "path": "../youtube_transcription",
-      "defaultAgent": "gentleman-vMK"
+      "defaultAgent": "gentle-MK"
     }
   ]
 }

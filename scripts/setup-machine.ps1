@@ -119,6 +119,7 @@ if (-not $SkipShortcuts) {
     if (-not (Test-Path $npmDir)) { New-Item -ItemType Directory -Path $npmDir -Force | Out-Null }
     $shortcuts = @(
         @{ Name = "gentleman-vmk"; Ps1Cmd = "opencode --agent gentleman-vMK $args"; CmdCmd = "opencode --agent gentleman-vMK %*"; BatCmd = "gentleman-vmk" }
+        @{ Name = "gentle-mk"; Ps1Cmd = "opencode --agent gentle-MK $args"; CmdCmd = "opencode --agent gentle-MK %*"; BatCmd = "gentle-mk" }
         @{ Name = "gentle-batch-edit"; Ps1Cmd = "gentle-batch-edit.bat $args"; CmdCmd = "gentle-batch-edit.bat %*"; BatCmd = "gentle-batch-edit" }
     )
     foreach ($sc in $shortcuts) {
@@ -163,8 +164,8 @@ if ((Test-Path $globalConfigPath) -and (Test-Path $repoConfigPath)) {
         $globalConfig = Get-Content $globalConfigPath -Raw | ConvertFrom-Json
         $repoConfig = Get-Content $repoConfigPath -Raw | ConvertFrom-Json
         $synced = $Force
-        if (-not $globalConfig.default_agent -or $globalConfig.default_agent -ne "gentleman-vMK-auto") {
-            $globalConfig | Add-Member -NotePropertyName "default_agent" -NotePropertyValue "gentleman-vMK-auto" -Force
+        if (-not $globalConfig.default_agent -or $globalConfig.default_agent -ne "gentle-MK-auto") {
+            $globalConfig | Add-Member -NotePropertyName "default_agent" -NotePropertyValue "gentle-MK-auto" -Force
             $synced = $true
         }
         foreach ($section in @("mcp", "permission", "skills", "agent")) {
@@ -294,13 +295,13 @@ if (-not $SkipVision) {
 
 # Step 8: Verify
 info "Verifying setup"
-$verifyCmds = Get-Command gentleman-vmk, gentle-batch-edit, codebase-memory-mcp, headroom, engram, ollama -EA SilentlyContinue
+$verifyCmds = Get-Command gentleman-vmk, gentle-mk, gentle-batch-edit, codebase-memory-mcp, headroom, engram, ollama -EA SilentlyContinue
 $goCmd = Get-Command "go" -EA SilentlyContinue
 $goAvailable = $null -ne $goCmd
 $checks = @(
     @{ Label = "GENTLEMAN_AGENT_ROOT"; Test = { $env:GENTLEMAN_AGENT_ROOT -eq $__rootDir } },
     @{ Label = "opencode.json exists"; Test = { Test-Path (Join-Path $RepoDir "opencode.json") } },
-    @{ Label = "Global shortcut: gentleman-vmk"; Test = { $verifyCmds.Name -contains "gentleman-vmk" } },
+    @{ Label = "Global shortcut: gentleman-vmk / gentle-mk"; Test = { ($verifyCmds.Name -contains "gentleman-vmk") -or ($verifyCmds.Name -contains "gentle-mk") } },
     @{ Label = "Global shortcut: gentle-batch-edit"; Test = { $verifyCmds.Name -contains "gentle-batch-edit" -or $goAvailable } },
     @{ Label = "Go toolchain"; Test = { $goAvailable } },
     @{ Label = "MCP: codebase-memory-mcp"; Test = { $verifyCmds.Name -contains "codebase-memory-mcp" } },
@@ -331,7 +332,7 @@ if ($allOk) {
         Write-Host "✅ DRY-RUN — nothing was applied. Review steps above, then re-run without -DryRun." -ForegroundColor Cyan
     } else {
         Write-Host "✅ Machine setup COMPLETE" -ForegroundColor Green
-        Write-Host "   → Run 'gentleman-vmk' to launch" -ForegroundColor Cyan
+        Write-Host "   → Run 'gentleman-vmk' or 'gentle-mk' to launch" -ForegroundColor Cyan
         if ($goAvailable) {
             Write-Host "   → Run 'gentle-batch-edit spec.jsonl' for bulk file edits" -ForegroundColor Cyan
         } else {

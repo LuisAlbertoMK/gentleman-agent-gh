@@ -130,7 +130,7 @@ Describe 'PS5/7 Compat — gentleman-vmk.bat wrapper' {
         $content = Get-Content $path -Raw
         $content | Should -Match 'pwsh\.exe'
         $content | Should -Match 'powershell\.exe'
-        $content | Should -Match 'opencode --agent gentleman-vMK'
+        $content | Should -Match 'opencode --agent (gentleman-vMK|gentle-MK)'
     }
 
     It 'T12: setup-machine.ps1 installs .bat shortcut from scripts/$($sc.BatCmd).bat' {

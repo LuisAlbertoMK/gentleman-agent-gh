@@ -75,6 +75,7 @@ function detectTemplate(agentName) {
 const TEMPLATE_MAP = {
   // Orchestrator — full bash allow + extra language denials
   'gentleman-vMK': 'orchestrator',
+  'gentle-MK': 'orchestrator',
   'gentle-orchestrator': 'sddorchestrator',
 
   // Read-only specialists — bash deny, no write/edit
@@ -127,6 +128,7 @@ const TEMPLATE_MAP = {
 
   // Mode variants — AUTO (all auto-approve except push + destructive + network)
   'gentleman-vMK-auto': 'auto',
+  'gentle-MK-auto': 'auto',
   'gentleman-deep-auto': 'auto',
   'gentleman-quick-auto': 'auto',
   'gentleman-codex-auto': 'auto',
@@ -145,8 +147,10 @@ const TEMPLATE_MAP = {
 
   // Mode variants — SEMI RETIRED (ADR-033 implemented 2026-09-04):
   // explicit '-semi' entries removed; '-semi' suffix below + skip still
-  // handle the 6 legacy definitions in opencode-base.json until base is
+  // handle the legacy definitions in opencode-base.json until base is
   // cleaned (JD follow-up). Do NOT re-add entries here.
+  // dual-read: gentle-MK-semi added for F2 rename compat (symmetric with PS map)
+  'gentle-MK-semi': 'semi',
 
   // Independent evaluator — bash ask, no edit/write
   'gentleman-reviewer': 'reviewer',

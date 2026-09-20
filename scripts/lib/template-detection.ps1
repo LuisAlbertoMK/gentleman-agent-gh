@@ -21,8 +21,10 @@
 $TemplateMap = @{
     # Orchestrator
     'gentleman-vMK' = 'orchestrator'
+    'gentle-MK' = 'orchestrator'
     'gentle-orchestrator' = 'sddorchestrator'
     'gentleman-vMK-semi' = 'semi'
+    'gentle-MK-semi' = 'semi'
 
     # Read-only specialists
     'gentleman-security'     = 'readonly'
@@ -75,6 +77,7 @@ $TemplateMap = @{
 
     # Mode variants — AUTO (zero-ask)
     'gentleman-vMK-auto'           = 'auto'
+    'gentle-MK-auto'               = 'auto'
     'gentleman-deep-auto'          = 'auto'
     'gentleman-quick-auto'         = 'auto'
     'gentleman-codex-auto'         = 'auto'
@@ -113,6 +116,7 @@ $RoleKeywords = @{
     'datascience' = 'readonly'
     'reviewer'    = 'reviewer'
     'vMK'         = 'orchestrator'
+    'MK'          = 'orchestrator'
 }
 
 <#

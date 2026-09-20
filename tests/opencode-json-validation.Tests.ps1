@@ -36,8 +36,8 @@ Describe "opencode.json Configuration Validation" {
             @($agentsWithoutPrompt).Count | Should -Be 0
         }
 
-        It "Orchestrator agent (gentleman-vMK) exists" {
-            $config.agent.'gentleman-vMK' | Should -Not -BeNullOrEmpty
+        It "Orchestrator agent (gentleman-vMK or gentle-MK) exists" {
+            ($config.agent.'gentleman-vMK' -or $config.agent.'gentle-MK') | Should -Not -BeNullOrEmpty
         }
 
         It "Subagents have 'hidden: true' or 'mode: subagent'" {

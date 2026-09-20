@@ -36,8 +36,11 @@ Describe 'ConfigValidator' {
         }
 
         It 'returns 1 for a config with array-unwrapped skills.paths (G1 regression)' {
+            $agentName = if (Get-Command Test-OpencodeConfig -ErrorAction SilentlyContinue) {
+                @('gentleman-vMK', 'gentle-MK') | Where-Object { Test-Path (Join-Path $PSScriptRoot "../../prompts/$_.md") } | Select-Object -First 1
+            } else { 'gentleman-vMK' }
             $bad = [pscustomobject]@{
-                agent  = [pscustomobject]@{ 'gentleman-vMK' = [pscustomobject]@{ mode = 'primary'; prompt = 'x' } }
+                agent  = [pscustomobject]@{ $agentName = [pscustomobject]@{ mode = 'primary'; prompt = 'x' } }
                 skills = [pscustomobject]@{ paths = '.agents/skills' }  # string, not array
             }
             $path = Join-Path $script:tempRoot 'unwrapped.json'
@@ -80,6 +83,7 @@ Describe 'ConfigValidator' {
             $config = [pscustomobject]@{
                 agent = [pscustomobject]@{
                     'gentleman-vMK' = [pscustomobject]@{ prompt = '{file:prompts/does-not-exist.md}' }
+                    'gentle-MK'     = [pscustomobject]@{ prompt = '{file:prompts/does-not-exist.md}' }
                 }
             }
             $result = Test-PromptRefs -Config $config -ConfigPath $script:realConfigPath
@@ -99,6 +103,7 @@ Describe 'ConfigValidator' {
             $config = [pscustomobject]@{
                 agent = [pscustomobject]@{
                     'gentleman-vMK' = [pscustomobject]@{ mode = 'primary' }
+                    'gentle-MK'     = [pscustomobject]@{ mode = 'primary' }
                     'sdd-propose'   = [pscustomobject]@{ mode = 'primary' }
                 }
             }

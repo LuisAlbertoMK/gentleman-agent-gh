@@ -10,7 +10,7 @@
 //
 // Interface consumed by PowerShell wrappers:
 //
-//	sync install  --target <dir> [--default-agent gentleman-vMK] [--chain-root <dir>] [--force] [--dry-run] [--json]
+//	sync install  --target <dir> [--default-agent gentle-MK] [--chain-root <dir>] [--force] [--dry-run] [--json]
 //	sync update   --project <dir> [--chain-root <dir>] [--mode chain-wins|project-wins] [--dry-run] [--json]
 //	sync update-all --manifest <projects.json> [--chain-root <dir>] [--mode chain-wins] [--parallel 4] [--dry-run] [--json]
 //
@@ -118,7 +118,7 @@ func printHelp() {
 	fmt.Println("  update-all --manifest <file> [flags]  Batch update multiple projects")
 	fmt.Println()
 	fmt.Println("Flags:")
-	fmt.Println("  --default-agent <name>   Agent to set as default (default: gentleman-vMK)")
+	fmt.Println("  --default-agent <name>   Agent to set as default (default: gentle-MK)")
 	fmt.Println("  --chain-root <dir>       Root of the SSoT chain (auto-detected)")
 	fmt.Println("  --mode <chain-wins|project-wins>  Merge strategy for update (default: chain-wins)")
 	fmt.Println("  --force                  Overwrite existing .gentleman-mode")
@@ -168,10 +168,10 @@ func outputHuman(report syncReport, exitCode int) {
 // Derived from permission-templates.json _used_by section (SSoT guard).
 var agentTemplateMap = map[string]string{
 	// orchestrator
-	"gentleman-vMK":          "orchestrator",
-	"gentleman-vMK-auto":     "orchestrator",
-	"gentleman-vMK-sub":      "orchestrator",
-	"gentleman-vMK-sub-auto": "orchestrator",
+	"gentle-MK":          "orchestrator",
+	"gentle-MK-auto":     "orchestrator",
+	"gentle-MK-sub":      "orchestrator",
+	"gentle-MK-sub-auto": "orchestrator",
 	// readwrite
 	"gentleman-aem":          "readwrite",
 	"gentleman-aem-sub":      "readwrite",
@@ -466,7 +466,7 @@ func runInstall(args []string) int {
 
 	defaultAgent := getArgValue(args, "--default-agent")
 	if defaultAgent == "" {
-		defaultAgent = "gentleman-vMK"
+		defaultAgent = "gentle-MK"
 	}
 	chainRoot := getArgValue(args, "--chain-root")
 	if chainRoot == "" {
@@ -891,7 +891,7 @@ func runUpdateAll(args []string) int {
 
 			defaultAgent := p.DefaultAgent
 			if defaultAgent == "" {
-				defaultAgent = "gentleman-vMK"
+				defaultAgent = "gentle-MK"
 			}
 
 			// Deep-clone chain for this project

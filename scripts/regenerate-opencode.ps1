@@ -248,7 +248,8 @@ foreach ($t in $autoTwins) {
   }
 }
 
-$orchAgent = Get-Prop $agentTable 'gentleman-vMK'
+$orchAgent = Get-Prop $agentTable 'gentle-MK'
+if (-not $orchAgent) { $orchAgent = Get-Prop $agentTable 'gentleman-vMK' }
 $orch = Get-Prop $orchAgent 'permission'
 $orchTask = Get-Prop $orch 'task'
 if (-not $orchTask) {
@@ -265,8 +266,9 @@ if (-not $orchTask) {
   }
 }
 
-# Verify gentleman-vMK-auto can delegate to -sub-auto twins (fail-closed task allowlist)
-$orchAutoAgent = Get-Prop $agentTable 'gentleman-vMK-auto'
+# Verify gentleman-vMK-auto / gentle-MK-auto can delegate to -sub-auto twins (fail-closed task allowlist)
+$orchAutoAgent = Get-Prop $agentTable 'gentle-MK-auto'
+if (-not $orchAutoAgent) { $orchAutoAgent = Get-Prop $agentTable 'gentleman-vMK-auto' }
 $orchAuto = Get-Prop $orchAutoAgent 'permission'
 $orchAutoTask = Get-Prop $orchAuto 'task'
 if (-not $orchAutoTask) {
