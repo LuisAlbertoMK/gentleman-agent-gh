@@ -91,7 +91,7 @@ function Write-Step([string]$N,[scriptblock]$B) {
                     }
                 }
                 "Global config" {
-                    $projMcp=$null; try{ $pj=Get-Content $projectCfg -Raw | ConvertFrom-Json; $projMcp=$pj.mcp }catch{}
+                    $projMcp=$null; try{ $pj=Get-Content $projectCfg -Raw | ConvertFrom-Json; $projMcp=$pj.mcp }catch{} # swallow deliberado: lectura opcional de config de proyecto; si falla se sigue con defaults
                     if(-not (Test-Path $globalCfg)){ $drift=$true; $driftDetail="global config missing" }
                     elseif($Force){ $drift=$true; $driftDetail="-Force would overwrite" }
                     else {

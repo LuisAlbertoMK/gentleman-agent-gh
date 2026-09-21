@@ -1,12 +1,12 @@
 {
-  "manualCount": 131,
+  "manualCount": 137,
   "byRule": [
     {
       "count": 1,
       "rule": "PSAvoidAssignmentToAutomaticVariable"
     },
     {
-      "count": 19,
+      "count": 26,
       "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
@@ -50,7 +50,7 @@
       "rule": "PSUseSingularNouns"
     }
   ],
-  "total": 1802,
+  "total": 1809,
   "timestamp": "2026-09-12T15:59:13",
   "ampersandCount": 0,
   "manualPairs": [
@@ -80,12 +80,22 @@
       "count": 1
     },
     {
+      "file": "clean-worktree-temp.ps1",
+      "rule": "PSAvoidUsingEmptyCatchBlock",
+      "count": 1
+    },
+    {
       "file": "delegation-registry.ps1",
       "rule": "PSAvoidUsingEmptyCatchBlock",
       "count": 1
     },
     {
       "file": "freeze-models.ps1",
+      "rule": "PSAvoidUsingEmptyCatchBlock",
+      "count": 4
+    },
+    {
+      "file": "inter-track.ps1",
       "rule": "PSAvoidUsingEmptyCatchBlock",
       "count": 4
     },
@@ -106,6 +116,11 @@
     },
     {
       "file": "sync-global.ps1",
+      "rule": "PSAvoidUsingEmptyCatchBlock",
+      "count": 2
+    },
+    {
+      "file": "switch-profile.ps1",
       "rule": "PSAvoidUsingEmptyCatchBlock",
       "count": 1
     },
