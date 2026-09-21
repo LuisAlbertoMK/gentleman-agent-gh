@@ -6,21 +6,22 @@ BeforeAll {
 }
 
 Describe 'scoring-cache.ps1 — test-mode guard (S1)' {
-    BeforeAll {
-        $cacheBefore = if (Test-Path $cacheFile) {
-            (Get-Item $cacheFile).LastWriteTime
-        } else { $null }
-    }
     It 'PESTER_TEST=1 does not modify score-cache.json' {
+        # Capture state INSIDE It block (immediately before invocation) to minimize
+        # cross-job env-var race: ScoreIntegration's AfterAll may remove PESTER_TEST
+        # process-wide while this It block is running score-auto.ps1.
+        $cacheBeforeHash = if (Test-Path $cacheFile) {
+            (Get-FileHash $cacheFile -Algorithm SHA256).Hash
+        } else { $null }
         $env:PESTER_TEST = '1'
         try {
             & $scriptPath -Json 2>$null | Out-Null
         } finally {
             $env:PESTER_TEST = $null
         }
-        if ($null -ne $cacheBefore) {
-            $cacheAfter = (Get-Item $cacheFile).LastWriteTime
-            $cacheAfter | Should -Be $cacheBefore
+        if ($null -ne $cacheBeforeHash) {
+            $cacheAfterHash = (Get-FileHash $cacheFile -Algorithm SHA256).Hash
+            $cacheAfterHash | Should -Be $cacheBeforeHash
         } else {
             Test-Path $cacheFile | Should -BeFalse
         }

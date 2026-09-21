@@ -91,8 +91,8 @@ try {
                             Write-Debug "score-auto: cache score $cs != .project.json $pjScore — invalidating cache (PESTER_TEST=1, recompute without persistence)"
                         } else {
                             Write-Warning "score-auto: cache score $cs != .project.json $pjScore — invalidating cache, recomputing"
+                            try { Remove-Item -LiteralPath $cacheFile -Force -ErrorAction SilentlyContinue } catch { Write-Debug "score-auto: cache invalidation failed ($($_.Exception.Message))" }
                         }
-                        try { Remove-Item -LiteralPath $cacheFile -Force -ErrorAction SilentlyContinue } catch { Write-Debug "score-auto: cache invalidation failed ($($_.Exception.Message))" }
                         $needsRecompute = $true
                     }
                 }
