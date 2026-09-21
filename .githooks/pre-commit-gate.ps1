@@ -154,7 +154,31 @@ if ($stagedRoja) {
     $uncleared = @()
     foreach ($f in $stagedRoja) {
         $marker = "$RepoRoot/.jd-cleared/" + ($f.Replace('/','_').Replace('\','_'))
-        if (-not (Test-Path $marker -PathType Leaf)) { $uncleared += $f }
+        if (-not (Test-Path $marker -PathType Leaf)) {
+            $uncleared += $f
+        } else {
+            # Validate marker content: accept both formats
+            # Legacy: empty file (backward compat)
+            # Evidence: "{who} {when} why fileHash:{hash}" prefix
+            $markerContent = (Get-Content -LiteralPath $marker -Raw -Encoding UTF8).Trim()
+            if ($markerContent -ne '') {
+                # Evidence format — validate prefix has minimum structure
+                $hasWho = ($markerContent -match '^\S+')
+                $hasWhen = ($markerContent -match '^\S+\s+\d{4}-\d{2}-\d{2}')
+                $hasFileHash = ($markerContent -match 'fileHash:[0-9a-f]{8}')
+                if (-not ($hasWho -and $hasWhen -and $hasFileHash)) {
+                    Write-Host "    WARNING: $marker — malformed evidence prefix (expected: who date why fileHash:XXXXXXXX)" -ForegroundColor Yellow
+                    # Non-blocking for existing markers — just warn
+                }
+            }
+            # Stale check: target file still exists?
+            $fullPath = Join-Path $RepoRoot $f
+            if (-not (Test-Path -LiteralPath $fullPath -PathType Leaf)) {
+                Write-Host "    PRUNE: $marker — target '$f' removed from tree" -ForegroundColor DarkYellow
+                Remove-Item -LiteralPath $marker -Force
+                $uncleared += $f
+            }
+        }
     }
     if ($env:FORCE_SHIP) {
         Warn "FORCE_SHIP set — JD bypass acknowledged (ensure '!ship' was intentional)`n    $($stagedRoja -join "`n")"

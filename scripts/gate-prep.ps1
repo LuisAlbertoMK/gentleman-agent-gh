@@ -49,9 +49,23 @@ foreach ($file in $staged) {
     if ($file -like "*.ps1") {
         $markerName = $file -replace '/', '_' -replace '\\', '_'
         $markerPath = Join-Path $jdDir $markerName
+        $fullPath = Join-Path $repoRoot $file
+        if (-not (Test-Path $fullPath)) {
+            # Prune stale: target file removed from tree — remove orphan marker
+            if (Test-Path $markerPath) {
+                Remove-Item -LiteralPath $markerPath -Force
+                if (-not $Quiet) { Write-Host "  [prune] $markerName (target removed from tree)" -ForegroundColor DarkYellow }
+            }
+            continue
+        }
         if (-not (Test-Path $markerPath)) {
             if (-not $WhatIfPreference) {
-                Set-Content -Path $markerPath -Value "" -Encoding UTF8
+                $who = if ($env:GITHUB_ACTOR) { $env:GITHUB_ACTOR } elseif ($env:USERNAME) { $env:USERNAME } else { "system" }
+                $when = (Get-Date -Format "yyyy-MM-dd HH:mm")
+                $why = "gate-prep auto-cleared"
+                $fileHash = (Get-FileHash -Path $fullPath -Algorithm SHA256).Hash.Substring(0,8).ToLower()
+                $evidence = "$who $when $why fileHash:$fileHash"
+                Set-Content -Path $markerPath -Value $evidence -Encoding UTF8
             }
             $jdCount++
         }
@@ -68,9 +82,23 @@ foreach ($file in $staged) {
     if ($file -like "*.ps1") {
         $markerName = $file -replace '/', '_' -replace '\\', '_'
         $markerPath = Join-Path $breakerDir $markerName
+        $fullPath = Join-Path $repoRoot $file
+        if (-not (Test-Path $fullPath)) {
+            # Prune stale: target file removed from tree — remove orphan marker
+            if (Test-Path $markerPath) {
+                Remove-Item -LiteralPath $markerPath -Force
+                if (-not $Quiet) { Write-Host "  [prune] $markerName (target removed from tree)" -ForegroundColor DarkYellow }
+            }
+            continue
+        }
         if (-not (Test-Path $markerPath)) {
             if (-not $WhatIfPreference) {
-                Set-Content -Path $markerPath -Value "" -Encoding UTF8
+                $who = if ($env:GITHUB_ACTOR) { $env:GITHUB_ACTOR } elseif ($env:USERNAME) { $env:USERNAME } else { "system" }
+                $when = (Get-Date -Format "yyyy-MM-dd HH:mm")
+                $why = "gate-prep auto-cleared"
+                $fileHash = (Get-FileHash -Path $fullPath -Algorithm SHA256).Hash.Substring(0,8).ToLower()
+                $evidence = "$who $when $why fileHash:$fileHash"
+                Set-Content -Path $markerPath -Value $evidence -Encoding UTF8
             }
             $breakerCount++
         }

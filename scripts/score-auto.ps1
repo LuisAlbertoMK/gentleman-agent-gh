@@ -60,7 +60,8 @@ try {
     $scriptManifestList = New-Object System.Collections.Generic.List[string]
     $skillManifestList = New-Object System.Collections.Generic.List[string]
     foreach ($m in $manifest) {
-        if ($m.group -eq 'script') { $scriptManifestList.Add("$($m.relpath):$($m.sha256)") }
+        # S3: cache-key only top-level scripts/*.ps1 (aligns with real scoring inputs)
+        if ($m.group -eq 'script' -and $m.relpath -match '^scripts/[^/]+\.ps1$') { $scriptManifestList.Add("$($m.relpath):$($m.sha256)") }
         elseif ($m.group -eq 'skill') { $skillManifestList.Add("$($m.relpath):$($m.sha256)") }
     }
     $scriptsHash = ($scriptManifestList | Sort-Object) -join "|"
