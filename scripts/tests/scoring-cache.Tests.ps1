@@ -3,6 +3,15 @@ BeforeAll {
     $scriptPath = Join-Path (Split-Path $PSScriptRoot -Parent) 'score-auto.ps1'
     $repoRoot   = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
     $cacheFile  = Join-Path $repoRoot '.learnings/score-cache.json'
+
+    # SCORE_CACHE_PATH: redirect score-auto.ps1 cache writes to a temp file,
+    # eliminating the race where ScoreIntegration's AfterAll removes PESTER_TEST
+    # process-wide while this suite is mid-execution. Even if PESTER_TEST vanishes,
+    # score-auto writes to $TestDrive, never the real cache.
+    $env:SCORE_CACHE_PATH = Join-Path $TestDrive 'score-cache.json'
+}
+AfterAll {
+    $env:SCORE_CACHE_PATH = $null
 }
 
 Describe 'scoring-cache.ps1 — test-mode guard (S1)' {

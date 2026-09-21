@@ -37,8 +37,16 @@ Set-StrictMode -Version Latest
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 $repoRoot = Get-GentlemanRoot
 
-$cacheDir  = Join-Path $repoRoot ".learnings"
-$cacheFile = Join-Path $cacheDir "score-cache.json"
+# SCORE_CACHE_PATH env override — allows tests to redirect cache writes to
+# a temp file, eliminating the race where PESTER_TEST removal mid-execution
+# causes real cache corruption (see scoring-cache.Tests.ps1).
+if ($env:SCORE_CACHE_PATH) {
+    $cacheFile = $env:SCORE_CACHE_PATH
+    $cacheDir  = Split-Path $cacheFile -Parent
+} else {
+    $cacheDir  = Join-Path $repoRoot ".learnings"
+    $cacheFile = Join-Path $cacheDir "score-cache.json"
+}
 
 # ponytail: init before try — ensures vars exist even if cache check throws
 $scriptFiles  = @()
