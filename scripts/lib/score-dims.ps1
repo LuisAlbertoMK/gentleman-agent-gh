@@ -218,16 +218,17 @@ $totalScripts = $scriptFiles.Count
 if ($hasScripts) {
     # FOREACH (not ForEach-Object) avoids multiline pipeline parsing bug
     # where pwsh misparses { ... } -ThrottleLimit and throws positional param error
-    $scriptStats = @()
+    # E5b: List.Add (was array += O(n^2))
+    $scriptStats = New-Object System.Collections.Generic.List[object]
     foreach ($sf in $scriptFiles) {
         $content = $scriptContentCache[$sf.FullName]
         if (-not $content) { continue }
-        $scriptStats += [PSCustomObject]@{
+        $scriptStats.Add([PSCustomObject]@{
             h = [bool]($content -match '<#')
             p = [bool]($content -match 'param\(')
             s = [bool]($content -match 'Set-StrictMode')
             t = [bool]($content -match 'try\s*\{')
-        }
+        })
     }
 
     # E3: single-pass counters (was 4x Where-Object pipeline passes)
