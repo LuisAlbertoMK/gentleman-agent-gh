@@ -96,6 +96,7 @@ try {
             if (-not (Test-Path -LiteralPath $sf.FullPath -PathType Leaf)) {
                 Remove-Item -LiteralPath $clearedMarker -Force
                 if (-not $Quiet) { Write-Host "  [prune] $($sf.RelativePath) — breaker-cleared stale (target removed)" -ForegroundColor DarkYellow }
+                continue
             } else {
                 if (-not $Quiet) { Write-Host "  $($sf.RelativePath) — .breaker-cleared" -ForegroundColor Gray }
                 continue

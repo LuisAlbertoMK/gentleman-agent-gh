@@ -52,14 +52,8 @@ Describe 'scoring-cache.ps1 — cache-key top-level scripts only (S3)' {
     BeforeAll {
         $tmpDir = Join-Path ([System.IO.Path]::GetTempPath()) "scoring-cache-test-$(Get-Random)"
         New-Item -ItemType Directory -Path $tmpDir -Force | Out-Null
-        # Save original cache for restore
-        $origCacheExists = Test-Path $cacheFile
-        $origCache = if ($origCacheExists) { Get-Content $cacheFile -Raw -Encoding UTF8 } else { $null }
     }
     AfterAll {
-        if ($origCacheExists -and $null -ne $origCache) {
-            $origCache | Set-Content $cacheFile -Encoding UTF8
-        }
         Remove-Item -Recurse -Force $tmpDir -ErrorAction SilentlyContinue
     }
     It 'cache key only hashes top-level scripts/*.ps1' {
