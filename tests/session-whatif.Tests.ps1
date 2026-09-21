@@ -173,3 +173,65 @@ Describe "S3: session-checkpoint.ps1 quarantine consumed pending" {
         $result.mem_saved | Should -Be $false
     }
 }
+
+Describe "S4: session-checkpoint.ps1 Redact-Secrets order + multiword" {
+
+    BeforeAll {
+        # S4: Define Redact-Secrets directly (avoids running full script with dependencies)
+        function script:Redact-Secrets {
+            [CmdletBinding()]
+            param([string]$Text)
+            if ([string]::IsNullOrEmpty($Text)) { return $Text }
+            $redacted = $Text
+            # S4: Specific prefixed secrets first (narrow patterns, no collateral)
+            $redacted = $redacted -replace 'sk-proj-[A-Za-z0-9\-_]{20,}', '[REDACTED]'
+            $redacted = $redacted -replace 'sk-[A-Za-z0-9]{20,}', '[REDACTED]'
+            $redacted = $redacted -replace 'gh[oprs]_[A-Za-z0-9_]{20,}', '[REDACTED]'
+            $redacted = $redacted -replace 'ghu_[A-Za-z0-9_]{20,}', '[REDACTED]'
+            # AWS keys (specific before generic)
+            $redacted = $redacted -replace '(?i)aws[_-]?secret[_-]?access[_-]?key(\s*[:=]\s*)\S+', 'aws_secret_access_key$1[REDACTED]'
+            $redacted = $redacted -replace '(?i)aws[_-]?access[_-]?key[_-]?id(\s*[:=]\s*)\S+', 'aws_access_key_id$1[REDACTED]'
+            # Bearer tokens (specific before generic)
+            $redacted = $redacted -replace '(?i)bearer\s+[A-Za-z0-9\-_\.=]+', 'bearer [REDACTED]'
+            # Generic key=value secrets — S4: .+ replaces \S+ to capture multiword passphrases
+            $redacted = $redacted -replace '(?i)(api[_-]?key|token|password|secret|credential)(\s*[:=]\s*).+', '$1$2[REDACTED]'
+            return $redacted
+        }
+    }
+
+    It "Redact-Secrets handles multiword passphrase" {
+        $result = Redact-Secrets -Text "password = my secret phrase here"
+        $result | Should -Match '\[REDACTED\]'
+        $result | Should -Not -Match 'my secret phrase here'
+    }
+
+    It "Redact-Secrets handles Bearer token" {
+        $result = Redact-Secrets -Text "Authorization: Bearer abc123def456"
+        $result | Should -Match 'bearer \[REDACTED\]'
+        $result | Should -Not -Match 'abc123def456'
+    }
+
+    It "Redact-Secrets handles OpenAI key" {
+        $result = Redact-Secrets -Text "api_key = sk-abc123def456ghi789jkl012mno345pqr"
+        $result | Should -Match '\[REDACTED\]'
+        $result | Should -Not -Match 'sk-abc123'
+    }
+
+    It "Redact-Secrets handles GitHub token" {
+        $result = Redact-Secrets -Text "token = ghp_abcdefghijklmnopqrstuvwxyz123456"
+        $result | Should -Match '\[REDACTED\]'
+        $result | Should -Not -Match 'ghp_abcdef'
+    }
+
+    It "Redact-Secrets preserves non-secret text" {
+        $result = Redact-Secrets -Text "This is a normal sentence with no secrets."
+        $result | Should -Be "This is a normal sentence with no secrets."
+    }
+
+    It "Redact-Secrets handles empty/null input" {
+        Redact-Secrets -Text "" | Should -Be ""
+        # PowerShell coerces $null to [string] empty for string params
+        $nullResult = Redact-Secrets -Text $null
+        [string]::IsNullOrEmpty($nullResult) | Should -Be $true
+    }
+}

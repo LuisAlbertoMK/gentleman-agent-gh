@@ -68,20 +68,18 @@ function Redact-Secrets {
     )
     if ([string]::IsNullOrEmpty($Text)) { return $Text }
     $redacted = $Text
-    # Generic key=value secrets: api_key, api-key, token, password, secret, credential
-    $redacted = $redacted -replace '(?i)(api[_-]?key|token|password|secret|credential)(\s*[:=]\s*)\S+', '$1$2[REDACTED]'
-    # Bearer tokens
-    $redacted = $redacted -replace '(?i)bearer\s+[A-Za-z0-9\-_\.=]+', 'bearer [REDACTED]'
-    # AWS keys
-    $redacted = $redacted -replace '(?i)aws[_-]?secret[_-]?access[_-]?key(\s*[:=]\s*)\S+', 'aws_secret_access_key$1[REDACTED]'
-    $redacted = $redacted -replace '(?i)aws[_-]?access[_-]?key[_-]?id(\s*[:=]\s*)\S+', 'aws_access_key_id$1[REDACTED]'
-    # OpenAI / GitHub / generic prefixed secrets
-    $redacted = $redacted -replace 'sk-[A-Za-z0-9]{20,}', '[REDACTED]'
+    # S4: Specific prefixed secrets first (narrow patterns, no collateral)
     $redacted = $redacted -replace 'sk-proj-[A-Za-z0-9\-_]{20,}', '[REDACTED]'
+    $redacted = $redacted -replace 'sk-[A-Za-z0-9]{20,}', '[REDACTED]'
     $redacted = $redacted -replace 'gh[oprs]_[A-Za-z0-9_]{20,}', '[REDACTED]'
     $redacted = $redacted -replace 'ghu_[A-Za-z0-9_]{20,}', '[REDACTED]'
-    # Fallback: any remaining (?i)(api[_-]?key|token|password|secret|credential)\s*[:=]\s*\S+ whole match redacted
-    $redacted = $redacted -replace '(?i)(api[_-]?key|token|password|secret|credential)\s*[:=]\s*\S+', '[REDACTED]'
+    # AWS keys (specific before generic)
+    $redacted = $redacted -replace '(?i)aws[_-]?secret[_-]?access[_-]?key(\s*[:=]\s*)\S+', 'aws_secret_access_key$1[REDACTED]'
+    $redacted = $redacted -replace '(?i)aws[_-]?access[_-]?key[_-]?id(\s*[:=]\s*)\S+', 'aws_access_key_id$1[REDACTED]'
+    # Bearer tokens (specific before generic)
+    $redacted = $redacted -replace '(?i)bearer\s+[A-Za-z0-9\-_\.=]+', 'bearer [REDACTED]'
+    # Generic key=value secrets — S4: .+ replaces \S+ to capture multiword passphrases
+    $redacted = $redacted -replace '(?i)(api[_-]?key|token|password|secret|credential)(\s*[:=]\s*).+', '$1$2[REDACTED]'
     return $redacted
 }
 
