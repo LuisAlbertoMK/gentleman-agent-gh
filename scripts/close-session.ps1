@@ -71,24 +71,25 @@ if (Test-Path -LiteralPath $bitacoraPath) {
 # --- Inter-track increment (CYCLE.md LOOP step 6c: "Log a bitacora + inter-track++") ---
 if (Test-Path -LiteralPath "$PSScriptRoot/inter-track.ps1") {
     try {
-        $itPrev = if (Test-Path ".learnings\inter-track.json") {
-            (Get-Content ".learnings\inter-track.json" -Raw | ConvertFrom-Json -EA SilentlyContinue).cycle.count
+        $itTrackPath = Join-Path -Path $repoRoot -ChildPath ".learnings\inter-track.json"
+        $itPrev = if (Test-Path -LiteralPath $itTrackPath) {
+            (Get-Content -LiteralPath $itTrackPath -Raw | ConvertFrom-Json -EA SilentlyContinue).cycle.count
         } else { 0 }
         # Suppress stdout/stderr — inter-track -Quiet outputs JSON to stdout
         # Skip increment in test mode (PESTER_TEST=1) to prevent test pollution
         if (-not $env:PESTER_TEST) {
             & "$PSScriptRoot/inter-track.ps1" -Increment -Quiet
         }
-        $itNew = if (Test-Path ".learnings\inter-track.json") {
-            (Get-Content ".learnings\inter-track.json" -Raw | ConvertFrom-Json -EA SilentlyContinue).cycle.count
+        $itNew = if (Test-Path -LiteralPath $itTrackPath) {
+            (Get-Content -LiteralPath $itTrackPath -Raw | ConvertFrom-Json -EA SilentlyContinue).cycle.count
         } else { $itPrev }
         if (-not $Quiet -and $itNew -ne $itPrev) {
             Write-Host "  📊 inter-track: $itPrev → $itNew (IC/IT)" -ForegroundColor Cyan
         }
         # G7 fix: auto-reset inter-track when target met so cycle id advances (cycle-29 → cycle-30)
         if (-not $env:PESTER_TEST -and $itNew -ne $itPrev) {
-            $itTarget = if (Test-Path ".learnings\inter-track.json") {
-                (Get-Content ".learnings\inter-track.json" -Raw | ConvertFrom-Json -EA SilentlyContinue).cycle.target
+            $itTarget = if (Test-Path -LiteralPath $itTrackPath) {
+                (Get-Content -LiteralPath $itTrackPath -Raw | ConvertFrom-Json -EA SilentlyContinue).cycle.target
             } else { 0 }
             if ($itTarget -gt 0 -and [int]$itNew -ge [int]$itTarget) {
                 & "$PSScriptRoot/inter-track.ps1" -Reset -Quiet
@@ -291,7 +292,8 @@ if ($Checkpoint) {
                 $topicForReceipt = $directive.topic_key
                 if (-not [string]::IsNullOrWhiteSpace($topicForReceipt)) {
                     $receiptKind = "pending-consumed"
-                    if ($PSCmdlet.ShouldProcess($topicForReceipt, "Record G7 engram receipt via inter-track")) {
+                    # Skip receipt in test mode (PESTER_TEST=1) to prevent test pollution
+                    if (-not $env:PESTER_TEST -and $PSCmdlet.ShouldProcess($topicForReceipt, "Record G7 engram receipt via inter-track")) {
                         $trackArgs = @{
                             RecordEngramEvent = $true
                             TopicKey          = $topicForReceipt
