@@ -107,7 +107,6 @@ if ($Status) {
                 $model = $config.agent.$_.model
                 $model -and $model -match 'contributor-free$'
             }).Count
-            $total = $subagentKeys.Count
             if ($freeCount -ge 19) { $currentProfile = 'zen' }
             elseif ($freeCount -le 5) { $currentProfile = 'go' }
         } catch { }
