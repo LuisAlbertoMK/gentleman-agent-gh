@@ -339,24 +339,24 @@ if (Test-Path $projectJsonPath) {
 # ============================================================
 
 try {
-    if ($DryRun) {
-        $dryCacheMsg = "score-auto: DryRun — skipping score-cache.json write"
+    if ($DryRun -or $isTestMode) {
+        $dryCacheMsg = "score-auto: DryRun/PESTER_TEST — skipping score-cache.json write"
         if ($isTestMode) { Write-Debug $dryCacheMsg } else { Write-Warning $dryCacheMsg }
     } else {
-    if (-not (Test-Path $cacheDir)) {
-        New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
-    }
-    # Slim cache: only essential fields (score + hash for invalidation)
-    # Full result already synced to .project.json (single source of truth)
-    $cacheObject = @{
-        v     = 2
-        hash  = $cacheHash
-        ts    = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
-        score = $finalScore
-        trend = $result.score.trend
-        dims  = @($dimensions.Keys).Count
-    }
-    $cacheObject | ConvertTo-Json -Depth 5 | Set-Content $cacheFile -Encoding UTF8
+        if (-not (Test-Path $cacheDir)) {
+            New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
+        }
+        # Slim cache: only essential fields (score + hash for invalidation)
+        # Full result already synced to .project.json (single source of truth)
+        $cacheObject = @{
+            v     = 2
+            hash  = $cacheHash
+            ts    = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
+            score = $finalScore
+            trend = $result.score.trend
+            dims  = @($dimensions.Keys).Count
+        }
+        $cacheObject | ConvertTo-Json -Depth 5 | Set-Content $cacheFile -Encoding UTF8
     }
 } catch {
     Write-Debug "score-cache save: $($_.Exception.Message)"
