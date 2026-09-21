@@ -109,7 +109,7 @@ if ($Json -or $Quiet) {
     ConvertTo-Json $summary -Depth 3
 } else {
     Write-Output "`n═══════════════════════════════════════════"
-    Write-Output "  CHECK — gentleman-vMK"
+    Write-Output "  CHECK — gentle-MK"
     Write-Output "═══════════════════════════════════════════"
     $results | ForEach-Object {
         $icon = switch ($_.status) { "OK"   { "✅" } "WARN" { "🟡" } "FAIL" { "🔴" } "SKIP" { "⏭️" } default { "❓" } }

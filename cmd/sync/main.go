@@ -170,8 +170,6 @@ var agentTemplateMap = map[string]string{
 	// orchestrator
 	"gentle-MK":          "orchestrator",
 	"gentle-MK-auto":     "orchestrator",
-	"gentle-MK-sub":      "orchestrator",
-	"gentle-MK-sub-auto": "orchestrator",
 	// readwrite
 	"gentleman-aem":          "readwrite",
 	"gentleman-aem-sub":      "readwrite",

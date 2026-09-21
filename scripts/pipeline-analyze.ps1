@@ -181,7 +181,7 @@ if ($Mode -in 'report','full') {
     $lines += ""
 
     $lines += "---"
-    $lines += "*Generado por pipeline-analyze.ps1 · @gentleman-vMK*"
+    $lines += "*Generado por pipeline-analyze.ps1 · @gentle-MK*"
 
     $report = $lines -join "`n"
     $report | Set-Content $reportFile -Encoding UTF8

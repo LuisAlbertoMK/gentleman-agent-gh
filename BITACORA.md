@@ -1,3 +1,4 @@
+2026-09-20 - chore(rename): barrido cero-restos — 24 FIXABLE a gentle-MK (CI, scripts, metadata, docs, prompts, skills), global split-brain curado (58 agentes + default), Go sin subs muertas, T8 + dead-code fix; KEEP intencional: históricos, shims, dual-read, fixtures.
 2026-09-20 - test(delegation): fusiona T1-T12 HEAD con suite cluster-path-overlap + fix real PS-CI-03 (ruta literal); cobertura FileCount/LineCount/RiskLevel/Domain restaurada.
 2026-09-20 - docs(bitacora): session close — !close ejecutado desde plan-execution
 2026-09-20 - Rename orquestador gentleman-vMK*→gentle-MK: F1 tests dual + F2 runtime dual-read + F3 alias-add/regen + F4 cutover (22M+2N, 0 deletes, default gentle-MK-auto, Go build verde); Pester 94/95 (drift pre-existing :52); regen sincronizó hardening permission.bash (fuente STALE); shims legacy .bat+ValidateSet.

@@ -46,4 +46,4 @@ Per `skill-registry/SKILL.md`:
 
 ---
 
-*Part of gentleman-vMK-agent-gh. Created Sprint 4.*
+*Part of gentle-MK-agent-gh. Created Sprint 4.*

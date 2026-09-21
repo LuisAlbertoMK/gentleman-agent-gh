@@ -27,7 +27,7 @@ name: {name}
 description: "{1-liner}"
 triggers: "{trigger words}"
 license: Apache-2.0
-metadata: author: gentleman-vMK, version: "1.0"
+metadata: author: gentle-MK, version: "1.0"
 ---
 ## When
 {trigger scenario}

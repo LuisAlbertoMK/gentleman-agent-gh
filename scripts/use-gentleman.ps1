@@ -5,7 +5,7 @@
     (opencode-base.json + permission-templates.json), not the global config.
 
 .DESCRIPTION
-    Bootstraps a project dir with gentleman-vMK as default agent. Config is generated
+    Bootstraps a project dir with gentle-MK as default agent. Config is generated
     from the chain (scripts/lib/{opencode-base,permission-templates,agent-overrides}.json
     + scripts/opencode-config/shared-deny-rules.json). Re-asserts the shared deny floor
     and adds a write-deny to ~/.config/opencode/**. .gentleman-mode defaults to 'manual'
@@ -15,7 +15,7 @@
     Project dir to gentleman-ize. Default: current project's git root (walk-up), else cwd.
 
 .PARAMETER DefaultAgent
-    Agent to set as default (gentleman-vMK/deep/codex/quick). Default: gentleman-vMK.
+    Agent to set as default (gentle-MK/deep/codex/quick). Default: gentle-MK.
 
 .PARAMETER Json
     Output JSON report instead of text.

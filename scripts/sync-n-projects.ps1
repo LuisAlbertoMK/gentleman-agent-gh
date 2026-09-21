@@ -10,7 +10,7 @@
 
   Manifest format:
     { "version":1, "chainRoot":".", "defaultMode":"chain-wins",
-      "projects":[{"path":"../mi-api","defaultAgent":"gentleman-vMK"}] }
+      "projects":[{"path":"../mi-api","defaultAgent":"gentle-MK"}] }
 
 .PARAMETER Manifest
   Path to projects.json manifest file. Default: ./projects.json
@@ -197,7 +197,7 @@ if ($AddProject) {
         if ($existing) {
         if (-not $Quiet) { Write-Output "[skip] $addPath already in manifest" }
     } else {
-        $manifestObj.projects += @{ path = $addPath; defaultAgent = "gentleman-vMK" }
+        $manifestObj.projects += @{ path = $addPath; defaultAgent = "gentle-MK" }
         if (-not $DryRun) {
             # Atomic rewrite: write to temp then move — prevents half-written manifests.
             # Unique temp name to avoid collisions between concurrent runs.
@@ -314,7 +314,7 @@ if ($useBinary) {
 
     foreach ($proj in $manifestObj.projects) {
         $projPath = $proj.path
-        $agent = if ($proj.defaultAgent) { $proj.defaultAgent } else { "gentleman-vMK" }
+        $agent = if ($proj.defaultAgent) { $proj.defaultAgent } else { "gentle-MK" }
 
         $step = "sync $projPath"
         if ($PSCmdlet.ShouldProcess($projPath, "use-gentleman")) {

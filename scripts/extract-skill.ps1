@@ -128,7 +128,7 @@ foreach ($key in $allKeys) {
     $null = $sb.AppendLine("license: Apache-2.0")
     $null = $sb.AppendLine("metadata:")
     $null = $sb.AppendLine("  tags: [auto-extracted, pattern]")
-    $null = $sb.AppendLine("  author: gentleman-vMK")
+    $null = $sb.AppendLine("  author: gentle-MK")
     $null = $sb.AppendLine('  version: "1.0"')
     $null = $sb.AppendLine("  source: extract-skill.ps1")
     $null = $sb.AppendLine("---")

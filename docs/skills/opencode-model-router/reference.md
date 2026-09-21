@@ -32,7 +32,7 @@
 
 ### Example 5: Architecture Decision
 **User**: "Should we migrate from REST to gRPC for internal services?"
-**Route**: Architecture/code review → DIRECT → `gentleman-vMK`
+**Route**: Architecture/code review → DIRECT → `gentle-MK`
 **Why**: Strategic decisions need primary agent judgment, not delegation
 
 ---

@@ -103,7 +103,7 @@ function Sync-AgentDefinition{
   Project opencode.json is canonical source; global config gets a copy for cross-project availability.
 #>
   $pcp=Join-Path $PSScriptRoot "..\opencode.json";$gcp=Join-Path (Get-GlobalConfigDir) "opencode.json"
-  $an=@("gentleman-vMK","gentleman-deep","gentleman-codex","gentleman-quick")
+  $an=@("gentle-MK","gentleman-deep","gentleman-codex","gentleman-quick")
   $sr=@{synced=@();skipped=@()}
   if(-not $Quiet){Write-Output "--- Syncing agents (project -> global) ---"}
   if(-not (Test-Path $pcp)){Write-Warning "No project opencode.json at $pcp";return $sr}

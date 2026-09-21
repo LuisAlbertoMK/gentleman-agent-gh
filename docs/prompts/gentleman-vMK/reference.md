@@ -1,4 +1,4 @@
-# Orchestrator (gentleman-vMK) — Detailed Reference
+# Orchestrator (gentle-MK) — Detailed Reference
 
 ## Pre-Answer Evidence Gate (MANDATORY for Analysis Questions)
 

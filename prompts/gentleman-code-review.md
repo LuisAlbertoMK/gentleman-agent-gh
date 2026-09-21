@@ -7,7 +7,7 @@
 ```
 Qwen 3.6-35B-A3B (73.4% SWE-bench) — primary, self-hosted
   → if not available (no Ollama / no API key / 404) → muse-spark-1.2-contributor-free (14 agents, verified GAP-1)
-    → if not available → default (gentleman-vMK)
+    → if not available → default (gentle-MK)
 ```
 
 Router must check model availability before delegating; if Qwen 404, log `fallback: Qwen → muse-spark` and continue. Never fail open without fallback.

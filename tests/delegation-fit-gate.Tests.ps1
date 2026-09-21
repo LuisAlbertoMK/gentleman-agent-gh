@@ -1,7 +1,6 @@
 #requires -Version 5.1
 Describe "delegation-fit-gate.ps1" {
   BeforeAll {
-    $scriptPath = Join-Path $PSScriptRoot "..\scripts\delegation-fit-gate.ps1"
   }
 
   It "T1 quick + 1 file + 10 lines + low risk is PASS" {
@@ -88,7 +87,6 @@ Describe "delegation-fit-gate.ps1" {
 
 Describe "delegation-fit-gate.ps1 — cluster-path-overlap" {
   BeforeAll {
-    $scriptPath = Join-Path $PSScriptRoot "..\scripts\delegation-fit-gate.ps1"
   }
 
   Context "PlannedPaths with duplicates → FAIL (P1 regression)" {

@@ -30,7 +30,7 @@ First-window setup for long-horizon tasks (≥3 files, T2+): before any `deliver
 
 ## Fallback
 
-If initializer fails, `gentleman-vMK` (orchestrator) takes over with same init checklist (degraded).
+If initializer fails, `gentle-MK` (orchestrator) takes over with same init checklist (degraded).
 
 ## Refs
 

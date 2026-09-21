@@ -44,7 +44,7 @@ These are the canonical permission blocks used across all agents. CI verifies co
 }
 ```
 
-## Orchestrator (gentleman-vMK)
+## Orchestrator (gentle-MK)
 
 ```json
 {

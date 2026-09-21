@@ -1,7 +1,7 @@
 #requires -Version 7
 <#
 .SYNOPSIS
-  Unified pre-session health check for gentleman-vMK and opencode-ai ecosystem.
+  Unified pre-session health check for gentle-MK and opencode-ai ecosystem.
   Checks: skills junctions (vmk + global), prompts junction.
   Part of P1 — Autonomous Integration Plan.
 .DESCRIPTION
@@ -224,7 +224,7 @@ if ($Json) {
   $healthResult | ConvertTo-Json -Depth 3
 } else {
   Write-Output "`n═══════════════════════════════════════════"
-  Write-Output "  HEALTH CHECK — gentleman-vMK"
+  Write-Output "  HEALTH CHECK — gentle-MK"
   Write-Output "═══════════════════════════════════════════"
   $checks | ForEach-Object {
     $icon = switch ($_.status) { "OK" { "✅" } "WARN" { "🟡" } "FAIL" { "🔴" } default { "❓" } }

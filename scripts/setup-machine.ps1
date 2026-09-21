@@ -5,7 +5,7 @@
     Gentleman Agent — One-shot machine setup for portability
 .DESCRIPTION
     Sets up a new machine after cloning gentleman-agent-gh: global shortcuts
-    (gentleman-vmk), GENTLEMAN_AGENT_ROOT + OpenCode env vars, MCP binaries
+    (gentle-mk), GENTLEMAN_AGENT_ROOT + OpenCode env vars, MCP binaries
     (codebase-memory-mcp, engram, headroom), Ollama + moondream, skill junction.
 .PARAMETER RepoDir
     Path to the cloned gentleman-agent-gh repo (default: current dir)
@@ -118,7 +118,7 @@ if (-not $SkipShortcuts) {
     $npmDir = "$env:APPDATA\npm"
     if (-not (Test-Path $npmDir)) { New-Item -ItemType Directory -Path $npmDir -Force | Out-Null }
     $shortcuts = @(
-        @{ Name = "gentleman-vmk"; Ps1Cmd = "opencode --agent gentleman-vMK $args"; CmdCmd = "opencode --agent gentleman-vMK %*"; BatCmd = "gentleman-vmk" }
+        @{ Name = "gentleman-vmk"; Ps1Cmd = "opencode --agent gentle-MK $args"; CmdCmd = "opencode --agent gentle-MK %*"; BatCmd = "gentleman-vmk" }
         @{ Name = "gentle-mk"; Ps1Cmd = "opencode --agent gentle-MK $args"; CmdCmd = "opencode --agent gentle-MK %*"; BatCmd = "gentle-mk" }
         @{ Name = "gentle-batch-edit"; Ps1Cmd = "gentle-batch-edit.bat $args"; CmdCmd = "gentle-batch-edit.bat %*"; BatCmd = "gentle-batch-edit" }
     )

@@ -5,7 +5,7 @@ triggers: "model router, routing, delegate or direct, model decision, specialize
 license: Apache-2.0
 metadata:
   tags: [engineering, routing, orchestration, multi-model]
-  author: gentleman-vMK
+  author: gentle-MK
   version: "3.3"
 token_budget: 3200
 ---
@@ -17,18 +17,18 @@ token_budget: 3200
 
 | Task | Action | Agent | Model (SSoT opencode.json) | Ctx | Fallback |
 |------|--------|-------|----------------------------|-----|----------|
-| Security/vulnerability | DELEGATE | `gentleman-security` | DeepSeek V4 Flash (`opencode-go/deepseek-v4-flash`) | — | `gentleman-deep` -> `gentleman-vMK` |
-| SEO/content | DELEGATE | `gentleman-seo` | DeepSeek V4 Flash (`opencode-go/deepseek-v4-flash`) | — | `gentleman-vMK` |
-| Infrastructure/K8s/Terraform | DELEGATE | `gentleman-infra` | MiMo V2.5 (`opencode-go/mimo-v2.5`) | — | `gentleman-deep` -> `gentleman-vMK` |
-| Frontend/UI/a11y | DELEGATE | `gentleman-frontend` | Muse Spark 1.3 Contributor (`opencode-go/muse-spark-1.3-contributor`) | — | `gentleman-quick` -> `gentleman-vMK` |
-| Performance/profiling | DELEGATE | `gentleman-performance` | DeepSeek V4 Flash (`opencode-go/deepseek-v4-flash`) | — | `gentleman-deep` -> `gentleman-vMK` |
-| Data/SQL/Python | DELEGATE | `gentleman-datascience` | Muse Spark 1.3 Contributor (`opencode-go/muse-spark-1.3-contributor`) | — | `gentleman-codex` -> `gentleman-vMK` |
-| Documentation | DELEGATE | `gentleman-docs` | Muse Spark 1.3 Contributor (`opencode-go/muse-spark-1.3-contributor`) | — | `gentleman-vMK` |
-| Implement plan | DELEGATE | `gentleman-implementer` | MiMo V2.5 (`opencode-go/mimo-v2.5`) | — | `gentleman-vMK` |
-| Architecture/code review | DIRECT | `gentleman-vMK` | Muse Spark 1.3 Contributor (`opencode-go/muse-spark-1.3-contributor`) | — | — |
+| Security/vulnerability | DELEGATE | `gentleman-security` | DeepSeek V4 Flash (`opencode-go/deepseek-v4-flash`) | — | `gentleman-deep` -> `gentle-MK` |
+| SEO/content | DELEGATE | `gentleman-seo` | DeepSeek V4 Flash (`opencode-go/deepseek-v4-flash`) | — | `gentle-MK` |
+| Infrastructure/K8s/Terraform | DELEGATE | `gentleman-infra` | MiMo V2.5 (`opencode-go/mimo-v2.5`) | — | `gentleman-deep` -> `gentle-MK` |
+| Frontend/UI/a11y | DELEGATE | `gentleman-frontend` | Muse Spark 1.3 Contributor (`opencode-go/muse-spark-1.3-contributor`) | — | `gentleman-quick` -> `gentle-MK` |
+| Performance/profiling | DELEGATE | `gentleman-performance` | DeepSeek V4 Flash (`opencode-go/deepseek-v4-flash`) | — | `gentleman-deep` -> `gentle-MK` |
+| Data/SQL/Python | DELEGATE | `gentleman-datascience` | Muse Spark 1.3 Contributor (`opencode-go/muse-spark-1.3-contributor`) | — | `gentleman-codex` -> `gentle-MK` |
+| Documentation | DELEGATE | `gentleman-docs` | Muse Spark 1.3 Contributor (`opencode-go/muse-spark-1.3-contributor`) | — | `gentle-MK` |
+| Implement plan | DELEGATE | `gentleman-implementer` | MiMo V2.5 (`opencode-go/mimo-v2.5`) | — | `gentle-MK` |
+| Architecture/code review | DIRECT | `gentle-MK` | Muse Spark 1.3 Contributor (`opencode-go/muse-spark-1.3-contributor`) | — | — |
 | Quick edit | DIRECT | `gentleman-quick` | Muse Spark 1.3 Contributor (`opencode-go/muse-spark-1.3-contributor`) | — | `gentleman-codex` |
 | Script generation | DIRECT | `gentleman-codex` | MiMo V2.5 (`opencode-go/mimo-v2.5`) | — | `gentleman-quick` |
-| Default | DIRECT | `gentleman-vMK` | Muse Spark 1.3 Contributor (`opencode-go/muse-spark-1.3-contributor`) | — | — |
+| Default | DIRECT | `gentle-MK` | Muse Spark 1.3 Contributor (`opencode-go/muse-spark-1.3-contributor`) | — | — |
 
 ## Implementer
 `gentleman-implementer` (MiMo V2.5 — `opencode-go/mimo-v2.5`) — precise plan execution. No unrequested changes.

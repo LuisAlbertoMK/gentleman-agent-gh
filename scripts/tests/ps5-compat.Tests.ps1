@@ -103,8 +103,8 @@ Describe 'PS5/7 Compat — no @args splatting in critical path' {
     It 'T8: setup-machine.ps1 shortcut template uses $args not @args' {
         $path = Join-Path $repoRoot 'setup-machine.ps1'
         $content = Get-Content $path -Raw
-        $content | Should -Match 'gentleman-vMK \$args'
-        $content | Should -Not -Match 'gentleman-vMK @args'
+        $content | Should -Match 'gentle-MK \$args'
+        $content | Should -Not -Match 'gentle-MK @args'
     }
 
     It 'T9: gentleman-init.ps1 forwards $args (not @args)' {

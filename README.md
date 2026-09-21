@@ -35,7 +35,7 @@ Suite of **92 skills** (+ `_shared`) + **128 top-level scripts** (121 PowerShell
 ## Quick Start
 
 1. **Clone & install**: `git clone https://github.com/LuisAlbertoMK/gentleman-agent-gh.git && cd gentleman-agent-gh && ./scripts/install.sh`
-2. **Open**: `opencode` in the project folder — `gentleman-vMK` loads automatically
+2. **Open**: `opencode` in the project folder — `gentle-MK` loads automatically
 3. **Ask**: "Analyze my project" · "Review this file" · "Create a test"
 4. **Shortcuts**: `!score` · `!health` · `!analisis`
 5. **Close**: `!close`
@@ -66,11 +66,11 @@ Switch modes:
 ## Features
 
 ### Multi-Agent Architecture
-58 agents total: main orchestrator (`gentleman-vMK`) + 12 specialists + 12 subagent twins + 10 SDD pipeline agents + 14 auto-mode variants + 1 global orchestrator bridge (`gentle-orchestrator`):
+58 agents total: main orchestrator (`gentle-MK`) + 12 specialists + 12 subagent twins + 10 SDD pipeline agents + 14 auto-mode variants + 1 global orchestrator bridge (`gentle-orchestrator`):
 
 | Agent | Model | Specialty |
 |-------|-------|-----------|
-| `gentleman-vMK` | default | Senior Architect mentor — main orchestrator |
+| `gentle-MK` | default | Senior Architect mentor — main orchestrator |
 | `gentleman-deep` | deepseek-v4-flash | Architecture, design, complex code |
 | `gentleman-reasoning` | deepseek-v4-flash | Deep chain-of-thought debugging, multi-step synthesis |
 | `gentleman-code-review` | qwen3.7-plus | Code review 73.4% SWE-bench → fallback muse-spark → default |
@@ -108,7 +108,7 @@ Switch modes:
 | `gentleman-quick-auto` | muse-spark-1.3-contributor | — AUTO mode (same model, `*: allow`) |
 | `gentleman-codex-auto` | mimo-v2.5 | — AUTO mode (same model, `*: allow`) |
 | `gentleman-implementer-auto` | mimo-v2.5 | — AUTO mode (same model, `*: allow`) |
-| `gentleman-vMK-auto` | muse-spark-1.3-contributor | — AUTO mode (orchestrator, `*: allow`) |
+| `gentle-MK-auto` | muse-spark-1.3-contributor | — AUTO mode (orchestrator, `*: allow`) |
 | `gentleman-aem-auto` | deepseek-v4-flash | — AUTO mode (Adobe Experience Manager migration) |
 | `gentleman-deep-sub-auto` | deepseek-v4-flash | — AUTO sub agent (same model, `*: allow`) |
 | `gentleman-reasoning-sub-auto` | deepseek-v4-flash | — AUTO reasoning sub agent (same model, `*: allow`) |
@@ -298,7 +298,7 @@ Minimal example:
   "projects": [
     {
       "path": "../mi-api",
-      "defaultAgent": "gentleman-vMK"
+      "defaultAgent": "gentle-MK"
     }
   ]
 }

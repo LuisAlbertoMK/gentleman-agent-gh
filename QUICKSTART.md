@@ -10,7 +10,7 @@ Gentleman Agent is an **AI software development team** with 58 specialized agent
 
 Each agent loads from 1-5 of 96 specialized skills as needed.
 
-- 🏗️ **Lead Architect** (`gentleman-vMK`) — your Senior Architect mentor
+- 🏗️ **Lead Architect** (`gentle-MK`) — your Senior Architect mentor
 - 🔒 **Specialists** (security, performance, frontend, etc.) — FREE TIER consultants
 - 🧠 **Persistent memory** (Engram) — the agent remembers across sessions
 - ✅ **Auto-verification** — triple check before any change
@@ -44,7 +44,7 @@ cd gentleman-agent-gh
 opencode
 ```
 
-The `gentleman-vMK` agent loads automatically as default.
+The `gentle-MK` agent loads automatically as default.
 
 **Time**: ~10 seconds
 

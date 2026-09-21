@@ -1,4 +1,4 @@
-# Quality Standard (Gentleman-VMK)
+# Quality Standard (Gentle-MK)
 
 > **Load on-demand**: `read operations/quality-standard.md` before commit or when doing complex changes.
 > Applies to EVERY project, EVERY change, EVERY session. No exceptions.

@@ -24,7 +24,7 @@ Gentleman Agent is a **multi-agent AI development team** for OpenCode. It provid
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         OpenCode Runtime                            │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
-│  │ gentleman-vMK│  │ 12 Specialist│  │ 9 SDD Pipeline│             │
+│  │  gentle-MK    │  │ 12 Specialist│  │ 9 SDD Pipeline│             │
 │  │  (Orchestr.) │  │   Agents     │  │   Agents      │             │
 │  └──────┬───────┘  └──────┬───────┘  └──────┬────────┘             │
 │         │                 │                  │                      │
@@ -65,7 +65,7 @@ Gentleman Agent is a **multi-agent AI development team** for OpenCode. It provid
 
 | Module | Count | Purpose |
 |--------|-------|---------|
-| Orchestrator | 1 | `gentleman-vMK` — Senior Architect mentor |
+| Orchestrator | 1 | `gentle-MK` — Senior Architect mentor |
 | Specialists | 12 | Security, SEO, Infra, Frontend, Performance, DataScience, Docs, Implementer, Deep, Codex, Quick |
 | SDD Pipeline | 9 | Init → Explore → Propose → Spec → Design → Tasks → Apply → Verify → Archive |
 

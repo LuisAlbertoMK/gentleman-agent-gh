@@ -457,7 +457,7 @@ description: "$description"
 license: Apache-2.0
 metadata:
   tags: [$($Pattern.tags -join ', ')]
-  author: gentleman-vMK (auto-forged)
+  author: gentle-MK (auto-forged)
   version: "1.0"
   source_pattern: "$($Pattern.id)"
   source_severity: "$($Pattern.severity)"
