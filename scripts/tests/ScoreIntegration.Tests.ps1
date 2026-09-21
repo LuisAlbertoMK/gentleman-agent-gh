@@ -42,11 +42,10 @@ BeforeAll {
 }
 
 AfterAll {
-    if ($null -eq $script:oldPesterTest) {
-        Remove-Item Env:PESTER_TEST -ErrorAction SilentlyContinue
-    } else {
-        $env:PESTER_TEST = $script:oldPesterTest
-    }
+    # WHY: Never Remove-Item Env:PESTER_TEST — it is process-wide and races with
+    # scoring-cache.Tests.ps1 which runs in parallel. Always restore to saved value
+    # (even if null) so other suites keep their test-mode flag intact.
+    $env:PESTER_TEST = $script:oldPesterTest
 }
 
 # ============================================================

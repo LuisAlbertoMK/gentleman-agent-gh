@@ -16,23 +16,32 @@ AfterAll {
 
 Describe 'scoring-cache.ps1 — test-mode guard (S1)' {
     It 'PESTER_TEST=1 does not modify score-cache.json' {
-        # Capture state INSIDE It block (immediately before invocation) to minimize
-        # cross-job env-var race: ScoreIntegration's AfterAll may remove PESTER_TEST
-        # process-wide while this It block is running score-auto.ps1.
-        $cacheBeforeHash = if (Test-Path $cacheFile) {
-            (Get-FileHash $cacheFile -Algorithm SHA256).Hash
+        # WHY: Do NOT manipulate $env:PESTER_TEST here — run-tests.ps1 already sets
+        # it process-wide for the entire Pester run. Setting it locally and clearing
+        # in finally causes a race: in parallel suites, clearing PESTER_TEST kills
+        # ScoreIntegration.Tests.ps1's test mode mid-execution.
+        #
+        # WHY assert on $env:SCORE_CACHE_PATH (TestDrive temp) not real cache:
+        #   - Real cache is shared, any writer mutates it → non-deterministic
+        #   - $env:SCORE_CACHE_PATH points to TestDrive (isolated per suite)
+        #   - score-auto.ps1 writes cache there; no other writer touches it
+        #   - Deterministic: temp is either unchanged or absent
+        $tempCache = $env:SCORE_CACHE_PATH
+        $tempBeforeHash = if ($tempCache -and (Test-Path $tempCache)) {
+            (Get-FileHash $tempCache -Algorithm SHA256).Hash
         } else { $null }
-        $env:PESTER_TEST = '1'
-        try {
-            & $scriptPath -Json 2>$null | Out-Null
-        } finally {
-            $env:PESTER_TEST = $null
-        }
-        if ($null -ne $cacheBeforeHash) {
-            $cacheAfterHash = (Get-FileHash $cacheFile -Algorithm SHA256).Hash
-            $cacheAfterHash | Should -Be $cacheBeforeHash
+
+        # PESTER_TEST is already set by run-tests.ps1 — just invoke
+        & $scriptPath -Json 2>$null | Out-Null
+
+        # Verify: temp file must NOT have been written with a real score.
+        # If temp existed before, its hash must be unchanged. If it didn't exist,
+        # it must still not exist (no side-effect leak from test-mode invocation).
+        if ($null -ne $tempBeforeHash) {
+            $tempAfterHash = (Get-FileHash $tempCache -Algorithm SHA256).Hash
+            $tempAfterHash | Should -Be $tempBeforeHash
         } else {
-            Test-Path $cacheFile | Should -BeFalse
+            Test-Path $tempCache | Should -BeFalse
         }
     }
 }
