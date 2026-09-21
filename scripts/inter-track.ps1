@@ -82,10 +82,14 @@ if (-not (Test-Path -LiteralPath $trackPath)) {
 
 # Exclusive file lock to prevent race conditions on read-modify-write
 function Invoke-TrackLocked {
-    param([scriptblock]$Action)
+    param(
+        [scriptblock]$Action,
+        [System.Management.Automation.Cmdlet]$CallerPSCmdlet
+    )
     $stream = $null
     $reader = $null
     $writer = $null
+    $mutated = $false
     try {
         $stream = [System.IO.FileStream]::new($trackPath, [System.IO.FileMode]::OpenOrCreate, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
         $reader = [System.IO.StreamReader]::new($stream, [System.Text.Encoding]::UTF8, $true, 1024, $true)
@@ -96,12 +100,16 @@ function Invoke-TrackLocked {
         } else {
             $data = $content | ConvertFrom-Json
         }
-        & $action ([ref]$data)
-        $stream.SetLength(0)
-        $stream.Seek(0, [System.IO.SeekOrigin]::Begin) | Out-Null
-        $writer = [System.IO.StreamWriter]::new($stream)
-        $writer.Write(($data | ConvertTo-Json -Depth 4))
-        $writer.Flush()
+        $mutatedRef = [ref]$mutated
+        & $action ([ref]$data) $mutatedRef
+        # dirty-flag: only write if action mutated data (WhatIf-safe: no write when $mutated stays $false)
+        if ($mutatedRef.Value) {
+            $stream.SetLength(0)
+            $stream.Seek(0, [System.IO.SeekOrigin]::Begin) | Out-Null
+            $writer = [System.IO.StreamWriter]::new($stream)
+            $writer.Write(($data | ConvertTo-Json -Depth 4))
+            $writer.Flush()
+        }
     } finally {
         # E4 perf-ciclo37-clusterA (C36A/E4 anti-leak): Dispose reader/writer +
         # Close/Dispose del stream (el lock FileShare::None se mantiene).
@@ -120,8 +128,8 @@ if (-not (Test-Path -LiteralPath $trackPath) -or (Get-Item $trackPath).Length -e
     $data | ConvertTo-Json | Set-Content -LiteralPath $trackPath -Encoding UTF8
 }
 
-Invoke-TrackLocked -Action {
-    param([ref]$dataRef)
+Invoke-TrackLocked -CallerPSCmdlet $PSCmdlet -Action {
+    param([ref]$dataRef, [ref]$mutatedRef)
     $data = $dataRef.Value
     if (-not $data) {
         $data = @{
@@ -142,46 +150,65 @@ Invoke-TrackLocked -Action {
         if ([string]::IsNullOrWhiteSpace($data.cycle.start)) {
             $data.cycle.start = $healNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
         }
+        $mutatedRef.Value = $true
         $dataRef.Value = $data
     }
 
 if ($Reset) {
-    # E8: single Get-Date reuse (was 3 calls)
-    $resetNow = Get-Date
-    $cycleId = "CYC-" + $resetNow.ToString("yyyyMMdd") + "-" + (Get-Random -Minimum 100 -Maximum 999)
-    # Archive current cycle to history
-    if ($data.cycle.count -gt 0) {
-        $archived = [PSCustomObject]@{
-            id     = $data.cycle.id
-            start  = $data.cycle.start
-            target = $data.cycle.target
-            count  = $data.cycle.count
-            end    = $resetNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+    $shouldProcessMsg = "Reset inter-track cycle (current count: $($data.cycle.count))"
+    if ($CallerPSCmdlet -and -not $CallerPSCmdlet.ShouldProcess($trackPath, $shouldProcessMsg)) {
+        # WhatIf: skip mutation, report what would happen
+        if (-not $Quiet) {
+            Write-Host "[inter-track] WhatIf: would reset cycle (current count: $($data.cycle.count))" -ForegroundColor DarkGray
         }
-        $data.history = @($data.history) + @($archived)
-    }
-    $data.cycle = @{
-        id     = $cycleId
-        start  = $resetNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
-        target = $Target
-        count  = 0
-    }
-    if (-not $Quiet) {
-        Write-Host "[inter-track] Reset. New cycle: $cycleId (target: $Target)" -ForegroundColor Cyan
+    } else {
+        # E8: single Get-Date reuse (was 3 calls)
+        $resetNow = Get-Date
+        $cycleId = "CYC-" + $resetNow.ToString("yyyyMMdd") + "-" + (Get-Random -Minimum 100 -Maximum 999)
+        # Archive current cycle to history
+        if ($data.cycle.count -gt 0) {
+            $archived = [PSCustomObject]@{
+                id     = $data.cycle.id
+                start  = $data.cycle.start
+                target = $data.cycle.target
+                count  = $data.cycle.count
+                end    = $resetNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+            }
+            $data.history = @($data.history) + @($archived)
+        }
+        $data.cycle = @{
+            id     = $cycleId
+            start  = $resetNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+            target = $Target
+            count  = 0
+        }
+        $mutatedRef.Value = $true
+        if (-not $Quiet) {
+            Write-Host "[inter-track] Reset. New cycle: $cycleId (target: $Target)" -ForegroundColor Cyan
+        }
     }
 }
 
 if ($Increment) {
-    $data.cycle.count = [int]$data.cycle.count + 1
-    if (-not $Quiet) {
-        $remaining = [int]$data.cycle.target - [int]$data.cycle.count
-        if ($remaining -le 0) {
-            Write-Host "[inter-track] [OK] Target met: $($data.cycle.count)/$($data.cycle.target)" -ForegroundColor Green
-        } else {
-            Write-Host "[inter-track] inter: $($data.cycle.count)/$($data.cycle.target) ($remaining remaining)" -ForegroundColor Yellow
+    $shouldProcessMsg = "Increment inter-track count ($($data.cycle.count) → $([int]$data.cycle.count + 1))"
+    if ($CallerPSCmdlet -and -not $CallerPSCmdlet.ShouldProcess($trackPath, $shouldProcessMsg)) {
+        # WhatIf: skip mutation, report what would happen
+        if (-not $Quiet) {
+            Write-Host "[inter-track] WhatIf: would increment ($($data.cycle.count) → $([int]$data.cycle.count + 1))" -ForegroundColor DarkGray
         }
+    } else {
+        $data.cycle.count = [int]$data.cycle.count + 1
+        $mutatedRef.Value = $true
+        if (-not $Quiet) {
+            $remaining = [int]$data.cycle.target - [int]$data.cycle.count
+            if ($remaining -le 0) {
+                Write-Host "[inter-track] [OK] Target met: $($data.cycle.count)/$($data.cycle.target)" -ForegroundColor Green
+            } else {
+                Write-Host "[inter-track] inter: $($data.cycle.count)/$($data.cycle.target) ($remaining remaining)" -ForegroundColor Yellow
+            }
+        }
+        $dataRef.Value = $data
     }
-    $dataRef.Value = $data
 }
 
 # G7: ensure Reset mutations are persisted via ref (object reference already covers it, but be explicit)
