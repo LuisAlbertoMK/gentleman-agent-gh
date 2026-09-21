@@ -1,3 +1,4 @@
+2026-09-20 - fix(nuance): ADR-020 refleja Fail real + drift-6 cerrado (opción B: 6 -semi fuera del mapa PS, sufijo intacto) + ROZA tests/ documentado como intencional.
 2026-09-20 - chore(rename): barrido cero-restos — 24 FIXABLE a gentle-MK (CI, scripts, metadata, docs, prompts, skills), global split-brain curado (58 agentes + default), Go sin subs muertas, T8 + dead-code fix; KEEP intencional: históricos, shims, dual-read, fixtures.
 2026-09-20 - test(delegation): fusiona T1-T12 HEAD con suite cluster-path-overlap + fix real PS-CI-03 (ruta literal); cobertura FileCount/LineCount/RiskLevel/Domain restaurada.
 2026-09-20 - docs(bitacora): session close — !close ejecutado desde plan-execution

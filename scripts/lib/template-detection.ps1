@@ -23,7 +23,6 @@ $TemplateMap = @{
     'gentleman-vMK' = 'orchestrator'
     'gentle-MK' = 'orchestrator'
     'gentle-orchestrator' = 'sddorchestrator'
-    'gentleman-vMK-semi' = 'semi'
     'gentle-MK-semi' = 'semi'
 
     # Read-only specialists
@@ -94,12 +93,8 @@ $TemplateMap = @{
     'gentleman-code-review-sub-auto'   = 'auto-sub'
     'gentleman-reasoning-sub-auto'     = 'auto-sub'
 
-    # Mode variants — SEMI
-    'gentleman-deep-semi'        = 'semi'
-    'gentleman-quick-semi'       = 'semi'
-    'gentleman-codex-semi'       = 'semi'
-    'gentleman-implementer-semi' = 'semi'
-    'gentleman-aem-semi'         = 'semi'
+    # Mode variants — SEMI — retired per ADR-033 (suffix rule handles behavior)
+    # Do NOT re-add explicit -semi entries here.
 
     # Reviewer
     'gentleman-reviewer' = 'reviewer'

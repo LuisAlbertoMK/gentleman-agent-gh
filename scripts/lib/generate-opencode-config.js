@@ -201,10 +201,10 @@ for (const [agentName, agentDef] of Object.entries(base.agent)) {
 
   // ADR-033 IMPLEMENTED 2026-09-04 (simplified to manual|auto): 'semi' skipped
   // at build so opencode.json carries 0 *-semi agents. Skip KEPT (not dead-code):
-  // opencode-base.json still defines the 6 legacy -semi agents + permission-
-  // templates.json still carries the 'semi' template; removing this skip would
-  // reintroduce/mis-map them (vMK-semi → orchestrator via keyword). Remove this
-  // skip only together with base + template cleanup (JD follow-up).
+  // opencode-base.json was purged of -semi agents per ADR-033 (base is clean);
+  // permission-templates.json still carries the 'semi' template; removing this skip
+  // would reintroduce/mis-map them (vMK-semi → orchestrator via keyword). Remove
+  // this skip only together with template cleanup (JD follow-up).
   if (templateName === 'semi') continue;
 
   const template = templates[templateName];
