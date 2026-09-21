@@ -278,6 +278,7 @@ $memSaveDirective = $null
 # --- Mode: process-pending — read pending-engram.json and emit directive for orchestrator ---
 if ($Mode -eq 'process-pending') {
     $pendingPath = Join-Path $checkpointDir "pending-engram.json"
+    $quarantinePath = $null
     if (Test-Path -LiteralPath $pendingPath) {
         try {
             $pendingContent = Get-Content -LiteralPath $pendingPath -Raw -ErrorAction Stop
@@ -285,6 +286,14 @@ if ($Mode -eq 'process-pending') {
             if ($pendingDirective -and $pendingDirective.topic_key) {
                 $memSaveDirective = $pendingDirective
                 $memSaved = $true
+                # S3: self-clear pending → quarantine to prevent re-emission (reuses F1-stale pattern)
+                try {
+                    $consumedTs = Get-Date -Format 'yyyyMMdd-HHmmss'
+                    $quarantinePath = Join-Path $checkpointDir "pending-consumed-$consumedTs.json"
+                    Move-Item -LiteralPath $pendingPath -Destination $quarantinePath -Force -ErrorAction Stop
+                } catch {
+                    Write-Warning "process-pending: quarantine of consumed pending failed (best-effort): $($_.Exception.Message)"
+                }
                 if (-not $Quiet) {
                     Write-Host "🔄 PROCESS-PENDING: Found pending directive for topic_key=$($pendingDirective.topic_key)" -ForegroundColor Cyan
                 }
@@ -311,7 +320,7 @@ if ($Mode -eq 'process-pending') {
         validated         = $true
         mem_saved         = $memSaved
         persisted         = $memSaved
-        pending_file      = if ((Test-Path -LiteralPath $pendingPath) -and $memSaved) { $pendingPath } else { $null }
+        pending_file      = if ($memSaved) { $quarantinePath } else { if (Test-Path -LiteralPath $pendingPath) { $pendingPath } else { $null } }
         mem_save_directive = $memSaveDirective
         indexed           = $false
         miner_patterns    = 0

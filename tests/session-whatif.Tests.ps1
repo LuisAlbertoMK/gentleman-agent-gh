@@ -121,3 +121,55 @@ Describe "S2: close-session.ps1 absolute paths + PESTER_TEST gate" {
         }
     }
 }
+
+Describe "S3: session-checkpoint.ps1 quarantine consumed pending" {
+
+    BeforeEach {
+        $script:TmpDir = Join-Path ([System.IO.Path]::GetTempPath()) "session-cp-$(Get-Random)"
+        $script:TmpScripts = Join-Path $script:TmpDir "scripts"
+        New-Item -ItemType Directory -Path $script:TmpScripts -Force | Out-Null
+        $cpDir = Join-Path $script:TmpDir ".opencode\session-checkpoints"
+        New-Item -ItemType Directory -Path $cpDir -Force | Out-Null
+        # Seed pending-engram.json
+        $pending = @{
+            topic_key = "checkpoint/session-state"
+            type      = "session_checkpoint"
+            title     = "Test checkpoint"
+            content   = "Test content"
+        }
+        $pending | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $cpDir "pending-engram.json") -Encoding UTF8
+        Copy-Item -LiteralPath (Join-Path $script:ScriptsRoot "session-checkpoint.ps1") -Destination $script:TmpScripts -Force
+    }
+
+    AfterEach {
+        if (Test-Path -LiteralPath $script:TmpDir) {
+            Remove-Item -LiteralPath $script:TmpDir -Recurse -Force -ErrorAction SilentlyContinue
+        }
+    }
+
+    It "process-pending quarantines pending-engram.json" {
+        $pendingPath = Join-Path $script:TmpDir ".opencode\session-checkpoints\pending-engram.json"
+        Test-Path -LiteralPath $pendingPath | Should -Be $true
+        $result = & "$($script:TmpScripts)\session-checkpoint.ps1" -Mode process-pending -Quiet | ConvertFrom-Json
+        $result.action | Should -Be "pending_directive_emitted"
+        # pending-engram.json should be consumed (quarantined)
+        Test-Path -LiteralPath $pendingPath | Should -Be $false
+        # A pending-consumed-*.json should exist
+        $quarantined = Get-ChildItem -LiteralPath (Join-Path $script:TmpDir ".opencode\session-checkpoints") -Filter "pending-consumed-*.json" -ErrorAction SilentlyContinue
+        $quarantined | Should -Not -BeNullOrEmpty
+    }
+
+    It "process-pending returns directive from consumed pending" {
+        $result = & "$($script:TmpScripts)\session-checkpoint.ps1" -Mode process-pending -Quiet | ConvertFrom-Json
+        $result.mem_save_directive.topic_key | Should -Be "checkpoint/session-state"
+        $result.mem_saved | Should -Be $true
+    }
+
+    It "process-pending with no pending file returns no_pending" {
+        $pendingPath = Join-Path $script:TmpDir ".opencode\session-checkpoints\pending-engram.json"
+        Remove-Item -LiteralPath $pendingPath -Force
+        $result = & "$($script:TmpScripts)\session-checkpoint.ps1" -Mode process-pending -Quiet | ConvertFrom-Json
+        $result.action | Should -Be "no_pending"
+        $result.mem_saved | Should -Be $false
+    }
+}
