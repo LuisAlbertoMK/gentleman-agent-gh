@@ -318,7 +318,7 @@ if ($Mode -eq 'process-pending') {
         validated         = $true
         mem_saved         = $memSaved
         persisted         = $memSaved
-        pending_file      = if ($memSaved) { $quarantinePath } else { if (Test-Path -LiteralPath $pendingPath) { $pendingPath } else { $null } }
+        pending_file      = if ($memSaved) { if ($quarantinePath -and (Test-Path -LiteralPath $quarantinePath)) { $quarantinePath } elseif (Test-Path -LiteralPath $pendingPath) { $pendingPath } else { $null } } else { if (Test-Path -LiteralPath $pendingPath) { $pendingPath } else { $null } }
         mem_save_directive = $memSaveDirective
         indexed           = $false
         miner_patterns    = 0

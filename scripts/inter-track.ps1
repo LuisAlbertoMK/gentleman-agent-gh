@@ -68,16 +68,18 @@ if ($RecordEngramEvent -and ($validKinds -notcontains $EventKind)) {
 
 # Initialize if not exists
 if (-not (Test-Path -LiteralPath $trackPath)) {
-    $init = @{
-        cycle  = @{
-            id     = ""
-            start  = ""
-            target = $Target
-            count  = 0
+    if (-not $WhatIfPreference) {
+        $init = @{
+            cycle  = @{
+                id     = ""
+                start  = ""
+                target = $Target
+                count  = 0
+            }
+            history = @()
         }
-        history = @()
+        $init | ConvertTo-Json | Set-Content -LiteralPath $trackPath -Encoding UTF8
     }
-    $init | ConvertTo-Json | Set-Content -LiteralPath $trackPath -Encoding UTF8
 }
 
 # Exclusive file lock to prevent race conditions on read-modify-write
@@ -121,13 +123,44 @@ function Invoke-TrackLocked {
 }
 
 if (-not (Test-Path -LiteralPath $trackPath) -or (Get-Item $trackPath).Length -eq 0) {
-    $data = @{
-        cycle  = @{ id = ""; start = ""; target = $Target; count = 0 }
-        history = @()
+    if (-not $WhatIfPreference) {
+        $data = @{
+            cycle  = @{ id = ""; start = ""; target = $Target; count = 0 }
+            history = @()
+        }
+        $data | ConvertTo-Json | Set-Content -LiteralPath $trackPath -Encoding UTF8
+    } else {
+        # WhatIf on missing/empty file: use defaults, skip locked write (OpenOrCreate would create the file)
+        $data = @{
+            cycle  = @{ id = ""; start = ""; target = $Target; count = 0 }
+            history = @()
+        }
     }
-    $data | ConvertTo-Json | Set-Content -LiteralPath $trackPath -Encoding UTF8
 }
 
+# WhatIf guard: skip locked file access when file doesn't exist (OpenOrCreate would create it)
+if ($WhatIfPreference -and -not (Test-Path -LiteralPath $trackPath)) {
+    # Produce output from defaults (data set above or by init blocks)
+    if (-not $data) {
+        $data = @{
+            cycle  = @{ id = ""; start = ""; target = $Target; count = 0 }
+            history = @()
+        }
+    }
+    # Output WhatIf result (mirrors action scriptblock output)
+    $result = [PSCustomObject]@{
+        cycleId  = $data.cycle.id
+        count    = [int]$data.cycle.count
+        target   = [int]$data.cycle.target
+        complete = ([int]$data.cycle.count -ge [int]$data.cycle.target)
+        remaining = [Math]::Max(0, [int]$data.cycle.target - [int]$data.cycle.count)
+    }
+    if ($Quiet) {
+        $result | ConvertTo-Json -Depth 4
+    } else {
+        Write-Host "  Cycle: $($data.cycle.id) | inter: $($data.cycle.count)/$($data.cycle.target)" -ForegroundColor Cyan
+    }
+} else {
 Invoke-TrackLocked -CallerPSCmdlet $PSCmdlet -Action {
     param([ref]$dataRef, [ref]$mutatedRef)
     $data = $dataRef.Value
@@ -144,14 +177,17 @@ Invoke-TrackLocked -CallerPSCmdlet $PSCmdlet -Action {
     # id="" with count>0. Heal lazily: first invocation seeing empty id
     # assigns one — count semantics untouched (no gaming per R3).
     if ([string]::IsNullOrWhiteSpace($data.cycle.id)) {
-        # E8: single Get-Date reuse (was 2 calls)
-        $healNow = Get-Date
-        $data.cycle.id = "CYC-" + $healNow.ToString("yyyyMMdd") + "-" + (Get-Random -Minimum 100 -Maximum 999)
-        if ([string]::IsNullOrWhiteSpace($data.cycle.start)) {
-            $data.cycle.start = $healNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+        # WhatIf: skip heal mutation — init guards already prevent fresh-file creation under WhatIf
+        if (-not $WhatIfPreference) {
+            # E8: single Get-Date reuse (was 2 calls)
+            $healNow = Get-Date
+            $data.cycle.id = "CYC-" + $healNow.ToString("yyyyMMdd") + "-" + (Get-Random -Minimum 100 -Maximum 999)
+            if ([string]::IsNullOrWhiteSpace($data.cycle.start)) {
+                $data.cycle.start = $healNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+            }
+            $mutatedRef.Value = $true
+            $dataRef.Value = $data
         }
-        $mutatedRef.Value = $true
-        $dataRef.Value = $data
     }
 
 if ($Reset) {
@@ -284,3 +320,4 @@ if ($Quiet) {
     }
 }
 } # /Invoke-TrackLocked -Action
+} # /WhatIf guard else
