@@ -95,3 +95,38 @@ function Get-FileManifest {
 
     @($manifest | Sort-Object relpath)
 }
+
+function Get-ScoredScriptFiles {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
+    <#
+    .SYNOPSIS
+        Extracts script/skill FileInfo objects from a manifest (avoids double walk).
+    .DESCRIPTION
+        Given a manifest from Get-FileManifest, returns script files, skill MD files,
+        and skill directory names without additional Get-ChildItem walks. Used by
+        score-dims.ps1 to avoid duplicating the tree walk already done by the manifest.
+    #>
+    param(
+        [Parameter(Mandatory)]
+        [string]$Root,
+        $Manifest
+    )
+    if (-not $Manifest) { $Manifest = Get-FileManifest -Path $Root }
+    $scripts   = [System.Collections.Generic.List[object]]::new()
+    $skills    = [System.Collections.Generic.List[object]]::new()
+    $skillDirSet = @{}
+    foreach ($m in $Manifest) {
+        $fullPath = Join-Path $Root $m.relpath
+        $item = Get-Item -LiteralPath $fullPath -EA SilentlyContinue
+        if (-not $item) { continue }
+        if ($m.group -eq 'script') {
+            $scripts.Add($item)
+        } elseif ($m.group -eq 'skill') {
+            $skills.Add($item)
+            if ($m.relpath -match '\.agents[/\\]skills[/\\]([^/\\]+)') {
+                $skillDirSet[$Matches[1]] = $true
+            }
+        }
+    }
+    @{ Scripts = @($scripts); Skills = @($skills); SkillDirs = @($skillDirSet.Keys) }
+}

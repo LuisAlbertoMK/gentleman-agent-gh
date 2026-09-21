@@ -16,6 +16,15 @@
 # Use $scriptRoot for any relative paths
 
 # --- Null guards: gracefully handle empty file arrays ---
+# If caller didn't provide file lists, extract from manifest (avoids double walk).
+# S5: Get-ScoredScriptFiles reuses the manifest from Get-FileManifest instead of
+# walking the tree a second time with Get-ChildItem.
+if ((-not $scriptFiles -or $scriptFiles.Count -eq 0) -and $manifest) {
+    $manifestFiles = Get-ScoredScriptFiles -Root (Get-Location).Path -Manifest $manifest
+    $scriptFiles  = $manifestFiles.Scripts
+    $skillMdFiles = $manifestFiles.Skills
+    $skillDirs    = $manifestFiles.SkillDirs
+}
 if (-not $scriptFiles)  { $scriptFiles = @() }
 if (-not $skillMdFiles) { $skillMdFiles = @() }
 if (-not $skillDirs)    { $skillDirs = @() }
