@@ -269,6 +269,7 @@ if ($RecordEngramEvent) {
         }
         $data.history = @($data.history) + @($recordedEvent)
         $dataRef.Value = $data
+        $mutatedRef.Value = $true
         $engramRecorded = $true
         if (-not $Quiet) {
             Write-Host "[inter-track] Recorded engram event: $EventKind / $TopicKey (cycle: $($data.cycle.id))" -ForegroundColor Cyan
