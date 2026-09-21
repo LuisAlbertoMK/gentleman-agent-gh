@@ -151,15 +151,18 @@ function Convert-GlobToRegex {
     param([string]$Glob)
     # Escape regex metacharacters (except * and ? which we handle as glob)
     $escaped = [regex]::Escape($Glob)
-    # Handle ** first: \*\* -> .* (recursive: zero-or-more path segments)
+    # Handle **/ → (?:.*/)?  (zero-or-more path segments + separator)
     # Use .Replace() (literal) instead of -replace (regex) to avoid escaping pain
+    # Note: [regex]::Escape does NOT escape /, so search for \*\*/ (not \*\*\/)
+    $escaped = $escaped.Replace('\*\*/', '(?:.*/)?')
+    # Handle trailing ** (no / after) → .*
     $escaped = $escaped.Replace('\*\*', '.*')
-    # Un-escape remaining single * (glob wildcard -> regex .*)
-    $escaped = $escaped -replace '\\\*', '.*'
-    # Un-escape ? (glob single char -> regex .)
-    $escaped = $escaped -replace '\\\?', '.'
-    # Wrap in anchors
-    return "^$escaped$"
+    # Single * → [^/]* (single path segment, NOT crossing /)
+    $escaped = $escaped -replace '\\\*', '[^/]*'
+    # Un-escape ? (glob single char -> regex . but not /)
+    $escaped = $escaped -replace '\\\?', '[^/]'
+    # Single-pass alternation with non-capturing group, fail-closed anchors
+    return "^(?:$escaped)$"
 }
 
 # E10 perf-ciclo34-clusterB: precompile glob regexes ONCE (was: Convert-GlobToRegex

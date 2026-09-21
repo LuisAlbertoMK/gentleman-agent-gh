@@ -124,8 +124,35 @@ Describe 'S3: Collision-free marker naming' {
 Describe 'S4: Single-pass glob matching' {
     It 'validate-write-scope.ps1 uses [^/] for single-segment glob' {
         $content = Get-Content (Join-Path $script:repoRoot 'scripts/validate-write-scope.ps1') -Raw
-        # Should have fixed the bare * glob issue
-        $content | Should -Match 'Convert-GlobToRegex'
+        # Single * must match [^/]* (not .*) to avoid crossing path separators
+        $content | Should -Match '\[\^/\]\*'
+    }
+
+    It 'validate-write-scope.ps1 uses non-capturing group alternation' {
+        $content = Get-Content (Join-Path $script:repoRoot 'scripts/validate-write-scope.ps1') -Raw
+        $content | Should -Match '\^\(\?:'
+    }
+
+    It 'src/*.ps1 does NOT match src/deep/x.ps1' {
+        # Simulate the regex conversion
+        $escaped = [regex]::Escape('src/*.ps1')
+        $escaped = $escaped.Replace('\*\*', '.*')
+        $escaped = $escaped -replace '\\\*', '[^/]*'
+        $escaped = $escaped -replace '\\\?', '[^/]'
+        $regex = "^(?:$escaped)$"
+        'src/foo.ps1' | Should -Match $regex
+        'src/deep/x.ps1' | Should -Not -Match $regex
+    }
+
+    It 'src/**/*.ps1 DOES match src/deep/x.ps1' {
+        $escaped = [regex]::Escape('src/**/*.ps1')
+        $escaped = $escaped.Replace('\*\*/', '(?:.*/)?')
+        $escaped = $escaped.Replace('\*\*', '.*')
+        $escaped = $escaped -replace '\\\*', '[^/]*'
+        $escaped = $escaped -replace '\\\?', '[^/]'
+        $regex = "^(?:$escaped)$"
+        'src/deep/x.ps1' | Should -Match $regex
+        'src/foo.ps1' | Should -Match $regex
     }
 
     It 'validate-write-scope.ps1 has syntax validation' {
