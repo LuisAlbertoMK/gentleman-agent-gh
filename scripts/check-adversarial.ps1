@@ -81,9 +81,17 @@ try {
     $forceShip = ($env:FORCE_SHIP -eq '1') -or ($env:FORCE_SHIP -eq 'true')
 
     foreach ($sf in $stagedFiles) {
-        # Check .breaker-cleared marker
-        $clearedMarker = "$RepoRoot\.breaker-cleared\" + ($sf.RelativePath.Replace('/','_').Replace('\','_'))
-        if (Test-Path $clearedMarker -PathType Leaf) {
+        # Check .breaker-cleared marker — collision-free naming + legacy fallback
+        $normalized = $sf.RelativePath -replace '[\\/]', '_'
+        $pathHash = [System.BitConverter]::ToString(
+            [System.Security.Cryptography.SHA256]::HashData([System.Text.Encoding]::UTF8.GetBytes($sf.RelativePath))
+        ).Replace('-','').Substring(0,8).ToLower()
+        $markerNew = "$RepoRoot\.breaker-cleared\${normalized}_${pathHash}"
+        $markerLegacy = "$RepoRoot\.breaker-cleared\$normalized"
+        $clearedMarker = if (Test-Path -LiteralPath $markerNew -PathType Leaf) { $markerNew }
+                         elseif (Test-Path -LiteralPath $markerLegacy -PathType Leaf) { $markerLegacy }
+                         else { $markerNew }
+        if (Test-Path -LiteralPath $clearedMarker -PathType Leaf) {
             # Stale check: target file still exists in tree?
             if (-not (Test-Path -LiteralPath $sf.FullPath -PathType Leaf)) {
                 Remove-Item -LiteralPath $clearedMarker -Force

@@ -101,17 +101,23 @@ Describe 'S2: FORCE_SHIP strict parsing' {
 }
 
 Describe 'S3: Collision-free marker naming' {
-    It 'gate-prep.ps1 uses mirror-named or hash suffix for naming' {
+    It 'gate-prep.ps1 uses hash suffix for collision-free naming' {
         $content = Get-Content (Join-Path $script:repoRoot 'scripts/gate-prep.ps1') -Raw
-        # Should not use simple Replace('/','_') without uniqueness
-        # Check that markerName has collision-avoidance mechanism
-        $content | Should -Match 'markerName'
+        # Must use SHA256 hash suffix to avoid path collisions
+        $content | Should -Match 'pathHash'
+        $content | Should -Match 'SHA256'
     }
 
-    It 'validate-write-scope.ps1 has no slash-to-underscore in path matching' {
-        $content = Get-Content (Join-Path $script:repoRoot 'scripts/validate-write-scope.ps1') -Raw
-        # S3 fix: should not have Replace('/','_') pattern in path matching
-        # (this is for write-scope, not marker naming)
+    It 'pre-commit-gate.ps1 uses hash-suffixed marker lookup' {
+        $content = Get-Content (Join-Path $script:repoRoot '.githooks/pre-commit-gate.ps1') -Raw
+        $content | Should -Match 'markerNew'
+        $content | Should -Match 'markerLegacy'
+    }
+
+    It 'check-adversarial.ps1 uses hash-suffixed breaker marker lookup' {
+        $content = Get-Content (Join-Path $script:repoRoot 'scripts/check-adversarial.ps1') -Raw
+        $content | Should -Match 'markerNew'
+        $content | Should -Match 'markerLegacy'
     }
 }
 

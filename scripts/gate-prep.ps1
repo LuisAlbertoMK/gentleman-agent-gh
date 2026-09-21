@@ -47,7 +47,12 @@ if (-not (Test-Path $jdDir)) { New-Item -ItemType Directory -Path $jdDir -Force 
 $jdCount = 0
 foreach ($file in $staged) {
     if ($file -like "*.ps1") {
-        $markerName = $file -replace '/', '_' -replace '\\', '_'
+        # Collision-free naming: normalized path + short hash suffix
+        $normalized = $file -replace '[\\/]', '_'
+        $pathHash = [System.BitConverter]::ToString(
+            [System.Security.Cryptography.SHA256]::HashData([System.Text.Encoding]::UTF8.GetBytes($file))
+        ).Replace('-','').Substring(0,8).ToLower()
+        $markerName = "${normalized}_${pathHash}"
         $markerPath = Join-Path $jdDir $markerName
         $fullPath = Join-Path $repoRoot $file
         if (-not (Test-Path $fullPath)) {
@@ -80,7 +85,12 @@ if (-not (Test-Path $breakerDir)) { New-Item -ItemType Directory -Path $breakerD
 $breakerCount = 0
 foreach ($file in $staged) {
     if ($file -like "*.ps1") {
-        $markerName = $file -replace '/', '_' -replace '\\', '_'
+        # Collision-free naming: normalized path + short hash suffix
+        $normalized = $file -replace '[\\/]', '_'
+        $pathHash = [System.BitConverter]::ToString(
+            [System.Security.Cryptography.SHA256]::HashData([System.Text.Encoding]::UTF8.GetBytes($file))
+        ).Replace('-','').Substring(0,8).ToLower()
+        $markerName = "${normalized}_${pathHash}"
         $markerPath = Join-Path $breakerDir $markerName
         $fullPath = Join-Path $repoRoot $file
         if (-not (Test-Path $fullPath)) {

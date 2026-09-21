@@ -153,8 +153,17 @@ Write-Host "[10/26] JD review check (ROZA zone)..."
 if ($stagedRoja) {
     $uncleared = @()
     foreach ($f in $stagedRoja) {
-        $marker = "$RepoRoot/.jd-cleared/" + ($f.Replace('/','_').Replace('\','_'))
-        if (-not (Test-Path $marker -PathType Leaf)) {
+        # Collision-free naming: normalized + hash suffix
+        $normalized = $f -replace '[\\/]', '_'
+        $pathHash = [System.BitConverter]::ToString(
+            [System.Security.Cryptography.SHA256]::HashData([System.Text.Encoding]::UTF8.GetBytes($f))
+        ).Replace('-','').Substring(0,8).ToLower()
+        $markerNew = "$RepoRoot/.jd-cleared/${normalized}_${pathHash}"
+        $markerLegacy = "$RepoRoot/.jd-cleared/$normalized"
+        $marker = if (Test-Path -LiteralPath $markerNew -PathType Leaf) { $markerNew }
+                  elseif (Test-Path -LiteralPath $markerLegacy -PathType Leaf) { $markerLegacy }
+                  else { $markerNew }  # default to new format for creation
+        if (-not (Test-Path -LiteralPath $marker -PathType Leaf)) {
             $uncleared += $f
         } else {
             # Validate marker content: accept both formats
