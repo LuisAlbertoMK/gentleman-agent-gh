@@ -245,7 +245,15 @@ if ($PSVersionTable.PSVersion.Major -lt 7) {
     }
 }
 
+# ============================================================
+# 4. SCORE COMPOSITION
+# ============================================================
+
+$allScores   = $dimensions.Values.PSForEach({ $_.s })
+$finalScore  = $math::Round(($allScores | Measure-Object -Average).Average, 1)
+
 # Bias calibration data (persist to .project.json, not just display)
+# MOVED: after $finalScore assignment — was using $finalScore before it was defined
 $biasCalPath = ".learnings/bias-calibration.json"
 $biasAdjusted = $null
 $biasNote = $null
@@ -266,13 +274,6 @@ if (Test-Path $biasCalPath) {
         Write-Debug "bias-cal read: $($_.Exception.Message)"
     }
 }
-
-# ============================================================
-# 4. SCORE COMPOSITION
-# ============================================================
-
-$allScores   = $dimensions.Values.PSForEach({ $_.s })
-$finalScore  = $math::Round(($allScores | Measure-Object -Average).Average, 1)
 
 $dimNames = @{
     "PA"  = "Project Artifacts"
