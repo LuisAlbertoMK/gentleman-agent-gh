@@ -367,7 +367,15 @@ if ($hasScripts) {
 }
 
 $spScore = 10
-# ADR-047: proportional threshold scales with skill ecosystem (1.3x skills, floor 60)
+# ADR-047: Proportional threshold scales with skill ecosystem.
+#   Formula: threshold = max(60, skillDirCount × 1.3)
+#   Floor 60 preserves original guardrail for small repos (>60 scripts = suspicious).
+#   At 100 skills → threshold = max(60, 130) = 130
+#   Boundary behavior (100 skills):
+#     129 scripts → 129 ≤ 130 → no penalty → SP = 10
+#     130 scripts → 130 ≤ 130 → no penalty → SP = 10
+#     131 scripts → 131 > 130 → penalty -1  → SP = 9
+#     132 scripts → 132 > 130 → penalty -1  → SP = 9
 $spScriptThreshold = [math]::Max(60, $skillDirCount * 1.3)
 if ($totalScripts -lt 15 -or $totalScripts -gt $spScriptThreshold) {
     $spScore -= 1
