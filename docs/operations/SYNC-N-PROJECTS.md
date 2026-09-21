@@ -9,7 +9,7 @@ Propaga la chain SSoT a los 15 proyectos D:\ en un solo comando.
   `gentleman-quick-sub`, `frontend-sub`, `datascience-sub`, `docs-sub`, `quick-sub-auto`.
   Resto de subs: Go / deepseek / mimo / qwen (sin tocar).
 - **Wrapper:** `scripts/sync-n-projects.ps1` (fallback `hashtable-splat` reparado 2026-09-15).
-  Binario Go `cmd/sync/main.go` no compila por toolchain corrupto → fallback a `use-gentleman.ps1`.
+  Binario Go `cmd/sync/main.go` OK (toolchain go1.27.1, build exit 0; recompilado post-rename 2026-09-21, default `gentle-MK`); fallback PS a `use-gentleman.ps1` se mantiene como respaldo.
 - **Manifest:** `projects.json` (`version: 1`, `chainRoot: "."`, `defaultMode: chain-wins`).
   15 proyectos reales en `D:\`: `arturo`, `automatizacion`, `clash`, `control-pedidos`,
   `conversor`, `erp-talleres`, `herramienta-tecnico`, `huawei-unlock-agent`, `kitchenos-full`,
@@ -99,7 +99,7 @@ Conocido: `automatizacion` y `Reportes-myco` ya están en `auto` — no tocar.
 | Síntoma | Causa | Fix |
 |---|---|---|
 | `ValidateSet` / splat falla en `sync-n-projects.ps1` | splat directo de hashtable con `ValidateSet` | usar fallback `hashtable-splat` (reparado 2026-09-15) |
-| Go no compila `cmd/sync/main.go` | toolchain corrupto | ignorar binario; el wrapper cae a `use-gentleman.ps1` (`binaryUsed:false` es OK) |
+| Go no compila `cmd/sync/main.go` | toolchain dañado (verificado OK go1.27.1 el 2026-09-21) | recompilar `go build -o bin/sync.exe ./cmd/sync`; si falla, el wrapper cae a `use-gentleman.ps1` (`binaryUsed:false` es OK) |
 | `target missing` | path `D:\...` inexistente | verificar path; `Ford-MYCO` está excluido a propósito |
 | freeze en `.model-cache` | caché de modelo colgada | borrar `<proyecto>\.model-cache` y reintentar |
 | `arturo` con 0 `zen-free` | merge `project-wins` preservó `big-pickle`/`nemotron`/`laguna` | divergencia conocida, no fallo; para alinearlo correr ese proyecto en `chain-wins` |
