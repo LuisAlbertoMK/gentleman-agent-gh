@@ -180,7 +180,8 @@ if ($stagedRoja) {
             }
         }
     }
-    if ($env:FORCE_SHIP) {
+    # Strict: only '1' or 'true' bypass (PS [bool]"false"=true bug fix)
+    if (($env:FORCE_SHIP -eq '1') -or ($env:FORCE_SHIP -eq 'true')) {
         Warn "FORCE_SHIP set — JD bypass acknowledged (ensure '!ship' was intentional)`n    $($stagedRoja -join "`n")"
     } elseif ($uncleared.Count -eq 0) {
         Pass

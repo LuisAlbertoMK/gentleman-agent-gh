@@ -77,7 +77,8 @@ try {
     }
 
     $allIssues = @()
-    $forceShip = [bool]$env:FORCE_SHIP
+    # Strict: only '1' or 'true' bypass (PS [bool]"false"=true bug fix)
+    $forceShip = ($env:FORCE_SHIP -eq '1') -or ($env:FORCE_SHIP -eq 'true')
 
     foreach ($sf in $stagedFiles) {
         # Check .breaker-cleared marker
