@@ -122,10 +122,10 @@ Describe 'S3: Collision-free marker naming' {
 }
 
 Describe 'S4: Single-pass glob matching' {
-    It 'validate-write-scope.ps1 uses [^/] for single-segment glob' {
+    It 'validate-write-scope.ps1 uses .* for star (crosses /, per write-scope.json:49)' {
         $content = Get-Content (Join-Path $script:repoRoot 'scripts/validate-write-scope.ps1') -Raw
-        # Single * must match [^/]* (not .*) to avoid crossing path separators
-        $content | Should -Match '\[\^/\]\*'
+        # Single * now matches .* (crosses /) per write-scope.json:49 contract
+        $content | Should -Match '\\\*.*\.\\?\*'
     }
 
     It 'validate-write-scope.ps1 uses non-capturing group alternation' {
@@ -133,22 +133,23 @@ Describe 'S4: Single-pass glob matching' {
         $content | Should -Match '\^\(\?:'
     }
 
-    It 'src/*.ps1 does NOT match src/deep/x.ps1' {
-        # Simulate the regex conversion
+    It 'src/*.ps1 matches src/deep/x.ps1 (star crosses / per write-scope.json:49)' {
+        # Per .gentleman/write-scope.json:49, '*' matches / (effectively recursive).
+        # This differs from standard glob where * stays within a segment.
         $escaped = [regex]::Escape('src/*.ps1')
         $escaped = $escaped.Replace('\*\*', '.*')
-        $escaped = $escaped -replace '\\\*', '[^/]*'
+        $escaped = $escaped -replace '\\\*', '.*'
         $escaped = $escaped -replace '\\\?', '[^/]'
         $regex = "^(?:$escaped)$"
         'src/foo.ps1' | Should -Match $regex
-        'src/deep/x.ps1' | Should -Not -Match $regex
+        'src/deep/x.ps1' | Should -Match $regex
     }
 
     It 'src/**/*.ps1 DOES match src/deep/x.ps1' {
         $escaped = [regex]::Escape('src/**/*.ps1')
         $escaped = $escaped.Replace('\*\*/', '(?:.*/)?')
         $escaped = $escaped.Replace('\*\*', '.*')
-        $escaped = $escaped -replace '\\\*', '[^/]*'
+        $escaped = $escaped -replace '\\\*', '.*'
         $escaped = $escaped -replace '\\\?', '[^/]'
         $regex = "^(?:$escaped)$"
         'src/deep/x.ps1' | Should -Match $regex

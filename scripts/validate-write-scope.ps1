@@ -157,8 +157,8 @@ function Convert-GlobToRegex {
     $escaped = $escaped.Replace('\*\*/', '(?:.*/)?')
     # Handle trailing ** (no / after) → .*
     $escaped = $escaped.Replace('\*\*', '.*')
-    # Single * → [^/]* (single path segment, NOT crossing /)
-    $escaped = $escaped -replace '\\\*', '[^/]*'
+    # Single * → .* (crosses / — per write-scope.json:49 contract)
+    $escaped = $escaped -replace '\\\*', '.*'
     # Un-escape ? (glob single char -> regex . but not /)
     $escaped = $escaped -replace '\\\?', '[^/]'
     # Single-pass alternation with non-capturing group, fail-closed anchors
