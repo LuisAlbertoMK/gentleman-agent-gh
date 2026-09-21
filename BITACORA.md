@@ -1,3 +1,4 @@
+2026-09-21 - Session close: automejora TODO en experimento/automejora-20260921 (19 commits: gates S1-S4 + sesión S1-S4 + scoring S1-S6 + race Nuance + star-opción-A + 4 HIGHs review) — 63/63 Pester, write-scope CLEAN, review dual WARN sin BLOCKER; main intacto en 91c1d68a, merge pendiente de decisión owner.
 2026-09-20 - Session close: rename gentleman-vMK to gentle-MK + ADR-033 nuance + drift-6 closed
 2026-09-20 - fix(nuance): ADR-020 refleja Fail real + drift-6 cerrado (opción B: 6 -semi fuera del mapa PS, sufijo intacto) + ROZA tests/ documentado como intencional.
 2026-09-20 - chore(rename): barrido cero-restos — 24 FIXABLE a gentle-MK (CI, scripts, metadata, docs, prompts, skills), global split-brain curado (58 agentes + default), Go sin subs muertas, T8 + dead-code fix; KEEP intencional: históricos, shims, dual-read, fixtures.
