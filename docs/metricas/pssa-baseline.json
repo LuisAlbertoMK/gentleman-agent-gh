@@ -1,5 +1,5 @@
 {
-  "manualCount": 147,
+  "manualCount": 131,
   "byRule": [
     {
       "count": 1,
@@ -50,7 +50,7 @@
       "rule": "PSUseSingularNouns"
     }
   ],
-  "total": 1818,
+  "total": 1802,
   "timestamp": "2026-09-12T15:59:13",
   "ampersandCount": 0,
   "manualPairs": [
@@ -1855,10 +1855,6 @@
     {
       "file": "verify.Tests.ps1",
       "count": 2
-    },
-    {
-      "file": "WDAC_GUI_1903_And_Above.ps1",
-      "count": 16
     },
     {
       "file": "wisdom-core.ps1",

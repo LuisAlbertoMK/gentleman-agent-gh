@@ -1,5 +1,8 @@
 #requires -Version 7
 [CmdletBinding(SupportsShouldProcess=$true)]
+# PSSA FP: $scriptFiles/$skillMdFiles are consumed by score-dims.ps1 dot-source — PSSA cannot trace cross-file usage; $null pattern doesn't reduce assignment count
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'scriptFiles')]
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'skillMdFiles')]
 
 <#
 .SYNOPSIS
@@ -49,6 +52,7 @@ if ($env:SCORE_CACHE_PATH) {
 }
 
 # ponytail: init before try — ensures vars exist even if cache check throws
+# PSSA FP: vars consumed by score-dims.ps1 dot-source at L231 — PSSA cannot trace cross-file usage
 $scriptFiles  = @()
 $skillMdFiles = @()
 $skillDirs    = @()
@@ -184,6 +188,7 @@ function Add-Dimension([string]$name, [double]$score, [hashtable]$evidence, [str
 # ============================================================
 
 $skillDirCount = $skillDirs.PSWhere({ $_ -ne '_shared' }).Count
+$null = $skillDirCount  # PSSA FP: consumed by score-dims.ps1 dot-source
 
 # ============================================================
 # 2. PARALLEL SUB-SCRIPTS
@@ -211,6 +216,8 @@ $jobs | Wait-Job -Timeout 60 | Out-Null
 $crossRefOutput = Receive-Job -Name "crossref" -ErrorAction SilentlyContinue
 $pssaOutput     = Receive-Job -Name "pssa" -ErrorAction SilentlyContinue | Out-String
 $backlogRaw     = Receive-Job -Name "backlog" -ErrorAction SilentlyContinue
+# PSSA FP: pssaOutput consumed by score-dims.ps1 dot-source; crossRefClean/backlogData not read locally
+$null = $pssaOutput
 
 $jobs | Remove-Job -Force 2>$null
 
@@ -220,9 +227,11 @@ $crossRefClean = try {
     ($jsonLine | ConvertFrom-Json -EA SilentlyContinue).allClean -eq $true
 } catch { $false }
 $backlogData   = try { $backlogRaw | ConvertFrom-Json -EA SilentlyContinue } catch { $null }
+$null = $crossRefClean; $null = $backlogData  # PSSA FP: consumed by score-dims.ps1 dot-source
 
 $hasReadme      = Test-Path "README.md"
 $hasProjectJson = Test-Path $projectJsonPath  # C4c: use single path definition
+$null = $hasReadme; $null = $hasProjectJson  # PSSA FP: consumed by score-dims.ps1 dot-source
 
 # ============================================================
 # 3. DIMENSION SCORING

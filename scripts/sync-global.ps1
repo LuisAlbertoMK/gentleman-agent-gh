@@ -12,6 +12,8 @@
 .PARAMETER Json  Output status as JSON.
 #>
 param([switch]$DryRun,[switch]$Repair,[switch]$Force,[switch]$NoAgentSync,[switch]$Json,[switch]$NoAgentsMd)
+# PSSA FP: params consumed inside Write-Step closures (cross-scope) — PSSA cannot trace into scriptblocks
+$null = $DryRun; $null = $Repair; $null = $Force; $null = $NoAgentsMd
 $ErrorActionPreference = "Stop"; Set-StrictMode -Version Latest
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 

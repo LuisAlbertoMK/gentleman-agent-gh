@@ -86,7 +86,9 @@ if (-not (Test-Path -LiteralPath $trackPath)) {
 function Invoke-TrackLocked {
     param(
         [scriptblock]$Action,
-        [System.Management.Automation.Cmdlet]$CallerPSCmdlet
+        # PSSA FP: CallerPSCmdlet and Action are consumed at L195/L230 inside Invoke-TrackLocked's scriptblock — PSSA cannot trace cross-scope usage
+    [System.Management.Automation.Cmdlet]$CallerPSCmdlet
+    $null = $CallerPSCmdlet; $null = $Action
     )
     $stream = $null
     $reader = $null

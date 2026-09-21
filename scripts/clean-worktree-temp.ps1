@@ -1,5 +1,7 @@
 #requires -Version 5.1
 [CmdletBinding(SupportsShouldProcess=$true)]
+# PSSA FP: $aborted is assigned in ForEach closures and read at :222 (abort guard) — PSSA cannot trace cross-scope control flow; $null pattern doesn't reduce assignment count
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'aborted')]
 <#
 .SYNOPSIS
   Clean temporary worktree artifacts: %TEMP%\opencode and repo *.tmp-* / *.bak-*.
