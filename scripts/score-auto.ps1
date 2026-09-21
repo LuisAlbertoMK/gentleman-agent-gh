@@ -67,10 +67,6 @@ try {
     $scriptsHash = ($scriptManifestList | Sort-Object) -join "|"
     $skillsHash = ($skillManifestList | Sort-Object) -join "|"
 
-    $manifestScriptCount = $scriptManifestList.Count
-    $manifestSkillCount = $skillManifestList.Count
-    if ($manifestScriptCount -lt $scriptFiles.Count -or $manifestSkillCount -ne $skillMdFiles.Count) { $cacheHash = $null }
-
     $interHash = if (Test-Path ".learnings/inter-track.json") { (Get-FileHash ".learnings/inter-track.json" -Algorithm SHA256).Hash.Substring(0,8) } else { "no-inter" }
     $compositeKey = "$scriptsHash|$skillsHash|$interHash"
     # Compact hash: SHA256 of composite key, first 16 hex chars (~8KB → 16 bytes)
@@ -80,7 +76,7 @@ try {
     if (Test-Path $cacheFile) {
         $cached = Get-Content $cacheFile -Raw -Encoding UTF8 | ConvertFrom-Json
         # v2 (slim): compare compact hash; v1 (legacy): compare full base64 hash
-        $cachedHash = if ($cached.v -eq 2) { $cached.hash } else { $cached.hash }
+        $cachedHash = $cached.hash
         if ($cachedHash -eq $cacheHash) {
             # Self-heal: cache/.project.json divergence check — extends $bp read to all cache-hit paths
             $needsRecompute = $false
