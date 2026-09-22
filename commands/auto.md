@@ -1,5 +1,5 @@
 ---
-description: Switch permission mode to AUTO — all commands auto-approved except push + deletes
+description: Switch permission mode to AUTO — all commands auto-approved except push (deny) + deletes (ask)
 ---
 
 You are executing `!auto`. Switch the current project to AUTO permission mode.
@@ -14,4 +14,4 @@ Steps:
    `$projRoot = (Get-Location).Path; $cur = $projRoot; while ($true) { if (Test-Path (Join-Path $cur '.git')) { $projRoot = $cur; break }; $p = Split-Path -Parent $cur; if (-not $p -or $p -eq $cur) { break }; $cur = $p }; Set-Content -LiteralPath (Join-Path $projRoot '.gentleman-mode') -Value 'auto' -NoNewline -Encoding Ascii`
 4. **Verify**: run `& "$root\scripts\switch-mode.ps1" -Status`. Note: the script resolves the CURRENT PROJECT root (walk-up from cwd to the git root) and reads/writes `.gentleman-mode` THERE — NOT next to itself. If the fallback ran, `Get-Content (Join-Path $projRoot '.gentleman-mode')` must equal `auto`.
 
-Report the mode summary: AUTO = git/file/scripts/commit auto-approved; push ASKS; destructive (rm, curl, ssh, docker, python, node) DENIED. Remind that delegation will use the `-auto` routing suffix and log to `.gentleman/audit.log` in the project root.
+Report the mode summary: AUTO = git/file/scripts/commit auto-approved; push DENIED (bypass-proof: covers git -C/--git-dir/git.exe); deletes/branch-D/reset ASK; destructive (rm, curl, ssh, docker, python, node) DENIED. Remind that delegation will use the `-auto` routing suffix and log to `.gentleman/audit.log` in the project root.

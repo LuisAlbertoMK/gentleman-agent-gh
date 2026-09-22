@@ -50,7 +50,7 @@ The `.gentleman-mode` file at project root controls permission level:
 |------|---------|----------|
 | `manual` | `manual` | Agent asks before every tool call |
 | `semi` | `semi` | Safe commands auto-approved, rest asks |
-| `auto` | `auto` | Most things auto-approved (except push/delete) |
+| `auto` | `auto` | Most things auto-approved (except push=deny, delete=ask) |
 
 Switch modes:
 

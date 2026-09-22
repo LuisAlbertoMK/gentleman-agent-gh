@@ -37,7 +37,7 @@
 
 | Shortcut | Action |
 |----------|--------|
-| `!auto` ✅ | Switch to AUTO — all commands auto-approved except push + deletes |
+| `!auto` ✅ | Switch to AUTO — all commands auto-approved except push (deny) + deletes (ask) |
 | `!semi` ✅ | Switch to SEMI-AUTO — safe commands auto-approved, rest ask |
 | `!manual` ✅ | Switch to MANUAL — every command asks (default) |
 | `!mode` ⚡ | Show current permission mode |
