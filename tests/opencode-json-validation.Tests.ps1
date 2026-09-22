@@ -37,7 +37,7 @@ Describe "opencode.json Configuration Validation" {
         }
 
         It "Orchestrator agent (gentleman-vMK or gentle-MK) exists" {
-            ($config.agent.'gentleman-vMK' -or $config.agent.'gentle-MK') | Should -Not -BeNullOrEmpty
+            ($null -ne $config.agent.PSObject.Properties['gentleman-vMK'] -or $null -ne $config.agent.PSObject.Properties['gentle-MK']) | Should -Not -BeNullOrEmpty
         }
 
         It "Subagents have 'hidden: true' or 'mode: subagent'" {
@@ -89,7 +89,7 @@ Describe "opencode.json Configuration Validation" {
 
         It "MCP servers have 'command' or 'type' field" {
             $servers = $config.mcp | Get-Member -MemberType NoteProperty | ForEach-Object { $config.mcp.$($_.Name) }
-            $serversWithoutCommand = $servers | Where-Object { -not ($_.command -or $_.type) }
+            $serversWithoutCommand = $servers | Where-Object { $null -eq $_.PSObject.Properties['command'] -and $null -eq $_.PSObject.Properties['type'] }
             @($serversWithoutCommand).Count | Should -Be 0
         }
     }
