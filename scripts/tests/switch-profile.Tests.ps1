@@ -1,3 +1,4 @@
+#requires -Version 7
 <#
 .SYNOPSIS
     Pester tests for switch-profile.ps1 — hermetic (operates on temp copies).

@@ -1,3 +1,4 @@
+#requires -Version 7
 BeforeAll {
     $script:VerifierPath = Join-Path $PSScriptRoot '../jd-verifier.ps1'
     $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
