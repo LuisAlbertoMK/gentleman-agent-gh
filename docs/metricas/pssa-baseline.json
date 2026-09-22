@@ -51,7 +51,7 @@
     }
   ],
   "total": 1809,
-  "timestamp": "2026-09-12T15:59:13",
+  "timestamp": "2026-09-22T00:00:00",
   "ampersandCount": 0,
   "manualPairs": [
     {
@@ -418,6 +418,26 @@
       "file": "shell-utils.ps1",
       "rule": "PSUseSingularNouns",
       "count": 4
+    },
+    {
+      "file": "validate-write-scope.ps1",
+      "rule": "PSAvoidUsingEmptyCatchBlock",
+      "count": 1
+    },
+    {
+      "file": "permission-gate.ps1",
+      "rule": "PSAvoidUsingEmptyCatchBlock",
+      "count": 1
+    },
+    {
+      "file": "sync-n-projects.ps1",
+      "rule": "PSAvoidUsingEmptyCatchBlock",
+      "count": 1
+    },
+    {
+      "file": "switch-profile.ps1",
+      "rule": "PSAvoidAssignmentToAutomaticVariable",
+      "count": 1
     }
   ],
   "autoFixableCount": 272,
