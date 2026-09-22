@@ -236,9 +236,11 @@ Write-Step "Global config" {
         } catch { Write-Warning "  Could not read shared-deny-rules.json: $_" }
         # MCP-reconcile: re-apply existing bash allow rules lost by permission overwrite at :222
         # Tradeoff: global-only allows (e.g. Remove-Item *Temp*opencode*) survive; project deny
-        # rules added by SEC-F2 above take precedence over re-applied allows.
+        # rules added by SEC-F2 or project SSoT above MUST NOT be overwritten by stale global allows.
         $reApplied = 0
         foreach ($key in $existingBashAllows.Keys) {
+            # FIX: skip keys where project SSoT or SEC-F2 deny-floor has explicit deny
+            if ($cfg.permission.bash.ContainsKey($key) -and $cfg.permission.bash[$key] -eq 'deny') { continue }
             if (-not $cfg.permission.bash.ContainsKey($key) -or $cfg.permission.bash[$key] -ne 'allow') {
                 $cfg.permission.bash[$key] = 'allow'; $reApplied++
             }

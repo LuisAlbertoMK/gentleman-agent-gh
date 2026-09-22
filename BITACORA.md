@@ -1,3 +1,4 @@
+2026-09-22 - sync-global reconcile fix (:240-245 guard deny) + -Force re-run: push=deny propagado a global (push, push *, push --delete *, push --force *)
 2026-09-21 - Merge experimento/automejora-20260921 → main (FF 23 commits: gates S1-S4 + sesión S1-S4 + scoring S1-S6 + Nuance race + star-opción-A + review 4 HIGHs + regresiones inter-track/checkpoint/S1-race fixeadas) — sync-global ok, 63/63 + 38/38 smoke en main, write-scope CLEAN, push a origin/main con pre-push gate verde; score-depth 2 fails = drift pre-existente en main (no tocar).
 2026-09-21 - Session close: automejora TODO en experimento/automejora-20260921 (19 commits: gates S1-S4 + sesión S1-S4 + scoring S1-S6 + race Nuance + star-opción-A + 4 HIGHs review) — 63/63 Pester, write-scope CLEAN, review dual WARN sin BLOCKER; main intacto en 91c1d68a, merge pendiente de decisión owner.
 2026-09-20 - Session close: rename gentleman-vMK to gentle-MK + ADR-033 nuance + drift-6 closed
