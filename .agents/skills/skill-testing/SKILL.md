@@ -14,7 +14,8 @@ After new/edited skill · pre-critical-task verification · periodic active skil
 1. **Syntax**: frontmatter complete · Headers correct · Assets exist · Triggers unique
 2. **Coverage**: primary use case · edge cases · templates · anti-patterns
 3. **Integration**: Load via trigger → Apply → Verify output
-4. **Tokens**: Avg prompt < X · Longest template < Y · Decision tree legible
+4. **Tokens**: Avg prompt < 3200 B · Longest template < 3200 B · Decision tree legible
+   *Criterion*: `scripts/check-token-budget.ps1 -Json` (`-BudgetBytes` default 3200 B) — `stats.skills.average` ≤ cap and `overBudgetFiles` = 0 (no file > 3200 B). Declared `token_budget` sits under the cap.
 ## Scoring
 | Criteria | Weight |
 |----------|--------|

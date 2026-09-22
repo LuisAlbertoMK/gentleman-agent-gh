@@ -1,10 +1,9 @@
 ---
 name: metricas
 description: "Before/after delta + % comparison — git diff or bookmark mode, tokenization-aware, multi-language"
-changelog: "2026-08-31 — SD 9.9→10 fix"
+changelog: "2026-09-18 — dropped !metrics trigger (now auto-metrics scoring); 2026-08-31 — SD 9.9→10 fix"
 triggers:
   - "!metricas"
-  - "!metrics"
   - "before after"
   - "delta"
   - "compare"
@@ -17,7 +16,9 @@ token_budget: 2900
 
 Measure codebase changes quantitatively — tokenization-aware diff analysis (git diff or bookmark modes), multi-language, percentage deltas.
 
-**Trigger**: `!metricas`, `!metrics`, "before after", "delta", "compare", "token count", "size change"
+**Trigger**: `!metricas`, "before after", "delta", "compare", "token count", "size change"
+
+> Migration: use `!metricas` for before/after deltas — `!metrics` now maps to auto-metrics (self-scoring).
 
 ## Two Modes
 | Mode | Use Case | How It Works |
