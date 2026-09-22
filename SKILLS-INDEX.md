@@ -1,6 +1,6 @@
 # SKILLS INDEX (Compact)
 
-> Top-20 daily-use skills. Full table: all 100 skills — use `skill` tool or read this file for complete list.
+> Top-20 daily-use skills. Full table: all 96 skills — use `skill` tool or read this file for complete list.
 >
 > **Version**: 5.9 | **Changelog**: 5.9 (2026-09-18 — archive duplicate skill-creator + 3 retired skills (cognitive-doc-design, prompt-engineering, senior-engineer)); 5.8 (2026-09-17 — count sync 96→100 per filesystem audit); 5.7 (2026-09-17 — +odd +rdd (skill registration); count 94→96); 5.6 (2026-09-02 — +state-reconcile +ps-compat (skill expansion); count 93→94 (excl. _shared per cross-ref Get-SkillDir)); 5.5 (2026-08-16: C28 auto-improvement cycle added depth to 90 skills; +2 new skills image-pipeline, customize-opencodec; count 89→90); 5.5.1 (2026-08-18: +1 new skill gentleman-aem; count 90→91); 5.4 (2026-08-13: count 87→88 per new automejora-analyzer skill); 5.3 (2026-08-12: count 78→87 per filesystem audit; README.md synced to current counts) 5.2 (archived 3 dead: cognitive-doc-design, prompt-engineering, senior-engineer → .archive/skills; count 81→78 per cross-ref-check; global discoverable 93→165 per FS scan: 78 project + 87 global, excl. _shared); 5.1 (sync count 93→81 per filesystem audit); 5.0 (compact top-20 table for token reduction); 4.7 (+1 new: adversarial-breaker; count 92→93); 4.6 (count corrected 80→92 per filesystem audit)
 
@@ -50,7 +50,7 @@
 
 ## Load Rule
 
-1. `skill` tool with name (skills.paths registered in opencode.json — 199 skills globally discoverable: 100 project + 99 global)
+1. `skill` tool with name (skills.paths registered in opencode.json — 195 skills globally discoverable: 96 project + 99 global)
 2. Fallback: `read skills/{name}/SKILL.md` directly from disk
 3. Assets: `read skills/{name}/references/` or `skills/{name}/assets/` for templates
 
