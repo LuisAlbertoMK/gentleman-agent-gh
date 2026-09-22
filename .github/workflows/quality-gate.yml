@@ -385,7 +385,7 @@ jobs:
 
       - name: Upload test-results on failure
         if: always()
-        uses: actions/upload-artifact@65c4c4a6d825f2c761f952ee3c6dd664a61b7c825 # v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-results
           path: test-results/
