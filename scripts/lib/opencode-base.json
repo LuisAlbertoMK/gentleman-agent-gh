@@ -1,5 +1,5 @@
 {
-  "model": "opencode-go/muse-spark-1.3-contributor",
+  "model": "opencode/muse-spark-1.3-contributor",
   "skills": [
     ".agents/skills"
   ],
@@ -256,7 +256,7 @@
   "agent": {
     "gentle-MK": {
       "description": "Orchestrator - decomposes tasks, delegates to right agent, synthesizes results. Never implements directly.",
-      "model": "opencode-go/muse-spark-1.3-contributor",
+      "model": "opencode/muse-spark-1.3-contributor",
       "mode": "primary",
       "prompt": "{file:prompts/gentle-MK.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "tools": {
@@ -266,7 +266,7 @@
     },
     "gentleman-deep": {
       "description": "Deep reasoning - hypothesis-driven debugging, root cause analysis, multi-file refactors with impact analysis",
-      "model": "opencode-go/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "tools": {
@@ -275,8 +275,8 @@
       }
     },
     "gentleman-deep-auto": {
-      "description": "Deep reasoning — AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "Deep reasoning â€” AUTO mode (all auto-approve except push + destructive + network)",
+      "model": "opencode/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "tools": {
@@ -285,8 +285,8 @@
       }
     },
     "gentleman-deep-sub": {
-      "description": "Deep reasoning subagent — hypothesis-driven debugging, root cause analysis (delegable via Task tool)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "Deep reasoning subagent â€” hypothesis-driven debugging, root cause analysis (delegable via Task tool)",
+      "model": "opencode/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -297,18 +297,18 @@
     },
     "gentleman-quick": {
       "description": "Fast executor - single-file atomic edits with immediate verification, scope-guarded",
-      "model": "opencode-go/muse-spark-1.3-contributor",
+      "model": "opencode/muse-spark-1.3-contributor",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}"
     },
     "gentleman-quick-auto": {
-      "description": "Fast executor — AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode-go/muse-spark-1.3-contributor",
+      "description": "Fast executor â€” AUTO mode (all auto-approve except push + destructive + network)",
+      "model": "opencode/muse-spark-1.3-contributor",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}"
     },
     "gentleman-quick-sub": {
-      "description": "Fast executor subagent — single-file atomic edits with immediate verification (delegable via Task tool)",
+      "description": "Fast executor subagent â€” single-file atomic edits with immediate verification (delegable via Task tool)",
       "model": "opencode/muse-spark-1.3-contributor-free",
       "hidden": true,
       "mode": "subagent",
@@ -316,7 +316,7 @@
     },
     "gentleman-codex": {
       "description": "Code generation - convention mirroring, defensive coding, new files/scripts/boilerplate",
-      "model": "opencode-go/mimo-v2.5",
+      "model": "opencode/mimo-v2.5",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "tools": {
@@ -324,8 +324,8 @@
       }
     },
     "gentleman-codex-auto": {
-      "description": "Code generation — AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode-go/mimo-v2.5",
+      "description": "Code generation â€” AUTO mode (all auto-approve except push + destructive + network)",
+      "model": "opencode/mimo-v2.5",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "tools": {
@@ -333,8 +333,8 @@
       }
     },
     "gentleman-codex-sub": {
-      "description": "Code generation subagent — convention mirroring, defensive coding, new files/scripts/boilerplate (delegable via Task tool, returns via {file:prompts/shared/_return-contract.md})",
-      "model": "opencode-go/mimo-v2.5",
+      "description": "Code generation subagent â€” convention mirroring, defensive coding, new files/scripts/boilerplate (delegable via Task tool, returns via {file:prompts/shared/_return-contract.md})",
+      "model": "opencode/mimo-v2.5",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -344,98 +344,98 @@
     },
     "gentleman-security": {
       "description": "Security specialist - STRIDE threat model, CVSS scoring, OWASP Top 10, injection/XSS/auth analysis (GO)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-security.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}"
     },
     "gentleman-security-sub": {
-      "description": "Security specialist subagent — STRIDE, CVSS, OWASP analysis (delegable via Task tool, read-only)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "Security specialist subagent â€” STRIDE, CVSS, OWASP analysis (delegable via Task tool, read-only)",
+      "model": "opencode/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-security.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}"
     },
     "gentleman-seo": {
       "description": "Technical SEO analyst - three-pillar audit (Technical/On-Page/Content), E-E-A-T, GEO readiness, schema validation (GO)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-seo.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}"
     },
     "gentleman-infra": {
       "description": "Infrastructure specialist - container security, K8s reliability, IaC quality, CI/CD security, dependency graphs (GO)",
-      "model": "opencode-go/mimo-v2.5",
+      "model": "opencode/mimo-v2.5",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-infra.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}"
     },
     "gentleman-frontend": {
       "description": "Frontend auditor - WCAG 2.2 AA (POUR), component architecture, design tokens, performance indicators (GO)",
-      "model": "opencode-go/muse-spark-1.3-contributor",
+      "model": "opencode/muse-spark-1.3-contributor",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-frontend.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}"
     },
     "gentleman-performance": {
       "description": "Performance specialist - Amdahl's Law, code complexity, N+1 detection, memory analysis, profiling-driven optimization (GO)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-performance.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}"
     },
     "gentleman-datascience": {
       "description": "Data science specialist - data quality framework, anti-patterns (apply/iterrows), SQL audit, statistical validity (GO)",
-      "model": "opencode-go/muse-spark-1.3-contributor",
+      "model": "opencode/muse-spark-1.3-contributor",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-datascience.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}"
     },
     "gentleman-docs": {
-      "description": "Documentation specialist - Diátaxis framework, completeness audit, content quality, cognitive load analysis (GO)",
-      "model": "opencode-go/muse-spark-1.3-contributor",
+      "description": "Documentation specialist - DiÃ¡taxis framework, completeness audit, content quality, cognitive load analysis (GO)",
+      "model": "opencode/muse-spark-1.3-contributor",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-docs.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}"
     },
     "gentleman-seo-sub": {
-      "description": "Technical SEO analyst subagent — three-pillar audit, E-E-A-T, schema validation (delegable via Task tool, read-only)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "Technical SEO analyst subagent â€” three-pillar audit, E-E-A-T, schema validation (delegable via Task tool, read-only)",
+      "model": "opencode/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-seo.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}"
     },
     "gentleman-infra-sub": {
-      "description": "Infrastructure subagent — container security, K8s reliability, IaC quality, CI/CD security (delegable via Task tool, read-only)",
-      "model": "opencode-go/mimo-v2.5",
+      "description": "Infrastructure subagent â€” container security, K8s reliability, IaC quality, CI/CD security (delegable via Task tool, read-only)",
+      "model": "opencode/mimo-v2.5",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-infra.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}"
     },
     "gentleman-frontend-sub": {
-      "description": "Frontend subagent — WCAG 2.2 AA, component architecture, design tokens (delegable via Task tool, read-only)",
+      "description": "Frontend subagent â€” WCAG 2.2 AA, component architecture, design tokens (delegable via Task tool, read-only)",
       "model": "opencode/muse-spark-1.3-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-frontend.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}"
     },
     "gentleman-performance-sub": {
-      "description": "Performance subagent — Amdahl's Law, N+1, complexity, profiling (delegable via Task tool, read-only)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "Performance subagent â€” Amdahl's Law, N+1, complexity, profiling (delegable via Task tool, read-only)",
+      "model": "opencode/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-performance.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}"
     },
     "gentleman-datascience-sub": {
-      "description": "Data science subagent — data quality, SQL audit, statistical validity (delegable via Task tool, read-only)",
+      "description": "Data science subagent â€” data quality, SQL audit, statistical validity (delegable via Task tool, read-only)",
       "model": "opencode/muse-spark-1.3-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-datascience.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}"
     },
     "gentleman-docs-sub": {
-      "description": "Documentation subagent — Diátaxis framework, completeness audit (delegable via Task tool, read-only)",
+      "description": "Documentation subagent â€” DiÃ¡taxis framework, completeness audit (delegable via Task tool, read-only)",
       "model": "opencode/muse-spark-1.3-contributor-free",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-docs.md}\n\n{file:prompts/shared/_analyze-only-protocol.md}\n\n{file:prompts/shared/_return-contract.md}"
     },
     "gentleman-implementer": {
-      "description": "Plan executor specialist — implements plans from specialized agents, no deviations (GO)",
-      "model": "opencode-go/mimo-v2.5",
+      "description": "Plan executor specialist â€” implements plans from specialized agents, no deviations (GO)",
+      "model": "opencode/mimo-v2.5",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "tools": {
@@ -443,8 +443,8 @@
       }
     },
     "gentleman-implementer-sub": {
-      "description": "Plan executor subagent — implements plans from specialized agents, no deviations (delegable via Task tool)",
-      "model": "opencode-go/mimo-v2.5",
+      "description": "Plan executor subagent â€” implements plans from specialized agents, no deviations (delegable via Task tool)",
+      "model": "opencode/mimo-v2.5",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -453,8 +453,8 @@
       }
     },
     "gentleman-deep-sub-auto": {
-      "description": "Deep reasoning subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "Deep reasoning subagent â€” AUTO mode (zero ask, bash.* allow, task.* deny) â€” delegable via Task tool",
+      "model": "opencode/deepseek-v4-flash",
       "mode": "subagent",
       "hidden": true,
       "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -464,15 +464,15 @@
       }
     },
     "gentleman-quick-sub-auto": {
-      "description": "Fast executor subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
+      "description": "Fast executor subagent â€” AUTO mode (zero ask, bash.* allow, task.* deny) â€” delegable via Task tool",
       "model": "opencode/muse-spark-1.3-contributor-free",
       "mode": "subagent",
       "hidden": true,
       "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}"
     },
     "gentleman-codex-sub-auto": {
-      "description": "Code generation subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
-      "model": "opencode-go/mimo-v2.5",
+      "description": "Code generation subagent â€” AUTO mode (zero ask, bash.* allow, task.* deny) â€” delegable via Task tool",
+      "model": "opencode/mimo-v2.5",
       "mode": "subagent",
       "hidden": true,
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -481,8 +481,8 @@
       }
     },
     "gentleman-implementer-sub-auto": {
-      "description": "Plan executor subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
-      "model": "opencode-go/mimo-v2.5",
+      "description": "Plan executor subagent â€” AUTO mode (zero ask, bash.* allow, task.* deny) â€” delegable via Task tool",
+      "model": "opencode/mimo-v2.5",
       "mode": "subagent",
       "hidden": true,
       "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -491,8 +491,8 @@
       }
     },
     "gentleman-implementer-auto": {
-      "description": "Plan executor — AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode-go/mimo-v2.5",
+      "description": "Plan executor â€” AUTO mode (all auto-approve except push + destructive + network)",
+      "model": "opencode/mimo-v2.5",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "tools": {
@@ -501,76 +501,76 @@
     },
     "sdd-apply": {
       "description": "Implement code changes from task definitions",
-      "model": "opencode-go/mimo-v2.5",
+      "model": "opencode/mimo-v2.5",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-apply.md}"
     },
     "sdd-archive": {
       "description": "Archive completed change artifacts",
-      "model": "opencode-go/mimo-v2.5",
+      "model": "opencode/mimo-v2.5",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-archive.md}"
     },
     "sdd-design": {
       "description": "Create technical design from proposals",
-      "model": "opencode-go/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-design.md}"
     },
     "sdd-explore": {
       "description": "Investigate codebase and think through ideas",
-      "model": "opencode-go/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-explore.md}"
     },
     "sdd-init": {
       "description": "Bootstrap SDD context and project configuration",
-      "model": "opencode-go/mimo-v2.5",
+      "model": "opencode/mimo-v2.5",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-init.md}"
     },
     "sdd-orchestrator": {
       "description": "SDD Orchestrator - coordinates sub-agents, never does work inline",
-      "model": "opencode-go/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/sdd/sdd-orchestrator.md}"
     },
     "sdd-propose": {
       "description": "Create change proposals from explorations",
-      "model": "opencode-go/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-propose.md}"
     },
     "sdd-spec": {
       "description": "Write detailed specifications from proposals",
-      "model": "opencode-go/deepseek-v4-flash",
+      "model": "opencode/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-spec.md}"
     },
     "sdd-tasks": {
       "description": "Break down specs and designs into implementation tasks",
-      "model": "opencode-go/mimo-v2.5",
+      "model": "opencode/mimo-v2.5",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-tasks.md}"
     },
     "sdd-verify": {
       "description": "Validate implementation against specs",
-      "model": "opencode-go/muse-spark-1.3-contributor",
+      "model": "opencode/muse-spark-1.3-contributor",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-verify.md}"
     },
     "gentle-MK-auto": {
-      "description": "Orchestrator — AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode-go/muse-spark-1.3-contributor",
+      "description": "Orchestrator â€” AUTO mode (all auto-approve except push + destructive + network)",
+      "model": "opencode/muse-spark-1.3-contributor",
       "mode": "primary",
       "prompt": "{file:prompts/gentle-MK.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "tools": {
@@ -579,8 +579,8 @@
       }
     },
     "gentleman-reviewer": {
-      "description": "Code review specialist — 4R framework, independent evaluator, adversarial verification (STRONG model)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "Code review specialist â€” 4R framework, independent evaluator, adversarial verification (STRONG model)",
+      "model": "opencode/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-reviewer.md}\n\n{file:prompts/shared/_return-contract.md}",
       "tools": {
@@ -589,8 +589,8 @@
       }
     },
     "gentleman-reviewer-sub": {
-      "description": "Code review subagent — 4R framework, independent evaluator, adversarial verification (delegable via Task tool, read-only)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "Code review subagent â€” 4R framework, independent evaluator, adversarial verification (delegable via Task tool, read-only)",
+      "model": "opencode/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-reviewer.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -600,8 +600,8 @@
       }
     },
     "gentleman-aem": {
-      "description": "AEM Migration Specialist — end-to-end Adobe Experience Manager site migrations: assessment, content transfer, component/datasource/HTL/Sling-Models migration, Adobe Tags/Launch data-layer migration, debugging",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "AEM Migration Specialist â€” end-to-end Adobe Experience Manager site migrations: assessment, content transfer, component/datasource/HTL/Sling-Models migration, Adobe Tags/Launch data-layer migration, debugging",
+      "model": "opencode/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-aem.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "tools": {
@@ -610,8 +610,8 @@
       }
     },
     "gentleman-aem-auto": {
-      "description": "AEM Migration Specialist — AUTO mode (zero ask, bash.* allow except destructive/security-denied)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "AEM Migration Specialist â€” AUTO mode (zero ask, bash.* allow except destructive/security-denied)",
+      "model": "opencode/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-aem.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "tools": {
@@ -620,8 +620,8 @@
       }
     },
     "gentleman-aem-sub": {
-      "description": "AEM Migration Specialist subagent — full migration lifecycle (delegable via Task tool)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "AEM Migration Specialist subagent â€” full migration lifecycle (delegable via Task tool)",
+      "model": "opencode/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-aem.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -631,8 +631,8 @@
       }
     },
     "gentleman-aem-sub-auto": {
-      "description": "AEM Migration Specialist subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "AEM Migration Specialist subagent â€” AUTO mode (zero ask, bash.* allow, task.* deny) â€” delegable via Task tool",
+      "model": "opencode/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
       "prompt": "{file:prompts/gentleman-aem.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -643,7 +643,7 @@
     },
     "gentle-orchestrator": {
       "description": "Global gentle-orchestrator - bridges gentleman-agent-gh with native SDD review, receipt-driven authority, lossless prompts",
-      "model": "opencode-go/muse-spark-1.3-contributor",
+      "model": "opencode/muse-spark-1.3-contributor",
       "tools": {
         "engram*": true,
         "codebase-memory*": true
@@ -652,8 +652,8 @@
       "mode": "primary"
     },
     "gentleman-reasoning": {
-      "description": "Reasoning specialist — deep chain-of-thought, hypothesis-driven debugging, multi-step synthesis (P0-3 reasoning tier)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "Reasoning specialist â€” deep chain-of-thought, hypothesis-driven debugging, multi-step synthesis (P0-3 reasoning tier)",
+      "model": "opencode/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_reasoning-tier.md}",
       "tools": {
@@ -662,8 +662,8 @@
       }
     },
     "gentleman-reasoning-sub": {
-      "description": "Reasoning subagent — chain-of-thought debugging, delegable via Task tool (P0-3)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "Reasoning subagent â€” chain-of-thought debugging, delegable via Task tool (P0-3)",
+      "model": "opencode/deepseek-v4-flash",
       "mode": "subagent",
       "hidden": true,
       "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_reasoning-tier.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -673,8 +673,8 @@
       }
     },
     "gentleman-reasoning-sub-auto": {
-      "description": "Reasoning subagent — AUTO mode (zero ask, bash.* allow, task.* deny) — delegable via Task tool (P0-3)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "Reasoning subagent â€” AUTO mode (zero ask, bash.* allow, task.* deny) â€” delegable via Task tool (P0-3)",
+      "model": "opencode/deepseek-v4-flash",
       "mode": "subagent",
       "hidden": true,
       "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_reasoning-tier.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -684,8 +684,8 @@
       }
     },
     "gentleman-code-review": {
-      "description": "Code review specialist — Qwen 3.6-plus (successor to 3.6-35B-A3B, 73.4% SWE-bench) → fallback muse-spark → default; contracts, supply-chain, best-practices",
-      "model": "opencode-go/qwen3.7-plus",
+      "description": "Code review specialist â€” Qwen 3.6-plus (successor to 3.6-35B-A3B, 73.4% SWE-bench) â†’ fallback muse-spark â†’ default; contracts, supply-chain, best-practices",
+      "model": "opencode/qwen3.7-plus",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-code-review.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "tools": {
@@ -694,8 +694,8 @@
       }
     },
     "gentleman-code-review-sub": {
-      "description": "Code review subagent — Qwen 73.4% → fallback muse-spark, delegable via Task tool (P1-2)",
-      "model": "opencode-go/qwen3.7-plus",
+      "description": "Code review subagent â€” Qwen 73.4% â†’ fallback muse-spark, delegable via Task tool (P1-2)",
+      "model": "opencode/qwen3.7-plus",
       "mode": "subagent",
       "hidden": true,
       "prompt": "{file:prompts/gentleman-code-review.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -705,8 +705,8 @@
       }
     },
     "gentleman-code-review-sub-auto": {
-      "description": "Code review subagent — AUTO mode (Qwen → fallback muse-spark, zero ask) — delegable via Task tool (P1-2)",
-      "model": "opencode-go/qwen3.7-plus",
+      "description": "Code review subagent â€” AUTO mode (Qwen â†’ fallback muse-spark, zero ask) â€” delegable via Task tool (P1-2)",
+      "model": "opencode/qwen3.7-plus",
       "mode": "subagent",
       "hidden": true,
       "prompt": "{file:prompts/gentleman-code-review.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -716,8 +716,8 @@
       }
     },
     "gentleman-initializer": {
-      "description": "Harness initializer — different prompt for first window, arms environment with all context before delegating (Anthropic Effective Harnesses 2025-11-26, R2-5)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "Harness initializer â€” different prompt for first window, arms environment with all context before delegating (Anthropic Effective Harnesses 2025-11-26, R2-5)",
+      "model": "opencode/deepseek-v4-flash",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-initializer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
       "tools": {
@@ -726,8 +726,8 @@
       }
     },
     "gentleman-initializer-sub": {
-      "description": "Initializer subagent — first-window setup, delegable via Task tool (R2-5)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "Initializer subagent â€” first-window setup, delegable via Task tool (R2-5)",
+      "model": "opencode/deepseek-v4-flash",
       "mode": "subagent",
       "hidden": true,
       "prompt": "{file:prompts/gentleman-initializer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
@@ -737,8 +737,8 @@
       }
     },
     "gentleman-initializer-sub-auto": {
-      "description": "Initializer subagent — AUTO mode (first-window setup, zero ask) — delegable via Task tool (R2-5)",
-      "model": "opencode-go/deepseek-v4-flash",
+      "description": "Initializer subagent â€” AUTO mode (first-window setup, zero ask) â€” delegable via Task tool (R2-5)",
+      "model": "opencode/deepseek-v4-flash",
       "mode": "subagent",
       "hidden": true,
       "prompt": "{file:prompts/gentleman-initializer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
