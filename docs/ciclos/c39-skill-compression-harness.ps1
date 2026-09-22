@@ -53,10 +53,6 @@ foreach ($t in $targets) {
 $allSkills = Get-ChildItem -Path ".agents/skills" -Recurse -Filter "SKILL.md"
 $totalAfter = ($allSkills | Measure-Object -Property Length -Sum).Sum
 $avgAfter = [math]::Round($totalAfter / $allSkills.Count, 0)
-# Simulated avg before (pre-compression total / count)
-$totalBefore = $totalAfter + 10752  # sum of reductions
-$avgBefore = [math]::Round($totalBefore / $allSkills.Count, 0)
-
 for ($run=1; $run -le 5; $run++) {
   $expNum++
   $results += [PSCustomObject]@{Exp=$expNum; Skill="GLOBAL"; Metric="avg_bytes_run$run"; Value=$avgAfter; Status=($(if($avgAfter -le 2048){"PASS"}else{"WARN"}))}
