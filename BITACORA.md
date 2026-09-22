@@ -1,3 +1,4 @@
+2026-09-22 - Gate verde: 4 junctions huérfanas podadas + SKILLS-INDEX 96 reales + PSSA baseline (4 deliberadas) + tests null-safe + dead var c39 + PR #37 cerrado (rama borrada) + Ford push feat/digitaldata-extension-hardening
 2026-09-22 - Ship: merge #38 + fix-up index + regen base + revert-regresión + push + cleanup 5 ramas + sync-global (4 junctions huérfanas pendientes) + #37 superado (no aplicar)
 2026-09-22 - Session close: OPT-1 ya resuelto (no-op), CI #1/#3 obsoletos + #2 vigente (PSSA incremental, pendiente decisión), Ford commit pendiente, push OK main==origin
 2026-09-22 - Unificación total modelos → muse-spark-1.3-contributor-free (repo 58/58 + top + global 58/58, watcher off, commits fa399a7c + d12d07a7, push origin/main OK) + merge drafts 6e68e266 + réplica Ford-MYCO 59/59 (sin commit) + OPT-1 pre-commit fix (commit separado)
