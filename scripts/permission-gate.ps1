@@ -1,5 +1,5 @@
 #requires -Version 7
-[CmdletBinding(SupportsShouldProcess=$true)]
+[CmdletBinding()]
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS

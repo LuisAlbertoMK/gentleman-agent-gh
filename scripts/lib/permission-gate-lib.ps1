@@ -35,10 +35,11 @@ function Convert-FromDenyGlob {
     return '^' + ([regex]::Escape($trimmed) -replace '\\ ', '\s+') + '\b'
 }
 
-# C4b: Load deny patterns from shared-deny-rules.json (single source of truth)
+# C4b: Load deny patterns from shared-deny-rules.json (SSoT for runtime gate)
 # Eliminates 22 hardcoded patterns duplicated across permission-gate-lib.ps1,
 # shared-deny-rules.json, and permission-templates.json.
-# All deny rules now live ONLY in shared-deny-rules.json.
+# Runtime gate deny patterns live in shared-deny-rules.json; config-generation
+# deny rules (opencode-base.json) mirror these values — keep in sync.
 $denyRulesPath = Join-Path (Split-Path $PSScriptRoot -Parent) 'opencode-config' 'shared-deny-rules.json'
 $script:denyPatterns = @()
 $script:allowPatterns = @()
@@ -88,7 +89,6 @@ if ($script:denyPatterns.Count -eq 0) {
         '^net user', '^net localgroup', '^net share', '^net use', '^net session',
         '^Add-MpPreference', '^Set-MpPreference',
         '^saps\s', '^start\s',
-        '^git push --force', '^git push -f',
         '^npm\sexec\s',
         '^npm\suninstall\s', '^npm\sremove\s', '^npm\supdate\s', '^npm\spublish\s',
         '^pip\sinstall\s', '^pip3\sinstall\s',
@@ -110,6 +110,11 @@ if ($script:denyPatterns.Count -eq 0) {
         )
     }
 }
+
+# Forced push (--force/-f/--delete) is destructive in ALL modes — deny floor
+# Bypass-proof: catches "git push --force", "git push -f", "git push --delete",
+# "git.exe push --force", "git -C repo push --force", etc.
+$script:denyPatterns += '^git(\.exe)?(\s+\S+)*\s+push(\s|$).*(--force|--delete|-f\b)'
 
 # Destructive filesystem — DENY in manual/semi, ASK in auto (user confirms deletes)
 $script:destructivePatterns = @(
@@ -140,10 +145,9 @@ $script:semiAllowPatterns = @(
     '^git stash list$', '^git status$', '^git diff$', '^git log$'
 )
 
-# Auto-mode: everything allowed EXCEPT pushes + deletes (both ask)
+# Auto-mode: everything allowed EXCEPT deletes (ask) + push (deny via autoDenyPatterns)
+# C4b: push moved from deny-floor → autoDenyPatterns (auto=deny, manual/semi=ask)
 $script:autoAskPatterns = @(
-    '^git push$', '^git push\s', # git push ASKS (not denied) in auto mode
-    '^git push --delete',
     '^git branch -D', '^git branch -d', # branch deletion
     '^git stash drop', # stash deletion
     '^git reset' # destructive reset (--hard deletes working tree changes)
@@ -153,6 +157,12 @@ $script:autoAskPatterns = @(
 if ($script:askPatterns) {
     $script:autoAskPatterns = $script:autoAskPatterns + $script:askPatterns | Sort-Object -Unique
 }
+# C4b: Auto-mode deny patterns (push: DENY in auto, ASK in manual/semi)
+# Pattern catches: git push, git -C repo push, git --git-dir=X push, git.exe push
+# Does NOT false-positive on: git push-foo (no space/$ after "push")
+$script:autoDenyPatterns = @(
+    '^git(\.exe)?(\s+\S+)*\s+push(\s|$)'
+)
 
 # ===== CLASSIFY =====
 function Get-CommandClass {
@@ -205,7 +215,11 @@ function Get-CommandClass {
             return 'ask'
         }
         'auto' {
-            # Check auto-mode ask patterns (push, delete)
+            # C4b: Check auto-mode deny patterns first (push: hard deny, no prompt)
+            foreach ($p in $script:autoDenyPatterns) {
+                if ($cmd -match $p) { return 'deny' }
+            }
+            # Check auto-mode ask patterns (delete, reset)
             foreach ($p in $script:autoAskPatterns) {
                 if ($cmd -match $p) { return 'ask' }
             }

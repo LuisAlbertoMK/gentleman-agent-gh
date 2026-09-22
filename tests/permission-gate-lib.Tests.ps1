@@ -142,7 +142,7 @@ Describe "permission-gate-lib.ps1" {
             $result | Should -Be "allow"
         }
 
-        It "Classifies 'git push origin main' as ask in manual/semi/auto" {
+        It "Classifies 'git push origin main' as auto=deny, manual=ask, semi=ask" {
             $result = Get-CommandClass -cmd "git push origin main" -mode "manual"
             $result | Should -Be "ask"
 
@@ -150,7 +150,23 @@ Describe "permission-gate-lib.ps1" {
             $result | Should -Be "ask"
 
             $result = Get-CommandClass -cmd "git push origin main" -mode "auto"
-            $result | Should -Be "ask"
+            $result | Should -Be "deny"
+        }
+
+        It "DENIES git -C repo push in auto [bypass-proof]" {
+            Get-CommandClass -cmd "git -C /some/repo push" -mode "auto" | Should -Be "deny"
+        }
+
+        It "DENIES git --git-dir=X push in auto [bypass-proof]" {
+            Get-CommandClass -cmd "git --git-dir=/x push" -mode "auto" | Should -Be "deny"
+        }
+
+        It "DENIES git.exe push in auto [bypass-proof]" {
+            Get-CommandClass -cmd "git.exe push" -mode "auto" | Should -Be "deny"
+        }
+
+        It "ALLOWS git push-foo (no false positive on push prefix)" {
+            Get-CommandClass -cmd "git push-foo" -mode "auto" | Should -Be "allow"
         }
 
         It "Classifies 'echo hello' as allow in semi/auto, ask in manual" {

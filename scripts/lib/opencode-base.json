@@ -7,10 +7,10 @@
     "bash": {
       "*": "allow",
       "git commit *": "ask",
-      "git push": "ask",
-      "git push *": "ask",
+      "git push": "deny",
+      "git push *": "deny",
       "git push --force *": "deny",
-      "git push --delete *": "ask",
+      "git push --delete *": "deny",
       "git rebase *": "ask",
       "git reset *": "ask",
       "git merge *": "ask",

@@ -217,7 +217,9 @@ Write-Step "Global config" {
             $mcpCfg=@{context7=@{enabled=$true;type="remote";url="https://mcp.context7.com/mcp"};engram=@{command=@("engram","mcp","--tools=mem_save,mem_search,mem_context,mem_session_summary,mem_get_observation,mem_save_prompt,mem_current_project,mem_judge");type="local"}}
         }
         # ADR-048: disable startup auto-upgrade — npm binary replacement races running instances (incident 2026-09-02)
-        $cfg=@{'$schema'="https://opencode.ai/config.json";'autoupdate'=$false;mcp=$mcpCfg;permission=@{bash=@{"*"="allow";"git commit *"="ask";"git push *"="ask";"git push --delete *"="ask";"git rebase *"="ask";"git reset *"="ask";"git merge *"="ask";"git branch -D *"="ask";"git stash drop *"="ask";"gh pr merge *"="ask";"git push --force *"="deny"};read=@{"*"="allow";"**/.env"="deny";"**/.env.*"="deny";"**/.env*"="deny";"**/credentials.json"="deny";"**/secrets/**"="deny";"**/*secret*"="deny";"**/.ssh/**"="deny";"**/*.key"="deny";"**/*.pem"="deny"}};agent=$existingAgents}
+        # C4b: push is deny in ALL modes at config level; manual/semi resolve to ask via
+        # permission-gate-lib.ps1 autoDenyPatterns (:157-159) which scope by mode at runtime.
+        $cfg=@{'$schema'="https://opencode.ai/config.json";'autoupdate'=$false;mcp=$mcpCfg;permission=@{bash=@{"*"="allow";"git commit *"="ask";"git push *"="deny";"git push --delete *"="deny";"git rebase *"="ask";"git reset *"="ask";"git merge *"="ask";"git branch -D *"="ask";"git stash drop *"="ask";"gh pr merge *"="ask";"git push --force *"="deny"};read=@{"*"="allow";"**/.env"="deny";"**/.env.*"="deny";"**/.env*"="deny";"**/credentials.json"="deny";"**/secrets/**"="deny";"**/*secret*"="deny";"**/.ssh/**"="deny";"**/*.key"="deny";"**/*.pem"="deny"}};agent=$existingAgents}
         # FIX-C(a/b): propagate skills + full permission map (bash/read/write/edit) from project SSoT; hardcoded literal above stays as fallback
         try{
             $pj2=Get-Content $projectCfg -Raw | ConvertFrom-Json

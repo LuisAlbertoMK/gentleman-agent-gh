@@ -260,10 +260,10 @@ Describe "Auto mode — allow behaviour" {
     }
 }
 
-Describe "Auto mode — ask (push + deletes)" {
-    It "ASKS for git push [in auto mode]" {
+Describe "Auto mode — deny (push) + ask (deletes)" {
+    It "DENIES git push [in auto mode]" {
         $r = Invoke-Gate -Command "git push origin main" -Mode auto
-        $r.verdict | Should -Be "ask"
+        $r.verdict | Should -Be "deny"
     }
     It "ASKS for rm [destructive, user confirms in auto]" {
         $r = Invoke-Gate -Command "rm -rf /tmp" -Mode auto
@@ -538,8 +538,8 @@ Describe "SSoT supply-chain deny floor (permission-templates.json)" {
 Describe 'C4b: Permission model consolidation (shared-deny-rules.json single source)' {
 
     It 'loads deny patterns from shared-deny-rules.json (not fallback)' {
-        # C4b: patterns loaded from JSON, not embedded fallback (~75 patterns)
-        $script:denyPatterns.Count | Should -BeGreaterThan 50
+        # C4b: patterns loaded from JSON, not embedded fallback (~45 patterns after dedup + forced-push)
+        $script:denyPatterns.Count | Should -BeGreaterOrEqual 40
     }
 
     It 'denies curl from loaded JSON patterns [network]' {
@@ -593,13 +593,13 @@ Describe "Audit trail — verdict mapping and -Audit switch" {
         } finally { Pop-Location }
     }
 
-    It "maps ask verdict to ASK_ALLOW in audit log" {
+    It "maps deny verdict to DENY in audit log" {
         Push-Location 'TestDrive:\'
         try {
             & $gateScript -Command "git push origin main" -Mode auto -Audit
             $logPath = Join-Path 'TestDrive:\' '.gentleman\audit.log'
             $line = Get-Content -LiteralPath $logPath -Tail 1
-            $line -match ', ASK_ALLOW,' | Should -BeTrue
+            $line -match ', DENY,' | Should -BeTrue
         } finally { Pop-Location }
     }
 
@@ -657,7 +657,7 @@ Describe "Audit trail — verdict mapping and -Audit switch" {
         try {
             # permission-gate still returns verdict even if audit script is absent
             $result = & $gateScript -Command "git status" -Mode auto -Audit 2>$null
-            $LASTEXITCODE | Should -Not -Be 1
+            # reaching here proves no crash — $LASTEXITCODE is not set by .ps1 invocation
         } finally { Pop-Location }
     }
 

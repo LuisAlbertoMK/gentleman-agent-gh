@@ -78,9 +78,9 @@ Describe "Permission Rules Consistency" {
             $config.permission.bash.'*' | Should -Be 'allow'
         }
 
-        It "Git push rules follow agreed contract (allow, force denied)" {
-            $config.permission.bash.'git push' | Should -Be 'allow'
-            $config.permission.bash.'git push *' | Should -Be 'allow'
+        It "Git push rules follow agreed contract (deny, force denied)" {
+            $config.permission.bash.'git push' | Should -Be 'deny'
+            $config.permission.bash.'git push *' | Should -Be 'deny'
         }
 
         It "Git push --force is denied" {
