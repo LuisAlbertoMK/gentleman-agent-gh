@@ -36,7 +36,7 @@
 |-------|--------|
 | Quality | quality-gate, code-review-agent, triple-verify, auto-metrics, external-auditor, immune-system, testing-strategy, rdd |
 | Code | commit-crafter, code-generation, quick-executor, refactoring-planner |
-| Security | security-scanner, auth-hardening, container-security, llm-security |
+| Security | security-scanner, auth-hardening, container-security, llm-security, api-testing, best-practices, data-quality, infra-audit (tipo→playbook: project-mapper) |
 | SDD | sdd (unified pipeline), sdd-quick, sdd-propose, sdd-design, sdd-apply, sdd-verify |
 | Coordination | delivery-harness, branch-pr, issue-creation, command-wrapper, odd |
 | Analysis | analysis-mode, deep-debugging |
