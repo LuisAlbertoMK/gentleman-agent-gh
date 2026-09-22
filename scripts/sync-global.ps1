@@ -33,14 +33,50 @@ $projectCfg = Resolve-Path "$PSScriptRoot\..\opencode.json" -EA Stop
 $report = @{timestamp=(Get-Date -Format "o");steps=@{};errors=@();warnings=@()}
 
 # ── MCP-reconcile: splice helpers (preserve file order + comments across writes) ──
-# SpliceJsonSection: replace a top-level "key": {…} section in raw JSON text
-# by counting brace depth — avoids full ConvertTo-Json re-serialization which
-# destroys key ordering and manual edits. Tradeoff: only handles top-level
-# object values (not arrays or scalars). See mcp-reconcile-force-20260918.md.
+# SpliceJsonSection: replace a top-level "key": {…} or "key": […] section in raw JSON text
+# by counting brace/bracket depth — avoids full ConvertTo-Json re-serialization which
+# destroys key ordering and manual edits. Supports both object and array top-level values.
+# H3: depth-aware — only accepts keys at depth 1 (directly inside root container).
+# H1: emits Write-Warning when top-level key not found (not silent no-op).
+# See mcp-reconcile-force-20260918.md.
+$script:_spliceNotFounds = [System.Collections.Generic.List[string]]::new()
+
 function SpliceJsonSection([string]$T,[string]$K,[string]$V){
     $ek=[regex]::Escape("`"$K`"")
-    $m=[regex]::Match($T,"(?s)($ek\s*:\s*)")
-    if(-not$m.Success){return $T}
+    # H3: anchor pre-filter + depth validation — only accept at depth 1 (inside root {})
+    $rx=[regex]"(?m)^\s*($ek\s*:\s*)"
+    $candidates=$rx.Matches($T)
+    if($candidates.Count -eq 0){
+        # H1: explicit warning instead of silent no-op
+        Write-Warning "SpliceJsonSection: top-level key '$K' not found — section not ported"
+        $script:_spliceNotFounds.Add($K)
+        return $T
+    }
+    # Single-pass depth scan: track { } [ ] outside strings, accept first candidate at depth 1
+    # depth 1 = inside root container (standard brace counting: start 0, root { -> 1)
+    $d=0;$iStr=$false;$esc=$false;$ci=0;$accepted=$null
+    for($p=0;$p-lt$T.Length -and $null -eq $accepted;$p++){
+        if($ci -lt $candidates.Count -and $p -eq $candidates[$ci].Index){
+            if($d -eq 1){$accepted=$candidates[$ci]}
+            $ci++
+        }
+        $c=$T[$p]
+        if($esc){$esc=$false;continue}
+        if($c -eq '\'){$esc=$true;continue}
+        if($c -eq '"'){$iStr=-not$iStr;continue}
+        if($iStr){continue}
+        if($c -eq '{'){$d++}
+        elseif($c -eq '}'){$d--}
+        elseif($c -eq '['){$d++}
+        elseif($c -eq ']'){$d--}
+    }
+    if($null -eq $accepted){
+        Write-Warning "SpliceJsonSection: top-level key '$K' not found at depth 1 — section not ported"
+        $script:_spliceNotFounds.Add($K)
+        return $T
+    }
+    # Value scan: find matching close brace/bracket (supports both {} and [])
+    $m=$accepted
     $s=$m.Index+$m.Length;$d=0;$iStr=$false;$esc=$false
     for($j=$s;$j-lt$T.Length;$j++){
         $c=$T[$j]
@@ -49,7 +85,10 @@ function SpliceJsonSection([string]$T,[string]$K,[string]$V){
         if($c -eq '"'){$iStr=-not$iStr;continue}
         if($iStr){continue}
         if($c -eq '{'){$d++}
-        if($c -eq '}'){$d--;if($d -eq 0){
+        elseif($c -eq '}'){$d--;if($d -eq 0){
+            return $T.Substring(0,$m.Index)+$m.Groups[1].Value+$V+$T.Substring($j+1)}}
+        elseif($c -eq '['){$d++}
+        elseif($c -eq ']'){$d--;if($d -eq 0){
             return $T.Substring(0,$m.Index)+$m.Groups[1].Value+$V+$T.Substring($j+1)}}
     }
     return $T
@@ -254,6 +293,8 @@ Write-Step "Global config" {
             $rawText = SpliceJsonSection -T $rawText -K 'mcp' -V ($cfg.mcp | ConvertTo-Json -Depth 10 -Compress)
             $rawText = SpliceJsonSection -T $rawText -K 'permission' -V ($cfg.permission | ConvertTo-Json -Depth 10 -Compress)
             if ($cfg.ContainsKey('skills')) { $rawText = SpliceJsonSection -T $rawText -K 'skills' -V ($cfg.skills | ConvertTo-Json -Depth 10 -Compress) }
+            foreach($nf in $script:_spliceNotFounds){ $report.warnings += "SpliceJsonSection: '$nf' not ported" }
+            $script:_spliceNotFounds.Clear()
             Set-Content $globalCfg -Value $rawText -Encoding UTF8 -Force
         } else {
             $cfg|ConvertTo-Json -Depth 10|Set-Content $globalCfg -Encoding UTF8 -Force
@@ -278,6 +319,8 @@ if(-not $NoAgentSync){Write-Step "Agent sync" {
             # MCP-reconcile: splice agent section only (preserve order + permission.bash + comments)
             $rawText = Get-Content $globalCfg -Raw
             $rawText = SpliceJsonSection -T $rawText -K 'agent' -V ($glob.agent | ConvertTo-Json -Depth 10 -Compress)
+            foreach($nf in $script:_spliceNotFounds){ $report.warnings += "SpliceJsonSection: '$nf' not ported" }
+            $script:_spliceNotFounds.Clear()
             Set-Content $globalCfg -Value $rawText -Encoding UTF8 -Force
         }
         Write-Host "  ${added} added, ${updated} updated, ${pruned} pruned (*-semi)" -Fore Green;$report.steps["agent_sync"]=@{added=$added;updated=$updated;pruned=$pruned}}
