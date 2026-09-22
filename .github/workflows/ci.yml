@@ -32,12 +32,7 @@ jobs:
 
       - name: Lint scripts/ with repo settings
         shell: pwsh
-        run: |
-          $results = Invoke-ScriptAnalyzer -Path ./scripts -Recurse -Settings ./PSScriptAnalyzerSettings.psd1
-          $errors = @($results | Where-Object { $_.Severity -eq 'Error' })
-          $errors | ForEach-Object { Write-Host "::error file=$($_.ScriptPath) line=$($_.Line):: $($_.RuleName): $($_.Message)" }
-          if ($errors.Count -gt 0) { exit 1 }
-          Write-Host "[PSSA] 0 errors ($(@($results).Count) total findings)"
+        run: ./scripts/pssa-gate.ps1 -Mode Incremental -Quiet
 
       - name: Machine-specific path scan (CI backstop for --no-verify)
         shell: pwsh
