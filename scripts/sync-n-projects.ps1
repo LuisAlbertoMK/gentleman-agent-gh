@@ -315,6 +315,7 @@ if ($useBinary) {
     foreach ($proj in $manifestObj.projects) {
         $projPath = $proj.path
         $agent = if ($proj.defaultAgent) { $proj.defaultAgent } else { "gentle-MK" }
+        $projMode = if ($proj.PSObject.Properties['mode']) { $proj.mode } else { $Mode }
 
         $step = "sync $projPath"
         if ($PSCmdlet.ShouldProcess($projPath, "use-gentleman")) {
@@ -351,7 +352,7 @@ if ($useBinary) {
                         $hasDrift = $true
                     }
                 } else {
-                    $guArgs = @{ TargetDir = $targetDir; DefaultAgent = $agent }
+                    $guArgs = @{ TargetDir = $targetDir; DefaultAgent = $agent; MergeMode = $projMode }
                     if ($DryRun) { $guArgs.DryRun = $true }
                     if ($Yes) { $guArgs.Yes = $true }
                     # E9 perf-ciclo37-clusterA (C35A/E9 Quiet bulk): en -Quiet se

@@ -29,6 +29,12 @@
 .PARAMETER DryRun
     Report what would be written without writing any files.
 
+.PARAMETER MergeMode
+    Merge strategy for existing project config sections (mcp/permission/agent).
+    "project-wins" (default): existing project values override the chain.
+    "chain-wins": chain values override existing project values.
+    Sections compaction/tool_output/experimental/tools/plugin always keep existing values.
+
 .EXAMPLE
     .\scripts\use-gentleman.ps1
     Gentleman-izes the current directory.
@@ -38,8 +44,8 @@
     Sets up my-api with gentleman-quick as default.
 
 .EXAMPLE
-    .\scripts\use-gentleman.ps1 -Json -Yes
-    Silent JSON output for CI/scripting.
+    .\scripts\use-gentleman.ps1 -MergeMode chain-wins -Json -Yes
+    Chain-wins merge for CI/scripting.
 #>
 param(
     [string]$TargetDir,
@@ -48,7 +54,9 @@ param(
     [switch]$Json,
     [switch]$Yes,
     [switch]$Force,
-    [switch]$DryRun
+    [switch]$DryRun,
+    [ValidateSet("chain-wins","project-wins")]
+    [string]$MergeMode = "project-wins"
 )
 
 Set-StrictMode -Version Latest
@@ -342,13 +350,19 @@ if (Test-Path $projectCfgFile -PathType Leaf) {
         $existing = Get-Content $projectCfgFile -Raw | ConvertFrom-Json
         foreach ($section in @('mcp', 'permission', 'agent')) {
             if ($existing.PSObject.Properties[$section]) {
-                $projectCfg.$section = Merge-ProjectSection $projectCfg.$section $existing.$section
+                if ($MergeMode -eq "chain-wins") {
+                    # chain-wins: project first, chain second → chain values override project
+                    $projectCfg.$section = Merge-ProjectSection $existing.$section $projectCfg.$section
+                } else {
+                    # project-wins (default): chain first, project second → project values override chain
+                    $projectCfg.$section = Merge-ProjectSection $projectCfg.$section $existing.$section
+                }
             }
         }
         foreach ($section in @('compaction', 'tool_output', 'experimental', 'tools', 'plugin')) {
             if ($existing.PSObject.Properties[$section]) { $projectCfg.$section = $existing.$section }
         }
-        Out-Message "  Merged existing project config (project wins)" -color DarkGray
+        Out-Message "  Merged existing project config ($MergeMode)" -color DarkGray
     } catch {
         Out-Message "  [warn] Existing config unreadable, regenerating from chain" -color Yellow
     }
@@ -466,6 +480,7 @@ $report = @{
     status         = if ($verifyOk) { "ok" } else { "fail" }
     target_dir     = $TargetDir
     default_agent  = $DefaultAgent
+    merge_mode     = $MergeMode
     dry_run        = [bool]$DryRun
     project_config = $projectCfgFile
     global_ok      = $globalOk
