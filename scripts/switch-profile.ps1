@@ -31,6 +31,7 @@
 #>
 
 [CmdletBinding(SupportsShouldProcess = $true)]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidAssignmentToAutomaticVariable', '', Justification='Public -Profile API (zen|go), intentional name, documented')]
 param(
     [Parameter()]
     [ValidateSet('zen', 'go')]
