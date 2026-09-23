@@ -32,13 +32,28 @@ Describe 'update-opencode.ps1' {
         $guarded | Should -BeTrue
     }
     It '-Json -HealOnly runs hermetically against healthy binary (status ok, healed false, version semver)' -Tag 'hermetic' {
-        $out = & $scriptPath -HealOnly -Json 2>&1 | Out-String
-        $json = $out | ConvertFrom-Json -EA Stop
-        $json.status | Should -Be 'ok'
-        $json.healed | Should -BeFalse
-        $json.after_version | Should -Match '^\d+\.\d+\.\d+'
-        $json.PSObject.Properties.Match('postinstall_path').Count | Should -BeGreaterThan 0
-        $json.postinstall_path | Should -Match 'postinstall\.mjs$'
+        # Truly hermetic: provision a fake healthy binary instead of relying on the
+        # ambient global install (absent on CI runners -> status 'fail', run 35908572266).
+        # A copy of node.exe answers --version with semver, satisfying Test-Binary.
+        # node is guaranteed wherever this script can run (npm/node are its own deps).
+        $donor = Get-Command node -EA SilentlyContinue | Select-Object -ExpandProperty Source
+        $tmpPrefix = Join-Path $env:TEMP "pester-healthy-prefix-$(Get-Random)"
+        $binDir = Join-Path $tmpPrefix "node_modules/opencode-ai/bin"
+        $null = New-Item -ItemType Directory -Path $binDir -Force
+        Copy-Item -LiteralPath $donor -Destination (Join-Path $binDir "opencode.exe") -Force
+        $fakeBin = Join-Path $env:TEMP "pester-healthy-fakebin-$(Get-Random)"
+        $null = New-Item -ItemType Directory -Path $fakeBin -Force
+        Set-Content -LiteralPath (Join-Path $fakeBin "npm.cmd") -Value "@echo off`r`necho $tmpPrefix" -Encoding ascii
+        $oldPath = $env:PATH; $env:PATH = "$fakeBin;$env:PATH"
+        try{
+            $out = & $scriptPath -HealOnly -Json 2>&1 | Out-String
+            $json = $out | ConvertFrom-Json -EA Stop
+            $json.status | Should -Be 'ok'
+            $json.healed | Should -BeFalse
+            $json.after_version | Should -Match '^\d+\.\d+\.\d+'
+            $json.PSObject.Properties.Match('postinstall_path').Count | Should -BeGreaterThan 0
+            $json.postinstall_path | Should -Match 'postinstall\.mjs$'
+        } finally { $env:PATH = $oldPath }
     }
 }
 Describe 'sync-global.ps1 ADR-048 integration' {
