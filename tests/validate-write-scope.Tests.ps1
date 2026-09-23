@@ -4,10 +4,29 @@ Describe "validate-write-scope.ps1" {
     $scriptPath = Join-Path $PSScriptRoot "..\scripts\validate-write-scope.ps1"
     # Clean untracked files so scope validation tests get a predictable baseline
     git clean -fd -q 2>$null
+    # T1/T3 assert CLEAN "on no changes" — a dirty live worktree (WIP files outside the
+    # allowed patterns, e.g. .agents/skills/*, README.md) makes them exit 1 spuriously.
+    # Isolate them in a throwaway temp repo (same pattern as
+    # scripts/tests/validate-write-scope.Integration.Tests.ps1).
+    $script:tempRoot = Join-Path ([System.IO.Path]::GetTempPath()) "vws-tests-$(Get-Random)"
+    New-Item -ItemType Directory -Path $script:tempRoot -Force -ErrorAction Stop | Out-Null
+    git -C $script:tempRoot init -q
+    git -C $script:tempRoot config core.autocrlf false
+    git -C $script:tempRoot config user.email "test@gentleman.test"
+    git -C $script:tempRoot config user.name "Gentleman Test"
+    New-Item -ItemType File -Path (Join-Path $script:tempRoot "dummy.txt") -Force | Out-Null
+    git -C $script:tempRoot add -A
+    git -C $script:tempRoot commit -m "initial" -q
+  }
+
+  AfterAll {
+    if (Test-Path $script:tempRoot) {
+      Remove-Item -Path $script:tempRoot -Recurse -Force -ErrorAction SilentlyContinue
+    }
   }
 
   It "T1 accepts string[] form, CLEAN on no changes" {
-    $r = & $scriptPath -AllowedPaths @("mejora-log.md","adr/*","scripts/*.ps1","tests/*") -BaseRef HEAD 2>&1
+    $r = & $scriptPath -AllowedPaths @("mejora-log.md","adr/*","scripts/*.ps1","tests/*") -BaseRef HEAD -RepoRoot $script:tempRoot 2>&1
     $LASTEXITCODE | Should -Be 0
     ($r -join "`n") | Should -Match '\[CLEAN\]'
   }
@@ -27,7 +46,7 @@ Describe "validate-write-scope.ps1" {
   }
 
   It "T3 comma-separated string back-compat CLEAN" {
-    $r = & $scriptPath -AllowedPaths "mejora-log.md,adr/*,scripts/*.ps1,tests/*" -BaseRef HEAD 2>&1
+    $r = & $scriptPath -AllowedPaths "mejora-log.md,adr/*,scripts/*.ps1,tests/*" -BaseRef HEAD -RepoRoot $script:tempRoot 2>&1
     $LASTEXITCODE | Should -Be 0
     ($r -join "`n") | Should -Match '\[CLEAN\]'
   }

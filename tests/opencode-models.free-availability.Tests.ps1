@@ -11,7 +11,7 @@
     (see GitHub issues #30534 Jun, #28929 May, #10620 Jan):
       opencode/mimo-v2.5-free          -> 404 (retired from free tier)
       opencode/deepseek-v4-flash-free  -> 404 (was "limited-time free"; removed)
-      opencode/nemotron-3-super-free   -> 404 (nemotron-3-ultra-free survives)
+      opencode/nemotron-3-super-free   -> 404 (nemotron-3-ultra-free also retired 2026-09-14)
       opencode/kimi-k2.5-free          -> 404 (retired)
     These 4 IDs were referenced ~32 times across config files and have
     been REPLACED. This test enforces they never return — if any reappears,
@@ -21,10 +21,11 @@
      "Mecanismos existen, enforcement es nulo").
 
     Replacement models (verified available, 0 cost):
-      opencode/big-pickle            -> pi.dev 200, cost 0, reasoning, 200K ctx
-      opencode/nemotron-3-ultra-free -> pi.dev 200, cost 0, reasoning, 1M ctx
-      opencode/laguna-s-2.1-free     -> runtime ground-truth (serving this session;
+      opencode/big-pickle               -> pi.dev 200, cost 0, reasoning, 200K ctx
+      opencode/muse-spark-1.3-contributor-free -> pi.dev 200, cost 0, code-gen, primary free model
+      opencode/laguna-s-2.1-free        -> runtime ground-truth (serving this session;
         pi.dev 404 = catalog lag, NOT removal). confidence: medium-high
+      NOTE: opencode/nemotron-3-ultra-free was retired in 2026-09-14 migration
 
     NOTE (Pester 6 scoping): variables used inside It blocks MUST live in
     BeforeAll — Describe-scope assignment is invisible to It at run time.
@@ -96,8 +97,8 @@ Describe "OpenCode free-model availability — anti-regression guard" {
         ($hits | Measure-Object).Count | Should -BeGreaterThan 0
     }
 
-    It "Replacement model opencode/nemotron-3-ultra-free IS present (proves super->ultra mapping)" {
-        $hits = Select-String -Path $configFiles -Pattern ([regex]::Escape('opencode/nemotron-3-ultra-free')) -AllMatches -ErrorAction SilentlyContinue
+    It "Replacement model opencode/muse-spark-1.3-contributor-free IS present (proves free-model availability)" {
+        $hits = Select-String -Path $configFiles -Pattern ([regex]::Escape('opencode/muse-spark-1.3-contributor-free')) -AllMatches -ErrorAction SilentlyContinue
         ($hits | Measure-Object).Count | Should -BeGreaterThan 0
     }
 

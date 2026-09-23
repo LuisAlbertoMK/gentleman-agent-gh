@@ -13,6 +13,11 @@ BeforeAll {
     New-Item -ItemType Directory -Path $testDir -Force | Out-Null
 
     # seed a small sqlite db with duplicates (observations + prompts + stale mutations)
+    # One mutation stale, one fresh — dates RELATIVE to now (placeholders replaced
+    # below) so the test never depends on the calendar: fixed seeds rot ~30 days
+    # after being written because the purge threshold is 30 days.
+    $staleDate = (Get-Date).AddDays(-40).ToString('yyyy-MM-dd HH:mm:ss')
+    $freshDate = (Get-Date).AddDays(-5).ToString('yyyy-MM-dd HH:mm:ss')
     $pySeed = @'
 import sqlite3, sys, os
 db = sys.argv[1]
@@ -29,12 +34,12 @@ c.execute("INSERT INTO observations (content, title, type) VALUES ('unique', 't2
 c.execute("INSERT INTO user_prompts (content) VALUES ('prompt-dup')")
 c.execute("INSERT INTO user_prompts (content) VALUES ('prompt-dup')")
 c.execute("INSERT INTO user_prompts (content) VALUES ('prompt-uniq')")
-# one mutation 40 days old, one fresh
-c.execute("INSERT INTO sync_mutations (occurred_at, target_key, entity, entity_key, op, payload, source, acked_at, project) VALUES ('2026-06-20 10:00:00', 'k1', 'e1', 'ek1', 'upsert', '{}', 's1', NULL, 'p1')")
-c.execute("INSERT INTO sync_mutations (occurred_at, target_key, entity, entity_key, op, payload, source, acked_at, project) VALUES ('2026-08-01 10:00:00', 'k2', 'e2', 'ek2', 'upsert', '{}', 's2', NULL, 'p2')")
+c.execute("INSERT INTO sync_mutations (occurred_at, target_key, entity, entity_key, op, payload, source, acked_at, project) VALUES ('__STALE_DATE__', 'k1', 'e1', 'ek1', 'upsert', '{}', 's1', NULL, 'p1')")
+c.execute("INSERT INTO sync_mutations (occurred_at, target_key, entity, entity_key, op, payload, source, acked_at, project) VALUES ('__FRESH_DATE__', 'k2', 'e2', 'ek2', 'upsert', '{}', 's2', NULL, 'p2')")
 conn.commit(); conn.close()
 print("seeded")
 '@
+    $pySeed = $pySeed.Replace('__STALE_DATE__', $staleDate).Replace('__FRESH_DATE__', $freshDate)
     $pySeedFile = Join-Path $env:TEMP "engram-compact-seed-$PID.py"
     [IO.File]::WriteAllText($pySeedFile, $pySeed, [Text.UTF8Encoding]::new($false))
     $null = & python $pySeedFile $script:dbPath

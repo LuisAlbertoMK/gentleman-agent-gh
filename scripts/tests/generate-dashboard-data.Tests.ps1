@@ -59,7 +59,7 @@ Describe 'generate-dashboard-data' {
         It 'generatedAt is valid ISO8601' {
             $raw = Get-Content $script:tempJson -Raw
             ($raw -match '"generatedAt"\s*:\s*"[^"]+T[^"]+"') | Should -Be $true
-            { [datetime]::Parse([string]$script:data.generatedAt) } | Should -Not -Throw
+            { [datetime]::Parse([string]$script:data.generatedAt, [System.Globalization.CultureInfo]::InvariantCulture, [System.Globalization.DateTimeStyles]::RoundtripKind) } | Should -Not -Throw
         }
     }
 
@@ -76,9 +76,9 @@ Describe 'generate-dashboard-data' {
             $script:data.agents.total | Should -Be $script:expectedAgents
             $script:data.agents.total | Should -Be 58
         }
-        It 'skills.total == 93 matches .agents/skills count' {
+        It 'skills.total == 97 matches .agents/skills count (incl _shared)' {
             $script:data.skills.total | Should -Be $script:expectedSkills
-            $script:data.skills.total | Should -Be 93
+            $script:data.skills.total | Should -Be 97
         }
     }
 
