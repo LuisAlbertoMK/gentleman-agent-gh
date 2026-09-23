@@ -26,11 +26,11 @@ token_budget: 3000
 9. Mojibake may be console codepage, NOT file corruption — verify bytes (hex/UTF8) before "fixing".
 
 ## Verification
-1. PSSA clean or documented baseline before commit.
-2. AST parse passes (`[Parser]::ParseFile` or `pwsh -c "Parse"`).
-3. Encoding edits: re-read `-Encoding UTF8`, no U+FFFD.
-4. Regex: test LF + CRLF samples.
-## Anti-Patterns & Rationalization
+- `Invoke-ScriptAnalyzer -Path <script>.ps1` clean (or documented baseline) before commit
+- `[Parser]::ParseFile('<script>.ps1', [ref]$null, [ref]$errors)` → `$errors.Count -eq 0`
+- Encoding edits re-read with `Get-Content -Encoding UTF8`: no U+FFFD mojibake
+- Regex validated against LF (`"`n"`) + CRLF (`"`r`n"`) samples — both match
+## Anti-Rationalization
 | Rationalization | Red Flag | Check |
 |---|---|---|
 | "PS7-only, 5.1 rules legacy" | Skip chain/encoding rules | Hooks/CI may run PS5.1 (GAP-2 2026-09-01) |
