@@ -177,12 +177,13 @@ try {
   console.log('  No agent-overrides.json found, using empty overrides');
 }
 
-// --- Load MCP security policy SSoT (Ronda2 S2) ---
+// --- Load MCP security policy SSoT (Ronda2 S2, tightened Ronda3 S1) ---
 // scripts/opencode-config/mcp-policy.json constrains the `mcp` section this
 // generator emits (the base carries it through untouched — previously nothing
 // validated base-mcp against the policy outside the commit gate). Missing file
-// = skip (fixture repos predate the policy); corrupt file or wrong $schema =
-// fail-closed, never silent.
+// = fail-closed WHEN the base declares an mcp section (real repo); only repos
+// predating the policy (base carries NO mcp section at all) may skip.
+// Corrupt file or wrong $schema = fail-closed, never silent.
 let mcpPolicy = null;
 try {
   mcpPolicy = JSON.parse(fs.readFileSync(POLICY_PATH, 'utf8'));
@@ -192,7 +193,14 @@ try {
   }
 } catch (e) {
   if (e.code === 'ENOENT') {
-    console.log('  No mcp-policy.json found, skipping MCP policy enforcement');
+    // Ronda3 S1 fail-closed: a base declaring MCP servers MUST be enforced
+    // against the policy — generating without it would silently drop SSoT
+    // enforcement. Only pre-policy repos (NO mcp section in base) may skip.
+    if (base.mcp) {
+      console.error('ERROR: mcp-policy.json is missing but opencode-base.json declares an mcp section — refusing to generate without MCP policy enforcement');
+      process.exit(1);
+    }
+    console.log('  No mcp-policy.json found, skipping MCP policy enforcement (base declares no mcp section — pre-policy repo)');
   } else {
     console.error(`ERROR: Cannot parse mcp-policy.json: ${e.message}`);
     process.exit(1);
