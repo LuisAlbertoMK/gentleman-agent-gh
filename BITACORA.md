@@ -1,3 +1,4 @@
+2026-09-23 - Ship+close: PR #41 mergeado a main (eceed072, fetch-depth 0, credential scan restaurado) + gh instalado user-scope + 4 ODD/RDD artefactos + cleanup local (branch mergeado borrado) + sync-global OK (58/58, sin drift) + CI main 8/9 (pester-tests rojo por 2 causas pre-existentes: update-opencode sin binario, resource-optimization JSON)
 2026-09-22 - Gate verde: 4 junctions huérfanas podadas + SKILLS-INDEX 96 reales + PSSA baseline (4 deliberadas) + tests null-safe + dead var c39 + PR #37 cerrado (rama borrada) + Ford push feat/digitaldata-extension-hardening
 2026-09-22 - Ship: merge #38 + fix-up index + regen base + revert-regresión + push + cleanup 5 ramas + sync-global (4 junctions huérfanas pendientes) + #37 superado (no aplicar)
 2026-09-22 - Session close: OPT-1 ya resuelto (no-op), CI #1/#3 obsoletos + #2 vigente (PSSA incremental, pendiente decisión), Ford commit pendiente, push OK main==origin
