@@ -26,7 +26,11 @@ Describe "Resource Optimization -- Config Profile Files" {
         $c._resource_tier | Should -Be "low"
         $c.small_model | Should -Be "opencode/free"
         $c.compaction.prune | Should -BeTrue
-        ($c.snapshot.enabled ?? $c.snapshot) | Should -BeFalse
+        # low profile stores snapshot as a bare bool while medium/high use an
+        # object with .enabled; branch on type so StrictMode (CI runner)
+        # never touches a missing property (PropertyNotFoundException).
+        $snapshotEnabled = if ($c.snapshot -is [bool]) { $c.snapshot } else { $c.snapshot.enabled }
+        $snapshotEnabled | Should -BeFalse
         $c.agent.default.depth | Should -Be 1
     }
 
