@@ -68,4 +68,77 @@ Describe 'lcm-dag.ps1' {
         }
         finally { $env:PESTER_TEST = '1' }
     }
+
+    It 'chain forms parent->child edges (Add -ParentId)' {
+        # Needs persistence (Add->Get via file), so PESTER_TEST is OFF inside try; restored after.
+        Remove-Item Env:PESTER_TEST -ErrorAction SilentlyContinue
+        $chainDag = Join-Path ([System.IO.Path]::GetTempPath()) ("lcm-chain-{0}.json" -f [guid]::NewGuid().ToString('N').Substring(0, 8))
+        try {
+            . $script:ScriptPath
+            $a = Add-LcmNode -Level L1 -Content 'chain parent node' -Path $chainDag
+            $b = Add-LcmNode -Level L2 -Content 'chain child node' -Path $chainDag -ParentId $a.id
+            $b.parent | Should -Be $a.id
+            $dag = Get-LcmDag -Path $chainDag
+            @($dag.edges | Where-Object { $_.from -eq $a.id -and $_.to -eq $b.id }).Count | Should -Be 1
+        }
+        finally { $env:PESTER_TEST = '1'; Remove-Item $chainDag -Force -ErrorAction SilentlyContinue }
+    }
+
+    It 'GC keeps current cycle intact and prunes old cycle' {
+        Remove-Item Env:PESTER_TEST -ErrorAction SilentlyContinue
+        $gcDag = Join-Path ([System.IO.Path]::GetTempPath()) ("lcm-gc-{0}.json" -f [guid]::NewGuid().ToString('N').Substring(0, 8))
+        try {
+            . $script:ScriptPath
+            $fixture = @{
+                nodes = @(
+                    @{ id = 'lcm-l1-0001'; level = 'L1'; parent = $null; content = 'current parent'; pointer = $null; tokens = 10; createdAt = '2026-09-23T00:00:00'; cycle = 'cycle-current' },
+                    @{ id = 'lcm-l2-0002'; level = 'L2'; parent = 'lcm-l1-0001'; content = 'current child'; pointer = $null; tokens = 10; createdAt = '2026-09-23T00:00:01'; cycle = 'cycle-current' },
+                    @{ id = 'lcm-l1-0003'; level = 'L1'; parent = $null; content = 'old cycle node'; pointer = $null; tokens = 10; createdAt = '2026-09-20T00:00:00'; cycle = 'cycle-old' }
+                )
+                edges = @(
+                    @{ from = 'lcm-l1-0001'; to = 'lcm-l2-0002' },
+                    @{ from = 'lcm-l1-0003'; to = 'lcm-l1-0001' }
+                )
+                meta = @{ createdAt = '2026-09-20T00:00:00'; cycle = 'cycle-old'; budget = 200000 }
+            }
+            $fixture | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $gcDag -Encoding UTF8
+            $r = Remove-LcmOldCycles -Path $gcDag -KeepCycle 'cycle-current'
+            $r.pruned | Should -Be 1
+            $r.prunedIds | Should -Contain 'lcm-l1-0003'
+            $after = Get-Content $gcDag -Raw | ConvertFrom-Json
+            @($after.nodes).Count | Should -Be 2
+            @($after.nodes.id) | Should -Not -Contain 'lcm-l1-0003'
+            # orphan edge (old→current) dropped; current parent→child edge intact
+            @($after.edges).Count | Should -Be 1
+            $after.edges[0].from | Should -Be 'lcm-l1-0001'
+            $after.edges[0].to | Should -Be 'lcm-l2-0002'
+            $after.meta.cycle | Should -Be 'cycle-current'
+        }
+        finally { $env:PESTER_TEST = '1'; Remove-Item $gcDag -Force -ErrorAction SilentlyContinue }
+    }
+
+    It 'GC without inter-track.json is a fail-closed no-op' {
+        Remove-Item Env:PESTER_TEST -ErrorAction SilentlyContinue
+        $gcDag = Join-Path ([System.IO.Path]::GetTempPath()) ("lcm-gcnoop-{0}.json" -f [guid]::NewGuid().ToString('N').Substring(0, 8))
+        $missingTrack = Join-Path ([System.IO.Path]::GetTempPath()) ("lcm-no-track-{0}.json" -f [guid]::NewGuid().ToString('N').Substring(0, 8))
+        try {
+            . $script:ScriptPath
+            $fixture = @{
+                nodes = @(
+                    @{ id = 'lcm-l1-0001'; level = 'L1'; parent = $null; content = 'node one'; pointer = $null; tokens = 10; createdAt = '2026-09-23T00:00:00'; cycle = 'cycle-x' },
+                    @{ id = 'lcm-l1-0002'; level = 'L1'; parent = $null; content = 'node two'; pointer = $null; tokens = 10; createdAt = '2026-09-23T00:00:01'; cycle = 'cycle-y' }
+                )
+                edges = @()
+                meta = @{ createdAt = '2026-09-23T00:00:00'; cycle = 'cycle-x'; budget = 200000 }
+            }
+            $fixture | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $gcDag -Encoding UTF8
+            $before = Get-Content $gcDag -Raw
+            $r = Remove-LcmOldCycles -Path $gcDag -InterTrackPath $missingTrack
+            $r.pruned | Should -Be 0
+            $r.kept | Should -Be 2
+            $r.noOp | Should -BeTrue
+            (Get-Content $gcDag -Raw) | Should -Be $before
+        }
+        finally { $env:PESTER_TEST = '1'; Remove-Item $gcDag -Force -ErrorAction SilentlyContinue }
+    }
 }
