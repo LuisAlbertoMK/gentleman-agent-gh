@@ -18,7 +18,7 @@
 Suite of **96 skills** (+ `_shared`) + **140 top-level scripts** (133 PowerShell + 7 shell) for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
-> **Score**: 9.6/10 (14 dimensions) — tracking in .project.json.
+> **Score**: 9.4/10 (14 dimensions) — tracking in .project.json.
 > **Skills**: 96 (+ `_shared`)
 > **Cycle**: 31 (active) — CA fidelity + G4-G8 remediation
 

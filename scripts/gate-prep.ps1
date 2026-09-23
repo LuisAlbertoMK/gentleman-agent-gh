@@ -188,7 +188,7 @@ Write-Host "  Staged: $trackedCount files" -ForegroundColor Green
 # fit 200 KiB per runtime BEFORE persisting authority (markers below).
 # Generated paths travel as metadata summary (1 KiB each).
 $budgetBaseRef = ""
-if ($env:CANDIDATE_BASEREF -ne $null -and $env:CANDIDATE_BASEREF -ne "") { $budgetBaseRef = $env:CANDIDATE_BASEREF }
+if ($null -ne $env:CANDIDATE_BASEREF -and $env:CANDIDATE_BASEREF -ne "") { $budgetBaseRef = $env:CANDIDATE_BASEREF }
 Test-CandidateBudget -BaseRef $budgetBaseRef -RepoRoot $repoRoot | Out-Null
 Write-Host "  Candidate budget: within 200 KiB per-runtime" -ForegroundColor Green
 
