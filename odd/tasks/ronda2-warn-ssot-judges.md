@@ -103,7 +103,7 @@ Total Ronda 2: 3 slices, cada uno ≤400L ✅. `confidence: medium` en estimacio
 | Slice | Commit | 4R veredicto | Gate | Estado |
 |-------|--------|--------------|------|--------|
 | 1 (A WARN fix) | fix(security): gate fails closed on MCP audit exit code (Ronda2 S1) — este commit | Tier 1 ligero en Verify (implementer: Pester 22/22 PASS, PSSA 0 errores, diff 37L ≤50L) | [9/26] fail-closed: exit≠0 sin [FAIL] → BLOCKING | ✅ implementado en esta rama, NO push |
-| 2 (B SSoT consumer) | — | — | — | 🔲 pendiente ejecución |
+| 2 (B SSoT consumer) | feat(config): generator consumes mcp-policy.json SSoT via sync-all (Ronda2 S2) — este commit | Tier 2 en Verify (implementer: MCP 22/22 + generate-config 14/14 con 5 nuevos policy→output, regen 23/23 OK, PSSA 0 errores/0 warnings nuevos, diff 208L ≤400L) | [9/26] OK + --validate VALID con enforcement MCP activo (5 servers compliant); regen real = caso (b): diff tocaba model/agent/watcher (profile-injected), mcp idéntico → opencode.json revertido byte-exacto, NO commiteado | ✅ implementado en esta rama, NO push |
 | 3 (C1 judges 3/6) | — | — | — | 🔲 pendiente ejecución |
 
 ## 6. Rollback por slice

@@ -32,6 +32,35 @@ BeforeAll {
         bash = @{ '*' = 'ask' }
     }
 
+    # Production-shaped mcp section (subset under policy test) — mirrors
+    # scripts/lib/opencode-base.json:mcp: exact-allowlisted remote, disabled
+    # hygiene servers, pinned npx. Any deviation = policy violation fixture.
+    $script:mcpOk = @{
+        'codebase-memory-mcp' = @{
+            type = 'local'; command = @('codebase-memory-mcp'); enabled = $true
+            timeout = 60000; environment = @{ CBM_ALLOWED_ROOT = '{env:GENTLEMAN_AGENT_ROOT}' }
+        }
+        'context7' = @{ enabled = $true; type = 'remote'; url = 'https://mcp.context7.com/mcp' }
+        'headroom' = @{ enabled = $false; type = 'local'; command = @('headroom', 'mcp', 'serve') }
+        'chrome-devtools-mcp' = @{
+            type = 'local'; command = @('npx', '-y', 'chrome-devtools-mcp@1.6.0', '--no-usage-statistics')
+            enabled = $false; timeout = 30000
+        }
+    }
+    $script:agentSec = @{
+        'gentleman-security' = @{
+            description = 'Security specialist'; model = 'opencode/nemotron-3-ultra-free';
+            mode = 'primary'; prompt = '{file:prompts/gentleman-security.md}' }
+    }
+
+    function Copy-McpPolicy {
+        param([string]$Repo)
+        $dst = Join-Path $Repo 'scripts\opencode-config'
+        New-Item -ItemType Directory -Path $dst -Force | Out-Null
+        Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\opencode-config\mcp-policy.json') `
+            -Destination (Join-Path $dst 'mcp-policy.json')
+    }
+
     function New-GenRepo {
         param([string]$Name)
         $repo = Join-Path $script:testDir $Name
@@ -46,10 +75,13 @@ BeforeAll {
             [string]$Repo,
             [hashtable]$Agent,
             [hashtable]$Templates,
-            [hashtable]$Overrides = @{}
+            [hashtable]$Overrides = @{},
+            [hashtable]$Extra = @{}
         )
         $libDir = Join-Path $Repo 'scripts\lib'
-        @{ agent = $Agent } | ConvertTo-Json -Depth 20 |
+        $base = @{ agent = $Agent }
+        foreach ($k in $Extra.Keys) { $base[$k] = $Extra[$k] }
+        $base | ConvertTo-Json -Depth 20 |
             Set-Content -LiteralPath (Join-Path $libDir 'opencode-base.json') -Encoding utf8
         $Templates | ConvertTo-Json -Depth 20 |
             Set-Content -LiteralPath (Join-Path $libDir 'permission-templates.json') -Encoding utf8
@@ -195,6 +227,87 @@ Describe 'generate-opencode-config.js — validation & overrides' {
         $cfg = Read-GenOutput (Join-Path $repo 'opencode.json')
         $cfg.agent.'sdd-apply'.hidden | Should -Be $true
         $cfg.agent.'gentleman-quick-sub-auto'.PSObject.Properties.Name | Should -Not -Contain 'hidden'
+    }
+}
+
+Describe 'generate-opencode-config.js — mcp-policy SSoT consumer (Ronda2 S2)' {
+    It 'compliant mcp passes and is emitted verbatim (policy→output)' {
+        $repo = New-GenRepo 'mcp-ok'
+        Set-GenFixture -Repo $repo -Agent $script:agentSec `
+            -Templates @{ 'readonly' = $script:tmplReadonly } -Extra @{ mcp = $script:mcpOk }
+        Copy-McpPolicy $repo
+
+        & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') | Out-Null
+        $LASTEXITCODE | Should -Be 0
+
+        $mcp = (Read-GenOutput (Join-Path $repo 'opencode.json')).mcp
+        $mcp.'context7'.url | Should -Be 'https://mcp.context7.com/mcp'
+        $mcp.'codebase-memory-mcp'.environment.CBM_ALLOWED_ROOT | Should -Be '{env:GENTLEMAN_AGENT_ROOT}'
+        $mcp.'headroom'.enabled | Should -Be $false
+    }
+
+    It 'non-allowlisted remote url fails closed (exit 1)' {
+        $repo = New-GenRepo 'mcp-evil-remote'
+        $evil = $script:mcpOk.Clone()
+        $evil['evil-bridge'] = @{ enabled = $true; type = 'remote'; url = 'https://evil.example.com/mcp' }
+        Set-GenFixture -Repo $repo -Agent $script:agentSec `
+            -Templates @{ 'readonly' = $script:tmplReadonly } -Extra @{ mcp = $evil }
+        Copy-McpPolicy $repo
+
+        $out = & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') 2>&1 | Out-String
+
+        $LASTEXITCODE | Should -Be 1
+        $out | Should -Match 'NOT allowlisted'
+        $out | Should -Match 'evil-bridge'
+    }
+
+    It 'enabled hygiene-listed server fails closed (exit 1)' {
+        $repo = New-GenRepo 'mcp-hygiene'
+        $bad = $script:mcpOk.Clone()
+        $bad['headroom'] = @{ enabled = $true; type = 'local'; command = @('headroom', 'mcp', 'serve') }
+        Set-GenFixture -Repo $repo -Agent $script:agentSec `
+            -Templates @{ 'readonly' = $script:tmplReadonly } -Extra @{ mcp = $bad }
+        Copy-McpPolicy $repo
+
+        $out = & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') 2>&1 | Out-String
+
+        $LASTEXITCODE | Should -Be 1
+        $out | Should -Match 'must stay disabled'
+        $out | Should -Match 'headroom'
+    }
+
+    It 'unpinned npx fails closed (exit 1)' {
+        $repo = New-GenRepo 'mcp-unpinned'
+        $bad = $script:mcpOk.Clone()
+        $bad['evil-npx'] = @{ enabled = $true; type = 'local'; command = @('npx', '-y', 'evil-mcp') }
+        Set-GenFixture -Repo $repo -Agent $script:agentSec `
+            -Templates @{ 'readonly' = $script:tmplReadonly } -Extra @{ mcp = $bad }
+        Copy-McpPolicy $repo
+
+        $out = & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') 2>&1 | Out-String
+
+        $LASTEXITCODE | Should -Be 1
+        $out | Should -Match 'without @version pin'
+        $out | Should -Match 'evil-npx'
+    }
+
+    It '--validate catches base-mcp ↔ policy drift (exit 1)' {
+        $repo = New-GenRepo 'mcp-validate-drift'
+        Set-GenFixture -Repo $repo -Agent $script:agentSec `
+            -Templates @{ 'readonly' = $script:tmplReadonly } -Extra @{ mcp = $script:mcpOk }
+        Copy-McpPolicy $repo
+
+        & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') | Out-Null
+        $LASTEXITCODE | Should -Be 0
+
+        $evil = $script:mcpOk.Clone()
+        $evil['evil-bridge'] = @{ enabled = $true; type = 'remote'; url = 'https://evil.example.com/mcp' }
+        Set-GenFixture -Repo $repo -Agent $script:agentSec `
+            -Templates @{ 'readonly' = $script:tmplReadonly } -Extra @{ mcp = $evil }
+
+        $out = & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') --validate 2>&1 | Out-String
+        $LASTEXITCODE | Should -Be 1
+        $out | Should -Match 'NOT allowlisted'
     }
 }
 
