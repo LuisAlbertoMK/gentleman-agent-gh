@@ -117,7 +117,7 @@ if (-not $OutputDir) {
 
 # --- Find target PID ---
 if ($SessionId -eq 0) {
-    $pids = @(Find-OpenCodePids | Where-Object { $_ })
+    $pids = @(Find-OpenCodePid | Where-Object { $_ })
     if ($pids.Count -eq 0) {
         if ($Json) {
             [PSCustomObject]@{ status = "no_opencode_process_found"; pids = @() } | ConvertTo-Json -Compress
