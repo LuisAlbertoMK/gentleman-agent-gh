@@ -196,3 +196,118 @@ test('Full pipeline: different findings → fix → re-judge → APPROVED', asyn
 - Pattern 2 (online verifier 76–162ms): small judge opcional pre-output — activar solo en hotfix ROJA donde latencia <200ms importa; default OFF.
 - Pattern 5 (constitutional/RLAIF): extensión documentada aquí; runtime trigger ya existe (gap>1.5 → immune-system).
 - Pattern 6 (reward model): future/pre-push — ranker over N samples gated before output; no wire aún.
+
+## Pattern 1 — Offline Eval (operational, Ronda2-S3)
+
+> Scope: ROJA dual blind with LARGE judge. Small judges never decide ROJA (see Pattern 2).
+
+**Procedure**
+1. Select target + freeze diff — cite `git diff HEAD | git hash-object --stdin` in the verdict.
+2. Resolve 2 profiles via `jd_profile_selector` first-match; identical → second = `security` (SKILL.md Rule 4).
+3. Run 2× `code-review-agent` blind (no shared context), 120s timeout, retry once.
+4. Synthesize per P2; write eval-log entry (format below); FIX/BLOCKER → `external-auditor` calibration (Rule 5).
+
+**Eval-log entry** (attach for ROJA FIX/BLOCKER):
+```json
+{
+  "target": "src/api/users.ts",
+  "freeze": "HEAD-<short>-<diff8>",
+  "profiles": ["architect", "security"],
+  "blind": true,
+  "verdicts": ["FIX", "FIX"],
+  "synthesis": "Confirmed — same root cause (users.ts:51-52, ±5 lines)",
+  "calibration": "external-auditor AGREE | gap 0.0"
+}
+```
+
+**Anti-rationalization (P1)**
+
+| Rationalization | Red Flag | Verification |
+|---|---|---|
+| "Small judge is enough for ROJA" | Small-only verdict on ROJA | P1 mandates LARGE-judge dual blind; small judge = P2 pre-check only |
+| "Pre-fix eval covers post-fix code" | Eval-log freeze ≠ current diff | Re-run eval on post-fix diff; freeze hash must match HEAD diff |
+
+**Verification (P1)**
+- Eval log present with freeze hash matching `git diff HEAD | git hash-object --stdin`.
+- `blind: true` + two distinct profiles (or architect/security fallback) recorded in the log.
+
+## Pattern 2 — Online Runtime Verifier (operational, Ronda2-S3)
+
+> Gated-optional, ROJA hotfix fast-path only, default OFF. Mechanical pre-check — NEVER a final verdict (SKILL.md Rule 2 still mandates dual blind).
+
+**Activation criteria** (all must hold; else skip straight to dual blind):
+1. Zone = ROJA hotfix where latency <200ms matters.
+2. `scripts/jd-verifier.ps1 -Zone ROJA -FastPath` reachable (`bin/fast.exe` present).
+3. Caller accepts ESCALATE fallback (over-budget/slow → dual-judge, exit 1).
+
+**Budget — design vs measured**
+- Design (Zylos, `docs/mejoras/2026-09-01-agent-improvement-research-plan.md:208-211`): 76–162ms;
+  enforced upper bound in `scripts/jd-verifier.ps1:103` (`$elapsedMs -le 162` → `VERIFY-OK`, else `ESCALATE`).
+- Measured 2026-09-23, `bin/fast.exe --gate --json` internal `elapsedMs`, n=12:
+  `100, 109, 111, 112, 120, 126, 145, 151, 155, 166, 176, 178` —
+  min 100ms · max 178ms · median ~136ms · 10/12 ≤162ms (83%) ·
+  2/12 over-budget → `ESCALATE` exit 1 (fail-closed).
+- Live fail-closed proof (same session): `151ms → VERIFY-OK` exit 0;
+  `166ms → ESCALATE` exit 1. Over-budget never passes.
+- Note: wall-clock process spawn (~240–460ms observed) is NOT the gated quantity — the gate consumes
+  internal `elapsedMs` only. Do not "optimize" wall-clock; the budget contract is internal.
+
+**Live transcript (2026-09-23, this repo)**
+```powershell
+PS> & scripts/jd-verifier.ps1 -Zone ROJA -FastPath
+SELF-CONSISTENCY: profiles A/B = majority-of-2 (diverge → tie-break by higher severity)
+VERIFY-OK mechanical (151ms)   # exit 0
+PS> & scripts/jd-verifier.ps1 -Zone ROJA -FastPath -Json
+{"verifier":"jd-verifier","zone":"ROJA","fastPath":{"ran":true,"passed":true,"elapsedMs":166,"decision":"ESCALATE"},"rounds":{"value":0,"capped":false},"constitutional":false,"timestamp":"..."}   # exit 1
+```
+
+**Anti-rationalization (P2)**
+
+| Rationalization | Red Flag | Verification |
+|---|---|---|
+| "VERIFY-OK = APPROVED" | VERIFY-OK cited as final verdict | Mechanical pre-check only; dual blind still mandatory (SKILL.md Rule 2) |
+| "Over-budget still counts" | elapsedMs >162 treated as pass | Over budget → ESCALATE exit 1, never VERIFY-OK (fail-closed, 166ms case above) |
+| "Wall-clock must fit 162ms" | Spawn time cited as budget breach | Budget contract = internal elapsedMs; wall-clock includes spawn, not gated |
+
+**Verification (P2)**
+- `& scripts/jd-verifier.ps1 -Zone ROJA -FastPath` → `VERIFY-OK (≤162ms)` exit 0 or `ESCALATE` exit 1; any other outcome → treat as ESCALATE.
+- Pester `scripts/tests/jd-verifier.Tests.ps1` PASS — covers budget boundary (97ms→OK, 200ms→ESCALATE) and missing-exe ESCALATE.
+
+## Pattern 3 — Self-Consistency (operational, Ronda2-S3)
+
+> Cheapest pattern; strongest in code review. Our 2-profile blind IS the majority-of-2 vote.
+
+**Procedure**
+1. Prerequisite: blind isolation (SKILL.md Rule 2) — shared-context verdicts are not votes.
+2. Both CLEAN → APPROVED. Same root-cause (±5 lines) → Confirmed.
+3. Diverge → triage → fix both → re-judge on diff delta only (max 2 rounds → ASK user, Rule 3).
+4. Tie-break (irreconcilable within budget): higher severity wins, flagged `CALIB: GAP` → `external-auditor` on FIX/BLOCKER.
+
+**Worked tie-break**
+```json
+{
+  "target": "src/payments/stripe.ts",
+  "votes": [
+    {"profile": "architect", "verdict": "FIX", "severity": "MEDIUM"},
+    {"profile": "security", "verdict": "FIX", "severity": "HIGH"}
+  ],
+  "synthesis": "Diverge → higher severity wins (HIGH) → fix both → re-judge round 1/2",
+  "output": "JD-src/payments/stripe.ts | Profiles: architect/security | 4R | Confirmed:0 | JDGMNT: ESCALATED | CALIB: GAP"
+}
+```
+
+**Anti-rationalization (P3)**
+
+| Rationalization | Red Flag | Verification |
+|---|---|---|
+| "Agreed-with-myself counts" | Two verdicts, one shared context | Votes valid only blind (Rule 2); shared context → re-run blind |
+| "3rd re-judge will converge" | Count >2 | Max 2 → ASK user (Rule 3); `jd-verifier.ps1 -Rounds 3` prints `ASK-USER`, exit 2 |
+| "Lower severity is enough" | Diverge resolved downward | Tie-break = higher severity wins; downward resolution → re-triage |
+
+**Verification (P3)**
+- Confirmed claims cite file ±5 lines with both profiles' lines visible.
+- Re-judge rounds ≤2 with diff-delta scope; round-3 attempt → `ASK-USER`, exit 2.
+
+> **Ronda 3 boundary (explicit, untouched here):** Pattern 4 Reflexion grounding beyond re-judge delta,
+> Pattern 5 constitutional runtime revision loop, Pattern 6 IRM/reward-ranker wiring →
+> `odd/tasks/ronda2-warn-ssot-judges.md` §7. This slice changes NOTHING in taxonomy rows 4–6 above.

@@ -104,7 +104,7 @@ Total Ronda 2: 3 slices, cada uno ≤400L ✅. `confidence: medium` en estimacio
 |-------|--------|--------------|------|--------|
 | 1 (A WARN fix) | fix(security): gate fails closed on MCP audit exit code (Ronda2 S1) — este commit | Tier 1 ligero en Verify (implementer: Pester 22/22 PASS, PSSA 0 errores, diff 37L ≤50L) | [9/26] fail-closed: exit≠0 sin [FAIL] → BLOCKING | ✅ implementado en esta rama, NO push |
 | 2 (B SSoT consumer) | feat(config): generator consumes mcp-policy.json SSoT via sync-all (Ronda2 S2) — este commit | Tier 2 en Verify (implementer: MCP 22/22 + generate-config 14/14 con 5 nuevos policy→output, regen 23/23 OK, PSSA 0 errores/0 warnings nuevos, diff 208L ≤400L) | [9/26] OK + --validate VALID con enforcement MCP activo (5 servers compliant); regen real = caso (b): diff tocaba model/agent/watcher (profile-injected), mcp idéntico → opencode.json revertido byte-exacto, NO commiteado | ✅ implementado en esta rama, NO push |
-| 3 (C1 judges 3/6) | — | — | — | 🔲 pendiente ejecución |
+| 3 (C1 judges 3/6) | feat(skills): judgment-day adopts judge patterns part 1 (Ronda2 S3) — este commit | Tier 1 en Verify (implementer: cross-ref-check ALL PASSED, Pester MCP 22/22 + jd-verifier 18/18 PASS sin regresión, budget medido n=12 mediana ~136ms, diff 142L ≤400L, taxonomy filas 4-6 intactas) | budget medido 100–178ms, 10/12 ≤162ms (83%); over-budget → ESCALATE fail-closed verificado live (151ms→VERIFY-OK exit 0, 166ms→ESCALATE exit 1) | ✅ implementado en esta rama, NO push |
 
 ## 6. Rollback por slice
 
