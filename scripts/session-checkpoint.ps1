@@ -17,6 +17,8 @@
       3. Validate content via engram-validate (poisoning guard)
       4. Index any large output via ctx_index for cross-session recovery
       5. Optionally trigger session-miner for pattern detection
+      6. If checkpoint file created at YELLOW+ → single LCM DAG node via
+         context-watchdog-check (anti-double-fire: 1 checkpoint ↔ ≤1 node)
 
     Call every 5-10 tool rounds or whenever ctx_watchdog exits YELLOW.
 
@@ -87,6 +89,18 @@ $repoRoot = Split-Path $PSScriptRoot -Parent
 $checkpointDir = Join-Path -Path $repoRoot -ChildPath ".opencode\session-checkpoints"
 $fileWritten = $false
 
+# --- LCM escalation authority (Ronda4 S3): the zone→checkpoint decision delegates to
+# Invoke-LcmEscalation (lcm-dag.ps1) instead of duplicating the zone switch below.
+# Fail-closed: if the DAG script cannot load, fall back to the legacy zone switch so
+# checkpoints keep working (same warn-and-continue pattern as ctx-watchdog above).
+$lcmEscalationAvailable = $false
+try {
+    . (Join-Path $PSScriptRoot 'lcm-dag.ps1')
+    $lcmEscalationAvailable = $true
+} catch {
+    Write-Warning "lcm-dag.ps1 unavailable, using legacy zone switch: $($_.Exception.Message)"
+}
+
 # --- Step 1: Get context zone from ctx-watchdog ---
 $watchdogResult = $null
 try {
@@ -115,13 +129,29 @@ if (-not $watchdogResult -or -not $watchdogResult.zone) {
 
 $contextZone   = $watchdogResult.zone
 $contextLevel  = $watchdogResult.level
-$zoneNeedsCheckpoint = switch ($contextZone) {
-    "GREEN"     { $false }
-    "YELLOW"    { $true }
-    "ORANGE"    { $true }
-    "RED"       { $true }
-    "CRITICAL"  { $true }
-    default     { $false }
+# Delegated (Ronda4 S3): Invoke-LcmEscalation is the single authority for
+# zone→checkpoint mapping (L1 ≥40%, L2 ≥60%, L3 ≥80%, else NONE).
+# Boundary note: escalation is inclusive at 40% (40/100 → L1) while ctx-watchdog.ps1
+# labels exactly-40% GREEN for display; checkpoint_needed follows the escalation authority.
+$lcmLevel = 'NONE'
+if ($lcmEscalationAvailable -and ($null -ne $watchdogResult.percent)) {
+    try { $lcmLevel = Invoke-LcmEscalation -CurrentTokens ([int]$watchdogResult.percent) -Budget 100 }
+    catch {
+        Write-Warning "Invoke-LcmEscalation failed, using legacy zone switch: $($_.Exception.Message)"
+        $lcmEscalationAvailable = $false
+    }
+}
+if ($lcmEscalationAvailable) {
+    $zoneNeedsCheckpoint = ($lcmLevel -ne 'NONE')
+} else {
+    $zoneNeedsCheckpoint = switch ($contextZone) {
+        "GREEN"     { $false }
+        "YELLOW"    { $true }
+        "ORANGE"    { $true }
+        "RED"       { $true }
+        "CRITICAL"  { $true }
+        default     { $false }
+    }
 }
 
 # --- Step 2: Decide checkpoint action ---
@@ -221,6 +251,39 @@ if ($Mode -in @('mark', 'full')) {
     }
     # A2 fix: track actual file write, not checkpointNeeded
     $fileWritten = $true
+}
+
+# --- Step 3b: LCM DAG auto-escalation (Ronda4 S3) ---
+# Anti-double-fire discriminator: at most ONE watchdog escalation per checkpoint file
+# created in this run ($dagDiscriminator = session_id binds 1 checkpoint ↔ ≤1 node).
+# Gate: mark/full mode + file actually written ($fileWritten) + zone warrants
+# ($zoneNeedsCheckpoint, escalation-derived). check/process-pending modes never
+# escalate (read-only preserved); Force in GREEN creates a checkpoint but no DAG node
+# (escalation follows thresholds, not Force). Fail-closed: DAG errors never fail the checkpoint.
+$dagLevel = 'NONE'
+$dagNodeCreated = $false
+$dagNodeId = $null
+$dagDiscriminator = $null
+if (($Mode -in @('mark', 'full')) -and $fileWritten -and $zoneNeedsCheckpoint) {
+    $dagDiscriminator = $checkpointData.session_id
+    try {
+        $dagTokens = [int]([math]::Round([double]$watchdogResult.percent * 2000))
+        if ($dagTokens -lt 0) { $dagTokens = 0 }
+        $dagContent = "checkpoint $dagDiscriminator at $contextZone ($($watchdogResult.percent)%) — $($sanitizedDecisions.Count) decisions, $($sanitizedDiscoveries.Count) discoveries"
+        $dagResult = & (Join-Path $PSScriptRoot 'context-watchdog-check.ps1') -CurrentTokens $dagTokens -Budget 200000 -Reason 'pre-memory' -Content $dagContent 2>$null
+        if ($dagResult -is [array]) { $dagResult = @($dagResult | Where-Object { $_ -is [hashtable] }) | Select-Object -Last 1 }
+        if (($null -ne $dagResult) -and ($dagResult -is [hashtable]) -and $dagResult.level) {
+            $dagLevel = [string]$dagResult.level
+            $dagNodeCreated = [bool]$dagResult.created
+            if ($dagResult.node -and $dagResult.node.id) { $dagNodeId = [string]$dagResult.node.id }
+        } else {
+            Write-Warning "context-watchdog-check returned no escalation result (discriminator=$dagDiscriminator)"
+            $dagDiscriminator = $null
+        }
+    } catch {
+        Write-Warning "LCM DAG escalation failed (fail-closed, checkpoint intact): $($_.Exception.Message)"
+        $dagDiscriminator = $null
+    }
 }
 
 # --- Step 4: Validate before mem_save (poisoning guard) ---
@@ -422,6 +485,10 @@ $result = [PSCustomObject]@{
     created_vs_persisted = if ($fileWritten -and -not $persisted) { $true } else { $false }
     pending_file      = $pendingFilePath
     mem_save_directive = $memSaveDirective
+    dag_escalation  = $dagLevel
+    dag_node_created = $dagNodeCreated
+    dag_node_id     = $dagNodeId
+    dag_discriminator = $dagDiscriminator
     indexed           = $indexed
     miner_patterns    = if ($minerResult) { $minerResult.RepeatedPatterns } else { 0 }
     has_pending_directive = $hasPendingDirective
