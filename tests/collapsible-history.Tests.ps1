@@ -22,7 +22,7 @@ Describe "opencode-collapsible-history Plugin" {
         $repoRoot = Split-Path $PSScriptRoot -Parent
         $pluginPath = Join-Path $repoRoot "plugins\collapsible-history.ts"
         $basePath = Join-Path $repoRoot "scripts\lib\opencode-base.json"
-        $globalPluginPath = "C:\Users\MK\.config\opencode\plugins\collapsible-history.ts"
+        $globalPluginPath = Join-Path $env:USERPROFILE ".config\opencode\plugins\collapsible-history.ts"
         $script:pluginText = $null
         $script:baseJson = $null
         if (Test-Path $pluginPath) { $script:pluginText = Get-Content $pluginPath -Raw }

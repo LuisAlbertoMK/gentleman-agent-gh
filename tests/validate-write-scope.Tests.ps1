@@ -35,7 +35,7 @@ Describe "validate-write-scope.ps1" {
     $scratch = "tests/_scratch_vws.txt"
     "x" | Set-Content -Path $scratch
     try {
-      git add $scratch
+      git add $scratch 2>$null
       $o = & $scriptPath -AllowedPaths @("zzz/nonexistent/*") -Staged -BaseRef HEAD 2>&1
       $LASTEXITCODE | Should -Be 1
       ($o -join "`n") | Should -Match '\[VIOLATION\]'
