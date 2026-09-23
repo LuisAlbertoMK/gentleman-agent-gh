@@ -11,6 +11,7 @@
     ".jd-cleared/*",
     ".learnings/*",
     ".opencode/*",
+    ".rdd/*",
     "adr/*",
     "backups/*",
     "benchmarks/*",
