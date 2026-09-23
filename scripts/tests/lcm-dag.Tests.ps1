@@ -48,4 +48,24 @@ Describe 'lcm-dag.ps1' {
         $n = Add-LcmNode -Level L3 -Content 'full file ref' -Pointer '.agents/skills/context-watchdog/SKILL.md' -Path $script:TmpDag -WarningAction SilentlyContinue
         $n.pointer | Should -Be '.agents/skills/context-watchdog/SKILL.md'
     }
+
+    It 'L3 file pointer round-trips lossless (Add -> Get -> resolve -> sha256 match)' {
+        # Needs persistence (Add->Get via file), so PESTER_TEST is OFF inside try; restored after.
+        Remove-Item Env:PESTER_TEST -ErrorAction SilentlyContinue
+        try {
+            . $script:ScriptPath
+            $src = Join-Path ([System.IO.Path]::GetTempPath()) ("lcm-src-{0}.md" -f [guid]::NewGuid().ToString('N').Substring(0, 8))
+            'lossless round-trip fixture content 123' | Set-Content -LiteralPath $src -Encoding UTF8 -NoNewline
+            $hash = (Get-FileHash -LiteralPath $src -Algorithm SHA256).Hash.ToLower()
+            $pointer = "file:$src#sha256:$hash"
+            $n = Add-LcmNode -Level L3 -Content 'fixture summary' -Pointer $pointer -Path $script:TmpDag
+            $got = Get-LcmNode -Id $n.id -Path $script:TmpDag
+            $got.pointer | Should -Be $pointer
+            $m = [regex]::Match($got.pointer, '^file:(?<ref>.+)#sha256:(?<hash>[0-9a-f]{64})$')
+            $m.Success | Should -BeTrue
+            (Get-FileHash -LiteralPath $m.Groups['ref'].Value -Algorithm SHA256).Hash.ToLower() | Should -Be $m.Groups['hash'].Value
+            Remove-Item $src -Force -ErrorAction SilentlyContinue
+        }
+        finally { $env:PESTER_TEST = '1' }
+    }
 }
