@@ -85,8 +85,34 @@ foreach ($key in $sectionKeys) {
   })
 }
 
+# ── Model fallback check (upstream v3.7.0 adapted) ─────────────────────
+# If a saved general/explore model does not resolve, warn and fall back
+# to the default without failing the drift check.
+$modelFallbackDefault = "opencode/muse-spark-1.3-contributor-free"
+try {
+  $modelCfg = Get-Content -LiteralPath $canonicalPath -Raw -Encoding UTF8 | ConvertFrom-Json
+  $savedGeneral = $null; $savedExplore = $null; $savedFallback = $null
+  if (($null -ne $modelCfg) -and ($null -ne $modelCfg.PSObject.Properties["models"])) {
+    if ($null -ne $modelCfg.models.PSObject.Properties["general"]) { $savedGeneral = $modelCfg.models.general }
+    if ($null -ne $modelCfg.models.PSObject.Properties["explore"]) { $savedExplore = $modelCfg.models.explore }
+  }
+  if (($null -ne $modelCfg) -and ($null -ne $modelCfg.PSObject.Properties["reviewer"])) {
+    if ($null -ne $modelCfg.reviewer.PSObject.Properties["fallback"]) { $savedFallback = $modelCfg.reviewer.fallback }
+  }
+  foreach ($entry in @(@{name = "models.general"; value = $savedGeneral }, @{name = "models.explore"; value = $savedExplore }, @{name = "reviewer.fallback"; value = $savedFallback })) {
+    if ([string]::IsNullOrWhiteSpace($entry.value)) {
+      Write-Warning ("[models] $($entry.name) not set or unresolvable — falling back to default '$modelFallbackDefault' (no failure)")
+    }
+  }
+} catch {
+  Write-Warning ("[models] fallback check skipped: " + $_.Exception.Message)
+}
+
 # ── Fix mode: sync global from canonical ─────────────────────────────────
 if ($Fix -and $totalDrift -gt 0) {
+  if (-not (Test-Path -LiteralPath $globalPath)) {
+    Write-Warning ("[fix] SKIP: global config not found at '$globalPath' — run sync first (no changes made)")
+  } else {
   if (-not $Quiet) { Write-Output "[fix] Syncing global config from canonical..." }
   $canonicalContent = Get-Content -LiteralPath $canonicalPath -Raw -Encoding UTF8 | ConvertFrom-Json
   $globalContent = Get-Content -LiteralPath $globalPath -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -100,6 +126,7 @@ if ($Fix -and $totalDrift -gt 0) {
   $globalContent.skills = $canonicalContent.skills
   $globalContent | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $globalPath -Encoding UTF8
   if (-not $Quiet) { Write-Output "[fix] global config updated → $globalPath" }
+  }
 }
 
 # ── Output ──────────────────────────────────────────────────────────────

@@ -137,6 +137,11 @@ if((Test-Path $canonicalJson) -and (Test-Path $globalJson)){
 }else{Add-Result "opencode.json" "SKIP" "Files not found"}
 
 # 5. Ensure MCP servers
+# Pi coding-agent dir override (upstream v3.6.0 #4892 style): the Pi npm root
+# lives under <agent dir>/npm/package.json. Never changes ~/.pi config root.
+$piAgentDir = Get-PiAgentDir
+$piNpmRoot = Join-Path $piAgentDir (Join-Path "npm" "package.json")
+if(-not $env:PI_CODING_AGENT_DIR){$env:PI_CODING_AGENT_DIR = $piAgentDir}
 if(-not $SkipMCP -and (Test-Path $globalJson)){
     $config = Get-Content $globalJson -Raw -Encoding UTF8 | ConvertFrom-Json
     $mcpChanged = $false

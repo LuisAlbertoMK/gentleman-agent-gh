@@ -35,6 +35,13 @@ $canonicalPath = (Join-Path $gentlemanRoot "opencode.json")
 $globalConfig  = Get-GlobalConfigDir
 $globalPath    = Join-Path $globalConfig "opencode.json"
 
+# ── Pi coding-agent dir (upstream v3.6.0 #4892 style override) ─────────────
+# Resolved via Get-PiAgentDir: honors $env:PI_CODING_AGENT_DIR, defaults to
+# ~/.pi/agent. Never changes the Pi config root (~/.pi). Re-export so child
+# processes inherit the resolved override.
+$piAgentDir = Get-PiAgentDir
+if (-not $env:PI_CODING_AGENT_DIR) { $env:PI_CODING_AGENT_DIR = $piAgentDir }
+
 # ── Validate canonical exists ────────────────────────────────────────────
 if (-not (Test-Path $canonicalPath)) { Write-Error "Canonical config not found: $canonicalPath"; exit 1 }
 
@@ -164,6 +171,28 @@ function Sync-Config {
    $results.Add(@{target=$Label; status="SYNCED"; detail="Updated: $($changes -join ', ')"})
 }
 
+# ── last_synced_at (upstream v3.5.0 adaptado) ─────────────────────────────
+# Escribe ISO8601 UTC en .gentleman/state.json SOLO tras sync exitoso.
+# Si falla/interrumpe, esta funcion no se alcanza y el valor previo se preserva.
+# -StatePath / $env:RDD_STATE_PATH: hook de test (ruta hermetica).
+function Write-LastSyncedAt {
+  param([string]$StatePath = '')
+  if ([string]::IsNullOrEmpty($StatePath)) { $StatePath = $env:RDD_STATE_PATH }
+  if ([string]::IsNullOrEmpty($StatePath)) { $StatePath = Join-Path (Join-Path (Get-GentlemanRoot) '.gentleman') 'state.json' }
+  $state = @{}
+  if (Test-Path -LiteralPath $StatePath) {
+    $raw = Get-Content -LiteralPath $StatePath -Raw -Encoding UTF8
+    if (-not [string]::IsNullOrWhiteSpace($raw)) {
+      $parsed = $raw | ConvertFrom-Json
+      foreach ($p in $parsed.PSObject.Properties) { $state[$p.Name] = $p.Value }
+    }
+  }
+  $state['last_synced_at'] = (Get-Date).ToUniversalTime().ToString('o')
+  $dir = Split-Path $StatePath -Parent
+  if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+  ($state | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath $StatePath -Encoding UTF8
+}
+
 # ── Execute ──────────────────────────────────────────────────────────────
 if ($env:PESTER_TEST -eq '1') {
   # Test mode: never write the user's real global config (opencode.json / AGENTS.md).
@@ -181,6 +210,9 @@ if ($env:PESTER_TEST -eq '1') {
     }
   } else {
     $results.Add(@{target="global-agents-md"; status="DRY-RUN"; detail="Would copy AGENTS.md"})
+  }
+  if (-not $DryRun) {
+    Write-LastSyncedAt
   }
 }
 

@@ -71,12 +71,13 @@ Default `lite`. See [SHORTCUTS.md](SHORTCUTS.md#ponytail-mode) for modes (`lite`
 
 | Task Type | Delegate To | Savings |
 |-----------|-------------|---------|
-| Read/grep/analyze >3 files | `explore` | 2-15K |
+| Tocan 2+ files no-triviales | `explore` / `general` | 2-15K |
 | Research + synthesis | `general` | 4-10K |
 
-**Pattern**: Delegate explore → get summary → synthesize/decide → delegate implementation if >3 files.
+**Pattern**: Delegate explore → get summary → synthesize/decide → delegate implementation if 2+ files no-triviales. Un edit mecánico posterior (rename, formato, CRLF, import-move) NO cuenta como segundo file. Validar premisas consecuentes + reusar findings hermanos + checks focused antes que full sin spend-gate duro.
 
 **NEVER delegate**: Single file edits, git ops, script execution, final verification.
+**NEVER delegate**: Mechanical-only follow-up solo.
 
 ### Delegation Rules
 

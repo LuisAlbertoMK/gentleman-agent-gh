@@ -42,10 +42,13 @@ if command -v go >/dev/null 2>&1 && [ -f "$REPO_ROOT/cmd/gate/main.go" ]; then
   fi
 fi
 
-# Fallback: PS gate (ADR-049 mandatory fallback)
+# Fallback: PS gate (ADR-049 mandatory fallback, requires PowerShell 7 by design)
 if command -v pwsh >/dev/null 2>&1; then
   exec pwsh -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/.githooks/pre-commit-gate.ps1" -RepoRoot "$REPO_ROOT"
 else
-  echo "ERROR: PowerShell 7 (pwsh) not found"
+  echo "ERROR: pre-commit gate unavailable — no Go gate binary and no PowerShell 7 (pwsh) found." >&2
+  echo "  Gate requires PowerShell 7 by design (Windows PowerShell 5.1 is NOT sufficient)." >&2
+  echo "  Fix: install PowerShell 7 (winget install Microsoft.PowerShell) or build the gate (go build -o bin/gate ./cmd/gate)." >&2
+  echo "  Bypass (skips all 21 checks): git commit --no-verify" >&2
   exit 1
 fi

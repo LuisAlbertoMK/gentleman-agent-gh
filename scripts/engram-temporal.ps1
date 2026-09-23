@@ -1,4 +1,4 @@
-#requires -Version 7
+#requires -Version 5.1
 <#
 .SYNOPSIS
     Engram temporal chain — Zep-style temporal edges (P1-3).
@@ -35,10 +35,10 @@ function Get-TemporalChain {
     $engramBin = Join-Path $env:LOCALAPPDATA 'engram\bin\engram.exe'
     if ($env:PESTER_TEST -ne '1' -and (Test-Path $engramBin)) {
         try {
-            $args = @('search', '--project', 'gentleman-agent-gh', '--limit', $Limit, '--json')
-            if ($TopicKey) { $args += @('--topic-key', $TopicKey) }
-            if ($Query) { $args += @('--query', $Query) }
-            $raw = & $engramBin @args 2>$null | Out-String
+            $engramArgs = @('search', '--project', 'gentleman-agent-gh', '--limit', $Limit, '--json')
+            if ($TopicKey) { $engramArgs += @('--topic-key', $TopicKey) }
+            if ($Query) { $engramArgs += @('--query', $Query) }
+            $raw = & $engramBin @engramArgs 2>$null | Out-String
             $obs = try { $raw | ConvertFrom-Json -ErrorAction Stop } catch { @() }
             foreach ($o in @($obs)) {
                 $chain += [ordered]@{ id = $o.id; topic_key = $o.topic_key; title = $o.title; createdAt = $o.created_at; type = $o.type }

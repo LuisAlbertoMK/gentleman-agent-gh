@@ -9,6 +9,7 @@ REM   sync-all -Quiet     — minimal output
 
 where pwsh.exe >nul 2>nul
 if %ERRORLEVEL% neq 0 (
+    echo [ERROR] sync-all.ps1 requires PowerShell 7+ (pwsh.exe) by design - no Windows PowerShell 5.1 fallback.
     echo [ERROR] PowerShell 7+ (pwsh.exe) not found.
     echo.
     echo   Install via: winget install Microsoft.PowerShell

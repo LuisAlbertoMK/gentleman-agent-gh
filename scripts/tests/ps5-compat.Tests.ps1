@@ -125,12 +125,17 @@ Describe 'PS5/7 Compat — gentleman-vmk.bat wrapper' {
         Test-Path $path | Should -Be $true
     }
 
-    It 'T11: gentleman-vmk.bat has pwsh + powershell fallback pattern' {
-        $path = Join-Path $repoRoot 'gentleman-vmk.bat'
-        $content = Get-Content $path -Raw
-        $content | Should -Match 'pwsh\.exe'
-        $content | Should -Match 'powershell\.exe'
-        $content | Should -Match 'opencode --agent (gentleman-vMK|gentle-MK)'
+    It 'T11: gentleman-vmk.bat is legacy forwarder to canonical gentle-mk.bat' {
+        $fwdPath = Join-Path $repoRoot 'gentleman-vmk.bat'
+        $fwd = Get-Content $fwdPath -Raw
+        $fwd | Should -Match 'call'
+        $fwd | Should -Match 'gentle-mk\.bat'
+        $fwd | Should -Match '(DEPRECATED|LEGACY|deprecated)'
+        $canonPath = Join-Path $repoRoot 'gentle-mk.bat'
+        $canon = Get-Content $canonPath -Raw
+        $canon | Should -Match 'pwsh\.exe'
+        $canon | Should -Match 'powershell\.exe'
+        $canon | Should -Match 'opencode --agent gentle-MK'
     }
 
     It 'T12: setup-machine.ps1 installs .bat shortcut from scripts/$($sc.BatCmd).bat' {

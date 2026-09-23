@@ -6,7 +6,7 @@
     Dot-sourced by sync-all.ps1, global-setup.ps1, sync-vmk.ps1, setup-machine.ps1,
     use-gentleman.ps1, sync-install.ps1.
     Provides: Get-GentlemanRoot, Get-GentlemanProjectRoot, Get-GlobalConfigDir,
-    New-CrossPlatLink, Find-Pwsh.
+    Get-PiAgentDir, New-CrossPlatLink, Find-Pwsh.
 
     PS5.1 compatibility: $IsLinux/$IsMacOS/$IsWindows automatic variables
     are PS6+ only. When absent (PS 5.1 Desktop edition) we polyfill them
@@ -124,4 +124,49 @@ function Find-Pwsh {
     $cmd = Get-Command pwsh -ErrorAction SilentlyContinue
     if ($cmd) { return $cmd }
     return Get-Command pwsh.exe -ErrorAction SilentlyContinue
+}
+
+function Get-PiAgentDir {
+    <#
+    .SYNOPSIS
+        Returns the Pi coding-agent directory (upstream v3.6.0 #4892 style).
+    .DESCRIPTION
+        Honors the PI_CODING_AGENT_DIR environment override:
+        - Absolute value → canonicalized and returned.
+        - Leading '~' → expanded against $HOME ($env:USERPROFILE fallback), canonicalized.
+        - Relative value → REJECTED (fail-closed): warning + fallback to ~/.pi/agent.
+          Only absolute or ~ paths are honored; CWD-relative resolution is refused
+          so a stray cwd can never redirect the agent dir silently.
+        - Unset / empty / unresolvable → falls back to ~/.pi/agent.
+        NEVER changes the Pi config root (~/.pi) nor the opencode global
+        config dir (see Get-GlobalConfigDir). Read-only: does not create
+        directories.
+    .EXAMPLE
+        $env:PI_CODING_AGENT_DIR = 'D:\agents\pi'; Get-PiAgentDir
+    #>
+    $override = $env:PI_CODING_AGENT_DIR
+    if ($override) { $override = $override.Trim() }
+    $homeDir = $HOME
+    if (-not $homeDir) { $homeDir = $env:USERPROFILE }
+    if (-not $homeDir) { $homeDir = $env:HOME }
+    $fallback = Join-Path (Join-Path $homeDir '.pi') 'agent'
+    if (-not $override) { return $fallback }
+    try {
+        if ($override -eq '~') { return $homeDir }
+        if ($override.StartsWith('~/') -or $override.StartsWith('~\')) {
+            return ([System.IO.Path]::GetFullPath((Join-Path $homeDir $override.Substring(2))))
+        }
+        if ($override.StartsWith('~')) {
+            $suffix = $override.Substring(1).TrimStart('/\')
+            if (-not $suffix) { return $homeDir }
+            return ([System.IO.Path]::GetFullPath((Join-Path $homeDir $suffix)))
+        }
+        if ([System.IO.Path]::IsPathRooted($override)) {
+            return ([System.IO.Path]::GetFullPath($override))
+        }
+        Write-Warning ("Get-PiAgentDir: relative PI_CODING_AGENT_DIR '$override' rejected — only absolute or ~ paths allowed; falling back to '$fallback'")
+        return $fallback
+    } catch {
+        return $fallback
+    }
 }
