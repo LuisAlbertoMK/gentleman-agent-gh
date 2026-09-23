@@ -143,6 +143,40 @@ Describe "security-audit-mcp.ps1 (P0-2)" {
         }
     }
 
+    Context "Gate fail-closed on audit exit code (Ronda2 S1)" {
+        BeforeAll {
+            $script:GateSrc = Get-Content -LiteralPath (Join-Path $PSScriptRoot ".." ".githooks" "pre-commit-gate.ps1") -Raw
+            $script:StubDir = Join-Path ([IO.Path]::GetTempPath()) ("mcp-failclosed-" + [guid]::NewGuid().ToString("N"))
+            New-Item -ItemType Directory -Path $script:StubDir -Force | Out-Null
+            # Stub audit: exits 1 with benign output (no [FAIL]) — the crash case
+            Set-Content -LiteralPath (Join-Path $script:StubDir "audit-crash.ps1") -Encoding utf8 -Value "Write-Output 'unexpected'; exit 1"
+            Set-Content -LiteralPath (Join-Path $script:StubDir "audit-ok.ps1") -Encoding utf8 -Value "Write-Output 'Result: PASS'; exit 0"
+        }
+        AfterAll {
+            if (Test-Path -LiteralPath $script:StubDir) { Remove-Item -LiteralPath $script:StubDir -Recurse -Force }
+        }
+
+        It "Gate checks LASTEXITCODE after the MCP audit call (fail-closed)" {
+            $script:GateSrc | Should -Match '\$LASTEXITCODE -ne 0'
+        }
+
+        It "FAILs when the audit exits nonzero without [FAIL] in output" {
+            $mcpOut = & (Join-Path $script:StubDir "audit-crash.ps1") *>&1 | Out-String
+            $gateFailed = $false
+            if ($LASTEXITCODE -ne 0) { $gateFailed = $true }
+            elseif ($mcpOut -match '\[FAIL\]') { $gateFailed = $true }
+            $gateFailed | Should -Be $true
+        }
+
+        It "Does NOT fail when the audit exits 0 with clean output" {
+            $mcpOut = & (Join-Path $script:StubDir "audit-ok.ps1") *>&1 | Out-String
+            $gateFailed = $false
+            if ($LASTEXITCODE -ne 0) { $gateFailed = $true }
+            elseif ($mcpOut -match '\[FAIL\]') { $gateFailed = $true }
+            $gateFailed | Should -Be $false
+        }
+    }
+
     Context "Live repo audit (read-only)" {
         It "PASSes on the real opencode.json with exit 0" {
             git --version | Out-Null
