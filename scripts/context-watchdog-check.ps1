@@ -43,13 +43,21 @@ if ($escalationLevel -eq 'NONE') {
     return @{ level = 'NONE'; pct = $pct; created = $false }
 }
 
-# Build content if not supplied
+# Build content if not supplied — level-shaped via lcm-dag.ps1 builders (Ronda4 S2).
 if (-not $Content) {
-    $Content = "watchdog escalation $escalationLevel at $pct% — reason: $Reason — $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+    $seed = "watchdog escalation at $pct% — reason: $Reason"
+    switch ($escalationLevel) {
+        'L1' { $Content = New-LcmL1Content -Sections @($seed) }
+        'L2' { $Content = New-LcmL2Content -Decisions @("escalated to L2 at $pct% — reason: $Reason") }
+        default { $Content = "watchdog escalation $escalationLevel at $pct% — reason: $Reason — $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" }
+    }
 }
 if ($escalationLevel -eq 'L3' -and -not $Pointer) {
-    # Default L3 pointer: current cycle + repo state
-    $Pointer = ".learnings/inter-track.json"
+    # Default L3 pointer: current cycle state in canonical hash-verified form
+    # (schema §2: kind:ref#sha256:hex64). Best-effort: inter-track.json
+    # absent → bare path (unverified, same as pre-S2).
+    try { $Pointer = New-LcmL3Pointer -Kind file -Ref '.learnings/inter-track.json' -RepoRoot $repoRoot }
+    catch { $Pointer = '.learnings/inter-track.json' }
 }
 
 Write-Host "watchdog: $pct% ($CurrentTokens/$Budget) — $Reason — escalate to $escalationLevel" -ForegroundColor Yellow
@@ -87,4 +95,4 @@ $boundary = switch ($Reason) {
     default      { '(periodic)' }
 }
 
-return @{ level = $escalationLevel; pct = $pct; created = $created; node = $node; boundary = $boundary }
+return @{ level = $escalationLevel; pct = $pct; created = $created; node = $node; boundary = $boundary; pointer = $Pointer }

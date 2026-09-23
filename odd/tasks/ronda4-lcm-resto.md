@@ -135,7 +135,8 @@ Total Ronda 4: 3 slices, cada uno ≤400L ✅, ~2 sesiones (S1 ~0.5 + S2 ~1 + S3
 | Slice | Commit | 4R veredicto | Gate | Estado |
 |-------|--------|--------------|------|--------|
 | 1 (G-b GC + parent-chain) | `feat(lcm): DAG garbage-collects old cycles and chains parent nodes` (Ronda4 S1) — este commit | self-4R PASS sin BLOCKER (Tier 2: 4R independiente pendiente pre-merge a main; FAIL → `judgment-day`, nunca auto-fix) | gate ALL CLEAR regla exacta, sin FORCE_SHIP ni markers nuevos (verificado pre-commit) | ✅ implementado en esta rama, NO push |
-| 2 (G-c migración/resolvers) + 3 (G-a+G-d hook+medición) | — | — | — | 🔲 no iniciados |
+| 2 (G-c migración/resolvers) | `feat(lcm): L1/L2/L3 migration with lossless resolvers` (Ronda4 S2) — este commit | self-4R PASS sin BLOCKER (Tier 1: sin schema/auth/API nuevos — kinds pre-definidos en schema §2; builders L1/L2 puros + `New-LcmL3Pointer` fail-closed + `Resolve-LcmPointer` 3 kinds no-throw con flag `resolvable`; default L3 canónico `file:…#sha256:…`; SKILL.md Verification NO tocado — el contrato ya lo exigía y S2 lo implementa bajo el mismo texto, justificación en commit) | gate regla exacta pre-commit sin FORCE_SHIP ni markers nuevos (verificado pre-commit) | ✅ implementado en esta rama, NO push |
+| 3 (G-a+G-d hook+medición) | — | — | — | 🔲 no iniciado |
 
 ## 6. Rollback por slice
 
