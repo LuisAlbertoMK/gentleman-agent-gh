@@ -31,6 +31,10 @@
   Also scan ~/.local/share/opencode/tool-output for files >14 days old.
   Disabled by default: tool-output is active session state.
 
+.PARAMETER Force
+  Bypass ShouldProcess confirmation prompts in apply mode (implies -Confirm:$false).
+  Never bypasses -WhatIf: -Force -WhatIf still only reports.
+
 .EXAMPLE
   & scripts/clean-worktree-temp.ps1                # list only (default)
   & scripts/clean-worktree-temp.ps1 -Apply         # delete matching files
@@ -43,10 +47,14 @@ param(
   [int]$OlderThanDays = 7,
   [switch]$Apply,
   [switch]$Json,
-  [switch]$IncludeToolOutput
+  [switch]$IncludeToolOutput,
+  [switch]$Force
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+# -Force bypasses ShouldProcess confirmation prompts; -WhatIf is still honored
+# because ShouldProcess checks WhatIfPreference regardless of ConfirmPreference.
+if ($Force) { $ConfirmPreference = 'None' }
 
 # ---- resolve git root ----
 $gitRoot = $null

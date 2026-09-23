@@ -2,8 +2,13 @@
 [CmdletBinding(SupportsShouldProcess=$true)]
 param(
     [switch]$Quiet,
-    [switch]$Json)
+    [switch]$Json,
+    [switch]$Force)
 Set-StrictMode -Version Latest
+# -Force bypasses confirmation prompts on destructive ops (stale-marker prune).
+# Default stays fail-closed: pruning is unconditional today, so without -Force
+# nothing about the script's behavior changes.
+if ($Force) { $ConfirmPreference = 'None' }
 <#
 .SYNOPSIS
     Pre-commit gate preparation — enforces staging-first → marker-generation → gate order.
