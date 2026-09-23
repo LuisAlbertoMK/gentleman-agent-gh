@@ -82,7 +82,7 @@ Orden mandatorio: **S1 (framework + pilot) → S2 (C1 quality/coordinación)**. 
 | Slice | Commit | 4R veredicto | Gate | Estado |
 |-------|--------|--------------|------|--------|
 | S1 (H1 framework + pilot 5) | `2d86c794` feat(skills): audit framework + checklist + pilot 5 skills (Ronda5 S1) | 4R PASS (JD 9/8/9/8, [10/26] OK) | Gate **28/28 ALL CLEAR** (hook pre-commit; [23/26] PS-CI-03 resuelto via marker) | ✅ commit A: 10 files +397/−11; costo/skill pilot 0–10L (delivery-harness 0L ya conforme; context-watchdog +4; code-review-agent ±4; security-scanner ±2; sdd-quick ±5); Pester audit-check 12/12; checklist congelada `docs/skills/audit-checklist.md` (34L); script 178L + test 145L; breaker marker new-format `scripts_tests_skills-audit-check.Tests.ps1_bb6407ba` |
-| S2 (H2/C1 11 skills) | (pendiente — ejecutar tras S1) | — | — | 🔲 listo para S2 (receta §5: tier 1, script verde 16/96) |
+| S2 (H2/C1 11 skills) | (este commit) feat(skills): audit cluster C1 quality-coordination (Ronda5 S2) | 4R PASS (B1 copy-paste humano: 4 tablas skill-specific reales) | Gate **28/28 ALL CLEAR** (sin marker; [25/26] token-regression exigió budget rdd 2850→3900) | ✅ 4 files +24/−2 (branch-pr +4 B3; testing-strategy +4 B2; rdd +15 B1/B2/B3 + budget; odd ±1 B1 heading); 7/11 ya conformes 0L; audit 16/16 (pilot 5 + C1 11) + repo 70/96 |
 
 ## 7. Rollback por slice
 

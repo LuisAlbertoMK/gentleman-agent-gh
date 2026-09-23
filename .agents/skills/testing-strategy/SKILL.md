@@ -33,6 +33,10 @@ CRITICAL (auth/payments/data/security): 80%+ E2E+contract+mutation. HIGH (core/A
 ## Anti-Patterns
 100% coverage theater · Test implementation not behavior · No risk diff · Plan w/o steps · Mock everything · Unit-test getters/DTOs · No debt budget
 
+## Red Flags
+- 100% coverage demanded without ROI estimate → STOP, require ROI first (rule: ROI estimate required)
+- E2E proposed for unit-testeable logic → escalate to pyramid ratio check (60-80/15-25/5-10)
+
 ## Verification
 - Cite `git log --name-only` gap + existing tests reference
 - Post-plan: `scripts/tests/*.Tests.ps1` count vs recommendation

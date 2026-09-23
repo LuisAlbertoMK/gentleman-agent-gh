@@ -3,7 +3,7 @@ name: rdd
 description: "Receipt-Driven Development — freeze candidate → risk-tiered review → receipt. Delivery stays human-owned."
 triggers: "rdd, receipt-driven, freeze, receipt-driven development, review after change"
 changelog: docs/ciclos/cycle30-20260917.md
-token_budget: 2850
+token_budget: 3900
 ---
 ## RDD Contract
 
@@ -71,6 +71,20 @@ FAIL + tier 2 → escalate to `judgment-day`. Never auto-fix on FAIL.
 | scope-changed | Re-freeze at current HEAD, re-run tier assessment |
 | stale snapshot | Warn + re-freeze. Previous review voided. |
 | review.status = FAIL | STOP. Escalate per tier. No fallback. |
+
+## Anti-Rationalization
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "Skip freeze, change is trivial" | No HEAD ref in receipt | `git rev-parse --short HEAD` captured before edit; no freeze → BLOCK |
+| "Auto-fix tier 2 to save time" | Fix applied without judgment-day | Tier 2 FAIL → STOP, escalate to judgment-day, never auto-fix |
+
+## Red Flags
+- Tier 2 FAIL auto-fixed without judgment-day → STOP, revert + escalate (rule: never auto-fix)
+- Stale freeze reused after scope change → STOP, re-freeze + re-review
+
+## Verification
+- Receipt `rdd-receipt-{id}.json` carries freeze `HEAD-{7-8}-{8}` + tier + 4R verdict + files
+- `git diff HEAD | git hash-object --stdin` matches frozen diff_hash at each gate
 
 ## Anti-patterns
 

@@ -34,5 +34,9 @@ Add `!` after type/scope. `BREAKING CHANGE:` in footer. Maps to `type:breaking-c
 ## Red Flags
 - Same rationalization 2× → force RED
 
+## Verification
+- `gh pr view <N> --json labels,closingIssuesReference` shows exactly one `type:*` label + linked approved issue
+- `git diff --stat` ≤400L or `size:exception` label present
+
 → docs/skills/branch-pr/reference.md · Cross-Refs: chained-pr | issue-creation | work-unit-commits | commit-crafter
 
