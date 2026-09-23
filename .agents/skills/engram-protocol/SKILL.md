@@ -2,6 +2,7 @@
 name: engram-protocol
 description: "Persistent memory protocol — save, search, dreaming, session lifecycle via Engram MCP"
 triggers: "remember, recall, engram, mem_save, mem_search, session close, dreaming, memory"
+changelog: docs/ciclos/cycle28-20260815.md
 token_budget: 2200
 ---
 > See [reference.md](docs/skills/engram-protocol/reference.md) for extended details, examples, and detailed patterns.

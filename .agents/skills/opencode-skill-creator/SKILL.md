@@ -32,7 +32,7 @@ Loop: Decide → Draft → Test prompts → Run (with-skill & baseline) → Revi
 
 ## Red Flags
 - Skill description contains `MUST`/`ALWAYS` without explanation → overfit (prefer explanation over MUST)
-- Token budget not bumped after adding capability → regression gate will block
+- Token budget not bumped after adding capability → BLOCKER at regression gate — reject ship until budget is re-measured
 
 ## Verification
 - `skill_validate` + `skill_aggregate_benchmark` pass before publish

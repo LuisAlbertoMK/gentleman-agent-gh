@@ -54,7 +54,7 @@ hop 2: command-wrapper      → [bash-safe]
 
 ## Red Flags
 - Skill used without `skill-graph` resolution → missing deps, silent failure
-- Circular dependency in skill graph → same error 2× pattern (micro loop)
+- Circular dependency in skill graph → same error 2× pattern (micro loop) — escalate to `skill-registry` rescan on 2nd occurrence
 
 ## Verification
 - `cross-ref-check.ps1` → `SKILL.md... OK` + `INDEX count` matches registry

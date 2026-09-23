@@ -32,8 +32,8 @@ Fixed width · h-screen · transition:all · >500ms · No reduced-motion · HSL/
 | "Responsive is optional" | Fixed px widths | CQ + Flex/Grid + spacing tokens |
 
 ## Red Flags
-- Hardcoded `#fff`/`#000`/px without tokens → slop
-- Animation on `width`/`height` → compositor violation
+- Hardcoded `#fff`/`#000`/px without tokens → slop — reject the diff until tokenized
+- Animation on `width`/`height` → compositor violation — STOP ship until compositor-only
 
 ## Example
 `/baseline-ui src/components/Button.tsx` → `UI-CLEANUP:Button—2026-08-27 CRITICAL:[contrast]→ HIGH:[layout]→ VERIFY:[axe]`

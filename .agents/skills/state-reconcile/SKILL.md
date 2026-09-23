@@ -79,7 +79,7 @@ token_budget: 2800
 
 - BITACORA and plan doc tell different stories
 
-- Status answer without `git log --grep` or `Test-Path`
+- Status answer without `git log --grep` or `Test-Path` → STOP, no status claim without evidence (rule 4)
 
 - Doc says pending but artifact file exists on disk
 

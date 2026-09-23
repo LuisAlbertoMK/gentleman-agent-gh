@@ -7,6 +7,7 @@ metadata:
   tags: [engineering, routing, orchestration, multi-model]
   author: gentle-MK
   version: "3.3"
+changelog: docs/ciclos/cycle28-20260815.md
 token_budget: 3200
 ---
 
@@ -40,6 +41,10 @@ Avoid: Qwen 3.7 Plus (`opencode-go/qwen3.7-plus`, re-plans), DeepSeek V4 Flash (
 | <50K | Normal routing |
 | 50K-100K | Prefer fast models |
 | >150K | Direct forced |
+
+## Red Flags
+- Security/vuln task routed DIRECT instead of DELEGATE → STOP, re-route via Routing Table
+- Model assignment diverging from opencode.json SSoT with no fallback → escalate to gentle-MK
 
 ---
 ## Reference Materials

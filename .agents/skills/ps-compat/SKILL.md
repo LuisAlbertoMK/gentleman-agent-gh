@@ -37,5 +37,5 @@ token_budget: 3000
 | "`\\n` works locally" | LF-only scans | Windows = CRLF (P1-1 audit:46) |
 | "Small script, skip #requires" | Missing version decl | Gate + cross-ref flag it |
 ## Red Flags
-- No `#requires` header; `Get-Content` w/o `-Encoding` on non-ASCII; `\n`-only scans on Windows files; `&&` for PS5.1; empty `catch` on encoding ops.
+- No `#requires` header; `Get-Content` w/o `-Encoding` on non-ASCII; `\n`-only scans on Windows files; `&&` for PS5.1; empty `catch` on encoding ops -> STOP commit until each hit is fixed per Rules 1-9 (PS5.1 hook breakage is a BLOCKER).
 ## Refs: quality-gate | command-wrapper | bash-safe (scripts/bash-safe.ps1) | ANTI-PATTERN-CATALOG.md:21,24,25,27,31 | docs/mejoras/2026-09-01-gap-scan-repo.md:17-21 | docs/mejoras/2026-09-01-p1-1-spec-audit.md:31-46

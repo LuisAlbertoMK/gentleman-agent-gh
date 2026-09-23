@@ -2,8 +2,8 @@
 name: trial-verify
 description: When facing >=2 viable options for a non-trivial reversible decision, implement/evaluate ALL of them, verify via independent subagent scoring, and PROCEED with the verified winner without asking the user to choose. Triggered by exception (d) of the 1-question rule.
 triggers: trial-verify, multi-option decision, which option, autonomous option resolution
-token_budget: 2950
 changelog: "2026-09-02 cycle32-p2 — externalize examples/patterns to reference.md (ADR-048)"
+token_budget: 2950
 ---
 
 # Trial-Verify Protocol

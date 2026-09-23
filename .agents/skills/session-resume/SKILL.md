@@ -31,7 +31,7 @@ Auto-commit/push · mid-task runs · output >10 lines · skip "small project" ·
 | "Will remember later" | Not calling mem_save before RED zone | Every 25 calls or YELLOW → `mem_save(topic_key=checkpoint/session-state)` |
 
 ## Red Flags
-- Unpushed commits silently growing (>5 ahead) → push now or `git branch` diverges
+- Unpushed commits silently growing (>5 ahead) → push now or `git branch` diverges — STOP new work until push/stash/continue is chosen (When to Use 2-3)
 - Restoring session without `mem_context` → re-discover what you already solved
 
 ## Verification
