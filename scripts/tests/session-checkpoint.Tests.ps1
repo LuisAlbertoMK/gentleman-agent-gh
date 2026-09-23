@@ -15,6 +15,10 @@ Set-StrictMode -Version Latest
 BeforeAll {
     $script:repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
     $script:checkpointDir = Join-Path $repoRoot ".opencode\session-checkpoints"
+    # Ronda4 S3: hermetic DAG — session-checkpoint now calls context-watchdog-check,
+    # which persists a real node outside PESTER_TEST=1. Dry-run for the whole file.
+    $script:prevPesterTest = $env:PESTER_TEST
+    $env:PESTER_TEST = '1'
 
     # Inline replica of the zone determination logic (mirrors ctx-watchdog.ps1)
     function Get-ContextZone {
@@ -47,6 +51,8 @@ AfterAll {
         }
         Remove-Item -LiteralPath $script:checkpointDir -Recurse -Force -ErrorAction SilentlyContinue
     }
+    # Ronda4 S3: restore PESTER_TEST isolation
+    $env:PESTER_TEST = $script:prevPesterTest
 }
 
 Describe "Session Checkpoint Bridge — Zone Detection" {
@@ -278,5 +284,84 @@ Describe "Session Checkpoint Bridge — Process-Pending Coverage (F2 fix)" {
                 Remove-Item -LiteralPath $pendingDir -Force -ErrorAction SilentlyContinue
             }
         }
+    }
+}
+
+Describe "Session Checkpoint Bridge — LCM Auto-Escalation (Ronda4 S3)" {
+    It "GREEN mark+Force creates checkpoint but does NOT escalate (threshold gate)" {
+        $params = @{ Mode = "mark"; UsagePercent = 5; Force = $true; Quiet = $true }
+        $out = & (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null
+        $result = $out | ConvertFrom-Json -ErrorAction SilentlyContinue
+        $result.checkpoint_created | Should -Be $true
+        $result.dag_escalation | Should -Be "NONE"
+        $result.dag_node_created | Should -Be $false
+        $result.dag_discriminator | Should -Be $null
+    }
+
+    It "YELLOW mark escalates L1 with discriminator bound to the checkpoint session_id" {
+        $params = @{ Mode = "mark"; UsagePercent = 45; Quiet = $true }
+        $out = & (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null
+        $result = $out | ConvertFrom-Json -ErrorAction SilentlyContinue
+        $result.checkpoint_created | Should -Be $true
+        $result.dag_escalation | Should -Be "L1"
+        $result.dag_node_created | Should -Be $false  # PESTER_TEST=1 dry-run
+        $result.dag_discriminator | Should -Not -Be $null
+        $checkpointJson = Get-Content -LiteralPath $result.checkpoint_file -Raw | ConvertFrom-Json
+        $result.dag_discriminator | Should -Be $checkpointJson.session_id
+    }
+
+    It "check mode at 85% never escalates (read-only preserved)" {
+        $result = Invoke-CheckpointCheck -Percent 85
+        $result.checkpoint_needed | Should -Be $true
+        $result.dag_escalation | Should -Be "NONE"
+        $result.dag_node_created | Should -Be $false
+        $result.dag_discriminator | Should -Be $null
+    }
+
+    It "escalation level follows Invoke-LcmEscalation (L2 at 65%, L3 at 85%, dry-run)" {
+        foreach ($case in @(@{ pct = 65; level = "L2" }, @{ pct = 85; level = "L3" })) {
+            $params = @{ Mode = "mark"; UsagePercent = $case.pct; Quiet = $true }
+            $out = & (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null
+            $result = $out | ConvertFrom-Json -ErrorAction SilentlyContinue
+            $result.dag_escalation | Should -Be $case.level
+        }
+    }
+
+    It "no-double-disparo: one mark at 65% persists exactly 1 DAG node bound to 1 checkpoint" {
+        $dagPath = Join-Path $script:repoRoot ".learnings\lcm-dag.json"
+        $hadDag = Test-Path -LiteralPath $dagPath
+        $backup = $null
+        if ($hadDag) { $backup = Get-Content -LiteralPath $dagPath -Raw -ErrorAction Stop }
+        $before = 0
+        if ($hadDag) { $before = @((($backup | ConvertFrom-Json).nodes)).Count }
+        $oldPester = $env:PESTER_TEST
+        $env:PESTER_TEST = $null
+        try {
+            $params = @{ Mode = "mark"; UsagePercent = 65; Quiet = $true }
+            $out = & (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null
+            $result = $out | ConvertFrom-Json -ErrorAction SilentlyContinue
+            $result.dag_escalation | Should -Be "L2"
+            $result.dag_node_created | Should -Be $true
+            $after = @(((Get-Content -LiteralPath $dagPath -Raw | ConvertFrom-Json).nodes)).Count
+            ($after - $before) | Should -Be 1
+            $result.dag_node_id | Should -Not -Be $null
+            $checkpointJson = Get-Content -LiteralPath $result.checkpoint_file -Raw | ConvertFrom-Json
+            $result.dag_discriminator | Should -Be $checkpointJson.session_id
+        } finally {
+            $env:PESTER_TEST = $oldPester
+            if ($hadDag) { $backup | Set-Content -LiteralPath $dagPath -Encoding UTF8 -ErrorAction SilentlyContinue }
+            elseif (Test-Path -LiteralPath $dagPath) { Remove-Item -LiteralPath $dagPath -Force -ErrorAction SilentlyContinue }
+        }
+    }
+
+    It "two mark runs yield distinct discriminators (no node reuse across escalations)" {
+        $params = @{ Mode = "mark"; UsagePercent = 45; Quiet = $true }
+        $first = (& (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null | ConvertFrom-Json -ErrorAction SilentlyContinue)
+        # session_id granularity is 1s (pre-existing checkpoint naming) — sleep past the boundary
+        Start-Sleep -Milliseconds 1100
+        $second = (& (Join-Path $PSScriptRoot "..\session-checkpoint.ps1") @params 2>$null | ConvertFrom-Json -ErrorAction SilentlyContinue)
+        $first.dag_discriminator | Should -Not -Be $null
+        $second.dag_discriminator | Should -Not -Be $null
+        $second.dag_discriminator | Should -Not -Be $first.dag_discriminator
     }
 }
