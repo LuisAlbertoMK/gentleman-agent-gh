@@ -30,13 +30,13 @@ Phase detail (relaxations, gates, skips) → reference. All phases persist via `
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "Skill without verification" | Doing work without checking output format | Output matches skill ## Output contract + file:line citaton |
-| "Save time skipping this skill" | Using skill directly without resolving deps | skill-graph resolution + cross-ref check |
-| "Output is self-evident" | No file:line or confidence marker | Cite file:line or flag confidence: unvalidated |
+| "4 files but still quick" | Files touched >3 | Count files; 4+ → STOP, escalate to full SDD pipeline |
+| "Schema change is tiny, quick covers it" | Any schema/auth/API diff | `git diff --stat` shows schema/auth/API → BLOCK, use full SDD |
+| "Skip verify to ship faster" | No verify report artifact | Proposal + verify report must persist (rule: skip intermediates only) |
 
 ## Red Flags
-- Doing work without checking output format → STOP, re-read skill
-- Second occurrence of same rationalization → force RED zone
+- ANY When-to-Use criterion fails but quick continues → STOP, escalate to full SDD (rule: BLOCK if ANY fails)
+- Commit without verify report → STOP, run Verify phase first
 
 ## Verification
 - Output matches skill ## Output contract + file:line citaton

@@ -29,6 +29,10 @@ Re-reads same content, re-states question, references unsaid→force YELLOW+L1. 
 ## Anti-Patterns
 Compress at RED · skip L1→L3 (destroys chain) · summarize stale instead of pruning (compounds drift)
 
+## Red Flags
+- YELLOW zone without L1 running → STOP, run `context-watchdog-check.ps1` + L1 now (rule 5 cadence)
+- Same file edited 3+ times without commit → STOP, summarize, commit, re-read (rule 4)
+
 ## Anti-Rationalization
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
