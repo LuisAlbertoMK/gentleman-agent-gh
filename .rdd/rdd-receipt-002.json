@@ -1,0 +1,56 @@
+{
+  "id": "rdd-receipt-002",
+  "freeze": "HEAD-20f516b4-e69de29b",
+  "freeze_note": "Freeze point = HEAD 20f516b4 del branch fix/credential-scan-fetch-depth ANTES de este commit. Diff hash e69de29b. Receipt generado EN CALIENTE, antes del merge.",
+  "tier": 1,
+  "tier_justification": "RDD SKILL Risk Tiers: Tier 1 = cambio pequeno sin auth/schema/API/deps. Este branch: 2 archivos de workflow (.github/workflows/ci.yml, .github/workflows/quality-gate.yml), +6/-0 lineas (solo agrega fetch-depth: 0 en 3 checkouts). No toca auth, schema, API ni dependencias.",
+  "files": [
+    ".github/workflows/ci.yml",
+    ".github/workflows/quality-gate.yml"
+  ],
+  "file_statuses": {
+    "deleted": [],
+    "modified": [
+      ".github/workflows/ci.yml",
+      ".github/workflows/quality-gate.yml"
+    ]
+  },
+  "lines_changed": 6,
+  "lines_deleted": 0,
+  "verdict": "PASS",
+  "verdict_note": "4R ejecutado (single review, tier 1) con veredicto PASS. lines_changed +6/-0. Sin fixes aplicados, sin blockers.",
+  "review": {
+    "status": "PASS",
+    "method": "code-review-agent 4R (single review, tier 1)",
+    "duration_ms": null,
+    "gate_output": "PASS",
+    "process_breach": false,
+    "gaps": []
+  },
+  "4r": {
+    "run": true,
+    "risk": 9,
+    "read": 9,
+    "rel": 9,
+    "res": 8,
+    "Risk": 9,
+    "Readability": 9,
+    "Reliability": 9,
+    "Resilience": 8,
+    "score": 8.8,
+    "method": "code-review-agent 4R (single review, tier 1)"
+  },
+  "fixes_applied": 0,
+  "blockers": [],
+  "process_blockers": [],
+  "escalation": "none",
+  "next": [
+    "Re-4R post-commit del receipt sobre el diff main...HEAD incluyendo .rdd/rdd-receipt-002.json",
+    "Verificar CI de GitHub (credential scan corriendo con fetch-depth: 0)"
+  ],
+  "auto_fix": false,
+  "retroactive": false,
+  "retroactive_note": "Receipt EN CALIENTE, redactado antes del merge — a diferencia del 001 que fue retroactivo post-ship.",
+  "notes": "Este branch es el residuo MINIMO de fix/ci-4r-followup-20260923 (que acumulo 3 rondas de blockers alrededor de scripts/gate-prep.ps1). Unico objetivo: restaurar el credential scan (fetch-depth: 0 porque el clone shallow hacia que los tests de scripts/tests/git-history-audit.Tests.ps1 no corrieran correctamente). Queda fuera a proposito: gate-prep.ps1 (incluye un prune destructivo PRE-EXISTENTE en main que borra markers trackeados), la falsificabilidad del marker, y las otras 2 causas de pester-tests rojo (update-opencode sin binario global, resource-optimization).",
+  "timestamp": "2026-09-23T12:04:31.2321491-06:00"
+}
