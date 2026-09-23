@@ -30,7 +30,7 @@ token_budget: 3000
 2. AST parse passes (`[Parser]::ParseFile` or `pwsh -c "Parse"`).
 3. Encoding edits: re-read `-Encoding UTF8`, no U+FFFD.
 4. Regex: test LF + CRLF samples.
-## Anti-Rationalization
+## Anti-Patterns & Rationalization
 | Rationalization | Red Flag | Check |
 |---|---|---|
 | "PS7-only, 5.1 rules legacy" | Skip chain/encoding rules | Hooks/CI may run PS5.1 (GAP-2 2026-09-01) |

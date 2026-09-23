@@ -38,7 +38,7 @@ Slice 2: ...
 5. **Review** — Log review per slice in task plan Review Log.
 ## Rollback
 Each slice commits independently. Revert slice N without touching N-1 or N+1.
-## Anti-Rationalization
+## Anti-Patterns & Rationalization
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
 | "One big commit is fine" | >400L or >1 logical unit in one commit | Slice Plan: 1 commit = 1 deliverable outcome |

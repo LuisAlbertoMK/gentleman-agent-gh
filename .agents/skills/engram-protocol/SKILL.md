@@ -4,6 +4,8 @@ description: "Persistent memory protocol — save, search, dreaming, session lif
 triggers: "remember, recall, engram, mem_save, mem_search, session close, dreaming, memory"
 token_budget: 2200
 ---
+> See [reference.md](docs/skills/engram-protocol/reference.md) for extended details, examples, and detailed patterns.
+
 ## Capture Pipeline
 Per turn: Fail→`mem_save(high,bugfix)`, Correction→`mem_save(normal,learning)`+immune-system, Decision→`mem_save(high,decision)`, Discovery→`mem_save(low,discovery)`.
 Batch: normal→every 3 turns, low→session-end, high→immediate.
