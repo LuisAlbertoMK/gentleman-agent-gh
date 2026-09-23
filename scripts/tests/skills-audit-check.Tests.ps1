@@ -135,6 +135,62 @@ Describe 'skills-audit-check.ps1' {
     ($r.Rules | Where-Object { $_.Rule -eq 'C3-no-bloat' }).Pass | Should -BeFalse
   }
 
+  It 'PASS A4: alias headings satisfy recalibrated structure' {
+    $root = Join-Path $TestDrive 'a4pass'
+    New-Item -ItemType Directory -Path $root -Force | Out-Null
+    $aliasSkill = @'
+---
+name: fixture-a4-pass
+description: "Fixture skill proving alias headings satisfy recalibrated A4."
+triggers: "fixture, alias headings"
+changelog: "2026-09-23 test fixture"
+token_budget: 2000
+---
+## Hard Rules
+Never invent heading names to satisfy a checklist.
+## Process
+Do fixture things in order.
+## Anti-Rationalization
+| Rationalization | Red Flag | Verification |
+|-----------------|----------|--------------|
+| "skip the check" | No output at all | Run check, STOP if empty |
+| "eyeball it" | No file:line cite | Cite file:line per finding |
+## Red Flags
+- Empty output with no error → STOP, re-run with -Verbose
+## Verification
+- `skills-audit-check.ps1 -SkillName fixture-a4-pass` exits 0
+→ docs/skills/fixture-a4-pass/reference.md · Cross-Refs: fixture-other
+'@
+    New-FixtureSkill -Root $root -Name 'fixture-a4-pass' -Content $aliasSkill -WithRefs
+    $r = Invoke-Audit -Root $root -Name 'fixture-a4-pass'
+    ($r.Rules | Where-Object { $_.Rule -eq 'A4-structure' }).Pass | Should -BeTrue
+    $r.AllPass | Should -BeTrue
+  }
+
+  It 'FAIL A4: thin skill without substantive sections' {
+    $root = Join-Path $TestDrive 'a4fail'
+    New-Item -ItemType Directory -Path $root -Force | Out-Null
+    $thinSkill = @'
+---
+name: fixture-a4-thin
+description: "Fixture thin skill with only meta headings, must fail A4."
+triggers: "fixture, thin skill"
+changelog: "2026-09-23 test fixture"
+token_budget: 2000
+---
+A thin skill with no substantive sections, only scaffolding.
+## Red Flags
+- Empty output with no error → STOP, re-run with -Verbose
+## Verification
+- `skills-audit-check.ps1 -SkillName fixture-a4-thin` exits 0
+→ docs/skills/fixture-a4-thin/reference.md · Cross-Refs: fixture-other
+'@
+    New-FixtureSkill -Root $root -Name 'fixture-a4-thin' -Content $thinSkill -WithRefs
+    $r = Invoke-Audit -Root $root -Name 'fixture-a4-thin'
+    ($r.Rules | Where-Object { $_.Rule -eq 'A4-structure' }).Pass | Should -BeFalse
+    $r.AllPass | Should -BeFalse
+  }
+
   It 'FAIL: missing SKILL.md fails all rules' {
     $root = Join-Path $TestDrive 'missing'
     New-Item -ItemType Directory -Path (Join-Path $root 'fixture-gone') -Force | Out-Null

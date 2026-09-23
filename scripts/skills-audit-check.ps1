@@ -83,7 +83,14 @@ function Test-AuditSkill {
   } else { Add-Rule 'A3-triggers' $false "triggers missing" }
 
   # A4: structural section + discoverability
-  $hasStruct = ($body -match '##\s+(When to Use|Workflow|Rules|Flow|4R|SCAN DIMENSIONS)')
+  # Recalibrated (R6-S0): ANY substantive h2 counts. The old 6-name allowlist
+  # (When to Use|Workflow|Rules|Flow|4R|SCAN DIMENSIONS) false-positived on legit
+  # aliases (## Hard Rules, ## Process, ## Decision Tree...). Meta/scaffolding
+  # h2s are excluded; h3 never counts (anchored ^## requires h2 level).
+  $metaHeads = 'Anti-Rationalization|Red Flags|Verification|Refs|Reference Materials'
+  $h2All = @([regex]::Matches($body, '(?m)^##\s+(.+?)\s*$'))
+  $substantive = @($h2All | ForEach-Object { $_.Groups[1].Value.Trim() } | Where-Object { $_ -notmatch "^(?:$metaHeads)$" })
+  $hasStruct = ($substantive.Count -ge 1)
   $hasRefsDir = Test-Path (Join-Path $SkillDir "references")
   $repoRoot = Split-Path (Split-Path $SkillsRoot -Parent) -Parent
   $docsRef = Join-Path (Join-Path $repoRoot "docs\skills") $dirName

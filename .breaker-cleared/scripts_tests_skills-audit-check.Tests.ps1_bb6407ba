@@ -12,7 +12,7 @@ Justificacion:
 - Hermeticidad: todo corre bajo `$TestDrive` (Pester); sin red, sin estado global, sin escritura
   fuera del sandbox del test.
 - JD 4R PASS sobre el target: 9/8/9/8 ([10/26] JD ya OK en este slice).
-- Pester: 13 Its verdes (`skills-audit-check.Tests.ps1`: 1 parse + 1 PASS 10/10 + 11 FAIL-contraste).
+- Pester: 14 Its verdes (`skills-audit-check.Tests.ps1`: 1 parse + 2 PASS (10/10 conforme + A4-alias) + 11 FAIL-contraste).
 - Precedente R1-S1 aceptado en Verify R1: `.breaker-cleared/tests_security-audit-mcp.Tests.ps1`
   (mismo patron `& $script:<path-derivado>`, legacy flat `/`->`_`).
 

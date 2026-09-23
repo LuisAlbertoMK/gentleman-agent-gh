@@ -9,7 +9,7 @@
 | A1 | Frontmatter `name` matches directory | `name: <dir>` exact | `A1-name` |
 | A2 | Frontmatter `description` non-empty, third-person, states what it does | ≥10 chars, no TODO/placeholder | `A2-description` |
 | A3 | Triggers discoverable | `triggers:` non-empty in frontmatter | `A3-triggers` |
-| A4 | Structure + discoverability | ≥1 structural section (`When to Use`/`Workflow`/`Rules`) AND (local `references/` OR `docs/skills/<name>/` OR `Cross-Refs`/`Refs` line) | `A4-structure` |
+| A4 | Structure + discoverability | ≥1 substantive `##` h2 (any name except meta: `Anti-Rationalization`/`Red Flags`/`Verification`/`Refs`/`Reference Materials`; h3 never counts) AND (local `references/` OR `docs/skills/<name>/` OR `Cross-Refs`/`Refs` line) | `A4-structure` |
 
 ## B. Addyosmani structure (anti-rationalization)
 
