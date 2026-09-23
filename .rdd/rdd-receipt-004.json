@@ -1,0 +1,50 @@
+{
+  "id": "rdd-receipt-004",
+  "freeze": "HEAD-8271f819-b733ed56",
+  "freeze_note": "Freeze point = merge 8271f819 (main) post-merge del PR #43 (rama fix/pester-resource-opt-20260923, commit b733ed56). Receipt post-merge: el draft pre-PR existia como rdd-receipt-003-slice2-draft fuera del repo y se renombro a 004 porque 003 ya lo ocupaba el slice 1 (PR #42).",
+  "tier": 1,
+  "tier_justification": "RDD SKILL Risk Tiers: Tier 1 = cambio pequeno sin auth/schema/API/deps. Este slice: solo scripts/tests/resource-optimization.Tests.ps1 (+5/-1, solo reescribe la asercion de snapshot del low profile). No toca runtime, workflows, auth, schema, API ni dependencias.",
+  "files": [
+    "scripts/tests/resource-optimization.Tests.ps1"
+  ],
+  "file_statuses": {
+    "deleted": [],
+    "modified": [
+      "scripts/tests/resource-optimization.Tests.ps1"
+    ]
+  },
+  "lines_changed": 5,
+  "lines_deleted": 1,
+  "verdict": "PASS",
+  "verdict_note": "Post-merge: PR #43 mergeado como 8271f819; CI pester-tests SUCCESS (run 35915016878). Suite resource-optimization 13/13 verde via run-ci-tests.ps1 (via StrictMode, igual que CI). Pre-commit gate 28/28 ALL CLEAR en el branch del slice. Sintaxis PS7 0 errores. 0 bytes no-ASCII.",
+  "review": {
+    "status": "PASS",
+    "method": "CI-log ground truth post-merge + reproduccion local por via CI (single review, tier 1)",
+    "duration_ms": null,
+    "gate_output": "PASS",
+    "process_breach": false,
+    "gaps": []
+  },
+  "4r": {
+    "run": true,
+    "Risk": 9,
+    "Readability": 9,
+    "Reliability": 9,
+    "Resilience": 8,
+    "score": 8.8,
+    "method": "single review, tier 1 (test-only, sin cambio runtime)"
+  },
+  "fixes_applied": 0,
+  "blockers": [],
+  "process_blockers": [],
+  "escalation": "none",
+  "next": [
+    "Verificar CI del PR del receipt-004 (solo .rdd/, sin codigo bajo test)",
+    "Merge lo hace el orquestador al final (no mergear esta rama)"
+  ],
+  "auto_fix": false,
+  "retroactive": true,
+  "retroactive_note": "Receipt post-merge: el contenido tecnico se redacto EN CALIENTE antes del PR (draft rdd-receipt-003-slice2-draft); el registro como 004 es posterior al merge 8271f819.",
+  "notes": "Root cause validado contra log CI (run 35908572266): PropertyNotFoundException 'enabled' en :29. low-resource.json usa snapshot bool mientras medium/high usan objeto; bajo Set-StrictMode (run-ci-tests.ps1:35) el acceso .enabled sobre bool es terminating y ?? no lo rescata. Hipotesis previa de memorias (JSON flaky) REFUTADA: es determinista. Fix solo-test que ramifica por tipo. Fixture intacto a proposito (cambiar el JSON shipped seria cambio runtime, fuera de scope). update-opencode:37 no tocado (slice hermano PR #42). Post-merge: PR #43 mergeado como 8271f819; pester-tests SUCCESS en CI run 35915016878.",
+  "timestamp": "2026-09-23T14:25:21.4603225-06:00"
+}
