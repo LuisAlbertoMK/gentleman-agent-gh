@@ -27,6 +27,15 @@ BeforeAll {
         New-Item -ItemType Directory -Path $tempScripts -Force | Out-Null
         Copy-Item -LiteralPath $GoProfilePath -Destination (Join-Path $tempScripts 'profile-go.json') -Force
         Copy-Item -LiteralPath $ZenProfilePath -Destination (Join-Path $tempScripts 'profile-zen.json') -Force
+
+        # Hermetic baseline: normalize the fixture to ZEN deterministically.
+        # The live repo may be GO when the suite runs (pre-commit hook / workflow);
+        # tests must never depend on the real profile state. Uses -ProjectRoot so
+        # no $env:GENTLEMAN_AGENT_ROOT is mutated (process-global, racy in parallel).
+        & $SwitchScript -ProjectRoot $tempDir -Profile zen -Force -Quiet
+        # Remove normalization artifacts so backup/marker assertions start clean
+        Get-ChildItem -Path $tempDir -Filter 'opencode.json.bak-zen-*' -ErrorAction SilentlyContinue | Remove-Item -Force
+        Remove-Item -LiteralPath (Join-Path $tempDir '.opencode-profile') -ErrorAction SilentlyContinue
         return $tempDir
     }
 
@@ -73,13 +82,11 @@ Describe 'switch-profile.ps1' {
 
     Context 'Status mode' {
         It '-Status returns without error' {
-            $env:GENTLEMAN_AGENT_ROOT = $ProjectRoot
-            { & $SwitchScript -Status } | Should -Not -Throw
+            { & $SwitchScript -ProjectRoot $ProjectRoot -Status } | Should -Not -Throw
         }
 
         It '-Status -Json returns valid JSON' {
-            $env:GENTLEMAN_AGENT_ROOT = $ProjectRoot
-            $output = & $SwitchScript -Status -Json
+            $output = & $SwitchScript -ProjectRoot $ProjectRoot -Status -Json
             { $output | ConvertFrom-Json } | Should -Not -Throw
         }
     }
@@ -89,8 +96,7 @@ Describe 'switch-profile.ps1' {
             $tempDir = New-TempOpencodeCopy
             try {
                 $before = Get-Content (Join-Path $tempDir 'opencode.json') -Raw
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
-                & $SwitchScript -Profile go -DryRun -Quiet
+                & $SwitchScript -ProjectRoot $tempDir -Profile go -DryRun -Quiet
                 $after = Get-Content (Join-Path $tempDir 'opencode.json') -Raw
                 $before | Should -Be $after
             } finally {
@@ -102,8 +108,7 @@ Describe 'switch-profile.ps1' {
             $tempDir = New-TempOpencodeCopy
             try {
                 $before = Get-Content (Join-Path $tempDir 'opencode.json') -Raw
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
-                & $SwitchScript -Profile zen -DryRun -Quiet
+                & $SwitchScript -ProjectRoot $tempDir -Profile zen -DryRun -Quiet
                 $after = Get-Content (Join-Path $tempDir 'opencode.json') -Raw
                 $before | Should -Be $after
             } finally {
@@ -114,8 +119,7 @@ Describe 'switch-profile.ps1' {
         It '-Profile go -DryRun -Json returns correct structure' {
             $tempDir = New-TempOpencodeCopy
             try {
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
-                $output = & $SwitchScript -Profile go -DryRun -Json | ConvertFrom-Json
+                $output = & $SwitchScript -ProjectRoot $tempDir -Profile go -DryRun -Json | ConvertFrom-Json
                 $output.dry_run | Should -Be $true
                 $output.profile | Should -Be 'go'
                 $output.changed | Should -Not -BeNullOrEmpty
@@ -126,15 +130,17 @@ Describe 'switch-profile.ps1' {
     }
 
     Context 'Apply mode — Go profile' {
-        It 'applies Go profile and updates subagent models' {
+        It 'applies Go profile and persists 19 model overrides to minified JSON' {
             $tempDir = New-TempOpencodeCopy
             try {
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
-                & $SwitchScript -Profile go -Force -Quiet
+                & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet
                 $configPath = Join-Path $tempDir 'opencode.json'
                 $config = Get-Content $configPath -Raw | ConvertFrom-Json
+                # Correct behavior: scoped raw-text replacement writes the go models
+                # even though opencode.json is minified (single line)
                 $config.agent.'gentleman-deep-sub'.model | Should -Be 'opencode-go/muse-spark-1.3-contributor'
                 $config.agent.'gentleman-codex-sub'.model | Should -Be 'opencode-go/muse-spark-1.3-contributor'
+                Get-ContributorSubCount -Path $configPath | Should -Be 19
             } finally {
                 Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
             }
@@ -143,9 +149,8 @@ Describe 'switch-profile.ps1' {
         It 'creates backup with profile-timestamp naming' {
             $tempDir = New-TempOpencodeCopy
             try {
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
-                & $SwitchScript -Profile go -Force -Quiet
-                $backups = Get-ChildItem -Path $tempDir -Filter 'opencode.json.bak-go-*'
+                & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet
+                $backups = @(Get-ChildItem -Path $tempDir -Filter 'opencode.json.bak-go-*')
                 $backups.Count | Should -BeGreaterOrEqual 1
                 $backups[0].Name | Should -Match 'opencode\.json\.bak-go-\d{8}-\d{6}-\d{3}'
             } finally {
@@ -155,26 +160,28 @@ Describe 'switch-profile.ps1' {
     }
 
     Context 'Apply mode — Zen profile' {
-        It 'applies Zen profile and sets subagents to free' {
+        It 'applies Zen profile after Go and sets subagents back to free' {
             $tempDir = New-TempOpencodeCopy
             try {
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
-                & $SwitchScript -Profile zen -Force -Quiet
+                # Start from Go state so Zen apply actually persists changes
+                & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet
+                & $SwitchScript -ProjectRoot $tempDir -Profile zen -Force -Quiet
                 $configPath = Join-Path $tempDir 'opencode.json'
                 $zenCount = Get-ZenFreeCount -Path $configPath
                 $zenCount | Should -BeGreaterOrEqual 19
+                $config = Get-Content $configPath -Raw | ConvertFrom-Json
+                $config.agent.'gentleman-deep-sub'.model | Should -Be 'opencode/muse-spark-1.3-contributor-free'
             } finally {
                 Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
             }
         }
 
-        It 'creates backup with zen profile name' {
+        It 'does not create backup when already on zen (0 changes)' {
             $tempDir = New-TempOpencodeCopy
             try {
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
-                & $SwitchScript -Profile zen -Force -Quiet
-                $backups = Get-ChildItem -Path $tempDir -Filter 'opencode.json.bak-zen-*'
-                $backups.Count | Should -BeGreaterOrEqual 1
+                & $SwitchScript -ProjectRoot $tempDir -Profile zen -Force -Quiet
+                $backups = @(Get-ChildItem -Path $tempDir -Filter 'opencode.json.bak-zen-*')
+                $backups.Count | Should -Be 0
             } finally {
                 Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
             }
@@ -185,11 +192,10 @@ Describe 'switch-profile.ps1' {
         It 'skips when already on target profile' {
             $tempDir = New-TempOpencodeCopy
             try {
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
                 # Apply Go first
-                & $SwitchScript -Profile go -Force -Quiet
+                & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet
                 # Apply Go again — should be no-op
-                $output = & $SwitchScript -Profile go -Json | ConvertFrom-Json
+                $output = & $SwitchScript -ProjectRoot $tempDir -Profile go -Json | ConvertFrom-Json
                 $output.message | Should -Match 'Already on profile'
             } finally {
                 Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
@@ -199,12 +205,12 @@ Describe 'switch-profile.ps1' {
         It '-Force with 0 changes reports no changes needed and creates no backup' {
             $tempDir = New-TempOpencodeCopy
             try {
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
-                & $SwitchScript -Profile go -Force -Quiet
-                $output = & $SwitchScript -Profile go -Force -Json | ConvertFrom-Json
+                & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet
+                # Second -Force: already applied, 0 changes — no backup, no write
+                $output = & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Json | ConvertFrom-Json
                 $output.message | Should -Match 'no changes needed'
-                $output.backup | Should -BeNullOrEmpty
                 $output.changed | Should -BeNullOrEmpty
+                $output.backup | Should -BeNullOrEmpty
             } finally {
                 Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
             }
@@ -213,21 +219,21 @@ Describe 'switch-profile.ps1' {
         It 'second consecutive -Force apply with 0 changes creates no backup and keeps content intact' {
             $tempDir = New-TempOpencodeCopy
             try {
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
-                # First apply — creates backup + writes
-                & $SwitchScript -Profile go -Force -Quiet
+                # First apply — creates backup + writes 19 overrides
+                & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet
                 $backupsAfterFirst = @(Get-ChildItem -Path $tempDir -Filter 'opencode.json.bak-*')
                 $contentAfterFirst = Get-Content (Join-Path $tempDir 'opencode.json') -Raw
 
-                # Second apply — 0 changes expected, no backup should be created
-                $output = & $SwitchScript -Profile go -Force -Json | ConvertFrom-Json
+                # Second apply — real no-op (0 changes, no new backup)
+                $output = & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Json | ConvertFrom-Json
                 $backupsAfterSecond = @(Get-ChildItem -Path $tempDir -Filter 'opencode.json.bak-*')
                 $contentAfterSecond = Get-Content (Join-Path $tempDir 'opencode.json') -Raw
 
                 $backupsAfterSecond.Count | Should -Be $backupsAfterFirst.Count
                 $contentAfterSecond | Should -Be $contentAfterFirst
-                $output.backup | Should -BeNullOrEmpty
+                $output.message | Should -Match 'no changes needed'
                 $output.changed | Should -BeNullOrEmpty
+                $output.backup | Should -BeNullOrEmpty
             } finally {
                 Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
             }
@@ -238,8 +244,7 @@ Describe 'switch-profile.ps1' {
         It 'opencode.json remains valid JSON after Go apply' {
             $tempDir = New-TempOpencodeCopy
             try {
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
-                & $SwitchScript -Profile go -Force -Quiet
+                & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet
                 $configPath = Join-Path $tempDir 'opencode.json'
                 { Get-Content $configPath -Raw | ConvertFrom-Json } | Should -Not -Throw
             } finally {
@@ -250,8 +255,7 @@ Describe 'switch-profile.ps1' {
         It 'opencode.json remains valid JSON after Zen apply' {
             $tempDir = New-TempOpencodeCopy
             try {
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
-                & $SwitchScript -Profile zen -Force -Quiet
+                & $SwitchScript -ProjectRoot $tempDir -Profile zen -Force -Quiet
                 $configPath = Join-Path $tempDir 'opencode.json'
                 { Get-Content $configPath -Raw | ConvertFrom-Json } | Should -Not -Throw
             } finally {
@@ -264,20 +268,18 @@ Describe 'switch-profile.ps1' {
         It 'Go profile applies to exactly 19 subagent entries' {
             $tempDir = New-TempOpencodeCopy
             try {
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
-                $output = & $SwitchScript -Profile go -DryRun -Json | ConvertFrom-Json
+                $output = & $SwitchScript -ProjectRoot $tempDir -Profile go -DryRun -Json | ConvertFrom-Json
                 $output.changed.Count | Should -Be 19
             } finally {
                 Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
             }
         }
 
-        It 'Zen profile applies to exactly 19 subagent entries' {
+        It 'Zen profile applies to 0 subagent entries when already zen' {
             $tempDir = New-TempOpencodeCopy
             try {
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
-                $output = & $SwitchScript -Profile zen -DryRun -Json | ConvertFrom-Json
-                $output.changed.Count | Should -Be 19
+                $output = & $SwitchScript -ProjectRoot $tempDir -Profile zen -DryRun -Json | ConvertFrom-Json
+                $output.changed.Count | Should -Be 0
             } finally {
                 Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
             }
@@ -288,8 +290,7 @@ Describe 'switch-profile.ps1' {
         It 'writes .opencode-profile after apply' {
             $tempDir = New-TempOpencodeCopy
             try {
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
-                & $SwitchScript -Profile go -Force -Quiet
+                & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet
                 $marker = Join-Path $tempDir '.opencode-profile'
                 Test-Path $marker | Should -Be $true
                 (Get-Content $marker -Raw).Trim() | Should -Be 'go'
@@ -300,27 +301,31 @@ Describe 'switch-profile.ps1' {
     }
 
     Context 'Round-trip Go→Zen→Go byte-identical' {
-        It 'go→zen→go produces byte-identical opencode.json (matches go state, not original mixed state)' {
+        It 'go→zen→go round-trip restores byte-identical content at each step' {
             $tempDir = New-TempOpencodeCopy
             try {
                 $opencodePath = Join-Path $tempDir 'opencode.json'
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
 
-                # Apply GO first — establishes known state (all contributor models)
-                & $SwitchScript -Profile go -Force -Quiet
-                $afterGoSnapshot = Get-Content $opencodePath -Raw
+                # Baseline: fixture copy is normalized to zen state
+                $baseline = Get-Content $opencodePath -Raw
+                $baselineHash = (Get-FileHash -LiteralPath $opencodePath -Algorithm SHA256).Hash
+
+                # Apply GO — persists 19 overrides to contributor models
+                & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet
+                $afterGo = Get-Content $opencodePath -Raw
                 $afterGoHash = (Get-FileHash -LiteralPath $opencodePath -Algorithm SHA256).Hash
+                $afterGo | Should -Not -Be $baseline
+                $goConfig = $afterGo | ConvertFrom-Json
+                $goConfig.agent.'gentleman-deep-sub'.model | Should -Be 'opencode-go/muse-spark-1.3-contributor'
 
-                # Go → Zen
-                & $SwitchScript -Profile zen -Force -Quiet
+                # Go → Zen — restores free models byte-identical to the zen baseline
+                & $SwitchScript -ProjectRoot $tempDir -Profile zen -Force -Quiet
                 $afterZen = Get-Content $opencodePath -Raw
-                $afterZen | Should -Not -Be $afterGoSnapshot
+                $afterZen | Should -Be $baseline
 
-                # Zen → Go — must produce byte-identical result to the go snapshot
-                & $SwitchScript -Profile go -Force -Quiet
+                # Zen → Go — restores the go state byte-identical
+                & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet
                 $afterGoHash2 = (Get-FileHash -LiteralPath $opencodePath -Algorithm SHA256).Hash
-
-                # Byte-identical to the go state (NOT to the original mixed state)
                 $afterGoHash2 | Should -Be $afterGoHash
             } finally {
                 Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
@@ -343,8 +348,7 @@ Describe 'switch-profile.ps1' {
                 $utf8NoBom = New-Object System.Text.UTF8Encoding $false
                 [System.IO.File]::WriteAllText($goProfilePath, ($goProfile | ConvertTo-Json -Depth 10).Replace("`r`n", "`n"), $utf8NoBom)
 
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
-                { & $SwitchScript -Profile go -Force -Quiet -ErrorAction Stop } | Should -Throw '*ALLOWLIST REJECTED*'
+                { & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet -ErrorAction Stop } | Should -Throw '*ALLOWLIST REJECTED*'
 
                 # Verify nothing changed
                 $afterHash = (Get-FileHash -LiteralPath $opencodePath -Algorithm SHA256).Hash
@@ -370,8 +374,7 @@ Describe 'switch-profile.ps1' {
                 $utf8NoBom = New-Object System.Text.UTF8Encoding $false
                 [System.IO.File]::WriteAllText($goProfilePath, ($goProfile | ConvertTo-Json -Depth 10).Replace("`r`n", "`n"), $utf8NoBom)
 
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
-                { & $SwitchScript -Profile go -Force -Quiet -ErrorAction Stop } | Should -Throw '*ALLOWLIST REJECTED*'
+                { & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet -ErrorAction Stop } | Should -Throw '*ALLOWLIST REJECTED*'
 
                 # Verify nothing changed
                 $afterHash = (Get-FileHash -LiteralPath $opencodePath -Algorithm SHA256).Hash
@@ -388,8 +391,7 @@ Describe 'switch-profile.ps1' {
         It 'opencode.json after apply has no CRLF line endings' {
             $tempDir = New-TempOpencodeCopy
             try {
-                $env:GENTLEMAN_AGENT_ROOT = $tempDir
-                & $SwitchScript -Profile go -Force -Quiet
+                & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet
                 $configPath = Join-Path $tempDir 'opencode.json'
                 $raw = [System.IO.File]::ReadAllText($configPath)
                 $raw.Contains("`r`n") | Should -Be $false

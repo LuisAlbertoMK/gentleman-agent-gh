@@ -20,6 +20,10 @@
     Suppress informational output.
 .PARAMETER Json
     Output results as JSON instead of text.
+.PARAMETER ProjectRoot
+    Override the project root (where opencode.json + scripts/opencode-configs live)
+    instead of resolving via $env:GENTLEMAN_AGENT_ROOT / walk-up. Used by hermetic
+    test fixtures; default resolution is unchanged when omitted.
 .EXAMPLE
     .\switch-profile.ps1 -Status
     .\switch-profile.ps1 -Profile go -DryRun -Json
@@ -42,7 +46,10 @@ param(
 
     [switch]$Quiet,
 
-    [switch]$Json
+    [switch]$Json,
+
+    [Parameter()]
+    [string]$ProjectRoot
 )
 
 Set-StrictMode -Version Latest
@@ -50,6 +57,11 @@ $ErrorActionPreference = 'Stop'
 
 # --- Resolve project root ---
 function Get-GentlemanProjectRoot {
+    # Explicit -ProjectRoot override wins (hermetic fixtures; no env dependence)
+    if ($ProjectRoot) {
+        if (Test-Path $ProjectRoot) { return (Resolve-Path $ProjectRoot).Path }
+        throw "ProjectRoot not found: $ProjectRoot"
+    }
     $root = $env:GENTLEMAN_AGENT_ROOT
     if ($root -and (Test-Path $root)) { return $root }
     # Fallback: walk up from script location
@@ -238,6 +250,41 @@ while (Test-Path $backupPath) {
 }
 $backupName = Split-Path -Leaf $backupPath
 
+# --- Scoped agent-object span locator (minified-JSON safe) ---
+# Finds the byte span of "<agentName>":{ ... } on the raw text by brace-depth
+# scanning (string-aware), so replacement never leaks outside the agent object.
+function Get-AgentObjectSpan {
+    param(
+        [string]$Raw,
+        [string]$AgentName
+    )
+    $needle = '"' + $AgentName + '":{'
+    $start = $Raw.IndexOf($needle, [StringComparison]::Ordinal)
+    if ($start -lt 0) { return $null }
+    $objStart = $start + $needle.Length - 1
+    $depth = 0
+    $inString = $false
+    $escaped = $false
+    for ($i = $objStart; $i -lt $Raw.Length; $i++) {
+        $ch = $Raw[$i]
+        if ($inString) {
+            if ($escaped) { $escaped = $false }
+            elseif ($ch -eq '\') { $escaped = $true }
+            elseif ($ch -eq '"') { $inString = $false }
+        } else {
+            if ($ch -eq '"') { $inString = $true }
+            elseif ($ch -eq '{') { $depth++ }
+            elseif ($ch -eq '}') {
+                $depth--
+                if ($depth -eq 0) {
+                    return @{ Start = $objStart; End = $i }
+                }
+            }
+        }
+    }
+    return $null
+}
+
 # --- Apply changes via ShouldProcess ---
 if ($PSCmdlet.ShouldProcess($OpencodeJsonPath, "Apply $Profile profile ($($changes.Count) model overrides)")) {
     $backupCreated = $null
@@ -265,82 +312,77 @@ if ($PSCmdlet.ShouldProcess($OpencodeJsonPath, "Apply $Profile profile ($($chang
             Write-Host "Backup: $backupName" -ForegroundColor Gray
         }
 
-        # Apply model overrides
-        foreach ($change in $changes) {
-            $config.agent.($change.agent).model = $change.to
-        }
-
-        # Write back — targeted in-place replacement to preserve exact formatting/bytes
-        # (ConvertTo-Json reformats JSON, breaking byte-identical round-trips)
+        # Apply model overrides — scoped raw-text replacement (minified-JSON safe).
+        # Locates the agent object span ("<agent>":{ ... }) and replaces the FIRST
+        # "model":"..." inside it, preserving every other byte (no reformatting).
+        # Fail-closed: throws if any expected replacement cannot be applied.
         $rawContent = [System.IO.File]::ReadAllText($OpencodeJsonPath) -replace "`r`n", "`n"
-        $lines = $rawContent -split "`n"
+        $applied = 0
         foreach ($change in $changes) {
-            $agentPattern = '"' + [regex]::Escape($change.agent) + '":\s*\{'
-            $agentIdx = -1
-            for ($i = 0; $i -lt $lines.Count; $i++) {
-                if ($lines[$i] -match $agentPattern) {
-                    $agentIdx = $i
-                    break
-                }
+            $span = Get-AgentObjectSpan -Raw $rawContent -AgentName $change.agent
+            if ($null -eq $span) {
+                throw "APPLY FAILED: agent object '$($change.agent)' not found in opencode.json"
             }
-            if ($agentIdx -ge 0) {
-                for ($j = $agentIdx + 1; $j -lt [Math]::Min($agentIdx + 20, $lines.Count); $j++) {
-                    if ($lines[$j] -match '"model":\s*"') {
-                        $lines[$j] = $lines[$j].Replace($change.from, $change.to)
-                        break
-                    }
-                }
+            $spanText = $rawContent.Substring($span.Start, $span.End - $span.Start + 1)
+            $modelMatch = [regex]::Match($spanText, '"model":"([^"]*)"')
+            if (-not $modelMatch.Success) {
+                throw "APPLY FAILED: no model key found in agent object '$($change.agent)'"
             }
+            $oldValue = $modelMatch.Groups[1].Value
+            if ($oldValue -ne $change.from) {
+                throw "APPLY FAILED: agent '$($change.agent)' expected current model '$($change.from)' but raw text has '$oldValue'"
+            }
+            $newSpanText = $spanText.Substring(0, $modelMatch.Index) + '"model":"' + $change.to + '"' + $spanText.Substring($modelMatch.Index + $modelMatch.Length)
+            $rawContent = $rawContent.Substring(0, $span.Start) + $newSpanText + $rawContent.Substring($span.End + 1)
+            $applied++
         }
-        $newContent = $lines -join "`n"
+        if ($applied -ne $changes.Count) {
+            throw "APPLY FAILED: expected $($changes.Count) replacements, applied $applied"
+        }
         $utf8NoBom = New-Object System.Text.UTF8Encoding $false
-        [System.IO.File]::WriteAllText($OpencodeJsonPath, $newContent, $utf8NoBom)
+        [System.IO.File]::WriteAllText($OpencodeJsonPath, $rawContent, $utf8NoBom)
 
-        # Post-write validation (symmetric: Go + Zen)
-        try {
-            $verify = Get-Content $OpencodeJsonPath -Raw | ConvertFrom-Json
-            $verifyAgentKeys = @($verify.agent.PSObject.Properties.Name)
-            $verifySubagentKeys = $verifyAgentKeys | Where-Object { $_ -match '-sub(-auto)?$' }
-            $verifyFreeCount = @($verifySubagentKeys | Where-Object {
-                $m = $verify.agent.$_.model
-                $m -and $m -match 'contributor-free$'
-            }).Count
-            $verifyContributorCount = @($verifySubagentKeys | Where-Object {
-                $m = $verify.agent.$_.model
-                $m -and $m -match 'muse-spark-1\.3-contributor$'
-            }).Count
-            $verifyDeepseekCount = @($verifySubagentKeys | Where-Object {
-                $m = $verify.agent.$_.model
-                $m -and $m -match 'deepseek'
-            }).Count
-            $verifyMimoCount = @($verifySubagentKeys | Where-Object {
-                $m = $verify.agent.$_.model
-                $m -and $m -match 'mimo'
-            }).Count
-            $verifyQwenCount = @($verifySubagentKeys | Where-Object {
-                $m = $verify.agent.$_.model
-                $m -and $m -match 'qwen'
-            }).Count
-            if ($Profile -eq 'zen' -and $verifyFreeCount -lt 19) {
-                Write-Warning "Post-write validation: expected >= 19 zen-free agents, found $verifyFreeCount"
+        # Post-write validation — FAIL-CLOSED gate (throw on mismatch, no silent warnings)
+        $verify = Get-Content $OpencodeJsonPath -Raw | ConvertFrom-Json
+        $verifyAgentKeys = @($verify.agent.PSObject.Properties.Name)
+        $verifySubagentKeys = $verifyAgentKeys | Where-Object { $_ -match '-sub(-auto)?$' }
+        $verifyFreeCount = @($verifySubagentKeys | Where-Object {
+            $m = $verify.agent.$_.model
+            $m -and $m -match 'contributor-free$'
+        }).Count
+        $verifyContributorCount = @($verifySubagentKeys | Where-Object {
+            $m = $verify.agent.$_.model
+            $m -and $m -match 'muse-spark-1\.3-contributor$'
+        }).Count
+        $verifyDeepseekCount = @($verifySubagentKeys | Where-Object {
+            $m = $verify.agent.$_.model
+            $m -and $m -match 'deepseek'
+        }).Count
+        $verifyMimoCount = @($verifySubagentKeys | Where-Object {
+            $m = $verify.agent.$_.model
+            $m -and $m -match 'mimo'
+        }).Count
+        $verifyQwenCount = @($verifySubagentKeys | Where-Object {
+            $m = $verify.agent.$_.model
+            $m -and $m -match 'qwen'
+        }).Count
+        if ($Profile -eq 'zen' -and $verifyFreeCount -lt 19) {
+            throw "Post-write validation FAILED: expected >= 19 zen-free agents, found $verifyFreeCount"
+        }
+        if ($Profile -eq 'go') {
+            if ($verifyDeepseekCount -ne 0) {
+                throw "Post-write validation FAILED: expected 0 deepseek-sub agents for Go, found $verifyDeepseekCount"
             }
-            if ($Profile -eq 'go') {
-                if ($verifyDeepseekCount -ne 0) {
-                    Write-Warning "Post-write validation: expected 0 deepseek-sub agents for Go, found $verifyDeepseekCount"
-                }
-                if ($verifyMimoCount -ne 0) {
-                    Write-Warning "Post-write validation: expected 0 mimo-sub agents for Go, found $verifyMimoCount"
-                }
-                if ($verifyQwenCount -ne 0) {
-                    Write-Warning "Post-write validation: expected 0 qwen-sub agents for Go, found $verifyQwenCount"
-                }
-                # 5 subs intentionally free-tier (quick/frontend/datascience/docs/quick-auto) per JD pto 1 + cost proposal
-                if ($verifyContributorCount -lt 19) {
-                    Write-Warning "Post-write validation: expected >= 19 muse-spark-contributor-sub agents for Go, found $verifyContributorCount"
-                }
+            if ($verifyMimoCount -ne 0) {
+                throw "Post-write validation FAILED: expected 0 mimo-sub agents for Go, found $verifyMimoCount"
             }
-        } catch {
-            Write-Warning "Post-write JSON validation failed: $_"
+            if ($verifyQwenCount -ne 0) {
+                throw "Post-write validation FAILED: expected 0 qwen-sub agents for Go, found $verifyQwenCount"
+            }
+            # 5 subs intentionally free-tier (quick/frontend/datascience/docs/quick-auto) per JD pto 1 + cost proposal
+            if ($verifyContributorCount -lt 19) {
+                throw "Post-write validation FAILED: expected >= 19 muse-spark-contributor-sub agents for Go, found $verifyContributorCount"
+            }
         }
     }
 
