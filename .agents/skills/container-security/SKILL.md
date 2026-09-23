@@ -50,7 +50,7 @@ Reviewing Dockerfiles, docker-compose, K8s manifests, Helm charts, or "is this c
 - Second occurrence of same rationalization → force RED zone
 
 ## Verification
-- grep -rn process.env + npm audit before commit
+- grep -rn `process.env` + npm audit before commit
 - cross-ref-check.ps1 → SKILL.md OK
 ## Containers/IaC Playbook
 Image: non-root USER 10001 + runAsNonRoot + readOnlyRootFilesystem
@@ -63,7 +63,6 @@ Caps: drop ALL + add min | cap-add individual FORBIDDEN: NET_ADMIN, SYS_MODULE, 
 ## Refs
 security-scanner · best-practices · quality-gate · auth-hardening · llm-security · infra-audit
 ---
-
 docs/skills/container-security/reference.md
 ---
 

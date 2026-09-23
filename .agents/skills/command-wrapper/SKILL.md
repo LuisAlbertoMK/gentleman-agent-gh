@@ -30,7 +30,12 @@ Every bash command MUST include: 1. **Description**: 5-10 words. 2. **Error hand
 - If output exceeds context limits → save to file, read relevant portions
 
 ## SAFETY WRAPPERS
-Destructive commands → BLOCK (ask required): `git push --force`, `rm -rf`. `git commit` → quality gate first.
+Destructive commands → BLOCK (ask required). Example — commands that require explicit approval before any run:
+```bash
+git push --force
+rm -rf <path>
+```
+`git commit` → quality gate first.
 
 ## PRE-EXEC
 side-effects>scripts/pre-exec-review.ps1 -Command (-Mode strict)
@@ -44,12 +49,12 @@ After critical commands, log to Engram: `title:"Command: {summary}" type:discove
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "destructivo sin -WhatIf" | rm -rf / git push --force sin safety wrapper | bloquear destructivo o usar -WhatIf + quality gate file:line |
+| "destructivo sin -WhatIf" | rm -rf <path> o force-push sin safety wrapper | bloquear destructivo o usar -WhatIf + quality gate file:line |
 | "output sin parsear se pierde" | output con warnings+results sin parsear | trim + parse JSON/table + extraer warnings y results file:line |
 | "ignorar exit code" | exit code ≠0 sin diagnosticar stderr | check exit code + parse stderr patterns file:line |
 
 ## Red Flags
-- Doing work without checking output format → STOP, re-read skill
+- Doing work before checking output format → STOP, re-read skill
 - Second occurrence of same rationalization → force RED zone
 
 ## Verification
