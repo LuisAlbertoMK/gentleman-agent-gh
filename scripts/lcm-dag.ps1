@@ -17,7 +17,8 @@
 
     PESTER_TEST=1 skips persistence (in-memory only).
 .NOTES
-    ADR: Dag is per-cycle (cycle id from inter-track.json if present). GC not yet.
+    ADR: Dag is per-cycle (cycle id from inter-track.json if present).
+    GC: Remove-LcmOldCycles prunes non-current cycles, fail-closed when cycle unknown.
     Part 3 will wire to context-watchdog.ps1 auto-escalation.
 #>
 [CmdletBinding(DefaultParameterSetName = 'Add')]
@@ -104,6 +105,56 @@ function Add-LcmNode {
         $dag | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $Path -Encoding UTF8
     }
     return $node
+}
+
+function Remove-LcmOldCycles {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '', Justification = 'Bulk GC prunes ALL old cycles; plural is semantically correct (Ronda4 S1 plan-mandated name)')]
+    param(
+        [string]$Path = $DagPath,
+        [string]$KeepCycle,
+        [string]$InterTrackPath = (Join-Path $repoRoot '.learnings/inter-track.json')
+    )
+    # Retention watermark: current cycle id, best-effort (same pattern as Initialize-LcmDag).
+    $currentCycle = $KeepCycle
+    if (-not $currentCycle) {
+        try { $currentCycle = (Get-Content $InterTrackPath -Raw | ConvertFrom-Json).cycle.id } catch {
+            # inter-track.json optional — without it the current cycle is unknown, swallow is intentional
+            Write-Debug "what failed: $($_.Exception.Message)"
+        }
+    }
+    if (-not $currentCycle) {
+        # FAIL-CLOSED: without a known current cycle, old is indistinguishable from
+        # current → no-op. Read-only: never creates or modifies the DAG file here.
+        Write-Verbose 'Remove-LcmOldCycles: current cycle unknown — no-op (fail-closed, nothing deleted)'
+        $keptCount = 0
+        if (Test-Path -LiteralPath $Path) { $keptCount = @((Get-Content $Path -Raw | ConvertFrom-Json).nodes).Count }
+        return [PSCustomObject]@{ keepCycle = $null; kept = $keptCount; pruned = 0; prunedIds = @(); path = $Path; noOp = $true }
+    }
+    $dag = Get-LcmDag -Path $Path
+    $keptIds = [System.Collections.Generic.HashSet[string]]::new()
+    $kept = @()
+    $prunedIds = @()
+    foreach ($n in @($dag.nodes)) {
+        # Fail-closed per node: prune ONLY when the node carries a cycle AND it differs
+        # from current. Nodes without a cycle predate cycle tracking — kept, never
+        # delete on suspicion.
+        if ($n.cycle -and ($n.cycle -ne $currentCycle)) { $prunedIds += $n.id }
+        else { $kept += $n; [void]$keptIds.Add([string]$n.id) }
+    }
+    $edges = @(@($dag.edges) | Where-Object { $keptIds.Contains([string]$_.from) -and $keptIds.Contains([string]$_.to) })
+    $result = [PSCustomObject]@{
+        keepCycle = $currentCycle; kept = $kept.Count; pruned = $prunedIds.Count
+        prunedIds = $prunedIds; path = $Path; noOp = ($prunedIds.Count -eq 0)
+    }
+    if (($env:PESTER_TEST -eq '1') -or (-not $PSCmdlet.ShouldProcess($Path, ("prune {0} node(s) from older cycles (keep {1})" -f $prunedIds.Count, $currentCycle)))) {
+        return $result
+    }
+    $dag.nodes = @($kept)
+    $dag.edges = @($edges)
+    if ($dag.meta) { $dag.meta.cycle = $currentCycle }
+    $dag | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $Path -Encoding UTF8
+    return $result
 }
 
 function Get-LcmNode {

@@ -57,7 +57,22 @@ Write-Host "watchdog: $pct% ($CurrentTokens/$Budget) — $Reason — escalate to
 $created = $false
 $node = $null
 if ($env:PESTER_TEST -ne '1') {
-    $node = Add-LcmNode -Level $escalationLevel -Content $Content -Pointer $Pointer
+    # Parent-chain (Ronda 4 S1): chain to the last node of the current cycle so
+    # edges[] form parent→child. Best-effort: lookup failure → $null parent (same as before).
+    $parentId = $null
+    try {
+        $chainDag = Get-LcmDag
+        $chainCycle = $null
+        try { $chainCycle = (Get-Content (Join-Path $repoRoot '.learnings/inter-track.json') -Raw | ConvertFrom-Json).cycle.id } catch {
+            Write-Debug "what failed: $($_.Exception.Message)"
+        }
+        $chainNodes = @($chainDag.nodes)
+        if ($chainCycle) { $chainNodes = @($chainNodes | Where-Object { $_.cycle -eq $chainCycle }) }
+        if ($chainNodes.Count -gt 0) { $parentId = $chainNodes[-1].id }
+    } catch {
+        Write-Debug "parent-chain lookup failed: $($_.Exception.Message)"
+    }
+    $node = Add-LcmNode -Level $escalationLevel -Content $Content -Pointer $Pointer -ParentId $parentId
     $created = $true
     Write-Host "  DAG node: $($node.id) ($escalationLevel, $($node.tokens) tokens, pointer: $($Pointer ?? '—'))" -ForegroundColor Cyan
 } else {
