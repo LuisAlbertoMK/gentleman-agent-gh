@@ -2,7 +2,7 @@
 
 ## What is this?
 
-**Gentleman Agent** is an **AI software development team** for OpenCode. Instead of a single chatbot, you get 49 specialized agents working together:
+**Gentleman Agent** is an **AI software development team** for OpenCode. Instead of a single chatbot, you get 58 specialized agents working together:
 
 - 🏗️ **Lead Architect** — Senior Architect mentor solving complex tasks
 - 🔒 **Specialists** — Security, performance, frontend, etc. consultants (FREE TIER)
@@ -15,11 +15,11 @@
 
 ---
 
-Suite of **92 skills** (+ `_shared`) + **128 top-level scripts** (121 PowerShell + 7 shell) for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
+Suite of **96 skills** (+ `_shared`) + **136 top-level scripts** (129 PowerShell + 7 shell) for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
 > **Score**: 9.6/10 (14 dimensions) — tracking in .project.json.
-> **Skills**: 92 (+ `_shared`)
+> **Skills**: 96 (+ `_shared`)
 > **Cycle**: 31 (active) — CA fidelity + G4-G8 remediation
 
 ---
@@ -204,7 +204,7 @@ The project uses two MCPs for cross-session memory:
 
 | Scope | Count | Reference |
 |-------|-------|-----------|
-| Skills | 92 specialized skills for analysis, security, testing, docs, and more | See [SKILLS-INDEX.md](SKILLS-INDEX.md) for full trigger table |
+| Skills | 96 specialized skills for analysis, security, testing, docs, and more | See [SKILLS-INDEX.md](SKILLS-INDEX.md) for full trigger table |
 
 ---
 
@@ -320,12 +320,12 @@ Typical workflow — dry run first, then real sync:
 
 ```
 gentleman-agent-gh/
-├── .agents/skills/          # 92 skills + _shared (canonical, git-tracked)
+├── .agents/skills/          # 96 skills + _shared (canonical, git-tracked)
 │   ├── quality-gate/
 │   ├── code-review-agent/
 │   └── .../
 ├── skills/                  # Junctions workspace (git-ignored)
-├── scripts/                 # 128 top-level scripts (121 PowerShell + 7 shell)
+├── scripts/                 # 136 top-level scripts (129 PowerShell + 7 shell)
 │   └── smoke/               # Smoke tests
 ├── docs/                    # Documentation
 │   ├── metricas/            # Session metrics

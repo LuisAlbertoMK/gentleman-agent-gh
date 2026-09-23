@@ -117,11 +117,11 @@
       }
     },
     "PA": {
-      "r": "X-ref True, 100 skills",
+        "r": "X-ref True, 96 skills",
       "s": 10.0,
       "e": {
         "project_json": true,
-        "skills": 100,
+        "skills": 96,
         "cross_ref": true,
         "readme": true
       }
