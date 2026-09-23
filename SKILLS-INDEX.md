@@ -34,19 +34,19 @@
 
 | Group | Skills |
 |-------|--------|
-| Quality | quality-gate, code-review-agent, triple-verify, auto-metrics, external-auditor, immune-system, testing-strategy, rdd |
-| Code | commit-crafter, code-generation, quick-executor, refactoring-planner |
-| Security | security-scanner, auth-hardening, container-security, llm-security, api-testing, best-practices, data-quality, infra-audit (tipo→playbook: project-mapper) |
-| SDD | sdd (unified pipeline), sdd-quick, sdd-propose, sdd-design, sdd-apply, sdd-verify |
-| Coordination | delivery-harness, branch-pr, issue-creation, command-wrapper, odd |
-| Analysis | analysis-mode, deep-debugging |
+| Quality | quality-gate, code-review-agent, triple-verify, auto-metrics, external-auditor, immune-system, testing-strategy, rdd, skill-testing, web-quality-audit, judgment-day |
+| Code | commit-crafter, code-generation, quick-executor, refactoring-planner, work-unit-commits |
+| Security | security-scanner, auth-hardening, container-security, llm-security, best-practices, data-quality, infra-audit, adversarial-breaker |
+| SDD | sdd (unified pipeline), sdd-quick, sdd-propose, sdd-design, sdd-apply, sdd-verify, sdd-archive, sdd-explore, sdd-init, sdd-spec, sdd-tasks |
+| Coordination | delivery-harness, branch-pr, issue-creation, command-wrapper, odd, chained-pr, ralph-loop, mini-orchestrator, subagent-isolation, cancel-ralph, state-reconcile, external-improvement |
+| Analysis | analysis-mode, deep-debugging, gap-analysis, research, project-mapper |
 | Memory | session-resume, engram-protocol, dreaming, bitacora |
-| Skills meta | opencode-skill-creator, skill-registry, skill-graph |
-| Engineering | plan-execution, infra-audit, perf-profiling, customize-opencode |
-| UI/Docs | baseline-ui, ui-engine, accessibility, seo, docs-audit |
-| Testing | visual-testing, e2e-testing, api-testing, image-pipeline, pdf-utils |
-| Communication | comment-writer |
-| Specialized | karpathy-loop, context-watchdog, recovery-protocol, metricas, workflow-optimizer , trial-verify |
+| Skills meta | opencode-skill-creator, skill-registry, skill-graph, skill-improver, self-improvement, automejora-analyzer, cross-project-forge, cross-project-wisdom |
+| Engineering | plan-execution, perf-profiling, customize-opencode, ci-cd, server-commands, ps-compat, development-mode, execution-mode, performance, performance-tracker, opencode-model-router |
+| UI/Docs | baseline-ui, ui-engine, accessibility, seo, docs-audit, aem-migration |
+| Testing | visual-testing, e2e-testing, api-testing, image-pipeline, pdf-utils, vision-analyze |
+| Communication | comment-writer, help |
+| Specialized | karpathy-loop, context-watchdog, recovery-protocol, metricas, workflow-optimizer, trial-verify, lean-context |
 
 ## Load Rule
 
