@@ -66,6 +66,11 @@ Total Ronda 3: 3 slices, cada uno ≤400L ✅, ~2 sesiones (S1 trivial + S2 ~1 +
 
 ## 3. RDD Freeze (re-capturado EN ESTA RAMA, antes de cualquier cambio futuro)
 
+> **Re-freeze R3-S2 (2026-09-23, implementer, solo lectura):** Slice 1 (E) movió HEAD `99259f62` →
+> `2661fb2b`. Re-captura limpia al inicio del Slice 2: `HEAD-2661fb2b-e69de29b`
+> (`git rev-parse HEAD` → `2661fb2b05da5ecf2f92207976222ea18ef99768`; `main` → `67707025` intacto;
+> `git status --porcelain` vacío; `git diff HEAD | git hash-object --stdin` → `e69de29b`).
+
 - **Freeze string:** `HEAD-99259f62-e69de29b`
 - **Captura (solo lectura — no commit/push/stash/checkout):**
   - `git branch --show-current` → `experimento/mejora-ronda3-judges72-strict-lcm` ✅ (fail-closed pasado)
@@ -107,7 +112,7 @@ Total Ronda 3: 3 slices, cada uno ≤400L ✅, ~2 sesiones (S1 trivial + S2 ~1 +
 | Slice | Commit | 4R veredicto | Gate | Estado |
 |-------|--------|--------------|------|--------|
 | 1 (E --strict) | fix(config): generator fails closed on missing mcp-policy outside fixtures (Ronda3 S1) — este commit | Tier 2 en Verify (implementer: discriminador `base.mcp`-presente; generate-config 16/16 — 14 previas + 2 nuevas R3S1; MCP 22/22 = audit-mcp 5/5 + mcp-resilience 4/4 + sync-all 11/11 + regenerate 2/2; jd-verifier 18/18; --validate VALID; PSSA 0 nuevos; diff ~40L ≤50L) | 28/28 ALL CLEAR (regla exacta; JD [10/28] Pass por markers pre-existentes, sin FORCE_SHIP ni markers nuevos) | ✅ implementado en esta rama, NO push |
-| 2 (D judges 3/6 restantes) | — | — | — | 🔲 pendiente |
+| 2 (D judges 3/6 restantes) | feat(skills): judgment-day adopts judge patterns part 2 (Ronda3 S2) — este commit | Tier 1 en Verify (implementer: P4 grounding gate + P5 loop lines + P6 ranker argmax ejecutados live con transcript en reference.md; jd-verifier 28/28 — 18 previas + 10 nuevas R3S2; MCP 22/22 = audit-mcp 5/5 + mcp-resilience 4/4 + sync-all 11/11 + regenerate 2/2; generate-config 16/16; cross-ref-check ALL PASSED; diff 289+/17- ≤400L; boundary honesto: auto pre-push hook wiring = future, manual -Rank es el contrato) | gate 28/28 ALL CLEAR — [2/26] #requires + [25/26] token_budget 7000 justificado (precedente R2-S3; 7637 ≤ 7700); sin FORCE_SHIP ni markers nuevos) | ✅ implementado en esta rama, NO push |
 | 3 (F1 LCM diseño + primer componente) | — | — | — | 🔲 pendiente |
 
 ## 6. Rollback por slice

@@ -1,7 +1,9 @@
 #requires -Version 7.0
 <#
 .SYNOPSIS
-    JD verifier — zone gate with fast-path and reflexion cap.
+    JD verifier — zone gate with fast-path, reflexion cap, grounding gate, constitutional loop, and ranker.
+    Patterns 4-6 (Ronda3-S2): -GroundingEvidence (P4 Reflexion), -RepeatFinding loop output (P5 constitutional),
+    -Rank argmax over N samples (P6 reward-ranker, manual pre-push invocation).
 #>
 [CmdletBinding()]
 param(
@@ -9,6 +11,8 @@ param(
     [Parameter()][int]$Rounds = 0,
     [Parameter()][switch]$FastPath,
     [Parameter()][switch]$RepeatFinding,
+    [Parameter()][string]$GroundingEvidence = '',
+    [Parameter()][string]$Rank = '',
     [Parameter()][string]$RepoRoot = (Get-Location).Path,
     [Parameter()][switch]$Json
 )
@@ -18,10 +22,42 @@ $ErrorActionPreference = 'Stop'
 
 $selfConsistency = 'SELF-CONSISTENCY: profiles A/B = majority-of-2 (diverge → tie-break by higher severity)'
 $constitutionalLine = 'CONSTITUTIONAL → register via immune-system (.agents/skills/immune-system)'
+$constitutionalLoopLine = 'CONSTITUTIONAL-LOOP: generate→critique→revise (gap>1.5 → immune-system rule)'
 $askUserLine = 'ASK-USER (Reflexion cap)'
 $escalateLine = 'ESCALATE dual-judge'
 
 $isCapped = $Rounds -gt 2
+$isRejudge = $Rounds -ge 1
+$groundingCited = (-not [string]::IsNullOrWhiteSpace($GroundingEvidence))
+# P4 Reflexion: re-judge rounds REQUIRE external grounding citations (tests/diff/retrieval).
+# Initial review (Rounds=0) needs no grounding; ungrounded re-judge fails closed.
+$groundingOk = ((-not $isRejudge) -or $groundingCited)
+
+function Invoke-Ranker {
+    # P6 reward-ranker: deterministic argmax over N labeled samples.
+    # Spec format: "label:score,label:score,..." (e.g. "a:0.7,b:0.9,c:0.4"). Ties → first max wins.
+    param([string]$Spec)
+    $empty = [ordered]@{ ran = $false; winner = $null; score = $null; samples = 0; error = $null }
+    if ([string]::IsNullOrWhiteSpace($Spec)) { return $empty }
+    $best = $null; $bestScore = $null; $count = 0
+    foreach ($pair in $Spec.Split(',', [System.StringSplitOptions]::RemoveEmptyEntries)) {
+        $kv = $pair.Split(':', 2)
+        if ($kv.Count -ne 2) {
+            return [ordered]@{ ran = $true; winner = $null; score = $null; samples = 0; error = "malformed pair '$pair' (want label:score)" }
+        }
+        $label = $kv[0].Trim(); $raw = $kv[1].Trim()
+        $score = 0.0
+        if ([string]::IsNullOrWhiteSpace($label) -or (-not [double]::TryParse($raw, [ref]$score))) {
+            return [ordered]@{ ran = $true; winner = $null; score = $null; samples = 0; error = "malformed pair '$pair' (want label:score)" }
+        }
+        $count++
+        if (($null -eq $bestScore) -or ($score -gt $bestScore)) { $best = $label; $bestScore = $score }
+    }
+    if ($count -eq 0) {
+        return [ordered]@{ ran = $true; winner = $null; score = $null; samples = 0; error = 'empty sample set' }
+    }
+    return [ordered]@{ ran = $true; winner = $best; score = $bestScore; samples = $count; error = $null }
+}
 
 # Resolve fast exe path: honor env override ONLY when PESTER_TEST=1, otherwise always repo bin/fast.exe
 $fastExeOverride = $env:JD_FAST_EXE
@@ -124,6 +160,11 @@ if ($isCapped) {
                 capped = $true
             }
             constitutional = [bool]$RepeatFinding.IsPresent
+            grounding    = [ordered]@{
+                cited    = [bool]$groundingCited
+                evidence = if ($groundingCited) { $GroundingEvidence.Trim() } else { $null }
+            }
+            ranker       = (Invoke-Ranker -Spec $Rank)
             timestamp    = (Get-Date -Format 'o')
         }
         $obj | ConvertTo-Json -Depth 4 -Compress | Write-Output
@@ -169,18 +210,47 @@ if ($Json) {
             capped = $false
         }
         constitutional = [bool]$RepeatFinding.IsPresent
+        grounding    = [ordered]@{
+            cited    = [bool]$groundingCited
+            evidence = if ($groundingCited) { $GroundingEvidence.Trim() } else { $null }
+            required = [bool]$isRejudge
+        }
+        ranker       = (Invoke-Ranker -Spec $Rank)
         timestamp    = (Get-Date -Format 'o')
     }
     $obj | ConvertTo-Json -Depth 4 -Compress | Write-Output
     if ($fastDecision -eq 'ESCALATE') { exit 1 }
+    if ((-not $groundingOk)) { exit 1 }
+    if ($obj.ranker.ran -and ($null -ne $obj.ranker.error)) { exit 1 }
     exit 0
 }
 
 # Textual mode (no -Json)
+$exitCode = 0
 Write-Output $selfConsistency
 
 if ($RepeatFinding.IsPresent) {
     Write-Output $constitutionalLine
+    Write-Output $constitutionalLoopLine
+}
+
+if ($isRejudge) {
+    if ($groundingCited) {
+        Write-Output "GROUNDED re-judge ($($GroundingEvidence.Trim()))"
+    } else {
+        Write-Output 'UNGROUNDED re-judge (no tests/diff/retrieval citation) — ESCALATE'
+        $exitCode = 1
+    }
+}
+
+$ranker = Invoke-Ranker -Spec $Rank
+if ($ranker.ran) {
+    if ($null -ne $ranker.error) {
+        Write-Output "RANKER-ERROR ($($ranker.error)) — ESCALATE"
+        $exitCode = 1
+    } else {
+        Write-Output "RANKER: winner=$($ranker.winner) ($($ranker.score)) over $($ranker.samples) samples"
+    }
 }
 
 if ($FastPath.IsPresent) {
@@ -192,11 +262,10 @@ if ($FastPath.IsPresent) {
     }
     if ($fp.decision -eq 'VERIFY-OK') {
         Write-Output "VERIFY-OK mechanical ($($fp.elapsedMs)ms)"
-        exit 0
     } else {
         Write-Output $escalateLine
         exit 1
     }
 }
 
-exit 0
+exit $exitCode
