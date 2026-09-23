@@ -184,9 +184,9 @@ test('Full pipeline: different findings → fix → re-judge → APPROVED', asyn
 | 1 | Offline eval | async, large judge OK | This skill (ROJA dual blind) |
 | 2 | Online runtime verifier | 76–162ms budget, small judge (Luna-2 3–8B, Prometheus 7B, Lynx 8B ≈97% cheaper at 0.88–0.95 acc) | ROJA hotfix fast-path (optional, not default) — **gated-optional**: small judge, opcional pre-output. Ver Pattern 2 en SKILL.md |
 | 3 | Self-consistency / self-critique | Best-of-N + majority vote, cheapest, strongest in code/math | Our 2-profile blind → implicit majority-of-2 |
-| 4 | Reflexion | Only with external grounding (tests, git diff, retrieval) — intrinsic "check your work" degrades reasoning | Re-judge delta (max 2 rounds) already grounded on diff |
-| 5 | Constitutional / RLAIF | training-time; runtime = generate→critique against constitution→revise | Gap >1.5 → immune-system (constitution for ROJA repeats) — **gated-optional**: trigger immune-system si gap>1.5 existe ya |
-| 6 | Inference-time reward model | ranker over N samples, gated before output | Future: pre-push reward ranker (not yet wired) — **gated-optional**: future/pre-push |
+| 4 | Reflexion | Only with external grounding (tests, git diff, retrieval) — intrinsic "check your work" degrades reasoning | Grounded re-judge (max 2 rounds): `-Rounds 1|2 -GroundingEvidence '<citations>'` → `GROUNDED` exit 0; ungrounded → `UNGROUNDED` exit 1 — **operational Ronda3-S2** |
+| 5 | Constitutional / RLAIF | training-time; runtime = generate→critique against constitution→revise | Runtime loop operational Ronda3-S2: `-RepeatFinding` → `CONSTITUTIONAL-LOOP: generate→critique→revise`; gap>1.5 → immune-system; repeat offense → permanent rule |
+| 6 | Inference-time reward model | ranker over N samples, gated before output | Operational Ronda3-S2 as verifier mode: `-Rank 'label:score,...'` → argmax winner (manual pre-push); auto hook wiring = future boundary |
 
 > **3-boundary rule** (Zylos): instrument judges before (a) user-facing output, (b) irreversible tool exec (git push, file Write), (c) persistent memory writes (Engram). Skip per-step judging to manage cost. Our gate covers (a)+(b); (c) is future.
 
@@ -194,8 +194,8 @@ test('Full pipeline: different findings → fix → re-judge → APPROVED', asyn
 
 **Gated-optional guidance:**
 - Pattern 2 (online verifier 76–162ms): small judge opcional pre-output — activar solo en hotfix ROJA donde latencia <200ms importa; default OFF.
-- Pattern 5 (constitutional/RLAIF): extensión documentada aquí; runtime trigger ya existe (gap>1.5 → immune-system).
-- Pattern 6 (reward model): future/pre-push — ranker over N samples gated before output; no wire aún.
+- Pattern 5 (constitutional/RLAIF): runtime loop operational Ronda3-S2 (`-RepeatFinding` → loop lines); training-time RLAIF stays out of scope.
+- Pattern 6 (reward model): operational as manual verifier mode (`-Rank`); auto pre-push hook wiring is future (touches `.githooks/`, out of scope) — documented boundary, not phantom wire.
 
 ## Pattern 1 — Offline Eval (operational, Ronda2-S3)
 
@@ -308,6 +308,104 @@ PS> & scripts/jd-verifier.ps1 -Zone ROJA -FastPath -Json
 - Confirmed claims cite file ±5 lines with both profiles' lines visible.
 - Re-judge rounds ≤2 with diff-delta scope; round-3 attempt → `ASK-USER`, exit 2.
 
-> **Ronda 3 boundary (explicit, untouched here):** Pattern 4 Reflexion grounding beyond re-judge delta,
-> Pattern 5 constitutional runtime revision loop, Pattern 6 IRM/reward-ranker wiring →
-> `odd/tasks/ronda2-warn-ssot-judges.md` §7. This slice changes NOTHING in taxonomy rows 4–6 above.
+## Pattern 4 — Reflexion Grounded (operational, Ronda3-S2)
+
+> Zylos constraint: Reflexion helps ONLY with external grounding (tests, git diff, retrieval).
+> Intrinsic "check your work" without citations degrades reasoning — an uncited re-judge verdict
+> is not evidence and fails closed.
+
+**Procedure**
+1. Re-judge scope = diff delta only (max 2 rounds, P3 cap still applies: round 3 → `ASK-USER` exit 2).
+2. Every re-judge verdict MUST cite ≥1 external anchor: `tests:<file>#L<line>` (failing/passing test),
+   `diff:<freeze8>` (re-captured `git diff HEAD | git hash-object --stdin`), or `retrieval:<KB-id>`.
+3. Enforce mechanically: `scripts/jd-verifier.ps1 -Rounds <1|2> -GroundingEvidence '<citations>'`.
+4. Initial review (`-Rounds 0`) needs no grounding — Reflexion constrains re-judges only.
+
+**Live transcript (2026-09-23, this repo)**
+```powershell
+PS> & scripts/jd-verifier.ps1 -Zone ROJA -Rounds 1
+UNGROUNDED re-judge (no tests/diff/retrieval citation) — ESCALATE   # exit 1
+PS> & scripts/jd-verifier.ps1 -Zone ROJA -Rounds 1 -GroundingEvidence 'tests:jd-verifier.Tests.ps1#L12;diff:HEAD'
+GROUNDED re-judge (tests:jd-verifier.Tests.ps1#L12;diff:HEAD)       # exit 0
+```
+
+**Anti-rationalization (P4)**
+
+| Rationalization | Red Flag | Verification |
+|---|---|---|
+| "Re-check passed, trust me" | Re-judge verdict with zero citations | P4: no citations → `UNGROUNDED` exit 1; cite or it didn't happen |
+| "Diff delta is grounding enough" | Delta cited but no test/retrieval anchor | ≥1 external anchor required (tests file:line, diff hash, or KB id) |
+| "Initial review needs grounding too" | `-Rounds 0` blocked for no citations | Grounding gate applies to re-judges only (`Rounds ≥1`); initial review unaffected |
+
+**Verification (P4)**
+- `& scripts/jd-verifier.ps1 -Zone ROJA -Rounds 1` (no evidence) → `UNGROUNDED`, exit 1.
+- Same with `-GroundingEvidence '<citations>'` → `GROUNDED`, exit 0.
+- Pester `scripts/tests/jd-verifier.Tests.ps1` P4 context PASS (grounded/ungrounded/initial/JSON).
+
+## Pattern 5 — Constitutional Runtime Loop (operational, Ronda3-S2)
+
+> Training-time RLAIF is out of scope. Runtime subset only:
+> generate → critique (against ROJA constitution) → revise → grounded re-judge (P4).
+
+**Constitution (ROJA)**: SKILL.md Rules 1–6 + reference.md anti-patterns table.
+Critique checks the candidate verdict against each rule; any violation → revise, then re-judge
+grounded (P4 citations mandatory — an ungrounded revise never closes the loop).
+
+**Procedure**
+1. Generate: 2× blind verdicts (P1/P3).
+2. Critique: test verdict against constitution; gap>1.5 vs `external-auditor` → flag.
+3. Revise: fix flagged findings; emit loop marker:
+   `scripts/jd-verifier.ps1 -RepeatFinding` → `CONSTITUTIONAL` + `CONSTITUTIONAL-LOOP: generate→critique→revise`.
+4. Close: grounded re-judge (P4) on the revise diff; repeat offense (same root-cause twice)
+   → `immune-system` permanent rule (`CALIB: IMMUNE_TRIGGERED | Rule: {anti-pattern-id}`).
+
+**Anti-rationalization (P5)**
+
+| Rationalization | Red Flag | Verification |
+|---|---|---|
+| "One critique pass fixes the constitution" | Single revise, loop never re-judged | P5: revise without grounded re-judge → re-run; loop closes on P4 evidence only |
+| "Repeat offense, new verdict" | Same root-cause re-approved twice | Second occurrence → `immune-system` rule, not another revise |
+| "RLAIF training covers this" | Training-time claim cited for runtime gap | Training-time RLAIF out of scope; runtime loop is the enforcement |
+
+**Verification (P5)**
+- `-RepeatFinding` emits both `CONSTITUTIONAL` and `CONSTITUTIONAL-LOOP` lines, exit 0.
+- Repeat root-cause → `immune-system` rule recorded (Edge Case 4 output flags).
+
+## Pattern 6 — Reward Ranker Pre-Push (operational verifier mode, Ronda3-S2)
+
+> Ranker over N candidate verdicts, gated before push. Orders candidates — NEVER approves:
+> winner still requires dual-blind confirmation (SKILL.md Rule 2).
+
+**Procedure**
+1. Collect N candidate verdicts with scalar scores (severity-weighted confidence, auditor delta, etc.).
+2. Rank: `scripts/jd-verifier.ps1 -Rank 'label:score,label:score,...'` → deterministic argmax.
+   Ties → first max wins (documented, tested). Malformed/empty spec → `RANKER-ERROR`, exit 1.
+3. Take winner → dual-blind confirmation (P1) before APPROVED. Ranker output cited in verdict log.
+
+**Live transcript (2026-09-23, this repo)**
+```powershell
+PS> & scripts/jd-verifier.ps1 -Zone ROJA -Rank 'a:0.7,b:0.9,c:0.4'
+RANKER: winner=b (0.9) over 3 samples   # exit 0
+```
+
+**Boundary (honest, not phantom)**: ranker executes for real as a verifier mode (transcript above,
+Pester P6 context). Automatic pre-push hook invocation (`.githooks/pre-push` calling the ranker)
+is FUTURE — it touches hook files outside this slice's AllowedPaths, so it is documented here
+instead of wired-in-false. Manual invocation pre-push is the operational contract until then.
+
+**Anti-rationalization (P6)**
+
+| Rationalization | Red Flag | Verification |
+|---|---|---|
+| "Ranker winner = APPROVED" | `RANKER: winner=` cited as final verdict | Ranker orders only; winner needs dual blind (rule 2) |
+| "Hook runs the ranker" | Pre-push auto-wire claimed | No hook calls the ranker (verify: `pre-push` has zero `jd-verifier` refs); manual mode is the contract |
+| "Ties mean consensus" | Tie silently picked | Ties → first max wins, deterministic and logged; re-judge on tie if stakes are ROJA |
+
+**Verification (P6)**
+- `-Rank 'a:0.7,b:0.9,c:0.4'` → `RANKER: winner=b (0.9) over 3 samples`, exit 0 (executed, not documented-in-false).
+- Malformed spec → `RANKER-ERROR`, exit 1. Ties → first max. JSON `ranker` object carries winner/score/samples.
+- Pester `scripts/tests/jd-verifier.Tests.ps1` P6 context PASS.
+
+> **Ronda 3 closure (R3-S2, 2026-09-23):** Patterns 4–6 operational above (grounding gate + loop +
+> ranker mode, all executed + Pester-covered). R2-4 (research-plan.md:208-211) CLOSED 6/6.
+> Remaining future: P6 auto pre-push hook wiring (hook files out of scope) — see Pattern 6 boundary.
