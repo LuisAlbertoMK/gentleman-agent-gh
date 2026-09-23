@@ -147,7 +147,8 @@ if ($mcpStaged) {
     catch { Fail "mcp-policy.json SSoT invalid — fix policy fragment: $_"; $mcpPolicyOk = $false }
     if ($mcpPolicyOk) {
         $mcpOut = & "$RepoRoot/scripts/security-audit-mcp.ps1" -CI *>&1 | Out-String
-        if ($mcpOut -match '\[FAIL\]') { Fail "MCP security audit FAIL`n$mcpOut" }
+        if ($LASTEXITCODE -ne 0) { Fail "MCP audit exit $LASTEXITCODE (fail-closed)`n$mcpOut" }
+        elseif ($mcpOut -match '\[FAIL\]') { Fail "MCP security audit FAIL`n$mcpOut" }
         else { $mcpOut.Trim() -split "`n" | ForEach-Object { Write-Host "    $_" }; Pass }
     }
 } else { Pass }
