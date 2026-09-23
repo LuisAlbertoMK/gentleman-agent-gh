@@ -1,0 +1,37 @@
+{
+  "$schema": "gentleman-agent/mcp-policy",
+  "version": "1.0",
+  "description": "SSoT MCP security policy (P0-2). Enforced by scripts/security-audit-mcp.ps1 via .githooks/pre-commit-gate.ps1 [9/26]. KB: r2-mcp-security-bestpractices (modelcontextprotocol.io 2026-07-28).",
+  "remoteAllowlist": {
+    "description": "Exact-match SSRF allowlist for enabled remote MCP servers. Non-listed remote URL = FAIL.",
+    "allowed": ["https://mcp.context7.com/mcp"],
+    "trustedPrefixes": [
+      "https://mcp.context7.com",
+      "https://learn.microsoft.com"
+    ],
+    "prefixNote": "Trusted prefix but not exact entry = WARN (promote to allowed when legit)."
+  },
+  "envPolicy": {
+    "description": "Credential-exposure scan over per-server environment blocks. Flagged values must move to vault references.",
+    "patternNote": "Secret-like values are flagged; placeholder references below are exempt.",
+    "allowedPlaceholders": ["GENTLEMAN_AGENT_ROOT", "CBM_ALLOWED_ROOT", "HEADROOM_PROXY_URL"],
+    "pathScoping": {
+      "var": "CBM_ALLOWED_ROOT",
+      "required": "{env:GENTLEMAN_AGENT_ROOT}",
+      "rule": "Must resolve inside repo scope; filesystem root = FAIL."
+    }
+  },
+  "versionPin": {
+    "description": "Supply-chain pinning for npx-launched servers.",
+    "rule": "Any npx command must carry a major.minor pin; unpinned npx = FAIL.",
+    "localBinaries": ["codebase-memory-mcp", "engram"]
+  },
+  "disabledHygiene": {
+    "description": "Known-wide servers that must stay disabled or absent.",
+    "servers": ["headroom", "chrome-devtools-mcp"]
+  },
+  "confusedDeputy": {
+    "description": "No enabled proxy-like MCP expected; proxy-like env on an enabled server = WARN.",
+    "expectedProxies": 0
+  }
+}
