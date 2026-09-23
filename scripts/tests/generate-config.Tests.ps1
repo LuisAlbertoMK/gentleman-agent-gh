@@ -311,6 +311,33 @@ Describe 'generate-opencode-config.js — mcp-policy SSoT consumer (Ronda2 S2)' 
     }
 }
 
+Describe 'generate-opencode-config.js — missing mcp-policy fail-closed (Ronda3 S1)' {
+    It 'real repo (base declares mcp, no policy file) fails closed (exit 1)' {
+        $repo = New-GenRepo 'mcp-missing-real'
+        Set-GenFixture -Repo $repo -Agent $script:agentSec `
+            -Templates @{ 'readonly' = $script:tmplReadonly } -Extra @{ mcp = $script:mcpOk }
+        # NOTE: deliberately NO Copy-McpPolicy — the policy file is absent.
+
+        $out = & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') 2>&1 | Out-String
+
+        $LASTEXITCODE | Should -Be 1
+        $out | Should -Match 'mcp-policy.json is missing'
+        $out | Should -Match 'mcp section'
+    }
+
+    It 'pre-policy fixture (base declares no mcp, no policy file) still skips (exit 0)' {
+        $repo = New-GenRepo 'mcp-missing-prepolicy'
+        Set-GenFixture -Repo $repo -Agent $script:agentSec `
+            -Templates @{ 'readonly' = $script:tmplReadonly }
+        # NOTE: no mcp in base AND no policy file — pre-policy repo shape.
+
+        $out = & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') 2>&1 | Out-String
+
+        $LASTEXITCODE | Should -Be 0
+        $out | Should -Match 'skipping MCP policy enforcement'
+    }
+}
+
 Describe 'R9: regen latency benchmark fixture (Gap D — same-context measurement)' {
     # Gap D fix: baseline was measured in orchestrator context (263.8ms) vs
     # subagent context (520.9ms) → false +97.4% regression. This test measures
