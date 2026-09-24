@@ -91,3 +91,7 @@ $env:OLLAMA_BASE_URL="https://api.ollama.com/v1"; $env:OLLAMA_API_KEY="sk-..."; 
 Offline-first fallback: if Ollama not reachable or `Test-OllamaBaseUrlAllowlist` blocks the endpoint, both scripts degrade to audit/variants-only (no crash). Allowlist enforces SSRF blocks (metadata/169.254.x/link-local/10.x/192.168.x) and, when `OLLAMA_CLOUD` != 1, only `localhost`/`127.0.0.1`.
 
 Security: `OllamaApiKey` is optional Bearer token — never commit keys; use env vars (`OLLAMA_CLOUD_KEY`, `OLLAMA_API_KEY`). Cloud path requires `VISION_ANALYZE_OLLAMA_CLOUD=1` per `.agents/skills/vision-analyze/SKILL.md` Hard Rules.
+
+## Config Invariants — compaction/snapshot NO-OP (R11-S3)
+
+`scripts/lib/opencode-base.json` keeps `compaction = {auto:true, prune:true, reserved:4000, keep:{tokens:8000}}`, with `snapshot` and `compaction.buffer` ABSENT. Why: determinism of runs and RDD receipts depends on a closed compaction config — an accidental change would silently alter context behavior. Guard: `tests/contract-compaction.Tests.ps1` fails on purpose if anyone edits compaction; changing it requires an explicit owner-approved slice (never a drive-by edit, never direct `opencode.json` — SSoT + `regenerate-opencode.ps1 -Yes`).
