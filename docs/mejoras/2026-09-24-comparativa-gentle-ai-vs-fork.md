@@ -138,3 +138,33 @@
 - Exclusión Defender (ticket TI).
 - Auditoría 58 agentes.
 - Re-medición quieta N=5–10.
+
+## 9. Testigo v1.37.2 re-obtenido 2026-09-24
+
+> Testigo restaurado; §1-§8 intactos, números históricos sin alterar.
+
+| Campo | Valor |
+|---|---|
+| Testigo | `C:\Users\LuisOrozco\bin\gentle-ai-v1.exe` → gentle-ai 1.37.2, 11279872 B |
+| SHA256 EXE | `3DCDA0BDBB3CF675F6AC86629A1C3393D9345103079393B4F2A6F81099433154` |
+| ZIP origen | `https://github.com/Gentleman-Programming/gentle-ai/releases/download/v1.37.2/gentle-ai_1.37.2_windows_amd64.zip`, 4243188 B |
+| SHA256 ZIP | `15F9C3A56B9DA80368620BA2BD3E086F25C65062647600038141A13428200AE5` |
+| Scoop manifest | commit fd97bf3 (v1.37.2), retirado en cae8b4e; bucket gentleman 0 manifests |
+| `--help` usuario (ms) | 106.3067 / 79.3569 / 78.8683 |
+| `--help` agente (ms) | 102.6499 / 93.5502 / 106.8961 |
+| Baseline §2:25 | ~168 ms v1; v3.7.0 ~1887 ms child (histórico; testigo actual en §9) |
+| v3 intacto | `C:\Users\LuisOrozco\go-path\bin\gentle-ai.exe` → 3.7.0, 26621952 B |
+
+### Benchmark fresco N=10 2026-09-24
+
+| Campo | Valor |
+|---|---|
+| Fecha / Defender / Admin | 2026-09-24; RealTime=True, Antivirus=True, AMRunningMode=Normal; IsInRole=False (sin exclusion, pendiente 7.1) |
+| Protocolo | 1 warmup descartado, secuencial, PS 5.1 Measure-Command |
+| v1 N=10 --help ms | 93.1105, 87.6184, 88.9894, 85.6198, 82.4034, 82.3721, 84.6004, 92.7041, 85.8114, 85.4287 |
+| v1 min / max / mean / median | 82.3721 / 93.1105 / 86.86582 / 85.7156 |
+| v3 N=10 --help ms | 203.7025, 192.6413, 197.2584, 178.4180, 173.2666, 169.5521, 164.0139, 182.8768, 172.5817, 170.2302 |
+| v3 min / max / mean / median | 164.0139 / 203.7025 / 180.45415 / 175.8423 |
+| Ratio v3/v1 | mean ~2.08x, median ~2.05x |
+| Veredicto | regresion confirmada pero acotada ~2x, no ~11x historica (2:26 contaminado por outlier 13s; hoy max 203.7 ms sin outlier) |
+| Advertencia | RealTime contamina absolutos, relativa valida |
