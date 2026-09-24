@@ -42,11 +42,71 @@ $ErrorActionPreference = "Stop"
 $violations = @()
 $stats = @{}
 
-# --- Scan skill SKILL.md files ---
-    $skillFiles = @()
+# --- Lazy scan helpers (perf: defer Get-ChildItem to point of use) ---
+function Get-SkillFilesLazy {
     if (Test-Path $SkillsPath) {
-        $skillFiles = @(Get-ChildItem -Path $SkillsPath -Filter "SKILL.md" -Recurse -File)
+        return @(Get-ChildItem -Path $SkillsPath -Filter "SKILL.md" -Recurse -File)
     }
+    return @()
+}
+function Get-PromptFilesLazy {
+    if (Test-Path $PromptsPath) {
+        return @(Get-ChildItem -Path $PromptsPath -File -Include "*.md", "*.prompt" -Recurse)
+    }
+    return @()
+}
+function Get-CmdFilesLazy {
+    if (Test-Path $CommandsPath) {
+        return @(Get-ChildItem -Path $CommandsPath -File -Include "*.md", "*.prompt" -Recurse)
+    }
+    return @()
+}
+
+# --- O2 TEMP counts cache (never inside repo; silent fallback to full scan) ---
+# Hit only if: cache exists + valid JSON + age < 60min + same paths/budgets +
+# fingerprint (per-dir count+bytes + max LastWriteTimeUtc ticks) unchanged.
+$__cacheFile = $env:TEMP
+if ([string]::IsNullOrWhiteSpace($__cacheFile)) { $__cacheFile = [System.IO.Path]::GetTempPath() }
+$__cacheFile = Join-Path (Join-Path $__cacheFile "opencode") "counts-cache.json"
+$__cacheTtlMin = 60
+$__cacheHit = $false
+# Single probe enumeration (reused by the full scan on miss, so cold path
+# does not enumerate twice; warm path skips all Measure/Where passes).
+$probeSkillFiles = @(Get-SkillFilesLazy)
+$probePromptFiles = @(Get-PromptFilesLazy)
+$probeCmdFiles = @(Get-CmdFilesLazy)
+$__fpSkillBytes = if ($probeSkillFiles.Count -gt 0) { [long]($probeSkillFiles | Measure-Object -Property Length -Sum).Sum } else { [long]0 }
+$__fpPromptBytes = if ($probePromptFiles.Count -gt 0) { [long]($probePromptFiles | Measure-Object -Property Length -Sum).Sum } else { [long]0 }
+$__fpCmdBytes = if ($probeCmdFiles.Count -gt 0) { [long]($probeCmdFiles | Measure-Object -Property Length -Sum).Sum } else { [long]0 }
+$__fpMaxTicks = [long]0
+foreach ($f in ($probeSkillFiles + $probePromptFiles + $probeCmdFiles)) {
+    $t = [long]$f.LastWriteTimeUtc.Ticks
+    if ($t -gt $__fpMaxTicks) { $__fpMaxTicks = $t }
+}
+$__fingerprint = "sk:$($probeSkillFiles.Count)/$__fpSkillBytes|pr:$($probePromptFiles.Count)/$__fpPromptBytes|cmd:$($probeCmdFiles.Count)/$__fpCmdBytes|mt:$__fpMaxTicks"
+try {
+    if (Test-Path $__cacheFile) {
+        $__c = (Get-Content $__cacheFile -Raw -ErrorAction Stop) | ConvertFrom-Json -ErrorAction Stop
+        $__age = ((Get-Date).ToUniversalTime() - [datetime]$__c.timestamp).TotalMinutes
+        if ($__age -ge 0 -and $__age -lt $__cacheTtlMin -and
+            [string]$__c.skillsPath -eq $SkillsPath -and [string]$__c.promptsPath -eq $PromptsPath -and
+            [string]$__c.commandsPath -eq $CommandsPath -and
+            [int]$__c.budgetBytes -eq $BudgetBytes -and [int]$__c.promptBudgetBytes -eq $PromptBudgetBytes -and
+            [string]$__c.fingerprint -eq $__fingerprint) {
+            $__cacheHit = $true
+            $stats = @{}
+            if ($__c.stats.PSObject.Properties['skills']) { $stats.skills = $__c.stats.skills }
+            if ($__c.stats.PSObject.Properties['prompts']) { $stats.prompts = $__c.stats.prompts }
+            $violations = @()
+            if ($null -ne $__c.violations) { $violations = @($__c.violations) }
+            $passed = [bool]$__c.passed
+        }
+    }
+} catch { $__cacheHit = $false }
+
+if (-not $__cacheHit) {
+# --- Scan skill SKILL.md files (first: early-exit gate) ---
+    $skillFiles = @($probeSkillFiles)
     if ($skillFiles.Count -gt 0) {
     $avgSkill = [math]::Round(($skillFiles | Measure-Object -Property Length -Average).Average, 0)
     $overBudget = @($skillFiles | Where-Object { $_.Length -gt $BudgetBytes })
@@ -64,14 +124,11 @@ $stats = @{}
 }
 
 # --- Scan prompt files (H-019 aligned: prompts/**/*.md + commands/**/*.md) ---
-$promptFiles = @()
-if (Test-Path $PromptsPath) {
-    $promptFiles = @(Get-ChildItem -Path $PromptsPath -File -Include "*.md", "*.prompt" -Recurse)
-}
-$cmdFiles = @()
-if (Test-Path $CommandsPath) {
-    $cmdFiles = @(Get-ChildItem -Path $CommandsPath -File -Include "*.md", "*.prompt" -Recurse)
-}
+# Early-exit: skills budget already failed → outcome (exit 1) is decided;
+# skip prompts/commands scans on the failure path.
+if ($violations.Count -eq 0) {
+$promptFiles = @($probePromptFiles)
+$cmdFiles = @($probeCmdFiles)
 if ($promptFiles.Count -gt 0) {
     $avgPrompt = [math]::Round(($promptFiles | Measure-Object -Property Length -Average).Average, 0)
     # ADR-046: orchestrator system prompts legitimately exceed the SKILL.md cap —
@@ -117,8 +174,28 @@ if ($promptFiles.Count -gt 0) {
         $violations += "H-019 overweight penalty $overweightPenalty — prompts>3072: $prOver3KB, cmds>3072: $cmdOver3KB, >5120: pr $prOver5KB/cmd $cmdOver5KB; files: $($overweightFiles -join ', ')"
     }
 }
+} # end early-exit guard (skills failed → prompts/commands skipped)
 
 $passed = $violations.Count -eq 0
+
+# O2: persist counts/stats to TEMP cache (best-effort, never breaks the gate).
+try {
+    $__cacheDir = Split-Path $__cacheFile -Parent
+    if (!(Test-Path $__cacheDir)) { New-Item $__cacheDir -ItemType Directory -Force | Out-Null }
+    [PSCustomObject]@{
+        timestamp         = (Get-Date).ToUniversalTime().ToString("o")
+        skillsPath        = $SkillsPath
+        promptsPath       = $PromptsPath
+        commandsPath      = $CommandsPath
+        budgetBytes       = $BudgetBytes
+        promptBudgetBytes = $PromptBudgetBytes
+        fingerprint       = $__fingerprint
+        stats             = $stats
+        violations        = @($violations)
+        passed            = $passed
+    } | ConvertTo-Json -Depth 5 | Set-Content $__cacheFile -Encoding UTF8
+} catch { }
+} # end O2 cache-miss guard (hit path restores stats/violations/passed above)
 
 if ($Json) {
     [PSCustomObject]@{
