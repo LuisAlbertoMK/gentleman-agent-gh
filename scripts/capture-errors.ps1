@@ -22,6 +22,11 @@
 .PARAMETER Failed
   Number of failed checks (for quality gate)
 
+.PARAMETER Total
+  Total number of checks (for quality gate). Optional: when omitted or 0,
+  it is derived as Passed + Failed so records written by callers that do
+  not pass -Total (e.g. .githooks/pre-commit-gate.ps1) still emit `total`.
+
 .PARAMETER Blocked
   Whether commit was blocked (yes/no)
 
@@ -47,6 +52,7 @@ param(
   [string]$Source = "",
   [int]$Passed = 0,
   [int]$Failed = 0,
+  [int]$Total = 0,
   [string]$Blocked = "",
   [array]$Errors = @(),
   [switch]$Snapshot,
@@ -65,6 +71,13 @@ $latestPath = Join-Path $errorDir "LATEST_error.json"
 $commit = try { $c = (git rev-parse --short HEAD 2>$null); if ($c) { $c.Trim() } else { "unknown" } } catch { "unknown" }
 $branch = try { $b = (git rev-parse --abbrev-ref HEAD 2>$null); if ($b) { $b.Trim() } else { "unknown" } } catch { "unknown" }
 
+# --- Derive total checks (gate runs 28 checks; passed+failed covers all) ---
+# Optional -Total override wins; otherwise derive as Passed + Failed so that
+# records written by callers that do not pass -Total (e.g.
+# .githooks/pre-commit-gate.ps1 line ~557) still emit `total` instead of
+# forcing readers into a fallback. Additive: no other field changes.
+$resolvedTotal = if ($Total -gt 0) { $Total } else { $Passed + $Failed }
+
 # --- Build error entry ---
 $entry = [PSCustomObject]@{
   version = "1.0"
@@ -74,6 +87,7 @@ $entry = [PSCustomObject]@{
   source = $Source
   passed = $Passed
   failed = $Failed
+  total = $resolvedTotal
   blocked = $Blocked
   errors = $Errors
   totalErrors = @($Errors | Where-Object { $_.Severity -eq "error" }).Count
