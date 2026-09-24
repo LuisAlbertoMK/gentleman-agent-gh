@@ -1,21 +1,30 @@
 #requires -Version 7
 <#
 .SYNOPSIS
-    R8-S1: las 4 receipts .rdd existentes validan contra contracts/rdd-receipt.schema.json.
+    R8-S1 + R9-S2 drift-fix: TODAS las receipts .rdd presentes validan contra contracts/rdd-receipt.schema.json.
 .DESCRIPTION
     Validador PowerShell nativo Test-Json -SchemaFile (sin deps nuevas; schema declara
     draft 2020-12, aceptado por Test-Json en PS 7). Solo lectura de .rdd: nunca modifica
     las receipts (si una receipt real NO pasa, el test lo reporta como divergencia).
-    Fixtures negativas hermeticas en TestDrive. Patron Pester+Test-Json congelado para S2/S3.
+    Conteo DINAMICO (R9-S2 fix del drift 005-008 vs test congelado en 001-004): los casos
+    por receipt se generan por discovery sobre .rdd/rdd-receipt-*.json, sin lista
+    hardcodeada 001-004 ni conteo fijo. Fixtures negativas hermeticas en TestDrive
+    (con -ErrorAction SilentlyContinue para que retornen False tambien bajo
+    $ErrorActionPreference='Stop' del pre-commit gate). Patron Pester+Test-Json
+    congelado para S2/S3.
 #>
 
-Describe 'RDD receipt contract (R8-S1)' {
+Describe 'RDD receipt contract (R8-S1, dynamic R9-S2)' {
     BeforeAll {
         $RepoRoot = Split-Path -Parent $PSScriptRoot
         $SchemaPath = Join-Path $RepoRoot 'contracts/rdd-receipt.schema.json'
         $RddDir = Join-Path $RepoRoot '.rdd'
-        $ReceiptFiles = Get-ChildItem (Join-Path $RddDir 'rdd-receipt-00*.json') | Sort-Object Name
+        $ReceiptFiles = @(Get-ChildItem (Join-Path $RddDir 'rdd-receipt-*.json') | Sort-Object Name)
     }
+
+    # Casos por discovery: una entrada por cada receipt presente en disco.
+    $ReceiptCases = @(Get-ChildItem (Join-Path $PSScriptRoot '..' '.rdd' 'rdd-receipt-*.json') |
+        Sort-Object Name | ForEach-Object { @{ Name = $_.Name } })
 
     It 'schema exists and declares draft 2020-12' {
         Test-Path -LiteralPath $SchemaPath | Should -BeTrue
@@ -23,19 +32,15 @@ Describe 'RDD receipt contract (R8-S1)' {
         $decl | Should -Match '2020-12'
     }
 
-    It 'receipt <Name> validates against schema' -ForEach @(
-        @{ Name = 'rdd-receipt-001.json' }
-        @{ Name = 'rdd-receipt-002.json' }
-        @{ Name = 'rdd-receipt-003.json' }
-        @{ Name = 'rdd-receipt-004.json' }
-    ) {
+    It 'receipt <Name> validates against schema' -ForEach $ReceiptCases {
         $path = Join-Path $RddDir $Name
         Test-Path -LiteralPath $path | Should -BeTrue
         Get-Content -LiteralPath $path -Raw -Encoding UTF8 | Test-Json -SchemaFile $SchemaPath | Should -BeTrue
     }
 
-    It 'exactly 4 receipts indexed (001-004)' {
-        @($ReceiptFiles).Count | Should -Be 4
+    It 'receipt set is dynamic (count matches files on disk, no hardcoded 4)' {
+        @($ReceiptFiles).Count | Should -BeGreaterThan 0
+        @($ReceiptFiles).Count | Should -Be @(Get-ChildItem (Join-Path $RddDir 'rdd-receipt-*.json')).Count
     }
 
     It 'negative fixture (bad verdict, tier, empty files) FAILs validation' {

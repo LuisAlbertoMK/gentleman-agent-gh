@@ -5,7 +5,7 @@
       "generator": "Get-Content -Raw | Test-Json -SchemaFile contracts/rdd-receipt.schema.json",
       "name": "validate-rdd-receipts.golden.json",
       "schema": "contracts/rdd-receipt.schema.json",
-      "sha256": "fce6581bf92ef7533b06a93b1d9ead5f5637a21dc8b7dac718b50487f65b9240"
+      "sha256": "e7daaf5d33c0a03929f7156fc818abb65aaef13b0e4e5648dba793abeb218f41"
     },
     {
       "args": "sorted templates",

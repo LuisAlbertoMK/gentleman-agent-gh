@@ -1,0 +1,25 @@
+{
+  "id": "rdd-receipt-009",
+  "freeze": "HEAD-d9ce9900",
+  "freeze_note": "Slice R9-S2 fix(drift): receipts 005-008 vs golden/test congelados en 001-004 en rama experimento/mejora-ronda9-contratos-ci. Base HEAD d9ce9900; emitido pre-commit sobre arbol con 3 modificados + 1 nuevo (ver files). lines_changed exacto por git diff --numstat solo scope del slice; odd/tasks/ronda9-contratos-ci.md queda untracked hasta S2 (fuera del receipt). Golden regenerado INCLUYE este 009 (generador dinamico por glob) para no reintroducir drift post-commit.",
+  "tier": 1,
+  "tier_justification": "RDD Risk Tiers: Tier 1 = solo tests/contract-receipt.Tests.ps1 (discovery dinamico, sin helper runtime) + testdata/golden/validate-rdd-receipts.golden.json + sha256 en golden-manifest.json. Sin runtime, workflows, auth, schemas ni dependencias.",
+  "files": [
+    "tests/contract-receipt.Tests.ps1",
+    "testdata/golden/validate-rdd-receipts.golden.json",
+    "testdata/golden/golden-manifest.json"
+  ],
+  "lines_changed": 40,
+  "lines_deleted": 15,
+  "verdict": "PASS",
+  "verdict_note": "Pester full contract+golden 166/166 0 FAIL (receipt 13/13: schema 1 + 9 receipts dinamicas 001-009 + conteo dinamico 1 + 2 negativas; goldens 17/17 re-run+hash+determinismo; manifest 6/6; permission 12/12; frontmatter 107/107; prompts 7/7; fixtures 4/4). Test-Json True: manifest vs golden-manifest.schema.json, golden regenerado (well-formed), 009 vs rdd-receipt.schema.json. Determinismo: doble re-run mismo contenido + regen==stored + manifest-sha==file-hash. 4R: Risk LOW (solo test+golden data, sin runtime/auth/schemas), Readability OK (casos por discovery con comentario), Reliability OK (glob cubre futuras receipts; empty-.rdd falla fail-closed), Resilience OK (negativas hermeticas TestDrive + SilentlyContinue bajo Stop del gate).",
+  "review": {
+    "status": "PASS 4R",
+    "method": "code-review-agent 4R + Pester full-suite verde",
+    "gaps": []
+  },
+  "blockers": [],
+  "next": ["R9-S2"],
+  "auto_fix": false,
+  "timestamp": "2026-09-24T14:41:58.4475037-06:00"
+}
