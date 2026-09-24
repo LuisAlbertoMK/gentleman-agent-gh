@@ -42,6 +42,58 @@ if (Test-Path -LiteralPath $fastExe) {
     } catch { $script:fastGate = $null }
 }
 
+function Test-JdReviewMarkers {
+    param([array]$StagedRoja, [string]$RepoRoot)
+    if ($StagedRoja) {
+        $uncleared = @()
+        foreach ($f in $StagedRoja) {
+            # Collision-free naming: normalized + hash suffix
+            $normalized = $f -replace '[\\/]', '_'
+            $pathHash = [System.BitConverter]::ToString(
+                [System.Security.Cryptography.SHA256]::HashData([System.Text.Encoding]::UTF8.GetBytes($f))
+            ).Replace('-','').Substring(0,8).ToLower()
+            $markerNew = "$RepoRoot/.jd-cleared/${normalized}_${pathHash}"
+            $markerLegacy = "$RepoRoot/.jd-cleared/$normalized"
+            $marker = if (Test-Path -LiteralPath $markerNew -PathType Leaf) { $markerNew }
+                       elseif (Test-Path -LiteralPath $markerLegacy -PathType Leaf) { $markerLegacy }
+                       else { $markerNew }  # default to new format for creation
+            if (-not (Test-Path -LiteralPath $marker -PathType Leaf)) {
+                $uncleared += $f
+            } else {
+                # Validate marker content: accept both formats
+                # Legacy: empty file (backward compat)
+                # Evidence: "{who} {when} why fileHash:{hash}" prefix
+                $markerContent = (Get-Content -LiteralPath $marker -Raw -Encoding UTF8).Trim()
+                if ($markerContent -ne '') {
+                    # Evidence format — validate prefix has minimum structure
+                    $hasWho = ($markerContent -match '^\S+')
+                    $hasWhen = ($markerContent -match '^\S+\s+\d{4}-\d{2}-\d{2}')
+                    $hasFileHash = ($markerContent -match 'fileHash:[0-9a-f]{8}')
+                    if (-not ($hasWho -and $hasWhen -and $hasFileHash)) {
+                        Write-Host "    WARNING: $marker — malformed evidence prefix (expected: who date why fileHash:XXXXXXXX)" -ForegroundColor Yellow
+                        # Non-blocking for existing markers — just warn
+                    }
+                }
+                # Stale check: target file still exists?
+                $fullPath = Join-Path $RepoRoot $f
+                if (-not (Test-Path -LiteralPath $fullPath -PathType Leaf)) {
+                    Write-Host "    PRUNE: $marker — target '$f' removed from tree" -ForegroundColor DarkYellow
+                    Remove-Item -LiteralPath $marker -Force
+                    $uncleared += $f
+                }
+            }
+        }
+        # Strict: only '1' or 'true' bypass (PS [bool]"false"=true bug fix)
+        if (($env:FORCE_SHIP -eq '1') -or ($env:FORCE_SHIP -eq 'true')) {
+            Warn "FORCE_SHIP set — JD bypass acknowledged (ensure '!ship' was intentional)`n    $($StagedRoja -join "`n")"
+        } elseif ($uncleared.Count -eq 0) {
+            Pass
+        } else {
+            Fail "ROZA zone files staged without JD dual review — BLOCKED:`n  $($uncleared | ForEach-Object { '    ' + $_ } | Out-String)  Run `!judgment-day` or touch .jd-cleared markers, or set FORCE_SHIP=1"
+        }
+    } else { Pass }
+}
+
 Write-Host "`n=== Gentleman Quality Gate ==="
 
 # [1/28] Trailing whitespace
@@ -150,54 +202,7 @@ if ($mcpStaged) {
 # Clears the recurring Warn for files already cleared via `!judgment-day`.
 # Marker naming: path separators -> underscores (scripts/foo.ps1 -> .jd-cleared/scripts_foo.ps1)
 Write-Host "[10/28] JD review check (ROZA zone)..."
-if ($stagedRoja) {
-    $uncleared = @()
-    foreach ($f in $stagedRoja) {
-        # Collision-free naming: normalized + hash suffix
-        $normalized = $f -replace '[\\/]', '_'
-        $pathHash = [System.BitConverter]::ToString(
-            [System.Security.Cryptography.SHA256]::HashData([System.Text.Encoding]::UTF8.GetBytes($f))
-        ).Replace('-','').Substring(0,8).ToLower()
-        $markerNew = "$RepoRoot/.jd-cleared/${normalized}_${pathHash}"
-        $markerLegacy = "$RepoRoot/.jd-cleared/$normalized"
-        $marker = if (Test-Path -LiteralPath $markerNew -PathType Leaf) { $markerNew }
-                  elseif (Test-Path -LiteralPath $markerLegacy -PathType Leaf) { $markerLegacy }
-                  else { $markerNew }  # default to new format for creation
-        if (-not (Test-Path -LiteralPath $marker -PathType Leaf)) {
-            $uncleared += $f
-        } else {
-            # Validate marker content: accept both formats
-            # Legacy: empty file (backward compat)
-            # Evidence: "{who} {when} why fileHash:{hash}" prefix
-            $markerContent = (Get-Content -LiteralPath $marker -Raw -Encoding UTF8).Trim()
-            if ($markerContent -ne '') {
-                # Evidence format — validate prefix has minimum structure
-                $hasWho = ($markerContent -match '^\S+')
-                $hasWhen = ($markerContent -match '^\S+\s+\d{4}-\d{2}-\d{2}')
-                $hasFileHash = ($markerContent -match 'fileHash:[0-9a-f]{8}')
-                if (-not ($hasWho -and $hasWhen -and $hasFileHash)) {
-                    Write-Host "    WARNING: $marker — malformed evidence prefix (expected: who date why fileHash:XXXXXXXX)" -ForegroundColor Yellow
-                    # Non-blocking for existing markers — just warn
-                }
-            }
-            # Stale check: target file still exists?
-            $fullPath = Join-Path $RepoRoot $f
-            if (-not (Test-Path -LiteralPath $fullPath -PathType Leaf)) {
-                Write-Host "    PRUNE: $marker — target '$f' removed from tree" -ForegroundColor DarkYellow
-                Remove-Item -LiteralPath $marker -Force
-                $uncleared += $f
-            }
-        }
-    }
-    # Strict: only '1' or 'true' bypass (PS [bool]"false"=true bug fix)
-    if (($env:FORCE_SHIP -eq '1') -or ($env:FORCE_SHIP -eq 'true')) {
-        Warn "FORCE_SHIP set — JD bypass acknowledged (ensure '!ship' was intentional)`n    $($stagedRoja -join "`n")"
-    } elseif ($uncleared.Count -eq 0) {
-        Pass
-    } else {
-        Fail "ROZA zone files staged without JD dual review — BLOCKED:`n  $($uncleared | ForEach-Object { '    ' + $_ } | Out-String)  Run `!judgment-day` or touch .jd-cleared markers, or set FORCE_SHIP=1"
-    }
-} else { Pass }
+Test-JdReviewMarkers -StagedRoja $stagedRoja -RepoRoot $RepoRoot
 
 # [11/28] Secrets scan — parse diff to get real filenames (not "InputStream")
 Write-Host "[11/28] Secrets scan..."
