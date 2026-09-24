@@ -1,0 +1,1 @@
+auto-executor 2026-09-24 Refactor-AP-S5 Tier-2: retired -auto/-semi/-sub-auto Its to fail-closed plus MK keyword (S1 template deletion); suite use-gentleman 20/20 green (was 16/20); test-only change, no productive logic fileHash:b579fbe6

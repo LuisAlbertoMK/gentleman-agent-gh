@@ -13,7 +13,7 @@
       1. $TemplateMap has all agents from the chain (opencode-base.json)
       2. $TemplateMap matches TEMPLATE_MAP in generate-opencode-config.js (no drift)
       3. Detect-Template() produces correct results for explicit + auto-registered agents
-      4. -sub-auto maps to auto-sub (not auto) — the drift bug
+      4. retired -auto/-semi/-sub-auto names fail closed (single-mode S1/S5)
       5. Role keyword auto-registration works
       6. Fail-closed on truly unknown agents
 #>
@@ -77,8 +77,8 @@ Describe 'Detect-Template — $TemplateMap parity with generate-opencode-config.
 }
 
 Describe 'Detect-Template — explicit map entries' {
-    It 'gentleman-vMK maps to orchestrator' {
-        Detect-Template -AgentName 'gentleman-vMK' | Should -Be 'orchestrator'
+    It 'gentle-MK maps to orchestrator (single-mode, explicit map)' {
+        Detect-Template -AgentName 'gentle-MK' | Should -Be 'orchestrator'
     }
 
     It 'gentleman-codex-sub maps to readwrite (was missing from PS map — drift fix)' {
@@ -89,11 +89,15 @@ Describe 'Detect-Template — explicit map entries' {
         Detect-Template -AgentName 'gentleman-reviewer-sub' | Should -Be 'reviewer'
     }
 
-    It 'all 4 -sub-auto agents map to auto-sub (not auto — the drift bug)' {
-        Detect-Template -AgentName 'gentleman-deep-sub-auto'       | Should -Be 'auto-sub'
-        Detect-Template -AgentName 'gentleman-quick-sub-auto'      | Should -Be 'auto-sub'
-        Detect-Template -AgentName 'gentleman-codex-sub-auto'      | Should -Be 'auto-sub'
-        Detect-Template -AgentName 'gentleman-implementer-sub-auto'| Should -Be 'auto-sub'
+    # Single-mode (Refactor-AP S1/S5): the auto-sub template was deleted, so
+    # retired -sub-auto names no longer resolve — fail-closed throw. (This It
+    # replaces the pre-single-mode 'maps to auto-sub' expectation; the old
+    # behavior was eliminated with the template, not moved.)
+    It 'retired -sub-auto names fail closed (auto-sub template deleted)' {
+        { Detect-Template -AgentName 'gentleman-deep-sub-auto' }        | Should -Throw
+        { Detect-Template -AgentName 'gentleman-quick-sub-auto' }       | Should -Throw
+        { Detect-Template -AgentName 'gentleman-codex-sub-auto' }       | Should -Throw
+        { Detect-Template -AgentName 'gentleman-implementer-sub-auto' } | Should -Throw
     }
 
     It 'role-based agents map to correct templates' {
@@ -105,20 +109,22 @@ Describe 'Detect-Template — explicit map entries' {
 }
 
 Describe 'Detect-Template — auto-registration (Gap A — naming conventions)' {
-    It 'gentleman-security-sub-auto auto-detected via -sub-auto suffix (NOT in explicit map)' {
-        # This agent follows naming conventions but is NOT in $TemplateMap
+    # Single-mode: no -auto/-semi suffix branch remains; this name resolves
+    # ONLY via the 'security' role keyword (NOT a template — documents that
+    # retired suffixes carry no template meaning anymore).
+    It 'gentleman-security-sub-auto resolves via security keyword (no auto-sub template)' {
         $result = Detect-Template -AgentName 'gentleman-security-sub-auto'
-        $result | Should -Be 'auto-sub'
+        $result | Should -Be 'readonly'
     }
 
-    It 'gentleman-foo-auto auto-detected via -auto suffix (NOT in explicit map)' {
-        $result = Detect-Template -AgentName 'gentleman-foo-auto'
-        $result | Should -Be 'auto'
+    # Single-mode: retired -auto suffix is not a template — fail-closed throw.
+    It 'gentleman-foo-auto fails closed (no -auto suffix branch)' {
+        { Detect-Template -AgentName 'gentleman-foo-auto' } | Should -Throw
     }
 
-    It 'gentleman-foo-semi auto-detected via -semi suffix (NOT in explicit map)' {
-        $result = Detect-Template -AgentName 'gentleman-foo-semi'
-        $result | Should -Be 'semi'
+    # Single-mode: retired -semi suffix is not a template — fail-closed throw.
+    It 'gentleman-foo-semi fails closed (no -semi suffix branch)' {
+        { Detect-Template -AgentName 'gentleman-foo-semi' } | Should -Throw
     }
 
     It 'gentleman-security-analyst-sub recurses: -sub stripped → gentleman-security-analyst → keyword match' {
@@ -144,8 +150,8 @@ Describe 'Detect-Template — role keyword matching' {
         Detect-Template -AgentName 'gentleman-code-reviewer' | Should -Be 'reviewer'
     }
 
-    It 'vMK keyword → orchestrator' {
-        Detect-Template -AgentName 'gentleman-vMK-clone' | Should -Be 'orchestrator'
+    It 'MK keyword → orchestrator (single-mode; vMK keyword removed in S1)' {
+        Detect-Template -AgentName 'gentleman-MK-clone' | Should -Be 'orchestrator'
     }
 }
 
