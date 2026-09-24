@@ -22,6 +22,22 @@ jobs:
         shell: pwsh
         run: ./scripts/run-ci-tests.ps1
 
+  contracts:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run contract + golden + prompt gates
+        shell: pwsh
+        run: |
+          $results = Invoke-Pester -Path './tests/contract-*.Tests.ps1','./tests/golden-prompts.Tests.ps1','./tests/golden-fixtures.Tests.ps1' -Output Detailed -PassThru
+          if ($results.FailedCount -gt 0) {
+            Write-Error "contracts: $($results.FailedCount) test(s) failed"
+            exit 1
+          }
+          Write-Output "OK: $($results.PassedCount)/$($results.TotalCount) contract tests passed"
+
   pssa-lint:
     runs-on: windows-latest
     timeout-minutes: 15

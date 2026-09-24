@@ -1,5 +1,7 @@
 # Gentleman Agent — OpenCode AI Agent Skills & Scripts
 
+[![contracts](https://github.com/LuisAlbertoMK/gentleman-agent-gh/actions/workflows/ci.yml/badge.svg?branch=main&event=push&job=contracts)](https://github.com/LuisAlbertoMK/gentleman-agent-gh/actions/workflows/ci.yml)
+
 ## What is this?
 
 **Gentleman Agent** is an **AI software development team** for OpenCode. Instead of a single chatbot, you get 58 specialized agents working together:
