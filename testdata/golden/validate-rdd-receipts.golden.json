@@ -1,0 +1,13 @@
+{
+  "args": ".rdd/rdd-receipt-00*.json (sorted by name)",
+  "failed": [],
+  "generator": "Get-Content -Raw | Test-Json -SchemaFile contracts/rdd-receipt.schema.json",
+  "passed": [
+    "rdd-receipt-001.json",
+    "rdd-receipt-002.json",
+    "rdd-receipt-003.json",
+    "rdd-receipt-004.json"
+  ],
+  "schema": "contracts/rdd-receipt.schema.json",
+  "total": 4
+}

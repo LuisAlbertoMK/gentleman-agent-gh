@@ -1,0 +1,20 @@
+{
+  "all_pass": true,
+  "args": "-SkillName odd -Json",
+  "generator": "scripts/skills-audit-check.ps1 -SkillName odd -Json",
+  "passed": 10,
+  "rules": [
+    { "detail": "name='odd' dir='odd'", "pass": true, "rule": "A1-name" },
+    { "detail": "len=141", "pass": true, "rule": "A2-description" },
+    { "detail": "triggers len=111", "pass": true, "rule": "A3-triggers" },
+    { "detail": "struct=True refsDir=False docsRef=False xref=True", "pass": true, "rule": "A4-structure" },
+    { "detail": "dataRows=3", "pass": true, "rule": "B1-anti-rat" },
+    { "detail": "bullets=3", "pass": true, "rule": "B2-red-flags" },
+    { "detail": "bullets=2", "pass": true, "rule": "B3-verification" },
+    { "detail": "token_budget=2850", "pass": true, "rule": "C1-token-budget" },
+    { "detail": "changelog len=31", "pass": true, "rule": "C2-changelog" },
+    { "detail": "bytes=2693", "pass": true, "rule": "C3-no-bloat" }
+  ],
+  "skill": "odd",
+  "total": 10
+}
