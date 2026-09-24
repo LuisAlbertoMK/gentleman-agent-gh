@@ -92,6 +92,13 @@ Regla (precedente `ronda7-arranque.md` + skill `odd`): ALL criteria must pass pa
   Scope: `opencode.json` (deny: curl,wget,npx,npm install,node,pip install +ftp/scp/rsync/docker/git clone según SSoT) + `prompts/shared/_permission-templates.md` si el SSoT necesita ajuste + extensión `tests/permission-rules-consistency.Tests.ps1` (Its que fallan si el drift reaparece). rm/ssh ya deny (no tocar). --no-verify sigue bypassando 21 checks (declarado, no se cierra aquí). Est. ~40-80L en 2-3 files, 1 commit. `confidence: medium` (riesgo ruptura flujos node/npx → allowlist explícita documentada).
   Outcome: SSoT=runtime (0 drift); `permission-rules-consistency` PASS; score seguridad no baja de 10.0.
 
+## 3.5. Corrección Fase 1.5 (premisas verificadas contra código opencode v1 — instalada 1.18.32, fuente contexto7 /anomalyco/opencode)
+
+- `subagent_depth` DESCARTADO (premisa invertida): el doc dice "Set to 1 by default, 0 to disable, or higher values to permit deeper nesting" → poner 2 AUMENTA la anidación (más recursos, no menos). No se aplica; queda en default. Nota: el check `subagent_depth` de §5-S3 queda superado (superseded) por esta corrección.
+- `snapshot` NO aplicado (key corregida): en v1 es boolean top-level (`"snapshot": true`), NO `snapshot.enabled`; además los snapshots son red de seguridad y no se tocan en este slice.
+- `experimental.mcp_timeout` key válida pero es slice S2 → DEFERIDO (Review Log), fuera del alcance del S3 ajustado.
+- Alcance aplicado del S3 ajustado: solo `watcher.ignore` (4 patrones) + `small_model` (con fallback seguro al modelo primario). Sin compaction, sin permisos, sin timeouts.
+
 ## 4. Freeze EN ESTA RAMA + Tier + review plan + OWNER-DECISIONS
 
 - **Freeze point:** rama `experimento/mejora-ronda10-recursos` @ HEAD `cd7c4c2527d3df95f38880593c189022326525fe` (prefijo `cd7c4c25` OK, = tip R9). Cada slice congela su base con `git rev-parse HEAD` + `git diff | git hash-object --stdin` (8 chars) en su receipt (plantillas sección 6, precedente `.rdd/rdd-receipt-007.json`). `main@77e983ce` nunca se toca.
@@ -204,8 +211,8 @@ Regla (precedente `ronda7-arranque.md` + skill `odd`): ALL criteria must pass pa
 | Slice | Reviewer/método | Veredicto | Fecha | Notas |
 |---|---|---|---|---|
 | R10-S1 | inline 4R self-check (Tier 1) | PASS | 2026-09-24 | Enfoque A: 6 refs rotas retiradas → hardware-profile.ps1 + opencode-configs/; Select-String 0 hits; cross-ref PASS; frontmatter 117/117; SKILL.md 2831→2785B (budget 2582×1.1 OK) |
-| R10-S2 | (pendiente, OWNER) | - | - | - |
-| R10-S3 | (pendiente, OWNER) | - | - | - |
+| R10-S2 | — | DEFERIDO (OWNER) | 2026-09-24 | `experimental.mcp_timeout` key válida pero es slice S2, fuera del alcance del S3 ajustado; timeouts quedan en 60000/60000/30000 pendientes de valores owner. |
+| R10-S3 | surgical edit + Test-Json + key-count (Tier 2, OWNER aprobado) | PASS | 2026-09-24 | `small_model=opencode/muse-spark-1.3-contributor-free` + `watcher.ignore=[node_modules/**,.git/**,dist/**,temp/**]`; Test-Json True; keys 13→15 (todas previas intactas); subagent_depth/snapshot NO aplicados (ver §3.5); monitor-opencode sin regresión n/a en local (declarado, no maquillado) |
 | R10-S4 | (pendiente, OWNER seguridad) | - | - | - |
 
 ## 8. Rollback (por slice, orden inverso)

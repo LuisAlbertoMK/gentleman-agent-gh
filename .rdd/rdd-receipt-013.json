@@ -1,0 +1,18 @@
+{
+  "id": "rdd-receipt-013",
+  "freeze": "HEAD-1ea86ef-e69de29b",
+  "freeze_note": "Slice R10-S3 ajustado config(perf): watcher.ignore + small_model en rama experimento/mejora-ronda10-recursos (base 1ea86ef8df7901ee9614dd4d1d2c5efe20b831d1, tip R10-S1). diff8=e69de29b = working tree limpio al iniciar el slice. lines_changed=2 solo scope (opencode.json single-line: 1 ins + 1 del); el commit ademas incluye odd/tasks/ronda10-recursos.md (fila Review Log R10-S3 + §3.5 Fase 1.5 + S2 DEFERIDO) + este receipt, ambos fuera del conteo (precedente rdd-receipt-007/011). OWNER aprobado (Tier 2). iGPU shared: sin offload VRAM.",
+  "tier": 2,
+  "tier_justification": "RDD Risk Tiers: Tier 2 = opencode.json compartido (watcher/small_model cambian comportamiento del agente en todos los runs). OWNER aprobado, slice ajustado por evidencia (§3.5).",
+  "files": ["opencode.json"],
+  "lines_changed": 2,
+  "lines_deleted": 1,
+  "verdict": "PASS",
+  "verdict_note": "APLICADO: small_model=opencode/muse-spark-1.3-contributor-free + watcher.ignore=[node_modules/**,.git/**,dist/**,temp/**]; Test-Json True; keys top-level 13->15 (las 13 previas intactas: model, skills, permission, default_agent, experimental, compaction, tools, mcp, agent, plugin, tool_output, rules, $schema); experimental.mcp_timeout intacto en 60000; compaction intacto. NO APLICADO: subagent_depth (premisa invertida — doc v1: default 1, 0 disables, higher = deeper nesting; poner 2 aumentaria recursos), snapshot (en v1 es boolean top-level, no snapshot.enabled; red de seguridad, no se toca), mcp_timeout (slice S2, DEFERIDO). Backup original en $env:TEMP (opencode-r10s3-backup.json, 23608B) + git show HEAD:opencode.json para revert.",
+  "review": {"status": "PASS", "method": "inline 4R self-check (Risk/Readability/Reliability/Resilience) — sin reviewer agent separado en este run", "gaps": ["monitor-opencode.ps1 sin-regresion no ejecutado en local (RSS/Priv requieren ventana de observacion con reinicio del runtime; se declara pendiente, no PASS)"]},
+  "escalation": "judgment-day",
+  "blockers": [],
+  "next": ["R10-S2 DEFERIDO pendiente (OWNER, valores timeout)", "R10-S4 (OWNER seguridad)"],
+  "auto_fix": false,
+  "timestamp": "2026-09-24T16:02:59.2783940-06:00"
+}
