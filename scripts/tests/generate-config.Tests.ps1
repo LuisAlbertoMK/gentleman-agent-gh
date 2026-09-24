@@ -119,11 +119,11 @@ Describe 'generate-opencode-config.js — fail-closed' {
     It 'exits 1 when extraPermKeys collides with a template key' {
         $repo = New-GenRepo 'collision'
         Set-GenFixture -Repo $repo `
-            -Agent @{ 'gentleman-quick-sub-auto' = @{
+            -Agent @{ 'gentleman-quick-sub' = @{
                 description = 'Fast executor subagent'; model = 'opencode/big-pickle';
                 hidden = $true; mode = 'subagent'; prompt = '{file:prompts/gentleman-quick.md}' } } `
-            -Templates @{ 'auto-sub' = $script:tmplAutoSub } `
-            -Overrides @{ 'gentleman-quick-sub-auto' = @{ extraPermKeys = @{ bash = @{ '*' = 'allow' } } } }
+            -Templates @{ 'readwrite' = $script:tmplReadwrite } `
+            -Overrides @{ 'gentleman-quick-sub' = @{ extraPermKeys = @{ bash = @{ '*' = 'allow' } } } }
 
         $out = & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') 2>&1 | Out-String
 
@@ -198,10 +198,10 @@ Describe 'generate-opencode-config.js — validation & overrides' {
         $repo = New-GenRepo 'idem'
         Set-GenFixture -Repo $repo `
             -Agent @{
-                'gentleman-quick-sub-auto' = @{ description = 'Fast executor subagent'; model = 'opencode/big-pickle'; hidden = $true; mode = 'subagent'; prompt = '{file:prompts/gentleman-quick.md}' }
+                'gentleman-quick-sub' = @{ description = 'Fast executor subagent'; model = 'opencode/big-pickle'; hidden = $true; mode = 'subagent'; prompt = '{file:prompts/gentleman-quick.md}' }
                 'gentleman-security' = @{ description = 'Security specialist'; model = 'opencode/nemotron-3-ultra-free'; mode = 'primary'; prompt = '{file:prompts/gentleman-security.md}' }
             } `
-            -Templates @{ 'auto-sub' = $script:tmplAutoSub; 'readonly' = $script:tmplReadonly }
+            -Templates @{ 'readwrite' = $script:tmplReadwrite; 'readonly' = $script:tmplReadonly }
 
         & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') | Out-Null
         $LASTEXITCODE | Should -Be 0
@@ -216,9 +216,9 @@ Describe 'generate-opencode-config.js — validation & overrides' {
         Set-GenFixture -Repo $repo `
             -Agent @{
                 'sdd-apply' = @{ description = 'Implement code changes from task definitions'; model = 'opencode/muse-spark-1.3-contributor-free'; mode = 'subagent'; prompt = '{file:prompts/sdd/sdd-apply.md}' }
-                'gentleman-quick-sub-auto' = @{ description = 'Fast executor subagent'; mode = 'subagent' }
+                'gentleman-quick-sub' = @{ description = 'Fast executor subagent'; mode = 'subagent' }
             } `
-            -Templates @{ 'readwrite' = $script:tmplReadwrite; 'auto-sub' = $script:tmplAutoSub } `
+            -Templates @{ 'readwrite' = $script:tmplReadwrite } `
             -Overrides @{ 'sdd-apply' = @{ hidden = $true } }
 
         & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') | Out-Null
@@ -226,7 +226,7 @@ Describe 'generate-opencode-config.js — validation & overrides' {
 
         $cfg = Read-GenOutput (Join-Path $repo 'opencode.json')
         $cfg.agent.'sdd-apply'.hidden | Should -Be $true
-        $cfg.agent.'gentleman-quick-sub-auto'.PSObject.Properties.Name | Should -Not -Contain 'hidden'
+        $cfg.agent.'gentleman-quick-sub'.PSObject.Properties.Name | Should -Not -Contain 'hidden'
     }
 }
 
