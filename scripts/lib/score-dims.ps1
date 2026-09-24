@@ -698,15 +698,15 @@ $testCoverageScore = if ($totalScripts -gt 0) { $math::Round($testedScripts.Coun
 $subScores += ($sdSubDims['script_test_coverage'] = $testCoverageScore)
 
 # Skill Changelog Coverage: % of skills with changelog in frontmatter
-$changelogScore = if ($totalSkills -gt 0) { $math::Round($skillsWithChangelog / $totalSkills * 10, 1) } else { 0 }
+$changelogScore = if ($totalSkills -gt 0) { $math::Min(10, $math::Round($skillsWithChangelog / $totalSkills * 10, 1)) } else { 0 }
 $subScores += ($sdSubDims['skill_changelog'] = $changelogScore)
 
 # Skill Trigger Coverage: % of skills with triggers in frontmatter
-$triggerScore = if ($totalSkills -gt 0) { $math::Round($skillsWithTriggers / $totalSkills * 10, 1) } else { 0 }
+$triggerScore = if ($totalSkills -gt 0) { $math::Min(10, $math::Round($skillsWithTriggers / $totalSkills * 10, 1)) } else { 0 }
 $subScores += ($sdSubDims['skill_triggers'] = $triggerScore)
 
 # Skill Refs Coverage: % of skills with ## Refs section
-$refsScore = if ($totalSkills -gt 0) { $math::Round($skillsWithRefs / $totalSkills * 10, 1) } else { 0 }
+$refsScore = if ($totalSkills -gt 0) { $math::Min(10, $math::Round($skillsWithRefs / $totalSkills * 10, 1)) } else { 0 }
 $subScores += ($sdSubDims['skill_refs'] = $refsScore)
 
 # README Skill Count Accuracy: does README match actual skill count?
