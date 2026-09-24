@@ -525,11 +525,17 @@ $gatePassScore = 0
 if ($null -ne $latestErrorJson) {
     try {
         $latError = $latestErrorJson
-        if ($latError.source -eq "quality-gate" -and $latError.total -gt 0) {
-            $gatePassRate = $latError.passed / $latError.total
-            $gatePassScore = $math::Round($gatePassRate * 10, 1)
-        } elseif ($latError.passed -ge 5) {
-            $gatePassScore = 10
+        # Null-safe total: LATEST_error.json may omit `total` (quality-gate
+        # writes passed without total); direct `.total` access throws under
+        # Set-StrictMode, which used to force gatePassScore=0 via the catch
+        # below instead of the intended passed>=5 -> 10 fallback.
+        $latTotal = $null
+        if ($null -ne $latError.PSObject.Properties['total']) { $latTotal = $latError.total }
+        if ($latError.source -eq "quality-gate" -and $null -ne $latTotal -and $latTotal -gt 0) {
+            $gatePassRate = $latError.passed / $latTotal
+            $gatePassScore = [math]::Round($gatePassRate * 10, 1)
+        } else {
+            $gatePassScore = Get-GatePassScore -Passed $latError.passed -Total $null
         }
     } catch { $gatePassScore = 0 }
 }

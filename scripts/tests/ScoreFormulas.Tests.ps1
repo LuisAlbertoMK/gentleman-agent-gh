@@ -108,6 +108,45 @@ Describe 'Get-MeScore (Metrics)' {
     }
 }
 
+Describe 'Get-GatePassScore (Gate Pass)' {
+    It 'returns ratio score when Total is present (30,30 -> 10)' {
+        Get-GatePassScore -Passed 30 -Total 30 | Should -Be 10
+    }
+    It 'returns ratio score when Total is present (14,28 -> 5)' {
+        Get-GatePassScore -Passed 14 -Total 28 | Should -Be 5
+    }
+    It 'returns ratio score when Total is present (21,28 -> 7.5)' {
+        Get-GatePassScore -Passed 21 -Total 28 | Should -Be 7.5
+    }
+    It 'returns ratio score when Total is present (28,30 -> 9.3)' {
+        Get-GatePassScore -Passed 28 -Total 30 | Should -Be 9.3
+    }
+    It 'prefers ratio over fallback when Total is present even with passed>=5 (5,30 -> 1.7)' {
+        Get-GatePassScore -Passed 5 -Total 30 | Should -Be 1.7
+    }
+    It 'returns 0 for zero passed with Total present (0,30 -> 0)' {
+        Get-GatePassScore -Passed 0 -Total 30 | Should -Be 0
+    }
+    It 'falls back to 10 when Total is missing and passed>=5 (28,missing -> 10)' {
+        Get-GatePassScore -Passed 28 -Total $null | Should -Be 10
+    }
+    It 'falls back to 10 at passed boundary 5 with missing Total (5,missing -> 10)' {
+        Get-GatePassScore -Passed 5 -Total $null | Should -Be 10
+    }
+    It 'falls back to 10 when Total is 0 and passed>=5 (28,0 -> 10)' {
+        Get-GatePassScore -Passed 28 -Total 0 | Should -Be 10
+    }
+    It 'returns 0 when Total is missing and passed is below 5' {
+        Get-GatePassScore -Passed 4 -Total $null | Should -Be 0
+    }
+    It 'returns 0 when both are zero (0,0 -> 0)' {
+        Get-GatePassScore -Passed 0 -Total 0 | Should -Be 0
+    }
+    It 'returns 0 when passed is 0 and Total is missing (0,missing -> 0)' {
+        Get-GatePassScore -Passed 0 -Total $null | Should -Be 0
+    }
+}
+
 Describe 'Get-CaScore (Cycle Activity)' {
     It 'returns 5.0 for half target (15,30)' {
         Get-CaScore -Count 15 -Target 30 | Should -Be 5.0
