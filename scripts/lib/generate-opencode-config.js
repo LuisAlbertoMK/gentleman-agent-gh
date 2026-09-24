@@ -40,13 +40,12 @@ const ROLE_KEYWORDS = {
   performance: 'readonly',
   datascience: 'readonly',
   reviewer:    'reviewer',
-  vMK:         'orchestrator',
 };
 
 // --- Detect template for an agent name ---
 // Resolution order (must mirror Detect-Template in template-detection.ps1 exactly):
 //   1. Explicit lookup in TEMPLATE_MAP (SSOT anchor)
-//   2. Suffix auto-registration (-sub-auto → auto-sub, -semi → semi, -auto → auto, -sub → recurse)
+//   2. Suffix delegation (-sub → recurse to parent template)
 //   3. Role keyword matching
 //   4. Fail-closed — throw
 function detectTemplate(agentName) {
@@ -55,10 +54,7 @@ function detectTemplate(agentName) {
     return TEMPLATE_MAP[agentName];
   }
 
-  // 2. Suffix auto-registration (longest suffix first)
-  if (agentName.endsWith('-sub-auto')) return 'auto-sub';
-  if (agentName.endsWith('-semi'))      return 'semi';
-  if (agentName.endsWith('-auto'))     return 'auto';
+  // 2. Suffix delegation (single-mode: only -sub recurses to parent template)
   if (agentName.endsWith('-sub'))      return detectTemplate(agentName.slice(0, -4));
 
   // 3. Role keyword matching
@@ -76,7 +72,6 @@ function detectTemplate(agentName) {
 // ALL agents should be listed here. New agents following naming conventions are auto-detected.
 const TEMPLATE_MAP = {
   // Orchestrator — full bash allow + extra language denials
-  'gentleman-vMK': 'orchestrator',
   'gentle-MK': 'orchestrator',
   'gentle-orchestrator': 'sddorchestrator',
 
@@ -127,32 +122,6 @@ const TEMPLATE_MAP = {
   'gentleman-performance-sub': 'readonly',
   'gentleman-datascience-sub': 'readonly',
   'gentleman-docs-sub': 'readonly',
-
-  // Mode variants — AUTO (all auto-approve except push + destructive + network)
-  'gentleman-vMK-auto': 'auto',
-  'gentle-MK-auto': 'auto',
-  'gentleman-deep-auto': 'auto',
-  'gentleman-quick-auto': 'auto',
-  'gentleman-codex-auto': 'auto',
-  'gentleman-implementer-auto': 'auto',
-  'gentleman-aem-auto': 'auto',
-  'gentleman-initializer-auto': 'auto',
-
-  // Mode variants — AUTO subagent twins (zero-ask, delegable via Task tool in auto mode)
-  'gentleman-deep-sub-auto': 'auto-sub',
-  'gentleman-quick-sub-auto': 'auto-sub',
-  'gentleman-codex-sub-auto': 'auto-sub',
-  'gentleman-implementer-sub-auto': 'auto-sub',
-  'gentleman-aem-sub-auto': 'auto-sub',
-  'gentleman-code-review-sub-auto': 'auto-sub',
-  'gentleman-reasoning-sub-auto': 'auto-sub',
-
-  // Mode variants — SEMI RETIRED (ADR-033 implemented 2026-09-04):
-  // explicit '-semi' entries removed; '-semi' suffix below + skip still
-  // handle the legacy definitions in opencode-base.json until base is
-  // cleaned (JD follow-up). Do NOT re-add entries here.
-  // dual-read: gentle-MK-semi added for F2 rename compat (symmetric with PS map)
-  'gentle-MK-semi': 'semi',
 
   // Independent evaluator — bash ask, no edit/write
   'gentleman-reviewer': 'reviewer',
@@ -277,14 +246,6 @@ const stats = { orchestrator: 0, readwrite: 0, readonly: 0, sddorchestrator: 0, 
 const orderedAgents = {};
 for (const [agentName, agentDef] of Object.entries(base.agent)) {
   const templateName = detectTemplate(agentName);
-
-  // ADR-033 IMPLEMENTED 2026-09-04 (simplified to manual|auto): 'semi' skipped
-  // at build so opencode.json carries 0 *-semi agents. Skip KEPT (not dead-code):
-  // opencode-base.json was purged of -semi agents per ADR-033 (base is clean);
-  // permission-templates.json still carries the 'semi' template; removing this skip
-  // would reintroduce/mis-map them (vMK-semi → orchestrator via keyword). Remove
-  // this skip only together with template cleanup (JD follow-up).
-  if (templateName === 'semi') continue;
 
   const template = templates[templateName];
 
