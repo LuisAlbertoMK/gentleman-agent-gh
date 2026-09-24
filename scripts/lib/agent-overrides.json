@@ -45,27 +45,6 @@
   "sdd-verify": {
     "hidden": true
   },
-  "gentle-MK-auto": {
-    "extraPermKeys": {
-      "task": {
-        "*": "deny",
-        "gentleman-deep-sub-auto": "allow",
-        "gentleman-quick-sub-auto": "allow",
-        "gentleman-codex-sub-auto": "allow",
-        "gentleman-implementer-sub-auto": "allow",
-        "sdd-apply": "allow",
-        "sdd-archive": "allow",
-        "sdd-design": "allow",
-        "sdd-explore": "allow",
-        "sdd-init": "allow",
-        "sdd-propose": "allow",
-        "sdd-spec": "allow",
-        "sdd-tasks": "allow",
-        "sdd-verify": "allow",
-        "gentleman-aem-sub-auto": "allow"
-      }
-    }
-  },
   "gentle-orchestrator": {
     "extraPermKeys": {
       "delegate": "allow",
@@ -79,9 +58,6 @@
         "gentleman-datascience-sub": "allow",
         "gentleman-deep-sub": "allow",
         "sdd-propose": "allow",
-        "gentleman-quick-sub-auto": "allow",
-        "gentleman-implementer-sub-auto": "allow",
-        "gentleman-deep-sub-auto": "allow",
         "gentleman-seo-sub": "allow",
         "gentleman-quick-sub": "allow",
         "sdd-tasks": "allow",
@@ -95,10 +71,8 @@
         "gentleman-security-sub": "allow",
         "sdd-init": "allow",
         "gentleman-infra-sub": "allow",
-        "gentleman-codex-sub-auto": "allow",
         "general": "allow",
-        "gentleman-aem-sub": "allow",
-        "gentleman-aem-sub-auto": "allow"
+        "gentleman-aem-sub": "allow"
       },
       "delegation_read": "allow",
       "delegation_list": "allow"
