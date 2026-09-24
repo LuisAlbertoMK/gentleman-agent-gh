@@ -14,7 +14,7 @@
     semi-agents.json deleted, allowlist sync no longer applicable). The production
     script therefore keeps a comment mirror of the arrays below. Keep that mirror
     in sync when editing the patterns here. Runtime 'semi' branch below is legacy
-    backward-compat (mode-gate remaps semi→auto) — JD follow-up decides removal.
+    backward-compat (single-mode Refactor-AP S2: mode file is a no-op, -auto/-semi are compat aliases) — JD follow-up decides removal.
 #>
 
 # ===== COMMAND CLASSIFICATION RULES =====

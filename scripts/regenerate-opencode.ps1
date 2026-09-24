@@ -1,4 +1,5 @@
 #requires -Version 7
+# NOTE (Refactor-AP S2b single-mode): RETIRED for -auto/-semi purposes — single-mode SSoT has 0 -auto agents; wrapper logic untouched.
 [CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS

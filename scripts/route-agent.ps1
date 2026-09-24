@@ -2,23 +2,17 @@
 [CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
-    Mode-aware agent routing — resolves the correct agent variant for delegation.
+    Single-mode agent routing — always resolves the base agent name (Refactor-AP S2).
 
 .DESCRIPTION
-    Reads .gentleman-mode (manual|auto) and appends the routing suffix
-    to the base agent name per the Mode-Aware Routing protocol in AGENTS.md:
+    Single-mode routing (gentle-ai style): there is only ONE mode. Every
+    base agent resolves to itself with NO suffix. The retired `-auto` /
+    `-semi` suffixes and `.gentleman-mode` / `-Mode` values are no-ops
+    accepted for backward compat (with a warning); effective mode is
+    always 'manual'.
 
-      manual → no suffix  (e.g. gentleman-quick)
-      semi   → [DEPRECATED, ADR-033] remaps to auto
-      auto   → -auto      (e.g. gentleman-quick-auto)
-
-    Read-only specialists and SDD phase subagents never get a suffix —
-    they always execute directly. Agents without a -semi/-auto variant
-    fall back to the base name automatically.
-
-    This is the single source of truth invoked BEFORE every subagent
-    delegation, so the orchestrator always announces the routing decision
-    consistent with the current mode.
+    Read-only specialists, SDD phase subagents and mode-aware core agents
+    all execute directly with no suffix.
 
 .PARAMETER BaseAgent
     Base agent name without mode suffix (e.g. gentleman-quick, gentleman-deep-sub).
@@ -34,7 +28,7 @@
 .EXAMPLE
     .\scripts\route-agent.ps1 -BaseAgent gentleman-quick
     .\scripts\route-agent.ps1 -BaseAgent gentleman-security-sub  # → no suffix
-    .\scripts\route-agent.ps1 -BaseAgent gentleman-quick -Mode auto -Json
+    .\scripts\route-agent.ps1 -BaseAgent gentleman-quick -Mode auto -Json  # mode no-op → no suffix
 #>
 param(
     [Parameter(Mandatory)]
@@ -75,37 +69,46 @@ if (-not $Mode) {
     }
 }
 
-# --- Routing logic ---
-$note = ""
-if ($ReadOnlySpecialists -contains $BaseAgent) {
-    $TargetAgent = $BaseAgent
-    $suffix      = ""
-    $note        = "read-only specialist — no suffix"
+# --- Refactor-AP S2 single-mode: mode file / -Mode are no-ops ---
+if ($Mode -ne 'manual') {
+    Write-Warning "Single-mode (Refactor-AP S2): mode '$Mode' is a no-op — treating as 'manual'. Suffixes -auto/-semi are compat aliases."
+    $Mode = 'manual'
 }
-elseif ($ModeAwareAgents -contains $BaseAgent) {
-    switch ($Mode) {
-        'manual' { $suffix = "" ; $note = "manual mode — no suffix" }
-        'semi'   {
-            # ADR-033: 'semi' DEPRECATED → remap to auto routing.
-            Write-Warning "'semi' mode is DEPRECATED (ADR-033: simplified to manual|auto). Routing as 'auto' (-auto suffix)."
-            $suffix = "-auto" ; $note = "semi (deprecated per ADR-033) → auto suffix -auto"
-        }
-        'auto'   { $suffix = "-auto"; $note = "auto mode — suffixed -auto" }
-    }
-    $TargetAgent = $BaseAgent + $suffix
+
+# --- Compat alias: retired -auto / -semi suffix on input accepted with warning ---
+$aliasSuffix = ''
+$canonicalBase = $BaseAgent
+if ($BaseAgent -match '(?<suffix>-auto|-semi)$') {
+    $aliasSuffix = $Matches['suffix']
+    $canonicalBase = $BaseAgent.Substring(0, $BaseAgent.Length - $aliasSuffix.Length)
+    Write-Warning "Single-mode (Refactor-AP S2): '$BaseAgent' uses retired suffix '$aliasSuffix' — compat alias for '$canonicalBase'."
+}
+
+# --- Routing logic (single-mode: always no suffix) ---
+$note = ""
+if ($ReadOnlySpecialists -contains $canonicalBase) {
+    $TargetAgent = $canonicalBase
+    $suffix      = ""
+    $note        = "read-only specialist — no suffix (single-mode)"
+}
+elseif ($ModeAwareAgents -contains $canonicalBase) {
+    $TargetAgent = $canonicalBase
+    $suffix      = ""
+    $note        = "single-mode — no suffix (mode file is a no-op)"
 }
 else {
     # SDD phase agents (sdd-*) and non-mode-aware subagent twins (gentleman-*-sub): no suffix
-    $TargetAgent = $BaseAgent
+    $TargetAgent = $canonicalBase
     $suffix      = ""
     # Warn for truly unknown agents (not sdd-* or *-sub variants)
-    if ('sdd', '-sub' | Where-Object { $BaseAgent.Contains($_) }) {
+    if ('sdd', '-sub' | Where-Object { $canonicalBase.Contains($_) }) {
         $note = "non-mode-aware agent — no suffix"
     } else {
-        Write-Warning "route-agent: '$BaseAgent' is not a recognized agent — no suffix applied"
+        Write-Warning "route-agent: '$canonicalBase' is not a recognized agent — no suffix applied"
         $note = "unknown agent — no suffix (WARNING)"
     }
 }
+if ($aliasSuffix) { $note += " (compat alias for retired '$aliasSuffix' suffix)" }
 
 if ($Json) {
     return [PSCustomObject]@{
