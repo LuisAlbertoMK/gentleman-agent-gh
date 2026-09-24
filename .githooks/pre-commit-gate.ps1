@@ -63,7 +63,8 @@ function Test-JdReviewMarkers {
                 # Validate marker content: accept both formats
                 # Legacy: empty file (backward compat)
                 # Evidence: "{who} {when} why fileHash:{hash}" prefix
-                $markerContent = (Get-Content -LiteralPath $marker -Raw -Encoding UTF8).Trim()
+                $markerRaw = Get-Content -LiteralPath $marker -Raw -Encoding UTF8
+                $markerContent = if ($null -ne $markerRaw) { $markerRaw.Trim() } else { '' }
                 if ($markerContent -ne '') {
                     # Evidence format — validate prefix has minimum structure
                     $hasWho = ($markerContent -match '^\S+')

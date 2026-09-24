@@ -42,6 +42,13 @@
     A. empty staged            -> exit 0, 28 headers, Gate 28/28,  0 BLOCKING (ALL CLEAR)
     B. docs/*.txt trailing ws  -> exit 0, 28 headers, Gate 28/28,  0 BLOCKING ([1/26] WARN, non-blocking!)
     C. scripts/*.ps1, no marker-> exit 1, 28 headers, Gate 27/28,  1 BLOCKING ([10/26] ROZA)
+    D. scripts/*.ps1 + EMPTY (0-byte) legacy marker
+                               -> exit 0, 28 headers, Gate 28/28,  0 BLOCKING ([10/26] OK, legacy-clear)
+       Isolation note: markers + stale-check resolve against -RepoRoot
+       (the REAL repo), so D creates a REAL probe file
+       (scripts/gate-char-probe.ps1) + a REAL 0-byte legacy marker
+       (.jd-cleared/scripts_gate-char-probe.ps1), stages the probe path in
+       the TEMP repo, and removes both real files in `finally`.
 
   NOTE on B: the plan guessed [1/26] would Fail with exit != 0. The gate code
   (L51) calls Warn, not Fail, for trailing whitespace — Warn counts as passed
@@ -224,5 +231,38 @@ Describe 'pre-commit-gate characterization (baseline snapshot)' {
     $r.Summary.Total | Should -Be 28
     $r.Status | Should -Be 'BLOCKED'
     $r.Verdicts['16'] | Should -Be 'OK'  # scripts/* is scope-allowed; only [10/26] blocks
+  }
+
+  It 'D: scripts/*.ps1 with EMPTY (0-byte) legacy marker -> no crash, [10/26] OK, exit 0, 28 headers, Gate 28/28' {
+    $probeRel = 'scripts/gate-char-probe.ps1'
+    $probeFull = Join-Path $script:RealRepo $probeRel
+    $markerFull = Join-Path $script:RealRepo '.jd-cleared/scripts_gate-char-probe.ps1'
+    # Pre-clean so a leftover from an aborted run cannot mask the signal.
+    Remove-Item -LiteralPath $probeFull -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $markerFull -Force -ErrorAction SilentlyContinue
+    try {
+      Set-Content -LiteralPath $probeFull -Value "#requires -Version 7`nWrite-Host 'probe'`n" -NoNewline -Encoding UTF8
+      New-Item -ItemType File -Path $markerFull -Force | Out-Null
+      [System.IO.File]::WriteAllBytes($markerFull, [byte[]]@())
+      (Get-Item -LiteralPath $markerFull).Length | Should -Be 0
+      $r = @(Invoke-GateScenario -Name 'D-empty-marker' -Fixtures @{
+        'scripts/gate-char-probe.ps1' = "#requires -Version 7`nWrite-Host 'probe'`n"
+      })[-1]
+      # The bug: Get-Content -Raw on a 0-byte file returns $null and .Trim()
+      # throws (PropertyNotFound/InvalidOperation), aborting the whole gate.
+      $r.RawOutput | Should -Not -Match 'You cannot call a method on a null-valued expression'
+      $r.RawOutput | Should -Not -Match 'InvalidOperation'
+      $r.ExitCode | Should -Be 0
+      $r.Headers.Count | Should -Be 28
+      $r.Verdicts['10'] | Should -Be 'OK'  # empty marker = legacy-clear, target exists -> no prune
+      $r.RawOutput | Should -Not -Match 'BLOCKING'
+      $r.Summary.Passed | Should -Be 28
+      $r.Summary.Total | Should -Be 28
+      $r.Status | Should -Be 'ALL CLEAR'
+    } finally {
+      # ALWAYS leave the real repo as it was: no probe, no marker.
+      Remove-Item -LiteralPath $probeFull -Force -ErrorAction SilentlyContinue
+      Remove-Item -LiteralPath $markerFull -Force -ErrorAction SilentlyContinue
+    }
   }
 }
