@@ -743,30 +743,3 @@ if ($depthScore -is [double]) {
 Add-Dimension "SD" $depthScore @{
     subd = $subScores.Count
 } "Depth: $($subScores.Count) sub-dims: $depthScore/10"
-
-# --- SG: Staleness Gate (SSoT freshness) ---
-$sgScore = 10
-$sgDaysOld = 0
-$sgLastUpdated = "unknown"
-$pjStalenessPath = $projectJsonPath  # C4c: use externally-set path
-if (Test-Path $pjStalenessPath) {
-    try {
-        $pjData = Get-Content $pjStalenessPath -Raw | ConvertFrom-Json
-        $sgLastUpdated = $pjData.score.last_updated
-        if ($sgLastUpdated) {
-            $lastUpdated = [datetime]::Parse($sgLastUpdated, $null, [System.Globalization.DateTimeStyles]::None)
-            $sgDaysOld = [int]((Get-Date) - $lastUpdated).TotalDays
-            if ($sgDaysOld -gt 7) { $sgScore = 0 }
-            elseif ($sgDaysOld -gt 3) { $sgScore = 5 }
-        } else {
-            $sgScore = 5  # No last_updated field
-        }
-    } catch {
-        $sgScore = 5  # Can't parse = uncertain freshness
-    }
-}
-
-Add-Dimension "SG" $sgScore @{
-    days_old = $sgDaysOld
-    last_updated = $sgLastUpdated
-} "SSoT age: ${sgDaysOld}d"
