@@ -463,7 +463,13 @@ Describe "SSoT supply-chain deny floor (single-mode SSoT layers)" {
             param($Rules, [string]$Cmd)
             $toks = $Cmd -split '\s+'
             $bestScore = [int]::MinValue
-            $bestVerdict = $Rules.'*'
+            # StrictMode-safe catch-all: shared-deny-rules.json has NO '*' key
+            # (deny floor without catch-all), so default is $null — preserves
+            # pre-StrictMode ($Rules.'*' → $null) semantics. Unmatched commands
+            # return $null instead of masking an SSoT gap. global bash map HAS
+            # '*'='allow', resolved via the same indexer path.
+            $starProp = $Rules.PSObject.Properties['*']
+            $bestVerdict = if ($starProp) { $starProp.Value } else { $null }
             foreach ($prop in $Rules.PSObject.Properties) {
                 $parts = $prop.Name -split '\s+'
                 $wild = $parts[$parts.Count - 1] -eq '*'
