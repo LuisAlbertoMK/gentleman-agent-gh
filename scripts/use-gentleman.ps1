@@ -49,7 +49,7 @@
 #>
 param(
     [string]$TargetDir,
-    [ValidateSet("gentle-MK","gentleman-vMK","gentleman-deep","gentleman-codex","gentleman-quick","gentle-MK-deep","gentle-MK-codex","gentle-MK-quick")]
+    [ValidateSet("gentle-MK","gentleman-deep","gentleman-codex","gentleman-quick","gentle-MK-deep","gentle-MK-codex","gentle-MK-quick")]
     [string]$DefaultAgent = "gentle-MK",
     [switch]$Json,
     [switch]$Yes,
@@ -317,9 +317,9 @@ if (-not $skillsOk) {
 if (Test-Path $globalCfgFile -PathType Leaf) {
     try {
         $cfg = Get-Content $globalCfgFile -Raw | ConvertFrom-Json
-        $hasGentleman = ($null -ne ($cfg.agent.PSObject.Properties['gentleman-vMK'])) -or ($null -ne ($cfg.agent.PSObject.Properties['gentle-MK']))
+        $hasGentleman = ($null -ne ($cfg.agent.PSObject.Properties['gentle-MK']))
         if (-not $hasGentleman) {
-            Out-Message "  [warn] neither gentleman-vMK nor gentle-MK in global config. Run sync-vmk.ps1." -color Yellow
+            Out-Message "  [warn] gentle-MK not in global config. Run sync-vmk.ps1." -color Yellow
             $globalOk = $false
         }
     } catch {

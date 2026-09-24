@@ -118,7 +118,6 @@ if (-not $SkipShortcuts) {
     $npmDir = "$env:APPDATA\npm"
     if (-not (Test-Path $npmDir)) { New-Item -ItemType Directory -Path $npmDir -Force | Out-Null }
     $shortcuts = @(
-        @{ Name = "gentleman-vmk"; Ps1Cmd = "opencode --agent gentle-MK $args"; CmdCmd = "opencode --agent gentle-MK %*"; BatCmd = "gentleman-vmk" }
         @{ Name = "gentle-mk"; Ps1Cmd = "opencode --agent gentle-MK $args"; CmdCmd = "opencode --agent gentle-MK %*"; BatCmd = "gentle-mk" }
         @{ Name = "gentle-batch-edit"; Ps1Cmd = "gentle-batch-edit.bat $args"; CmdCmd = "gentle-batch-edit.bat %*"; BatCmd = "gentle-batch-edit" }
     )
@@ -295,13 +294,13 @@ if (-not $SkipVision) {
 
 # Step 8: Verify
 info "Verifying setup"
-$verifyCmds = Get-Command gentleman-vmk, gentle-mk, gentle-batch-edit, codebase-memory-mcp, headroom, engram, ollama -EA SilentlyContinue
+$verifyCmds = Get-Command gentle-mk, gentle-batch-edit, codebase-memory-mcp, headroom, engram, ollama -EA SilentlyContinue
 $goCmd = Get-Command "go" -EA SilentlyContinue
 $goAvailable = $null -ne $goCmd
 $checks = @(
     @{ Label = "GENTLEMAN_AGENT_ROOT"; Test = { $env:GENTLEMAN_AGENT_ROOT -eq $__rootDir } },
     @{ Label = "opencode.json exists"; Test = { Test-Path (Join-Path $RepoDir "opencode.json") } },
-    @{ Label = "Global shortcut: gentleman-vmk / gentle-mk"; Test = { ($verifyCmds.Name -contains "gentleman-vmk") -or ($verifyCmds.Name -contains "gentle-mk") } },
+    @{ Label = "Global shortcut: gentle-mk"; Test = { ($verifyCmds.Name -contains "gentle-mk") } },
     @{ Label = "Global shortcut: gentle-batch-edit"; Test = { $verifyCmds.Name -contains "gentle-batch-edit" -or $goAvailable } },
     @{ Label = "Go toolchain"; Test = { $goAvailable } },
     @{ Label = "MCP: codebase-memory-mcp"; Test = { $verifyCmds.Name -contains "codebase-memory-mcp" } },
@@ -332,7 +331,7 @@ if ($allOk) {
         Write-Host "✅ DRY-RUN — nothing was applied. Review steps above, then re-run without -DryRun." -ForegroundColor Cyan
     } else {
         Write-Host "✅ Machine setup COMPLETE" -ForegroundColor Green
-        Write-Host "   → Run 'gentleman-vmk' or 'gentle-mk' to launch" -ForegroundColor Cyan
+        Write-Host "   → Run 'gentle-mk' to launch" -ForegroundColor Cyan
         if ($goAvailable) {
             Write-Host "   → Run 'gentle-batch-edit spec.jsonl' for bulk file edits" -ForegroundColor Cyan
         } else {
