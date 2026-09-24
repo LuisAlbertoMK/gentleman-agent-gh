@@ -120,8 +120,8 @@ Regla (precedente `ronda6-skills-barrido.md:39`): ALL criteria must pass para SM
 
 | Slice | Commit | Reviewer/Tier | Resultado | Fecha |
 |---|---|---|---|---|
-| S1 | ESTE-COMMIT (SHA se anota en S2 tras commit; re-intento en verde post-paste-S3) | Tier 1 (auto) | GREEN: boot-budget 7/7 ALL PASS (esencial 6758B≤8192B; AGENTS 2731≤2800 ✅, INDEX 2847≤3000 ✅, gentle-MK 1180≤1200 ✅); PSSA 0 errores (6 warnings no-bloqueantes: WriteHost-INFO + BeforeAll-scope + ShouldProcess); test 72L. Previo 2026-09-24: commit bloqueado 27/28 en rojo (baseline esencial 12149B>8192B, hook `[13/26] Pester` exit 1) — desbloqueado por paste S3 verificado | 2026-09-24 |
-| S2 | SIN SHA — sin commit (gate en rojo hasta paste S3) | Tier 2 (auto) | esencial 12149→9014B (INDEX 4870→2847 ≤3000 ✅, gentle-MK 2292→1180 ≤1200 ✅, AGENTS.md 4987 intacto-write-deny); cross-ref-check ALL PASSED; orchestrator-hooks 16/16; boot-budget 5/7 (2 FAIL esperados: esencial + AGENTS, solo paste S3); resolver top-1 auth-hardening sin cambio | 2026-09-24 |
+| S1 | f869d56b (gate 28/28) | Tier 1 (auto) | GREEN: boot-budget 7/7 ALL PASS (esencial 6758B≤8192B; AGENTS 2731≤2800 ✅, INDEX 2847≤3000 ✅, gentle-MK 1180≤1200 ✅); PSSA 0 errores (6 warnings no-bloqueantes: WriteHost-INFO + BeforeAll-scope + ShouldProcess); test 72L. Previo 2026-09-24: commit bloqueado 27/28 en rojo (baseline esencial 12149B>8192B, hook `[13/26] Pester` exit 1) — desbloqueado por paste S3 verificado | 2026-09-24 |
+| S2 | ESTE-COMMIT (SHA se anota en S3 tras commit) | Tier 2 (auto) | GREEN: esencial 12149→6758B (INDEX 4870→2847 ≤3000 ✅, gentle-MK 2292→1180 ≤1200 ✅, AGENTS.md 2731 paste-S3 verificado, 0L agente); cross-ref-check ALL PASSED (9/9 + semi SKIP); orchestrator-hooks 16/16; boot-budget 7/7; AGENTS.md/opencode.json 0L agente ✅ | 2026-09-24 |
 | S3 (humano) | — | — | pendiente | — |
 
 ## 9. Rollback

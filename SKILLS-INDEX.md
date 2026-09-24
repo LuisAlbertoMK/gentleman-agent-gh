@@ -1,8 +1,8 @@
 # SKILLS INDEX (Compact)
 
-> Top-20 daily-use skills. Full table: all 96 skills — use `skill` tool or read this file for complete list.
+> Top-20 daily-use skills (all 96 skills — full list via `skill` tool).
 >
-> **Version**: 5.9 | **Changelog**: 5.9 (2026-09-18 — archive duplicate skill-creator + 3 retired skills (cognitive-doc-design, prompt-engineering, senior-engineer)); 5.8 (2026-09-17 — count sync 96→100 per filesystem audit); 5.7 (2026-09-17 — +odd +rdd (skill registration); count 94→96); 5.6 (2026-09-02 — +state-reconcile +ps-compat (skill expansion); count 93→94 (excl. _shared per cross-ref Get-SkillDir)); 5.5 (2026-08-16: C28 auto-improvement cycle added depth to 90 skills; +2 new skills image-pipeline, customize-opencodec; count 89→90); 5.5.1 (2026-08-18: +1 new skill gentleman-aem; count 90→91); 5.4 (2026-08-13: count 87→88 per new automejora-analyzer skill); 5.3 (2026-08-12: count 78→87 per filesystem audit; README.md synced to current counts) 5.2 (archived 3 dead: cognitive-doc-design, prompt-engineering, senior-engineer → .archive/skills; count 81→78 per cross-ref-check; global discoverable 93→165 per FS scan: 78 project + 87 global, excl. _shared); 5.1 (sync count 93→81 per filesystem audit); 5.0 (compact top-20 table for token reduction); 4.7 (+1 new: adversarial-breaker; count 92→93); 4.6 (count corrected 80→92 per filesystem audit)
+> **Version**: 5.9 | **Changelog**: 5.9 retired 4 dup/dead skills; history: `git log SKILLS-INDEX.md`.
 
 ## Top 20 Daily-Use Skills
 
@@ -30,28 +30,25 @@
 | state reconcile, plan sync, plan stale, backlog verify, que falta, pendiente, status claim, what's missing, plan drift | state-reconcile |
 | powershell 5.1, ps5, ps7, ps compatibility, encoding, CRLF, BOM, PSSA, Join-Path, cmatch, requires, bash-safe, script authoring | ps-compat |
 
-## Quick Groups
+## Quick Groups (heads only; `+N more` → complete via `skill` tool)
 
 | Group | Skills |
 |-------|--------|
-| Quality | quality-gate, code-review-agent, triple-verify, auto-metrics, external-auditor, immune-system, testing-strategy, rdd, skill-testing, web-quality-audit, judgment-day |
-| Code | commit-crafter, code-generation, quick-executor, refactoring-planner, work-unit-commits |
-| Security | security-scanner, auth-hardening, container-security, llm-security, best-practices, data-quality, infra-audit, adversarial-breaker |
-| SDD | sdd (unified pipeline), sdd-quick, sdd-propose, sdd-design, sdd-apply, sdd-verify, sdd-archive, sdd-explore, sdd-init, sdd-spec, sdd-tasks |
-| Coordination | delivery-harness, branch-pr, issue-creation, command-wrapper, odd, chained-pr, ralph-loop, mini-orchestrator, subagent-isolation, cancel-ralph, state-reconcile, external-improvement |
+| Quality | quality-gate, code-review-agent, triple-verify (+8 more) |
+| Code | commit-crafter, code-generation, quick-executor (+2 more) |
+| Security | security-scanner, auth-hardening, container-security (+5 more) |
+| SDD | sdd-quick, sdd-apply, sdd-verify (+8 more) |
+| Coordination | delivery-harness, branch-pr, issue-creation (+9 more) |
 | Analysis | analysis-mode, deep-debugging, gap-analysis, research, project-mapper |
 | Memory | session-resume, engram-protocol, dreaming, bitacora |
-| Skills meta | opencode-skill-creator, skill-registry, skill-graph, skill-improver, self-improvement, automejora-analyzer, cross-project-forge, cross-project-wisdom |
-| Engineering | plan-execution, perf-profiling, customize-opencode, ci-cd, server-commands, ps-compat, development-mode, execution-mode, performance, performance-tracker, opencode-model-router |
-| UI/Docs | baseline-ui, ui-engine, accessibility, seo, docs-audit, aem-migration |
-| Testing | visual-testing, e2e-testing, api-testing, image-pipeline, pdf-utils, vision-analyze |
+| Skills meta | opencode-skill-creator, skill-registry, skill-graph (+5 more) |
+| Engineering | plan-execution, perf-profiling, ci-cd (+8 more) |
+| UI/Docs | baseline-ui, ui-engine, accessibility (+3 more) |
+| Testing | visual-testing, e2e-testing, api-testing (+3 more) |
 | Communication | comment-writer, help |
-| Specialized | karpathy-loop, context-watchdog, recovery-protocol, metricas, workflow-optimizer, trial-verify, lean-context |
+| Specialized | karpathy-loop, context-watchdog, recovery-protocol (+4 more) |
 
 ## Load Rule
 
-1. `skill` tool with name (skills.paths registered in opencode.json — 195 skills globally discoverable: 96 project + 99 global)
-2. Fallback: `read skills/{name}/SKILL.md` directly from disk
-3. Assets: `read skills/{name}/references/` or `skills/{name}/assets/` for templates
-
-**Validation**: `scripts/skill-validate.ps1` | **Scripts**: ensure-tools, token-count, skill-graph, pull-upstream
+1. `skill` tool with name (registered in opencode.json) — fallback: `read skills/{name}/SKILL.md`
+2. Assets: `skills/{name}/references/` or `assets/` — validate: `scripts/skill-validate.ps1`
