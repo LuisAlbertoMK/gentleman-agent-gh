@@ -8,8 +8,7 @@
 
 ### Example 1: Large Log Analysis (500MB+ logs)
 ```powershell
-# Activate dev mode first
-& "$env:GENTLEMAN_AGENT_ROOT/scripts/optimize-system.ps1"
+# Activate dev mode first (detect HW: scripts/hardware-profile.ps1; profile: scripts/opencode-configs/)
 Get-Process "opencode*","node*" | ForEach-Object { $_.PriorityClass = "High" }
 powercfg /SETACTIVE "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"
 
@@ -65,7 +64,7 @@ git ls-files | Where-Object { (Get-Item $_).Length -gt 10MB } | ForEach-Object -
 
 ### Example 4: GPU-Accelerated ML/Compute Workloads
 ```powershell
-# Activate GPU priority (requires optimize-system.ps1 first)
+# Activate GPU priority (registry writes inline in skill Activate §; no prereq script)
 Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\DirectX\UserGpuPreferences" "python.exe" "High" -EA SilentlyContinue
 Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\DirectX\UserGpuPreferences" "node.exe" "High" -EA SilentlyContinue
 
@@ -183,7 +182,7 @@ $files | ForEach-Object -Parallel { ... } -ThrottleLimit $throttle
 
 1. **Activate dev mode for 1MB files** — No measurable benefit, adds complexity
 2. **Forget to deactivate** — Leaves system in High priority, drains battery, starves other apps
-3. **Run before optimize-system.ps1** — Registry keys missing, GPU priority no-op, power plan may not exist
+3. **Skip Activate registry writes** — Registry keys missing, GPU priority no-op, power plan may not exist
 4. **Expect GPU boost for CLI tools** — GPU priority only applies to DirectX/Vulkan graphics pipelines
 5. **Hardcode ThrottleLimit** — Causes thread starvation on low-core or hyperthreaded CPUs
 6. **Assume priority inheritance works everywhere** — Some process launchers (cmd.exe, certain shells) reset priority
