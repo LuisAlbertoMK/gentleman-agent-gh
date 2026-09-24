@@ -94,6 +94,30 @@ function Test-JdReviewMarkers {
     } else { Pass }
 }
 
+function Test-SecretsScan {
+    $diffLines = git diff --cached --diff-filter=ACM -- ':!.githooks' ':!*.Tests.ps1' ':!scripts/check-mcp-security.ps1' ':!.agents/skills/*/references/*' ':!.gitleaks.toml' ':!docs/mejoras/*' ':!cmd/gate/*'
+    $secrets = @(); $currentFile = ""; $lineInFile = 0
+    foreach ($dl in $diffLines) {
+        if ($dl -match '^\+\+\+ b/(.+)$') { $currentFile = $Matches[1]; continue }
+        if ($dl -match '^@@ -\d+,\d+ \+(\d+),\d+ @@') { $lineInFile = [int]$Matches[1] - 1; continue }
+        if ($dl -match '^\+([^\+].*)$') {
+            $lineInFile++
+            $text = $Matches[1]
+            if ($text -match '(ghp_|gho_|github_pat_|AKIA|ctx7sk_|-----BEGIN\s+(RSA|EC|DSA|PRIVATE)\s+KEY|GH_TOKEN\s*=|GITHUB_TOKEN\s*=|password\s*=|api[_-]?key\s*=|secret\s*=|token\s*=)') {
+                $secrets += [PSCustomObject]@{ Filename = $currentFile; LineNumber = $lineInFile; Line = $text }
+            }
+        }
+    }
+    if ($secrets) {
+        $secrets | ForEach-Object {
+            $line = $_.Line.Trim()
+            if ($line.Length -gt 80) { $line = $line.Substring(0,77)+'...' }
+            Write-Host "    $($_.Filename):$($_.LineNumber) $line"
+        }
+        Fail "potential secrets found in staged diff"
+    } else { Pass }
+}
+
 Write-Host "`n=== Gentleman Quality Gate ==="
 
 # [1/28] Trailing whitespace
@@ -206,27 +230,7 @@ Test-JdReviewMarkers -StagedRoja $stagedRoja -RepoRoot $RepoRoot
 
 # [11/28] Secrets scan — parse diff to get real filenames (not "InputStream")
 Write-Host "[11/28] Secrets scan..."
-$diffLines = git diff --cached --diff-filter=ACM -- ':!.githooks' ':!*.Tests.ps1' ':!scripts/check-mcp-security.ps1' ':!.agents/skills/*/references/*' ':!.gitleaks.toml' ':!docs/mejoras/*' ':!cmd/gate/*'
-$secrets = @(); $currentFile = ""; $lineInFile = 0
-foreach ($dl in $diffLines) {
-    if ($dl -match '^\+\+\+ b/(.+)$') { $currentFile = $Matches[1]; continue }
-    if ($dl -match '^@@ -\d+,\d+ \+(\d+),\d+ @@') { $lineInFile = [int]$Matches[1] - 1; continue }
-    if ($dl -match '^\+([^\+].*)$') {
-        $lineInFile++
-        $text = $Matches[1]
-        if ($text -match '(ghp_|gho_|github_pat_|AKIA|ctx7sk_|-----BEGIN\s+(RSA|EC|DSA|PRIVATE)\s+KEY|GH_TOKEN\s*=|GITHUB_TOKEN\s*=|password\s*=|api[_-]?key\s*=|secret\s*=|token\s*=)') {
-            $secrets += [PSCustomObject]@{ Filename = $currentFile; LineNumber = $lineInFile; Line = $text }
-        }
-    }
-}
-if ($secrets) {
-    $secrets | ForEach-Object {
-        $line = $_.Line.Trim()
-        if ($line.Length -gt 80) { $line = $line.Substring(0,77)+'...' }
-        Write-Host "    $($_.Filename):$($_.LineNumber) $line"
-    }
-    Fail "potential secrets found in staged diff"
-} else { Pass }
+Test-SecretsScan
 
 # [12/28] SKILL.md frontmatter completeness
 Write-Host "[12/28] Taste invariant: SKILL.md frontmatter..."
