@@ -364,7 +364,7 @@ gentleman-agent-gh/
 ### Typical flow
 
 ```
-1. gentleman-vmk               ← open agent
+1. gentle-mk                   ← open agent
 2. "do X"                      ← ask for task
 3. agent resolves alone        ← trivial changes = no ceremony
 4. !score                      ← optional: measure result
