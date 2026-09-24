@@ -118,6 +118,43 @@ function Test-SecretsScan {
     } else { Pass }
 }
 
+function Test-TokenBudget {
+    param($RepoRoot, $FastGate)
+    if ($null -ne $FastGate -and $null -ne $FastGate.tokenBudget) {
+        $tb = $FastGate.tokenBudget
+        if (-not $tb.passed) {
+            $tbSkillAvg = 'N/A'; $tbPromptAvg = 'N/A'; $tbOver = 0; $tbBudget = $tb.budget
+            if ($null -ne $tb.PSObject.Properties['skills'] -and $null -ne $tb.skills) {
+                if ($null -ne $tb.skills.PSObject.Properties['average']) { $tbSkillAvg = $tb.skills.average }
+                if ($null -ne $tb.skills.PSObject.Properties['overBudgetFiles']) { $tbOver = $tb.skills.overBudgetFiles }
+            } elseif ($null -ne $tb.PSObject.Properties['stats'] -and $null -ne $tb.stats) {
+                if ($null -ne $tb.stats.skills) { $tbSkillAvg = $tb.stats.skills.average; $tbOver = $tb.stats.skills.overBudgetFiles }
+            }
+            if ($null -ne $tb.PSObject.Properties['prompts'] -and $null -ne $tb.prompts -and $null -ne $tb.prompts.PSObject.Properties['average']) { $tbPromptAvg = $tb.prompts.average }
+            elseif ($null -ne $tb.PSObject.Properties['stats'] -and $null -ne $tb.stats -and $null -ne $tb.stats.prompts) { $tbPromptAvg = $tb.stats.prompts.average }
+            if ($null -ne $tb.PSObject.Properties['prompts'] -and $null -ne $tb.prompts -and $null -ne $tb.prompts.PSObject.Properties['overBudgetFiles']) { $tbOver += $tb.prompts.overBudgetFiles }
+            elseif ($null -ne $tb.PSObject.Properties['stats'] -and $null -ne $tb.stats -and $null -ne $tb.stats.prompts -and $null -ne $tb.stats.prompts.PSObject.Properties['overBudgetFiles']) { $tbOver += $tb.stats.prompts.overBudgetFiles }
+            Warn "token budget exceeded — skills $($tbSkillAvg)B/$tbBudget, prompts $($tbPromptAvg)B/$tbBudget ($tbOver files over) (fast: $($tb.elapsedMs)ms)"
+        } else { Pass }
+    } else {
+        $budgetScript = Join-Path $RepoRoot 'scripts/check-token-budget.ps1'
+        if (Test-Path -LiteralPath $budgetScript) {
+            $budgetOut = & "$RepoRoot/scripts/check-token-budget.ps1" -Json 2>&1 | Out-String
+            $budgetResult = try { $budgetOut | ConvertFrom-Json -ErrorAction Stop } catch { $null }
+            if ($budgetResult -and -not $budgetResult.passed) {
+                $skillAvg = if ($budgetResult.stats.skills) { $budgetResult.stats.skills.average } else { 'N/A' }
+                $promptAvg = if ($budgetResult.stats.prompts) { $budgetResult.stats.prompts.average } else { 'N/A' }
+                $overFiles = 0
+                if ($budgetResult.stats.skills) { $overFiles += $budgetResult.stats.skills.overBudgetFiles }
+                if ($budgetResult.stats.prompts) { $overFiles += $budgetResult.stats.prompts.overBudgetFiles }
+                Warn "token budget exceeded — skills $($skillAvg)B/$($budgetResult.budget), prompts $($promptAvg)B/$($budgetResult.budget) ($overFiles files over)"
+            } else { Pass }
+        } else {
+            Warn "check-token-budget.ps1 not found"
+        }
+    }
+}
+
 Write-Host "`n=== Gentleman Quality Gate ==="
 
 # [1/28] Trailing whitespace
@@ -359,39 +396,7 @@ if (Test-Path -LiteralPath $backlogScript) {
 # the 3,200-byte average target (ADR-048 — was 2,000B ADR-007; bumped for bulk R2-1 81×400). Uses Warn (not Fail) since
 # oversize skills are a known condition under ADR-018.
 Write-Host "[20/28] Token budget check..."
-if ($null -ne $script:fastGate -and $null -ne $script:fastGate.tokenBudget) {
-    $tb = $script:fastGate.tokenBudget
-    if (-not $tb.passed) {
-        $tbSkillAvg = 'N/A'; $tbPromptAvg = 'N/A'; $tbOver = 0; $tbBudget = $tb.budget
-        if ($null -ne $tb.PSObject.Properties['skills'] -and $null -ne $tb.skills) {
-            if ($null -ne $tb.skills.PSObject.Properties['average']) { $tbSkillAvg = $tb.skills.average }
-            if ($null -ne $tb.skills.PSObject.Properties['overBudgetFiles']) { $tbOver = $tb.skills.overBudgetFiles }
-        } elseif ($null -ne $tb.PSObject.Properties['stats'] -and $null -ne $tb.stats) {
-            if ($null -ne $tb.stats.skills) { $tbSkillAvg = $tb.stats.skills.average; $tbOver = $tb.stats.skills.overBudgetFiles }
-        }
-        if ($null -ne $tb.PSObject.Properties['prompts'] -and $null -ne $tb.prompts -and $null -ne $tb.prompts.PSObject.Properties['average']) { $tbPromptAvg = $tb.prompts.average }
-        elseif ($null -ne $tb.PSObject.Properties['stats'] -and $null -ne $tb.stats -and $null -ne $tb.stats.prompts) { $tbPromptAvg = $tb.stats.prompts.average }
-        if ($null -ne $tb.PSObject.Properties['prompts'] -and $null -ne $tb.prompts -and $null -ne $tb.prompts.PSObject.Properties['overBudgetFiles']) { $tbOver += $tb.prompts.overBudgetFiles }
-        elseif ($null -ne $tb.PSObject.Properties['stats'] -and $null -ne $tb.stats -and $null -ne $tb.stats.prompts -and $null -ne $tb.stats.prompts.PSObject.Properties['overBudgetFiles']) { $tbOver += $tb.stats.prompts.overBudgetFiles }
-        Warn "token budget exceeded — skills $($tbSkillAvg)B/$tbBudget, prompts $($tbPromptAvg)B/$tbBudget ($tbOver files over) (fast: $($tb.elapsedMs)ms)"
-    } else { Pass }
-} else {
-    $budgetScript = Join-Path $RepoRoot 'scripts/check-token-budget.ps1'
-    if (Test-Path -LiteralPath $budgetScript) {
-        $budgetOut = & "$RepoRoot/scripts/check-token-budget.ps1" -Json 2>&1 | Out-String
-        $budgetResult = try { $budgetOut | ConvertFrom-Json -ErrorAction Stop } catch { $null }
-        if ($budgetResult -and -not $budgetResult.passed) {
-            $skillAvg = if ($budgetResult.stats.skills) { $budgetResult.stats.skills.average } else { 'N/A' }
-            $promptAvg = if ($budgetResult.stats.prompts) { $budgetResult.stats.prompts.average } else { 'N/A' }
-            $overFiles = 0
-            if ($budgetResult.stats.skills) { $overFiles += $budgetResult.stats.skills.overBudgetFiles }
-            if ($budgetResult.stats.prompts) { $overFiles += $budgetResult.stats.prompts.overBudgetFiles }
-            Warn "token budget exceeded — skills $($skillAvg)B/$($budgetResult.budget), prompts $($promptAvg)B/$($budgetResult.budget) ($overFiles files over)"
-        } else { Pass }
-    } else {
-        Warn "check-token-budget.ps1 not found"
-    }
-}
+Test-TokenBudget -RepoRoot $RepoRoot -FastGate $script:fastGate
 
 # [21/28] Budget script validation (C6)
 # Verifies check-budget.ps1 is present and syntactically valid —
