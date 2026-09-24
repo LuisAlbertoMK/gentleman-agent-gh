@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gentleman-agent-gh/contracts/skill-frontmatter.schema.json",
+  "title": "Skill Frontmatter",
+  "description": "Contrato formal del frontmatter YAML de .agents/skills/*/SKILL.md parseado a JSON (Ronda 8 S2). Validador: PowerShell Test-Json -SchemaFile (PS 7, sin deps nuevas). SUBSET SEGURO: solo type/required/enum/pattern/minLength/minimum + anyOf DE SOLO-TIPOS (string-or-array en triggers: Test-Json lo soporta; lo que NO soporta es additionalProperties-schema DENTRO de anyOf ni $ref/$defs: FAIL-OPEN). additionalProperties:true a proposito: los skills tienen keys propias (delegate_only, license, metadata) y cerrar de golpe daria falsos positivos. El parseo YAML->JSON vive en el helper Pester (BeforeAll), NO aqui.",
+  "type": "object",
+  "required": ["name", "description"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9_-]+$"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 10
+    },
+    "triggers": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ]
+    },
+    "changelog": {
+      "type": "string"
+    },
+    "token_budget": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "additionalProperties": true
+}
