@@ -121,8 +121,8 @@ Regla (precedente `ronda6-skills-barrido.md:39`): ALL criteria must pass para SM
 | Slice | Commit | Reviewer/Tier | Resultado | Fecha |
 |---|---|---|---|---|
 | S1 | f869d56b (gate 28/28) | Tier 1 (auto) | GREEN: boot-budget 7/7 ALL PASS (esencial 6758B≤8192B; AGENTS 2731≤2800 ✅, INDEX 2847≤3000 ✅, gentle-MK 1180≤1200 ✅); PSSA 0 errores (6 warnings no-bloqueantes: WriteHost-INFO + BeforeAll-scope + ShouldProcess); test 72L. Previo 2026-09-24: commit bloqueado 27/28 en rojo (baseline esencial 12149B>8192B, hook `[13/26] Pester` exit 1) — desbloqueado por paste S3 verificado | 2026-09-24 |
-| S2 | ESTE-COMMIT (SHA se anota en S3 tras commit) | Tier 2 (auto) | GREEN: esencial 12149→6758B (INDEX 4870→2847 ≤3000 ✅, gentle-MK 2292→1180 ≤1200 ✅, AGENTS.md 2731 paste-S3 verificado, 0L agente); cross-ref-check ALL PASSED (9/9 + semi SKIP); orchestrator-hooks 16/16; boot-budget 7/7; AGENTS.md/opencode.json 0L agente ✅ | 2026-09-24 |
-| S3 (humano) | — | — | pendiente | — |
+| S2 | 318e7aea (gate 5/5 ALL CLEAR, sin bypass) | Tier 2 (auto) | GREEN: esencial 12149→6758B (INDEX 4870→2847 ≤3000 ✅, gentle-MK 2292→1180 ≤1200 ✅, AGENTS.md 2731 paste-S3 verificado, 0L agente); cross-ref-check ALL PASSED (9/9 + semi SKIP); orchestrator-hooks 16/16; boot-budget 7/7; AGENTS.md/opencode.json 0L agente ✅ | 2026-09-24 |
+| S3 (humano) | ESTE-COMMIT (paste humano verificado por agente) | Tier 1 doc-only + acto humano (agente verify-only, 0L edit en AGENTS.md) | GREEN: AGENTS.md 4987→2731B (≤2800 ✅); fidelidad OK (bridge+rules+Pre-Flight+Subagent-First+Default-FAIL+Skills+nav agent-context presentes; 7 headers movidos ausentes; gentleman-vMK 0, gentle-MK presente); esencial final 6758B (target ≤7000 ✅, FAIL ≤8192 ✅); boot-budget 7/7; cross-ref ALL PASSED; orchestrator-hooks 16/16; PSSA 0 errores | 2026-09-24 |
 
 ## 9. Rollback
 
