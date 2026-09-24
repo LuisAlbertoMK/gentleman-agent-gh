@@ -112,7 +112,7 @@ Describe 'ConfigValidator' {
             $result | Where-Object { $_ -match 'gentle-orchestrator' } | Should -Not -BeNullOrEmpty
         }
 
-        It 'passes for the real 50-agent opencode.json' {
+        It 'passes for the real 44-agent opencode.json' {
             $config = Get-Content -LiteralPath $script:realConfigPath -Raw | ConvertFrom-Json
             $result = Test-AgentDefinitions -Config $config
             $result | Should -BeNullOrEmpty
