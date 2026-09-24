@@ -1,5 +1,14 @@
 {
   "model": "opencode/muse-spark-1.3-contributor",
+  "small_model": "opencode/muse-spark-1.3-contributor-free",
+  "watcher": {
+    "ignore": [
+      "node_modules/**",
+      ".git/**",
+      "dist/**",
+      "temp/**"
+    ]
+  },
   "skills": [
     ".agents/skills"
   ],
