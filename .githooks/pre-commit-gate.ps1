@@ -155,6 +155,15 @@ function Test-TokenBudget {
     }
 }
 
+function Test-AdversarialProfile {
+    param([array]$Staged, [string]$RepoRoot)
+    $stagedSecurity = $Staged | Where-Object { $_ -match '\.ps1$' }
+    if ($stagedSecurity) {
+        & "$RepoRoot/scripts/check-adversarial.ps1" -RepoRoot $RepoRoot -ErrorAction SilentlyContinue 2>&1 | Out-Null
+        if ($LASTEXITCODE -eq 0) { Pass } else { Fail "adversarial profile violations — see output above, touch .breaker-cleared/<file> markers or set FORCE_SHIP=1" }
+    } else { Pass }
+}
+
 Write-Host "`n=== Gentleman Quality Gate ==="
 
 # [1/28] Trailing whitespace
@@ -437,11 +446,7 @@ if (Test-Path -LiteralPath $watchdogScript) {
 # The full adversarial-breaker skill (sub-agent deep analysis) is triggered
 # manually via `!breaker` or auto-triggered in SDD post-Verify for ROZA zone.
 Write-Host "[23/28] Adversarial-breaker profile scan..."
-$stagedSecurity = $staged | Where-Object { $_ -match '\.ps1$' }
-if ($stagedSecurity) {
-    & "$RepoRoot/scripts/check-adversarial.ps1" -RepoRoot $RepoRoot -ErrorAction SilentlyContinue 2>&1 | Out-Null
-    if ($LASTEXITCODE -eq 0) { Pass } else { Fail "adversarial profile violations — see output above, touch .breaker-cleared/<file> markers or set FORCE_SHIP=1" }
-} else { Pass }
+Test-AdversarialProfile -Staged $staged -RepoRoot $RepoRoot
 
 # [24/28] Async-result verification — fail-closed on unresolved subagent failures
 # Scans for *.async-result.json produced by monitor-subagent.ps1 / post-delegation-check.ps1.
