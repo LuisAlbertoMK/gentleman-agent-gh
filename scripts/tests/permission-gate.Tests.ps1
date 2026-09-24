@@ -441,24 +441,30 @@ Describe "Unicode whitespace normalization — no pattern evasion" {
 }
 
 # ============================================================
-# SSoT supply-chain deny floor — permission-templates.json
-# (opencode agent config layer; C3b Gap 1: npm/pip/yarn/pnpm/bun
-#  install vectors must DENY in auto+semi, legitimate run/test/ci
-#  and pip read-only queries must stay ALLOW).
-# NOTE: these assert the SSoT rules that generate opencode.json,
-# NOT the runtime lib Get-CommandClass verdicts (separate layer).
+# SSoT supply-chain deny floor — single-mode (ADR-050)
+# (C3b Gap 1: npm/pip/yarn/bun install vectors ALLOW per ADR-046
+#  toolchain freedom; npm exec/publish/uninstall stay DENY).
+# NOTE: permission-templates.json no longer carries per-command auto/semi
+# layers (removed by ADR-050 single-mode refactor — only catch-all
+# orchestrator/readwrite/readonly/sddorchestrator/reviewer remain), so these
+# assert the two vigente SSoT layers that generate opencode.json:
+#   (a) scripts/opencode-config/shared-deny-rules.json — toolchain floor
+#   (b) generated opencode.json global bash map — legit run/test/ci +
+#       pip read-only queries (explicit allow keys).
 # ============================================================
-Describe "SSoT supply-chain deny floor (permission-templates.json)" {
+Describe "SSoT supply-chain deny floor (single-mode SSoT layers)" {
     BeforeAll {
-        $script:tpl = Get-Content (Join-Path (Split-Path $PSScriptRoot -Parent) 'lib\permission-templates.json') -Raw | ConvertFrom-Json
+        $libDir = Split-Path $PSScriptRoot -Parent
+        $script:sharedRules = Get-Content (Join-Path $libDir 'opencode-config\shared-deny-rules.json') -Raw | ConvertFrom-Json
+        $opencodeCfg = Get-Content (Join-Path (Split-Path $libDir -Parent) 'opencode.json') -Raw | ConvertFrom-Json
+        $script:globalBash = $opencodeCfg.permission.bash
 
-        function Get-SSoTRule {
-            param([string]$Mode, [string]$Cmd)
-            $rules = $script:tpl.$Mode.bash
+        function Get-SSoTBestMatch {
+            param($Rules, [string]$Cmd)
             $toks = $Cmd -split '\s+'
             $bestScore = [int]::MinValue
-            $bestVerdict = $rules.'*'
-            foreach ($prop in $rules.PSObject.Properties) {
+            $bestVerdict = $Rules.'*'
+            foreach ($prop in $Rules.PSObject.Properties) {
                 $parts = $prop.Name -split '\s+'
                 $wild = $parts[$parts.Count - 1] -eq '*'
                 $n = if ($wild) { $parts.Count - 1 } else { $parts.Count }
@@ -472,65 +478,75 @@ Describe "SSoT supply-chain deny floor (permission-templates.json)" {
             }
             return $bestVerdict
         }
+
+        function Get-SharedRule {
+            param([string]$Cmd)
+            Get-SSoTBestMatch -Rules $script:sharedRules -Cmd $Cmd
+        }
+
+        function Get-GlobalRule {
+            param([string]$Cmd)
+            Get-SSoTBestMatch -Rules $script:globalBash -Cmd $Cmd
+        }
     }
 
-    It "ALLOWS npm install in auto [ADR-046 toolchain freedom]" {
-        Get-SSoTRule auto "npm install evil-pkg" | Should -Be "allow"
+    It "ALLOWS npm install [ADR-046 toolchain freedom, shared-deny-rules]" {
+        Get-SharedRule "npm install evil-pkg" | Should -Be "allow"
     }
-    It "ALLOWS npm i -g in auto [ADR-046 toolchain freedom]" {
-        Get-SSoTRule auto "npm i -g evil" | Should -Be "allow"
+    It "ALLOWS npm i -g [ADR-046 toolchain freedom, shared-deny-rules]" {
+        Get-SharedRule "npm i -g evil" | Should -Be "allow"
     }
-    It "ALLOWS pip install in auto [ADR-046 toolchain freedom]" {
-        Get-SSoTRule auto "pip install numpy" | Should -Be "allow"
+    It "ALLOWS pip install [ADR-046 toolchain freedom, shared-deny-rules]" {
+        Get-SharedRule "pip install numpy" | Should -Be "allow"
     }
-    It "ALLOWS pip3 install in auto [ADR-046 toolchain freedom]" {
-        Get-SSoTRule auto "pip3 install evil" | Should -Be "allow"
+    It "ALLOWS pip3 install [ADR-046 toolchain freedom, shared-deny-rules]" {
+        Get-SharedRule "pip3 install evil" | Should -Be "allow"
     }
-    It "ALLOWS yarn add in auto [ADR-046 toolchain freedom]" {
-        Get-SSoTRule auto "yarn add evil" | Should -Be "allow"
+    It "ALLOWS yarn add [ADR-046 toolchain freedom, shared-deny-rules]" {
+        Get-SharedRule "yarn add evil" | Should -Be "allow"
     }
-    It "ALLOWS bun install in auto [ADR-046 toolchain freedom]" {
-        Get-SSoTRule auto "bun install evil" | Should -Be "allow"
+    It "ALLOWS bun install [ADR-046 toolchain freedom, shared-deny-rules]" {
+        Get-SharedRule "bun install evil" | Should -Be "allow"
     }
-    It "ALLOWS npx in auto [ADR-046 toolchain freedom]" {
-        Get-SSoTRule auto "npx evil" | Should -Be "allow"
+    It "ALLOWS npx [ADR-046 toolchain freedom, shared-deny-rules]" {
+        Get-SharedRule "npx evil" | Should -Be "allow"
     }
-    It "ALLOWS node in auto [ADR-046 toolchain freedom]" {
-        Get-SSoTRule auto "node --version" | Should -Be "allow"
-        Get-SSoTRule auto "node evil.js" | Should -Be "allow"
+    It "ALLOWS node [ADR-046 toolchain freedom, shared-deny-rules]" {
+        Get-SharedRule "node --version" | Should -Be "allow"
+        Get-SharedRule "node evil.js" | Should -Be "allow"
     }
-    It "ALLOWS npm add in auto [ADR-046 toolchain freedom]" {
-        Get-SSoTRule auto "npm add evil-pkg" | Should -Be "allow"
+    It "ALLOWS npm add [ADR-046 toolchain freedom, shared-deny-rules]" {
+        Get-SharedRule "npm add evil-pkg" | Should -Be "allow"
     }
-    It "DENIES npm exec in auto [supply chain - arbitrary code]" {
-        Get-SSoTRule auto "npm exec -y evil" | Should -Be "deny"
+    It "DENIES npm exec [supply chain - arbitrary code, shared-deny-rules]" {
+        Get-SharedRule "npm exec -y evil" | Should -Be "deny"
     }
-    It "ALLOWS npm run build in auto [legitimate]" {
-        Get-SSoTRule auto "npm run build" | Should -Be "allow"
+    It "ALLOWS npm run build [legitimate, opencode.json global bash]" {
+        Get-GlobalRule "npm run build" | Should -Be "allow"
     }
-    It "ALLOWS npm test in auto [legitimate]" {
-        Get-SSoTRule auto "npm test" | Should -Be "allow"
+    It "ALLOWS npm test [legitimate, opencode.json global bash]" {
+        Get-GlobalRule "npm test" | Should -Be "allow"
     }
-    It "ALLOWS npm ci in auto [legitimate lockfile install]" {
-        Get-SSoTRule auto "npm ci" | Should -Be "allow"
+    It "ALLOWS npm ci [legitimate lockfile install, opencode.json global bash]" {
+        Get-GlobalRule "npm ci" | Should -Be "allow"
     }
-    It "ALLOWS npm install in semi [ADR-046 toolchain freedom]" {
-        Get-SSoTRule semi "npm install evil-pkg" | Should -Be "allow"
+    It "ALLOWS npm install [ADR-046 toolchain freedom, shared-deny-rules]" {
+        Get-SharedRule "npm install evil-pkg" | Should -Be "allow"
     }
-    It "ASKS for npm ci in semi [ADR-046: catch-all softened, human approves]" {
-        Get-SSoTRule semi "npm ci" | Should -Be "ask"
+    It "ALLOWS npm ci [single-mode: semi removed per ADR-050, legit lockfile install]" {
+        Get-GlobalRule "npm ci" | Should -Be "allow"
     }
-    It "ALLOWS pip install in semi [ADR-046 toolchain freedom]" {
-        Get-SSoTRule semi "pip install evil" | Should -Be "allow"
+    It "ALLOWS pip install [ADR-046 toolchain freedom, shared-deny-rules]" {
+        Get-SharedRule "pip install evil" | Should -Be "allow"
     }
-    It "ALLOWS npm run build in semi [legitimate]" {
-        Get-SSoTRule semi "npm run build" | Should -Be "allow"
+    It "ALLOWS npm run build [legitimate, opencode.json global bash]" {
+        Get-GlobalRule "npm run build" | Should -Be "allow"
     }
-    It "ALLOWS pip freeze in semi [read-only info]" {
-        Get-SSoTRule semi "pip freeze" | Should -Be "allow"
+    It "ALLOWS pip freeze [read-only info, opencode.json global bash]" {
+        Get-GlobalRule "pip freeze" | Should -Be "allow"
     }
-    It "ALLOWS pip show in semi [read-only info]" {
-        Get-SSoTRule semi "pip show requests" | Should -Be "allow"
+    It "ALLOWS pip show [read-only info, opencode.json global bash]" {
+        Get-GlobalRule "pip show requests" | Should -Be "allow"
     }
 }
 
