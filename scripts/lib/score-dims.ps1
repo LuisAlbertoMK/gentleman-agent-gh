@@ -15,6 +15,9 @@
 # Ensure $PSScriptRoot reflects the caller (score-auto.ps1) directory
 # Use $scriptRoot for any relative paths
 
+# Pure scoring formulas (DC, Bi, Me, CA) — no I/O, behavior-preserving extraction
+. (Join-Path $PSScriptRoot 'score-formulas.ps1')
+
 # --- Null guards: gracefully handle empty file arrays ---
 # If caller didn't provide file lists, extract from manifest (avoids double walk).
 # S5: Get-ScoredScriptFiles reuses the manifest from Get-FileManifest instead of
@@ -156,7 +159,6 @@ Add-Dimension "Sec" ($math::Max(0, $math::Min(10, $secScore))) @{
 
 # --- DC: Dead Code ---
 
-$dcScore       = 10
 $orphanSkills  = 0
 $deadJunctions = 0
 
@@ -164,19 +166,9 @@ $deadJunctions = 0
 $skillFilesInWorkspace = Get-ChildItem ".\skills" -File -EA SilentlyContinue
 $orphanSkills = @($skillFilesInWorkspace | Where-Object { $_.Name -notin $skillDirs }).Count
 
-if ($orphanSkills -gt 5) {
-    $dcScore -= 2
-} elseif ($orphanSkills -gt 0) {
-    $dcScore -= 1
-}
-
 # Dead junctions (symlinks pointing to missing targets)
 $junctionDirs   = Get-ChildItem ".\skills" -Directory -EA SilentlyContinue
 $deadJunctions  = @($junctionDirs | Where-Object { $_.Target -and -not (Test-Path $_.Target) }).Count
-
-if ($deadJunctions -gt 0) {
-    $dcScore -= 1
-}
 
 # Commented-out code patterns in scripts (exclude this file)
 $commentedLines = 0
@@ -201,9 +193,7 @@ if ($hasScripts) {
     $commentedLines = $commentedPatterns.Count
 }
 
-if ($commentedLines -gt 10) {
-    $dcScore -= 1
-}
+$dcScore = Get-DcScore -Orphans $orphanSkills -DeadJunctions $deadJunctions -Commented $commentedLines
 
 Add-Dimension "DC" ($math::Max(0, $math::Min(10, $dcScore))) @{
     orphans        = $orphanSkills
@@ -325,15 +315,7 @@ if ($bitacoraExists) {
     $bitacoraLines   = $bitacoraContent.Split("`n").Count
 }
 
-if ($bitacoraLines -gt 10) {
-    $biScore = 10
-} elseif ($bitacoraLines -gt 5) {
-    $biScore = 7
-} elseif ($bitacoraExists) {
-    $biScore = 5
-} else {
-    $biScore = 0
-}
+$biScore = Get-BiScore -Exists $bitacoraExists -Lines $bitacoraLines
 
 Add-Dimension "Bi" $biScore @{
     exists = $bitacoraExists
@@ -347,15 +329,7 @@ $hasErrorsDir  = Test-Path "docs/metricas/errors"
 $hasErrorJson  = Test-Path "docs/metricas/errors/LATEST_error.json"
 $hasReports    = (Get-ChildItem "docs/metricas" -File -EA SilentlyContinue).Count -gt 0
 
-$meScore = 4
-if ($hasMetricsDir -and $hasErrorJson) {
-    $meScore = 9
-} elseif ($hasMetricsDir) {
-    $meScore = 7
-}
-if ($hasReports -and $hasErrorsDir) {
-    $meScore = $math::Min(10, $meScore + 1)
-}
+$meScore = Get-MeScore -Dir $hasMetricsDir -ErrDir $hasErrorsDir -ErrJson $hasErrorJson -Reports $hasReports
 
 Add-Dimension "Me" $meScore @{
     md = $hasMetricsDir
@@ -495,7 +469,7 @@ if (Test-Path $interTrackPath) {
         $interTrack = Get-Content $interTrackPath -Raw | ConvertFrom-Json
         $cycleCount  = [int]$interTrack.cycle.count
         $cycleTarget = [int]$interTrack.cycle.target
-        $cycleScore  = $math::Min(10, $math::Round(($cycleCount / $cycleTarget) * 10, 1))
+        $cycleScore  = Get-CaScore -Count $cycleCount -Target $cycleTarget
     } catch {
         $cycleScore = 0
     }
