@@ -1,0 +1,1 @@
+﻿implementer 2026-09-24 BREAKER triage ACCEPTED gate-prep: PS-BND-01 at :8 comment-text match only; real code at :11 is a standard opt-in switch with fail-closed default; residual risk none beyond explicit operator intent fileHash:61822ab5

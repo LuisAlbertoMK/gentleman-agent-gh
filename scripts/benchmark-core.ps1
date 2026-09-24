@@ -97,17 +97,37 @@ $sdir = Join-Path $repoRoot 'scripts'
 # BENCHMARK COMMAND
 # ============================================================
 if ($Command -eq 'Benchmark') {
-    . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
     $r = Convert-Path "$PSScriptRoot\.."
     $cd = "$r\.agents\skills"; $am = "$r\AGENTS.md"; $sd = "$r\scripts"; $sn = "$r\benchmarks"
     $sw = [System.Diagnostics.Stopwatch]::StartNew()
+    # Lazy: full content (-Raw) only when the branch needs exact content metrics.
+    # Bare Benchmark (solo-conteos, no flags) uses file metadata (Get-Item Length) without reading content.
+    # Gate/Snapshot/SetBaseline/Json keep -Raw: the pinned baseline stores char counts ($c.Length) and
+    # file bytes differ (BOM/multibyte), so Length-only Gate causes false >3KB regressions. CLI publica sin cambios.
+    $needFull = [bool]($Snapshot -or $SetBaseline -or $Json -or $Gate)
     $sk = @(Get-ChildItem $cd -Directory).PSWhere({$_.Name -ne '_shared'}).PSForEach({
         $m = "$($_.FullName)\SKILL.md"; if(!(test-path $m)){return}
-        $c = Get-Content $m -Raw
-        @{Name=$_.Name; Bytes=$c.Length; Lines=($c-split"`n").Count; F=$c-match"^---"; W=$c-match"(?m)^## When to Use"; R=$c-match"(?m)^## (Rules|Critical Rules)"}
+        if($needFull){
+            $c = Get-Content $m -Raw
+            @{Name=$_.Name; Bytes=$c.Length; Lines=($c-split"`n").Count; F=$c-match"^---"; W=$c-match"(?m)^## When to Use"; R=$c-match"(?m)^## (Rules|Critical Rules)"}
+        }else{
+            @{Name=$_.Name; Bytes=(Get-Item $m).Length; Lines=0; F=$false; W=$false; R=$false}
+        }
     })
-    $ac = if(test-path $am){Get-Content $am -Raw}else{""}
+    if($needFull){$ac = if(test-path $am){Get-Content $am -Raw}else{""}}
+    else{$ac = ""; $acBytes = if(test-path $am){(Get-Item $am).Length}else{0}; $acLines = 0}
     $sc = Get-ChildItem $sd -Filter *.ps1 -EA 0
+    # O3 lazy: platform.ps1 (Get-GlobalConfigDir) loads only on the Benchmark
+    # junction-check path. Regression/AsyncPush branches never load it (Fase 1:
+    # dot-source already inside this branch). Intra-Benchmark deferral does NOT
+    # apply: every Benchmark invocation (bare/Gate/Snapshot/Json) reports
+    # junction counts via dump/$snap, so the helper is always needed here.
+    # Guard flag avoids double dot-sourcing if the branch re-enters.
+    if (-not (Test-Path 'variable:script:__BenchmarkPlatformLoaded')) { $script:__BenchmarkPlatformLoaded = $false }
+    if (-not $script:__BenchmarkPlatformLoaded) {
+        . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
+        $script:__BenchmarkPlatformLoaded = $true
+    }
     $gd = Join-Path (Get-GlobalConfigDir) "skills"
     $jo = 0; $dead = 0
     foreach($i in $sk){
@@ -128,8 +148,10 @@ if ($Command -eq 'Benchmark') {
     $sb = @($sk.PSForEach({$_.Bytes}) | Sort-Object); $ct = $sb.Count
     $md = if($ct-gt0){if($ct%2-eq1){$sb[($ct-1)/2]}else{[math]::Round(($sb[$ct/2-1]+$sb[$ct/2])/2)}}else{0}
     $sw.Stop()
+    $agentsBytes = if($needFull){[int]($ac.Length)}else{[int]$acBytes}
+    $agentsLines = if($needFull){($ac-split"`n").Count}else{[int]$acLines}
     $sys = @{
-        AgentsMdBytes=[int]($ac.Length); AgentsMdLines=($ac-split"`n").Count; TotalSkills=$sk.Count
+        AgentsMdBytes=$agentsBytes; AgentsMdLines=$agentsLines; TotalSkills=$sk.Count
         TotalSkillBytes=[int]$ab; TotalSkillLines=[int]$al; SkillsOver3kb=$o3
         AvgSkillBytes=if($ct-gt0){[math]::Round($ab/$ct)}else{0}; MedianSkillBytes=$md
         MinSkillBytes=if($ct-gt0){$sb[0]}else{0}; MaxSkillBytes=if($ct-gt0){$sb[-1]}else{0}
@@ -219,9 +241,21 @@ if ($Command -eq 'Regression') {
     $samples = @()
     if (-not $Json -and -not $Quiet) { Write-Host "🏃 Running benchmark: $scriptName ($Runs samples)" -ForegroundColor Cyan }
 
+    # Injection guard: -RegCommand args must not contain statement separators (single script + args only)
+    $badRx = '[;&|`]'
+    $badRx2 = '[\$><]'
+    foreach ($a in @($scriptName) + @($scriptArgs)) {
+        if ($null -ne $a -and ($a -match $badRx -or $a -match $badRx2 -or $a -match '[\r\n]' -or $a.Contains('--%'))) {
+            throw "benchmark-core: illegal metacharacter in -Command args (single script + literal args only): $a"
+        }
+    }
+
     for ($i = 0; $i -lt $Runs; $i++) {
         $sw = [System.Diagnostics.Stopwatch]::StartNew()
-        Invoke-Expression ("& '" + ($scriptPath -replace "'", "''") + "' $($scriptArgs -join ' ')") > $null 2>&1
+        # Avoid Invoke-Expression (PSSA) — re-parse command line via scriptblock so switches bind correctly and quoting is preserved.
+        $invokeLine = "& '" + ($scriptPath -replace "'", "''") + "' $($scriptArgs -join ' ')"
+        $sb = [scriptblock]::Create($invokeLine)
+        & $sb > $null 2>&1
         $sw.Stop()
         $samples += $sw.Elapsed.TotalMilliseconds
         if (-not $Json) { Write-Progress -Activity "Benchmarking" -Status "Run $($i+1)/$Runs" -PercentComplete (($i+1)/$Runs*100) }

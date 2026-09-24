@@ -1,13 +1,25 @@
 {
   "command": "sync-vmk.ps1 -DryRun -Json",
   "runs": 10,
-  "median_ms": 62.13,
-  "mean_ms": 77.42,
-  "stdev_ms": 44.54,
-  "q1_ms": 57.37,
-  "q3_ms": 70.55,
-  "iqr_ms": 13.18,
-  "min_ms": 55.96,
-  "max_ms": 202.43,
-  "timestamp": "2026-08-28T23:49:09.9358305Z"
+  "median_ms": 41.77,
+  "mean_ms": 51.02,
+  "stdev_ms": 30.98,
+  "q1_ms": 35.3,
+  "q3_ms": 47.01,
+  "iqr_ms": 11.71,
+  "min_ms": 34.01,
+  "max_ms": 137.27,
+  "timestamp": "2026-09-24T17:00:51.1041426Z",
+  "reference": {
+    "source": "docs/mejoras/2026-09-24-comparativa-gentle-ai-vs-fork.md §5 (pwsh7, unidad previa) + task dictation 2026-09-24; transcribed, not re-measured here; not a gate",
+    "in_process_tibio_ms": "10-12",
+    "child_ms": "518-540",
+    "scripts_clave_pwsh7": {
+      "health-check -Json": { "ms": 1511, "exit": 1 },
+      "benchmark-core -Gate": { "ms": 1645, "exit": 2 },
+      "token-count -Quiet": { "ms": 781, "exit": 0 },
+      "skill-graph": { "ms": 1024 },
+      "check-token-budget": { "ms": 893 }
+    }
+  }
 }
