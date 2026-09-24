@@ -241,9 +241,21 @@ if ($Command -eq 'Regression') {
     $samples = @()
     if (-not $Json -and -not $Quiet) { Write-Host "🏃 Running benchmark: $scriptName ($Runs samples)" -ForegroundColor Cyan }
 
+    # Injection guard: -RegCommand args must not contain statement separators (single script + args only)
+    $badRx = '[;&|`]'
+    $badRx2 = '[\$><]'
+    foreach ($a in @($scriptName) + @($scriptArgs)) {
+        if ($null -ne $a -and ($a -match $badRx -or $a -match $badRx2 -or $a -match '[\r\n]' -or $a.Contains('--%'))) {
+            throw "benchmark-core: illegal metacharacter in -Command args (single script + literal args only): $a"
+        }
+    }
+
     for ($i = 0; $i -lt $Runs; $i++) {
         $sw = [System.Diagnostics.Stopwatch]::StartNew()
-        Invoke-Expression ("& '" + ($scriptPath -replace "'", "''") + "' $($scriptArgs -join ' ')") > $null 2>&1
+        # Avoid Invoke-Expression (PSSA) — re-parse command line via scriptblock so switches bind correctly and quoting is preserved.
+        $invokeLine = "& '" + ($scriptPath -replace "'", "''") + "' $($scriptArgs -join ' ')"
+        $sb = [scriptblock]::Create($invokeLine)
+        & $sb > $null 2>&1
         $sw.Stop()
         $samples += $sw.Elapsed.TotalMilliseconds
         if (-not $Json) { Write-Progress -Activity "Benchmarking" -Status "Run $($i+1)/$Runs" -PercentComplete (($i+1)/$Runs*100) }
