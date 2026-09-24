@@ -1,0 +1,16 @@
+{
+  "id": "rdd-receipt-017",
+  "freeze": "HEAD-cd331fc-43bc11d9",
+  "freeze_note": "Slice R11-S2 chore(deps): pin exacto + lockfile verify en rama experimento/mejora-ronda11-deuda (base cd331fcb = tip R11-S1). diff8=43bc11d9 = working tree con package.json pineado al verificar. lines_changed=~3 solo scope (package.json 1 + plan review log 1). CI NO tocada a blocking (advisory sigue; blocking = ADR futuro, fuera del slice).",
+  "tier": 1,
+  "tier_justification": "RDD Risk Tiers: Tier 1 autonomo = devDependencies pin exacto (no runtime, no CI blocking, no prompts), scopes plan R11-S2 §3.",
+  "files": ["package.json", "odd/tasks/ronda11-deuda.md"],
+  "lines_changed": 3,
+  "lines_deleted": 0,
+  "verdict": "PASS",
+  "verdict_note": "APLICADO: @playwright/test ^1.63.0->1.63.0 (= version resuelta package-lock.json, lockfileVersion 3); Test-Json True; npm ls --depth=0 sin deriva (3 devDeps exactos); npm audit --audit-level=high reporta fast-uri high transitivo + hono/qs moderate (advisory, sin gate roto, sin fix aplicado); npm ci --dry-run up-to-date + expand-config no-op.",
+  "review": {"status": "PASS", "method": "code-review-agent 4R simple (Tier 1) + Test-Json + npm ls/audit/ci --dry-run", "gaps": []},
+  "next": ["R11-S3"],
+  "auto_fix": false,
+  "timestamp": "2026-09-24T17:10:00-06:00"
+}

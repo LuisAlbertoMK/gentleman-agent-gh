@@ -129,7 +129,7 @@
 | Slice | Reviewer/método | Veredicto | Fecha | Notas |
 |---|---|---|---|---|
 | R11-S1 | code-review-agent 4R simple (Tier 1) | PASS | 2026-09-24 | Pester 19/19 (17 previas intactas + 2 nuevas paridad); gate 83→87 reglas; Test-Json True |
-| R11-S2 | — | - | - | - |
+| R11-S2 | code-review-agent 4R simple (Tier 1) | PASS | 2026-09-24 | Pin @playwright/test ^1.63.0→1.63.0 (=lockfile); npm ls sin deriva; audit advisory (fast-uri high transitivo, sin blocking); npm ci --dry-run up-to-date |
 | R11-S3 | — | - | - | - |
 | R11-S4 | — | - | - | (OWNER facturación pendiente) |
 | R11-S5 | — | - | - | (OWNER destructivo pendiente; ejecución fuera) |
