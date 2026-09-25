@@ -22,7 +22,7 @@ System resource prioritization — RAM/CPU/GPU/file I/O optimization. NOT task e
 
 ## Verify: `Get-Process "opencode*" | Select-Object Name, PriorityClass, @{N='MB';E={[math]::Round($_.WorkingSet64/1MB,1)}}`
 
-## Notes: Reversible · Safe · Activate before large files · `"$env:GENTLEMAN_AGENT_ROOT/scripts/optimize-system.ps1"` once per machine
+## Notes: Reversible · Safe · Activate before large files · Detect HW via `scripts/hardware-profile.ps1`, profile in `scripts/opencode-configs/`
 
 ## WHEN TO ACTIVATE
 - Opening files >10MB → always
@@ -31,7 +31,7 @@ System resource prioritization — RAM/CPU/GPU/file I/O optimization. NOT task e
 - Normal editing (<1MB files) → no benefit
 
 ## PREREQUISITES
-- Run `"$env:GENTLEMAN_AGENT_ROOT/scripts/optimize-system.ps1"` once per machine (sets up registry keys)
+- No prereq script: registry writes run inline in Activate § above
 - Admin rights needed for power plan change (silent fail if unavailable)
 - GPU priority only affects DirectX apps
 ---
@@ -44,7 +44,7 @@ docs/skills/development-mode/reference.md
 |-----------------|----------|--------------|
 | "Modo dev = modo de ejecución" | Confusing dev-mode (RAM/CPU) with execution-mode (QUICK/THOROUGH) | dev-mode=PriorityClass/powercfg, execution-mode=SDD pipeline — check Refs |
 | "Siempre High priority" | Activating for <1MB files | WHEN TO ACTIVATE: >10MB→always, <1MB→no benefit — check size first |
-| "Admin innecesario" | Skipping optimize-system.ps1 prereq | Run `optimize-system.ps1` once — verify registry keys before power plan |
+| "Admin innecesario" | Skipping Activate registry writes | Activate writes keys inline — verify before power plan |
 
 ## Red Flags
 - Doing work without checking output format → STOP, re-read skill

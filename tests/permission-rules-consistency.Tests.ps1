@@ -130,4 +130,29 @@ Describe "Permission Rules Consistency" {
             $true | Should -Be $true
         }
     }
+
+    Context "R10-S4 network-fetch contract (red=deny, toolchain=allow)" {
+        It "Network-fetch commands are denied in opencode.json runtime" {
+            # R10-S4: cerrar vectores de RED (owner #693: toolchain queda libre)
+            $config.permission.bash.'curl *' | Should -Be 'deny'
+            $config.permission.bash.'wget *' | Should -Be 'deny'
+            $config.permission.bash.'ftp *' | Should -Be 'deny'
+            $config.permission.bash.'scp *' | Should -Be 'deny'
+            $config.permission.bash.'rsync *' | Should -Be 'deny'
+        }
+
+        It "git clone stays ask (legitimate dep flow, not deny)" {
+            $config.permission.bash.'git clone *' | Should -Be 'ask'
+        }
+
+        It "Toolchain stays frictionless (node/npm/npx/python NOT denied)" {
+            # Owner direction (respeta #693): npm/python/node sin friccion via *:allow
+            $bashNames = $config.permission.bash.PSObject.Properties.Name
+            foreach ($tool in @('node *', 'npm install *', 'npx *', 'pip install *')) {
+                if ($bashNames -contains $tool) {
+                    $config.permission.bash.$tool | Should -Not -Be 'deny'
+                }
+            }
+        }
+    }
 }

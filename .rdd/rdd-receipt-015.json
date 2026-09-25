@@ -1,0 +1,17 @@
+{
+  "id": "rdd-receipt-015",
+  "freeze": "HEAD-47fce84-dcd4ae3d",
+  "freeze_note": "Slice R10-S3b follow-up durabilidad config(perf): watcher.ignore + small_model al SSoT base en rama experimento/mejora-ronda10-recursos (base 47fce8475510690820ee7a35e58bdb2b8b6ed22c, tip R10-S3 no-durable). diff8=dcd4ae3d = working tree con solo el edit SSoT pendiente de regen al iniciar el slice. lines_changed=10 solo scope (opencode-base.json +9, opencode.json 1 ins + 1 del minified single-line); mas este receipt, fuera del conteo (precedente rdd-receipt-007/011/013).",
+  "tier": 1,
+  "tier_justification": "RDD Risk Tiers: Tier 1 = el cambio funcional (watcher/small_model) ya estaba aplicado y verificado en runtime por R10-S3 (receipt-013 PASS); este follow-up solo lo mueve al SSoT durable sin cambiar comportamiento efectivo. Sin superficie nueva.",
+  "files": ["scripts/lib/opencode-base.json", "opencode.json"],
+  "lines_changed": 10,
+  "lines_deleted": 1,
+  "verdict": "PASS",
+  "verdict_note": "DURABLE: small_model + watcher.ignore ahora en SSoT base (13->15 keys); regen -Yes OK 20/20 checks; opencode.json conserva watcher.ignore=[node_modules/**,.git/**,dist/**,temp/**] + small_model=opencode/muse-spark-1.3-contributor-free; Test-Json True; 13 keys originales intactas; agentes 44; bash 71; experimental.mcp_timeout intacto en 60000; sin WARNING de profile keys (marker .opencode-hw-tier ausente, regen lossless como previsto).",
+  "review": {"status": "PASS", "method": "regenerate-opencode.ps1 -Yes wrapper sancionado (20 checks OK) + Test-Json + key-count", "gaps": []},
+  "blockers": [],
+  "next": ["R10-S4 (OWNER seguridad, receipt-014)"],
+  "auto_fix": false,
+  "timestamp": "2026-09-24T16:12:29.4161251-06:00"
+}

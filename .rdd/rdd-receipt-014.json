@@ -1,0 +1,18 @@
+{
+  "id": "rdd-receipt-014",
+  "freeze": "HEAD-c6fcc1b-aca81f32",
+  "freeze_note": "Slice R10-S4 fix(security): deny network-fetch en SSoT permisos en rama experimento/mejora-ronda10-recursos (base c6fcc1b8e00cef17c4411653337ae45c65218fbe, tip R10-S3b durable). diff8=aca81f32 = working tree con solo el edit SSoT-base pendiente de regen al iniciar el slice. lines_changed=32 solo scope (opencode-base.json +6, opencode.json 1 ins + 1 del minified single-line, permission-rules-consistency +25); mas este receipt, fuera del conteo (precedente rdd-receipt-007/011/013/015). OWNER-DECISION: direccion cerrar-RED/dejar-toolchain-libre (respeta #693).",
+  "tier": 2,
+  "tier_justification": "RDD Risk Tiers: Tier 2 seguridad = permisos runtime SSoT (afecta todos los runs; score no debe bajar). OWNER aprobado.",
+  "files": ["scripts/lib/opencode-base.json", "opencode.json", "tests/permission-rules-consistency.Tests.ps1"],
+  "lines_changed": 32,
+  "lines_deleted": 1,
+  "verdict": "PASS",
+  "verdict_note": "APLICADO: permission.bash SSoT 71->77 reglas (curl/wget/ftp/scp/rsync=deny, git clone=ask); regen -Yes OK 20/20; opencode.json runtime trae las 6 nuevas; Test-Json True; Pester permission-rules-consistency 17/17 PASS (14 previas + 3 nuevas R10-S4 red=deny/toolchain=allow); security-audit-mcp FAIL=0 WARN=0 PASS; mcp_timeout intacto 60000; agentes 44; node/npm/npx/pip install sin deny (quedan allow por *:allow, #693 respetado); rm/ssh no tocados (ya deny).",
+  "review": {"status": "PASS", "method": "regenerate-opencode.ps1 -Yes (20 checks OK) + Invoke-Pester + security-audit-mcp.ps1 + Test-Json", "gaps": ["prompts/shared/_permission-templates.md NO reconciliado: el edit fue denegado por el gate de permisos runtime (edit prompts/**=deny en opencode.json vigente); el bloque Orchestrator aun exige node/python/python3 en deny, inconsistente con la direccion toolchain=allow. No se uso bypass. Requiere follow-up del owner con alcance prompts."]},
+  "escalation": "judgment-day",
+  "blockers": ["Follow-up owner: reconciliar prompts/shared/_permission-templates.md (quitar node/python/python3 del bloque Orchestrator para contrato red=deny/toolchain=allow) — fuera del alcance ejecutable de este slice por el gate edit prompts/**=deny."],
+  "next": ["R11 (S5+S6)", "Follow-up prompts/_permission-templates.md (owner)"],
+  "auto_fix": false,
+  "timestamp": "2026-09-24T16:15:36.0374355-06:00"
+}
