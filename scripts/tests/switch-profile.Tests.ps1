@@ -67,6 +67,8 @@ BeforeAll {
 Describe 'switch-profile.ps1' {
 
     Context 'Profile overlay files' {
+        # Overlay files still declare 19 keys (12 live + 7 inert `-auto` purged
+        # from the SSoT by ADR-050; dead keys never match an agent object).
         It 'profile-go.json exists and is valid JSON' {
             $goProfile = Get-Content $GoProfilePath -Raw | ConvertFrom-Json
             $goProfile.mapping | Should -Not -BeNullOrEmpty
@@ -130,7 +132,10 @@ Describe 'switch-profile.ps1' {
     }
 
     Context 'Apply mode — Go profile' {
-        It 'applies Go profile and persists 19 model overrides to minified JSON' {
+        # ADR-050 single-mode: overlays still declare 19 keys, but the 7 `-auto`
+        # twins were purged from the SSoT (58→44 agents) — only 12 mapped subs
+        # are live, so a go switch persists exactly 12 overrides.
+        It 'applies Go profile and persists 12 model overrides to minified JSON' {
             $tempDir = New-TempOpencodeCopy
             try {
                 & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet
@@ -140,7 +145,7 @@ Describe 'switch-profile.ps1' {
                 # even though opencode.json is minified (single line)
                 $config.agent.'gentleman-deep-sub'.model | Should -Be 'opencode-go/muse-spark-1.3-contributor'
                 $config.agent.'gentleman-codex-sub'.model | Should -Be 'opencode-go/muse-spark-1.3-contributor'
-                Get-ContributorSubCount -Path $configPath | Should -Be 19
+                Get-ContributorSubCount -Path $configPath | Should -Be 12
             } finally {
                 Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
             }
@@ -167,8 +172,10 @@ Describe 'switch-profile.ps1' {
                 & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet
                 & $SwitchScript -ProjectRoot $tempDir -Profile zen -Force -Quiet
                 $configPath = Join-Path $tempDir 'opencode.json'
+                # ADR-050: zen must leave every live sub free — 12 mapped subs
+                # + 4 intentionally-free unmapped (quick/frontend/datascience/docs) = 16.
                 $zenCount = Get-ZenFreeCount -Path $configPath
-                $zenCount | Should -BeGreaterOrEqual 19
+                $zenCount | Should -Be 16
                 $config = Get-Content $configPath -Raw | ConvertFrom-Json
                 $config.agent.'gentleman-deep-sub'.model | Should -Be 'opencode/muse-spark-1.3-contributor-free'
             } finally {
@@ -219,7 +226,7 @@ Describe 'switch-profile.ps1' {
         It 'second consecutive -Force apply with 0 changes creates no backup and keeps content intact' {
             $tempDir = New-TempOpencodeCopy
             try {
-                # First apply — creates backup + writes 19 overrides
+                # First apply — creates backup + writes 12 overrides (ADR-050: 19 − 7 purged -auto)
                 & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet
                 $backupsAfterFirst = @(Get-ChildItem -Path $tempDir -Filter 'opencode.json.bak-*')
                 $contentAfterFirst = Get-Content (Join-Path $tempDir 'opencode.json') -Raw
@@ -265,11 +272,11 @@ Describe 'switch-profile.ps1' {
     }
 
     Context 'Counts per profile' {
-        It 'Go profile applies to exactly 19 subagent entries' {
+        It 'Go profile applies to exactly 12 subagent entries (ADR-050: 19 overlay keys − 7 purged -auto)' {
             $tempDir = New-TempOpencodeCopy
             try {
                 $output = & $SwitchScript -ProjectRoot $tempDir -Profile go -DryRun -Json | ConvertFrom-Json
-                $output.changed.Count | Should -Be 19
+                $output.changed.Count | Should -Be 12
             } finally {
                 Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
             }
@@ -310,7 +317,7 @@ Describe 'switch-profile.ps1' {
                 $baseline = Get-Content $opencodePath -Raw
                 $baselineHash = (Get-FileHash -LiteralPath $opencodePath -Algorithm SHA256).Hash
 
-                # Apply GO — persists 19 overrides to contributor models
+                # Apply GO — persists 12 overrides to contributor models (ADR-050 live mapped subs)
                 & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet
                 $afterGo = Get-Content $opencodePath -Raw
                 $afterGoHash = (Get-FileHash -LiteralPath $opencodePath -Algorithm SHA256).Hash
