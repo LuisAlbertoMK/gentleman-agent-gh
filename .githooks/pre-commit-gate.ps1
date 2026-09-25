@@ -17,6 +17,50 @@ function Pass { $script:passed++; Write-Host "  $([char]0x1b)[32mOK$([char]0x1b)
 function Warn  { param([string]$Msg) $script:passed++; if ($Msg) { Write-Host "  $([char]0x1b)[33m$Msg$([char]0x1b)[0m" } else { Write-Host "  $([char]0x1b)[33mWARN$([char]0x1b)[0m" } }
 function Fail  { param([string]$Msg) $script:failed++; $script:blocked = $true; if ($Msg) { Write-Host "  $([char]0x1b)[31mBLOCKING: $Msg$([char]0x1b)[0m" } else { Write-Host "  $([char]0x1b)[31mBLOCKING$([char]0x1b)[0m" } }
 
+# --- External-check runner helper (fail-closed) --------------------------------
+# A blocking check MUST NOT report green when its runner could not be verified.
+# `& script ...; if ($LASTEXITCODE -eq 0)` is unsafe: a runner that never executes
+# (missing / blocked / crash) leaves $LASTEXITCODE STALE at its previous value, and
+# -ErrorAction SilentlyContinue hides the real error. This helper runs the runner,
+# captures its output WITHOUT masking errors, extracts its trailing JSON summary,
+# and parses it. Callers assert an explicit result field; a runner that emits no
+# parseable JSON yields Ok=$false so the caller fails with an actionable message.
+function Invoke-GateRunner {
+    param(
+        [Parameter(Mandatory)][string]$ScriptPath,
+        # Hashtable (NOT an array): array splatting passes '-Json' as a POSITIONAL
+        # value, so named/switch params would silently mis-bind.
+        [Parameter(Mandatory)][hashtable]$Arguments
+    )
+    if (-not (Test-Path -LiteralPath $ScriptPath)) {
+        return [PSCustomObject]@{ Ok = $false; Json = $null; Raw = ''; Error = "runner not found: $ScriptPath" }
+    }
+    $raw = ''
+    try {
+        # 2>&1 captures stderr too; deliberately NO -ErrorAction SilentlyContinue so
+        # a real failure surfaces instead of being masked.
+        $raw = & $ScriptPath @Arguments 2>&1 | Out-String -Width 4096
+    } catch {
+        return [PSCustomObject]@{ Ok = $false; Json = $null; Raw = ''; Error = "runner threw: $($_.Exception.Message)" }
+    }
+    # Progress text (e.g. the node generator in regenerate-opencode) may precede the
+    # JSON summary — take the LAST object emitted.
+    $jsonStart = $raw.LastIndexOf("`n{")
+    if ($jsonStart -lt 0 -and $raw.TrimStart().StartsWith('{')) { $jsonStart = $raw.IndexOf('{') }
+    if ($jsonStart -lt 0) {
+        return [PSCustomObject]@{ Ok = $false; Json = $null; Raw = $raw; Error = 'runner emitted no JSON result' }
+    }
+    $candidate = $raw.Substring($jsonStart).Trim()
+    $lastBrace = $candidate.LastIndexOf('}')
+    if ($lastBrace -ge 0) { $candidate = $candidate.Substring(0, $lastBrace + 1) }
+    $parsed = $null
+    try { $parsed = $candidate | ConvertFrom-Json -ErrorAction Stop } catch { $parsed = $null }
+    if ($null -eq $parsed) {
+        return [PSCustomObject]@{ Ok = $false; Json = $null; Raw = $raw; Error = 'runner JSON result was not parseable' }
+    }
+    return [PSCustomObject]@{ Ok = $true; Json = $parsed; Raw = $raw; Error = $null }
+}
+
 # Detect staged files (done once, reused by multiple checks)
 $staged = git diff --cached --name-only --diff-filter=ACM
 $stagedPS1       = $staged | Where-Object { $_ -like '*.ps1' -and $_ -notmatch '^\.(jd|breaker)-cleared/' }
@@ -162,8 +206,20 @@ function Test-AdversarialProfile {
     param([array]$Staged, [string]$RepoRoot)
     $stagedSecurity = $Staged | Where-Object { $_ -match '\.ps1$' }
     if ($stagedSecurity) {
-        & "$RepoRoot/scripts/check-adversarial.ps1" -RepoRoot $RepoRoot -ErrorAction SilentlyContinue 2>&1 | Out-Null
-        if ($LASTEXITCODE -eq 0) { Pass } else { Fail "adversarial profile violations — see output above, touch .breaker-cleared/<file> markers or set FORCE_SHIP=1" }
+        # FORCE_SHIP is a deliberate human override (same as [10/28]); honor it first.
+        $forceShip = ($env:FORCE_SHIP -eq '1') -or ($env:FORCE_SHIP -eq 'true')
+        if ($forceShip) {
+            Pass
+        } else {
+            # Verify the runner's JSON passed field. check-adversarial.ps1 swallows its
+            # own exceptions (Write-Warning + exit 0) and then emits NO JSON — so a
+            # broken runner must fail here, not pass on a stale exit code.
+            $advRun = Invoke-GateRunner -ScriptPath "$RepoRoot/scripts/check-adversarial.ps1" -Arguments @{ Quiet = $true; RepoRoot = $RepoRoot }
+            if (-not $advRun.Ok) {
+                Fail "adversarial profile scan: no se pudo verificar ($($advRun.Error))"
+            } elseif ($advRun.Json.passed -eq $true) { Pass }
+            else { Fail "adversarial profile violations (blocks=$($advRun.Json.blocks)) — touch .breaker-cleared/<file> markers or set FORCE_SHIP=1" }
+        }
     } else { Pass }
 }
 
@@ -200,8 +256,17 @@ if ($stagedSkills) {
         if ($null -ne $cr.PSObject.Properties['brokenCrossRefs']) { $crBroken = $cr.brokenCrossRefs }
         if ($crPassed) { Pass } else { Fail "cross-ref validation failed (fast: brokenCrossRefs=$crBroken)" }
     } else {
-        & "$RepoRoot/scripts/cross-ref-check.ps1" -Quiet -ErrorAction SilentlyContinue 2>&1 | Out-Null
-        if ($LASTEXITCODE -eq 0) { Pass } else { Fail "cross-ref validation failed" }
+        # Fallback (fast gate unavailable/parse-failed): verify the runner's JSON
+        # result, never just $LASTEXITCODE. -Quiet implies -Json in the script, but
+        # its JSON goes to stdout, so parse the result explicitly.
+        $crRun = Invoke-GateRunner -ScriptPath "$RepoRoot/scripts/cross-ref-check.ps1" -Arguments @{ Json = $true }
+        if (-not $crRun.Ok) {
+            Fail "cross-ref validation: no se pudo verificar ($($crRun.Error))"
+        } elseif ($crRun.Json.allClean -eq $true) { Pass }
+        else {
+            $crBroken = if ($null -ne $crRun.Json.PSObject.Properties['brokenCrossRefs']) { $crRun.Json.brokenCrossRefs } else { 'n/a' }
+            Fail "cross-ref validation failed (brokenCrossRefs=$crBroken)"
+        }
     }
 } else { Pass }
 
@@ -368,8 +433,13 @@ if ($stagedConfig) {
 Write-Host "[15/28] opencode.json sync with SSoT..."
 $stagedLib = $staged | Where-Object { $_ -match '^(scripts/lib/|opencode\.json$)' }
 if ($stagedLib) {
-    & "$RepoRoot/scripts/regenerate-opencode.ps1" -Quiet -ErrorAction SilentlyContinue 2>&1 | Out-Null
-    if ($LASTEXITCODE -eq 0) { Pass } else { Fail "opencode.json out of sync with SSoT — run scripts/regenerate-opencode.ps1 -Yes" }
+    # Validate sync by parsing the runner's JSON status, not $LASTEXITCODE (the
+    # runner logs node generator output before its JSON summary).
+    $regenRun = Invoke-GateRunner -ScriptPath "$RepoRoot/scripts/regenerate-opencode.ps1" -Arguments @{ Quiet = $true }
+    if (-not $regenRun.Ok) {
+        Fail "opencode.json sync: no se pudo verificar ($($regenRun.Error))"
+    } elseif ($regenRun.Json.status -eq 'ok') { Pass }
+    else { Fail "opencode.json out of sync with SSoT (status=$($regenRun.Json.status)) — run scripts/regenerate-opencode.ps1 -Yes" }
 } else { Pass }
 
 # [16/28] Write-scope enforcement (OPT-IN via .gentleman/write-scope.json)
@@ -383,8 +453,13 @@ if (Test-Path -LiteralPath $scopeFile) {
         $allowed = @($scope.allowed_paths) -join ','
         if (-not $allowed) { Fail "write-scope.json has no allowed_paths" }
         else {
-            & "$RepoRoot/scripts/validate-write-scope.ps1" -AllowedPaths $allowed -BaseRef HEAD -Staged -ErrorAction SilentlyContinue 2>&1 | Out-Null
-            if ($LASTEXITCODE -eq 0) { Pass } else { Fail "staged changes outside allowed_paths ($scopeFile)" }
+            # Verify the runner's JSON status (CLEAN/VIOLATION/error), not $LASTEXITCODE.
+            $wsRun = Invoke-GateRunner -ScriptPath "$RepoRoot/scripts/validate-write-scope.ps1" -Arguments @{ AllowedPaths = $allowed; BaseRef = 'HEAD'; Staged = $true; Json = $true }
+            if (-not $wsRun.Ok) {
+                Fail "write-scope check: no se pudo verificar ($($wsRun.Error))"
+            } elseif ($wsRun.Json.status -eq 'CLEAN') { Pass }
+            elseif ($wsRun.Json.status -eq 'VIOLATION') { Fail "staged changes outside allowed_paths ($scopeFile)" }
+            else { Fail "write-scope validation error ($($wsRun.Json.message))" }
         }
     } catch { Fail "write-scope.json parse error: $_" }
 } else { Pass }
@@ -419,8 +494,13 @@ if (Test-Path -LiteralPath $configPath) {
 Write-Host "[19/28] Backlog integrity check..."
 $backlogScript = Join-Path $RepoRoot 'scripts/check-backlog-integrity.ps1'
 if (Test-Path -LiteralPath $backlogScript) {
-    & "$RepoRoot/scripts/check-backlog-integrity.ps1" *> $null
-    if ($LASTEXITCODE -eq 0) { Pass } else { Fail "backlog integrity check failed — CYCLE.md status does not match repo reality" }
+    # Verify the runner's JSON allPassed field, not $LASTEXITCODE (a runner that
+    # never runs leaves the exit code stale).
+    $blRun = Invoke-GateRunner -ScriptPath $backlogScript -Arguments @{ Json = $true }
+    if (-not $blRun.Ok) {
+        Fail "backlog integrity: no se pudo verificar ($($blRun.Error))"
+    } elseif ($blRun.Json.allPassed -eq $true) { Pass }
+    else { Fail "backlog integrity check failed — CYCLE.md status does not match repo reality (failed=$($blRun.Json.failed))" }
 } else { Fail "backlog-integrity.ps1 not found at $backlogScript" }
 
 # [20/28] Token budget check (C9)

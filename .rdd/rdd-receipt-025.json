@@ -1,0 +1,40 @@
+{
+  "id": "rdd-receipt-025",
+  "freeze": "HEAD-e7f7e3f2-f57b4d7a",
+  "freeze_note": "Rama nueva fix/gate-fail-open-audit (stacked sobre fix/hook-pester-silent-skip, PR base de esa rama). Parent directo = e7f7e3f2 (2o commit del PR #51). diff8=f57b4d7a = SHA256[:8] de `git diff HEAD -- .githooks/pre-commit-gate.ps1` antes de agregar esta receipt (evita circularidad). Receipt incluida en el commit final.",
+  "tier": 2,
+  "tier_justification": "Tier 2 = modifica el gate de pre-commit compartido (.githooks/pre-commit-gate.ps1), endureciendo 5 checks BLOQUEANTES de falso-verde a fail-closed. No toca codigo de produccion ni runtime. Requiere evidencia rojo/verde de gate real.",
+  "files": [
+    ".githooks/pre-commit-gate.ps1",
+    ".rdd/rdd-receipt-025.json"
+  ],
+  "file_statuses": {
+    "modified": [
+      ".githooks/pre-commit-gate.ps1"
+    ]
+  },
+  "lines_changed": 90,
+  "lines_deleted": 10,
+  "verdict": "PASS",
+  "verdict_note": "ANTES (fail-open): 5 checks BLOQUEANTES usaban `& runner ...; if ($LASTEXITCODE -eq 0)` y 4 de ellos ademas `-ErrorAction SilentlyContinue`. Un runner que no ejecuta (ausente/bloqueado/crash) deja `$LASTEXITCODE` STALE en su valor previo (p.ej. 0 de un comando anterior) y SilentlyContinue oculta el error real => PASS sin verificar. Casos: [3/26] cross-ref L78-79, [15/26] regenerate-opencode L314-315, [16/26] validate-write-scope L329-330, [19/26] backlog-integrity L365-366, [23/26] adversarial L451-452. DESPUES: helper `Invoke-GateRunner` (fail-closed) que (a) NO usa -ErrorAction SilentlyContinue (mantiene 2>&1), (b) captura la salida, (c) extrae el ultimo objeto JSON del runner, (d) lo parsea, y (e) el call-site asserta un campo explicito (crossRef.allClean / status=ok / status=CLEAN / allPassed / passed). Si el runner no existe, lanza, o no emite JSON parseable => Fail \"no se pudo verificar (<detalle>)\". [23] respeta FORCE_SHIP (bypass humano, igual que [10/26]). Los checks Warn-level por diseno ([4],[8],[17]) NO se volvieron bloqueantes.",
+  "review": {
+    "status": "PASS",
+    "method": "Auditoria de los 26+2 pasos del gate + fix de 5 checks bloqueantes con helper fail-closed + prueba rojo/verde en worktree aislado (gate original vs nuevo, triggers sinteticos) + prueba rojo in-vivo con git commit real (sin --no-verify/FORCE_SHIP) + no-regresion Invoke-Pester (tests/contract-permission, tests/contract-receipt, tests/validate-write-scope, tests/gates-markers, tests/orchestrator-hooks, scripts/tests/check-backlog-integrity, scripts/tests/check-adversarial, scripts/tests/cross-ref-check, scripts/tests/gate-prep, scripts/tests/check-config-drift) + validacion de receipt contra contracts/rdd-receipt.schema.json con Test-Json",
+    "gaps": [
+      "[3] y [15] NO se pueden activar por git commit real en el repo principal bajo el write-set permitido (sus guards exigen staged en .agents/skills/ y en scripts/lib|opencode.json, fuera del set permitido). Se ejercitaron en un worktree aislado (detached @ e7f7e3f2) con triggers sinteticos staged: RUN A gate ORIGINAL + 5 runners stubbed (exit 0, sin salida) => [3,15,16,19,23] los 5 PASS (fail-open demostrado); RUN B gate NUEVO + mismos stubs => los 5 BLOCKING; RUN C gate NUEVO + runners restaurados byte-exact (restore-exact=True) => los 5 PASS ([15] status real='ok').",
+      "[9] MCP audit exit 2 en el worktree es artefacto de entorno (falta GENTLEMAN_AGENT_ROOT), no relacionado con los 5 fixes; en el repo principal [9] es OK.",
+      "Falsos positivos del barrido (NO fail-open / NO tocados): [4] skill-drift L86-87, [8] benchmark L135-137 y [17] config-drift L343-344 usan el mismo patron SilentlyContinue+LASTEXITCODE pero son Warn-level POR DISENO; [20] token-budget es Warn por ADR-018 (ya corregido en receipt 024).",
+      "FIX-ADYACENTE NO TOCADO (fuera de scope, reportado): [8/26] benchmark — si el runner crashea, `-match 'REGRESSIONS'` no matchea y cae en `Pass` (en vez de Warn); es no-bloqueante pero de la misma clase. El fast-gate Go (cmd/gate/main.go L148-159) trata fast.exe ausente/fallido como 'ok/skipped'; es el fast path y el slow path PS real corre despues cuando aplica."
+    ]
+  },
+  "notes": "Auditoria (26+2 pasos): BLOQUEANTES fail-open corregidos = [3],[15],[16],[19],[23]. BLOQUEANTES OK = [2],[6],[7],[9],[10],[11],[12],[13] (ya endurecido), [14] (git show falla => Pass, menor), [18],[21],[22] (Warn si falta el script), [24],[25] (ya endurecido),[26],[27]. WARN por diseno = [1],[4],[5],[8],[17],[20],[22],[28]. NOTA DE DESARROLLO: la primera version del helper usaba array-splat `@('-Json')`, que en PowerShell pasa '-Json' como argumento POSICIONAL (no como parametro nombrado), mis-bindeando los runners (p.ej. -Json -> RepoRoot en check-backlog-integrity) y disparando falsos 'no se pudo verificar'; se corrigio a hashtable-splat `@{ Json = $true }` (verificado: array-splat='NO', hash-splat='YES' con switch).",
+  "fixes_applied": 5,
+  "blockers": [],
+  "next": [
+    "Unificar los checks Warn-level ([4],[8],[17]) bajo Invoke-GateRunner para que 'no se pudo verificar' sea VISIBLE y distinto de Pass, sin volverlos bloqueantes.",
+    "Endurecer el fast-gate Go (cmd/gate/main.go) que reporta 'ok/skipped' cuando fast.exe no corre.",
+    "tests/scripts/generate-config.Tests.ps1 mantiene 5 fails pre-existentes (receipt 022), ajenos a este fix."
+  ],
+  "auto_fix": false,
+  "timestamp": "2026-09-25T12:10:28-06:00"
+}
