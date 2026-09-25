@@ -149,22 +149,59 @@ paridad exacta.
   (incluye `permission-parity-global`).
 - `Invoke-Pester tests/permission-rules-consistency.Tests.ps1` -> **19/19 PASS**
   (se actualizaron las aserciones que codificaban los denies viejos).
+- `Invoke-Pester tests/contract-permission.Tests.ps1` -> **13/13 PASS**.
+- `Invoke-Pester tests/opencode-json-validation.Tests.ps1` -> **21/21 PASS**.
+- No-regresion: `contract-compaction` **3/3**, `permission-rules-consistency`
+  **19/19**, `contract-receipt` **24/24**.
 
-## 7. Deuda / residual (fuera de este slice)
+## 7. Deuda cerrada (este slice)
 
-Estas suites aun codifican los denies viejos y **fallaran** si se ejecutan (no
-estan en el write-scope de este slice; el pre-commit gate solo corre tests
-staged, por eso no bloquea este commit):
+Estado: **cerrada** — las 2 suites que codificaban los denies viejos se
+alinearon a la paridad; 0 fallos.
 
-- `tests/contract-permission.Tests.ps1` -> 3 fails
-  (`readonly ... bash/task deny, no edit/write`; `readwrite minimal`;
-  `orchestrator denies task ...`).
-- `tests/opencode-json-validation.Tests.ps1` -> 1 fail (`git push --force is denied`).
-- `scripts/tests/generate-config.Tests.ps1` -> usa fixtures `readonly` propias;
-  revisar si su expectativa sigue vigente.
+- `tests/contract-permission.Tests.ps1` -> **13/13 PASS** (antes 9 pass / 3 fail).
+  Se reemplazaron asertos obsoletos por asertos de paridad: ningun template
+  lleva delta `bash/read/write/edit`; `readonly` conserva el lockdown
+  estructural `task:*=deny`; `readwrite`/`reviewer`/`sddorchestrator` no llevan
+  delta; el orquestador hereda el bash global y conserva `task:*=deny` +
+  allowlist. Se agrego un `It` explicito de "no deltas por-template".
+- `tests/opencode-json-validation.Tests.ps1` -> **21/21 PASS** (antes 16 pass /
+  1 fail). `git push --force *` pasa de `deny` a `ask` (paridad); bash = 1 allow
+  + 14 ask + 0 deny; `write`/`edit` ausentes; `read` conserva los **13 denies de
+  secretos** (proteccion retenida); ningun agente lleva delta
+  `bash/read/write/edit`.
+- `scripts/tests/generate-config.Tests.ps1` -> **11 pass / 5 fail PRE-EXISTENTES**
+  (verificado con worktree de `b700098b`: mismo 11/5). NO los causa la paridad:
+  son fixtures `-auto`/`auto-sub` retirados en Refactor-AP S1b + un fixture
+  mcp-policy. Fuera del write-scope de este slice.
 
-Follow-up sugerido: actualizar esas suites a la paridad (o aplicar la variante
-segura si se decide revertir la paridad).
+### 7.1 Gate vs runtime — veredicto (reportado, NO modificado)
+
+`shared-deny-rules.json` (SSoT del gate) **NO** es un plugin/hook del runtime de
+OpenCode. Evidencia:
+
+- `scripts/lib/permission-gate-lib.ps1:8-12`: "Dot-sourced by
+  scripts/permission-gate.ps1 (and by its Pester tests). This file is NOT meant
+  to be invoked directly."
+- `scripts/permission-gate.ps1:8-10`: "Works as a **behavioral gate** — the
+  orchestrator calls this BEFORE running any command" (invocacion manual).
+  Ningun archivo bajo `prompts/**` lo menciona (grep sin matches).
+- `plugins/` solo contiene `collapsible-history.ts` / `.tui.ts`; `.githooks/`
+  son hooks de git, no del runtime de agentes.
+
+PERO el deny floor **si** llega al runtime por otra via:
+`scripts/sync-global.ps1:268-275` (SEC-F2) porta las reglas `deny` de
+`shared-deny-rules.json` al config GLOBAL
+`~/.config/opencode/opencode.json(c)`; `scripts/use-gentleman.ps1:243-289`
+(`Assert-SecurityFloor`) hace lo mismo en configs de proyecto generadas.
+Evidencia en esta maquina: `~/.config/opencode/opencode.json` hoy tiene
+`permission` = bash(71) + read + write + edit, con `ssh *:deny`,
+`git push *:deny`, `git push --force *:deny`. Ese global **intercepta bash en
+runtime** hasta re-sincronizar/limpiar el global.
+
+=> Conclusion: la paridad del repo (`opencode.json`, 15 reglas) no se siente por
+completo en una maquina con el global viejo. **Reportado; NO modificado** (fuera
+del write-scope de este slice).
 
 ## 8. Rollback
 
