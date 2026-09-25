@@ -13,9 +13,9 @@ List snapshots only, no restore.
 .PARAMETER DryRun
 Show what would be restored without applying.
 #>
-Set-StrictMode -Version Latest
 [CmdletBinding(SupportsShouldProcess=$true)]
 param([switch]$Quiet,[string]$Revision="",[switch]$List,[switch]$DryRun,[switch]$Force)
+Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 $cfg=Join-Path (Get-GlobalConfigDir)
