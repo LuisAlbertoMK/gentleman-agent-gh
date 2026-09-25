@@ -132,7 +132,7 @@
 | R11-S2 | code-review-agent 4R simple (Tier 1) | PASS | 2026-09-24 | Pin @playwright/test ^1.63.0→1.63.0 (=lockfile); npm ls sin deriva; audit advisory (fast-uri high transitivo, sin blocking); npm ci --dry-run up-to-date |
 | R11-S3 | code-review-agent 4R simple (Tier 1) | PASS | 2026-09-24 | Invariante 3/3 verde; base.json intacto (Select-String solo :207); nota en RUNBOOK |
 | R11-S4 | code-review-agent 4R BLOCKER-capable (Tier 2 docs-only) | PASS | 2026-09-24 | RE-SCOPEADO: premisa laguna-high MOOT (ventana terminó 2026-08-27); doc coste corregido + guía variante; receipt 019 validado contra schema; hook pre-commit PASS; base.json/opencode.json intactos |
-| R11-S5 | — | - | - | (OWNER destructivo pendiente; ejecución fuera) |
+| R11-S5 | code-review-agent 4R BLOCKER-capable (Tier 3) + Pester copia + Test-Json schema | PASS | 2026-09-25 | Script dry-run-default + runbook + test 6/6 en copia (shim sqlite3.cmd/python, fixture con schema fiel ms-epoch); time_created=ms + event.aggregate_id=session.id 100% (medido read-only); DB real intacta (mtime/size verificados); guard AllowProduction; ejecucion real FUERA (ventana owner); receipt 020 validado |
 
 ## 8. Rollback (por slice, orden inverso)
 

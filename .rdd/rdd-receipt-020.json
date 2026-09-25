@@ -1,0 +1,17 @@
+{
+  "id": "rdd-receipt-020",
+  "freeze": "HEAD-eeef359-b167e3e1",
+  "freeze_note": "Slice R11-S5 feat(db) en rama experimento/mejora-ronda11-deuda (base eeef359 = tip R11-S4). diff8=b167e3e1 = git diff tracked (RUNBOOK + plan) al verificar; script/test/receipt nuevos incluidos en el commit. Post-bloqueo hook [23/26] PS-CI-03: refactor Invoke-DbQuery/Get-RowsToDelete (`& $Exe` -> invocacion literal `sqlite3`, sin param -Exe; prereq Get-Command intacto). PROHIBIDO ejecutar contra la DB real dentro del slice.",
+  "tier": 3,
+  "tier_justification": "RDD Risk Tiers: Tier 3 = script con potencial destructivo (DELETE + VACUUM). Mitigado: dry-run default, guard -AllowProduction, backup verificado obligatorio, test solo en copias. Ejecucion real FUERA del slice (ventana owner).",
+  "files": ["scripts/opencode-db-maintenance.ps1", "scripts/tests/opencode-db-maintenance.Tests.ps1", "docs/operations/RUNBOOK.md", "odd/tasks/ronda11-deuda.md", ".rdd/rdd-receipt-020.json"],
+  "lines_changed": 303,
+  "lines_deleted": 1,
+  "verdict": "PASS",
+  "verdict_note": "PASS HONESTO: script testeado en COPIA (Pester 6/6: dry-run no escribe, retencion borra solo lo viejo, -Apply exige backup, prereq sqlite3 fail-limpio, guard produccion, fixture intacto; 6/6 RE-VERIFICADO tras refactor PS-CI-03 `& $Exe`->`sqlite3` literal, firma interna sin -Exe, uso documentado intacto). DB real intacta (mtime/size verificados). EJECUCION REAL queda FUERA del slice, ventana owner con runbook.",
+  "review": {"status": "PASS", "method": "code-review-agent 4R BLOCKER-capable (Tier 3) + Pester copia 6/6 + Test-Json schema + mtime/size DB real", "gaps": ["sqlite3 CLI ausente en esta maquina: test usa shim sqlite3.cmd/python solo en temp; runbook declara prereq winget"]},
+  "escalation": "judgment-day",
+  "next": [],
+  "auto_fix": false,
+  "timestamp": "2026-09-24T18:28:52-06:00"
+}

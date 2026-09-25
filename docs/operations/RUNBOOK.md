@@ -95,3 +95,28 @@ Security: `OllamaApiKey` is optional Bearer token — never commit keys; use env
 ## Config Invariants — compaction/snapshot NO-OP (R11-S3)
 
 `scripts/lib/opencode-base.json` keeps `compaction = {auto:true, prune:true, reserved:4000, keep:{tokens:8000}}`, with `snapshot` and `compaction.buffer` ABSENT. Why: determinism of runs and RDD receipts depends on a closed compaction config — an accidental change would silently alter context behavior. Guard: `tests/contract-compaction.Tests.ps1` fails on purpose if anyone edits compaction; changing it requires an explicit owner-approved slice (never a drive-by edit, never direct `opencode.json` — SSoT + `regenerate-opencode.ps1 -Yes`).
+
+## opencode.db Maintenance — DESTRUCTIVE, owner window only (R11-S5)
+
+Script: `scripts/opencode-db-maintenance.ps1` (dry-run default, cero escrituras).
+Test: `scripts/tests/opencode-db-maintenance.Tests.ps1` (6 Its, solo DBs copia en `$env:TEMP`).
+
+> WARNING: `-Apply` borra sesiones viejas + `VACUUM`. `freelist=0` medido 2026-09-24:
+> hoy NO hay ganancia gratis; cualquier reclaim exige borrar datos + VACUUM.
+
+Prereqs: `sqlite3` CLI en PATH (`winget install SQLite.SQLite`); cerrar opencode
+y agentes (WAL activo); disco libre >= 2x tamano DB; ventana anunciada.
+
+1. Copia de practica: copiar `~/.local/share/opencode/opencode.db*` a temp y correr
+   el script contra la COPIA primero (dry-run, luego `-Apply` a la copia).
+2. Dry-run real (solo lectura efectiva, nunca escribe):
+   `.\scripts\opencode-db-maintenance.ps1 -DatabasePath $copiaDb`
+3. Ventana owner: `.\scripts\opencode-db-maintenance.ps1 -DatabasePath <real> -Apply -AllowProduction -RetentionDays 90 -BackupDir <dir>`
+   Sin `-AllowProduction` el script REHUSA tocar la DB real (fail-closed).
+4. Verificar: reporte `Mode=Applied`, `SizeAfterBytes < SizeBeforeBytes`,
+   `PRAGMA quick_check` = ok, opencode arranca y lista sesiones recientes.
+5. Rollback: el backup es `opencode-<timestamp>.db` (VACUUM INTO + quick_check
+   verificado ANTES de borrar). Restaurar = detener opencode, copiar backup sobre
+   la DB real (+ borrar `-wal`/`-shm` residuales), arrancar, verificar.
+   Rollback del slice (codigo): `git revert <commit-S5>`; el original nunca se toca
+   fuera de la ventana (verificar mtime/tamano de `opencode.db`).
