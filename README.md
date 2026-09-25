@@ -4,7 +4,7 @@
 
 ## What is this?
 
-**Gentleman Agent** is an **AI software development team** for OpenCode. Instead of a single chatbot, you get 58 specialized agents working together:
+**Gentleman Agent** is an **AI software development team** for OpenCode. Instead of a single chatbot, you get 44 specialized agents working together:
 
 - 🏗️ **Lead Architect** — Senior Architect mentor solving complex tasks
 - 🔒 **Specialists** — Security, performance, frontend, etc. consultants (FREE TIER)
@@ -17,10 +17,10 @@
 
 ---
 
-Suite of **96 skills** (+ `_shared`) + **140 top-level scripts** (133 PowerShell + 7 shell) for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
+Suite of **96 skills** (+ `_shared`) + **143 top-level scripts** (136 PowerShell + 7 shell) for [OpenCode](https://github.com/sst/opencode). Designed for software development with clean architecture, TDD, and multi-layer verification.
 
 > **Repo**: `LuisAlbertoMK/gentleman-agent-gh`
-> **Score**: 9.4/10 (14 dimensions) — tracking in .project.json.
+> **Score**: 9.4/10 (13 dimensions) — tracking in .project.json.
 > **Skills**: 96 (+ `_shared`)
 > **Cycle**: 31 (active) — CA fidelity + G4-G8 remediation
 
@@ -327,7 +327,7 @@ gentleman-agent-gh/
 │   ├── code-review-agent/
 │   └── .../
 ├── skills/                  # Junctions workspace (git-ignored)
-├── scripts/                 # 140 top-level scripts (133 PowerShell + 7 shell)
+├── scripts/                 # 143 top-level scripts (136 PowerShell + 7 shell)
 │   └── smoke/               # Smoke tests
 ├── docs/                    # Documentation
 │   ├── metricas/            # Session metrics

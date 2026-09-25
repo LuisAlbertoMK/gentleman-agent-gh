@@ -147,7 +147,8 @@ if ($baselineData -and $baselineData.median_ms) {
 
 # --- Update baseline if requested ---
 if ($UpdateBaseline) {
-    $baselineObj = [PSCustomObject]@{
+    $statsKeys = @('command', 'runs', 'median_ms', 'mean_ms', 'stdev_ms', 'q1_ms', 'q3_ms', 'iqr_ms', 'min_ms', 'max_ms', 'timestamp')
+    $newStats = [ordered]@{
         command         = $Command
         runs            = $Runs
         median_ms       = [math]::Round($median, 2)
@@ -160,6 +161,18 @@ if ($UpdateBaseline) {
         max_ms          = [math]::Round($samples[-1], 2)
         timestamp       = (Get-Date).ToUniversalTime().ToString("o")
     }
+    # MERGE: preserve extra keys from the previous baseline (e.g. 'reference')
+    # so -UpdateBaseline never drops metadata it doesn't own. Stats always win.
+    # $baselineData was loaded at startup; $null when the file is missing/corrupt
+    # → fresh baseline, same as before.
+    if ($baselineData) {
+        foreach ($prop in $baselineData.PSObject.Properties) {
+            if ($prop.Name -notin $statsKeys -and -not $newStats.Contains($prop.Name)) {
+                $newStats[$prop.Name] = $prop.Value
+            }
+        }
+    }
+    $baselineObj = [PSCustomObject]$newStats
     if (-not (Test-Path (Split-Path $Baseline -Parent))) {
         New-Item -ItemType Directory -Path (Split-Path $Baseline -Parent) -Force | Out-Null
     }

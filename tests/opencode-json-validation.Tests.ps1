@@ -70,8 +70,44 @@ Describe "opencode.json Configuration Validation" {
             $config.permission.bash.'git push *' | Should -Not -BeNullOrEmpty
         }
 
-        It "Git push --force is denied" {
-            $config.permission.bash.'git push --force *' | Should -Be 'deny'
+        It "Git push --force is asked (strict gentle-ai parity, not denied)" {
+            $config.permission.bash.'git push --force *' | Should -Be 'ask'
+        }
+
+        It "bash is 1 allow wildcard + 14 asks, 0 denies (gentle-ai parity)" {
+            $asks = @($config.permission.bash.PSObject.Properties | Where-Object { $_.Value -eq 'ask' }).Count
+            $denies = @($config.permission.bash.PSObject.Properties | Where-Object { $_.Value -eq 'deny' }).Count
+            $asks | Should -Be 14
+            $denies | Should -Be 0
+        }
+
+        It "write/edit permission keys are absent (gentle-ai parity)" {
+            ($null -eq $config.permission.PSObject.Properties['write']) | Should -BeTrue
+            ($null -eq $config.permission.PSObject.Properties['edit']) | Should -BeTrue
+        }
+
+        It "read denies the 13 secret patterns (protection retained)" {
+            $secrets = @(
+                '*.env', '*.env.*', '**/.env', '**/.env.*', '**/secrets/**',
+                '**/credentials.json', '**/.ssh/**', '**/.credentials/**',
+                '**/Library/Keychains/**', '**/.aws/credentials',
+                '**/.config/gh/hosts.yml', '**/*.pem', '**/*.key'
+            )
+            $denies = @($config.permission.read.PSObject.Properties | Where-Object { $_.Value -eq 'deny' })
+            $denies.Count | Should -Be 13
+            foreach ($k in $secrets) { $config.permission.read.$k | Should -Be 'deny' }
+        }
+
+        It "no agent carries a bash/read/write/edit delta (inherits global)" {
+            $bad = @()
+            foreach ($ap in $config.agent.PSObject.Properties) {
+                $perm = $ap.Value.PSObject.Properties['permission']
+                if ($null -eq $perm) { continue }
+                foreach ($k in @('bash', 'read', 'write', 'edit')) {
+                    if ($null -ne $perm.Value.PSObject.Properties[$k]) { $bad += "$($ap.Name).$k" }
+                }
+            }
+            ($bad -join ', ') | Should -Be ''
         }
     }
 

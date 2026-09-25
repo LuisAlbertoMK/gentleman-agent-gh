@@ -1,0 +1,1 @@
+﻿implementer 2026-09-24 BREAKER triage ACCEPTED characterization.Tests: PS-CI-03 at :156-160 invokes an in-file literal block defined at :147-154 with no outside input, test-only file; residual risk none fileHash:7bf5906f

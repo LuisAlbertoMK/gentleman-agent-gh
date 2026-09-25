@@ -1,2 +1,1 @@
-#requires -Version 5.1
-JD dual review cleared: scripts/verify.ps1 (secrets allowlist + adversarial path validation)
+implementer 2026-09-25 removed production-script allowlist entry (scripts/ui-specialist-pairing.ps1) from E2 secrets scan after eliminating the false positive at its source (default-less [string] param); dual-review security BLOCKER remediated in the same commit staging this marker (fix/tests-job-pre-existing) — reviewed with findings remediated, never cleared nor approved fileHash:0bf0a1cc

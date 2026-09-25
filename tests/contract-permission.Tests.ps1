@@ -71,22 +71,35 @@ Describe 'Permission templates contract (R8-S2)' {
         $bad.Count | Should -Be 0
     }
 
-    It 'readonly is locked down (bash/task deny, no edit/write)' {
+    It 'no template carries bash/read/write/edit deltas (strict gentle-ai parity)' {
         $j = Get-Content -LiteralPath $SourcePath -Raw -Encoding UTF8 | ConvertFrom-Json -Depth 10
-        $j.readonly.bash.'*' | Should -Be 'deny'
+        $bad = @()
+        foreach ($t in $Templates) {
+            foreach ($k in @('bash', 'read', 'write', 'edit')) {
+                if ($null -ne $j.$t.PSObject.Properties[$k]) { $bad += "$t.$k" }
+            }
+        }
+        ($bad -join ', ') | Should -Be ''
+    }
+
+    It 'readonly keeps structural task lockdown, no bash/edit/write delta' {
+        $j = Get-Content -LiteralPath $SourcePath -Raw -Encoding UTF8 | ConvertFrom-Json -Depth 10
         $j.readonly.task.'*' | Should -Be 'deny'
-        "$($j.readonly.edit)" | Should -Be 'deny'
-        "$($j.readonly.write)" | Should -Be 'deny'
+        ($null -eq $j.readonly.PSObject.Properties['bash']) | Should -BeTrue
+        ($null -eq $j.readonly.PSObject.Properties['edit']) | Should -BeTrue
+        ($null -eq $j.readonly.PSObject.Properties['write']) | Should -BeTrue
     }
 
-    It 'readwrite is minimal (bash ask only)' {
+    It 'readwrite carries no permission delta (inherits global overlay)' {
         $j = Get-Content -LiteralPath $SourcePath -Raw -Encoding UTF8 | ConvertFrom-Json -Depth 10
-        $j.readwrite.bash.'*' | Should -Be 'ask'
+        foreach ($k in @('bash', 'read', 'write', 'edit')) {
+            ($null -eq $j.readwrite.PSObject.Properties[$k]) | Should -BeTrue
+        }
     }
 
-    It 'orchestrator denies task by default with allow exceptions' {
+    It 'orchestrator inherits global bash and denies task with allow exceptions' {
         $j = Get-Content -LiteralPath $SourcePath -Raw -Encoding UTF8 | ConvertFrom-Json -Depth 10
-        $j.orchestrator.bash.'*' | Should -Be 'ask'
+        ($null -eq $j.orchestrator.PSObject.Properties['bash']) | Should -BeTrue
         $j.orchestrator.task.'*' | Should -Be 'deny'
         $j.orchestrator.task.explore | Should -Be 'allow'
         @($j.orchestrator.task.PSObject.Properties | Where-Object { $_.Value -eq 'allow' }).Count | Should -BeGreaterThan 0

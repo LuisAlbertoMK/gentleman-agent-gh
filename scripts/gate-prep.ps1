@@ -78,6 +78,21 @@ function Test-CandidateBudget {
         if ($null -eq $numstatLines) {
             $numstatLines = @()
         }
+        $deletedSet = @{}
+        $deletedLines = @()
+        if ($RepoRoot -ne "") {
+            $deletedLines = & git -C "$RepoRoot" diff --cached --diff-filter=D --name-only 2>$null
+        }
+        else {
+            $deletedLines = & git diff --cached --diff-filter=D --name-only 2>$null
+        }
+        if ($null -ne $deletedLines) {
+            foreach ($dp in $deletedLines) {
+                if ([string]::IsNullOrWhiteSpace($dp)) { continue }
+                $dpTrimmed = $dp.Trim()
+                if ($dpTrimmed -ne "") { $deletedSet[$dpTrimmed] = $true }
+            }
+        }
         $generatedAsMetadata = 0
         foreach ($line in $numstatLines) {
             if ([string]::IsNullOrWhiteSpace($line)) { continue }
@@ -119,6 +134,9 @@ function Test-CandidateBudget {
                     $full = Join-Path $fsRoot $path
                     if (Test-Path -LiteralPath $full) {
                         $size = [int](Get-Item -LiteralPath $full).Length
+                    }
+                    elseif ($deletedSet.ContainsKey($path)) {
+                        $size = 0
                     }
                     else {
                         throw "Test-CandidateBudget: cannot size staged path '$path' (no blob, no file) — fail-closed"

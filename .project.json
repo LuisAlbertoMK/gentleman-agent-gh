@@ -138,14 +138,6 @@
         "rp": true,
         "ed": true
       }
-    },
-    "SG": {
-      "s": 5.0,
-      "r": "SSoT age: 7d",
-      "e": {
-        "days_old": 7,
-        "last_updated": "2026-09-17"
-      }
     }
   }
 }

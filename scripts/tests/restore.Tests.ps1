@@ -14,7 +14,6 @@ BeforeAll {
     $env:USERPROFILE = $tempRoot
 
     $lines = Get-Content "$scriptsRoot/restore.ps1" -ErrorAction Stop
-    $tmp = $lines[14]; $lines[14] = $lines[15]; $lines[15] = $tmp
     for ($i = 0; $i -lt $lines.Count; $i++) {
         $lines[$i] = $lines[$i] -replace 'exit (\d+)', 'return $1'
         $lines[$i] = $lines[$i] -replace '\$PSScriptRoot', "'$scriptsRoot'"
@@ -123,6 +122,23 @@ Describe "restore.ps1 - Cancellation via q" {
         Mock Read-Host { "q" }
         & $script:fixedScript
         $global:checkoutCalled | Should -Be $false
+    }
+}
+
+Describe "restore.ps1 - param-first invariant" {
+
+    It "declares SupportsShouldProcess and places param() before any executable statement" {
+        $realFile = Join-Path $PSScriptRoot '..' 'restore.ps1'
+        $raw = Get-Content -LiteralPath $realFile -Raw -ErrorAction Stop
+        $raw | Should -Match '\[CmdletBinding\(SupportsShouldProcess'
+        # Strip the <#...#> help block; the first remaining non-blank,
+        # non-#requires, non-comment, non-attribute line must be param(.
+        $stripped = $raw -replace '(?s)<#.*?#>', ''
+        $first = @($stripped -split "`r?`n" | Where-Object {
+            $t = $_.Trim()
+            $t -ne '' -and $t -notmatch '^#requires' -and $t -notmatch '^#' -and $t -notmatch '^\['
+        })[0]
+        $first.Trim() | Should -Match '^param\('
     }
 }
 

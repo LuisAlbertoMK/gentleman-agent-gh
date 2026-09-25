@@ -61,7 +61,7 @@ param(
     # (2026-08-27) — NOT enabled now; a future cloud provider can override this base URL without
     # touching the check below or the 100%-local vision-analyze privacy rule.
     [string]$OllamaBaseUrl = "127.0.0.1:11434",
-    [string]$OllamaApiKey = ""
+    [string]$OllamaApiKey
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
