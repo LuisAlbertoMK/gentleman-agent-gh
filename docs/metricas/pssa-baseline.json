@@ -1,391 +1,396 @@
 {
+  "timestamp": "2026-09-25T11:28:37",
+  "total": 1865,
   "manualPairs": [
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "analyze-automejora.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "autonomy-heartbeat.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "benchmark-async-push.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "benchmark-core.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "check-token-budget.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "clean-worktree-temp.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "delegation-registry.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "freeze-models.ps1",
-      "count": 4
+      "count": 4,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "inter-track.ps1",
-      "count": 4
+      "count": 4,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "permission-gate.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "review-mode-disable.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "review-mode-status.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "score-auto.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "subagent-budget-guard.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "switch-profile.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "sync-engram.ps1",
-      "count": 3
+      "count": 3,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "sync-global.ps1",
-      "count": 2
+      "count": 2,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "sync-n-projects.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingEmptyCatchBlock",
       "file": "validate-write-scope.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidUsingEmptyCatchBlock"
     },
     {
-      "rule": "PSAvoidUsingWMICmdlet",
       "file": "delegation-registry.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSAvoidUsingWMICmdlet"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "audit-log.ps1",
-      "count": 2
+      "count": 2,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "auto-improve.ps1",
-      "count": 4
+      "count": 4,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "autonomy-heartbeat.ps1",
-      "count": 3
+      "count": 3,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "babyagi-loop.ps1",
-      "count": 9
+      "count": 9,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "benchmark-async-push.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "benchmark-core.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "check-deadcode.ps1",
-      "count": 2
+      "count": 2,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "check-mcp-security.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "dev-server.ps1",
-      "count": 2
+      "count": 2,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "engram-auto-capture.ps1",
-      "count": 3
+      "count": 3,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "gate-prep.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "gentleman-init.ps1",
-      "count": 2
+      "count": 2,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "global-setup.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "intake-verify.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "invoke-callback.ps1",
-      "count": 2
+      "count": 2,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "monitor-subagent.ps1",
-      "count": 3
+      "count": 3,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "query-coverage.ps1",
-      "count": 2
+      "count": 2,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "remove-semi-agents.ps1",
-      "count": 2
+      "count": 2,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
+      "file": "restore.ps1",
+      "count": 2,
+      "rule": "PSReviewUnusedParameter"
+    },
+    {
       "file": "run-ci-tests.ps1",
-      "count": 2
+      "count": 2,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "setup-install.ps1",
-      "count": 2
+      "count": 2,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "setup-machine.ps1",
-      "count": 2
+      "count": 2,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "skill-resolver-fast.ps1",
-      "count": 2
+      "count": 2,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "skillspector-gate.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "subagent-budget-guard.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "sync-engram.ps1",
-      "count": 3
+      "count": 3,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "sync-global-ps5.ps1",
-      "count": 2
+      "count": 2,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "trend.ps1",
-      "count": 12
+      "count": 12,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSReviewUnusedParameter",
       "file": "verify.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSReviewUnusedParameter"
     },
     {
-      "rule": "PSShouldProcess",
       "file": "bash-safe.ps1",
-      "count": 5
+      "count": 5,
+      "rule": "PSShouldProcess"
     },
     {
-      "rule": "PSShouldProcess",
       "file": "template-detection.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSShouldProcess"
     },
     {
-      "rule": "PSUseApprovedVerbs",
       "file": "auto-improve.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSUseApprovedVerbs"
     },
     {
-      "rule": "PSUseApprovedVerbs",
       "file": "babyagi-loop.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSUseApprovedVerbs"
     },
     {
-      "rule": "PSUseApprovedVerbs",
       "file": "engram-auto-capture.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSUseApprovedVerbs"
     },
     {
-      "rule": "PSUseApprovedVerbs",
       "file": "post-delegation-check.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSUseApprovedVerbs"
     },
     {
-      "rule": "PSUseApprovedVerbs",
       "file": "session-checkpoint.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSUseApprovedVerbs"
     },
     {
-      "rule": "PSUseApprovedVerbs",
       "file": "shell-utils.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSUseApprovedVerbs"
     },
     {
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
       "file": "babyagi-loop.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSUseDeclaredVarsMoreThanAssignments"
     },
     {
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
       "file": "benchmark-async-push.ps1",
-      "count": 4
+      "count": 4,
+      "rule": "PSUseDeclaredVarsMoreThanAssignments"
     },
     {
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
       "file": "benchmark-core.ps1",
-      "count": 4
+      "count": 4,
+      "rule": "PSUseDeclaredVarsMoreThanAssignments"
     },
     {
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
       "file": "global-setup.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSUseDeclaredVarsMoreThanAssignments"
     },
     {
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
       "file": "intake-verify.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSUseDeclaredVarsMoreThanAssignments"
     },
     {
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
       "file": "post-delegation-check.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSUseDeclaredVarsMoreThanAssignments"
     },
     {
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
       "file": "ui-offline-audit.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSUseDeclaredVarsMoreThanAssignments"
     },
     {
-      "rule": "PSUseDeclaredVarsMoreThanAssignments",
       "file": "wisdom-core.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSUseDeclaredVarsMoreThanAssignments"
     },
     {
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
       "file": "auto-improve.ps1",
-      "count": 2
+      "count": 2,
+      "rule": "PSUseShouldProcessForStateChangingFunctions"
     },
     {
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
       "file": "babyagi-loop.ps1",
-      "count": 3
+      "count": 3,
+      "rule": "PSUseShouldProcessForStateChangingFunctions"
     },
     {
-      "rule": "PSUseShouldProcessForStateChangingFunctions",
       "file": "wisdom-core.ps1",
-      "count": 2
+      "count": 2,
+      "rule": "PSUseShouldProcessForStateChangingFunctions"
     },
     {
-      "rule": "PSUseSingularNouns",
       "file": "analyze-automejora.ps1",
-      "count": 3
+      "count": 3,
+      "rule": "PSUseSingularNouns"
     },
     {
-      "rule": "PSUseSingularNouns",
       "file": "auto-improve.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSUseSingularNouns"
     },
     {
-      "rule": "PSUseSingularNouns",
       "file": "babyagi-loop.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSUseSingularNouns"
     },
     {
-      "rule": "PSUseSingularNouns",
       "file": "ConfigValidator.psm1",
-      "count": 3
+      "count": 3,
+      "rule": "PSUseSingularNouns"
     },
     {
-      "rule": "PSUseSingularNouns",
       "file": "freeze-models.ps1",
-      "count": 2
+      "count": 2,
+      "rule": "PSUseSingularNouns"
     },
     {
-      "rule": "PSUseSingularNouns",
       "file": "pre-commit-gate.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSUseSingularNouns"
     },
     {
-      "rule": "PSUseSingularNouns",
       "file": "review-assess.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSUseSingularNouns"
     },
     {
-      "rule": "PSUseSingularNouns",
       "file": "session-checkpoint.ps1",
-      "count": 1
+      "count": 1,
+      "rule": "PSUseSingularNouns"
     },
     {
-      "rule": "PSUseSingularNouns",
       "file": "shell-utils.ps1",
-      "count": 4
+      "count": 4,
+      "rule": "PSUseSingularNouns"
     }
   ],
-  "autoFixableCount": 285,
+  "autoFixableCount": 290,
   "ampersandCount": 0,
-  "manualCount": 149,
-  "trackedCount": 1181,
-  "timestamp": "2026-09-24T21:27:41",
+  "manualCount": 151,
   "byRule": [
     {
       "count": 32,
@@ -404,7 +409,7 @@
       "rule": "PSAvoidUsingWriteHost"
     },
     {
-      "count": 99,
+      "count": 101,
       "rule": "PSReviewUnusedParameter"
     },
     {
@@ -416,7 +421,7 @@
       "rule": "PSUseApprovedVerbs"
     },
     {
-      "count": 285,
+      "count": 290,
       "rule": "PSUseBOMForUnicodeEncodedFile"
     },
     {
@@ -432,7 +437,6 @@
       "rule": "PSUseSingularNouns"
     }
   ],
-  "total": 1858,
   "byFile": [
     {
       "count": 2,
@@ -1319,7 +1323,7 @@
       "file": "restore-project-score.Tests.ps1"
     },
     {
-      "count": 13,
+      "count": 15,
       "file": "restore.ps1"
     },
     {
@@ -1580,6 +1584,10 @@
     },
     {
       "count": 1,
+      "file": "scripts_restore.ps1"
+    },
+    {
+      "count": 1,
       "file": "scripts_run-ci-tests.ps1"
     },
     {
@@ -1615,12 +1623,28 @@
       "file": "scripts_tests_ralph-lifecycle.Tests.ps1"
     },
     {
+      "count": 1,
+      "file": "scripts_tests_restore.Tests.ps1"
+    },
+    {
       "count": 2,
       "file": "scripts_tests_security-audit-mcp.Tests.ps1"
     },
     {
       "count": 1,
+      "file": "scripts_tests_verify.Tests.ps1"
+    },
+    {
+      "count": 1,
+      "file": "scripts_ui-specialist-pairing.ps1"
+    },
+    {
+      "count": 1,
       "file": "scripts_use-gentleman.ps1"
+    },
+    {
+      "count": 1,
+      "file": "scripts_verify.ps1"
     },
     {
       "count": 19,
@@ -1994,5 +2018,6 @@
       "count": 1,
       "file": "wisdom-store.Tests.ps1"
     }
-  ]
+  ],
+  "trackedCount": 1181
 }
