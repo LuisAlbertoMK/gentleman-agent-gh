@@ -84,8 +84,8 @@ $env:OLLAMA_CLOUD="1"
 $env:OLLAMA_CLOUD_KEY="sk-..."
 .\scripts\ui-specialist-pairing.ps1 -Target src/components -Mode full -Vision -OllamaBaseUrl api.ollama.com:443 -OllamaApiKey $env:OLLAMA_CLOUD_KEY
 
-# analyze-page.js env variant:
-$env:OLLAMA_BASE_URL="https://api.ollama.com/v1"; $env:OLLAMA_API_KEY="sk-..."; node scripts/analyze-page.js http://localhost:3000 --mode ui
+# analyze-page.js env variant (set OLLAMA_API_KEY to your key first):
+$env:OLLAMA_BASE_URL="https://api.ollama.com/v1"; node scripts/analyze-page.js http://localhost:3000 --mode ui
 ```
 
 Offline-first fallback: if Ollama not reachable or `Test-OllamaBaseUrlAllowlist` blocks the endpoint, both scripts degrade to audit/variants-only (no crash). Allowlist enforces SSRF blocks (metadata/169.254.x/link-local/10.x/192.168.x) and, when `OLLAMA_CLOUD` != 1, only `localhost`/`127.0.0.1`.

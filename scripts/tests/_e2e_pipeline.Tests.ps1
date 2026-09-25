@@ -118,17 +118,17 @@ Describe 'E2E: Security Gates' {
 # ============================================================
 Describe 'E2E: Pre-commit Hook' {
 
-    It 'hook delegates to pre-commit-gate.ps1 with [13/26] through [21/26] checks' {
+    It 'hook delegates to pre-commit-gate.ps1 with [13/28] through [21/28] checks' {
         $hookPath = Join-Path $script:ProjectRoot ".githooks/pre-commit"
         $gatePath = Join-Path $script:ProjectRoot ".githooks/pre-commit-gate.ps1"
         $hookPath | Should -Exist
         $gatePath | Should -Exist
         Get-Content $hookPath -Raw | Should -Match 'pre-commit-gate\.ps1'
-        Get-Content $gatePath -Raw | Should -Match '\[13/26\]'
-        Get-Content $gatePath -Raw | Should -Match '\[14/26\]'
-        Get-Content $gatePath -Raw | Should -Match '\[19/26\]'
-        Get-Content $gatePath -Raw | Should -Match '\[20/26\]'
-        Get-Content $gatePath -Raw | Should -Match '\[21/26\]'
+        Get-Content $gatePath -Raw | Should -Match '\[13/28\]'
+        Get-Content $gatePath -Raw | Should -Match '\[14/28\]'
+        Get-Content $gatePath -Raw | Should -Match '\[19/28\]'
+        Get-Content $gatePath -Raw | Should -Match '\[20/28\]'
+        Get-Content $gatePath -Raw | Should -Match '\[21/28\]'
     }
 
     It 'hook Pester step uses Invoke-Pester and blocks on failure' {
@@ -138,20 +138,20 @@ Describe 'E2E: Pre-commit Hook' {
         $content | Should -Match '\[12/13\] Pester tests'
     }
 
-    It 'hook preserves all 26 steps' {
+    It 'hook preserves all 28 steps' {
         $gatePath = Join-Path $script:ProjectRoot ".githooks/pre-commit-gate.ps1"
         $content = Get-Content $gatePath -Raw
-        for ($i = 1; $i -le 26; $i++) {
-            $content | Should -Match "\[$i/26\]"
+        for ($i = 1; $i -le 28; $i++) {
+            $content | Should -Match "\[$i/28\]"
         }
     }
 
     It 'gate includes C6/C8/C9 validation checks for new scripts' {
         $gatePath = Join-Path $script:ProjectRoot ".githooks/pre-commit-gate.ps1"
         $content = Get-Content $gatePath -Raw
-        $content | Should -Match '\[20/26\] Token budget'
-        $content | Should -Match '\[21/26\] Budget script validation'
-        $content | Should -Match '\[22/26\] Context watchdog'
+        $content | Should -Match '\[20/28\] Token budget'
+        $content | Should -Match '\[21/28\] Budget script validation'
+        $content | Should -Match '\[22/28\] Context watchdog'
         $content | Should -Match 'check-token-budget\.ps1'
         $content | Should -Match 'check-budget\.ps1'
         $content | Should -Match 'ctx-watchdog\.ps1'

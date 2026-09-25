@@ -12,7 +12,7 @@
       "generator": "leaf-scan allow/deny/ask per template over scripts/lib/permission-templates.json (sorted templates)",
       "name": "permission-matrix-expansion.golden.json",
       "schema": "contracts/permission-templates.schema.json",
-      "sha256": "0d3e0bf7128a07961a2160b66bc8b5e1e60ae49da715d47d33dc9c78a718a40b"
+      "sha256": "556dd8fe2c20c8dcfaf22e0dbf030f7c4ca7ce1ba6db728a4505b72094a7e7ff"
     },
     {
       "args": "odd, engram-protocol, ps-compat",

@@ -1,0 +1,39 @@
+{
+  "id": "rdd-receipt-022",
+  "freeze": "HEAD-d06d90de-7e33b7aa",
+  "freeze_note": "Cierre de la deuda de tests del slice perm-parity (d06d90de), misma rama experimento/mejora-permisos-gentle-ai. diff8=7e33b7aa = hash del diff staged de 3 archivos (2 tests + spec); receipt 022 es nuevo e incluido en el commit. Base = d06d90de (padre directo).",
+  "tier": 1,
+  "tier_justification": "RDD Risk Tiers: Tier 1 = actualizacion de tests (asertos) + docs + receipt. NO toca codigo de produccion ni config de runtime; solo alinea expectativas a un cambio de permisos ya congelado en d06d90de.",
+  "files": [
+    "tests/contract-permission.Tests.ps1",
+    "tests/opencode-json-validation.Tests.ps1",
+    "docs/mejoras/2026-09-25-permission-parity-gentle-ai.md",
+    ".rdd/rdd-receipt-022.json"
+  ],
+  "file_statuses": {
+    "modified": [
+      "tests/contract-permission.Tests.ps1",
+      "tests/opencode-json-validation.Tests.ps1",
+      "docs/mejoras/2026-09-25-permission-parity-gentle-ai.md"
+    ]
+  },
+  "lines_changed": 112,
+  "lines_deleted": 26,
+  "verdict": "PASS",
+  "verdict_note": "PASS HONESTO: contract-permission 13/13, opencode-json-validation 21/21; sin regresion (contract-compaction 3/3, permission-rules-consistency 19/19, contract-receipt 24/24). Asertos obsoletos reemplazados por paridad: bash = 1 allow + 14 ask + 0 deny; write/edit ausentes; read conserva los 13 denies de secretos; ningun agente lleva delta bash/read/write/edit; git push --force * = ask. generate-config.Tests.ps1 tiene 5 fails PRE-EXISTENTES (mismo 11 pass/5 fail verificado en worktree de b700098b), ajenos a la paridad y fuera de scope. Gate vs runtime reportado: permission-gate-lib.ps1 no es plugin/hook (behavioral gate, invocado a mano; prompts no lo mencionan), PERO sync-global.ps1:268-275 porta shared-deny-rules.json al global ~/.config/opencode/opencode.json (hoy bash=71 + write/edit con ssh/git push deny), por lo que el deny floor SI intercepta bash hasta re-sincronizar; NO modificado (fuera de scope).",
+  "review": {
+    "status": "PASS",
+    "method": "RDD receipt Tier 1 + evidencia mecanica (Pester 5 suites, structured -PassThru)",
+    "gaps": [
+      "No se ejecuto dual-review !judgment-day (Tier 1, solo tests/docs).",
+      "scripts/tests/generate-config.Tests.ps1 sigue con 5 fails pre-existentes (fixtures -auto/auto-sub + mcp-policy), fuera del write-scope.",
+      "El global ~/.config/opencode/opencode.json conserva el deny floor viejo: la paridad del repo no se siente al 100% hasta re-sincronizar (reportado, no modificado)."
+    ]
+  },
+  "next": [
+    "Reconciliar el global (~/.config/opencode/opencode.json) con la paridad via sync-global, o decidir mantener el deny floor documentado.",
+    "Si el CI de PR #50 corre la suite completa: los 5 fails de generate-config son pre-existentes y ajenos a este PR."
+  ],
+  "auto_fix": false,
+  "timestamp": "2026-09-25T00:00:00-06:00"
+}

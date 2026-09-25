@@ -15,6 +15,9 @@
 # Ensure $PSScriptRoot reflects the caller (score-auto.ps1) directory
 # Use $scriptRoot for any relative paths
 
+# Pure scoring formulas (DC, Bi, Me, CA) — no I/O, behavior-preserving extraction
+. (Join-Path $PSScriptRoot 'score-formulas.ps1')
+
 # --- Null guards: gracefully handle empty file arrays ---
 # If caller didn't provide file lists, extract from manifest (avoids double walk).
 # S5: Get-ScoredScriptFiles reuses the manifest from Get-FileManifest instead of
@@ -156,7 +159,6 @@ Add-Dimension "Sec" ($math::Max(0, $math::Min(10, $secScore))) @{
 
 # --- DC: Dead Code ---
 
-$dcScore       = 10
 $orphanSkills  = 0
 $deadJunctions = 0
 
@@ -164,19 +166,9 @@ $deadJunctions = 0
 $skillFilesInWorkspace = Get-ChildItem ".\skills" -File -EA SilentlyContinue
 $orphanSkills = @($skillFilesInWorkspace | Where-Object { $_.Name -notin $skillDirs }).Count
 
-if ($orphanSkills -gt 5) {
-    $dcScore -= 2
-} elseif ($orphanSkills -gt 0) {
-    $dcScore -= 1
-}
-
 # Dead junctions (symlinks pointing to missing targets)
 $junctionDirs   = Get-ChildItem ".\skills" -Directory -EA SilentlyContinue
 $deadJunctions  = @($junctionDirs | Where-Object { $_.Target -and -not (Test-Path $_.Target) }).Count
-
-if ($deadJunctions -gt 0) {
-    $dcScore -= 1
-}
 
 # Commented-out code patterns in scripts (exclude this file)
 $commentedLines = 0
@@ -201,9 +193,7 @@ if ($hasScripts) {
     $commentedLines = $commentedPatterns.Count
 }
 
-if ($commentedLines -gt 10) {
-    $dcScore -= 1
-}
+$dcScore = Get-DcScore -Orphans $orphanSkills -DeadJunctions $deadJunctions -Commented $commentedLines
 
 Add-Dimension "DC" ($math::Max(0, $math::Min(10, $dcScore))) @{
     orphans        = $orphanSkills
@@ -325,15 +315,7 @@ if ($bitacoraExists) {
     $bitacoraLines   = $bitacoraContent.Split("`n").Count
 }
 
-if ($bitacoraLines -gt 10) {
-    $biScore = 10
-} elseif ($bitacoraLines -gt 5) {
-    $biScore = 7
-} elseif ($bitacoraExists) {
-    $biScore = 5
-} else {
-    $biScore = 0
-}
+$biScore = Get-BiScore -Exists $bitacoraExists -Lines $bitacoraLines
 
 Add-Dimension "Bi" $biScore @{
     exists = $bitacoraExists
@@ -347,15 +329,7 @@ $hasErrorsDir  = Test-Path "docs/metricas/errors"
 $hasErrorJson  = Test-Path "docs/metricas/errors/LATEST_error.json"
 $hasReports    = (Get-ChildItem "docs/metricas" -File -EA SilentlyContinue).Count -gt 0
 
-$meScore = 4
-if ($hasMetricsDir -and $hasErrorJson) {
-    $meScore = 9
-} elseif ($hasMetricsDir) {
-    $meScore = 7
-}
-if ($hasReports -and $hasErrorsDir) {
-    $meScore = $math::Min(10, $meScore + 1)
-}
+$meScore = Get-MeScore -Dir $hasMetricsDir -ErrDir $hasErrorsDir -ErrJson $hasErrorJson -Reports $hasReports
 
 Add-Dimension "Me" $meScore @{
     md = $hasMetricsDir
@@ -495,7 +469,7 @@ if (Test-Path $interTrackPath) {
         $interTrack = Get-Content $interTrackPath -Raw | ConvertFrom-Json
         $cycleCount  = [int]$interTrack.cycle.count
         $cycleTarget = [int]$interTrack.cycle.target
-        $cycleScore  = $math::Min(10, $math::Round(($cycleCount / $cycleTarget) * 10, 1))
+        $cycleScore  = Get-CaScore -Count $cycleCount -Target $cycleTarget
     } catch {
         $cycleScore = 0
     }
@@ -551,11 +525,17 @@ $gatePassScore = 0
 if ($null -ne $latestErrorJson) {
     try {
         $latError = $latestErrorJson
-        if ($latError.source -eq "quality-gate" -and $latError.total -gt 0) {
-            $gatePassRate = $latError.passed / $latError.total
-            $gatePassScore = $math::Round($gatePassRate * 10, 1)
-        } elseif ($latError.passed -ge 5) {
-            $gatePassScore = 10
+        # Null-safe total: LATEST_error.json may omit `total` (quality-gate
+        # writes passed without total); direct `.total` access throws under
+        # Set-StrictMode, which used to force gatePassScore=0 via the catch
+        # below instead of the intended passed>=5 -> 10 fallback.
+        $latTotal = $null
+        if ($null -ne $latError.PSObject.Properties['total']) { $latTotal = $latError.total }
+        if ($latError.source -eq "quality-gate" -and $null -ne $latTotal -and $latTotal -gt 0) {
+            $gatePassRate = $latError.passed / $latTotal
+            $gatePassScore = [math]::Round($gatePassRate * 10, 1)
+        } else {
+            $gatePassScore = Get-GatePassScore -Passed $latError.passed -Total $null
         }
     } catch { $gatePassScore = 0 }
 }
@@ -588,81 +568,82 @@ if ($bitacoraContent) {
 }
 
 $subScores = @()
+$sdSubDims = [ordered]@{}
 
 # Project Artifacts sub-dimensions
 $paEvidence = $dimensions["PA"].e
-$subScores += $(if ($paEvidence.readme) { 10 } else { 0 })
-$subScores += $(if ($paEvidence.cross_ref) { 10 } else { 0 })
-$subScores += $math::Min(10, $paEvidence.skills / 6)
-$subScores += $(if ($paEvidence.project_json) { 10 } else { 0 })
+$subScores += ($sdSubDims['pa_readme'] = $(if ($paEvidence.readme) { 10 } else { 0 }))
+$subScores += ($sdSubDims['pa_cross_ref'] = $(if ($paEvidence.cross_ref) { 10 } else { 0 }))
+$subScores += ($sdSubDims['pa_skills'] = $math::Min(10, $paEvidence.skills / 6))
+$subScores += ($sdSubDims['pa_project_json'] = $(if ($paEvidence.project_json) { 10 } else { 0 }))
 
 # Security sub-dimensions
 $secEvidence = $dimensions["Sec"].e
-$subScores += $(if ($secEvidence.weak_crypto) { 5 } else { 10 })
-$subScores += $(if ($secEvidence.secrets) { 3 } else { 10 })
+$subScores += ($sdSubDims['sec_weak_crypto'] = $(if ($secEvidence.weak_crypto) { 5 } else { 10 }))
+$subScores += ($sdSubDims['sec_secrets'] = $(if ($secEvidence.secrets) { 3 } else { 10 }))
 
 # Dead Code sub-dimensions
 $dcEvidence = $dimensions["DC"].e
-$subScores += $(if ($dcEvidence.orphans -le 0) { 10 } elseif ($dcEvidence.orphans -le 5) { 7 } else { 5 })
-$subScores += $(if ($dcEvidence.dead_junctions -le 0) { 10 } else { 7 })
-$subScores += $(if ($dcEvidence.commented_out -le 10) { 10 } else { 7 })
+$subScores += ($sdSubDims['dc_orphans'] = $(if ($dcEvidence.orphans -le 0) { 10 } elseif ($dcEvidence.orphans -le 5) { 7 } else { 5 }))
+$subScores += ($sdSubDims['dc_dead_junctions'] = $(if ($dcEvidence.dead_junctions -le 0) { 10 } else { 7 }))
+$subScores += ($sdSubDims['dc_commented_out'] = $(if ($dcEvidence.commented_out -le 10) { 10 } else { 7 }))
 
 # Clean Code sub-dimensions
 if ($dimensions.ContainsKey("CC") -and $dimensions["CC"].e -and $totalScripts -gt 0) {
     $ccEvidence = $dimensions["CC"].e
-    $subScores += $math::Round($ccEvidence.with_help / $totalScripts * 10, 1)
-    $subScores += $math::Round($ccEvidence.with_params / $totalScripts * 10, 1)
-    $subScores += $math::Round($ccEvidence.with_strictmode / $totalScripts * 10, 1)
+    $subScores += ($sdSubDims['cc_with_help'] = $math::Round($ccEvidence.with_help / $totalScripts * 10, 1))
+    $subScores += ($sdSubDims['cc_with_params'] = $math::Round($ccEvidence.with_params / $totalScripts * 10, 1))
+    $subScores += ($sdSubDims['cc_with_strictmode'] = $math::Round($ccEvidence.with_strictmode / $totalScripts * 10, 1))
 }
 
 # Best Practices sub-dimensions
 if ($dimensions.ContainsKey("BP") -and $dimensions["BP"].e -and $totalScripts -gt 0) {
     $bpEvidence = $dimensions["BP"].e
-    $subScores += $math::Round($bpEvidence.param_cov / $totalScripts * 10, 1)
-    $subScores += $math::Round($bpEvidence.trycatch / $totalScripts * 10, 1)
+    $subScores += ($sdSubDims['bp_param_cov'] = $math::Round($bpEvidence.param_cov / $totalScripts * 10, 1))
+    $subScores += ($sdSubDims['bp_trycatch'] = $math::Round($bpEvidence.trycatch / $totalScripts * 10, 1))
 }
 
 # Orthography sub-dimension
-$subScores += $(if ($corruptedFiles -le 0) { 10 } elseif ($corruptedFiles -le 5) { 9 } elseif ($corruptedFiles -le 10) { 7 } else { 4 })
+$subScores += ($sdSubDims['ortho_corrupted'] = $(if ($corruptedFiles -le 0) { 10 } elseif ($corruptedFiles -le 5) { 9 } elseif ($corruptedFiles -le 10) { 7 } else { 4 }))
 
 # Bitacora sub-dimensions
 $biEvidence = $dimensions["Bi"].e
-$subScores += $(if ($biEvidence.exists) { 10 } else { 0 })
-$subScores += $math::Min(10, $biEvidence.lines / 2)
+$subScores += ($sdSubDims['bi_exists'] = $(if ($biEvidence.exists) { 10 } else { 0 }))
+$subScores += ($sdSubDims['bi_lines'] = $math::Min(10, $biEvidence.lines / 2))
 
 # Metrics sub-dimensions
-$subScores += $(if ($hasMetricsDir) { 10 } else { 0 })
-$subScores += $(if ($hasErrorsDir) { 10 } else { 0 })
-$subScores += $(if ($hasErrorJson) { 10 } else { 0 })
-$subScores += $(if ($hasReports) { 10 } else { 0 })
+$subScores += ($sdSubDims['me_metrics_dir'] = $(if ($hasMetricsDir) { 10 } else { 0 }))
+$subScores += ($sdSubDims['me_errors_dir'] = $(if ($hasErrorsDir) { 10 } else { 0 }))
+$subScores += ($sdSubDims['me_error_json'] = $(if ($hasErrorJson) { 10 } else { 0 }))
+$subScores += ($sdSubDims['me_reports'] = $(if ($hasReports) { 10 } else { 0 }))
 
 # Script Performance sub-dimensions
-$subScores += $(if ($totalScripts -ge 15 -and $totalScripts -le $spScriptThreshold) { 10 } else { 7 })
-$subScores += $(if ($avgScriptSizeKB -le 10) { 10 } elseif ($avgScriptSizeKB -le 15) { 7 } else { 5 })
-$subScores += $(if ($hugeScriptCount -le 0) { 10 } else { 5 })
+$subScores += ($sdSubDims['sp_script_count'] = $(if ($totalScripts -ge 15 -and $totalScripts -le $spScriptThreshold) { 10 } else { 7 }))
+$subScores += ($sdSubDims['sp_avg_size'] = $(if ($avgScriptSizeKB -le 10) { 10 } elseif ($avgScriptSizeKB -le 15) { 7 } else { 5 }))
+$subScores += ($sdSubDims['sp_huge_scripts'] = $(if ($hugeScriptCount -le 0) { 10 } else { 5 }))
 
 # Skill Effectiveness sub-dimensions
-$subScores += $(if ($totalSkills -ge 60) { 10 } else { 7 })
-$subScores += $(if ($over3KBSkills -le 0) { 10 } elseif ($over3KBSkills -le 1) { 9 } else { 7 })
-$subScores += $(if ($over5KBSkills -le 0) { 10 } else { 7 })
-$subScores += $(if ($avgSkillSizeKB -le 2.0) { 10 } elseif ($avgSkillSizeKB -le 2.5) { 9.5 } else { 7 })
+$subScores += ($sdSubDims['se_total_skills'] = $(if ($totalSkills -ge 60) { 10 } else { 7 }))
+$subScores += ($sdSubDims['se_over3kb'] = $(if ($over3KBSkills -le 0) { 10 } elseif ($over3KBSkills -le 1) { 9 } else { 7 }))
+$subScores += ($sdSubDims['se_over5kb'] = $(if ($over5KBSkills -le 0) { 10 } else { 7 }))
+$subScores += ($sdSubDims['se_avg_size'] = $(if ($avgSkillSizeKB -le 2.0) { 10 } elseif ($avgSkillSizeKB -le 2.5) { 9.5 } else { 7 }))
 
 # Cycle Activity sub-dimension
-$subScores += $math::Min(10, $cycleCount / $cycleTarget * 10)
+$subScores += ($sdSubDims['ca_cycle_activity'] = $math::Min(10, $cycleCount / $cycleTarget * 10))
 
 # Backlog Integrity sub-dimension
-$subScores += $(if ($backlogTotalItems -gt 0) { $backlogPassed / $backlogTotalItems * 10 } else { 0 })
+$subScores += ($sdSubDims['backlog_integrity'] = $(if ($backlogTotalItems -gt 0) { $backlogPassed / $backlogTotalItems * 10 } else { 0 }))
 
 # Tool Hygiene sub-dimension
-$subScores += $toolHygieneScore
+$subScores += ($sdSubDims['tool_hygiene'] = $toolHygieneScore)
 # Delegation Rate sub-dimension
-$subScores += $delegationScore
+$subScores += ($sdSubDims['delegation_rate'] = $delegationScore)
 # Gate Pass Rate sub-dimension
-$subScores += $gatePassScore
+$subScores += ($sdSubDims['gate_pass_rate'] = $gatePassScore)
 # Cross-Ref Freshness sub-dimension
-$subScores += $crossRefFreshScore
+$subScores += ($sdSubDims['crossref_freshness'] = $crossRefFreshScore)
 # Audit Freshness sub-dimension
-$subScores += $auditFreshScore
+$subScores += ($sdSubDims['audit_freshness'] = $auditFreshScore)
 
 # --- SD extra sub-dims ---
 
@@ -675,7 +656,7 @@ $skillsWithRefs = 0
 if ($hasSkills) {
     foreach ($sm in $skillMdFiles) {
         $content = $skillContentCache[$sm.FullName]
-        if ($sm.Directory.Name -ne '_shared' -and $content -match 'MERGED into|redirect') { $redirectSkills += $sm }
+        if ($sm.Directory.Name -ne '_shared' -and $content -match 'MERGED into') { $redirectSkills += $sm }
         if ($content -match 'changelog:') { $skillsWithChangelog++ }
         if ($content -match 'triggers:')  { $skillsWithTriggers++ }
         if ($content -match '##\s*(?:Cross-)?Refs')  { $skillsWithRefs++ }
@@ -695,14 +676,14 @@ if ($redirectSkills.Count -gt 0) {
     }
     $redirectScore = $math::Round($validRedirects / $redirectSkills.Count * 10, 1)
 }
-$subScores += $redirectScore
+$subScores += ($sdSubDims['skill_redirect'] = $redirectScore)
 
 # AGENTS.md Section Coverage: % of required sections present
 $requiredSections = @('Rules', 'Personality', 'Pre-Flight Gate', 'Subagent-First', 'Learning Loop', 'Default-FAIL', 'Skills', 'Delegation Rules')
 $agentsMdContent = if (Test-Path "AGENTS.md") { Get-Content "AGENTS.md" -Raw } else { "" }
 $sectionsFound = @($requiredSections | Where-Object { $agentsMdContent -match "##.*$_" }).Count
 $agentsMdScore = $math::Round($sectionsFound / $requiredSections.Count * 10, 1)
-$subScores += $agentsMdScore
+$subScores += ($sdSubDims['agents_md_coverage'] = $agentsMdScore)
 
 # Script Test Coverage: % of scripts with Pester test files
 $testFiles = Get-ChildItem "scripts\tests\*.Tests.ps1" -EA SilentlyContinue
@@ -714,25 +695,25 @@ if ($hasScripts) {
     }
 }
 $testCoverageScore = if ($totalScripts -gt 0) { $math::Round($testedScripts.Count / $totalScripts * 10, 1) } else { 0 }
-$subScores += $testCoverageScore
+$subScores += ($sdSubDims['script_test_coverage'] = $testCoverageScore)
 
 # Skill Changelog Coverage: % of skills with changelog in frontmatter
-$changelogScore = if ($totalSkills -gt 0) { $math::Round($skillsWithChangelog / $totalSkills * 10, 1) } else { 0 }
-$subScores += $changelogScore
+$changelogScore = if ($totalSkills -gt 0) { $math::Min(10, $math::Round($skillsWithChangelog / $totalSkills * 10, 1)) } else { 0 }
+$subScores += ($sdSubDims['skill_changelog'] = $changelogScore)
 
 # Skill Trigger Coverage: % of skills with triggers in frontmatter
-$triggerScore = if ($totalSkills -gt 0) { $math::Round($skillsWithTriggers / $totalSkills * 10, 1) } else { 0 }
-$subScores += $triggerScore
+$triggerScore = if ($totalSkills -gt 0) { $math::Min(10, $math::Round($skillsWithTriggers / $totalSkills * 10, 1)) } else { 0 }
+$subScores += ($sdSubDims['skill_triggers'] = $triggerScore)
 
 # Skill Refs Coverage: % of skills with ## Refs section
-$refsScore = if ($totalSkills -gt 0) { $math::Round($skillsWithRefs / $totalSkills * 10, 1) } else { 0 }
-$subScores += $refsScore
+$refsScore = if ($totalSkills -gt 0) { $math::Min(10, $math::Round($skillsWithRefs / $totalSkills * 10, 1)) } else { 0 }
+$subScores += ($sdSubDims['skill_refs'] = $refsScore)
 
 # README Skill Count Accuracy: does README match actual skill count?
 $readmeContent = if (Test-Path "README.md") { Get-Content "README.md" -Raw } else { "" }
 $readmeSkillMatch = if ($readmeContent -match '(\d+)\s*skills') { [int]$Matches[1] -eq $totalSkills } else { $false }
 $readmeAccuracyScore = if ($readmeSkillMatch) { 10 } else { 5 }
-$subScores += $readmeAccuracyScore
+$subScores += ($sdSubDims['readme_accuracy'] = $readmeAccuracyScore)
 
 # ponytail: 42 sub-dims total (35 base + 3 SD extra + 4 new)
 $depthScore = ($subScores | Measure-Object -Average).Average
@@ -742,31 +723,5 @@ if ($depthScore -is [double]) {
 
 Add-Dimension "SD" $depthScore @{
     subd = $subScores.Count
+    subdims = $sdSubDims
 } "Depth: $($subScores.Count) sub-dims: $depthScore/10"
-
-# --- SG: Staleness Gate (SSoT freshness) ---
-$sgScore = 10
-$sgDaysOld = 0
-$sgLastUpdated = "unknown"
-$pjStalenessPath = $projectJsonPath  # C4c: use externally-set path
-if (Test-Path $pjStalenessPath) {
-    try {
-        $pjData = Get-Content $pjStalenessPath -Raw | ConvertFrom-Json
-        $sgLastUpdated = $pjData.score.last_updated
-        if ($sgLastUpdated) {
-            $lastUpdated = [datetime]::Parse($sgLastUpdated, $null, [System.Globalization.DateTimeStyles]::None)
-            $sgDaysOld = [int]((Get-Date) - $lastUpdated).TotalDays
-            if ($sgDaysOld -gt 7) { $sgScore = 0 }
-            elseif ($sgDaysOld -gt 3) { $sgScore = 5 }
-        } else {
-            $sgScore = 5  # No last_updated field
-        }
-    } catch {
-        $sgScore = 5  # Can't parse = uncertain freshness
-    }
-}
-
-Add-Dimension "SG" $sgScore @{
-    days_old = $sgDaysOld
-    last_updated = $sgLastUpdated
-} "SSoT age: ${sgDaysOld}d"

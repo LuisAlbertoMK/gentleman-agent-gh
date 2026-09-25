@@ -72,18 +72,27 @@ jobs:
           else { Write-Output "OK: All skills ≤3KB" }
 
       - name: Permission consistency
+        # R11 strict parity (docs/mejoras/2026-09-25-permission-parity-gentle-ai.md):
+        # agents/templates carry structural delegation (task) only; bash/read/write/edit
+        # inherit the global overlay from opencode-base.json. Per-agent bash.* keys are
+        # ABSENT by design (see tests/contract-permission.Tests.ps1: no bash/read/write/edit
+        # deltas) — so this gate asserts the overlay + task lockdown, not per-agent bash.*.
         run: |
           $config = Get-Content 'opencode.json' -Raw | ConvertFrom-Json
-          $readOnlyAgents = @('gentleman-security', 'gentleman-seo', 'gentleman-infra', 'gentleman-frontend', 'gentleman-performance', 'gentleman-datascience', 'gentleman-docs', 'gentleman-security-sub')
           $fail = 0
+          if ($config.permission.bash.'*' -ne 'allow') { Write-Error "FAIL: overlay bash.* must be allow (strict parity)"; $fail++ }
+          foreach ($gate in @('git push', 'git push *', 'git push --force *', 'git rebase *', 'git reset --hard *')) {
+            if ($config.permission.bash.$gate -ne 'ask') { Write-Error "FAIL: overlay bash '$gate' must be ask"; $fail++ }
+          }
+          $readOnlyAgents = @('gentleman-security', 'gentleman-seo', 'gentleman-infra', 'gentleman-frontend', 'gentleman-performance', 'gentleman-datascience', 'gentleman-docs', 'gentleman-security-sub')
           foreach ($agent in $readOnlyAgents) {
             $a = $config.agent.$agent
             if (-not $a) { Write-Warning "Agent not found: $agent"; $fail++; continue }
-            $bashDeny = $a.permission.bash.'*'
-            if ($bashDeny -ne 'deny') { Write-Error "FAIL: $agent has bash.* = $bashDeny (expected deny)"; $fail++ }
+            foreach ($k in @('bash', 'read', 'write', 'edit')) {
+              if ($null -ne $a.permission.PSObject.Properties[$k]) { Write-Error "FAIL: $agent carries permission.$k delta (must inherit overlay)"; $fail++ }
+            }
+            if ($a.permission.task.'*' -ne 'deny') { Write-Error "FAIL: $agent task.* must be deny (read-only lockdown)"; $fail++ }
           }
-          $orchBash = $config.agent.'gentle-MK'.permission.bash
-          if ($orchBash.'*' -ne 'ask') { Write-Error "FAIL: orchestrator bash.* = $($orchBash.'*') (expected ask — delegates, never implements)"; $fail++ }
           $orchTask = $config.agent.'gentle-MK'.permission.task
           if (-not $orchTask -or $orchTask.'*' -ne 'deny') { Write-Error "FAIL: orchestrator task.* must be deny (fail-closed whitelist)"; $fail++ }
           $subAgents = @('gentleman-deep-sub', 'gentleman-quick-sub', 'gentleman-implementer-sub', 'gentleman-security-sub')

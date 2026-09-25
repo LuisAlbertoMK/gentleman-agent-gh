@@ -73,7 +73,7 @@ $stagedSkillMds  = $staged | Where-Object { $_ -match '\.agents/skills/[^/]+/SKI
 $stagedTests     = $staged | Where-Object { $_ -match '\.Tests\.ps1$' -and $_ -notmatch '^\.(jd|breaker)-cleared/' } # clearance markers are prose, not Pester suites
 $stagedConfig    = $staged | Where-Object { $_ -match 'scripts/opencode-config/' }
 
-# Fast path (Go) — single --gate invocation replaces [3/26] + [20/26] (~4.9s PS → ~0.4s Go)
+# Fast path (Go) — single --gate invocation replaces [3/28] + [20/28] (~4.9s PS → ~0.4s Go)
 $script:fastGate = $null
 $fastExe = Join-Path $RepoRoot 'bin/fast.exe'
 if (Test-Path -LiteralPath $fastExe) {
@@ -86,17 +86,154 @@ if (Test-Path -LiteralPath $fastExe) {
     } catch { $script:fastGate = $null }
 }
 
+function Test-JdReviewMarkers {
+    param([array]$StagedRoja, [string]$RepoRoot)
+    if ($StagedRoja) {
+        $uncleared = @()
+        foreach ($f in $StagedRoja) {
+            # Collision-free naming: normalized + hash suffix
+            $normalized = $f -replace '[\\/]', '_'
+            $pathHash = [System.BitConverter]::ToString(
+                [System.Security.Cryptography.SHA256]::HashData([System.Text.Encoding]::UTF8.GetBytes($f))
+            ).Replace('-','').Substring(0,8).ToLower()
+            $markerNew = "$RepoRoot/.jd-cleared/${normalized}_${pathHash}"
+            $markerLegacy = "$RepoRoot/.jd-cleared/$normalized"
+            $marker = if (Test-Path -LiteralPath $markerNew -PathType Leaf) { $markerNew }
+                       elseif (Test-Path -LiteralPath $markerLegacy -PathType Leaf) { $markerLegacy }
+                       else { $markerNew }  # default to new format for creation
+            if (-not (Test-Path -LiteralPath $marker -PathType Leaf)) {
+                $uncleared += $f
+            } else {
+                # Validate marker content: accept both formats
+                # Legacy: empty file (backward compat)
+                # Evidence: "{who} {when} why fileHash:{hash}" prefix
+                $markerRaw = Get-Content -LiteralPath $marker -Raw -Encoding UTF8
+                $markerContent = if ($null -ne $markerRaw) { $markerRaw.Trim() } else { '' }
+                if ($markerContent -ne '') {
+                    # Evidence format — validate prefix has minimum structure
+                    $hasWho = ($markerContent -match '^\S+')
+                    $hasWhen = ($markerContent -match '^\S+\s+\d{4}-\d{2}-\d{2}')
+                    $hasFileHash = ($markerContent -match 'fileHash:[0-9a-f]{8}')
+                    if (-not ($hasWho -and $hasWhen -and $hasFileHash)) {
+                        Write-Host "    WARNING: $marker — malformed evidence prefix (expected: who date why fileHash:XXXXXXXX)" -ForegroundColor Yellow
+                        # Non-blocking for existing markers — just warn
+                    }
+                }
+                # Stale check: target file still exists?
+                $fullPath = Join-Path $RepoRoot $f
+                if (-not (Test-Path -LiteralPath $fullPath -PathType Leaf)) {
+                    Write-Host "    PRUNE: $marker — target '$f' removed from tree" -ForegroundColor DarkYellow
+                    Remove-Item -LiteralPath $marker -Force
+                    $uncleared += $f
+                }
+            }
+        }
+        # Strict: only '1' or 'true' bypass (PS [bool]"false"=true bug fix)
+        if (($env:FORCE_SHIP -eq '1') -or ($env:FORCE_SHIP -eq 'true')) {
+            Warn "FORCE_SHIP set — JD bypass acknowledged (ensure '!ship' was intentional)`n    $($StagedRoja -join "`n")"
+        } elseif ($uncleared.Count -eq 0) {
+            Pass
+        } else {
+            Fail "ROZA zone files staged without JD dual review — BLOCKED:`n  $($uncleared | ForEach-Object { '    ' + $_ } | Out-String)  Run `!judgment-day` or touch .jd-cleared markers, or set FORCE_SHIP=1"
+        }
+    } else { Pass }
+}
+
+function Test-SecretsScan {
+    $diffLines = git diff --cached --diff-filter=ACM -- ':!.githooks' ':!*.Tests.ps1' ':!scripts/check-mcp-security.ps1' ':!.agents/skills/*/references/*' ':!.gitleaks.toml' ':!docs/mejoras/*' ':!cmd/gate/*'
+    $secrets = @(); $currentFile = ""; $lineInFile = 0
+    foreach ($dl in $diffLines) {
+        if ($dl -match '^\+\+\+ b/(.+)$') { $currentFile = $Matches[1]; continue }
+        if ($dl -match '^@@ -\d+,\d+ \+(\d+),\d+ @@') { $lineInFile = [int]$Matches[1] - 1; continue }
+        if ($dl -match '^\+([^\+].*)$') {
+            $lineInFile++
+            $text = $Matches[1]
+            if ($text -match '(ghp_|gho_|github_pat_|AKIA|ctx7sk_|-----BEGIN\s+(RSA|EC|DSA|PRIVATE)\s+KEY|GH_TOKEN\s*=|GITHUB_TOKEN\s*=|password\s*=|api[_-]?key\s*=|secret\s*=|token\s*=)') {
+                $secrets += [PSCustomObject]@{ Filename = $currentFile; LineNumber = $lineInFile; Line = $text }
+            }
+        }
+    }
+    if ($secrets) {
+        $secrets | ForEach-Object {
+            $line = $_.Line.Trim()
+            if ($line.Length -gt 80) { $line = $line.Substring(0,77)+'...' }
+            Write-Host "    $($_.Filename):$($_.LineNumber) $line"
+        }
+        Fail "potential secrets found in staged diff"
+    } else { Pass }
+}
+
+function Test-TokenBudget {
+    param($RepoRoot, $FastGate)
+    if ($null -ne $FastGate -and $null -ne $FastGate.tokenBudget) {
+        $tb = $FastGate.tokenBudget
+        if (-not $tb.passed) {
+            $tbSkillAvg = 'N/A'; $tbPromptAvg = 'N/A'; $tbOver = 0; $tbBudget = $tb.budget
+            if ($null -ne $tb.PSObject.Properties['skills'] -and $null -ne $tb.skills) {
+                if ($null -ne $tb.skills.PSObject.Properties['average']) { $tbSkillAvg = $tb.skills.average }
+                if ($null -ne $tb.skills.PSObject.Properties['overBudgetFiles']) { $tbOver = $tb.skills.overBudgetFiles }
+            } elseif ($null -ne $tb.PSObject.Properties['stats'] -and $null -ne $tb.stats) {
+                if ($null -ne $tb.stats.skills) { $tbSkillAvg = $tb.stats.skills.average; $tbOver = $tb.stats.skills.overBudgetFiles }
+            }
+            if ($null -ne $tb.PSObject.Properties['prompts'] -and $null -ne $tb.prompts -and $null -ne $tb.prompts.PSObject.Properties['average']) { $tbPromptAvg = $tb.prompts.average }
+            elseif ($null -ne $tb.PSObject.Properties['stats'] -and $null -ne $tb.stats -and $null -ne $tb.stats.prompts) { $tbPromptAvg = $tb.stats.prompts.average }
+            if ($null -ne $tb.PSObject.Properties['prompts'] -and $null -ne $tb.prompts -and $null -ne $tb.prompts.PSObject.Properties['overBudgetFiles']) { $tbOver += $tb.prompts.overBudgetFiles }
+            elseif ($null -ne $tb.PSObject.Properties['stats'] -and $null -ne $tb.stats -and $null -ne $tb.stats.prompts -and $null -ne $tb.stats.prompts.PSObject.Properties['overBudgetFiles']) { $tbOver += $tb.stats.prompts.overBudgetFiles }
+            Warn "token budget exceeded — skills $($tbSkillAvg)B/$tbBudget, prompts $($tbPromptAvg)B/$tbBudget ($tbOver files over) (fast: $($tb.elapsedMs)ms)"
+        } else { Pass }
+    } else {
+        $budgetScript = Join-Path $RepoRoot 'scripts/check-token-budget.ps1'
+        if (Test-Path -LiteralPath $budgetScript) {
+            $budgetOut = & "$RepoRoot/scripts/check-token-budget.ps1" -Json 2>&1 | Out-String
+            $budgetResult = try { $budgetOut | ConvertFrom-Json -ErrorAction Stop } catch { $null }
+            if ($null -eq $budgetResult) {
+                Warn "token budget check: no se pudo verificar (runner sin resultado)"
+            } elseif (-not $budgetResult.passed) {
+                $skillAvg = if ($budgetResult.stats.skills) { $budgetResult.stats.skills.average } else { 'N/A' }
+                $promptAvg = if ($budgetResult.stats.prompts) { $budgetResult.stats.prompts.average } else { 'N/A' }
+                $overFiles = 0
+                if ($budgetResult.stats.skills) { $overFiles += $budgetResult.stats.skills.overBudgetFiles }
+                if ($budgetResult.stats.prompts) { $overFiles += $budgetResult.stats.prompts.overBudgetFiles }
+                Warn "token budget exceeded — skills $($skillAvg)B/$($budgetResult.budget), prompts $($promptAvg)B/$($budgetResult.budget) ($overFiles files over)"
+            } else { Pass }
+        } else {
+            Warn "check-token-budget.ps1 not found"
+        }
+    }
+}
+
+function Test-AdversarialProfile {
+    param([array]$Staged, [string]$RepoRoot)
+    $stagedSecurity = $Staged | Where-Object { $_ -match '\.ps1$' }
+    if ($stagedSecurity) {
+        # FORCE_SHIP is a deliberate human override (same as [10/28]); honor it first.
+        $forceShip = ($env:FORCE_SHIP -eq '1') -or ($env:FORCE_SHIP -eq 'true')
+        if ($forceShip) {
+            Pass
+        } else {
+            # Verify the runner's JSON passed field. check-adversarial.ps1 swallows its
+            # own exceptions (Write-Warning + exit 0) and then emits NO JSON — so a
+            # broken runner must fail here, not pass on a stale exit code.
+            $advRun = Invoke-GateRunner -ScriptPath "$RepoRoot/scripts/check-adversarial.ps1" -Arguments @{ Quiet = $true; RepoRoot = $RepoRoot }
+            if (-not $advRun.Ok) {
+                Fail "adversarial profile scan: no se pudo verificar ($($advRun.Error))"
+            } elseif ($advRun.Json.passed -eq $true) { Pass }
+            else { Fail "adversarial profile violations (blocks=$($advRun.Json.blocks)) — touch .breaker-cleared/<file> markers or set FORCE_SHIP=1" }
+        }
+    } else { Pass }
+}
+
 Write-Host "`n=== Gentleman Quality Gate ==="
 
-# [1/26] Trailing whitespace
-Write-Host "[1/26] Trailing whitespace..."
+# [1/28] Trailing whitespace
+Write-Host "[1/28] Trailing whitespace..."
 $wsOut = git diff --cached --check 2>&1
 $wsLines = $wsOut | Where-Object { $_ -notmatch '^\s*$' }
 if ($wsLines) { $wsLines -join "`n" | ForEach-Object { Write-Host "    $_" }; Warn "fix trailing whitespace before push" }
 else { Pass }
 
-# [2/26] #requires Version check
-Write-Host "[2/26] #requires Version check (staged .ps1)..."
+# [2/28] #requires Version check
+Write-Host "[2/28] #requires Version check (staged .ps1)..."
 if ($stagedPS1) {
     $missing = $stagedPS1 | Where-Object {
         $full = Join-Path $RepoRoot $_
@@ -107,8 +244,8 @@ if ($stagedPS1) {
     else { Pass }
 } else { Pass }
 
-# [3/26] Cross-ref check
-Write-Host "[3/26] Cross-ref check..."
+# [3/28] Cross-ref check
+Write-Host "[3/28] Cross-ref check..."
 if ($stagedSkills) {
     if ($null -ne $script:fastGate -and $null -ne $script:fastGate.crossRef) {
         $cr = $script:fastGate.crossRef
@@ -133,15 +270,15 @@ if ($stagedSkills) {
     }
 } else { Pass }
 
-# [4/26] Skill drift
-Write-Host "[4/26] Skill drift..."
+# [4/28] Skill drift
+Write-Host "[4/28] Skill drift..."
 if ($stagedSkills) {
     & "$RepoRoot/scripts/check-skill-drift.ps1" -Quiet -ErrorAction SilentlyContinue 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) { Pass } else { Warn "skill drift detected (non-blocking)" }
 } else { Pass }
 
-# [5/26] Improvement cycle — overweight skills
-Write-Host "[5/26] Improvement cycle..."
+# [5/28] Improvement cycle — overweight skills
+Write-Host "[5/28] Improvement cycle..."
 $canonical = "$RepoRoot/.agents/skills"
 $overweight = if (Test-Path $canonical) {
     Get-ChildItem $canonical -Directory | Where-Object { $_.Name -ne '_shared' } | ForEach-Object {
@@ -151,8 +288,8 @@ $overweight = if (Test-Path $canonical) {
 }
 if ($overweight) { Warn "skills >3KB (consider improvement cycle):`n$($overweight -join "`n")" } else { Pass }
 
-# [6/26] .project.json integrity
-Write-Host "[6/26] .project.json integrity..."
+# [6/28] .project.json integrity
+Write-Host "[6/28] .project.json integrity..."
 if ($stagedProject) {
     try {
         $json = Get-Content "$RepoRoot/.project.json" -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -164,8 +301,8 @@ if ($stagedProject) {
     } catch { Fail ".project.json parse error: $_" }
 } else { Pass }
 
-# [7/26] review-rules.jsonc integrity
-Write-Host "[7/26] review-rules.jsonc integrity..."
+# [7/28] review-rules.jsonc integrity
+Write-Host "[7/28] review-rules.jsonc integrity..."
 if ($stagedRules) {
     try {
         $raw = Get-Content "$RepoRoot/review-rules.jsonc" -Raw -Encoding UTF8
@@ -182,17 +319,16 @@ if ($stagedRules) {
     } catch { Fail "review-rules.jsonc parse error: $_" }
 } else { Pass }
 
-# [8/26] Benchmark check
-Write-Host "[8/26] Benchmark check..."
+# [8/28] Benchmark check
+Write-Host "[8/28] Benchmark check..."
 if ($stagedAgents) {
     $benchOut = & "$RepoRoot/scripts/benchmark-core.ps1" -Gate 2>&1 | Out-String
     if ($benchOut -match 'REGRESSIONS') { Warn "benchmark regressions detected`n$benchOut" }
     else { $benchOut.Trim() -split "`n" | ForEach-Object { Write-Host "    $_" }; Pass }
 } else { Pass }
 
-# [9/26] MCP security audit (KB r2-mcp-security-bestpractices 2026-07-28: SSRF allowlist, version pin, env secrets, disabled hygiene)
-# P0-2 S2: SSoT policy = scripts/opencode-config/mcp-policy.json; audit runs -CI (fail-closed exit 1)
-Write-Host "[9/26] MCP security audit..."
+# [9/28] MCP security audit (KB r2-mcp-security-bestpractices 2026-07-28: SSRF allowlist, version pin, env secrets, disabled hygiene)
+Write-Host "[9/28] MCP security audit..."
 $mcpStaged = $staged | Where-Object { $_ -match 'opencode\.json|security-audit-mcp\.ps1|scripts/opencode-config/mcp-policy\.json' }
 if ($mcpStaged) {
     $mcpPolicy = Join-Path $RepoRoot 'scripts/opencode-config/mcp-policy.json'
@@ -206,85 +342,18 @@ if ($mcpStaged) {
     }
 } else { Pass }
 
-# [10/26] JD review check — respects .jd-cleared/<path> markers or FORCE_SHIP env
+# [10/28] JD review check — respects .jd-cleared/<path> markers or FORCE_SHIP env
 # Clears the recurring Warn for files already cleared via `!judgment-day`.
 # Marker naming: path separators -> underscores (scripts/foo.ps1 -> .jd-cleared/scripts_foo.ps1)
-Write-Host "[10/26] JD review check (ROZA zone)..."
-if ($stagedRoja) {
-    $uncleared = @()
-    foreach ($f in $stagedRoja) {
-        # Collision-free naming: normalized + hash suffix
-        $normalized = $f -replace '[\\/]', '_'
-        $pathHash = [System.BitConverter]::ToString(
-            [System.Security.Cryptography.SHA256]::HashData([System.Text.Encoding]::UTF8.GetBytes($f))
-        ).Replace('-','').Substring(0,8).ToLower()
-        $markerNew = "$RepoRoot/.jd-cleared/${normalized}_${pathHash}"
-        $markerLegacy = "$RepoRoot/.jd-cleared/$normalized"
-        $marker = if (Test-Path -LiteralPath $markerNew -PathType Leaf) { $markerNew }
-                  elseif (Test-Path -LiteralPath $markerLegacy -PathType Leaf) { $markerLegacy }
-                  else { $markerNew }  # default to new format for creation
-        if (-not (Test-Path -LiteralPath $marker -PathType Leaf)) {
-            $uncleared += $f
-        } else {
-            # Validate marker content: accept both formats
-            # Legacy: empty file (backward compat)
-            # Evidence: "{who} {when} why fileHash:{hash}" prefix
-            $markerContent = (Get-Content -LiteralPath $marker -Raw -Encoding UTF8).Trim()
-            if ($markerContent -ne '') {
-                # Evidence format — validate prefix has minimum structure
-                $hasWho = ($markerContent -match '^\S+')
-                $hasWhen = ($markerContent -match '^\S+\s+\d{4}-\d{2}-\d{2}')
-                $hasFileHash = ($markerContent -match 'fileHash:[0-9a-f]{8}')
-                if (-not ($hasWho -and $hasWhen -and $hasFileHash)) {
-                    Write-Host "    WARNING: $marker — malformed evidence prefix (expected: who date why fileHash:XXXXXXXX)" -ForegroundColor Yellow
-                    # Non-blocking for existing markers — just warn
-                }
-            }
-            # Stale check: target file still exists?
-            $fullPath = Join-Path $RepoRoot $f
-            if (-not (Test-Path -LiteralPath $fullPath -PathType Leaf)) {
-                Write-Host "    PRUNE: $marker — target '$f' removed from tree" -ForegroundColor DarkYellow
-                Remove-Item -LiteralPath $marker -Force
-                $uncleared += $f
-            }
-        }
-    }
-    # Strict: only '1' or 'true' bypass (PS [bool]"false"=true bug fix)
-    if (($env:FORCE_SHIP -eq '1') -or ($env:FORCE_SHIP -eq 'true')) {
-        Warn "FORCE_SHIP set — JD bypass acknowledged (ensure '!ship' was intentional)`n    $($stagedRoja -join "`n")"
-    } elseif ($uncleared.Count -eq 0) {
-        Pass
-    } else {
-        Fail "ROZA zone files staged without JD dual review — BLOCKED:`n  $($uncleared | ForEach-Object { '    ' + $_ } | Out-String)  Run `!judgment-day` or touch .jd-cleared markers, or set FORCE_SHIP=1"
-    }
-} else { Pass }
+Write-Host "[10/28] JD review check (ROZA zone)..."
+Test-JdReviewMarkers -StagedRoja $stagedRoja -RepoRoot $RepoRoot
 
-# [11/26] Secrets scan — parse diff to get real filenames (not "InputStream")
-Write-Host "[11/26] Secrets scan..."
-$diffLines = git diff --cached --diff-filter=ACM -- ':!.githooks' ':!*.Tests.ps1' ':!scripts/check-mcp-security.ps1' ':!.agents/skills/*/references/*' ':!.gitleaks.toml' ':!docs/mejoras/*' ':!cmd/gate/*'
-$secrets = @(); $currentFile = ""; $lineInFile = 0
-foreach ($dl in $diffLines) {
-    if ($dl -match '^\+\+\+ b/(.+)$') { $currentFile = $Matches[1]; continue }
-    if ($dl -match '^@@ -\d+,\d+ \+(\d+),\d+ @@') { $lineInFile = [int]$Matches[1] - 1; continue }
-    if ($dl -match '^\+([^\+].*)$') {
-        $lineInFile++
-        $text = $Matches[1]
-        if ($text -match '(ghp_|gho_|github_pat_|AKIA|ctx7sk_|-----BEGIN\s+(RSA|EC|DSA|PRIVATE)\s+KEY|GH_TOKEN\s*=|GITHUB_TOKEN\s*=|password\s*=|api[_-]?key\s*=|secret\s*=|token\s*=)') {
-            $secrets += [PSCustomObject]@{ Filename = $currentFile; LineNumber = $lineInFile; Line = $text }
-        }
-    }
-}
-if ($secrets) {
-    $secrets | ForEach-Object {
-        $line = $_.Line.Trim()
-        if ($line.Length -gt 80) { $line = $line.Substring(0,77)+'...' }
-        Write-Host "    $($_.Filename):$($_.LineNumber) $line"
-    }
-    Fail "potential secrets found in staged diff"
-} else { Pass }
+# [11/28] Secrets scan — parse diff to get real filenames (not "InputStream")
+Write-Host "[11/28] Secrets scan..."
+Test-SecretsScan
 
-# [12/26] SKILL.md frontmatter completeness
-Write-Host "[12/26] Taste invariant: SKILL.md frontmatter..."
+# [12/28] SKILL.md frontmatter completeness
+Write-Host "[12/28] Taste invariant: SKILL.md frontmatter..."
 if ($stagedSkillMds) {
     $fmFail = $false
     foreach ($sf in $stagedSkillMds) {
@@ -299,8 +368,8 @@ if ($stagedSkillMds) {
     if ($fmFail) { Fail "frontmatter issues" } else { Pass }
 } else { Pass }
 
-# [13/26] Pester tests
-Write-Host "[13/26] Pester tests..."
+# [13/28] Pester tests
+Write-Host "[13/28] Pester tests..."
 if ($stagedTests) {
     # Only Import-Module failure means "Pester not available" (non-blocking).
     # Anything after that (config build / Invoke-Pester) is a REAL gate failure.
@@ -352,16 +421,16 @@ if ($stagedTests) {
     }
 } else { Pass }
 
-# [14/26] Config expansion check
-Write-Host "[14/26] Config expansion check..."
+# [14/28] Config expansion check
+Write-Host "[14/28] Config expansion check..."
 if ($stagedConfig) {
     $importMarkers = git show :opencode.json 2>$null | Select-String -Pattern '\$import'
     if ($importMarkers) { Fail "Config sources changed but opencode.json has unresolved `$import markers" }
     else { Pass }
 } else { Pass }
 
-# [15/26] opencode.json sync with SSoT (scripts/lib/*)
-Write-Host "[15/26] opencode.json sync with SSoT..."
+# [15/28] opencode.json sync with SSoT (scripts/lib/*)
+Write-Host "[15/28] opencode.json sync with SSoT..."
 $stagedLib = $staged | Where-Object { $_ -match '^(scripts/lib/|opencode\.json$)' }
 if ($stagedLib) {
     # Validate sync by parsing the runner's JSON status, not $LASTEXITCODE (the
@@ -373,10 +442,10 @@ if ($stagedLib) {
     else { Fail "opencode.json out of sync with SSoT (status=$($regenRun.Json.status)) — run scripts/regenerate-opencode.ps1 -Yes" }
 } else { Pass }
 
-# [16/26] Write-scope enforcement (OPT-IN via .gentleman/write-scope.json)
+# [16/28] Write-scope enforcement (OPT-IN via .gentleman/write-scope.json)
 # Absent file => no constraint, pass. Present => staged changes outside
 # allowed_paths fail the gate (wired in as a follow-up to INFRA-I6).
-Write-Host "[16/26] Write-scope check..."
+Write-Host "[16/28] Write-scope check..."
 $scopeFile = Join-Path $RepoRoot '.gentleman\write-scope.json'
 if (Test-Path -LiteralPath $scopeFile) {
     try {
@@ -395,11 +464,11 @@ if (Test-Path -LiteralPath $scopeFile) {
     } catch { Fail "write-scope.json parse error: $_" }
 } else { Pass }
 
-# [17/26] Config drift check (repo opencode.json vs global opencode.json(c))
+# [17/28] Config drift check (repo opencode.json vs global opencode.json(c))
 # Runs ONLY when a global config exists (developer machines synced via
 # sync-global.ps1). Machines without one (fresh clones, CI runners) skip —
 # wiring this into quality-gate.yml would false-fail every CI run.
-Write-Host "[17/26] Config drift check..."
+Write-Host "[17/28] Config drift check..."
 $globalDir = Join-Path $env:USERPROFILE '.config\opencode'
 $globalConf = @("$globalDir\opencode.json", "$globalDir\opencode.jsonc") | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
 if ($globalConf) {
@@ -407,10 +476,10 @@ if ($globalConf) {
     if ($LASTEXITCODE -eq 0) { Pass } else { Warn "config drift vs global — run scripts/sync-global.ps1" }
 } else { Pass }
 
-# [18/26] Config size budget (ADR-007)
+# [18/28] Config size budget (ADR-007)
 # Enforces opencode.json ≤ 65,536 B so config growth cannot silently creep past
 # the budget. Mirrored in quality-gate.yml ("Config size budget" step).
-Write-Host "[18/26] Config size budget..."
+Write-Host "[18/28] Config size budget..."
 $configPath = Join-Path $RepoRoot 'opencode.json'
 if (Test-Path -LiteralPath $configPath) {
     $configSize = (Get-Item -LiteralPath $configPath).Length
@@ -418,11 +487,11 @@ if (Test-Path -LiteralPath $configPath) {
     else { Pass }
 } else { Fail "opencode.json not found at $configPath" }
 
-# [19/26] Backlog integrity check
+# [19/28] Backlog integrity check
 # Verifies CYCLE.md backlog item status matches repo reality. Runs ALWAYS
 # (like [17/17]) and is fail-closed if the script is missing. Mirrored in
 # .github/workflows/quality-gate.yml ("Backlog integrity check" step).
-Write-Host "[19/26] Backlog integrity check..."
+Write-Host "[19/28] Backlog integrity check..."
 $backlogScript = Join-Path $RepoRoot 'scripts/check-backlog-integrity.ps1'
 if (Test-Path -LiteralPath $backlogScript) {
     # Verify the runner's JSON allPassed field, not $LASTEXITCODE (a runner that
@@ -434,52 +503,18 @@ if (Test-Path -LiteralPath $backlogScript) {
     else { Fail "backlog integrity check failed — CYCLE.md status does not match repo reality (failed=$($blRun.Json.failed))" }
 } else { Fail "backlog-integrity.ps1 not found at $backlogScript" }
 
-# [20/26] Token budget check (C9)
+# [20/28] Token budget check (C9)
 # Runs check-token-budget.ps1 to audit skill/prompt file sizes against
 # the 3,200-byte average target (ADR-048 — was 2,000B ADR-007; bumped for bulk R2-1 81×400). Uses Warn (not Fail) since
 # oversize skills are a known condition under ADR-018.
-Write-Host "[20/26] Token budget check..."
-if ($null -ne $script:fastGate -and $null -ne $script:fastGate.tokenBudget) {
-    $tb = $script:fastGate.tokenBudget
-    if (-not $tb.passed) {
-        $tbSkillAvg = 'N/A'; $tbPromptAvg = 'N/A'; $tbOver = 0; $tbBudget = $tb.budget
-        if ($null -ne $tb.PSObject.Properties['skills'] -and $null -ne $tb.skills) {
-            if ($null -ne $tb.skills.PSObject.Properties['average']) { $tbSkillAvg = $tb.skills.average }
-            if ($null -ne $tb.skills.PSObject.Properties['overBudgetFiles']) { $tbOver = $tb.skills.overBudgetFiles }
-        } elseif ($null -ne $tb.PSObject.Properties['stats'] -and $null -ne $tb.stats) {
-            if ($null -ne $tb.stats.skills) { $tbSkillAvg = $tb.stats.skills.average; $tbOver = $tb.stats.skills.overBudgetFiles }
-        }
-        if ($null -ne $tb.PSObject.Properties['prompts'] -and $null -ne $tb.prompts -and $null -ne $tb.prompts.PSObject.Properties['average']) { $tbPromptAvg = $tb.prompts.average }
-        elseif ($null -ne $tb.PSObject.Properties['stats'] -and $null -ne $tb.stats -and $null -ne $tb.stats.prompts) { $tbPromptAvg = $tb.stats.prompts.average }
-        if ($null -ne $tb.PSObject.Properties['prompts'] -and $null -ne $tb.prompts -and $null -ne $tb.prompts.PSObject.Properties['overBudgetFiles']) { $tbOver += $tb.prompts.overBudgetFiles }
-        elseif ($null -ne $tb.PSObject.Properties['stats'] -and $null -ne $tb.stats -and $null -ne $tb.stats.prompts -and $null -ne $tb.stats.prompts.PSObject.Properties['overBudgetFiles']) { $tbOver += $tb.stats.prompts.overBudgetFiles }
-        Warn "token budget exceeded — skills $($tbSkillAvg)B/$tbBudget, prompts $($tbPromptAvg)B/$tbBudget ($tbOver files over) (fast: $($tb.elapsedMs)ms)"
-    } else { Pass }
-} else {
-    $budgetScript = Join-Path $RepoRoot 'scripts/check-token-budget.ps1'
-    if (Test-Path -LiteralPath $budgetScript) {
-        $budgetOut = & "$RepoRoot/scripts/check-token-budget.ps1" -Json 2>&1 | Out-String
-        $budgetResult = try { $budgetOut | ConvertFrom-Json -ErrorAction Stop } catch { $null }
-        if ($null -eq $budgetResult) {
-            Warn "token budget check: no se pudo verificar (runner sin resultado)"
-        } elseif (-not $budgetResult.passed) {
-            $skillAvg = if ($budgetResult.stats.skills) { $budgetResult.stats.skills.average } else { 'N/A' }
-            $promptAvg = if ($budgetResult.stats.prompts) { $budgetResult.stats.prompts.average } else { 'N/A' }
-            $overFiles = 0
-            if ($budgetResult.stats.skills) { $overFiles += $budgetResult.stats.skills.overBudgetFiles }
-            if ($budgetResult.stats.prompts) { $overFiles += $budgetResult.stats.prompts.overBudgetFiles }
-            Warn "token budget exceeded — skills $($skillAvg)B/$($budgetResult.budget), prompts $($promptAvg)B/$($budgetResult.budget) ($overFiles files over)"
-        } else { Pass }
-    } else {
-        Warn "check-token-budget.ps1 not found"
-    }
-}
+Write-Host "[20/28] Token budget check..."
+Test-TokenBudget -RepoRoot $RepoRoot -FastGate $script:fastGate
 
-# [21/26] Budget script validation (C6)
+# [21/28] Budget script validation (C6)
 # Verifies check-budget.ps1 is present and syntactically valid —
 # ensures the budget enforcement tool is available for runtime use
 # by the orchestrator during agent sessions.
-Write-Host "[21/26] Budget script validation..."
+Write-Host "[21/28] Budget script validation..."
 $budgetRuntime = Join-Path $RepoRoot 'scripts/check-budget.ps1'
 if (Test-Path -LiteralPath $budgetRuntime) {
     $btTokens = $null; $btErrors = $null
@@ -492,11 +527,11 @@ if (Test-Path -LiteralPath $budgetRuntime) {
     Warn "check-budget.ps1 not found"
 }
 
-# [22/26] Context watchdog validation (C8)
+# [22/28] Context watchdog validation (C8)
 # Verifies ctx-watchdog.ps1 is present and syntactically valid —
 # ensures the context-zone monitoring tool is available for runtime
 # use by the skill-graph during agent sessions.
-Write-Host "[22/26] Context watchdog validation..."
+Write-Host "[22/28] Context watchdog validation..."
 $watchdogScript = Join-Path $RepoRoot 'scripts/ctx-watchdog.ps1'
 if (Test-Path -LiteralPath $watchdogScript) {
     $wdTokens = $null; $wdErrors = $null
@@ -509,36 +544,20 @@ if (Test-Path -LiteralPath $watchdogScript) {
     Warn "ctx-watchdog.ps1 not found"
 }
 
-# [23/26] Adversarial-breaker profile scan — lightweight commit-time scan.
+# [23/28] Adversarial-breaker profile scan — lightweight commit-time scan.
 # Runs AFTER Verify ([12/13] Pester tests) — catches obvious security patterns.
 # The full adversarial-breaker skill (sub-agent deep analysis) is triggered
 # manually via `!breaker` or auto-triggered in SDD post-Verify for ROZA zone.
-Write-Host "[23/26] Adversarial-breaker profile scan..."
-$stagedSecurity = $staged | Where-Object { $_ -match '\.ps1$' }
-if ($stagedSecurity) {
-    # FORCE_SHIP is a deliberate human override (same as [10/26]); honor it first.
-    $forceShip = ($env:FORCE_SHIP -eq '1') -or ($env:FORCE_SHIP -eq 'true')
-    if ($forceShip) {
-        Pass
-    } else {
-        # Verify the runner's JSON passed field. check-adversarial.ps1 swallows its
-        # own exceptions (Write-Warning + exit 0) and then emits NO JSON — so a
-        # broken runner must fail here, not pass on a stale exit code.
-        $advRun = Invoke-GateRunner -ScriptPath "$RepoRoot/scripts/check-adversarial.ps1" -Arguments @{ Quiet = $true; RepoRoot = $RepoRoot }
-        if (-not $advRun.Ok) {
-            Fail "adversarial profile scan: no se pudo verificar ($($advRun.Error))"
-        } elseif ($advRun.Json.passed -eq $true) { Pass }
-        else { Fail "adversarial profile violations (blocks=$($advRun.Json.blocks)) — touch .breaker-cleared/<file> markers or set FORCE_SHIP=1" }
-    }
-} else { Pass }
+Write-Host "[23/28] Adversarial-breaker profile scan..."
+Test-AdversarialProfile -Staged $staged -RepoRoot $RepoRoot
 
-# [24/26] Async-result verification — fail-closed on unresolved subagent failures
+# [24/28] Async-result verification — fail-closed on unresolved subagent failures
 # Scans for *.async-result.json produced by monitor-subagent.ps1 / post-delegation-check.ps1.
 # If ANY has .passed = $false, blocks commit — prevents silent-failure mode where LLM
 # forgets post-delegation verification (gap documented in mejora-log.md:775).
 # To unblock: fix the failed check(s) and re-run, or remove the stale result file
 # after manual confirmation.
-Write-Host "[24/26] Async-result verification..."
+Write-Host "[24/28] Async-result verification..."
 $staleResults = @()
 $asyncResults = Get-ChildItem -Path $RepoRoot -Filter '*.async-result.json' -ErrorAction SilentlyContinue
 foreach ($ar in $asyncResults) {
@@ -572,11 +591,11 @@ if ($staleResults) {
     Fail "unresolved subagent failure(s) — fix checks / re-run monitor or remove stale *.async-result.json"
 } else { Pass }
 
-# [25/26] Token budget regression (Pattern 3 — skill-testing)
+# [25/28] Token budget regression (Pattern 3 — skill-testing)
 # Reads `token_budget` frontmatter from SKILL.md files and asserts current
 # file size ≤ budget * 1.1 (10% drift). Skills without token_budget are
 # WARN (non-blocking) since not all skills declare budgets.
-Write-Host "[25/26] Token budget regression..."
+Write-Host "[25/28] Token budget regression..."
 $tbrScript = Join-Path $RepoRoot 'scripts\test-token-budget-regression.ps1'
 if (Test-Path -LiteralPath $tbrScript) {
     $tbrOut = & $tbrScript -SkillsPath (Join-Path $RepoRoot '.agents\skills') -Json 2>&1 | Out-String
@@ -591,11 +610,11 @@ if (Test-Path -LiteralPath $tbrScript) {
     Warn "test-token-budget-regression.ps1 not found at $tbrScript"
 }
 
-# [26/26] Machine-specific path scan (V6 regression class — hardcoded
+# [26/28] Machine-specific path scan (V6 regression class — hardcoded
 # "D:/repo", "C:/Users/<someone>" inside scripts broke suites on other
 # machines). Scans staged .ps1 for absolute drive paths outside comments.
 # Verified winner P3 (trial 2, ADR-044 era): local hook + CI backstop.
-Write-Host "[26/26] Machine-specific path scan..."
+Write-Host "[26/28] Machine-specific path scan..."
 $machPathHits = @()
 foreach ($sf in $staged) {
     if ($sf -notmatch '\.ps1$') { continue }

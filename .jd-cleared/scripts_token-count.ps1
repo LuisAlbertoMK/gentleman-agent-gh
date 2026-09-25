@@ -1,0 +1,1 @@
+﻿implementer 2026-09-24 JD-4R APPROVED token-count: display grouping fix only; profiler DATA hit at :78 is a literal header line with file size counts, no sensitive values; breaker accepted separately fileHash:8c2a31d8

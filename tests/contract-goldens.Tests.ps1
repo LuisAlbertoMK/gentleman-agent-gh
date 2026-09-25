@@ -29,6 +29,11 @@ Describe 'Contract goldens comparator (R8-S3)' {
             'registry-build.golden.json'
             'audit-check-report.golden.json'
         )
+        # Hermetic registry builds: canonical generator + skills source, cached
+        # once here; each Invoke-GoldenGenerator call builds into its own temp
+        # file (never scripts/skill-registry.json — gitignored, absent in CI).
+        $RegistryBuilder = Join-Path $RepoRoot 'scripts/build-skill-registry.ps1'
+        $RegistrySkillsDir = Join-Path $RepoRoot '.agents/skills'
 
         function ConvertTo-SortedObject {
             param([object]$Node)
@@ -164,17 +169,34 @@ Describe 'Contract goldens comparator (R8-S3)' {
                     }
                 }
                 'registry-build.golden.json' {
-                    $src = Join-Path $RepoRoot 'scripts/skill-registry.json'
-                    $r = Get-Content -LiteralPath $src -Raw -Encoding UTF8 | ConvertFrom-Json -Depth 12
-                    $names = @($r.skills.PSObject.Properties.Name | Sort-Object)
-                    return [ordered]@{
-                        excluded_volatile = @('generated')
-                        generator         = 'scripts/build-skill-registry.ps1 + normalization (drop .generated locale datetime, sort skill names)'
-                        normalization     = 'drop .generated (locale datetime, non-deterministic); sort skill names; trigger_index as count only'
-                        skill_count       = $names.Count
-                        skills            = $names
-                        source            = 'scripts/skill-registry.json'
-                        trigger_index_count = @($r.trigger_index.PSObject.Properties).Count
+                    # Hermetic: build the registry into a fresh temp file per
+                    # invocation (never read scripts/skill-registry.json — it is
+                    # gitignored and absent from clean CI checkouts). Each call
+                    # builds exactly once, so the double re-run determinism test
+                    # below still exercises 2 real builder runs.
+                    $tmp = Join-Path ([System.IO.Path]::GetTempPath()) ("registry-build-{0}-{1}.json" -f $PID, [guid]::NewGuid().ToString('N'))
+                    try {
+                        & $RegistryBuilder -SkillsDir $RegistrySkillsDir -OutputFile $tmp -Quiet
+                        if (-not (Test-Path -LiteralPath $tmp)) {
+                            throw "registry builder produced no output file: $tmp (scripts/build-skill-registry.ps1 swallows errors via Write-Warning — see warnings above)"
+                        }
+                        $r = Get-Content -LiteralPath $tmp -Raw -Encoding UTF8 | ConvertFrom-Json -Depth 12
+                        if (-not $r.skills -or -not $r.trigger_index) {
+                            throw "registry builder output at $tmp is missing 'skills' or 'trigger_index' (fail-silent build?)"
+                        }
+                        $names = @($r.skills.PSObject.Properties.Name | Sort-Object)
+                        return [ordered]@{
+                            excluded_volatile = @('generated')
+                            generator         = 'scripts/build-skill-registry.ps1 + normalization (drop .generated locale datetime, sort skill names)'
+                            normalization     = 'drop .generated (locale datetime, non-deterministic); sort skill names; trigger_index as count only'
+                            skill_count       = $names.Count
+                            skills            = $names
+                            source            = 'scripts/skill-registry.json'
+                            trigger_index_count = @($r.trigger_index.PSObject.Properties).Count
+                        }
+                    }
+                    finally {
+                        if (Test-Path -LiteralPath $tmp) { Remove-Item -LiteralPath $tmp -Force }
                     }
                 }
                 'audit-check-report.golden.json' {

@@ -188,14 +188,32 @@ Describe 'lcm-dag.ps1' {
 
     It 'L3 default pointer is canonical file pointer with matching sha256 (watchdog dry-run)' {
         $env:PESTER_TEST = '1'
-        $r = & $script:WatchdogPath -CurrentTokens 170000 -Budget 200000 -Reason pre-tool
-        $r.level | Should -Be 'L3'
-        $r.pointer | Should -Match '^file:.+#sha256:[0-9a-f]{64}$'
-        $m = [regex]::Match($r.pointer, '^file:(?<ref>.+)#sha256:(?<hash>[0-9a-f]{64})$')
-        $m.Success | Should -BeTrue
-        $refPath = $m.Groups['ref'].Value
-        if (-not [System.IO.Path]::IsPathRooted($refPath)) { $refPath = Join-Path $script:RepoRoot $refPath }
-        (Get-FileHash -LiteralPath $refPath -Algorithm SHA256).Hash.ToLower() | Should -Be $m.Groups['hash'].Value
+        # Fixture (test-only, no production touch): the watchdog builds its default L3
+        # pointer by hashing .learnings/inter-track.json, but that file is untracked +
+        # gitignored (absent in fresh checkouts — only engram-sync.json ships), so the
+        # watchdog falls back to a bare pointer BY DESIGN (context-watchdog-check.ps1
+        # :55-60: best-effort, unverified pre-S2 form). The canonical-pointer invariant
+        # this test guards needs the file present — create it here, remove afterwards.
+        $trackPath = Join-Path $script:RepoRoot '.learnings/inter-track.json'
+        $trackExisted = Test-Path -LiteralPath $trackPath
+        try {
+            if (-not $trackExisted) {
+                '{"cycle":{"id":"pester-fixture-cycle"}}' | Set-Content -LiteralPath $trackPath -Encoding UTF8 -NoNewline
+            }
+            $r = & $script:WatchdogPath -CurrentTokens 170000 -Budget 200000 -Reason pre-tool
+            $r.level | Should -Be 'L3'
+            $r.pointer | Should -Match '^file:.+#sha256:[0-9a-f]{64}$'
+            $m = [regex]::Match($r.pointer, '^file:(?<ref>.+)#sha256:(?<hash>[0-9a-f]{64})$')
+            $m.Success | Should -BeTrue
+            $refPath = $m.Groups['ref'].Value
+            if (-not [System.IO.Path]::IsPathRooted($refPath)) { $refPath = Join-Path $script:RepoRoot $refPath }
+            (Get-FileHash -LiteralPath $refPath -Algorithm SHA256).Hash.ToLower() | Should -Be $m.Groups['hash'].Value
+        }
+        finally {
+            if (-not $trackExisted -and (Test-Path -LiteralPath $trackPath)) {
+                Remove-Item -LiteralPath $trackPath -Force
+            }
+        }
     }
 
     It 'GC without inter-track.json is a fail-closed no-op' {

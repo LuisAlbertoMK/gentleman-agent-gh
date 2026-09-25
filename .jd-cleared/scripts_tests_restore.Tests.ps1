@@ -1,0 +1,1 @@
+implementer 2026-09-25 added param-first invariant test (SupportsShouldProcess + param() before any executable statement) on the real file; dual-review reliability finding remediated in the same commit staging this marker (fix/tests-job-pre-existing) — reviewed with findings remediated, never cleared nor approved fileHash:0c395e4e

@@ -97,3 +97,39 @@ Describe 'verify.ps1 — JSON contract' {
         $r.allPassed | Should -BeOfType [bool]
     }
 }
+
+Describe 'verify.ps1 — ui-specialist-pairing credential guard' {
+    # What this Describe guards (and only this):
+    #  1. scripts/ui-specialist-pairing.ps1 declares the OllamaApiKey param
+    #     WITHOUT a default assignment, so the E2 secrets-scan pattern
+    #     'api[_-]?key\s*=' has no match here (no false positive, no
+    #     allowlist entry needed). Reintroducing '= "..."' fails below.
+    #  2. No hardcoded secret-like literal anywhere in that file (it holds
+    #     a Bearer sink: $headers.Authorization = "Bearer $OllamaApiKey").
+    # What it does NOT guard: the E2 scan itself (covered by the
+    # 'verify.ps1 — E2 secrets scan' Describe above against throwaway repos),
+    # nor the other 12 credential regexes beyond the name+quote heuristic here.
+    BeforeAll {
+        $script:pairingFile = Join-Path $PSScriptRoot '..\ui-specialist-pairing.ps1'
+    }
+
+    It 'declares OllamaApiKey with no default value (no hardcoded credential)' {
+        $content = Get-Content -Path $script:pairingFile -Raw
+        $assignLines = @($content -split "`r?`n" | Where-Object { $_ -match '\$OllamaApiKey\s*=' })
+        $assignLines.Count | Should -Be 0 -Because 'the param must stay default-less (unbound [string] is empty); any "= ..." reintroduces the E2 false positive or a real literal'
+    }
+
+    It 'contains no other hardcoded secret-like literals' {
+        $content = Get-Content -Path $script:pairingFile -Raw
+        $names = @('password', 'secret', 'token')
+        $bad = @()
+        foreach ($line in ($content -split "`r?`n")) {
+            foreach ($n in $names) {
+                $isNamed = $line -match ('\w*' + $n + '\w*\s*=')
+                $hasQuotedValue = ($line -match '=\s*"[^"]') -or ($line -match "=\s*'[^']")
+                if ($isNamed -and $hasQuotedValue) { $bad += $line.Trim() }
+            }
+        }
+        $bad.Count | Should -Be 0 -Because 'no hardcoded secret-like literals allowed in the allowlisted file'
+    }
+}
