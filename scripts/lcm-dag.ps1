@@ -183,6 +183,7 @@ function New-LcmL1Content {
         Pure function — no persistence, safe under PESTER_TEST=1.
     #>
     [CmdletBinding()]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure string builder, no persistence or state change (Ronda4 S2 contract)')]
     param(
         [string[]]$Sections = @(),
         [string]$Prefix = 'L1 section summary'
@@ -203,6 +204,7 @@ function New-LcmL2Content {
         Pure function — no persistence, safe under PESTER_TEST=1.
     #>
     [CmdletBinding()]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure string builder, no persistence or state change (Ronda4 S2 contract)')]
     param(
         [string[]]$Decisions = @(),
         [string[]]$EngramIds = @()
@@ -242,6 +244,7 @@ function Get-LcmPointerBytes {
         unresolvable refs (fail-closed via ok=$false); malformed input throws.
     #>
     [CmdletBinding()]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '', Justification = 'Returns canonical byte[] payload; plural is semantically correct (same rationale as Remove-LcmOldCycles)')]
     param(
         [ValidateSet('file','engram','diff')][string]$Kind,
         [string]$Ref,
@@ -288,6 +291,7 @@ function New-LcmL3Pointer {
         build time must never enter the DAG (schema: unverified != lossless).
     #>
     [CmdletBinding()]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure pointer builder, read-only resolution plus hash; never writes state (Ronda4 S2 contract)')]
     param(
         [ValidateSet('file','engram','diff')][string]$Kind,
         [string]$Ref,
