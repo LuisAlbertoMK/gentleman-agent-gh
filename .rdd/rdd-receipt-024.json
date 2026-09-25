@@ -1,0 +1,37 @@
+{
+  "id": "rdd-receipt-024",
+  "freeze": "HEAD-069855a7-b46581c5",
+  "freeze_note": "Misma rama/PR que la receipt 023 (fix/hook-pester-silent-skip, PR #51), mismo archivo .githooks/pre-commit-gate.ps1. Base = 069855a7 (padre directo, fix previo del hook Pester). diff8=b46581c5 = SHA256[:8] de `git diff HEAD -- .githooks/pre-commit-gate.ps1` antes de agregar esta receipt (evita circularidad). Receipt incluida en el commit final.",
+  "tier": 2,
+  "tier_justification": "Tier 2 = modifica el gate de pre-commit compartido (.githooks/pre-commit-gate.ps1). No toca codigo de produccion ni runtime, pero endurece la semantica de un check bloqueante ([25/26] pasa de falso-verde a fail-closed) y aclara el resultado de un check Warn-level ([20/26]). Requiere evidencia de gate real (rojo + verde).",
+  "files": [
+    ".githooks/pre-commit-gate.ps1",
+    ".rdd/rdd-receipt-024.json"
+  ],
+  "file_statuses": {
+    "modified": [
+      ".githooks/pre-commit-gate.ps1"
+    ]
+  },
+  "lines_changed": 5,
+  "lines_deleted": 3,
+  "verdict": "PASS",
+  "verdict_note": "ANTES: [25/26] (bloqueante) hacia `try { ConvertFrom-Json } catch { $null }` y ante runner sin JSON emitia `Warn \"token budget runner unavailable\"` (no bloqueaba) => falso verde; ademas `-ErrorAction SilentlyContinue` ocultaba el error. [20/26] (Warn-level por ADR-018) con `$null` caia en `else { Pass }` => Pass silencioso indistinguible de una verificacion real. DESPUES: [25/26] runner sin resultado parseable => `Fail` fail-closed con mensaje explicito y sin `-ErrorAction SilentlyContinue` (el `2>&1` se mantiene para capturar salida/error; si el script NO existe, el Warn de la rama Test-Path se conserva). [20/26] `$null` => `Warn \"no se pudo verificar (runner sin resultado)\"`, distinto de Pass; el exceso real sigue en Warn (no se vuelve bloqueante). PRUEBA NEGATIVA real: runner temporalmente roto (emite texto no-JSON + exit 1) con el gate staged, `git commit` => [25/26] BLOCKING, Gate 27/28, BLOCKED, COMMIT_EXIT=1, HEAD sin cambiar. PRUEBA POSITIVA: runner restaurado (hash 831084B5...), gate real => [25/26] OK, [20/26] OK, ALL CLEAR. Sin --no-verify ni FORCE_SHIP.",
+  "review": {
+    "status": "PASS",
+    "method": "Prueba de gate real con git commit (rojo bloquea / verde pasa) + barrido del antipatron en .githooks/pre-commit-gate.ps1 + Invoke-Pester tests/contract-permission.Tests.ps1 + validacion de receipt contra contracts/rdd-receipt.schema.json con Test-Json",
+    "gaps": [
+      "BARRIDO (mismos patrones 'runner no corre => verde' fuera de scope, NO corregidos; slice aparte): [3/26] L78-79 cross-ref (BLOQUEANTE, MEDIUM: `-ErrorAction SilentlyContinue` + solo `$LASTEXITCODE -eq 0`; un runner que falla sin setear exit code puede dejar un $LASTEXITCODE stale en 0); [15/26] L314-315 regenerate-opencode (BLOQUEANTE, MEDIUM, mismo patron); [16/26] L329-330 validate-write-scope (BLOQUEANTE, MEDIUM, mismo patron); [19/26] L365-366 backlog-integrity (BLOQUEANTE, LOW-MEDIUM: `*> $null` traga todo, depende de $LASTEXITCODE); [23/26] L451-452 adversarial (BLOQUEANTE, MEDIUM: `-ErrorAction SilentlyContinue` + $LASTEXITCODE). No son el antipatron exacto `catch { $null } + else Pass/Warn`, pero comparten la clase 'no pudo verificar != verde'.",
+      "INFO/por diseno (no defecto): [8/26] L135-137 benchmark y [4/26] L86-87 skill-drift, [17/26] L343-344 config-drift usan Warn/no-bloqueante; [35-43] fast-gate SI cae a `$null` pero luego corre el slow path real (fallback, no falso verde).",
+      "[20/26] en esta maquina tomo el fast path de bin/fast.exe (tokenBudget.passed=true) y mostro OK; la rama fallback corregida (L390-408) solo se ejercita si fast.exe falta o no emite tokenBudget, por lo que la prueba positiva no la ejecuto in-vivo (si se ejercito en la clase de fix, no observada)."
+    ]
+  },
+  "fixes_applied": 2,
+  "blockers": [],
+  "next": [
+    "Considerar un slice aparte que unifique los checks bloqueantes bajo un helper 'Run-ExternalCheck' que distinga exit-code ausente/error de un fallo real.",
+    "tests/scripts/generate-config.Tests.ps1 sigue con 5 fails pre-existentes (receipt 022), ajenos a este fix."
+  ],
+  "auto_fix": false,
+  "timestamp": "2026-09-25T11:30:00-06:00"
+}

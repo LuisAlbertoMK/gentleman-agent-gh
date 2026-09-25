@@ -392,7 +392,9 @@ if ($null -ne $script:fastGate -and $null -ne $script:fastGate.tokenBudget) {
     if (Test-Path -LiteralPath $budgetScript) {
         $budgetOut = & "$RepoRoot/scripts/check-token-budget.ps1" -Json 2>&1 | Out-String
         $budgetResult = try { $budgetOut | ConvertFrom-Json -ErrorAction Stop } catch { $null }
-        if ($budgetResult -and -not $budgetResult.passed) {
+        if ($null -eq $budgetResult) {
+            Warn "token budget check: no se pudo verificar (runner sin resultado)"
+        } elseif (-not $budgetResult.passed) {
             $skillAvg = if ($budgetResult.stats.skills) { $budgetResult.stats.skills.average } else { 'N/A' }
             $promptAvg = if ($budgetResult.stats.prompts) { $budgetResult.stats.prompts.average } else { 'N/A' }
             $overFiles = 0
@@ -497,10 +499,10 @@ if ($staleResults) {
 Write-Host "[25/26] Token budget regression..."
 $tbrScript = Join-Path $RepoRoot 'scripts\test-token-budget-regression.ps1'
 if (Test-Path -LiteralPath $tbrScript) {
-    $tbrOut = & $tbrScript -SkillsPath (Join-Path $RepoRoot '.agents\skills') -Json -ErrorAction SilentlyContinue 2>&1 | Out-String
+    $tbrOut = & $tbrScript -SkillsPath (Join-Path $RepoRoot '.agents\skills') -Json 2>&1 | Out-String
     $tbrResult = try { $tbrOut | ConvertFrom-Json -ErrorAction Stop } catch { $null }
     if ($null -eq $tbrResult) {
-        Warn "token budget runner unavailable"
+        Fail "token budget regression: runner no produjo resultado (crash o salida no-JSON) — no se pudo verificar"
     } elseif (-not $tbrResult.passed) {
         $tbrResult.violations | ForEach-Object { Write-Host "    $($_.Skill): $($_.Current)B > $($_.Limit)B (budget $($_.Budget)B)" }
         Fail "token budget regression violations"
