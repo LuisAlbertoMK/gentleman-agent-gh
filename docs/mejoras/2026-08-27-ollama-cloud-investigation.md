@@ -83,7 +83,7 @@ model = "moondream:latest"  # or llava:7b
 ```powershell
 param(
     [string]$OllamaBaseUrl = "http://127.0.0.1:11434",  # ← default local
-    [string]$OllamaApiKey                             # ← opcional para cloud, cadena vacía por defecto
+    [string]$OllamaApiKey  # ← opcional para cloud; sin default (un [string] no bindeado vale '' — ver scripts/ui-specialist-pairing.ps1:64)
 )
 
 # Línea 182:

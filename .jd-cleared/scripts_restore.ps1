@@ -1,2 +1,2 @@
-implementer 2026-09-25 one-line syntactic fix (Set-StrictMode moved after param block, params byte-identical; parser 0 errors, restore.Tests.ps1 7/7 green) fileHash:7ae08e6f
-JD dual review cleared: scripts/restore.ps1 (fix/tests-job-pre-existing; no behavior change)
+implementer 2026-09-25 one-line syntactic fix (Set-StrictMode moved after param block, params byte-identical; parser 0 errors, restore.Tests.ps1 7/7 green; fix commit faf6c58d dated 2026-09-24 local/-0600 = 2026-09-25 UTC) fileHash:7ae08e6f
+adversarial single review (session ses_293c2ed5ffez1z5a5Rz8mOmim) verdict CHANGES REQUIRED on scripts/restore.ps1; follow-up dual review (reliability FIX, security BLOCKER on verify.ps1 secrets allowlist) verdict ESCALATED; all findings remediated in the same commit staging this marker (fix/tests-job-pre-existing) — reviewed with findings remediated, never cleared nor approved

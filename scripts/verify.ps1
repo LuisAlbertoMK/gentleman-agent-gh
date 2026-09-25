@@ -70,7 +70,6 @@ function Invoke-E2Check{
     $sSkip=@('scripts\verify.ps1','scripts\check-mcp-security.ps1','scripts\tests\check-mcp-security.Tests.ps1','scripts\tests\verify.Tests.ps1',
              'scripts\tests\git-history-audit.Tests.ps1', # defines the 13 credential regexes itself (self-referential scanner, CI tests #107931965490)
              'scripts\security-audit-mcp.ps1', # defines $secretRx detection regex (self-referential scanner, no literal)
-             'scripts\ui-specialist-pairing.ps1', # declares the OllamaApiKey string param with empty default (name-only match, no secret)
              'docs\mejoras\2026-07-29-gentleman-agent-gh-global-analysis.md','docs\mejoras\2026-07-29-gentleman-agent-gh-cycle28-analysis.md',
              'docs\design\pattern-guard.md','docs\CHANGELOG.md',
              '.agents\skills\pdf-utils\SKILL.md','.agents\skills\security-scanner\references\patterns-guide.md')
