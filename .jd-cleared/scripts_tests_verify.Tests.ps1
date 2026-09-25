@@ -1,0 +1,1 @@
+implementer 2026-09-25 rewrote credential-guard net with honest scope comment (OllamaApiKey default-less assertion + no hardcoded literals; does not replace E2); dual-review reliability+security findings remediated in the same commit staging this marker (fix/tests-job-pre-existing) — reviewed with findings remediated, never cleared nor approved fileHash:0414d3f7
