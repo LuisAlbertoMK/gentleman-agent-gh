@@ -155,4 +155,20 @@ Describe "Permission Rules Consistency" {
             }
         }
     }
+
+    Context "R11-S1 gate parity ftp/scp/rsync/clone (gate=runtime)" {
+        It "Gate denies ftp/scp/rsync (parity with opencode-base.json runtime)" {
+            # R11-S1: el runtime SSoT (opencode-base.json) ya trae ftp/scp/rsync=deny desde R10-S4;
+            # el gate SSoT (shared-deny-rules.json) los incorpora para paridad gate-vs-runtime.
+            $denyRules = Get-Content $denyRulesPath -Raw | ConvertFrom-Json
+            $denyRules.'ftp *' | Should -Be 'deny'
+            $denyRules.'scp *' | Should -Be 'deny'
+            $denyRules.'rsync *' | Should -Be 'deny'
+        }
+
+        It "Gate asks git clone (parity with runtime ask, not deny)" {
+            $denyRules = Get-Content $denyRulesPath -Raw | ConvertFrom-Json
+            $denyRules.'git clone *' | Should -Be 'ask'
+        }
+    }
 }

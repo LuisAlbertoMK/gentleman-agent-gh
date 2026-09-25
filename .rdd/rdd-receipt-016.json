@@ -1,0 +1,16 @@
+{
+  "id": "rdd-receipt-016",
+  "freeze": "HEAD-7297bcc-91414fc3",
+  "freeze_note": "Slice R11-S1 fix(security): paridad gate ftp/scp/rsync/clone en rama experimento/mejora-ronda11-deuda (base 7297bccbbc57773135b2ced8a2e216a0f06b7774 = tip R10). diff8=91414fc3 = working tree con gate json +4 y test +2 Its al verificar (el plan odd/tasks/ronda11-deuda.md untracked de Fase 1 se trackea en este mismo commit). lines_changed=~35 solo scope (gate json +4, test +20, plan tracked + review log 1).",
+  "tier": 1,
+  "tier_justification": "RDD Risk Tiers: Tier 1 autonomo = SSoT del gate (no runtime; opencode.json/prompts/base.json intactos), riesgo ~0, scopes plan R11-S1 §3.",
+  "files": ["scripts/opencode-config/shared-deny-rules.json", "tests/permission-rules-consistency.Tests.ps1", "odd/tasks/ronda11-deuda.md"],
+  "lines_changed": 35,
+  "lines_deleted": 0,
+  "verdict": "PASS",
+  "verdict_note": "APLICADO: gate 83->87 reglas (ftp */scp */rsync *=deny, git clone *=ask) = runtime R10-S4 (deny/deny/deny/ask); Pester permission-rules-consistency 19/19 PASS (17 previas intactas incl. :40-46 curl/wget/ssh + 2 nuevas R11-S1 paridad); Test-Json gate True; runtime opencode.json/base.json NO tocados.",
+  "review": {"status": "PASS", "method": "code-review-agent 4R simple (Tier 1) + Invoke-Pester + Test-Json", "gaps": []},
+  "next": ["R11-S2"],
+  "auto_fix": false,
+  "timestamp": "2026-09-24T17:00:00-06:00"
+}

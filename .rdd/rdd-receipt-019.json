@@ -1,0 +1,16 @@
+{
+  "id": "rdd-receipt-019",
+  "freeze": "HEAD-d671dd2-10494e04",
+  "freeze_note": "Slice R11-S4 RE-SCOPEADO docs(cost): analisis coste corregido + guia variante en rama experimento/mejora-ronda11-deuda (base d671dd25 = tip R11-S3). diff8=10494e04 = git diff tracked (plan) al verificar; doc nuevo untracked docs/mejoras/2026-09-24-cost-analysis.md incluido en el commit. Premisa original cap/routeo laguna-high MOOT: laguna-s-2.1-free/high termino 2026-08-27. scripts/lib/opencode-base.json y opencode.json NO tocados.",
+  "tier": 2,
+  "tier_justification": "RDD Risk Tiers: Tier 2 docs-only = doc nuevo + nota plan + receipt, cero cambio runtime/config, sin enforcement (scope re-scopeado R11-S4).",
+  "files": ["docs/mejoras/2026-09-24-cost-analysis.md", "odd/tasks/ronda11-deuda.md", ".rdd/rdd-receipt-019.json"],
+  "lines_changed": 75,
+  "lines_deleted": 6,
+  "verdict": "PASS",
+  "verdict_note": "RE-SCOPEADO por evidencia (opencode.db read-only del orquestador, sin re-medir): tabla coste por modelo/variante + hallazgo (variantes high/xhigh/max dominan; free base=$0) + correccion stale laguna-high + guia default/small_model (SSoT base.json:3, solo lectura) + por que NO cap duro ($0.794/14d, sesiones largas legitimas). Review Log S4 rellenado; R11§9.1 corregido. 0 enforcement, 0 cambio config.",
+  "review": {"status": "PASS", "method": "code-review-agent 4R BLOCKER-capable (Tier 2) + Test-Json schema + Select-String small_model (solo lectura)", "gaps": []},
+  "next": ["R11-S5 (OWNER)"],
+  "auto_fix": false,
+  "timestamp": "2026-09-25T00:00:00-06:00"
+}

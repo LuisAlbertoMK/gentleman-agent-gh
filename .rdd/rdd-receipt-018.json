@@ -1,0 +1,16 @@
+{
+  "id": "rdd-receipt-018",
+  "freeze": "HEAD-1c0061e-0760b04e",
+  "freeze_note": "Slice R11-S3 docs(config): compaction/snapshot NO-OP + invariante en rama experimento/mejora-ronda11-deuda (base 1c0061eb = tip R11-S2). diff8=0760b04e = working tree con test invariante + nota RUNBOOK al verificar. lines_changed=~45 solo scope (test nuevo ~37, RUNBOOK +4, plan review log 1). scripts/lib/opencode-base.json NO tocado.",
+  "tier": 1,
+  "tier_justification": "RDD Risk Tiers: Tier 1 autonomo = test invariante solo-lectura + nota docs (cero cambio runtime), scopes plan R11-S3 §3.",
+  "files": ["tests/contract-compaction.Tests.ps1", "docs/operations/RUNBOOK.md", "odd/tasks/ronda11-deuda.md"],
+  "lines_changed": 45,
+  "lines_deleted": 0,
+  "verdict": "PASS",
+  "verdict_note": "APLICADO: tests/contract-compaction.Tests.ps1 (convencion tests/contract-* para contratos) fija compaction cerrado auto/prune/reserved:4000/keep:8000 + snapshot ausente + buffer ausente — 3/3 PASS, falla a proposito ante cambio futuro; Select-String confirma compaction solo en base.json:207 sin snapshot/buffer; base.json y opencode.json intactos; nota invariante en RUNBOOK (por que: determinismo/receipts).",
+  "review": {"status": "PASS", "method": "code-review-agent 4R simple (Tier 1) + Invoke-Pester + Select-String", "gaps": []},
+  "next": ["R11-S4 (OWNER)", "R11-S5 (OWNER)"],
+  "auto_fix": false,
+  "timestamp": "2026-09-24T17:20:00-06:00"
+}
