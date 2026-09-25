@@ -14,7 +14,8 @@
     - -Yes: writes opencode.json, then runs structural verification:
       1. The 4 subagent twins exist (mode: subagent, hidden: true)
       2. Orchestrator task whitelist is fail-closed ("*": "deny") and allows the 4 twins
-      3. Read-only agents (incl. gentleman-security-sub) deny bash.*
+      3. Strict permission parity with gentle-ai: no agent carries a
+         bash/read/write/edit delta — every agent inherits the global overlay
       4. JSON is parseable and opencode.json is valid against the node generator --validate
   SAFE BY DEFAULT: without -Yes this script never writes anything.
 
@@ -240,10 +241,27 @@ $staleOrchAuto = @($agentNames | Where-Object { $_ -eq 'gentle-MK-auto' -or $_ -
 if ($staleOrchAuto.Count -gt 0) { Add-Check 'no-orch-auto-agent' $false "retired auto orchestrator present: $($staleOrchAuto -join ', ')" }
 else { Add-Check 'no-orch-auto-agent' $true 'no gentle-MK-auto / gentleman-vMK-auto (single-mode)' }
 
-$readOnly = @('gentleman-security', 'gentleman-seo', 'gentleman-infra', 'gentleman-frontend', 'gentleman-performance', 'gentleman-datascience', 'gentleman-docs', 'gentleman-security-sub', 'gentleman-seo-sub', 'gentleman-infra-sub', 'gentleman-frontend-sub', 'gentleman-performance-sub', 'gentleman-datascience-sub', 'gentleman-docs-sub')
-$roFail = @($readOnly | Where-Object { (Get-EffectiveBashStar (Get-Prop $agentTable $_) $cfg) -ne 'deny' })
-if ($roFail) { Add-Check 'readonly-bash-deny' $false "not deny: $($roFail -join ', ')" }
-else { Add-Check 'readonly-bash-deny' $true "$($readOnly.Count) read-only agents deny bash.*" }
+# R11 STRICT PARITY with gentle-ai (docs/mejoras/2026-09-25-permission-parity-gentle-ai.md):
+# the global overlay owns bash+read only (no write/edit; gentle-ai has no
+# read-only agents). The former 'readonly-bash-deny' assertion is RETIRED —
+# read-only specialization now lives in each agent's prompt, not the permission
+# gate. Replacement: assert STRICT parity — every agent resolves its effective
+# bash.* to the global default AND carries no per-agent bash/read/write/edit
+# delta (catches a re-introduced write/edit or read override inexactly matching
+# the global root).
+$rootBashStar = (Get-Prop (Get-Prop (Get-Prop $cfg 'permission') 'bash') '*')
+$parityFail = @()
+foreach ($n in $agentNames) {
+  $ap = Get-Prop (Get-Prop $agentTable $n) 'permission'
+  if ($null -eq $ap) { continue }
+  foreach ($k in @('bash', 'read', 'write', 'edit')) {
+    if ($null -ne (Get-Prop $ap $k)) { $parityFail += "$n.$k" }
+  }
+  $eff = Get-EffectiveBashStar (Get-Prop $agentTable $n) $cfg
+  if ($eff -ne $rootBashStar) { $parityFail += "$n.bash.*=$eff" }
+}
+if ($parityFail) { Add-Check 'permission-parity-global' $false "per-agent permission deltas present (strict parity broken): $($parityFail -join ', ')" }
+else { Add-Check 'permission-parity-global' $true "$($agentNames.Count) agents inherit the global overlay (no bash/read/write/edit deltas)" }
 
 # --- Final: re-validate (the written file MUST satisfy --validate) ---
 & $node $generator --validate 2>&1 | ForEach-Object { $_ }

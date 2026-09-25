@@ -78,28 +78,30 @@ Describe "Permission Rules Consistency" {
             $config.permission.bash.'*' | Should -Be 'allow'
         }
 
-        It "Git push rules follow agreed contract (deny, force denied)" {
-            $config.permission.bash.'git push' | Should -Be 'deny'
-            $config.permission.bash.'git push *' | Should -Be 'deny'
+        It "Git push rules follow the gentle-ai overlay (ask, force ask)" {
+            # R11 strict parity: the overlay sets git push / git push * to ask (not deny)
+            $config.permission.bash.'git push' | Should -Be 'ask'
+            $config.permission.bash.'git push *' | Should -Be 'ask'
         }
 
-        It "Git push --force is denied" {
-            $config.permission.bash.'git push --force *' | Should -Be 'deny'
+        It "Git push --force is ask (overlay parity, not deny)" {
+            $config.permission.bash.'git push --force *' | Should -Be 'ask'
         }
     }
 
     Context "Cross-Reference Consistency" {
-        It "Deny rules in JSON are referenced in opencode.json" {
+        It "Shared gate deny-rules are intentionally not mirrored 1:1 by the R11 runtime overlay" {
+            # R11 strict parity supersedes the old 1:1 cross-reference: the runtime
+            # overlay (opencode-base.json) carries allow/ask only, while the commit
+            # gate keeps its deny list in shared-deny-rules.json. Overlap shrinks to
+            # the shared transfer commands (ssh/scp/rsync present but verdict=ask)
+            # and the runtime bash carries no 'deny' verdict at all.
             $denyRules = Get-Content $denyRulesPath -Raw | ConvertFrom-Json
             $jsonRuleNames = $denyRules | Get-Member -MemberType NoteProperty | ForEach-Object { $_.Name }
-
-            # Verify at least some rules are present in opencode.json permissions
-            $opencodePerms = $config.permission.bash
-            $opencodePermNames = $opencodePerms | Get-Member -MemberType NoteProperty | ForEach-Object { $_.Name }
-
-            # At least 10 rules should be present (both use shared-deny-rules.json as SSoT)
+            $opencodePermNames = $config.permission.bash.PSObject.Properties.Name
             $matchedRules = $jsonRuleNames | Where-Object { $opencodePermNames -contains $_ }
-            @($matchedRules).Count | Should -BeGreaterOrEqual 10
+            @($matchedRules).Count | Should -BeLessOrEqual 5
+            $config.permission.bash.PSObject.Properties.Value | Should -Not -Contain 'deny'
         }
 
         It "No conflicting rules (same command, different verdicts)" {
@@ -118,9 +120,11 @@ Describe "Permission Rules Consistency" {
     }
 
     Context "Destructive Patterns" {
-        It "Destructive git commands are defined in opencode.json" {
-            # git push --force should be denied
-            $config.permission.bash.'git push --force *' | Should -Be 'deny'
+        It "Destructive git commands are gated as ask in opencode.json" {
+            # R11 strict parity: overlay asks for push --force / rebase / reset --hard
+            $config.permission.bash.'git push --force *' | Should -Be 'ask'
+            $config.permission.bash.'git rebase *' | Should -Be 'ask'
+            $config.permission.bash.'git reset --hard *' | Should -Be 'ask'
         }
 
         It "Filesystem operations are controlled via separate mechanisms" {
@@ -131,18 +135,23 @@ Describe "Permission Rules Consistency" {
         }
     }
 
-    Context "R10-S4 network-fetch contract (red=deny, toolchain=allow)" {
-        It "Network-fetch commands are denied in opencode.json runtime" {
-            # R10-S4: cerrar vectores de RED (owner #693: toolchain queda libre)
-            $config.permission.bash.'curl *' | Should -Be 'deny'
-            $config.permission.bash.'wget *' | Should -Be 'deny'
-            $config.permission.bash.'ftp *' | Should -Be 'deny'
-            $config.permission.bash.'scp *' | Should -Be 'deny'
-            $config.permission.bash.'rsync *' | Should -Be 'deny'
+    Context "R10-S4 network vectors - R11 strict parity overlay (ask, not deny)" {
+        It "Network file-transfer commands are ask in the runtime overlay" {
+            # R11 strict parity (docs/mejoras/2026-09-25-permission-parity-gentle-ai.md):
+            # the gentle-ai overlay drops the R10-S4 denies; ssh/scp/sftp/rsync are ask.
+            $config.permission.bash.'ssh *' | Should -Be 'ask'
+            $config.permission.bash.'scp *' | Should -Be 'ask'
+            $config.permission.bash.'sftp *' | Should -Be 'ask'
+            $config.permission.bash.'rsync *' | Should -Be 'ask'
         }
 
-        It "git clone stays ask (legitimate dep flow, not deny)" {
-            $config.permission.bash.'git clone *' | Should -Be 'ask'
+        It "curl/wget/ftp/git clone are absent (inherit global *:allow)" {
+            # The overlay carries no curl/wget/ftp/git-clone rule -> they inherit bash.*=allow
+            $bashNames = $config.permission.bash.PSObject.Properties.Name
+            foreach ($cmd in @('curl *', 'wget *', 'ftp *', 'git clone *')) {
+                $bashNames | Should -Not -Contain $cmd
+            }
+            $config.permission.bash.'*' | Should -Be 'allow'
         }
 
         It "Toolchain stays frictionless (node/npm/npx/python NOT denied)" {
@@ -156,17 +165,19 @@ Describe "Permission Rules Consistency" {
         }
     }
 
-    Context "R11-S1 gate parity ftp/scp/rsync/clone (gate=runtime)" {
-        It "Gate denies ftp/scp/rsync (parity with opencode-base.json runtime)" {
-            # R11-S1: el runtime SSoT (opencode-base.json) ya trae ftp/scp/rsync=deny desde R10-S4;
-            # el gate SSoT (shared-deny-rules.json) los incorpora para paridad gate-vs-runtime.
+    Context "R11-S1 gate SSoT (shared-deny-rules.json) - runtime parity superseded by R11 strict parity" {
+        It "Gate SSoT still denies ftp/scp/rsync (shared-deny-rules.json unchanged)" {
+            # NOTE: R11 strict permission parity changed the RUNTIME (opencode-base.json
+            # overlay: ssh/scp/sftp/rsync=ask; curl/wget/ftp/git clone inherit *:allow).
+            # This gate SSoT is intentionally left as-is in this slice (out of write scope);
+            # the gate-vs-runtime divergence is tracked in the parity spec.
             $denyRules = Get-Content $denyRulesPath -Raw | ConvertFrom-Json
             $denyRules.'ftp *' | Should -Be 'deny'
             $denyRules.'scp *' | Should -Be 'deny'
             $denyRules.'rsync *' | Should -Be 'deny'
         }
 
-        It "Gate asks git clone (parity with runtime ask, not deny)" {
+        It "Gate SSoT still asks git clone (runtime now inherits allow)" {
             $denyRules = Get-Content $denyRulesPath -Raw | ConvertFrom-Json
             $denyRules.'git clone *' | Should -Be 'ask'
         }

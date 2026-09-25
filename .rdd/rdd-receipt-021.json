@@ -1,0 +1,45 @@
+{
+  "id": "rdd-receipt-021",
+  "freeze": "HEAD-b700098b-e85eaf9f",
+  "freeze_note": "Slice perm-parity en rama experimento/mejora-permisos-gentle-ai (base b700098b = tip experimento/mejora-ronda11-deuda, stacked). diff8=e85eaf9f = git diff tracked al congelar (5 archivos); doc + receipt nuevos incluidos en el commit. Fuente Alan: Gentleman-Programming/gentle-ai internal/components/permissions/inject.go:63-101 var openCodeOverlayJSON.",
+  "tier": 2,
+  "tier_justification": "RDD Risk Tiers: Tier 2 = cambio de politica de permisos (bash/read/write/edit) con impacto de seguridad amplio pero reversible y config-only (regenerable). NO toca codigo de ejecucion ni datos. Paridad ESTRICTA pedida por owner.",
+  "files": [
+    "scripts/lib/opencode-base.json",
+    "scripts/lib/permission-templates.json",
+    "opencode.json",
+    "scripts/regenerate-opencode.ps1",
+    "tests/permission-rules-consistency.Tests.ps1",
+    "docs/mejoras/2026-09-25-permission-parity-gentle-ai.md",
+    ".rdd/rdd-receipt-021.json"
+  ],
+  "file_statuses": {
+    "modified": [
+      "scripts/lib/opencode-base.json",
+      "scripts/lib/permission-templates.json",
+      "opencode.json",
+      "scripts/regenerate-opencode.ps1",
+      "tests/permission-rules-consistency.Tests.ps1"
+    ]
+  },
+  "lines_changed": 292,
+  "lines_deleted": 208,
+  "verdict": "PASS",
+  "verdict_note": "PASS HONESTO: paridad ESTRICTA verificada (root = bash+read; 0 agentes con delta bash/read/write/edit; 44 agentes). --validate VALID, Test-Json True, regenerate-opencode.ps1 -Yes OK 20/20 (nuevo check permission-parity-global), Pester permission-rules-consistency 19/19. IMPACTO declarado: -54 denies bash, sub-agentes read-only dejan de serlo, se pierden write/edit. Variante segura documentada NO aplicada. Deuda residual declarada: contract-permission.Tests.ps1 (3) y opencode-json-validation.Tests.ps1 (1) siguen asumiendo los denies viejos (fuera del write-scope de este slice).",
+  "review": {
+    "status": "PASS",
+    "method": "code-review-agent 4R (Tier 2) sobre diff congelado + evidencia mecanica: generate --validate, Test-Json, regenerate-opencode -Yes, Pester 19/19",
+    "gaps": [
+      "No se ejecuto dual-review !judgment-day formal; el slice se apoya en receipt RDD Tier 2 + spec + verificacion mecanica.",
+      "shared-deny-rules.json (gate) NO se toca: queda divergente del runtime (ftp/scp/rsync deny en gate vs ask/allow en runtime).",
+      "Otros Tests.ps1 (contract-permission, opencode-json-validation) aun codifican los denies viejos y fallaran si se corren fuera del gate staged."
+    ]
+  },
+  "escalation": "judgment-day",
+  "next": [
+    "Actualizar tests/contract-permission.Tests.ps1 y tests/opencode-json-validation.Tests.ps1 a la paridad (o revertir con la variante segura).",
+    "Decidir si alinear shared-deny-rules.json (gate) con el runtime o mantener la divergencia documentada."
+  ],
+  "auto_fix": false,
+  "timestamp": "2026-09-25T00:00:00-06:00"
+}
