@@ -1,10 +1,10 @@
 {
   "expansion": {
-    "orchestrator": { "allow": 23, "ask": 1, "deny": 1, "total": 25 },
-    "readonly": { "allow": 0, "ask": 0, "deny": 4, "total": 4 },
-    "readwrite": { "allow": 0, "ask": 1, "deny": 0, "total": 1 },
-    "reviewer": { "allow": 0, "ask": 1, "deny": 2, "total": 3 },
-    "sddorchestrator": { "allow": 3, "ask": 1, "deny": 0, "total": 4 }
+    "orchestrator": { "allow": 23, "ask": 0, "deny": 1, "total": 24 },
+    "readonly": { "allow": 0, "ask": 0, "deny": 1, "total": 1 },
+    "readwrite": { "allow": 0, "ask": 0, "deny": 0, "total": 0 },
+    "reviewer": { "allow": 0, "ask": 0, "deny": 0, "total": 0 },
+    "sddorchestrator": { "allow": 0, "ask": 0, "deny": 0, "total": 0 }
   },
   "generator": "leaf-scan allow/deny/ask per template over scripts/lib/permission-templates.json (sorted templates)",
   "source": "scripts/lib/permission-templates.json",
