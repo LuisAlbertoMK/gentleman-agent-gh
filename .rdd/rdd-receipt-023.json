@@ -1,0 +1,36 @@
+{
+  "id": "rdd-receipt-023",
+  "freeze": "HEAD-b700098b-084ced59",
+  "freeze_note": "Rama fix/hook-pester-silent-skip creada desde experimento/mejora-ronda11-deuda (b700098b). diff8=084ced59 = hash de `git diff HEAD -- .githooks/pre-commit-gate.ps1` (git hash-object --stdin) antes de agregar esta receipt, para evitar circularidad. Base = b700098b (padre directo). Receipt incluida en el commit final.",
+  "tier": 2,
+  "tier_justification": "Tier 2 = modifica el gate de pre-commit compartido (.githooks/pre-commit-gate.ps1). No toca codigo de produccion ni configuracion de runtime, pero cambia semantica de bloqueo de un control de calidad que corre en cada commit: un error antes silenciado ahora bloquea. Requiere evidencia de gate real (rojo y verde).",
+  "files": [
+    ".githooks/pre-commit-gate.ps1",
+    ".rdd/rdd-receipt-023.json"
+  ],
+  "file_statuses": {
+    "modified": [
+      ".githooks/pre-commit-gate.ps1"
+    ]
+  },
+  "lines_changed": 45,
+  "lines_deleted": 31,
+  "verdict": "PASS",
+  "verdict_note": "Prueba negativa real (git commit, 2 tests staged: 1 rojo + 1 verde): el hook EJECUTA Pester (Tests Passed: 1, Failed: 1) y BLOQUEA con 'BLOCKING: Pester: 1 test(s) failed' -> Gate 27/28, BLOCKED, commit abortado (HEAD sin cambiar). Prueba positiva real (2 tests verdes): descubre y corre ambos archivos (Tests Passed: 2, Failed: 0), paso [13/26] OK, Gate 28/28 ALL CLEAR. ANTES (hook original ejecutado con los mismos staged): [13/26] emitia 'Warn Pester not available: No se encuentra la propiedad Parallel...' y el gate terminaba 28/28 ALL CLEAR sin correr un solo test. Fix: (1) asignacion de Run.Parallel guardada por existencia de propiedad (Pester 5.x no expone esa propiedad); (2) Import-Module falla -> Warn no bloqueante, pero cualquier fallo de configuracion/Invoke-Pester -> Fail bloqueante. Sin --no-verify ni FORCE_SHIP.",
+  "review": {
+    "status": "PASS",
+    "method": "Prueba de gate real con git commit (rojo bloquea / verde pasa) + diff vs hook original + validacion de receipt contra contracts/rdd-receipt.schema.json con Test-Json",
+    "gaps": [
+      "Otros pasos con patron 'catch que traga' NO se corrigieron (fuera de scope): [20/26] en su rama fallback convierte un JSON no parseable en Pass silencioso via `try/catch { $null }`; [25/26] convierte un runner no parseable en Warn 'unavailable'.",
+      "tests/scripts/generate-config.Tests.ps1 sigue con 5 fails pre-existentes (reportado en receipt 022), ajenos a este fix."
+    ]
+  },
+  "fixes_applied": 1,
+  "blockers": [],
+  "next": [
+    "Correr tests/contract-receipt.Tests.ps1 para confirmar discovery dinamico de esta receipt.",
+    "Evaluar en un slice aparte si [20/26] y [25/26] deben endurecerse igual (error real != skip silencioso)."
+  ],
+  "auto_fix": false,
+  "timestamp": "2026-09-25T01:45:45-06:00"
+}
