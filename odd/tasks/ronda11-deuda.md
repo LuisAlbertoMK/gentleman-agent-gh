@@ -74,9 +74,9 @@
 - **R11-S3 - `docs(config): compaction/snapshot NO-OP + invariante`** (Tier 1, AUTÓNOMO) - TERCERO (requiere S2)
   Scope: test que fija invariante (compaction cerrado `prune:true,reserved:4000,keep:8000`, `snapshot` ausente, sin `buffer`) + nota en docs. NO tocar `base.json`. Est. ~20-40L, 1 commit. `confidence: medium-high`.
   Outcome: cambio futuro de compaction exige romper el test a propósito (determinismo protegido).
-- **R11-S4 - `policy(cost): cap/routeo laguna-high sin enforcement`** (Tier 2, OWNER facturación) - CUARTO (requiere S3)
-  Scope: política (umbral alerta/sesión + guía routeo a `small_model` ya definido en `base.json:3`) + doc de por qué NO hay cap duro (TOP5 legítimo, D1c `low`). Si el owner aprueba routeo → vía SSoT + regenerate. Est. ~60-120L, 1 commit. `confidence: medium`.
-  Outcome: visibilidad del outlier sin romper sesiones largas; enforcement diferido con diseño.
+- **R11-S4 - `docs(cost): análisis coste corregido + guía variante`** (Tier 2, docs-only) - CUARTO (requiere S3) — **RE-SCOPEADO 2026-09-24 por evidencia del orquestador (opencode.db read-only): la premisa original "cap/routeo laguna-high" quedó MOOT — `laguna-s-2.1-free/high` ($1.155, 75 sess) terminó 2026-08-27 (~4 sem muerto), NO es leak activo. Hallazgo: las VARIANTES high/xhigh/max dominan el gasto, no los modelos base. Gasto activo bajo ($0.794/14d) → NO hay cap que aplicar.**
+  Scope: doc `docs/mejoras/2026-09-24-cost-analysis.md` (tabla coste por modelo/variante + hallazgo variantes + corrección stale explícita + guía `default`/small_model sin enforcement + por qué NO cap duro). NO tocar `scripts/lib/opencode-base.json`, NO tocar `opencode.json`, NO tocar prompts, NO cambiar modelos ni variantes. Est. ~60-90L, 1 commit. `confidence: high` (datos medidos provistos, sin re-medición).
+  Outcome: premisa stale documentada para que futuras rondas no la re-descubran; 0 enforcement, 0 cambio runtime.
 - **R11-S5 - `feat(db): script higiene opencode.db SIN ejecutar`** (Tier 3, OWNER destructivo) - QUINTO (requiere S4)
   Scope: script backup+`VACUUM`/retención por edad + runbook + test en DB copia (nunca el original). La EJECUCIÓN queda fuera del slice (ventana owner). Est. ~40-90L, 1 commit. `confidence: medium`.
   Outcome: script mergeado y testeado en copia; `freelist=0` documenta que hoy no hay ganancia gratis.
@@ -94,7 +94,7 @@
 - **S1:** `Invoke-Pester tests/permission-rules-consistency.Tests.ps1` (PASS, incluye Its nuevas ftp/scp/rsync/clone) + `Test-Json` del gate json. Esperado: 0 drift gate-vs-runtime en esos 4.
 - **S2:** `npm ci --dry-run` o `npm ls` sin deriva + `npm audit --audit-level=high` (reporte, advisory) + `Test-Json package.json`. Esperado: pin exacto, lockfile en sync.
 - **S3:** Pester invariante PASS + `Select-String 'compaction|snapshot' scripts/lib/opencode-base.json` (=207-214, sin buffer/snapshot). Esperado: invariante verde, runtime intacto.
-- **S4:** doc política presente + `Select-String 'small_model' scripts/lib/opencode-base.json` (=`base.json:3`) + score seguridad ≥10.0. Esperado: alerta definida, 0 enforcement.
+- **S4 (RE-SCOPEADO docs-only):** doc `docs/mejoras/2026-09-24-cost-analysis.md` presente + `Test-Json .rdd/rdd-receipt-019.json -SchemaFile contracts/rdd-receipt.schema.json` (True) + `Select-String 'small_model' scripts/lib/opencode-base.json` (=`base.json:3`, solo lectura, sin modificar). Esperado: corrección stale + guía variante, 0 enforcement, 0 cambio config.
 - **S5:** script `-WhatIf`/dry-run en COPIA + Pester del script PASS + `Test-Path` backup. Esperado: 0 toques a `opencode.db` real (timestamp intacto).
 
 ## 6. Receipt templates (se rellenan al ejecutar; numeración 016+)
@@ -131,7 +131,7 @@
 | R11-S1 | code-review-agent 4R simple (Tier 1) | PASS | 2026-09-24 | Pester 19/19 (17 previas intactas + 2 nuevas paridad); gate 83→87 reglas; Test-Json True |
 | R11-S2 | code-review-agent 4R simple (Tier 1) | PASS | 2026-09-24 | Pin @playwright/test ^1.63.0→1.63.0 (=lockfile); npm ls sin deriva; audit advisory (fast-uri high transitivo, sin blocking); npm ci --dry-run up-to-date |
 | R11-S3 | code-review-agent 4R simple (Tier 1) | PASS | 2026-09-24 | Invariante 3/3 verde; base.json intacto (Select-String solo :207); nota en RUNBOOK |
-| R11-S4 | — | - | - | (OWNER facturación pendiente) |
+| R11-S4 | code-review-agent 4R BLOCKER-capable (Tier 2 docs-only) | PASS | 2026-09-24 | RE-SCOPEADO: premisa laguna-high MOOT (ventana terminó 2026-08-27); doc coste corregido + guía variante; receipt 019 validado contra schema; hook pre-commit PASS; base.json/opencode.json intactos |
 | R11-S5 | — | - | - | (OWNER destructivo pendiente; ejecución fuera) |
 
 ## 8. Rollback (por slice, orden inverso)
@@ -145,7 +145,7 @@
 
 ## 9. Resto a futuro / NO entra en R11 (explícito)
 
-1. **Atribución skill/ruta del outlier (D1c `low`):** requiere minar `message`/`part.data` (42K/182K filas) — diseño R12+, no R11.
+1. **Atribución skill/ruta del outlier (D1c `low`):** CORREGIDO 2026-09-24 (R11-S4 re-scopeado): el "outlier laguna-high" era STALE (terminó 2026-08-27) — ver `docs/mejoras/2026-09-24-cost-analysis.md` §3. Ya NO es prioritario; requiere minar `message`/`part.data` (42K/182K filas) solo si un futuro gasto ACTIVO lo justifica — diseño R12+, no R11.
 2. **Cap duro / enforcement:** descartado en R11 (TOP5 muestra sesiones legítimas de 8M; romper = peor que el gasto).
 3. **`npm audit` blocking en CI:** ADR futuro (el gate lo declara: `quality-gate.yml:43`); R11 solo pin + advisory.
 4. **`--no-verify` (21 checks):** política, no slice técnico; fuera.
