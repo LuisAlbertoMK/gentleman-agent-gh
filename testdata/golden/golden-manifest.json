@@ -1,0 +1,40 @@
+{
+  "goldens": [
+    {
+      "args": ".rdd/rdd-receipt-00*.json (sorted by name)",
+      "generator": "Get-Content -Raw | Test-Json -SchemaFile contracts/rdd-receipt.schema.json",
+      "name": "validate-rdd-receipts.golden.json",
+      "schema": "contracts/rdd-receipt.schema.json",
+      "sha256": "e7daaf5d33c0a03929f7156fc818abb65aaef13b0e4e5648dba793abeb218f41"
+    },
+    {
+      "args": "sorted templates",
+      "generator": "leaf-scan allow/deny/ask per template over scripts/lib/permission-templates.json (sorted templates)",
+      "name": "permission-matrix-expansion.golden.json",
+      "schema": "contracts/permission-templates.schema.json",
+      "sha256": "0d3e0bf7128a07961a2160b66bc8b5e1e60ae49da715d47d33dc9c78a718a40b"
+    },
+    {
+      "args": "odd, engram-protocol, ps-compat",
+      "generator": "Convert-SkillFrontmatterToJson (tests/contract-frontmatter.Tests.ps1 pattern: scalars, token_budget int, '- item' lists)",
+      "name": "skill-frontmatter-parse.golden.json",
+      "schema": "contracts/skill-frontmatter.schema.json",
+      "sha256": "8ef5c0f03a3cfcab79c9fa282340af768b7e417a38922a30d7e57240ad17b76b"
+    },
+    {
+      "args": "drop .generated, sort skill names",
+      "generator": "scripts/build-skill-registry.ps1 + normalization (drop .generated locale datetime, sort skill names)",
+      "name": "registry-build.golden.json",
+      "schema": "",
+      "sha256": "244cd219aa5dab428de6bfb1319d21a93347882b9407ae176876ecf385468e3b"
+    },
+    {
+      "args": "-SkillName odd -Json",
+      "generator": "scripts/skills-audit-check.ps1 -SkillName odd -Json",
+      "name": "audit-check-report.golden.json",
+      "schema": "",
+      "sha256": "562760bc38a506f54f64634151824a566a7125c58d8c362617fc1fa6e4d883c4"
+    }
+  ],
+  "version": 1
+}

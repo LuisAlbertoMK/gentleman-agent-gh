@@ -3,7 +3,7 @@ name: ui-engine
 description: "UI system — Grid/Flexbox/@layer/:has(), container queries, compositor-only animation, OKLCH tokens, component patterns"
 triggers: "ui, layout, responsive, animation, design tokens, css, grid, flexbox, container query, dark mode, component layout, page layout, component patterns, hooks, compound components, state management"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2200
+token_budget: 2900
 ---
 ## Decision Tree
 1D→Flex | 2D→Grid | Child→Subgrid | Parent→:has() | Unknown→auto-fit,minmax(280px,1fr) | CQ(container-type:inline-size) | Page→MQ
@@ -32,6 +32,13 @@ Flex2D · Grid1D · !important vs @layer · flex:1 w/o min-inline-size:0 · MQ f
 | "Grid cuando Flexbox basta" | 1D layout con Grid | Decision Tree: 1D→Flex 2D→Grid |
 | "Animar layout properties" | transition:all / width/height | Transform+opacity only + reduced-motion |
 | "Tokens ad-hoc" | hex/HSL sin chain | PRIM→SEM→COMP OKLCH + ≥4.5:1 |
+
+## Red Flags
+- `transition: all` or width/height animation merged → STOP, restrict to `transform`/`opacity` + `prefers-reduced-motion`
+- `!important` overriding `@layer` order → BLOCKER, fix the cascade layers instead
+- `outline: none` with no `:focus-visible` replacement → reject, restore visible focus (contrast ≥4.5:1)
+- `cqi` units outside a `container-type` scope → STOP, declare the container first
+- Hex/HSL tokens bypassing PRIM→SEM→COMP chain → escalate to a token audit before ship
 
 ## Verification
 - Output matches ## Output contract + file:line citation; cross-ref-check.ps1 → SKILL.md OK

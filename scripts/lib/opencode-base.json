@@ -185,7 +185,7 @@
       "**/.gnupg/**": "deny"
     }
   },
-  "default_agent": "gentle-MK-auto",
+  "default_agent": "gentle-MK",
   "experimental": {
     "mcp_timeout": 60000
   },
@@ -274,16 +274,6 @@
         "engram*": true
       }
     },
-    "gentleman-deep-auto": {
-      "description": "Deep reasoning â€” AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode/deepseek-v4-flash",
-      "mode": "primary",
-      "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
-      "tools": {
-        "codebase-memory*": true,
-        "engram*": true
-      }
-    },
     "gentleman-deep-sub": {
       "description": "Deep reasoning subagent â€” hypothesis-driven debugging, root cause analysis (delegable via Task tool)",
       "model": "opencode/deepseek-v4-flash",
@@ -301,12 +291,6 @@
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}"
     },
-    "gentleman-quick-auto": {
-      "description": "Fast executor â€” AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode/muse-spark-1.3-contributor",
-      "mode": "primary",
-      "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}"
-    },
     "gentleman-quick-sub": {
       "description": "Fast executor subagent â€” single-file atomic edits with immediate verification (delegable via Task tool)",
       "model": "opencode/muse-spark-1.3-contributor-free",
@@ -316,15 +300,6 @@
     },
     "gentleman-codex": {
       "description": "Code generation - convention mirroring, defensive coding, new files/scripts/boilerplate",
-      "model": "opencode/mimo-v2.5",
-      "mode": "primary",
-      "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
-      "tools": {
-        "codebase-memory*": true
-      }
-    },
-    "gentleman-codex-auto": {
-      "description": "Code generation â€” AUTO mode (all auto-approve except push + destructive + network)",
       "model": "opencode/mimo-v2.5",
       "mode": "primary",
       "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
@@ -452,53 +427,6 @@
         "codebase-memory*": true
       }
     },
-    "gentleman-deep-sub-auto": {
-      "description": "Deep reasoning subagent â€” AUTO mode (zero ask, bash.* allow, task.* deny) â€” delegable via Task tool",
-      "model": "opencode/deepseek-v4-flash",
-      "mode": "subagent",
-      "hidden": true,
-      "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
-      "tools": {
-        "codebase-memory*": true,
-        "engram*": true
-      }
-    },
-    "gentleman-quick-sub-auto": {
-      "description": "Fast executor subagent â€” AUTO mode (zero ask, bash.* allow, task.* deny) â€” delegable via Task tool",
-      "model": "opencode/muse-spark-1.3-contributor-free",
-      "mode": "subagent",
-      "hidden": true,
-      "prompt": "{file:prompts/gentleman-quick.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}"
-    },
-    "gentleman-codex-sub-auto": {
-      "description": "Code generation subagent â€” AUTO mode (zero ask, bash.* allow, task.* deny) â€” delegable via Task tool",
-      "model": "opencode/mimo-v2.5",
-      "mode": "subagent",
-      "hidden": true,
-      "prompt": "{file:prompts/gentleman-codex.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
-      "tools": {
-        "codebase-memory*": true
-      }
-    },
-    "gentleman-implementer-sub-auto": {
-      "description": "Plan executor subagent â€” AUTO mode (zero ask, bash.* allow, task.* deny) â€” delegable via Task tool",
-      "model": "opencode/mimo-v2.5",
-      "mode": "subagent",
-      "hidden": true,
-      "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
-      "tools": {
-        "codebase-memory*": true
-      }
-    },
-    "gentleman-implementer-auto": {
-      "description": "Plan executor â€” AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode/mimo-v2.5",
-      "mode": "primary",
-      "prompt": "{file:prompts/gentleman-implementer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
-      "tools": {
-        "codebase-memory*": true
-      }
-    },
     "sdd-apply": {
       "description": "Implement code changes from task definitions",
       "model": "opencode/mimo-v2.5",
@@ -568,16 +496,6 @@
       "mode": "subagent",
       "prompt": "{file:prompts/sdd/sdd-verify.md}"
     },
-    "gentle-MK-auto": {
-      "description": "Orchestrator â€” AUTO mode (all auto-approve except push + destructive + network)",
-      "model": "opencode/muse-spark-1.3-contributor",
-      "mode": "primary",
-      "prompt": "{file:prompts/gentle-MK.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
-      "tools": {
-        "engram*": true,
-        "codebase-memory*": true
-      }
-    },
     "gentleman-reviewer": {
       "description": "Code review specialist â€” 4R framework, independent evaluator, adversarial verification (STRONG model)",
       "model": "opencode/deepseek-v4-flash",
@@ -609,29 +527,8 @@
         "codebase-memory*": true
       }
     },
-    "gentleman-aem-auto": {
-      "description": "AEM Migration Specialist â€” AUTO mode (zero ask, bash.* allow except destructive/security-denied)",
-      "model": "opencode/deepseek-v4-flash",
-      "mode": "primary",
-      "prompt": "{file:prompts/gentleman-aem.md}\n\n{file:prompts/shared/_core-behavior-gp.md}",
-      "tools": {
-        "engram*": true,
-        "codebase-memory*": true
-      }
-    },
     "gentleman-aem-sub": {
       "description": "AEM Migration Specialist subagent â€” full migration lifecycle (delegable via Task tool)",
-      "model": "opencode/deepseek-v4-flash",
-      "hidden": true,
-      "mode": "subagent",
-      "prompt": "{file:prompts/gentleman-aem.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
-      "tools": {
-        "engram*": true,
-        "codebase-memory*": true
-      }
-    },
-    "gentleman-aem-sub-auto": {
-      "description": "AEM Migration Specialist subagent â€” AUTO mode (zero ask, bash.* allow, task.* deny) â€” delegable via Task tool",
       "model": "opencode/deepseek-v4-flash",
       "hidden": true,
       "mode": "subagent",
@@ -672,17 +569,6 @@
         "engram*": true
       }
     },
-    "gentleman-reasoning-sub-auto": {
-      "description": "Reasoning subagent â€” AUTO mode (zero ask, bash.* allow, task.* deny) â€” delegable via Task tool (P0-3)",
-      "model": "opencode/deepseek-v4-flash",
-      "mode": "subagent",
-      "hidden": true,
-      "prompt": "{file:prompts/gentleman-deep.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_reasoning-tier.md}\n\n{file:prompts/shared/_return-contract.md}",
-      "tools": {
-        "codebase-memory*": true,
-        "engram*": true
-      }
-    },
     "gentleman-code-review": {
       "description": "Code review specialist â€” Qwen 3.6-plus (successor to 3.6-35B-A3B, 73.4% SWE-bench) â†’ fallback muse-spark â†’ default; contracts, supply-chain, best-practices",
       "model": "opencode/qwen3.7-plus",
@@ -704,17 +590,6 @@
         "engram*": true
       }
     },
-    "gentleman-code-review-sub-auto": {
-      "description": "Code review subagent â€” AUTO mode (Qwen â†’ fallback muse-spark, zero ask) â€” delegable via Task tool (P1-2)",
-      "model": "opencode/qwen3.7-plus",
-      "mode": "subagent",
-      "hidden": true,
-      "prompt": "{file:prompts/gentleman-code-review.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
-      "tools": {
-        "codebase-memory*": true,
-        "engram*": true
-      }
-    },
     "gentleman-initializer": {
       "description": "Harness initializer â€” different prompt for first window, arms environment with all context before delegating (Anthropic Effective Harnesses 2025-11-26, R2-5)",
       "model": "opencode/deepseek-v4-flash",
@@ -727,17 +602,6 @@
     },
     "gentleman-initializer-sub": {
       "description": "Initializer subagent â€” first-window setup, delegable via Task tool (R2-5)",
-      "model": "opencode/deepseek-v4-flash",
-      "mode": "subagent",
-      "hidden": true,
-      "prompt": "{file:prompts/gentleman-initializer.md}\n\n{file:prompts/shared/_core-behavior-gp.md}\n\n{file:prompts/shared/_return-contract.md}",
-      "tools": {
-        "codebase-memory*": true,
-        "engram*": true
-      }
-    },
-    "gentleman-initializer-sub-auto": {
-      "description": "Initializer subagent â€” AUTO mode (first-window setup, zero ask) â€” delegable via Task tool (R2-5)",
       "model": "opencode/deepseek-v4-flash",
       "mode": "subagent",
       "hidden": true,
@@ -772,7 +636,7 @@
         "sdd-verify"
       ],
       "delegate_to_agent": "gentle-orchestrator",
-      "fallback_default": "gentle-MK-auto"
+      "fallback_default": "gentle-MK"
     }
   }
 }

@@ -11,8 +11,8 @@
 
     Resolution order (first match wins):
       1. Explicit $TemplateMap — SSOT anchor, manual entries always win
-      2. Suffix auto-registration (-sub-auto → auto-sub, -auto → auto, -semi → semi, -sub → recurse)
-      3. Role keyword matching (security/infra/docs/... → readonly, reviewer → reviewer, vMK → orchestrator)
+      2. Suffix delegation (-sub → recurse to parent template)
+      3. Role keyword matching (security/infra/docs/... → readonly, reviewer → reviewer, MK → orchestrator)
       4. Fail-closed — throw if no match
 #>
 
@@ -20,10 +20,8 @@
 # Every agent here MUST match the JS map. Drift = bug.
 $TemplateMap = @{
     # Orchestrator
-    'gentleman-vMK' = 'orchestrator'
     'gentle-MK' = 'orchestrator'
     'gentle-orchestrator' = 'sddorchestrator'
-    'gentle-MK-semi' = 'semi'
 
     # Read-only specialists
     'gentleman-security'     = 'readonly'
@@ -74,28 +72,6 @@ $TemplateMap = @{
     'sdd-tasks'     = 'readwrite'
     'sdd-orchestrator' = 'sddorchestrator'
 
-    # Mode variants — AUTO (zero-ask)
-    'gentleman-vMK-auto'           = 'auto'
-    'gentle-MK-auto'               = 'auto'
-    'gentleman-deep-auto'          = 'auto'
-    'gentleman-quick-auto'         = 'auto'
-    'gentleman-codex-auto'         = 'auto'
-    'gentleman-implementer-auto'   = 'auto'
-    'gentleman-aem-auto'           = 'auto'
-    'gentleman-initializer-auto'   = 'auto'
-
-    # Mode variants — AUTO-SUB (zero-ask, subagent)
-    'gentleman-deep-sub-auto'          = 'auto-sub'   # FIX: was 'auto' (drift)
-    'gentleman-quick-sub-auto'         = 'auto-sub'   # FIX: was 'auto' (drift)
-    'gentleman-codex-sub-auto'         = 'auto-sub'   # FIX: was 'auto' (drift)
-    'gentleman-implementer-sub-auto'   = 'auto-sub'   # FIX: was 'auto' (drift)
-    'gentleman-aem-sub-auto'           = 'auto-sub'
-    'gentleman-code-review-sub-auto'   = 'auto-sub'
-    'gentleman-reasoning-sub-auto'     = 'auto-sub'
-
-    # Mode variants — SEMI — retired per ADR-033 (suffix rule handles behavior)
-    # Do NOT re-add explicit -semi entries here.
-
     # Reviewer
     'gentleman-reviewer' = 'reviewer'
 }
@@ -110,7 +86,6 @@ $RoleKeywords = @{
     'performance' = 'readonly'
     'datascience' = 'readonly'
     'reviewer'    = 'reviewer'
-    'vMK'         = 'orchestrator'
     'MK'          = 'orchestrator'
 }
 
@@ -119,13 +94,13 @@ $RoleKeywords = @{
     Detect permission template for an agent name.
 .DESCRIPTION
     1. Explicit lookup in $TemplateMap (SSOT anchor)
-    2. Suffix auto-registration (-sub-auto → auto-sub, -auto → auto, -semi → semi, -sub → recurse)
+    2. Suffix delegation (-sub → recurse to parent template)
     3. Role keyword matching (security/infra/... → readonly)
     4. Fail-closed — throw if no match
 
     Mirrors detectTemplate() in generate-opencode-config.js exactly.
 .EXAMPLE
-    Detect-Template -AgentName 'gentleman-codex-sub-auto'  # → 'auto-sub'
+    Detect-Template -AgentName 'gentleman-codex-sub'      # → 'readwrite'
     Detect-Template -AgentName 'gentleman-security-sub'   # → 'readonly'
     Detect-Template -AgentName 'gentleman-biz'             # → throws
 #>
@@ -143,10 +118,7 @@ function Detect-Template {
         return $TemplateMap[$AgentName]
     }
 
-    # 2. Suffix auto-registration (longest suffix first)
-    if ($AgentName -match '-sub-auto$') { return 'auto-sub' }
-    if ($AgentName -match '-semi$')      { return 'semi' }
-    if ($AgentName -match '-auto$')     { return 'auto' }
+    # 2. Suffix delegation (single-mode: only -sub recurses to parent template)
     if ($AgentName -match '-sub$')      {
         $parent = $AgentName -replace '-sub$', ''
         return Detect-Template -AgentName $parent

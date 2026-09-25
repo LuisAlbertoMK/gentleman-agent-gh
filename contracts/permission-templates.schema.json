@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gentleman-agent-gh/contracts/permission-templates.schema.json",
+  "title": "Permission Templates",
+  "description": "Contrato formal de scripts/lib/permission-templates.json (Ronda 8 S2). Validador: PowerShell Test-Json -SchemaFile (PS 7, sin deps nuevas). SUBSET SEGURO: solo type/required/enum/pattern/minimum + additionalProperties-con-schema EN TOP-LEVEL. PROHIBIDO aqui: $ref/$defs y additionalProperties-schema DENTRO de anyOf (Test-Json/NJsonSchema hace FAIL-OPEN con ellos: valida True aunque el dato sea malo). La semantica de valores (hojas allow/deny/ask, lockdown de readonly, defaults de orchestrator) vive en Pester, NO en este schema. Solo lectura de la fuente: nunca modificar permission-templates.json.",
+  "type": "object",
+  "required": ["orchestrator", "readonly", "readwrite", "reviewer", "sddorchestrator"],
+  "properties": {
+    "_doc": {
+      "type": "string"
+    },
+    "_generated": {
+      "type": "string"
+    },
+    "_used_by": {
+      "type": "object"
+    },
+    "orchestrator": {
+      "type": "object"
+    },
+    "readonly": {
+      "type": "object"
+    },
+    "readwrite": {
+      "type": "object"
+    },
+    "reviewer": {
+      "type": "object"
+    },
+    "sddorchestrator": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": {
+    "type": "object"
+  }
+}

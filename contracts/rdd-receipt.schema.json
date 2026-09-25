@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gentleman-agent-gh/contracts/rdd-receipt.schema.json",
+  "title": "RDD Receipt",
+  "description": "Contrato formal de .rdd/rdd-receipt-NNN.json (Ronda 8 S1). Validador: PowerShell Test-Json -SchemaFile (PS 7, sin deps nuevas; declara draft 2020-12, verificado que Test-Json lo acepta; draft-07 tambien aceptado como fallback). Root abierto a proposito: receipts 002-004 traen 'notes' y 001 no. Campo '4r' permisivo: 001 usa keys minusculas, 003-004 capitalizadas, 002 mixtas.",
+  "type": "object",
+  "required": ["id", "freeze", "tier", "files", "verdict", "timestamp"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^rdd-receipt-\\d{3}$"
+    },
+    "freeze": {
+      "type": "string",
+      "minLength": 1
+    },
+    "freeze_note": {
+      "type": "string"
+    },
+    "tier": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3
+    },
+    "tier_justification": {
+      "type": "string"
+    },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "file_statuses": {
+      "type": "object",
+      "properties": {
+        "deleted": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "modified": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "lines_changed": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "lines_deleted": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "SKIP", "VERIFY_OK_FASTPATH"]
+    },
+    "verdict_note": {
+      "type": "string"
+    },
+    "review": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "method": {
+          "type": "string"
+        },
+        "duration_ms": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "gate_output": {
+          "type": "string"
+        },
+        "process_breach": {
+          "type": "boolean"
+        },
+        "gaps": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "4r": {
+      "type": "object"
+    },
+    "fixes_applied": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "blockers": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "process_blockers": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "escalation": {
+      "type": "string"
+    },
+    "next": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "auto_fix": {
+      "type": "boolean"
+    },
+    "retroactive": {
+      "type": "boolean"
+    },
+    "retroactive_note": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

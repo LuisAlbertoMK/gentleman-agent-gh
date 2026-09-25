@@ -367,8 +367,34 @@ if ($PSCmdlet.ShouldProcess($OpencodeJsonPath, "Apply $Profile profile ($($chang
             $m = $verify.agent.$_.model
             $m -and $m -match 'qwen'
         }).Count
-        if ($Profile -eq 'zen' -and $verifyFreeCount -lt 19) {
-            throw "Post-write validation FAILED: expected >= 19 zen-free agents, found $verifyFreeCount"
+        if ($Profile -eq 'zen') {
+            # ADR-050 single-mode: overlays still declare 19 keys but the 7 -auto
+            # twins were purged from the SSoT (58->44 agents). The floor is derived
+            # from live state so it cannot drift again: live mapped subs (overlay
+            # keys that exist as agents in opencode.json) + unmapped subs that are
+            # intentionally free (quick/frontend/datascience/docs). It only changes
+            # if the SSoT or the overlay mapping changes, which is when it should.
+            $liveMappedKeys = @($mapping.PSObject.Properties.Name | Where-Object { $verifyAgentKeys -contains $_ })
+            # Invariant: no live mapped sub may keep a non-free model after a zen switch.
+            $mappedNonFree = @()
+            foreach ($mk in $liveMappedKeys) {
+                $mkModel = $verify.agent.$mk.model
+                if (-not ($mkModel -and $mkModel -match 'contributor-free$')) { $mappedNonFree += $mk }
+            }
+            if ($mappedNonFree.Count -gt 0) {
+                throw "Post-write validation FAILED: mapped sub agents not on free models: $($mappedNonFree -join ', ')"
+            }
+            $unmappedFreeCount = 0
+            foreach ($sk in $verifySubagentKeys) {
+                if ($liveMappedKeys -notcontains $sk) {
+                    $skModel = $verify.agent.$sk.model
+                    if ($skModel -and $skModel -match 'contributor-free$') { $unmappedFreeCount++ }
+                }
+            }
+            $expectedZenFree = $liveMappedKeys.Count + $unmappedFreeCount
+            if ($verifyFreeCount -lt $expectedZenFree) {
+                throw "Post-write validation FAILED: expected >= $expectedZenFree zen-free agents, found $verifyFreeCount"
+            }
         }
         if ($Profile -eq 'go') {
             if ($verifyDeepseekCount -ne 0) {
@@ -380,9 +406,13 @@ if ($PSCmdlet.ShouldProcess($OpencodeJsonPath, "Apply $Profile profile ($($chang
             if ($verifyQwenCount -ne 0) {
                 throw "Post-write validation FAILED: expected 0 qwen-sub agents for Go, found $verifyQwenCount"
             }
-            # 5 subs intentionally free-tier (quick/frontend/datascience/docs/quick-auto) per JD pto 1 + cost proposal
-            if ($verifyContributorCount -lt 19) {
-                throw "Post-write validation FAILED: expected >= 19 muse-spark-contributor-sub agents for Go, found $verifyContributorCount"
+            # ADR-050 single-mode: same derivation as zen — the overlay maps 19 keys
+            # but only the live ones (present as agents in the SSoT) become
+            # contributor models. 4 subs stay intentionally free-tier
+            # (quick/frontend/datascience/docs) per JD pto 1 + cost proposal.
+            $liveMappedCount = @($mapping.PSObject.Properties.Name | Where-Object { $verifyAgentKeys -contains $_ }).Count
+            if ($verifyContributorCount -lt $liveMappedCount) {
+                throw "Post-write validation FAILED: expected >= $liveMappedCount muse-spark-contributor-sub agents for Go, found $verifyContributorCount"
             }
         }
     }

@@ -1,0 +1,25 @@
+{
+  "id": "rdd-receipt-007",
+  "freeze": "HEAD-3fb95446-e69de29b",
+  "freeze_note": "Slice R8-S3 commit 3fb95446 (feat(contracts): golden outputs + hash comparator) en rama experimento/mejora-ronda8-contratos. diff8=e69de29b = working tree limpio al emitir el receipt (git diff vacio). lines_changed=387 solo scope del slice (goldens 88 + manifest 40 + test 259); el commit ademas toco odd/tasks/ronda8-contratos.md (1/1, plan del slice) + marker .breaker-cleared (1/0, artefacto infra), ambos fuera del receipt.",
+  "tier": 1,
+  "tier_justification": "RDD Risk Tiers: Tier 1 = solo fixtures testdata/golden/ + tests/contract-goldens.Tests.ps1 (comparador inline en BeforeAll, sin helper runtime). Igual que S1 + verificacion de determinismo (doble re-run, mismo hash).",
+  "files": [
+    "testdata/golden/*.golden.json",
+    "testdata/golden/golden-manifest.json",
+    "tests/contract-goldens.Tests.ps1"
+  ],
+  "lines_changed": 387,
+  "lines_deleted": 0,
+  "verdict": "PASS",
+  "verdict_note": "Pester goldens 17/17 en doble run (mismo resultado) + receipt 8/8 + permission 12/12 + frontmatter 107/107 + golden-prompts 7/7 + golden-fixtures 4/4, sin regresion. Manifest sha256 byte-level 5/5 + canonico re-run 5/5 + determinismo doble-run 5/5 + sin timestamps. Verificacion 4R formal: PASS global S3 17/17, prompts 11/11, determinismo probado.",
+  "review": {
+    "status": "PASS 4R + determinismo doble-run",
+    "method": "code-review-agent 4R + Compare-Golden re-run 17/17",
+    "gaps": []
+  },
+  "blockers": [],
+  "next": ["Ronda 9"],
+  "auto_fix": false,
+  "timestamp": "2026-09-24T14:18:17.5313754-06:00"
+}

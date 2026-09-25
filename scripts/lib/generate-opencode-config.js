@@ -3,9 +3,10 @@
  * generate-opencode-config.js
  *
  * Generates opencode.json from:
- *   - opencode-base.json (agent definitions WITHOUT permission blocks)
+ *   - opencode-base.json (agent definitions WITHOUT permission blocks; carries the mcp section through)
  *   - permission-templates.json (7 shared permission patterns)
  *   - agent-overrides.json (agent-specific extra properties: hidden, custom perms)
+ *   - mcp-policy.json (MCP security policy SSoT — build-time enforcement over the mcp section)
  *
  * Usage:
  *   node scripts/lib/generate-opencode-config.js           # write opencode.json
@@ -23,6 +24,7 @@ const ROOT = path.resolve(__dirname, '../..');
 const BASE_PATH = path.join(__dirname, 'opencode-base.json');
 const TEMPLATES_PATH = path.join(__dirname, 'permission-templates.json');
 const OVERRIDES_PATH = path.join(__dirname, 'agent-overrides.json');
+const POLICY_PATH = path.join(ROOT, 'scripts/opencode-config/mcp-policy.json');
 const OUTPUT_PATH = path.join(ROOT, 'opencode.json');
 
 const VALIDATE = process.argv.includes('--validate');
@@ -38,13 +40,12 @@ const ROLE_KEYWORDS = {
   performance: 'readonly',
   datascience: 'readonly',
   reviewer:    'reviewer',
-  vMK:         'orchestrator',
 };
 
 // --- Detect template for an agent name ---
 // Resolution order (must mirror Detect-Template in template-detection.ps1 exactly):
 //   1. Explicit lookup in TEMPLATE_MAP (SSOT anchor)
-//   2. Suffix auto-registration (-sub-auto → auto-sub, -semi → semi, -auto → auto, -sub → recurse)
+//   2. Suffix delegation (-sub → recurse to parent template)
 //   3. Role keyword matching
 //   4. Fail-closed — throw
 function detectTemplate(agentName) {
@@ -53,10 +54,7 @@ function detectTemplate(agentName) {
     return TEMPLATE_MAP[agentName];
   }
 
-  // 2. Suffix auto-registration (longest suffix first)
-  if (agentName.endsWith('-sub-auto')) return 'auto-sub';
-  if (agentName.endsWith('-semi'))      return 'semi';
-  if (agentName.endsWith('-auto'))     return 'auto';
+  // 2. Suffix delegation (single-mode: only -sub recurses to parent template)
   if (agentName.endsWith('-sub'))      return detectTemplate(agentName.slice(0, -4));
 
   // 3. Role keyword matching
@@ -74,7 +72,6 @@ function detectTemplate(agentName) {
 // ALL agents should be listed here. New agents following naming conventions are auto-detected.
 const TEMPLATE_MAP = {
   // Orchestrator — full bash allow + extra language denials
-  'gentleman-vMK': 'orchestrator',
   'gentle-MK': 'orchestrator',
   'gentle-orchestrator': 'sddorchestrator',
 
@@ -126,32 +123,6 @@ const TEMPLATE_MAP = {
   'gentleman-datascience-sub': 'readonly',
   'gentleman-docs-sub': 'readonly',
 
-  // Mode variants — AUTO (all auto-approve except push + destructive + network)
-  'gentleman-vMK-auto': 'auto',
-  'gentle-MK-auto': 'auto',
-  'gentleman-deep-auto': 'auto',
-  'gentleman-quick-auto': 'auto',
-  'gentleman-codex-auto': 'auto',
-  'gentleman-implementer-auto': 'auto',
-  'gentleman-aem-auto': 'auto',
-  'gentleman-initializer-auto': 'auto',
-
-  // Mode variants — AUTO subagent twins (zero-ask, delegable via Task tool in auto mode)
-  'gentleman-deep-sub-auto': 'auto-sub',
-  'gentleman-quick-sub-auto': 'auto-sub',
-  'gentleman-codex-sub-auto': 'auto-sub',
-  'gentleman-implementer-sub-auto': 'auto-sub',
-  'gentleman-aem-sub-auto': 'auto-sub',
-  'gentleman-code-review-sub-auto': 'auto-sub',
-  'gentleman-reasoning-sub-auto': 'auto-sub',
-
-  // Mode variants — SEMI RETIRED (ADR-033 implemented 2026-09-04):
-  // explicit '-semi' entries removed; '-semi' suffix below + skip still
-  // handle the legacy definitions in opencode-base.json until base is
-  // cleaned (JD follow-up). Do NOT re-add entries here.
-  // dual-read: gentle-MK-semi added for F2 rename compat (symmetric with PS map)
-  'gentle-MK-semi': 'semi',
-
   // Independent evaluator — bash ask, no edit/write
   'gentleman-reviewer': 'reviewer',
   'gentleman-reviewer-sub': 'reviewer',
@@ -173,6 +144,83 @@ try {
   overrides = JSON.parse(fs.readFileSync(OVERRIDES_PATH, 'utf8'));
 } catch (e) {
   console.log('  No agent-overrides.json found, using empty overrides');
+}
+
+// --- Load MCP security policy SSoT (Ronda2 S2, tightened Ronda3 S1) ---
+// scripts/opencode-config/mcp-policy.json constrains the `mcp` section this
+// generator emits (the base carries it through untouched — previously nothing
+// validated base-mcp against the policy outside the commit gate). Missing file
+// = fail-closed WHEN the base declares an mcp section (real repo); only repos
+// predating the policy (base carries NO mcp section at all) may skip.
+// Corrupt file or wrong $schema = fail-closed, never silent.
+let mcpPolicy = null;
+try {
+  mcpPolicy = JSON.parse(fs.readFileSync(POLICY_PATH, 'utf8'));
+  if (mcpPolicy.$schema !== 'gentleman-agent/mcp-policy') {
+    console.error(`ERROR: Unexpected $schema in mcp-policy.json: ${mcpPolicy.$schema}`);
+    process.exit(1);
+  }
+} catch (e) {
+  if (e.code === 'ENOENT') {
+    // Ronda3 S1 fail-closed: a base declaring MCP servers MUST be enforced
+    // against the policy — generating without it would silently drop SSoT
+    // enforcement. Only pre-policy repos (NO mcp section in base) may skip.
+    if (base.mcp) {
+      console.error('ERROR: mcp-policy.json is missing but opencode-base.json declares an mcp section — refusing to generate without MCP policy enforcement');
+      process.exit(1);
+    }
+    console.log('  No mcp-policy.json found, skipping MCP policy enforcement (base declares no mcp section — pre-policy repo)');
+  } else {
+    console.error(`ERROR: Cannot parse mcp-policy.json: ${e.message}`);
+    process.exit(1);
+  }
+}
+
+// --- MCP policy enforcement (Ronda2 S2) ---
+// Mirrors the FAIL conditions of scripts/security-audit-mcp.ps1 so drift
+// base-mcp ↔ policy breaks the build instead of reaching the gate.
+// WARN-level audit heuristics (secret-regex scan, trusted-prefix promotion
+// note, proxy-like env) stay audit-side — the generator enforces only
+// deterministic FAILs. Returns violation strings (empty = compliant).
+function checkMcpPolicy(mcp, policy) {
+  const violations = [];
+  if (!mcp || typeof mcp !== 'object') {
+    violations.push('MCP policy: mcp section missing from SSoT base (policy expects managed servers)');
+    return violations;
+  }
+  const allowed = (policy.remoteAllowlist && policy.remoteAllowlist.allowed) || [];
+  const prefixes = (policy.remoteAllowlist && policy.remoteAllowlist.trustedPrefixes) || [];
+  for (const [name, srv] of Object.entries(mcp)) {
+    if (!srv || typeof srv !== 'object') continue;
+    if (srv.type === 'remote' && srv.enabled === true) {
+      const url = srv.url || '';
+      if (!allowed.includes(url) && !prefixes.some((p) => url.startsWith(p))) {
+        violations.push(`MCP policy: remote server "${name}" url NOT allowlisted: ${url}`);
+      }
+    }
+    if (Array.isArray(srv.command)) {
+      const joined = srv.command.join(' ');
+      if (/\bnpx\b/.test(joined) && !/@\d+\.\d+/.test(joined)) {
+        violations.push(`MCP policy: "${name}" npx without @version pin: ${joined}`);
+      }
+    }
+  }
+  for (const name of ((policy.disabledHygiene && policy.disabledHygiene.servers) || [])) {
+    if (mcp[name] && mcp[name].enabled === true) {
+      violations.push(`MCP policy: "${name}" must stay disabled (disabledHygiene) but is enabled`);
+    }
+  }
+  const scoping = policy.envPolicy && policy.envPolicy.pathScoping;
+  const cbmEnv = mcp['codebase-memory-mcp'] && mcp['codebase-memory-mcp'].environment;
+  if (scoping && cbmEnv && cbmEnv[scoping.var] !== undefined) {
+    const resolved = String(cbmEnv[scoping.var]).replace('{env:GENTLEMAN_AGENT_ROOT}', process.env.GENTLEMAN_AGENT_ROOT || ROOT);
+    // Filesystem-root resolution = FAIL (mirrors the audit's '^(C:\\|C:/|/)$' check;
+    // explicit comparison avoids regex-literal slash-terminator pitfalls).
+    if (resolved === 'C:\\' || resolved === 'C:/' || resolved === '/') {
+      violations.push(`MCP policy: ${scoping.var} resolves to filesystem root: ${resolved}`);
+    }
+  }
+  return violations;
 }
 
 // --- Deep clone and sort keys in permission objects ---
@@ -198,14 +246,6 @@ const stats = { orchestrator: 0, readwrite: 0, readonly: 0, sddorchestrator: 0, 
 const orderedAgents = {};
 for (const [agentName, agentDef] of Object.entries(base.agent)) {
   const templateName = detectTemplate(agentName);
-
-  // ADR-033 IMPLEMENTED 2026-09-04 (simplified to manual|auto): 'semi' skipped
-  // at build so opencode.json carries 0 *-semi agents. Skip KEPT (not dead-code):
-  // opencode-base.json was purged of -semi agents per ADR-033 (base is clean);
-  // permission-templates.json still carries the 'semi' template; removing this skip
-  // would reintroduce/mis-map them (vMK-semi → orchestrator via keyword). Remove
-  // this skip only together with template cleanup (JD follow-up).
-  if (templateName === 'semi') continue;
 
   const template = templates[templateName];
 
@@ -298,6 +338,18 @@ if (permNames.length > 0 && Object.keys(rootPerm).length > 0) {
 
 base.agent = orderedAgents;
 
+// --- Enforce MCP policy SSoT over the emitted mcp section (Ronda2 S2) ---
+// Write path: fail-closed BEFORE touching opencode.json (write stays atomic-ish).
+if (mcpPolicy) {
+  console.log('[2/5] Enforcing mcp-policy.json SSoT over mcp section...');
+  const violations = checkMcpPolicy(base.mcp, mcpPolicy);
+  if (violations.length > 0) {
+    for (const v of violations) console.error(`ERROR: ${v}`);
+    process.exit(1);
+  }
+  console.log(`  MCP policy: ${Object.keys(base.mcp || {}).length} server(s) compliant`);
+}
+
 console.log(`  Orchestrator:     ${stats.orchestrator} agent(s)`);
 console.log(`  Read/Write:       ${stats.readwrite} agent(s)`);
 console.log(`  Read-Only:        ${stats.readonly} agent(s)`);
@@ -358,6 +410,12 @@ if (VALIDATE) {
   // every top-level key the SSoT defines must exist in opencode.json
   for (const k of Object.keys(generated)) {
     if (!(k in existing)) issues.push(`top-level key missing in opencode.json: ${k}`);
+  }
+
+  // Ronda2 S2: the emitted mcp section must satisfy mcp-policy.json, so drift
+  // base-mcp ↔ policy breaks --validate (CI + gate) instead of passing silent.
+  if (mcpPolicy) {
+    for (const v of checkMcpPolicy(generated.mcp, mcpPolicy)) issues.push(v);
   }
 
   if (issues.length > 0) {

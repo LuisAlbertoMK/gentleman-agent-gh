@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gentleman-agent-gh/contracts/golden-manifest.schema.json",
+  "title": "Golden Manifest",
+  "description": "Contrato formal de testdata/golden/golden-manifest.json (Ronda 9 S1). Validador GATE: PowerShell Test-Json -SchemaFile (PS 7, sin deps nuevas). SUBSET SEGURO: solo type/required/enum/pattern/minLength/minimum/minItems + format date-time (opcional) + additionalProperties BOOLEANO en root. PROHIBIDO aqui: $ref/$defs y additionalProperties-schema DENTRO de anyOf (Test-Json/NJsonSchema hace FAIL-OPEN con ellos: valida True aunque el dato sea malo, hallazgo R8-S2). Refleja datos REALES observados (40L, 5 goldens): 'created' AUSENTE en 5/5 -> opcional; 'schema' VACIO ('') en 2/5 (registry, audit) -> string sin minLength; 'args' presente 5/5 pero tolerado ausente. Entradas abiertas (additionalProperties:true) para tolerar 'source'/'expansion' futuras.",
+  "type": "object",
+  "required": ["version", "goldens"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "goldens": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["name", "generator", "sha256"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+\\.golden\\.json$"
+          },
+          "generator": {
+            "type": "string",
+            "minLength": 1
+          },
+          "args": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "schema": {
+            "type": "string"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}

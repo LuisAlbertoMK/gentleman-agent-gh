@@ -1,0 +1,1 @@
+﻿implementer 2026-09-24 JD-4R APPROVED benchmark-core: additive timing-stats plus cancel-flow coverage; profiler hit at :255 is comment text only; dynamic execution at :257-258 mitigated by metachar reject at :245-251 with quote escape; local-only harness no remote input; breaker risks accepted separately fileHash:f779fdc4

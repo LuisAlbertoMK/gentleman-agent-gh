@@ -1,0 +1,1 @@
+auto-executor 2026-09-24 Refactor-AP-S5 Tier-2: rewrite 7 to 9 Its single-mode (no -auto suffix, compat-alias no-ops, JSON-line filter); suite route-agent 9/9 green (was 0/7); test-only change, no productive logic fileHash:0d885335

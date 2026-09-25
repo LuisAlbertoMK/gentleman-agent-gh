@@ -1,4 +1,5 @@
 #requires -Version 7
+# NOTE (Refactor-AP S2b single-mode): RETIRED — ADR-033 semi cleanup complete; kept as no-op record, logic untouched.
 <#
 .SYNOPSIS
     Remove deprecated '*-semi' agents from the global OpenCode config (opencodec.json).

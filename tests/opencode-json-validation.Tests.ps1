@@ -36,8 +36,9 @@ Describe "opencode.json Configuration Validation" {
             @($agentsWithoutPrompt).Count | Should -Be 0
         }
 
-        It "Orchestrator agent (gentleman-vMK or gentle-MK) exists" {
-            ($null -ne $config.agent.PSObject.Properties['gentleman-vMK'] -or $null -ne $config.agent.PSObject.Properties['gentle-MK']) | Should -Not -BeNullOrEmpty
+        It "Orchestrator agent gentle-MK exists (single-mode, no -auto twin)" {
+            ($null -ne $config.agent.PSObject.Properties['gentle-MK']) | Should -Be $true
+            ($null -eq $config.agent.PSObject.Properties['gentle-MK-auto']) | Should -Be $true
         }
 
         It "Subagents have 'hidden: true' or 'mode: subagent'" {
@@ -111,6 +112,9 @@ Describe "opencode.json Configuration Validation" {
                 $base = $semi -replace '-semi$', ''
                 $agentNames | Should -Contain $base
             }
+
+            # Single-mode (Refactor-AP S5): the -auto family was deleted (S1) — expect zero.
+            @($autoAgents).Count | Should -Be 0
         }
 
         It "Subagent variants have matching base agents" {

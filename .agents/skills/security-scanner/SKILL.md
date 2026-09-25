@@ -31,8 +31,8 @@ quality-gate · best-practices · command-wrapper · research · code-review-age
 | "Medium can wait" | Deferring MEDIUM | Medium→suggest now, CRITICAL+HIGH fix before commit (rule 2) |
 
 ## Red Flags
-- Flagging `process.env` vars as secrets without verifying FP (rule 3)
-- No risk summary `NONE/LOW/MED/HIGH` at end (rule 5)
+- Flagging `process.env` vars as secrets without verifying FP → STOP, verify rule 3
+- No risk summary `NONE/LOW/MED/HIGH` at end → reject, add summary per rule 5
 
 ## Verification
 - Scan output format `Secrets:{N} Injection:{N} ... | CRITICAL/HIGH...` with `file:line` + fix per issue

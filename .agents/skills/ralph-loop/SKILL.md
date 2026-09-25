@@ -39,6 +39,10 @@ Wired: `close-session.ps1` calls `& scripts/ralph-lifecycle.ps1 -Hook post-close
 | "COMPLETE sin evidencia" | Promise w/o task completeness | Verify completeness + check-complete hook |
 | "saltar hooks" | pre/post-close omitted | Run ralph-lifecycle.ps1 before close |
 
+## Red Flags
+- `<promise>DONE</promise>` emitted without verifiable completion → STOP, re-verify task state before close
+- Loop past maxIterations still running → force `/cancel-ralph` and escalate blocker to user
+
 ## Verification
 - Output matches contract; cross-ref-check.ps1 → OK
 

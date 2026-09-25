@@ -2,24 +2,28 @@
 [CmdletBinding()]
 <#
 .SYNOPSIS
-    Mode Gate — pre-delegation validation. Verifies agent suffix matches current mode.
+    Mode Gate — single-mode pre-delegation validation (Refactor-AP S2).
 .DESCRIPTION
-    Before delegating to a sub-agent, the orchestrator MUST call this gate.
-    It reads .gentleman-mode and validates that the target agent name has the
-    correct suffix for the current mode.
+    Single-mode gate (gentle-ai style): there is only ONE mode. Every
+    delegation target is ALLOWED; the retired `-auto` / `-semi` suffixes are
+    accepted as backward-compat aliases (with a warning), and
+    `.gentleman-mode` is a no-op — the file stays on disk for switch-mode
+    compat but is always treated as 'manual'.
 
-    Mode → Required suffix:
-      auto   → -auto (e.g., gentleman-quick → gentleman-quick-auto)
-      semi   → -semi (e.g., gentleman-quick → gentleman-quick-semi)
-      manual → no suffix (e.g., gentleman-quick → gentleman-quick)
+    The security deny-floor (bash deny-list, push deny, ask-list) is enforced
+    elsewhere (opencode-base.json + permission-gate) and is UNAFFECTED by
+    this gate being permissive by design (upstream gentle-ai: single mode,
+    human-owned push/release).
 
-    If the suffix doesn't match, the gate BLOCKS the delegation with a clear error.
+    Refactor-AP S2 retired the auto/manual/semi suffix enforcement.
+    Fallback mode: 'manual'.
 
 .PARAMETER TargetAgent
     The intended delegation target (e.g., "gentleman-quick").
 
 .PARAMETER Mode
-    Override mode check (default: read from .gentleman-mode).
+    Accepted for backward compat only; any value is treated as 'manual'.
+    A non-manual value emits a warning.
 
 .PARAMETER ModeFilePath
     Override the mode file path (default: nearest .gentleman-mode walking up from
@@ -29,8 +33,8 @@
     Output JSON instead of human-readable text.
 
 .EXAMPLE
-    .\scripts\mode-gate.ps1 -TargetAgent "gentleman-quick-auto"
-    .\scripts\mode-gate.ps1 -TargetAgent "gentleman-quick" -Mode auto -Json
+    .\scripts\mode-gate.ps1 -TargetAgent "gentleman-quick"
+    .\scripts\mode-gate.ps1 -TargetAgent "gentleman-quick-auto" -Json
 #>
 
 param(
@@ -47,7 +51,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-# Cross-platform helpers (Get-GlobalConfigDir)
+# Cross-platform helpers (Get-GentlemanProjectRoot)
 . (Join-Path (Join-Path $PSScriptRoot "lib") "platform.ps1")
 
 $projectRoot = if (Get-Command Get-GentlemanProjectRoot -ErrorAction SilentlyContinue) { Get-GentlemanProjectRoot } else { (Get-Location).Path }
@@ -71,7 +75,7 @@ $modeFile = if ($ModeFilePath) {
     if ($found) { $found } else { Join-Path -Path $projectRoot '.gentleman-mode' }
 }
 
-# --- Resolve current mode ---
+# --- Resolve current mode (single-mode: always 'manual') ---
 if (-not $Mode) {
     if (Test-Path -LiteralPath $modeFile) {
         $Mode = (Get-Content -LiteralPath $modeFile -Raw).Trim()
@@ -79,155 +83,55 @@ if (-not $Mode) {
         $Mode = 'manual'  # default fallback
     }
 }
+if (-not $Mode) { $Mode = 'manual' }
 
-# --- ADR-033: 'semi' mode DEPRECATED → remap to 'auto' with warning ---
-$originalMode = $Mode
-if ($Mode -eq 'semi') {
-    Write-Warning "'semi' mode is DEPRECATED (ADR-033: simplified to manual|auto). Remapping to 'auto' — suffixed -semi agents still accepted for backward compat but auto routing preferred."
-    $Mode = 'auto'
-}
-if ($Mode -and $Mode -notin 'manual','auto','') {
-    Write-Error "Invalid mode '$Mode'. Valid modes: manual, auto. (semi is deprecated, maps to auto.)"
-    exit 1
+# --- Refactor-AP S2 single-mode: mode file / -Mode are no-ops ---
+if ($Mode -ne 'manual') {
+    Write-Warning "Single-mode (Refactor-AP S2): mode '$Mode' is a no-op — treating as 'manual'. Suffixes -auto/-semi are compat aliases."
+    $Mode = 'manual'
 }
 
-# --- Determine expected suffix ---
-$suffixMap = @{
-    'auto'   = '-auto'
-    'semi'   = '-semi'
-    'manual' = ''
-}
-$expectedSuffix = $suffixMap[$Mode]
-
-# --- Determine if agent is a read-only specialist (always exception) ---
-$readOnlySpecialists = @(
-    'gentleman-security',
-    'gentleman-seo',
-    'gentleman-infra',
-    'gentleman-frontend',
-    'gentleman-performance',
-    'gentleman-datascience',
-    'gentleman-docs',
-    'gentleman-reviewer'
-)
-$isReadOnly = $TargetAgent -in $readOnlySpecialists
-
-# --- Validate ---
-$hasSuffix = $TargetAgent -match '-auto$|-semi$'
-$modeOk = $false
-
-if ($isReadOnly) {
-    $modeOk = $true  # Read-only specialists always use base name
-} elseif ($Mode -eq 'manual') {
-    $modeOk = -not $hasSuffix  # No suffix allowed in manual
-} elseif ($Mode -eq 'auto') {
-    if ($originalMode -eq 'semi') {
-        # ADR-033 backward compat: an explicit -semi request stays honored after the remap
-        $modeOk = $TargetAgent -match '-semi$'
-    } else {
-        $modeOk = $TargetAgent -match '-auto$'
-    }
+# --- Compat aliases: retired -auto / -semi suffixes accepted with warning ---
+$aliasSuffix = ''
+$baseAgent = $TargetAgent
+if ($TargetAgent -match '(?<suffix>-auto|-semi)$') {
+    $aliasSuffix = $Matches['suffix']
+    $baseAgent = $TargetAgent.Substring(0, $TargetAgent.Length - $aliasSuffix.Length)
+    Write-Warning "Single-mode (Refactor-AP S2): '$TargetAgent' uses retired suffix '$aliasSuffix' — compat alias for '$baseAgent'."
 }
 
-# --- Read-only and SDD sub-agents are always allowed ---
-$alwaysAllowed = @(
-    'gentleman-orchestrator',
-    'sdd-init',
-    'sdd-explore',
-    'sdd-propose',
-    'sdd-design',
-    'sdd-spec',
-    'sdd-tasks',
-    'sdd-apply',
-    'sdd-verify',
-    'sdd-archive',
-    'sdd-quick'
-)
-$isAlwaysAllowed = $TargetAgent -in $alwaysAllowed
+# --- Single-mode: everything is ALLOWED, exit 0 by default ---
+$modeOk = $true
+$expectedSuffix = ''
 
-# --- Fallback: does the suffixed agent exist in any resolvable config? ---
-# In external projects the -auto/-semi variants may not be defined (pre-sync).
-# If the suffixed agent does NOT exist anywhere, allow the base agent instead
-# of dead-blocking the delegation.
-function Test-SuffixedAgentPresence {
-    param([string]$AgentName)
-    $candidates = @(
-        (Join-Path (Get-Location) 'opencode.json'),
-        (Join-Path (Get-Location) 'opencode.jsonc'),
-        (Join-Path (Get-GlobalConfigDir) 'opencode.json'),
-        (Join-Path (Get-GlobalConfigDir) 'opencode.jsonc')
-    ) | Where-Object { Test-Path -LiteralPath $_ }
-    foreach ($cfg in $candidates) {
-        try {
-            $parsed = Get-Content -LiteralPath $cfg -Raw -Encoding UTF8 | ConvertFrom-Json
-            $agentSection = $parsed.PSObject.Properties['agent']
-            if ($null -ne $agentSection) {
-                $prop = $agentSection.Value.PSObject.Properties[$AgentName]
-                if ($null -ne $prop) { return $true }
-            }
-        } catch { continue }
-    }
-    return $false
-}
-
-if ($isAlwaysAllowed) {
-    $modeOk = $true
-}
-
-# --- Fallback resolution (auto/semi): suffixed agent missing → allow base ---
-$fallbackUsed = $false
-if (-not $modeOk -and $Mode -ne 'manual' -and -not $isReadOnly -and -not $hasSuffix) {
-    $suffixedAgent = "$TargetAgent$expectedSuffix"
-    if (-not (Test-SuffixedAgentPresence -AgentName $suffixedAgent)) {
-        $modeOk = $true
-        $fallbackUsed = $true
-    }
-}
-
-# --- Build result ---
+# --- Build result (JSON field contract unchanged) ---
 $result = [PSCustomObject]@{
     action          = 'mode-gate'
-    mode            = $originalMode
+    mode            = $Mode
     target_agent    = $TargetAgent
     expected_suffix = $expectedSuffix
     allowed         = $modeOk
-    reason          = if ($modeOk) {
-        if ($isAlwaysAllowed) { "Always-allowed agent: $TargetAgent" }
-        elseif ($isReadOnly) { "Read-only specialist: $TargetAgent" }
-        elseif ($fallbackUsed) { "FALLBACK: '$TargetAgent$expectedSuffix' not defined in configs — allowed base agent '$TargetAgent'" }
-        elseif ($Mode -eq 'manual') { "Manual mode — no suffix required" }
-        else { "Mode '$Mode' — suffix '$expectedSuffix' matches" }
+    reason          = if ($aliasSuffix) {
+        "Compat alias: '$TargetAgent' accepted as '$baseAgent' (retired '$aliasSuffix' suffix, single-mode)"
     } else {
-        if ($Mode -eq 'auto') { "AUTO mode requires -auto suffix (got: $TargetAgent, expected: $TargetAgent-auto)" }
-        else { "MANUAL mode requires NO suffix (got: $TargetAgent, expected: $TargetAgent without suffix)" }
+        "Single-mode — no suffix required (mode file is a no-op)"
     }
 }
 
 if ($Json) {
     Write-Output ($result | ConvertTo-Json)
-    if (-not $modeOk) { exit 1 } else { exit 0 }
+    exit 0
 }
 
 # --- Human-readable output ---
-$fg = if ($modeOk) { 'Green' } else { 'Red' }
-$icon = if ($modeOk) { '✅' } else { '❌' }
-$status = if ($modeOk) { 'ALLOWED' } else { 'BLOCKED' }
+Write-Host "╔══════════════════════════════════════════╗" -ForegroundColor Green
+Write-Host "║         Mode Gate — Delegation Check    ║" -ForegroundColor Green
+Write-Host "╠══════════════════════════════════════════╣" -ForegroundColor Green
+Write-Host "║  ✅  Mode:  $($Mode.ToUpper().PadRight(36))║" -ForegroundColor Green
+Write-Host "║  ✅  Agent: $($TargetAgent.PadRight(36))║" -ForegroundColor Green
+Write-Host "║  ✅  Suffix: $($expectedSuffix.PadRight(35))║" -ForegroundColor Green
+Write-Host "║                                            ║" -ForegroundColor Green
+Write-Host "║  ══ ALLOWED ══" -ForegroundColor Green
+Write-Host "╚══════════════════════════════════════════╝" -ForegroundColor Green
 
-Write-Host "╔══════════════════════════════════════════╗" -ForegroundColor $fg
-Write-Host "║         Mode Gate — Delegation Check    ║" -ForegroundColor $fg
-Write-Host "╠══════════════════════════════════════════╣" -ForegroundColor $fg
-Write-Host "║  $icon  Mode:  $($Mode.ToUpper().PadRight(36))║" -ForegroundColor $fg
-Write-Host "║  $icon  Agent: $($TargetAgent.PadRight(36))║" -ForegroundColor $fg
-Write-Host "║  $icon  Suffix: $($expectedSuffix.PadRight(35))║" -ForegroundColor $fg
-Write-Host "║                                            ║" -ForegroundColor $fg
-Write-Host "║  ══ $status ══" -ForegroundColor $fg
-if (-not $modeOk) {
-    Write-Host "║                                            ║" -ForegroundColor $fg
-    Write-Host "║  $($result.reason.PadRight(44))║" -ForegroundColor $fg
-}
-Write-Host "╚══════════════════════════════════════════╝" -ForegroundColor $fg
-
-if (-not $modeOk) {
-    exit 1
-}
 exit 0

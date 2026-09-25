@@ -51,7 +51,11 @@ Describe 'E2E: Skill Coverage (all registered skills)' {
 
     It 'every skill declares >=1 depth section (Examples/Testing/Anti-Patterns)' {
         foreach ($s in $script:skillTable) {
-            $hasDepth = $s.Content -match '(?im)^##[^\n]*(Examples|Testing Patterns|Anti-Patterns|Edge Cases|Quality Gates)'
+            # Both header variants are repo-blessed: 8810a5d7 used `Anti-Patterns & ...`
+            # while the B1 audit contract (scripts/skills-audit-check.ps1) requires a
+            # literal `## Anti-Rationalization` section. Both head the same
+            # Rationalization|Red Flag table, so both count as depth.
+            $hasDepth = $s.Content -match '(?im)^##[^\n]*(Examples|Testing Patterns|Anti-Patterns|Anti-Rationalization|Edge Cases|Quality Gates)'
             # ADR-007: depth content (Examples/Testing Patterns/Edge Cases) is externalized to
             # docs/skills/<name>/reference.md to stay under the 3KB token budget — a reference
             # link satisfies the depth requirement.

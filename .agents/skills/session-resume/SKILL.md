@@ -3,7 +3,7 @@ name: session-resume
 description: "Session continuity — save/restore state, git gate, sparse skill pre-load, Engram recall"
 triggers: "session resume, dónde lo dejamos, continuá, session start, code memory, memory, recordar, acordate, multi-session, donde quedamos, handoff"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 2100
+token_budget: 2400
 ---
 ## When to Use
 1. Is git repo? NO → `mem_context` only. YES → check 2 states.
@@ -31,9 +31,12 @@ Auto-commit/push · mid-task runs · output >10 lines · skip "small project" ·
 | "Will remember later" | Not calling mem_save before RED zone | Every 25 calls or YELLOW → `mem_save(topic_key=checkpoint/session-state)` |
 
 ## Red Flags
-- Unpushed commits silently growing (>5 ahead) → push now or `git branch` diverges
+- Unpushed commits silently growing (>5 ahead) → push now or `git branch` diverges — STOP new work until push/stash/continue is chosen (When to Use 2-3)
 - Restoring session without `mem_context` → re-discover what you already solved
 
 ## Verification
-- Resume path chosen in ≤4 options, output ≤10 lines, branch/commit info accurate
+- `git status --porcelain=v1 -b` run before any work — dirty/ahead states drive When-to-Use paths 2–4
+- Resume output matches the `## Output (dirty)` contract: `{branch}: {N} uncommitted…`, ≤10 lines, ≤4 options
+- Branch/commit info verified via `git rev-parse --abbrev-ref HEAD` + `git log --oneline -3`
+- `mem_context` recalled before restore; `mem_save(topic_key=checkpoint/session-state)` every 25 calls or YELLOW zone
 > docs/skills/session-resume/reference.md

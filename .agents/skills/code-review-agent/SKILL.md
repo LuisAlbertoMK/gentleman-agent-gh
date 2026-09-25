@@ -34,12 +34,12 @@ mem_search("review-profile/{p}")->load->adjust lens->Run 4R->mem_save(title:"CR 
 | "cargo-cult fixes sin entender el porqué" | Fixes sin Evidence/Ref ni trace (a)-(d) | BLOCKER chain (a)line (b)trace (c)ref (d)fix + WHY |
 
 ## Red Flags
-- Doing work without checking output format → STOP, re-read skill
-- Second occurrence of same rationalization → force RED zone
+- Verdict PASS sin `### 4R|Risk:` ni evidencia por R<6 → STOP, re-score con template (rules 1/4)
+- Nits>3 con Risk>=7 sin cambio → STOP, re-enfocar Risk/Rel primero (rule 7)
 
 ## Verification
-- Output matches skill ## Output contract + file:line citaton
-- cross-ref-check.ps1 → SKILL.md OK
+- Output `## CR:sum ### 4R|Risk:X|Read:X|Rel:X|Res:X|Score:X.X|Verdict:P/W/F ### Fixes:…` con `file:line` + fix por cada R<6 (rules 3/4)
+- BLOCKER incluye chain (a)line (b)trace (c)ref (d)fix; `cross-ref-check.ps1` → SKILL.md OK
 ## Refs
 judgment-day*skill-improver*quality-gate*triple-verify*engram-protocol
 ## Reference

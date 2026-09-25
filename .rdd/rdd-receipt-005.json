@@ -1,0 +1,24 @@
+{
+  "id": "rdd-receipt-005",
+  "freeze": "HEAD-533c6a4b-e69de29b",
+  "freeze_note": "Slice R8-S1 commit 533c6a4b (feat(contracts): rdd-receipt schema + test over 4 receipts) en rama experimento/mejora-ronda8-contratos. diff8=e69de29b = working tree limpio al emitir el receipt (git diff vacio). lines_changed=183 solo scope del slice (schema 129 + test 54); el commit ademas toco odd/tasks/ronda8-contratos.md (194, plan del slice, fuera del receipt).",
+  "tier": 1,
+  "tier_justification": "RDD Risk Tiers: Tier 1 = sin auth/schema-consumida/API/deps. Este slice agrega contracts/rdd-receipt.schema.json (contrato nuevo, nada lo consume aun) + tests/contract-receipt.Tests.ps1 (solo test). No toca runtime, workflows, auth ni dependencias.",
+  "files": [
+    "contracts/rdd-receipt.schema.json",
+    "tests/contract-receipt.Tests.ps1"
+  ],
+  "lines_changed": 183,
+  "lines_deleted": 0,
+  "verdict": "PASS",
+  "verdict_note": "Pester tests/contract-receipt.Tests.ps1 8/8 PASS + Test-Json spot-check del schema 4/4 + golden-fixtures 4/4, sin regresion. Verificacion 4R formal del orquestador (deep-verify ses_f2af1277): PASS global S1 8/8.",
+  "review": {
+    "status": "PASS 4R formal orquestador (deep-verify ses_f2af1277)",
+    "method": "code-review-agent 4R + Pester 8/8",
+    "gaps": []
+  },
+  "blockers": [],
+  "next": ["R8-S2"],
+  "auto_fix": false,
+  "timestamp": "2026-09-24T14:18:17.5313754-06:00"
+}

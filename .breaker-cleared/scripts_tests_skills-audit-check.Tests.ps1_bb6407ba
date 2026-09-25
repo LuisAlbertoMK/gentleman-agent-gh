@@ -1,0 +1,23 @@
+breaker-cleared (falso positivo documentado — NO bypass, FORCE_SHIP prohibido)
+File: scripts/tests/skills-audit-check.Tests.ps1
+Rule: [23/26] PS-CI-03 — Call operator & with variable command
+Line: :37 (`$out = & $script:ScriptPath -SkillName $Name -SkillsRoot $Root -Json | Out-String`)
+
+Justificacion:
+- Allowlist EFECTIVO con throw en :33-37: `$expected = Join-Path ... 'skills-audit-check.ps1'`;
+  `if ($script:ScriptPath -ne $expected) { throw "Blocked: ScriptPath outside allowlist: ..." }`.
+  No es solo determinismo: cualquier valor fuera del allowlist aborta antes del `&`.
+- Args fijos: `-SkillName $Name -SkillsRoot $Root -Json` (nombres de parametro fijos;
+  `$Name`/`$Root` vienen de fixtures creadas en TestDrive hermetico por `New-FixtureSkill`).
+- Hermeticidad: todo corre bajo `$TestDrive` (Pester); sin red, sin estado global, sin escritura
+  fuera del sandbox del test.
+- JD 4R PASS sobre el target: 9/8/9/8 ([10/26] JD ya OK en este slice).
+- Pester: 14 Its verdes (`skills-audit-check.Tests.ps1`: 1 parse + 2 PASS (10/10 conforme + A4-alias) + 11 FAIL-contraste).
+- Precedente R1-S1 aceptado en Verify R1: `.breaker-cleared/tests_security-audit-mcp.Tests.ps1`
+  (mismo patron `& $script:<path-derivado>`, legacy flat `/`->`_`).
+
+Formato marker: nuevo collision-free `${normalized}_${pathHash}` =
+`scripts_tests_skills-audit-check.Tests.ps1_bb6407ba`
+(SHA256("scripts/tests/skills-audit-check.Tests.ps1")[0:8] = bb6407ba;
+ default de creacion per .githooks/pre-commit-gate.ps1:172; legacy tambien aceptado
+ per scripts/check-adversarial.ps1:91-93).

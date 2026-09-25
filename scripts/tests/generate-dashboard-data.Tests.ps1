@@ -72,9 +72,9 @@ Describe 'generate-dashboard-data' {
         }
         AfterAll { $env:PESTER_TEST = $null }
 
-        It 'agents.total == 58 matches opencode.json count' {
+        It 'agents.total == 44 matches opencode.json count' {
             $script:data.agents.total | Should -Be $script:expectedAgents
-            $script:data.agents.total | Should -Be 58
+            $script:data.agents.total | Should -Be 44
         }
         It 'skills.total == 97 matches .agents/skills count (incl _shared)' {
             $script:data.skills.total | Should -Be $script:expectedSkills

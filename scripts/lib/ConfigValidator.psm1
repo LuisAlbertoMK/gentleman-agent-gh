@@ -148,7 +148,7 @@ Validates the agent section contains the full expected set: gentleman-*,
     if ($gentleman.Count -eq 0) { $failures.Add('no gentleman-* agents found') }
     if ($sdd.Count -eq 0)       { $failures.Add('no sdd-* agents found (G3 regression — expected 10)') }
     if ($orch.Count -eq 0)      { $failures.Add('gentle-orchestrator agent missing (G3 regression)') }
-    if ($names.Count -ne 58)    { $failures.Add("expected 58 agents, found $($names.Count)") }
+    if ($names.Count -ne 44)    { $failures.Add("expected 44 agents, found $($names.Count)") }
 
     return @($failures)
 }

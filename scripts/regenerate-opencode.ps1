@@ -1,4 +1,5 @@
 #requires -Version 7
+# NOTE (Refactor-AP S2b single-mode): RETIRED for -auto/-semi purposes — single-mode SSoT has 0 -auto agents; wrapper logic untouched.
 [CmdletBinding(SupportsShouldProcess=$true)]
 <#
 .SYNOPSIS
@@ -193,7 +194,8 @@ if ($sizeBytes -gt $MaxBytes) {
 
 $agentTable = Get-Prop $cfg 'agent'
 $twins = @('gentleman-deep-sub', 'gentleman-quick-sub', 'gentleman-implementer-sub', 'gentleman-security-sub', 'gentleman-seo-sub', 'gentleman-infra-sub', 'gentleman-frontend-sub', 'gentleman-performance-sub', 'gentleman-datascience-sub', 'gentleman-docs-sub', 'gentleman-aem-sub')
-$autoTwins = @('gentleman-deep-sub-auto', 'gentleman-quick-sub-auto', 'gentleman-codex-sub-auto', 'gentleman-implementer-sub-auto', 'gentleman-aem-sub-auto')
+# Single-mode (Refactor-AP S5): the -auto twin family was deleted in S1 — no
+# $autoTwins list; absence is asserted by zero-auto-agents below.
 foreach ($t in $twins) {
   $a = Get-Prop $agentTable $t
   if (-not $a) { Add-Check "twin-$t" $false 'missing from opencode.json' }
@@ -204,49 +206,15 @@ foreach ($t in $twins) {
     else { Add-Check "twin-$t" $true 'mode:subagent hidden:true' }
   }
 }
-# Resolution (a) + round-2 EXACT EQUALITY: the hardcoded zero-ask expectation
-# predates ADR-046, which sanctions exactly one ask in auto-sub mode — the
-# `npm *` catch-all (installs/add/ci/run/test → allow, exec → deny,
-# unclassified npm → ask). Subset-only checking would miss a SILENT REMOVAL
-# of that friction (agent left with zero ask = full frictionless allow), so
-# the invariant is EXACT EQUALITY between the generated agent's ask keys and
-# the template's sanctioned ask set. Fail-closed if the template is missing,
-# unparseable, or carries no auto-sub.bash block.
-$sanctionedAsks = $null
-try {
-  $tplBash = (Get-Content -LiteralPath (Join-Path $root 'scripts\lib\permission-templates.json') -Raw | ConvertFrom-Json).'auto-sub'.bash
-  if ($null -eq $tplBash) { throw 'template auto-sub.bash absent' }
-  $sanctionedAsks = @($tplBash.PSObject.Properties | Where-Object { $_.Value -eq 'ask' } | ForEach-Object { $_.Name })
-} catch { $sanctionedAsks = $null }
-foreach ($t in $autoTwins) {
-  $a = Get-Prop $agentTable $t
-  if (-not $a) { Add-Check "auto-twin-$t" $false 'missing from opencode.json' }
-  else {
-    $tMode = Get-Prop $a 'mode'; $tHidden = Get-Prop $a 'hidden'
-    if ($null -eq $tMode -or $null -eq $tHidden) { Add-Check "auto-twin-$t" $false 'mode/hidden missing (expected subagent/true)' }
-    elseif ($tMode -ne 'subagent' -or $tHidden -ne $true) { Add-Check "auto-twin-$t" $false "mode=$tMode hidden=$tHidden (expected subagent/true)" }
-    else {
-      $bashStar = Get-EffectiveBashStar $a $cfg
-      if ($null -eq $bashStar) { Add-Check "auto-twin-$t" $false 'bash.* missing (no wildcard — expected allow)' }
-      elseif ($bashStar -ne 'allow') { Add-Check "auto-twin-$t" $false "bash.*=$bashStar (expected allow)" }
-      else {
-        if ($null -eq $sanctionedAsks) { Add-Check "auto-twin-$t" $false 'cannot load template ask set (fail-closed — template missing/unparseable)' }
-        else {
-          $bashNode = Get-Prop (Get-Prop $a 'permission') 'bash'
-          if ($null -eq $bashNode) { Add-Check "auto-twin-$t" $false 'bash block missing (no ask set to verify)' }
-          else {
-            $agentAsks = @($bashNode.PSObject.Properties | Where-Object { $_.Value -eq 'ask' } | ForEach-Object { $_.Name })
-            $unsanctioned = @($agentAsks | Where-Object { $sanctionedAsks -notcontains $_ })
-            $removed = @($sanctionedAsks | Where-Object { $agentAsks -notcontains $_ })
-            if ($unsanctioned.Count -gt 0) { Add-Check "auto-twin-$t" $false "unsanctioned ask: $($unsanctioned -join ', ') (not in template auto-sub ask set)" }
-            elseif ($removed.Count -gt 0) { Add-Check "auto-twin-$t" $false "missing sanctioned ask: $($removed -join ', ') (silent removal would zero-out ADR-046 npm friction)" }
-            else { Add-Check "auto-twin-$t" $true "$($agentAsks.Count) sanctioned ask entries (ADR-046 npm catch-all), parity with template" }
-          }
-        }
-      }
-    }
-  }
-}
+# Single-mode (Refactor-AP S5): 44 agents, 0 -auto. The retired auto-twin
+# checks (which verified against the auto-sub template deleted in S1) are
+# replaced by absence assertions — resurrecting any -auto agent trips these.
+$agentNames = @($agentTable.PSObject.Properties.Name)
+if ($agentNames.Count -ne 44) { Add-Check 'agent-count-44' $false "found $($agentNames.Count) agents (expected 44 single-mode)" }
+else { Add-Check 'agent-count-44' $true '44 agents (single-mode)' }
+$staleAuto = @($agentNames | Where-Object { $_ -match '-auto$' })
+if ($staleAuto.Count -gt 0) { Add-Check 'zero-auto-agents' $false "retired -auto agents present: $($staleAuto -join ', ') (expected 0)" }
+else { Add-Check 'zero-auto-agents' $true '0 -auto agents (single-mode)' }
 
 $orchAgent = Get-Prop $agentTable 'gentle-MK'
 if (-not $orchAgent) { $orchAgent = Get-Prop $agentTable 'gentleman-vMK' }
@@ -266,24 +234,11 @@ if (-not $orchTask) {
   }
 }
 
-# Verify gentleman-vMK-auto / gentle-MK-auto can delegate to -sub-auto twins (fail-closed task allowlist)
-$orchAutoAgent = Get-Prop $agentTable 'gentle-MK-auto'
-if (-not $orchAutoAgent) { $orchAutoAgent = Get-Prop $agentTable 'gentleman-vMK-auto' }
-$orchAuto = Get-Prop $orchAutoAgent 'permission'
-$orchAutoTask = Get-Prop $orchAuto 'task'
-if (-not $orchAutoTask) {
-  Add-Check 'orch-auto-task-failclosed' $false 'vMK-auto task block missing (expected fail-closed deny + auto-twin allows)'
-} else {
-  $orchAutoStar = Get-Prop $orchAutoTask '*'
-  if ($orchAutoStar -ne 'deny') {
-    if ($null -eq $orchAutoStar) { Add-Check 'orch-auto-task-failclosed' $false 'vMK-auto task.* missing (expected deny — fail-closed)' }
-    else { Add-Check 'orch-auto-task-failclosed' $false "vMK-auto task.* = $orchAutoStar (expected deny)" }
-  } else {
-    $missingAuto = @($autoTwins | Where-Object { (Get-Prop $orchAutoTask $_) -ne 'allow' })
-    if ($missingAuto.Count -gt 0) { Add-Check 'orch-auto-task-failclosed' $false "vMK-auto not allowed: $($missingAuto -join ', ')" }
-    else { Add-Check 'orch-auto-task-failclosed' $true "vMK-auto fail-closed with $($autoTwins.Count) auto-sub twins allowed" }
-  }
-}
+# Single-mode (Refactor-AP S5): the -auto orchestrator twin was deleted in S1 —
+# assert absence (fail-closed: resurrecting it must trip this check).
+$staleOrchAuto = @($agentNames | Where-Object { $_ -eq 'gentle-MK-auto' -or $_ -eq 'gentleman-vMK-auto' })
+if ($staleOrchAuto.Count -gt 0) { Add-Check 'no-orch-auto-agent' $false "retired auto orchestrator present: $($staleOrchAuto -join ', ')" }
+else { Add-Check 'no-orch-auto-agent' $true 'no gentle-MK-auto / gentleman-vMK-auto (single-mode)' }
 
 $readOnly = @('gentleman-security', 'gentleman-seo', 'gentleman-infra', 'gentleman-frontend', 'gentleman-performance', 'gentleman-datascience', 'gentleman-docs', 'gentleman-security-sub', 'gentleman-seo-sub', 'gentleman-infra-sub', 'gentleman-frontend-sub', 'gentleman-performance-sub', 'gentleman-datascience-sub', 'gentleman-docs-sub')
 $roFail = @($readOnly | Where-Object { (Get-EffectiveBashStar (Get-Prop $agentTable $_) $cfg) -ne 'deny' })

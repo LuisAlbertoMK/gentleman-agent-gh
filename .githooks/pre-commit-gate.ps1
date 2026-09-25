@@ -262,11 +262,17 @@ if ($stagedAgents) {
 
 # [9/28] MCP security audit (KB r2-mcp-security-bestpractices 2026-07-28: SSRF allowlist, version pin, env secrets, disabled hygiene)
 Write-Host "[9/28] MCP security audit..."
-$mcpStaged = $staged | Where-Object { $_ -match 'opencode\.json|security-audit-mcp\.ps1' }
+$mcpStaged = $staged | Where-Object { $_ -match 'opencode\.json|security-audit-mcp\.ps1|scripts/opencode-config/mcp-policy\.json' }
 if ($mcpStaged) {
-    $mcpOut = & "$RepoRoot/scripts/security-audit-mcp.ps1" *>&1 | Out-String
-    if ($mcpOut -match '\[FAIL\]') { Fail "MCP security audit FAIL`n$mcpOut" }
-    else { $mcpOut.Trim() -split "`n" | ForEach-Object { Write-Host "    $_" }; Pass }
+    $mcpPolicy = Join-Path $RepoRoot 'scripts/opencode-config/mcp-policy.json'
+    try { $null = Get-Content -LiteralPath $mcpPolicy -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop; $mcpPolicyOk = $true }
+    catch { Fail "mcp-policy.json SSoT invalid — fix policy fragment: $_"; $mcpPolicyOk = $false }
+    if ($mcpPolicyOk) {
+        $mcpOut = & "$RepoRoot/scripts/security-audit-mcp.ps1" -CI *>&1 | Out-String
+        if ($LASTEXITCODE -ne 0) { Fail "MCP audit exit $LASTEXITCODE (fail-closed)`n$mcpOut" }
+        elseif ($mcpOut -match '\[FAIL\]') { Fail "MCP security audit FAIL`n$mcpOut" }
+        else { $mcpOut.Trim() -split "`n" | ForEach-Object { Write-Host "    $_" }; Pass }
+    }
 } else { Pass }
 
 # [10/28] JD review check — respects .jd-cleared/<path> markers or FORCE_SHIP env

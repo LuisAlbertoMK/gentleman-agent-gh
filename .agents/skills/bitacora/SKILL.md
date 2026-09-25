@@ -43,7 +43,7 @@ docs/skills/bitacora/reference.md
 | "skip si sesión corta" | sesión <YELLOW sin BITACORA aunque hubo git diff | si git diff ≠0 → BITACORA obligatoria aunque ctx<40% |
 
 ## Red Flags
-- BITACORA missing or 0 bytes → create with `# Bitácora` header (not silent continue)
+- BITACORA missing or 0 bytes → create with `# Bitácora` header (not silent continue); session-close with diff ≠0 and still unlogged → STOP until 1-line entry is prepended
 - Output >10 lines on resume → spamming session start
 
 ## Verification

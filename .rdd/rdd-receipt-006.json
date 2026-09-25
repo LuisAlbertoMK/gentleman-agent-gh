@@ -1,0 +1,27 @@
+{
+  "id": "rdd-receipt-006",
+  "freeze": "HEAD-7d93b1b4-e69de29b",
+  "freeze_note": "Slice R8-S2 commit 7d93b1b4 (feat(contracts): permission + frontmatter schemas + tests) en rama experimento/mejora-ronda8-contratos. diff8=e69de29b = working tree limpio al emitir el receipt (git diff vacio). lines_changed=322 solo scope del slice (37+32+135+118); el commit ademas toco odd/tasks/ronda8-contratos.md (1/1, plan del slice, fuera del receipt).",
+  "tier": 2,
+  "tier_justification": "RDD Risk Tiers: Tier 2 = dos schemas nuevos con semantica de valores (allow/deny/ask) + matriz de permisos. Requiere code-review-agent 4R BLOCKER-capable obligatorio; judgment-day dual solo en FAIL (no requerido: PASS directo).",
+  "files": [
+    "contracts/permission-templates.schema.json",
+    "contracts/skill-frontmatter.schema.json",
+    "tests/contract-permission.Tests.ps1",
+    "tests/contract-frontmatter.Tests.ps1"
+  ],
+  "lines_changed": 322,
+  "lines_deleted": 0,
+  "verdict": "PASS",
+  "verdict_note": "Pester permission 12/12 + frontmatter 107/107 (97 sweep) + S1 8/8 + E1 10/10, sin regresion. Nombres resueltos por delegacion: permission-templates (= fuente) + tests singulares separados. Test-Json/NJsonSchema no soporta $ref/$defs: estructura fija en schema, semantica de valores en Pester (leaf-scan). Verificacion 4R formal: PASS global S2 12/12+107/107.",
+  "review": {
+    "status": "PASS 4R formal",
+    "method": "code-review-agent 4R BLOCKER-capable + Pester 12/12+107/107",
+    "gaps": []
+  },
+  "escalation": "judgment-day (no requerido, PASS directo)",
+  "blockers": [],
+  "next": ["R8-S3"],
+  "auto_fix": false,
+  "timestamp": "2026-09-24T14:18:17.5313754-06:00"
+}

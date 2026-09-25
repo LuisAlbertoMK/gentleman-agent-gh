@@ -1,0 +1,28 @@
+{
+  "generator": "Convert-SkillFrontmatterToJson (tests/contract-frontmatter.Tests.ps1 pattern: scalars, token_budget int, '- item' lists)",
+  "samples": {
+    "engram-protocol": {
+      "changelog": "docs/ciclos/cycle28-20260815.md",
+      "description": "Persistent memory protocol — save, search, dreaming, session lifecycle via Engram MCP",
+      "name": "engram-protocol",
+      "token_budget": 2200,
+      "triggers": "remember, recall, engram, mem_save, mem_search, session close, dreaming, memory"
+    },
+    "odd": {
+      "changelog": "docs/ciclos/cycle28-20260815.md",
+      "description": "Organic Driven Development — slice features into ≤400L conventional-commit units with review gates. Use sdd-quick for registry/spec concerns.",
+      "name": "odd",
+      "token_budget": 2850,
+      "triggers": "organic driven development, one day delivery, odd, slice plan, daily delivery, commit slicing, review per slice"
+    },
+    "ps-compat": {
+      "changelog": "2026-09-02 — created: consolidates ANTI-PATTERN-CATALOG #10/#13/#14/#16/#20 + GAP-2 + P1-1 CRLF trap",
+      "description": "PowerShell 5.1/7 compatibility + encoding pre-write checklist - consolidates anti-patterns #10/#13/#14/#16/#20, GAP-2 hook incident, P1-1 CRLF false positives",
+      "name": "ps-compat",
+      "token_budget": 3000,
+      "triggers": "powershell 5.1, ps5, ps7, ps compatibility, encoding, CRLF, BOM, PSSA, Join-Path, cmatch, requires, bash-safe"
+    }
+  },
+  "schema": "contracts/skill-frontmatter.schema.json",
+  "total": 3
+}

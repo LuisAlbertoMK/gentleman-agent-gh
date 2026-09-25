@@ -9,7 +9,7 @@
 4. `mem_search(query="project/{name}", scope=project, limit=1)`
 5. Missing → trigger Project fingerprint (dreaming)
 
-**Pre-answer search**: `engram-protocol` for proactive search; `gentleman-vMK.md` = Pre-Answer Evidence Gate.
+**Pre-answer search**: `engram-protocol` for proactive search; `gentle-MK.md` = Pre-Answer Evidence Gate.
 
 ## Skill Pre-load
 ```powershell

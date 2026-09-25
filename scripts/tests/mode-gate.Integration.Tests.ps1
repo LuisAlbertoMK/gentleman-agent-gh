@@ -1,7 +1,11 @@
 #requires -Version 7
 <#
 .SYNOPSIS
-    Integration tests for mode-gate.ps1 — tests the ACTUAL script.
+    Integration tests for mode-gate.ps1 — single-mode (Refactor-AP S2).
+.DESCRIPTION
+    New expectations: every target is ALLOWED; `-auto`/`-semi` are compat
+    aliases (ALLOWED + warning); `.gentleman-mode` / `-Mode` are no-ops
+    (always effective 'manual', fallback 'manual').
 .NOTES
     Tests run against a per-run temp mode file (-ModeFilePath) — the repo's
     real .gentleman-mode is never read or written. Safe to run in parallel
@@ -27,6 +31,16 @@ BeforeAll {
         if ($Json) { $invoke.Json = $true }
         & $scriptPath @invoke 2>&1
     }
+
+    function Invoke-ModeGateWarning {
+        param(
+            [string]$TargetAgent,
+            [string]$Mode = ""
+        )
+        $invoke = @{ TargetAgent = $TargetAgent; ModeFilePath = $modeFilePath }
+        if ($Mode) { $invoke.Mode = $Mode }
+        & $scriptPath @invoke 3>&1 2>$null | Out-String
+    }
 }
 
 AfterAll {
@@ -35,138 +49,104 @@ AfterAll {
     }
 }
 
-Describe "Mode gate — auto mode" {
+Describe "Mode gate — single-mode base agents" {
 
-    BeforeAll {
-        Set-Content -LiteralPath $modeFilePath -Value "auto" -NoNewline -Encoding ASCII -Force
-    }
-
-    It "ALLOWS -auto suffixed agent in auto mode" {
-        $output = Invoke-ModeGate -TargetAgent "gentleman-quick-auto" -Json
+    It "ALLOWS gentle-MK (default agent)" {
+        $output = Invoke-ModeGate -TargetAgent "gentle-MK" -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
-        $result.mode | Should -Be "auto"
+        $result.mode | Should -Be "manual"
+        $result.expected_suffix | Should -Be ""
+        $LASTEXITCODE | Should -Be 0
     }
 
-    It "BLOCKS base agent (no suffix) in auto mode" {
+    It "ALLOWS base agent (no suffix)" {
         $output = Invoke-ModeGate -TargetAgent "gentleman-quick" -Json
-        # Should exit with error
-        $result = $output | Out-String -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
-        if ($LASTEXITCODE -ne 0) {
-            $result.allowed | Should -Be $false
-        }
+        $result = $output | Out-String | ConvertFrom-Json
+        $result.allowed | Should -Be $true
+        $LASTEXITCODE | Should -Be 0
     }
 
-    It "ALLOWS read-only specialist in auto mode" {
+    It "ALLOWS read-only specialist" {
         $output = Invoke-ModeGate -TargetAgent "gentleman-security" -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
     }
 
-    It "ALLOWS SDD sub-agent in auto mode" {
+    It "ALLOWS SDD sub-agent" {
         $output = Invoke-ModeGate -TargetAgent "sdd-apply" -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
     }
 }
 
-Describe "Mode gate — manual mode" {
+Describe "Mode gate — compat aliases" {
 
-    BeforeAll {
-        Set-Content -LiteralPath $modeFilePath -Value "manual" -NoNewline -Encoding ASCII -Force
-    }
-
-    It "ALLOWS base agent (no suffix) in manual mode" {
-        $output = Invoke-ModeGate -TargetAgent "gentleman-quick" -Json
-        $result = $output | Out-String | ConvertFrom-Json
-        $result.allowed | Should -Be $true
-    }
-
-    It "BLOCKS -auto suffixed agent in manual mode" {
+    It "ALLOWS -auto suffixed agent as compat alias" {
         $output = Invoke-ModeGate -TargetAgent "gentleman-quick-auto" -Json
-        $result = $output | Out-String -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
-        if ($LASTEXITCODE -ne 0) {
-            $result.allowed | Should -Be $false
-        }
-    }
-}
-
-Describe "Mode gate — explicit -Mode override" {
-
-    It "ALLOWS -auto agent with -Mode auto override" {
-        $output = Invoke-ModeGate -TargetAgent "gentleman-deep-auto" -Mode auto -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
+        $result.reason | Should -Match "Compat alias"
+        $LASTEXITCODE | Should -Be 0
     }
 
-    It "BLOCKS base agent with -Mode auto override" {
-        $output = Invoke-ModeGate -TargetAgent "gentleman-deep" -Mode auto -Json
-        $result = $output | Out-String -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
-        if ($LASTEXITCODE -ne 0) {
-            $result.allowed | Should -Be $false
-        }
-    }
-
-    It "ALLOWS base agent with -Mode manual override" {
-        $output = Invoke-ModeGate -TargetAgent "gentleman-deep" -Mode manual -Json
-        $result = $output | Out-String | ConvertFrom-Json
-        $result.allowed | Should -Be $true
-    }
-}
-
-Describe "Mode gate — semi mode" {
-
-    BeforeAll {
-        Set-Content -LiteralPath $modeFilePath -Value "semi" -NoNewline -Encoding ASCII -Force
-    }
-
-    It "ALLOWS -semi suffixed agent in semi mode" {
+    It "ALLOWS -semi suffixed agent as compat alias" {
         $output = Invoke-ModeGate -TargetAgent "gentleman-quick-semi" -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
-        $result.mode | Should -Be "semi"
+        $result.reason | Should -Match "Compat alias"
+        $LASTEXITCODE | Should -Be 0
     }
 
-    It "BLOCKS base agent (no suffix) in semi mode" {
+    It "ALLOWS gentle-MK-auto as compat alias" {
+        $output = Invoke-ModeGate -TargetAgent "gentle-MK-auto" -Json
+        $result = $output | Out-String | ConvertFrom-Json
+        $result.allowed | Should -Be $true
+        $LASTEXITCODE | Should -Be 0
+    }
+
+    It "emits a warning for suffixed aliases" {
+        $text = Invoke-ModeGateWarning -TargetAgent "gentleman-quick-auto"
+        $text | Should -Match "compat alias"
+    }
+}
+
+Describe "Mode gate — mode file and -Mode are no-ops" {
+
+    It "treats mode file 'auto' as manual" {
+        Set-Content -LiteralPath $modeFilePath -Value "auto" -NoNewline -Encoding ASCII -Force
         $output = Invoke-ModeGate -TargetAgent "gentleman-quick" -Json
-        $result = $output | Out-String -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
-        if ($LASTEXITCODE -ne 0) {
-            $result.allowed | Should -Be $false
-        }
-    }
-
-    It "BLOCKS -auto agent in semi mode" {
-        $output = Invoke-ModeGate -TargetAgent "gentleman-quick-auto" -Json
-        $result = $output | Out-String -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
-        if ($LASTEXITCODE -ne 0) {
-            $result.allowed | Should -Be $false
-        }
-    }
-
-    It "ALLOWS read-only specialist in semi mode" {
-        $output = Invoke-ModeGate -TargetAgent "gentleman-security" -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
+        $result.mode | Should -Be "manual"
     }
 
-    It "ALLOWS SDD sub-agent in semi mode" {
-        $output = Invoke-ModeGate -TargetAgent "sdd-apply" -Json
+    It "treats mode file 'semi' as manual" {
+        Set-Content -LiteralPath $modeFilePath -Value "semi" -NoNewline -Encoding ASCII -Force
+        $output = Invoke-ModeGate -TargetAgent "gentleman-quick" -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
+        $result.mode | Should -Be "manual"
     }
 
-    It "ALLOWS -semi agent with -Mode semi override" {
+    It "ALLOWS with -Mode auto override (no-op)" {
+        $output = Invoke-ModeGate -TargetAgent "gentleman-deep" -Mode auto -Json
+        $result = $output | Out-String | ConvertFrom-Json
+        $result.allowed | Should -Be $true
+        $result.mode | Should -Be "manual"
+    }
+
+    It "ALLOWS with -Mode semi override (no-op)" {
         $output = Invoke-ModeGate -TargetAgent "gentleman-deep-semi" -Mode semi -Json
         $result = $output | Out-String | ConvertFrom-Json
         $result.allowed | Should -Be $true
+        $result.mode | Should -Be "manual"
     }
 
-    It "BLOCKS -semi agent with -Mode manual override" {
-        $output = Invoke-ModeGate -TargetAgent "gentleman-deep-semi" -Mode manual -Json
-        $result = $output | Out-String -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
-        if ($LASTEXITCODE -ne 0) {
-            $result.allowed | Should -Be $false
-        }
+    It "ALLOWS with -Mode manual override" {
+        $output = Invoke-ModeGate -TargetAgent "gentleman-deep" -Mode manual -Json
+        $result = $output | Out-String | ConvertFrom-Json
+        $result.allowed | Should -Be $true
     }
 }
 

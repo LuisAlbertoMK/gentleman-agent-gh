@@ -2,7 +2,7 @@
 name: context-watchdog
 description: "Monitor context window — Recursive Summary Compression (L1/L2/L3), YELLOW/RED zones, hallucination detection"
 triggers: "Context explosion, compress, compression schedule, session break"
-changelog: "2026-09-01 P0-1 — DAG wiring: hierarchical summary DAG + check integration"
+changelog: "2026-09-23 R3S3 F1 — lossless pointer schema (references/lcm-pointer-schema.md) + round-trip test"
 token_budget: 2400
 ---
 ## Rules
@@ -29,6 +29,10 @@ Re-reads same content, re-states question, references unsaid→force YELLOW+L1. 
 ## Anti-Patterns
 Compress at RED · skip L1→L3 (destroys chain) · summarize stale instead of pruning (compounds drift)
 
+## Red Flags
+- YELLOW zone without L1 running → STOP, run `context-watchdog-check.ps1` + L1 now (rule 5 cadence)
+- Same file edited 3+ times without commit → STOP, summarize, commit, re-read (rule 4)
+
 ## Anti-Rationalization
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
@@ -38,6 +42,6 @@ Compress at RED · skip L1→L3 (destroys chain) · summarize stale instead of p
 
 ## Verification
 - Post-L1: token count drops >20%, next tool call succeeds
-- Post-L3: DAG node has lossless Pointer; `Get-LcmNode -Id <id>` resolves
+- Post-L3: DAG node has lossless Pointer `file:<path>#sha256:<hash>`; `Get-LcmNode -Id <id>` resolves + hash matches (schema: `references/lcm-pointer-schema.md` §2)
 
 → docs/skills/context-watchdog/reference.md · Cross-Refs: skill-graph | performance | session-resume | lean-context

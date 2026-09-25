@@ -3,7 +3,7 @@ name: best-practices
 description: "Apply modern web development best practices for security, compatibility, and code quality."
 triggers: "best practices, security audit, modernize code, code quality, check vulnerabilities"
 changelog: docs/ciclos/cycle28-20260815.md
-token_budget: 3992
+token_budget: 4600
 ---
 
 ## When to Use
@@ -29,8 +29,8 @@ Valid HTML(no dup IDs) | Semantic HTML5 | Explicit img dims | Event delegation |
 | "Copy headers blindly" | Headers sin verificar FP / SRI faltante | SRI `openssl dgst -sha384` + CSP nonce + Permissions-Policy verify |
 
 ## Red Flags
-- `npm audit` alone without supply-chain check (postinstall/typosquat)
-- Permissions requested before user action without explanation
+- `npm audit` alone without supply-chain check (postinstall/typosquat) → BLOCKER for deploy until postinstall/typosquat reviewed
+- Permissions requested before user action without explanation → STOP and require user action + explanation first
 
 ## Verification
 - `web-quality-audit` skill checklist PASS + Lighthouse score

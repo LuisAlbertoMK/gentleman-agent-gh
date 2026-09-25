@@ -8,7 +8,7 @@
     Coverage targets:
       1. Unmapped agent            -> process.exit(1) fail-closed
       2. extraPermKeys collision   -> ERROR, process.exit(1)
-      3. auto-sub merge            -> bash:{*:allow} + task:{*:deny}, ZERO ask
+      3. readwrite merge (ADR-050) -> bash:{*:ask}, single key, ZERO allow/deny
       4. readonly merge            -> bash:{*:deny} (+ edit/write/task deny)
       5. --validate idempotency    -> exit 0 when generated output is in sync
       6. hidden propagation        -> hidden:true from agent-overrides.json only
@@ -18,10 +18,8 @@ BeforeAll {
     $script:testDir = Join-Path $env:TEMP "generate-config-test-$PID"
 
     # Production-exact template shapes (subset under test) — contract source of truth.
-    $script:tmplAutoSub = @{
-        bash = @{ '*' = 'allow' }
-        task = @{ '*' = 'deny' }
-    }
+    # NOTE (ADR-050 single-mode): the auto/auto-sub/semi templates were REMOVED from
+    # the SSoT (commit 65bd2a6c); no auto-sub fixture lives here anymore.
     $script:tmplReadonly = @{
         bash = @{ '*' = 'deny' }
         edit = 'deny'
@@ -30,6 +28,35 @@ BeforeAll {
     }
     $script:tmplReadwrite = @{
         bash = @{ '*' = 'ask' }
+    }
+
+    # Production-shaped mcp section (subset under policy test) — mirrors
+    # scripts/lib/opencode-base.json:mcp: exact-allowlisted remote, disabled
+    # hygiene servers, pinned npx. Any deviation = policy violation fixture.
+    $script:mcpOk = @{
+        'codebase-memory-mcp' = @{
+            type = 'local'; command = @('codebase-memory-mcp'); enabled = $true
+            timeout = 60000; environment = @{ CBM_ALLOWED_ROOT = '{env:GENTLEMAN_AGENT_ROOT}' }
+        }
+        'context7' = @{ enabled = $true; type = 'remote'; url = 'https://mcp.context7.com/mcp' }
+        'headroom' = @{ enabled = $false; type = 'local'; command = @('headroom', 'mcp', 'serve') }
+        'chrome-devtools-mcp' = @{
+            type = 'local'; command = @('npx', '-y', 'chrome-devtools-mcp@1.6.0', '--no-usage-statistics')
+            enabled = $false; timeout = 30000
+        }
+    }
+    $script:agentSec = @{
+        'gentleman-security' = @{
+            description = 'Security specialist'; model = 'opencode/nemotron-3-ultra-free';
+            mode = 'primary'; prompt = '{file:prompts/gentleman-security.md}' }
+    }
+
+    function Copy-McpPolicy {
+        param([string]$Repo)
+        $dst = Join-Path $Repo 'scripts\opencode-config'
+        New-Item -ItemType Directory -Path $dst -Force | Out-Null
+        Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\opencode-config\mcp-policy.json') `
+            -Destination (Join-Path $dst 'mcp-policy.json')
     }
 
     function New-GenRepo {
@@ -46,10 +73,13 @@ BeforeAll {
             [string]$Repo,
             [hashtable]$Agent,
             [hashtable]$Templates,
-            [hashtable]$Overrides = @{}
+            [hashtable]$Overrides = @{},
+            [hashtable]$Extra = @{}
         )
         $libDir = Join-Path $Repo 'scripts\lib'
-        @{ agent = $Agent } | ConvertTo-Json -Depth 20 |
+        $base = @{ agent = $Agent }
+        foreach ($k in $Extra.Keys) { $base[$k] = $Extra[$k] }
+        $base | ConvertTo-Json -Depth 20 |
             Set-Content -LiteralPath (Join-Path $libDir 'opencode-base.json') -Encoding utf8
         $Templates | ConvertTo-Json -Depth 20 |
             Set-Content -LiteralPath (Join-Path $libDir 'permission-templates.json') -Encoding utf8
@@ -87,11 +117,11 @@ Describe 'generate-opencode-config.js — fail-closed' {
     It 'exits 1 when extraPermKeys collides with a template key' {
         $repo = New-GenRepo 'collision'
         Set-GenFixture -Repo $repo `
-            -Agent @{ 'gentleman-quick-sub-auto' = @{
+            -Agent @{ 'gentleman-quick-sub' = @{
                 description = 'Fast executor subagent'; model = 'opencode/big-pickle';
                 hidden = $true; mode = 'subagent'; prompt = '{file:prompts/gentleman-quick.md}' } } `
-            -Templates @{ 'auto-sub' = $script:tmplAutoSub } `
-            -Overrides @{ 'gentleman-quick-sub-auto' = @{ extraPermKeys = @{ bash = @{ '*' = 'allow' } } } }
+            -Templates @{ 'readwrite' = $script:tmplReadwrite } `
+            -Overrides @{ 'gentleman-quick-sub' = @{ extraPermKeys = @{ bash = @{ '*' = 'allow' } } } }
 
         $out = & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') 2>&1 | Out-String
 
@@ -100,14 +130,19 @@ Describe 'generate-opencode-config.js — fail-closed' {
         $out | Should -Match 'bash'
     }
 
-    It 'EXTRA perm-escalation: extraPermKeys with task key on auto-sub agent is denied (H2 regression)' {
+    It 'EXTRA perm-escalation: extraPermKeys with task key on readonly agent is denied (H2 regression, ADR-050 single-mode)' {
+        # ADR-050 REMOVED the auto-sub template, so the old premise (task key collides
+        # with the auto-sub template) evaporated: readwrite carries NO task key and the
+        # escalation would silently merge instead of failing closed. The H2 intent —
+        # task-escalation via extraPermKeys is denied — migrates to the live template
+        # that still carries a task key: readonly (gentleman-security).
         $repo = New-GenRepo 'collision-task'
         Set-GenFixture -Repo $repo `
-            -Agent @{ 'gentleman-quick-sub-auto' = @{
-                description = 'Fast executor'; model = 'opencode/big-pickle';
-                hidden = $true; mode = 'subagent'; prompt = '{file:prompts/gentleman-quick.md}' } } `
-            -Templates @{ 'auto-sub' = $script:tmplAutoSub } `
-            -Overrides @{ 'gentleman-quick-sub-auto' = @{ extraPermKeys = @{ task = @{ '*' = 'allow' } } } }
+            -Agent @{ 'gentleman-security' = @{
+                description = 'Security specialist'; model = 'opencode/nemotron-3-ultra-free';
+                mode = 'primary'; prompt = '{file:prompts/gentleman-security.md}' } } `
+            -Templates @{ 'readonly' = $script:tmplReadonly } `
+            -Overrides @{ 'gentleman-security' = @{ extraPermKeys = @{ task = @{ '*' = 'allow' } } } }
 
         $out = & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') 2>&1 | Out-String
 
@@ -118,23 +153,27 @@ Describe 'generate-opencode-config.js — fail-closed' {
 }
 
 Describe 'generate-opencode-config.js — permission merge' {
-    It 'auto-sub merge: bash:{*:allow} + task:{*:deny}, ZERO ask' {
-        $repo = New-GenRepo 'auto-sub'
+    It 'readwrite merge: bash:{*:ask}, single key, ZERO allow/deny (ADR-050 single-mode)' {
+        # ADR-050 REMOVED the auto-sub template (bash allow + task deny, ZERO ask) and
+        # re-mapped gentleman-quick-sub -> readwrite (bash ask). A literal port would
+        # invert the old ZERO-ask assertion, so this test asserts the NEW merge output
+        # for the successor mapping — the old invariant is gone by design, declared here.
+        $repo = New-GenRepo 'readwrite-sub'
         Set-GenFixture -Repo $repo `
-            -Agent @{ 'gentleman-quick-sub-auto' = @{
+            -Agent @{ 'gentleman-quick-sub' = @{
                 description = 'Fast executor subagent'; model = 'opencode/big-pickle';
                 hidden = $true; mode = 'subagent'; prompt = '{file:prompts/gentleman-quick.md}' } } `
-            -Templates @{ 'auto-sub' = $script:tmplAutoSub }
+            -Templates @{ 'readwrite' = $script:tmplReadwrite }
 
         & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') | Out-Null
         $LASTEXITCODE | Should -Be 0
 
-        $agent = (Read-GenOutput (Join-Path $repo 'opencode.json')).agent.'gentleman-quick-sub-auto'
+        $agent = (Read-GenOutput (Join-Path $repo 'opencode.json')).agent.'gentleman-quick-sub'
         $perm = $agent.permission
-        $perm.bash.'*' | Should -Be 'allow'
-        $perm.task.'*' | Should -Be 'deny'
-        ($perm | ConvertTo-Json -Depth 10 -Compress) | Should -Not -Match '"ask"'
-        ($perm.PSObject.Properties.Name -join ',') | Should -Be 'bash,task'
+        $perm.bash.'*' | Should -Be 'ask'
+        ($perm | ConvertTo-Json -Depth 10 -Compress) | Should -Not -Match '"allow"'
+        ($perm | ConvertTo-Json -Depth 10 -Compress) | Should -Not -Match '"deny"'
+        ($perm.PSObject.Properties.Name -join ',') | Should -Be 'bash'
         # Base fields survive the rebuild untouched.
         $agent.description | Should -Be 'Fast executor subagent'
         $agent.mode | Should -Be 'subagent'
@@ -166,10 +205,10 @@ Describe 'generate-opencode-config.js — validation & overrides' {
         $repo = New-GenRepo 'idem'
         Set-GenFixture -Repo $repo `
             -Agent @{
-                'gentleman-quick-sub-auto' = @{ description = 'Fast executor subagent'; model = 'opencode/big-pickle'; hidden = $true; mode = 'subagent'; prompt = '{file:prompts/gentleman-quick.md}' }
+                'gentleman-quick-sub' = @{ description = 'Fast executor subagent'; model = 'opencode/big-pickle'; hidden = $true; mode = 'subagent'; prompt = '{file:prompts/gentleman-quick.md}' }
                 'gentleman-security' = @{ description = 'Security specialist'; model = 'opencode/nemotron-3-ultra-free'; mode = 'primary'; prompt = '{file:prompts/gentleman-security.md}' }
             } `
-            -Templates @{ 'auto-sub' = $script:tmplAutoSub; 'readonly' = $script:tmplReadonly }
+            -Templates @{ 'readwrite' = $script:tmplReadwrite; 'readonly' = $script:tmplReadonly }
 
         & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') | Out-Null
         $LASTEXITCODE | Should -Be 0
@@ -184,9 +223,9 @@ Describe 'generate-opencode-config.js — validation & overrides' {
         Set-GenFixture -Repo $repo `
             -Agent @{
                 'sdd-apply' = @{ description = 'Implement code changes from task definitions'; model = 'opencode/muse-spark-1.3-contributor-free'; mode = 'subagent'; prompt = '{file:prompts/sdd/sdd-apply.md}' }
-                'gentleman-quick-sub-auto' = @{ description = 'Fast executor subagent'; mode = 'subagent' }
+                'gentleman-quick-sub' = @{ description = 'Fast executor subagent'; mode = 'subagent' }
             } `
-            -Templates @{ 'readwrite' = $script:tmplReadwrite; 'auto-sub' = $script:tmplAutoSub } `
+            -Templates @{ 'readwrite' = $script:tmplReadwrite } `
             -Overrides @{ 'sdd-apply' = @{ hidden = $true } }
 
         & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') | Out-Null
@@ -194,7 +233,115 @@ Describe 'generate-opencode-config.js — validation & overrides' {
 
         $cfg = Read-GenOutput (Join-Path $repo 'opencode.json')
         $cfg.agent.'sdd-apply'.hidden | Should -Be $true
-        $cfg.agent.'gentleman-quick-sub-auto'.PSObject.Properties.Name | Should -Not -Contain 'hidden'
+        $cfg.agent.'gentleman-quick-sub'.PSObject.Properties.Name | Should -Not -Contain 'hidden'
+    }
+}
+
+Describe 'generate-opencode-config.js — mcp-policy SSoT consumer (Ronda2 S2)' {
+    It 'compliant mcp passes and is emitted verbatim (policy→output)' {
+        $repo = New-GenRepo 'mcp-ok'
+        Set-GenFixture -Repo $repo -Agent $script:agentSec `
+            -Templates @{ 'readonly' = $script:tmplReadonly } -Extra @{ mcp = $script:mcpOk }
+        Copy-McpPolicy $repo
+
+        & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') | Out-Null
+        $LASTEXITCODE | Should -Be 0
+
+        $mcp = (Read-GenOutput (Join-Path $repo 'opencode.json')).mcp
+        $mcp.'context7'.url | Should -Be 'https://mcp.context7.com/mcp'
+        $mcp.'codebase-memory-mcp'.environment.CBM_ALLOWED_ROOT | Should -Be '{env:GENTLEMAN_AGENT_ROOT}'
+        $mcp.'headroom'.enabled | Should -Be $false
+    }
+
+    It 'non-allowlisted remote url fails closed (exit 1)' {
+        $repo = New-GenRepo 'mcp-evil-remote'
+        $evil = $script:mcpOk.Clone()
+        $evil['evil-bridge'] = @{ enabled = $true; type = 'remote'; url = 'https://evil.example.com/mcp' }
+        Set-GenFixture -Repo $repo -Agent $script:agentSec `
+            -Templates @{ 'readonly' = $script:tmplReadonly } -Extra @{ mcp = $evil }
+        Copy-McpPolicy $repo
+
+        $out = & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') 2>&1 | Out-String
+
+        $LASTEXITCODE | Should -Be 1
+        $out | Should -Match 'NOT allowlisted'
+        $out | Should -Match 'evil-bridge'
+    }
+
+    It 'enabled hygiene-listed server fails closed (exit 1)' {
+        $repo = New-GenRepo 'mcp-hygiene'
+        $bad = $script:mcpOk.Clone()
+        $bad['headroom'] = @{ enabled = $true; type = 'local'; command = @('headroom', 'mcp', 'serve') }
+        Set-GenFixture -Repo $repo -Agent $script:agentSec `
+            -Templates @{ 'readonly' = $script:tmplReadonly } -Extra @{ mcp = $bad }
+        Copy-McpPolicy $repo
+
+        $out = & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') 2>&1 | Out-String
+
+        $LASTEXITCODE | Should -Be 1
+        $out | Should -Match 'must stay disabled'
+        $out | Should -Match 'headroom'
+    }
+
+    It 'unpinned npx fails closed (exit 1)' {
+        $repo = New-GenRepo 'mcp-unpinned'
+        $bad = $script:mcpOk.Clone()
+        $bad['evil-npx'] = @{ enabled = $true; type = 'local'; command = @('npx', '-y', 'evil-mcp') }
+        Set-GenFixture -Repo $repo -Agent $script:agentSec `
+            -Templates @{ 'readonly' = $script:tmplReadonly } -Extra @{ mcp = $bad }
+        Copy-McpPolicy $repo
+
+        $out = & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') 2>&1 | Out-String
+
+        $LASTEXITCODE | Should -Be 1
+        $out | Should -Match 'without @version pin'
+        $out | Should -Match 'evil-npx'
+    }
+
+    It '--validate catches base-mcp ↔ policy drift (exit 1)' {
+        $repo = New-GenRepo 'mcp-validate-drift'
+        Set-GenFixture -Repo $repo -Agent $script:agentSec `
+            -Templates @{ 'readonly' = $script:tmplReadonly } -Extra @{ mcp = $script:mcpOk }
+        Copy-McpPolicy $repo
+
+        & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') | Out-Null
+        $LASTEXITCODE | Should -Be 0
+
+        $evil = $script:mcpOk.Clone()
+        $evil['evil-bridge'] = @{ enabled = $true; type = 'remote'; url = 'https://evil.example.com/mcp' }
+        Set-GenFixture -Repo $repo -Agent $script:agentSec `
+            -Templates @{ 'readonly' = $script:tmplReadonly } -Extra @{ mcp = $evil }
+
+        $out = & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') --validate 2>&1 | Out-String
+        $LASTEXITCODE | Should -Be 1
+        $out | Should -Match 'NOT allowlisted'
+    }
+}
+
+Describe 'generate-opencode-config.js — missing mcp-policy fail-closed (Ronda3 S1)' {
+    It 'real repo (base declares mcp, no policy file) fails closed (exit 1)' {
+        $repo = New-GenRepo 'mcp-missing-real'
+        Set-GenFixture -Repo $repo -Agent $script:agentSec `
+            -Templates @{ 'readonly' = $script:tmplReadonly } -Extra @{ mcp = $script:mcpOk }
+        # NOTE: deliberately NO Copy-McpPolicy — the policy file is absent.
+
+        $out = & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') 2>&1 | Out-String
+
+        $LASTEXITCODE | Should -Be 1
+        $out | Should -Match 'mcp-policy.json is missing'
+        $out | Should -Match 'mcp section'
+    }
+
+    It 'pre-policy fixture (base declares no mcp, no policy file) still skips (exit 0)' {
+        $repo = New-GenRepo 'mcp-missing-prepolicy'
+        Set-GenFixture -Repo $repo -Agent $script:agentSec `
+            -Templates @{ 'readonly' = $script:tmplReadonly }
+        # NOTE: no mcp in base AND no policy file — pre-policy repo shape.
+
+        $out = & node (Join-Path $repo 'scripts\lib\generate-opencode-config.js') 2>&1 | Out-String
+
+        $LASTEXITCODE | Should -Be 0
+        $out | Should -Match 'skipping MCP policy enforcement'
     }
 }
 

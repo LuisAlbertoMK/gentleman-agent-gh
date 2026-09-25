@@ -1,4 +1,4 @@
-#requires -Version 7
+#requires -Version 7.0
 BeforeAll {
     $script:VerifierPath = Join-Path $PSScriptRoot '../jd-verifier.ps1'
     $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
@@ -240,6 +240,79 @@ Describe 'jd-verifier.ps1' {
                 $env:JD_FAST_EXE = $orig
                 Remove-Item -LiteralPath $stubPath -Force -ErrorAction SilentlyContinue
             }
+        }
+    }
+
+    Context 'P4 Reflexion grounding (Ronda3-S2)' {
+        It 'ungrounded re-judge escalates exit 1 (fail-closed)' {
+            $res = Invoke-Verifier -VerifierArgs @('-Zone','ROJA','-Rounds','1')
+            $res.Stdout | Should -Match 'UNGROUNDED re-judge'
+            $res.Stdout | Should -Match 'ESCALATE'
+            $res.ExitCode | Should -Be 1
+        }
+
+        It 'grounded re-judge passes exit 0' {
+            $res = Invoke-Verifier -VerifierArgs @('-Zone','ROJA','-Rounds','1','-GroundingEvidence','tests:jd-verifier.Tests.ps1;diff:HEAD')
+            $res.Stdout | Should -Match 'GROUNDED re-judge'
+            $res.ExitCode | Should -Be 0
+        }
+
+        It 'initial review needs no grounding' {
+            $res = Invoke-Verifier -VerifierArgs @('-Zone','ROJA')
+            $res.Stdout | Should -Not -Match 'UNGROUNDED'
+            $res.ExitCode | Should -Be 0
+        }
+
+        It '-Json carries grounding object' {
+            $res = Invoke-Verifier -VerifierArgs @('-Zone','ROJA','-Rounds','2','-GroundingEvidence','retrieval:KB855','-Json')
+            $json = $res.Stdout | ConvertFrom-Json -ErrorAction Stop
+            $json.grounding.cited | Should -BeTrue
+            $json.grounding.required | Should -BeTrue
+            $res.ExitCode | Should -Be 0
+        }
+
+        It '-Json ungrounded re-judge exits 1' {
+            $res = Invoke-Verifier -VerifierArgs @('-Zone','ROJA','-Rounds','2','-Json')
+            $json = $res.Stdout | ConvertFrom-Json -ErrorAction Stop
+            $json.grounding.cited | Should -BeFalse
+            $res.ExitCode | Should -Be 1
+        }
+    }
+
+    Context 'P5 constitutional loop line (Ronda3-S2)' {
+        It 'outputs generate-critique-revise loop with RepeatFinding' {
+            $res = Invoke-Verifier -VerifierArgs @('-Zone','ROJA','-RepeatFinding')
+            $res.Stdout | Should -Match 'CONSTITUTIONAL-LOOP: generate'
+            $res.ExitCode | Should -Be 0
+        }
+    }
+
+    Context 'P6 reward-ranker (Ronda3-S2)' {
+        It 'ranks N samples and picks argmax' {
+            $res = Invoke-Verifier -VerifierArgs @('-Zone','ROJA','-Rank','a:0.7,b:0.9,c:0.4')
+            $res.Stdout | Should -Match 'RANKER: winner=b \(0.9\) over 3 samples'
+            $res.ExitCode | Should -Be 0
+        }
+
+        It 'ties resolve to first max (documented)' {
+            $res = Invoke-Verifier -VerifierArgs @('-Zone','ROJA','-Rank','a:0.9,b:0.9')
+            $res.Stdout | Should -Match 'RANKER: winner=a'
+            $res.ExitCode | Should -Be 0
+        }
+
+        It 'malformed spec escalates exit 1' {
+            $res = Invoke-Verifier -VerifierArgs @('-Zone','ROJA','-Rank','bogus')
+            $res.Stdout | Should -Match 'RANKER-ERROR'
+            $res.ExitCode | Should -Be 1
+        }
+
+        It '-Json carries ranker object' {
+            $res = Invoke-Verifier -VerifierArgs @('-Zone','ROJA','-Rank','x:0.2,y:0.8','-Json')
+            $json = $res.Stdout | ConvertFrom-Json -ErrorAction Stop
+            $json.ranker.ran | Should -BeTrue
+            $json.ranker.winner | Should -Be 'y'
+            $json.ranker.samples | Should -Be 2
+            $res.ExitCode | Should -Be 0
         }
     }
 

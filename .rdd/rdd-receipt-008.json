@@ -1,0 +1,21 @@
+{
+  "id": "rdd-receipt-008",
+  "freeze": "HEAD-d4a3e13b-e69de29b",
+  "freeze_note": "Slice R9-S1 test(contracts): golden-manifest schema + gate sobre manifest real en rama experimento/mejora-ronda9-contratos-ci. diff8=e69de29b = git diff vacio al emitir el receipt (2 files nuevos untracked: schema 48L + test 78L). lines_changed=126 solo scope del slice.",
+  "tier": 1,
+  "tier_justification": "RDD Risk Tiers: Tier 1 = solo contracts/golden-manifest.schema.json + tests/contract-manifest.Tests.ps1 (patron R8-S1 replicado, sin pipeline compartido). Ajv-strict solo INFO.",
+  "files": ["contracts/golden-manifest.schema.json", "tests/contract-manifest.Tests.ps1"],
+  "lines_changed": 126,
+  "lines_deleted": 0,
+  "verdict": "PASS",
+  "verdict_note": "Pester manifest 6/6 + Test-Json spot-check True sobre manifest real + Ajv-strict INFO WARN (draft 2020-12 sin meta-schema en Ajv base; format date-time sin ajv-formats; tolerado por plan, nunca gatea). Hook intento 1 BLOCKED: 2 negativas fallaban bajo $ErrorActionPreference='Stop' del gate (.githooks/pre-commit-gate.ps1:10, Pester in-process) porque Test-Json emite error-record terminante; fix intento 1/2: -ErrorAction SilentlyContinue en ambas negativas (retorna False igual) -> 6/6 tambien bajo Stop. No-regresion: permission 12/12 + frontmatter 107/107 + prompts 7/7 + manifest 6/6. 2 fallos PRE-EXISTENTES en base d4a3e13b (drift receipts 005-007 vs golden/test congelados en 001-004): goldens 16/17 (re-run validate-rdd-receipts difiere) + receipt 7/8 (exactly-4 espera 4, hay 7); fuera de scope S1, no introducidos por este slice (writes solo 2 files nuevos).",
+  "review": {
+    "status": "PASS 4R Score 8.75 (Risk:9|Read:9|Rel:9|Res:8)",
+    "method": "code-review-agent 4R",
+    "gaps": ["goldens 16/17 + receipt 7/8 pre-existentes por drift 005-007 (fuera de scope S1; candidato a slice de regeneracion de goldens, no a este commit)"]
+  },
+  "blockers": [],
+  "next": ["R9-S2"],
+  "auto_fix": false,
+  "timestamp": "2026-09-24T14:30:56.6397340-06:00"
+}
