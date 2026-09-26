@@ -1,0 +1,43 @@
+{
+  "id": "rdd-receipt-028",
+  "freeze": "HEAD-dba368a6-8db487d5",
+  "freeze_note": "Rama fix/benchmark-skills-over3kb, base origin/main dba368a6. diff8=8db487d5 = SHA-256 (primeros 8 hex) del diff de 86ced2f2 (2 SKILL.md + odd/tasks/skills-over3kb-gate.md). El receipt 028 es nuevo y va en su propio commit; no forma parte del freeze.",
+  "tier": 1,
+  "tier_justification": "RDD Risk Tiers: Tier 1 = contenido de guia agent-facing (2 SKILL.md) + doc de tracking ODD + receipt. NO toca codigo de produccion, config de runtime, schema, auth ni CI. No es Tier 0 porque cambia instrucciones que los agentes leen en runtime, aunque el delta real de contenido sea de 7 lineas.",
+  "files": [
+    ".agents/skills/container-security/SKILL.md",
+    ".agents/skills/security-scanner/SKILL.md",
+    "odd/tasks/skills-over3kb-gate.md",
+    ".rdd/rdd-receipt-028.json"
+  ],
+  "file_statuses": {
+    "modified": [
+      ".agents/skills/container-security/SKILL.md",
+      ".agents/skills/security-scanner/SKILL.md"
+    ],
+    "added": [
+      "odd/tasks/skills-over3kb-gate.md"
+    ]
+  },
+  "lines_changed": 85,
+  "lines_deleted": 5,
+  "verdict": "PASS",
+  "verdict_note": "PASS HONESTO con evidencia mecanica. Causa raiz cerrada: el unico predicado que fallaba era SkillsOver3kb (7 pinneado vs 9 real, benchmark-core.ps1:205). Medido con la semantica exacta del gate (Get-Content -Raw char count, _shared excluido, -gt 3072): TOTAL=96, OVER3072=7. container-security 3073 -> 3015 chars; security-scanner 3197 -> 3008 chars. Sin tocar headings: ambos conservan frontmatter ---, ## When to Use y ## Rules; security-scanner conserva ## Anti-Rationalization (satisface el depth-section de scripts/tests/skill-coverage-e2e.Tests.ps1:52). Recortes de redundancia pura verificados: los 6 items de ## Anti-Patterns ya estaban en Rules/Red Flags/Anti-Rationalization; SYS_MODULE ya figuraba en la lista FORBIDDEN; el --include quitado es el mismo recorte que aplico el ciclo C28-wave2. Evidencia: gate local 28/28 ALL CLEAR en 86ced2f2; test-token-budget-regression 97/97 exit 0; cross-ref-check exit 0; 163 tests Pester 0 fallos (skill-coverage-e2e 4, CrossRefPatterns 25, skill-frontmatter 10, contract-frontmatter 107, contract-goldens 17). Otros predicados del gate no disparan: TotalSkillBytes 262405 vs limite 5% 267848 (margen 5443); AgentsMdBytes 2731 vs baseline 4908; registry goldens no llevan hash de contenido.",
+  "review": {
+    "status": "PASS",
+    "method": "RDD receipt Tier 1 + evidencia mecanica (medicion con la semantica del gate, pre-commit gate 28/28, 5 suites Pester, token-budget, cross-ref) con verificacion delegada e independiente a gentle-ai-verify",
+    "gaps": [
+      "No se ejecuto dual-review !judgment-day (Tier 1, contenido de skills + doc).",
+      "El predicado GlobalJunctionsOk falla SOLO en local (96 -> 79): 17 junctions faltantes en C:\\Users\\MK\\.config\\opencode\\skills. Es estado del entorno local, independiente del contenido de los .md, y ademas el predicado se saltea en CI (benchmark-core.ps1:206). PRE-EXISTENTE, no atribuible a este cambio.",
+      "El PR #55 (fix de la referencia muerta a scripts/benchmark.ps1) sigue siendo el prerequisito para que el job tests de CI pueda evaluar esta regresion; sin #55 el step muere antes de llegar al benchmark.",
+      "El worker delegado reporto char counts incorrectos (3030/3046) que no coinciden con la medicion del orquestador (3015/3008); se descarto su numero y se uso la medicion verificada."
+    ]
+  },
+  "next": [
+    "Mergear PR #55 primero (o junto) para que el job tests de CI llegue al benchmark con la referencia viva.",
+    "Opcional: alinear el global ~/.config/opencode/skills con las 17 junctions faltantes via sync-global (fuera de scope, estado local).",
+    "Considerar un ADR/relax del umbral 3KB o compresion adicional para los 7 skills que siguen por encima (judgment-day 5335, best-practices 4494, opencode-model-router 4294, data-quality 4251, auth-hardening 3778, rdd 3767, project-mapper 3415)."
+  ],
+  "auto_fix": false,
+  "timestamp": "2026-09-26T00:00:00-06:00"
+}

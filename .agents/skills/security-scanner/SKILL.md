@@ -26,7 +26,7 @@ quality-gate · best-practices · command-wrapper · research · code-review-age
 
 | Rationalization | Red Flag | Verification |
 |-----------------|----------|--------------|
-| "No secrets in this repo" | Skipping secrets scan | `grep -rn "process.env\|apiKey\|password" --include="*.{js,ts,go,py}"` on staged files |
+| "No secrets in this repo" | Skipping secrets scan | `grep -rn "process.env\|apiKey\|password"` on staged files |
 | "npm audit is enough" | Only `npm audit`, no supply chain | Check postinstall/typosquat + `npm ls --all` (rule 1: tool first + manual) |
 | "Medium can wait" | Deferring MEDIUM | Medium→suggest now, CRITICAL+HIGH fix before commit (rule 2) |
 
@@ -38,6 +38,4 @@ quality-gate · best-practices · command-wrapper · research · code-review-age
 - Scan output format `Secrets:{N} Injection:{N} ... | CRITICAL/HIGH...` with `file:line` + fix per issue
 - `security-audit-mcp.ps1` (P0-2) as pre-flight for MCP configs; `llm-security` skill for prompt injection
 
-## Anti-Patterns
-Flag env vars as secrets · Skip dependency audit · Fix without solution · Ignore medium · No risk summary · npm audit alone (miss supply chain)
 > docs/skills/security-scanner/reference.md
