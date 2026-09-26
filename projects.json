@@ -28,6 +28,10 @@
       "defaultAgent": "gentle-MK"
     },
     {
+      "path": "../Ford-MYCO",
+      "defaultAgent": "gentle-MK"
+    },
+    {
       "path": "../herramienta-tecnico",
       "defaultAgent": "gentle-MK"
     },

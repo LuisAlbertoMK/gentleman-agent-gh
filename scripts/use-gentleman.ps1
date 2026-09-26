@@ -335,7 +335,7 @@ if (-not $globalOk) {
     $repoSetup = Join-Path $repoRoot "scripts\setup-machine.ps1"
     if (Test-Path $repoSetup) {
         Out-Message "  -> Fixing by running setup-machine.ps1..." -color Cyan
-        & $repoSetup -RepoDir $repoRoot -Yes:$Yes
+        & $repoSetup -RepoDir $repoRoot
         $globalOk = $true
     } else {
         throw "Global gentleman setup incomplete. Clone gentleman-agent-gh and run setup-machine.ps1 first."
