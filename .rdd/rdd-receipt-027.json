@@ -1,0 +1,37 @@
+{
+  "id": "rdd-receipt-027",
+  "freeze": "HEAD-dba368a6-c0410172b",
+  "freeze_note": "Rama fix/quality-gate-benchmark-ref creada desde origin/main dba368a6 (Merge PR #54). diff c0410172b = hash del diff staged de .github/workflows/quality-gate.yml (1 linea: re-point a scripts/benchmark-core.ps1). El receipt 027 es nuevo y va en commit separado del fix.",
+  "tier": 2,
+  "tier_justification": "RDD Risk Tiers: Tier 2 = cambio de configuracion de CI (.github/workflows/*.yml) — afecta el pipeline de produccion. NO toca codigo de producto ni runtime. Cambio minimo (1 linea) a un script sucesor verificado.",
+  "files": [
+    ".github/workflows/quality-gate.yml",
+    ".rdd/rdd-receipt-027.json"
+  ],
+  "file_statuses": {
+    "modified": [
+      ".github/workflows/quality-gate.yml"
+    ]
+  },
+  "lines_changed": 1,
+  "lines_deleted": 1,
+  "verdict": "PASS",
+  "verdict_note": "PASS HONESTO (scope = re-point de la referencia muerta). El step `Benchmark report` del job `tests` pasa de `./scripts/benchmark.ps1 -Snapshot -Gate` (script archivado por 5c503d68 -> scripts/archive/benchmark.ps1) a `./scripts/benchmark-core.ps1 -Snapshot -Gate`, que ES el sucesor directo: su SYNOPSIS dice literalmente 'Replaces: benchmark.ps1' y expone los mismos params -Snapshot/-Gate/-Json/-SetBaseline/-Baseline. El hook .githooks/pre-commit-gate.ps1:258 ya usaba benchmark-core.ps1 -Gate (fix GAP-2, commit 2bb36f94), confirmando el sucesor. VERIFICACION REAL: el comando exacto corre y resuelve el script (ya no 'not recognized'); exit code 2 por REGRESION GENUINA Y PRE-EXISTENTE, no por baseline faltante: 'Skills >3KB increased (7->9)' contra el baseline pineado raiz benchmark-baseline.json (SkillsOver3kb=7). En CI la comparacion de junctions se salta (benchmark-core.ps1:206: -not $env:CI -and -not $env:GITHUB_ACTIONS), por lo que CI fallara SOLO por Skills>3KB. Esto es un fallo legitimo del gate, AJENO a este cambio y anterior a el (skills crecieron despues del re-pin 57153d31 del 2026-09-24; judgment-day 5335B, opencode-model-router 4294B). Fuera del write-scope permitido (solo workflow + receipt): NO se re-pinea el baseline ni se comprimen skills.",
+  "review": {
+    "status": "PASS (fix de referencia) — CI residualmente rojo por regresion pre-existente ajena",
+    "method": "Ejecucion local pwsh 7 del comando exacto del workflow + simulacion de entorno CI ($env:CI + $env:GITHUB_ACTIONS), parseo PyYAML, barrido git grep completo de referencias",
+    "gate_output": "EXIT 2 — 'Skills >3KB increased (7->9)'. Salida: Skills 96 | Total 262405B | >3KB 9 | Scripts 136. En CI-sim solo queda esa regresion (junction check saltado).",
+    "gaps": [
+      "El job `tests`/`Benchmark report` de main SEGUIRA en rojo tras este fix: el gate detecta Skills>3KB 7->9 contra el baseline pineado. Requiere accion companion (re-pin de benchmark-baseline.json, o compresion de judgment-day 5335B y opencode-model-router 4294B) que queda FUERA del write-scope.",
+      "Referencias muertas NO ejecutables (docs) sin tocar: README.md:236, benchmarks/benchmarks.md:5,54,71, CYCLE.md:51, docs/metricas/SUMMARY.md:8, docs/propuestas/fusion-architectures.md:274, docs/ciclos/cycle38-47-plan-20260916.md:33, docs/metricas/pssa-baseline.json:603 y reportes historicos en docs/mejoras/* + .archive/*.",
+      "No se ejecuto dual-review !judgment-day (Tier 2, cambio de 1 linea de CI)."
+    ]
+  },
+  "blockers": [],
+  "next": [
+    "Accion companion para verde en CI: re-pinear benchmark-baseline.json (-SetBaseline) o comprimir los 2 skills >3KB; decision del maintainer, fuera de este PR.",
+    "Doc-sync en PR aparte para las referencias de documentacion a benchmark.ps1 (README:236, benchmarks.md:5,54,71, etc.)."
+  ],
+  "auto_fix": false,
+  "timestamp": "2026-09-26T00:00:00-06:00"
+}
