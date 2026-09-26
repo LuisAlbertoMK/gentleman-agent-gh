@@ -321,7 +321,7 @@ jobs:
           }
 
       - name: Benchmark report
-        run: ./scripts/benchmark.ps1 -Snapshot -Gate
+        run: ./scripts/benchmark-core.ps1 -Snapshot -Gate
 
       - name: Error snapshot
         if: always()
