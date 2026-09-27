@@ -1,6 +1,6 @@
 # SKILLS INDEX (Compact)
 
-> Top-20 daily-use skills (all 96 skills — full list via `skill` tool).
+> Top-20 daily-use skills (all 103 skills — full list via `skill` tool).
 >
 > **Version**: 5.9 | **Changelog**: 5.9 retired 4 dup/dead skills; history: `git log SKILLS-INDEX.md`.
 

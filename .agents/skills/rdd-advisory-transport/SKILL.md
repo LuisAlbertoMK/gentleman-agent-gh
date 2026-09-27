@@ -44,6 +44,12 @@ Load when changing how any runtime (Claude Code, OpenCode, Codex, future) invoke
 5. Prove Codex organically before advertising; retire historical transport code last.
 6. Gate every slice on the bench journey corpus diff: all journeys unchanged.
 
+## Edge Cases
+
+- An adapter that parses bindings, rebuilds prompts, or holds retry state violates the minimality contract.
+- Truncated or incomplete input must never become PASS, complete, or a clean receipt; refuse at the budget gate.
+- A validator that cannot inspect immutable trees produces no verdict; never record it as failed.
+
 ## Output Contract
 
 Report per slice: contract surface touched, adapter minimality guard status, bench corpus diff result, semantic regression result, capability advertisement state, and any unresolved maintainer decision (e.g. receipt `provider_contract` descriptor).

@@ -48,6 +48,12 @@ For a full-backlog audit REPORT (dispositions across every open issue/PR), use `
 | One thread, two failure modes | Comment naming both and what each waits on; close neither |
 | A gate ships without the change that satisfies it | Highest severity: the population it blocks cannot even reproduce their other issues |
 
+## Edge Cases
+
+- A test written against the issue's mechanism that passes on unmodified main means the diagnosis is wrong.
+- One issue thread carrying two failure modes must close neither; comment naming both and their wait states.
+- A gate shipped without the change that satisfies it blocks the population from reproducing other issues.
+
 ## Output Contract
 
 Per triage: bucket counts, per-issue table (issue | bucket | root/cluster | evidence ref), urgent flags. Per fix batch: which issues it closes, the named tests proving each closure, and net line delta (deletion-heavy is the goal).

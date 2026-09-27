@@ -71,6 +71,12 @@ When documenting a PR, reduce reviewer burnout by making the review path explici
 - Keep each section focused on one decision or unit of work.
 - Use checklists for acceptance criteria and verification.
 
+## Examples
+
+Dense: "This PR refactors auth middleware, updates the schema, adds retry logic, and fixes a logging bug."
+
+Review-first: "Adds retry logic to auth — review `auth/middleware.ts` first. Also: schema update, logging fix."
+
 ## Commands
 
 ```bash
