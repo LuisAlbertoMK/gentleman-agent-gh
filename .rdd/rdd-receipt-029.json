@@ -1,0 +1,68 @@
+{
+  "id": "rdd-receipt-029",
+  "freeze": "HEAD-4a6c67a9-0d604abe",
+  "freeze_note": "Rama fix/main-skill-drift-4a6c67a9, base origin/main 4a6c67a9. diff8=0d604abe = SHA-256 (primeros 8 hex) del diff 4a6c67a9..3c2218d3 (13a695be + 3c2218d3, 14 archivos). El receipt 029 va en su propio commit y no forma parte del freeze.",
+  "tier": 2,
+  "tier_justification": "RDD Risk Tiers: Tier 2 por cambio NORMATIVO del gate, no por codigo de produccion. El work unit (a) re-pinnea benchmark-baseline.json, o sea redefine que crecimiento del benchmark se considera aceptable (SkillsOver3kb 7 -> 15 y TotalSkillBytes 255094 -> 312561), y (b) relaja un bound de politica en un test (overBudget `-le 8` -> `-le 14`). Ambos son decisiones de que el repo tolera, no arreglos mecanicos. Ademas regenera 2 goldens y toca 6 skills. No toca codigo de produccion, config de runtime, schema ni auth.",
+  "files": [
+    "SKILLS-INDEX.md",
+    ".project.json",
+    "README.md",
+    "scripts/tests/generate-dashboard-data.Tests.ps1",
+    ".agents/skills/cognitive-doc-design/SKILL.md",
+    ".agents/skills/gentle-ai-bench/SKILL.md",
+    ".agents/skills/issue-root-resolution/SKILL.md",
+    ".agents/skills/rdd-advisory-transport/SKILL.md",
+    ".agents/skills/rdd-defect-workflow/SKILL.md",
+    ".agents/skills/systemic-issue-triage/SKILL.md",
+    "testdata/golden/registry-build.golden.json",
+    "testdata/golden/golden-manifest.json",
+    "benchmark-baseline.json",
+    "odd/tasks/main-remediation-4a6c67a9.md",
+    ".rdd/rdd-receipt-029.json"
+  ],
+  "file_statuses": {
+    "modified": [
+      "SKILLS-INDEX.md",
+      ".project.json",
+      "README.md",
+      "scripts/tests/generate-dashboard-data.Tests.ps1",
+      ".agents/skills/cognitive-doc-design/SKILL.md",
+      ".agents/skills/gentle-ai-bench/SKILL.md",
+      ".agents/skills/issue-root-resolution/SKILL.md",
+      ".agents/skills/rdd-advisory-transport/SKILL.md",
+      ".agents/skills/rdd-defect-workflow/SKILL.md",
+      ".agents/skills/systemic-issue-triage/SKILL.md",
+      "testdata/golden/registry-build.golden.json",
+      "testdata/golden/golden-manifest.json",
+      "benchmark-baseline.json"
+    ],
+    "added": [
+      "odd/tasks/main-remediation-4a6c67a9.md"
+    ]
+  },
+  "lines_changed": 291,
+  "lines_deleted": 36,
+  "verdict": "PASS",
+  "verdict_note": "PASS HONESTO con evidencia mecanica. Causa raiz: el push directo 4a6c67a9 agrego 7 directorios de skills sin regenerar ningun artefacto derivado. Quality Gate run 36253270401 = failure: job `tests` 1807 pass / 7 fail, job `tests-v1` 484 pass / 1 fail. cross-ref-check -Json confirmo brokenCrossRefs=0 (no habia refs rotas: todo era drift de conteos y artefactos). Los 8 fallos se cerraron: cross-ref T1/T2 (`INDEX says 96, has 103` -> header a 103), dashboard counts (97 -> 104) y overBudget (bound 8 -> 14), README drift (96 -> 103 en 2 lugares), E2E triple-agreement (filesystem == SKILLS-INDEX == .project.json == 103), E2E depth section (6 skills: cognitive-doc-design con `## Examples`; los 5 de estilo contrato con `## Edge Cases` derivados de sus propias Hard Rules/Decision Gates, evitando el escape ADR-007 porque docs/skills/<name>/ no existe y quedaria puntero colgando), golden registry-build (skill_count 97 -> 104, regenerado con build-skill-registry.ps1 + la normalizacion exacta del comparador) y su sha256 en golden-manifest.json. El golden se normalizo a LF antes de hashear porque .gitattributes fuerza eol=lf: hashear el working copy CRLF habria producido un hash invalido tras el checkout. Evidencia: pre-commit gate local 28/28 ALL CLEAR en 13a695be (incluye la suite Pester completa); contract-goldens 17/17; skill-coverage-e2e 4/4; readme-drift 4/4; generate-dashboard-data 14/14; cross-ref 3/4 con el unico fallo restante (T4) explicado abajo. Benchmark: re-pin a 103 skills / TotalSkillBytes 312561 / SkillsOver3kb 15 / MaxSkillBytes 22390 / GlobalJunctionsOk 79; gate con CI=true + GITHUB_ACTIONS=true (la condicion real del step `Benchmark report` del job `tests`) = exit 0. Verificacion independiente delegada a gentle-ai-verify.",
+  "review": {
+    "status": "PASS",
+    "method": "RDD receipt Tier 2 + evidencia mecanica: logs de CI del run 36253270401 (jobs `tests` y `tests-v1`, steps fallidos), cross-ref-check.ps1 -Json, medicion con la semantica exacta del gate en worktree detached de 4a6c67a9, pre-commit gate local 28/28, 5 suites Pester focalizadas, y verificacion independiente delegada (gentle-ai-verify)",
+    "gaps": [
+      "El re-pin del baseline es una decision de politica explicitamente aprobada por el owner (opcion 'todo, incluido re-pin'): acepta SkillsOver3kb 15 y TotalSkillBytes 312561. La deuda de calidad subyacente (7 skills >3KB pasaron a 15, con gentle-ai-collab-perfect en 22390 chars) NO se resolvio, se acepto. Queda como follow-up con su propio ADR.",
+      "El bound del dashboard (`overBudget -le 8` -> `-le 14`) tambien es politica: 14 skills superan su token_budget declarado. Se relajo para reflejar la realidad en vez de comprimir; misma deuda que el punto anterior.",
+      "cross-ref.Tests.ps1 T4 falla SOLO en local: 24 junctions globales faltantes en ~/.config/opencode/skills (ok=79/missing=24 sobre 103). Es estado del entorno de la maquina, independiente del contenido, y NO falla en CI (en el run 36253270401 T4 no figura entre los 7 fallos). Deuda local documentada, no arreglada.",
+      "El step `Benchmark report` de main sigue apuntando al archivado scripts/benchmark.ps1: lo arregla el PR #55. Mientras #55 no mergee, el Quality Gate de ESTA rama va a seguir fallando ese step aunque el benchmark ya este re-pinneado. #55 y este PR son complementarios, no alternativos.",
+      "SKILLS-INDEX-FULL.md quedo stale (dice 92 skills, generado 2026-08-28) y ningun test ni script lo referencia. Drift cosmetico fuera de scope, reportado.",
+      "Los delegados (gentle-ai-worker) reportaron char counts y conteos poco fiables en ambas rondas (p.ej. cognitive-doc-design '~2971' cuando eran 3066); todas las cifras de este receipt son mediciones propias del orquestador sobre el arbol final, no las del delegado."
+    ]
+  },
+  "next": [
+    "Mergear PR #55 (re-point de la referencia muerta) para que el step `Benchmark report` corra de verdad; despues este PR, para que main salga del rojo.",
+    "Follow-up de calidad con ADR propio: 15 skills sobre 3KB y 14 sobre su token_budget declarado, con gentle-ai-collab-perfect en 22390 chars. Decidir entre compresion real, externalizacion ADR-007 con docs/skills/<name>/reference.md, o relax explicito del umbral.",
+    "Decidir que hacer con SKILLS-INDEX-FULL.md (92 skills, sin generador, sin test que lo valide): actualizarlo a mano, generar un script, o retirarlo.",
+    "Alinear las 24 junctions globales faltantes via scripts/sync-global.ps1 (estado de la maquina, requiere decision porque toca ~/.config/opencode)."
+  ],
+  "auto_fix": false,
+  "timestamp": "2026-09-26T00:00:00-06:00"
+}
