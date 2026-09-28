@@ -76,7 +76,9 @@ Describe 'generate-dashboard-data' {
             $script:data.agents.total | Should -Be $script:expectedAgents
             $script:data.agents.total | Should -Be 44
         }
-        It 'skills.total == 97 matches .agents/skills count (incl _shared)' {
+        # skills.total counts every directory under .agents/skills, including _shared
+        # (the shared references dir), so it tracks the live directory count.
+        It 'skills.total == 104 matches .agents/skills count (incl _shared)' {
             $script:data.skills.total | Should -Be $script:expectedSkills
             $script:data.skills.total | Should -Be 104
         }
@@ -122,10 +124,16 @@ Describe 'generate-dashboard-data' {
         }
         AfterAll { $env:PESTER_TEST = $null }
 
+        # The generator is unbounded by design: it emits one entry per skill whose
+        # SKILL.md exceeds the 3200B budget (sorted by delta desc) and sets
+        # skills.overBudget to that same count. The previous `<= 8` was a
+        # pre-4a6c67a9 coincidence (it mirrored fast.exe overBudgetFiles=8) and
+        # broke on a legitimate config change, so assert the invariant instead.
         It 'overBudgetSkills is array with name,size,budget fields' {
             $arr = $script:data.skills.overBudgetSkills
             $arr | Should -Not -BeNullOrEmpty
-            $arr.Count | Should -BeLessOrEqual 14
+            $arr.Count | Should -BeGreaterThan 0
+            $arr.Count | Should -Be $script:data.skills.overBudget
             foreach ($item in @($arr)[0..([Math]::Min(4, $arr.Count - 1))]) {
                 $item.PSObject.Properties.Name | Should -Contain 'name'
                 ($item.PSObject.Properties.Name -contains 'size' -or $item.PSObject.Properties.Name -contains 'actual') | Should -Be $true
