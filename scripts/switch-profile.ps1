@@ -91,8 +91,8 @@ $ProfileFiles = @{
 
 # --- Expected counts per profile ---
 $ExpectedCounts = @{
-    'go'  = 19   # 12 deepseek→contributor + 5 mimo→contributor + 2 qwen→contributor
-    'zen' = 19   # 14 go-paid→free + 5 already-free (kept for consistency) + 2 qwen→free
+    'go'  = 19   # overlay keys (12 live subs + 7 inert -auto twins); role-tailored opencode-go models
+    'zen' = 19   # same 19 overlay keys, all mapped to opencode/muse-spark-1.3-contributor-free
 }
 
 # --- Help ---
@@ -292,7 +292,17 @@ if ($PSCmdlet.ShouldProcess($OpencodeJsonPath, "Apply $Profile profile ($($chang
 
     if ($changes.Count -gt 0) {
         # --- Allowlist validation: verify every overlay entry ---
+        # Go plan (max performance, quota-aware): frontier models (tiny monthly
+        # quotas) go to low-frequency/high-value roles; high-quota models carry the
+        # execution roles. Verified against opencode.ai/docs/go + models.dev catalog.
         $allowedModels = @(
+            'opencode-go/kimi-k3',
+            'opencode-go/grok-4.7',
+            'opencode-go/glm-5.3',
+            'opencode-go/glm-5.3-flash',
+            'opencode-go/mimo-v2.6-pro',
+            'opencode-go/kimi-k2.7-code',
+            'opencode-go/deepseek-v4-pro',
             'opencode-go/muse-spark-1.3-contributor',
             'opencode/muse-spark-1.3-contributor-free'
         )
@@ -351,22 +361,6 @@ if ($PSCmdlet.ShouldProcess($OpencodeJsonPath, "Apply $Profile profile ($($chang
             $m = $verify.agent.$_.model
             $m -and $m -match 'contributor-free$'
         }).Count
-        $verifyContributorCount = @($verifySubagentKeys | Where-Object {
-            $m = $verify.agent.$_.model
-            $m -and $m -match 'muse-spark-1\.3-contributor$'
-        }).Count
-        $verifyDeepseekCount = @($verifySubagentKeys | Where-Object {
-            $m = $verify.agent.$_.model
-            $m -and $m -match 'deepseek'
-        }).Count
-        $verifyMimoCount = @($verifySubagentKeys | Where-Object {
-            $m = $verify.agent.$_.model
-            $m -and $m -match 'mimo'
-        }).Count
-        $verifyQwenCount = @($verifySubagentKeys | Where-Object {
-            $m = $verify.agent.$_.model
-            $m -and $m -match 'qwen'
-        }).Count
         if ($Profile -eq 'zen') {
             # ADR-050 single-mode: overlays still declare 19 keys but the 7 -auto
             # twins were purged from the SSoT (58->44 agents). The floor is derived
@@ -397,22 +391,27 @@ if ($PSCmdlet.ShouldProcess($OpencodeJsonPath, "Apply $Profile profile ($($chang
             }
         }
         if ($Profile -eq 'go') {
-            if ($verifyDeepseekCount -ne 0) {
-                throw "Post-write validation FAILED: expected 0 deepseek-sub agents for Go, found $verifyDeepseekCount"
+            # Model-agnostic invariants: the go overlay is role-tailored, so the old
+            # family heuristics (deepseek/mimo/qwen/muse-spark-contributor) no longer
+            # describe it. Two fail-closed checks instead:
+            #   1. no live mapped sub may keep a free (contributor-free) model
+            #   2. every live mapped sub must carry exactly its overlay model
+            # ADR-050: the overlay declares 19 keys but only the live ones (present
+            # as agents in the SSoT) are switched; 4 subs stay intentionally free-tier
+            # (quick/frontend/datascience/docs).
+            $liveMappedKeys = @($mapping.PSObject.Properties.Name | Where-Object { $verifyAgentKeys -contains $_ })
+            $mappedFree = @()
+            $mismatched = @()
+            foreach ($mk in $liveMappedKeys) {
+                $mkModel = $verify.agent.$mk.model
+                if (-not $mkModel -or $mkModel -match 'contributor-free$') { $mappedFree += $mk }
+                elseif ($mkModel -ne $mapping.$mk) { $mismatched += $mk }
             }
-            if ($verifyMimoCount -ne 0) {
-                throw "Post-write validation FAILED: expected 0 mimo-sub agents for Go, found $verifyMimoCount"
+            if ($mappedFree.Count -gt 0) {
+                throw "Post-write validation FAILED: mapped sub agents still on free models after Go switch: $($mappedFree -join ', ')"
             }
-            if ($verifyQwenCount -ne 0) {
-                throw "Post-write validation FAILED: expected 0 qwen-sub agents for Go, found $verifyQwenCount"
-            }
-            # ADR-050 single-mode: same derivation as zen — the overlay maps 19 keys
-            # but only the live ones (present as agents in the SSoT) become
-            # contributor models. 4 subs stay intentionally free-tier
-            # (quick/frontend/datascience/docs) per JD pto 1 + cost proposal.
-            $liveMappedCount = @($mapping.PSObject.Properties.Name | Where-Object { $verifyAgentKeys -contains $_ }).Count
-            if ($verifyContributorCount -lt $liveMappedCount) {
-                throw "Post-write validation FAILED: expected >= $liveMappedCount muse-spark-contributor-sub agents for Go, found $verifyContributorCount"
+            if ($mismatched.Count -gt 0) {
+                throw "Post-write validation FAILED: mapped sub agents do not match overlay models: $($mismatched -join ', ')"
             }
         }
     }

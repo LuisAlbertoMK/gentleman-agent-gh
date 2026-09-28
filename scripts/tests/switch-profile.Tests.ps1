@@ -51,15 +51,15 @@ BeforeAll {
         }).Count
     }
 
-    # Helper: count contributor (non-free) subagents
-    function Get-ContributorSubCount {
+    # Helper: count paid Go (opencode-go/*) subagents
+    function Get-PaidGoSubCount {
         param([string]$Path)
         $config = Get-Content $Path -Raw | ConvertFrom-Json
         $agentKeys = @($config.agent.PSObject.Properties.Name)
         $subagentKeys = $agentKeys | Where-Object { $_ -match '-sub(-auto)?$' }
         return ($subagentKeys | Where-Object {
             $m = $config.agent.$_.model
-            $m -and $m -match 'muse-spark-1\.3-contributor$'
+            $m -and $m -match '^opencode-go/'
         }).Count
     }
 }
@@ -143,9 +143,9 @@ Describe 'switch-profile.ps1' {
                 $config = Get-Content $configPath -Raw | ConvertFrom-Json
                 # Correct behavior: scoped raw-text replacement writes the go models
                 # even though opencode.json is minified (single line)
-                $config.agent.'gentleman-deep-sub'.model | Should -Be 'opencode-go/muse-spark-1.3-contributor'
-                $config.agent.'gentleman-codex-sub'.model | Should -Be 'opencode-go/muse-spark-1.3-contributor'
-                Get-ContributorSubCount -Path $configPath | Should -Be 12
+                $config.agent.'gentleman-deep-sub'.model | Should -Be 'opencode-go/kimi-k3'
+                $config.agent.'gentleman-codex-sub'.model | Should -Be 'opencode-go/kimi-k2.7-code'
+                Get-PaidGoSubCount -Path $configPath | Should -Be 12
             } finally {
                 Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
             }
@@ -317,13 +317,13 @@ Describe 'switch-profile.ps1' {
                 $baseline = Get-Content $opencodePath -Raw
                 $baselineHash = (Get-FileHash -LiteralPath $opencodePath -Algorithm SHA256).Hash
 
-                # Apply GO — persists 12 overrides to contributor models (ADR-050 live mapped subs)
+                # Apply GO — persists 12 overrides to role-tailored opencode-go models (ADR-050 live mapped subs)
                 & $SwitchScript -ProjectRoot $tempDir -Profile go -Force -Quiet
                 $afterGo = Get-Content $opencodePath -Raw
                 $afterGoHash = (Get-FileHash -LiteralPath $opencodePath -Algorithm SHA256).Hash
                 $afterGo | Should -Not -Be $baseline
                 $goConfig = $afterGo | ConvertFrom-Json
-                $goConfig.agent.'gentleman-deep-sub'.model | Should -Be 'opencode-go/muse-spark-1.3-contributor'
+                $goConfig.agent.'gentleman-deep-sub'.model | Should -Be 'opencode-go/kimi-k3'
 
                 # Go → Zen — restores free models byte-identical to the zen baseline
                 & $SwitchScript -ProjectRoot $tempDir -Profile zen -Force -Quiet
