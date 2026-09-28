@@ -206,7 +206,7 @@ The project uses two MCPs for cross-session memory:
 
 | Scope | Count | Reference |
 |-------|-------|-----------|
-| Skills | 96 specialized skills for analysis, security, testing, docs, and more | See [SKILLS-INDEX.md](SKILLS-INDEX.md) for full trigger table |
+| Skills | 103 specialized skills for analysis, security, testing, docs, and more | See [SKILLS-INDEX.md](SKILLS-INDEX.md) for full trigger table |
 
 ---
 
@@ -322,7 +322,7 @@ Typical workflow — dry run first, then real sync:
 
 ```
 gentleman-agent-gh/
-├── .agents/skills/          # 96 skills + _shared (canonical, git-tracked)
+├── .agents/skills/          # 103 skills + _shared (canonical, git-tracked)
 │   ├── quality-gate/
 │   ├── code-review-agent/
 │   └── .../

@@ -8,7 +8,7 @@
 
 Gentleman Agent is an **AI software development team** with 58 specialized agents (13 core + 12 subagent twins + 10 SDD pipeline + 5 auto + 5 semi variants + orchestrator + additional specialist/reviewer/aem/reasoning/initializer variants). Instead of a single chatbot, you get:
 
-Each agent loads from 1-5 of 96 specialized skills as needed.
+Each agent loads from 1-5 of 103 specialized skills as needed.
 
 - 🏗️ **Lead Architect** (`gentle-MK`) — your Senior Architect mentor
 - 🔒 **Specialists** (security, performance, frontend, etc.) — FREE TIER consultants
@@ -115,7 +115,7 @@ This automatically:
 ## Next steps
 
 1. **Read [AGENTS.md](AGENTS.md)** to understand the full protocol
-2. **Explore skills** in `.agents/skills/` (96 available)
+2. **Explore skills** in `.agents/skills/` (103 available)
 3. **Try `!analisis`** for multi-agent analysis of your project
 4. **Check [CYCLE.md](CYCLE.md)** to see the current improvement cycle
 
