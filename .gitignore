@@ -56,6 +56,13 @@ scripts/*.local.ps1
 scripts/*.local.sh
 scripts/.env
 
+# Per-machine project manifest (SYNC-N-PROJECTS)
+# projects.json is per-machine (sibling layout differs per host) — NOT versioned.
+# Template: projects.json.example (versioned). Generate locally:
+#   pwsh ./scripts/sync-n-projects.ps1 -Discover
+/projects.json
+!projects.json.example
+
 # ============================================
 # Temp / scratch
 # ============================================

@@ -38,6 +38,30 @@
   Append a project to the manifest before syncing. Relative path resolved
   against the manifest's chainRoot.
 
+.PARAMETER Discover
+  Discovery mode: scan a root directory for sibling projects and generate
+  the per-machine projects.json manifest (real schema), then exit without
+  syncing. Never overwrites an existing manifest without -Force.
+  Discovery lives only in this wrapper — cmd/sync has no equivalent yet
+  (documented follow-up, see docs/operations/SYNC-N-PROJECTS.md).
+
+.PARAMETER DiscoverRoot
+  Root directory scanned in -Discover mode. Default: the parent directory
+  of the chain repo. Relative paths resolve against the chain repo root.
+
+.PARAMETER AllowExternalManifest
+  Opt-in for -Discover writes whose manifest path resolves OUTSIDE the chain
+  repo (e.g. a temp dir in tests). Protected locations (drive roots,
+  SystemRoot/System32, ProgramFiles) are always refused, flag or not.
+
+.EXAMPLE
+  .\scripts\sync-n-projects.ps1 -Discover -DryRun
+  Preview the per-machine manifest for sibling projects.
+
+.EXAMPLE
+  .\scripts\sync-n-projects.ps1 -Discover -Force
+  (Re)generate ./projects.json from sibling repos.
+
 .EXAMPLE
   .\scripts\sync-n-projects.ps1
   Sync all projects from ./projects.json.
@@ -57,7 +81,10 @@ param(
     [switch]$Quiet,
     [switch]$Yes,
     [string]$AddProject,
-    [switch]$Force
+    [switch]$Force,
+    [switch]$Discover,
+    [string]$DiscoverRoot = "",
+    [switch]$AllowExternalManifest
 )
 
 Set-StrictMode -Version Latest
@@ -81,6 +108,10 @@ if ($PSVersionTable.PSVersion.Major -lt 7) {
         if ($Quiet)  { $params += "-Quiet" }
         if ($Yes)    { $params += "-Yes" }
         if ($AddProject) { $params += "-AddProject"; $params += $AddProject }
+        if ($Force) { $params += "-Force" }
+        if ($Discover) { $params += "-Discover" }
+        if ($DiscoverRoot) { $params += "-DiscoverRoot"; $params += $DiscoverRoot }
+        if ($AllowExternalManifest) { $params += "-AllowExternalManifest" }
         & $pwsh.Source $params
         exit $LASTEXITCODE
     }
@@ -99,6 +130,167 @@ if ($PSVersionTable.PSVersion.Major -lt 7) {
 }
 
 $repoRoot = Split-Path $PSScriptRoot -Parent
+
+# F1v2 protected-location gate (shared by sync + discover-write paths):
+# FAIL when the resolved target is a protected location: a drive root
+# ([IO.Path]::GetPathRoot($t) -eq $t, e.g. D:\ C:\) or inside SystemRoot,
+# SystemRoot\System32, ProgramFiles, ProgramFiles(x86). OrdinalIgnoreCase.
+function Test-ProtectedLocation {
+    param([string]$Full)
+    if ([string]::IsNullOrEmpty($Full)) { return $false }
+    try { if ([IO.Path]::GetPathRoot($Full) -eq $Full) { return $true } } catch { }
+    $protected = @()
+    if ($env:SystemRoot) {
+        $protected += [System.IO.Path]::GetFullPath($env:SystemRoot)
+        $protected += [System.IO.Path]::GetFullPath((Join-Path $env:SystemRoot "System32"))
+    }
+    if (${env:ProgramFiles}) { $protected += [System.IO.Path]::GetFullPath(${env:ProgramFiles}) }
+    if (${env:ProgramFiles(x86)}) { $protected += [System.IO.Path]::GetFullPath(${env:ProgramFiles(x86)}) }
+    foreach ($p in $protected) {
+        if ($Full -eq $p) { return $true }
+        if ($Full.StartsWith($p + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
+        if ($Full.Equals($p, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
+    }
+    return $false
+}
+
+# ── Discover mode: generate per-machine manifest ─────────────────────
+# Scans a root directory (default: parent of the chain repo) for direct
+# children that are git repos (have .git) or contain opencode.json, and
+# emits a manifest with the real schema (version/chainRoot/defaultMode/
+# projects[] with relative ../<name> paths and defaultAgent gentle-MK),
+# sorted alphabetically for deterministic output. Exits without syncing.
+# Excluded: the chain repo itself, dot-directories, node_modules, and
+# junctions/symlinks (reparse points — H4: the later sync would write
+# THROUGH the link to an external target).
+# NOTE: .gitignore is NOT consulted — beyond the exclusions above, every
+# candidate is listed; the manifest is a per-machine allowlist the
+# operator curates afterwards. Go parity (cmd/sync discovery) is an
+# explicit follow-up, not part of this change.
+if ($Discover) {
+    $chainFull = [System.IO.Path]::GetFullPath($repoRoot)
+    if ([string]::IsNullOrWhiteSpace($DiscoverRoot)) {
+        $discoverRootFull = [System.IO.Path]::GetFullPath((Split-Path $repoRoot -Parent))
+    } elseif ([System.IO.Path]::IsPathRooted($DiscoverRoot)) {
+        $discoverRootFull = [System.IO.Path]::GetFullPath($DiscoverRoot)
+    } else {
+        $discoverRootFull = [System.IO.Path]::GetFullPath((Join-Path $repoRoot $DiscoverRoot))
+    }
+    if (-not (Test-Path -LiteralPath $discoverRootFull -PathType Container)) {
+        Write-Error "Discover root not found: $discoverRootFull"
+        exit 1
+    }
+    $rawCandidates = Get-ChildItem -LiteralPath $discoverRootFull -Directory | Where-Object {
+        ($_.Name -notlike '.*') -and ($_.Name -ne 'node_modules') -and
+        (-not ($_.Attributes -band [IO.FileAttributes]::ReparsePoint)) -and
+        (-not $_.FullName.Equals($chainFull, [System.StringComparison]::OrdinalIgnoreCase)) -and
+        ((Test-Path -LiteralPath (Join-Path $_.FullName '.git')) -or
+         (Test-Path -LiteralPath (Join-Path $_.FullName 'opencode.json')))
+    }
+    # H2 test seam: SYNC_DISCOVER_REVERSE_INPUT=1 reverses the enumeration
+    # order so the Sort-Object below is load-bearing (filesystem order alone
+    # would mask a missing sort — NTFS returns alphabetical order by chance).
+    if ($env:SYNC_DISCOVER_REVERSE_INPUT -eq '1') {
+        $rawCandidates = @($rawCandidates)
+        [Array]::Reverse($rawCandidates)
+    }
+    $candidates = $rawCandidates | Sort-Object -Property Name
+    $entries = @()
+    foreach ($dir in $candidates) {
+        $entries += [PSCustomObject]@{
+            path         = "../$($dir.Name)"
+            defaultAgent = "gentle-MK"
+        }
+    }
+    $discovered = [PSCustomObject]@{
+        version     = 1
+        chainRoot   = "."
+        defaultMode = "chain-wins"
+        projects    = $entries
+    }
+    $discoveredJson = $discovered | ConvertTo-Json -Depth 10
+    # Manifest target: relative -Manifest paths resolve against the chain
+    # repo root (unlike sync mode, which prefers the process CWD first).
+    if ([System.IO.Path]::IsPathRooted($Manifest)) {
+        $discoverManifestPath = [System.IO.Path]::GetFullPath($Manifest)
+    } else {
+        $discoverManifestPath = [System.IO.Path]::GetFullPath((Join-Path $repoRoot $Manifest))
+    }
+    # H7: text-mode display abbreviates $HOME as ~ so -DryRun / [ok] lines
+    # don't print the operator's absolute profile path to stdout (logs/CI).
+    # -Json output is untouched (entries were always relative ../<name>).
+    $displayRoot = $discoverRootFull
+    if ($HOME -and $displayRoot.StartsWith($HOME, [System.StringComparison]::OrdinalIgnoreCase)) {
+        $displayRoot = '~' + $displayRoot.Substring($HOME.Length)
+    }
+    $displayManifest = $discoverManifestPath
+    if ($HOME -and $displayManifest.StartsWith($HOME, [System.StringComparison]::OrdinalIgnoreCase)) {
+        $displayManifest = '~' + $displayManifest.Substring($HOME.Length)
+    }
+    if ($DryRun) {
+        if ($Json) {
+            Write-Output $discoveredJson
+        } else {
+            if (-not $Quiet) {
+                Write-Output "Discovered $($entries.Count) project(s) under $displayRoot (dry-run, manifest not written):"
+                foreach ($e in $entries) { Write-Output "  $($e.path)" }
+                if ($entries.Count -eq 0) { Write-Warning "No candidate projects found — manifest would be empty" }
+            }
+            Write-Output $discoveredJson
+        }
+        exit 0
+    }
+    # H5: a manifest path that exists as a DIRECTORY must fail fast with a
+    # clear message BEFORE any temp file exists — otherwise Move-Item -Force
+    # silently moves the tmp file INSIDE the directory (fake success + residue).
+    if (Test-Path -LiteralPath $discoverManifestPath -PathType Container) {
+        Write-Error "Manifest path is a directory: $discoverManifestPath. Pass a file path (e.g. ./projects.json), not a directory."
+        exit 1
+    }
+    # H6: confinement for the discover-write path (mirrors the sync-path
+    # Test-ProtectedLocation gate). Protected locations are always refused;
+    # any other path outside the chain repo needs -AllowExternalManifest.
+    if (Test-ProtectedLocation $discoverManifestPath) {
+        Write-Error "Manifest path is a protected location: $discoverManifestPath. Refusing to write."
+        exit 1
+    }
+    $repoSep = [System.IO.Path]::DirectorySeparatorChar
+    $discoverInRepo = $discoverManifestPath.Equals($chainFull, [System.StringComparison]::OrdinalIgnoreCase) -or
+        $discoverManifestPath.StartsWith($chainFull + $repoSep, [System.StringComparison]::OrdinalIgnoreCase)
+    if ((-not $discoverInRepo) -and (-not $AllowExternalManifest)) {
+        Write-Error "Manifest path is outside the chain repo ($chainFull): $discoverManifestPath. Re-run with -AllowExternalManifest to allow it, or use a path inside the repo."
+        exit 1
+    }
+    if ((Test-Path -LiteralPath $discoverManifestPath) -and (-not $Force)) {
+        Write-Error "Manifest already exists: $discoverManifestPath. Re-run with -Force to overwrite, or use -DryRun to preview."
+        exit 1
+    }
+    # H3: the [ok]/Json success output lives INSIDE ShouldProcess so
+    # -WhatIf (ShouldProcess=$false, nothing written) stays silent instead
+    # of printing a "[ok] Discovered ..." lie.
+    if ($PSCmdlet.ShouldProcess($discoverManifestPath, "discover projects manifest")) {
+        # Atomic rewrite: write to temp then move — prevents half-written manifests.
+        $tmpDir = Split-Path $discoverManifestPath -Parent
+        if (-not (Test-Path -LiteralPath $tmpDir -PathType Container)) {
+            New-Item -ItemType Directory -Path $tmpDir -Force | Out-Null
+        }
+        $tmpPath = Join-Path $tmpDir ("sync-n-projects." + [IO.Path]::GetRandomFileName() + ".tmp")
+        try {
+            $discoveredJson | Set-Content -LiteralPath $tmpPath -Encoding UTF8
+            Move-Item -LiteralPath $tmpPath -Destination $discoverManifestPath -Force
+        } catch {
+            if (Test-Path -LiteralPath $tmpPath) { Remove-Item -LiteralPath $tmpPath -Force -ErrorAction SilentlyContinue }
+            Write-Error "Failed to write discovered manifest: $($_.Exception.Message)"
+            exit 1
+        }
+        if ($Json) {
+            Write-Output $discoveredJson
+        } elseif (-not $Quiet) {
+            Write-Output "[ok] Discovered $($entries.Count) project(s) -> $displayManifest"
+        }
+    }
+    exit 0
+}
 
 # ── Resolve manifest ──────────────────────────────────────────────────
 $manifestPath = [System.IO.Path]::GetFullPath($Manifest)
@@ -140,29 +332,8 @@ $manifestDir = Split-Path $manifestPath -Parent
 $manifestDirFull = [System.IO.Path]::GetFullPath($manifestDir)
 $manifestSep = [System.IO.Path]::DirectorySeparatorChar
 $addEscapeDetail = $null
-# F1v2 protected-location gate (replaces F1 manifestDir FAIL): the manifest IS
-# the operator allowlist, so sibling layout (../x) is by-design. Only FAIL
-# (no throw) when the resolved target is a protected location: a drive root
-# ([IO.Path]::GetPathRoot($t) -eq $t, e.g. D:\ C:\) or inside SystemRoot,
-# SystemRoot\System32, ProgramFiles, ProgramFiles(x86). OrdinalIgnoreCase.
-function Test-ProtectedLocation {
-    param([string]$Full)
-    if ([string]::IsNullOrEmpty($Full)) { return $false }
-    try { if ([IO.Path]::GetPathRoot($Full) -eq $Full) { return $true } } catch { }
-    $protected = @()
-    if ($env:SystemRoot) {
-        $protected += [System.IO.Path]::GetFullPath($env:SystemRoot)
-        $protected += [System.IO.Path]::GetFullPath((Join-Path $env:SystemRoot "System32"))
-    }
-    if (${env:ProgramFiles}) { $protected += [System.IO.Path]::GetFullPath(${env:ProgramFiles}) }
-    if (${env:ProgramFiles(x86)}) { $protected += [System.IO.Path]::GetFullPath(${env:ProgramFiles(x86)}) }
-    foreach ($p in $protected) {
-        if ($Full -eq $p) { return $true }
-        if ($Full.StartsWith($p + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
-        if ($Full.Equals($p, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
-    }
-    return $false
-}
+# NOTE: Test-ProtectedLocation is defined above (before the Discover block)
+# and shared by both the discover-write and sync paths.
 
 # ── Add project (optional) ───────────────────────────────────────────
 if ($AddProject) {
