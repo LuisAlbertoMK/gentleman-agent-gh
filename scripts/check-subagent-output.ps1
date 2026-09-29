@@ -56,6 +56,7 @@ function Validate-AgentReturnContract {
     $requiredHeaders = @('## Decision Taken', '## Files Changed', '## Key Findings', '## Nuance')
     $missing = @()
     $empty   = @()
+    $detail  = @()
     # 1. Detect missing headers
     foreach ($h in $requiredHeaders) {
         if ($Output -notmatch [regex]::Escape($h)) { $missing += $h }
@@ -82,12 +83,18 @@ function Validate-AgentReturnContract {
                 $empty += $h
             }
         }
+        # 3. Key Findings: SEVERITY tag + non-empty bullets
+        $kfText = (($sections['## Key Findings'] -join "`n"))
+        $bullets = @($sections['## Key Findings'] | Where-Object { $_ -match '^\s*(\d+\.\s*\S|[-*]\s*\S)' })
+        if ($bullets.Count -eq 0) { $detail += 'Key Findings: no non-empty bullets' }
+        if ($kfText -notmatch '\[(CRITICAL|HIGH|MEDIUM|LOW)\]') { $detail += 'Key Findings: missing SEVERITY tag [CRITICAL|HIGH|MEDIUM|LOW]' }
     }
     return [PSCustomObject]@{
-        valid   = ($missing.Count -eq 0 -and $empty.Count -eq 0)
+        valid   = ($missing.Count -eq 0 -and $empty.Count -eq 0 -and $detail.Count -eq 0)
         agent   = $AgentName
         missing = $missing
         empty   = $empty
+        detail  = $detail
     }
 }
 
