@@ -26,7 +26,7 @@
       "generator": "scripts/build-skill-registry.ps1 + normalization (drop .generated locale datetime, sort skill names)",
       "name": "registry-build.golden.json",
       "schema": "",
-      "sha256": "244cd219aa5dab428de6bfb1319d21a93347882b9407ae176876ecf385468e3b"
+      "sha256": "b9687db32623f335f06e493be2fd3871a36923f059d5c9166c6acea1c010888e"
     },
     {
       "args": "-SkillName odd -Json",

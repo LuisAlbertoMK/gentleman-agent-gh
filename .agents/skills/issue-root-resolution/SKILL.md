@@ -46,6 +46,12 @@ Load when auditing a defect backlog for shared root causes, proposing a fix for 
 5. Implement in slices (issue-first: every PR links a `status:approved` issue), audit each worker report.
 6. Hygiene pass: evidence-gated closures, stale-repro re-verification requests, meta-issue update with what changed and why.
 
+## Edge Cases
+
+- An issue filed before a fix merged is evidence about old builds, not a claim against current `main`.
+- When the mechanism map contradicts the hypothesis, the map wins and the plan must be revised first.
+- A fix that adds a new mechanism, flag, or verb is deferred until a deletion-shaped alternative is ruled out.
+
 ## Output Contract
 
 Per pass, report: roots table (issues, fix shape, state), closures with rule+evidence, borderline list with reasons, D-items and their answers, mechanism-map mismatches found, and the meta-issue comment link.

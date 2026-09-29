@@ -44,6 +44,12 @@ This skill guides public collaboration. It does not grant issue approval, label,
 4. Normalize, enforce budget, run tests, and record each flow's exact candidate, command, scenario, and result.
 5. Freeze, validate read-only, and give the verdict, evidence, and one humane next action.
 
+## Edge Cases
+
+- When RDD is disabled, do not start receipt reviews or fabricate approval; report `disabled/unmanaged`.
+- A forecast exceeding 400 additions plus deletions requires a chained PR or maintainer exception first.
+- Synthetic proxy coverage never proves a CLI or lifecycle flow that requires actual runtime E2E evidence.
+
 ## Output Contract
 
 Return `rdd_mode`, `issue_pr`, `causal_invariant`, `operator_flows`, `journey_runtime_evidence`, `changed_line_budget`, `tests`, `rollback`, and `unresolved_authority_decisions`.

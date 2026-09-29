@@ -31,6 +31,12 @@ Load when touching `bench/` in gentle-ai, adding or changing a journey, changing
 3. Run `go test ./...` in `bench/` for declarations, THEN the driven harness for execution; both results go in the PR body.
 4. On semantic changes, list the journeys you checked for stale pins.
 
+## Edge Cases
+
+- Reusing a retired journey ID breaks the collision guard; read the full corpus before naming a new one.
+- A green `go test ./bench` does not prove execution; only the driven harness validates the journey.
+- `dead_end` must print `n/a` when no dead end was measured; fabricating a value invalidates the column.
+
 ## Output Contract
 
 PR evidence includes the driven-mode summary line (completed / unsupported / failed counts) from a locally built binary, not only `go test` output.

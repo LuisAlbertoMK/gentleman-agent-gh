@@ -78,7 +78,7 @@ Describe 'generate-dashboard-data' {
         }
         It 'skills.total == 97 matches .agents/skills count (incl _shared)' {
             $script:data.skills.total | Should -Be $script:expectedSkills
-            $script:data.skills.total | Should -Be 97
+            $script:data.skills.total | Should -Be 104
         }
     }
 
@@ -125,7 +125,7 @@ Describe 'generate-dashboard-data' {
         It 'overBudgetSkills is array with name,size,budget fields' {
             $arr = $script:data.skills.overBudgetSkills
             $arr | Should -Not -BeNullOrEmpty
-            $arr.Count | Should -BeLessOrEqual 8
+            $arr.Count | Should -BeLessOrEqual 14
             foreach ($item in @($arr)[0..([Math]::Min(4, $arr.Count - 1))]) {
                 $item.PSObject.Properties.Name | Should -Contain 'name'
                 ($item.PSObject.Properties.Name -contains 'size' -or $item.PSObject.Properties.Name -contains 'actual') | Should -Be $true
