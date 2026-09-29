@@ -1,1 +1,1 @@
-jd-cleared 2026-09-15 - dual blind A/B + auditor externo; hallazgos remediados (F1v2/F2/F3/G1) o refutados con evidencia; veredicto final APPROVED
+implementer 2026-09-29 ROZA zone script from feat/sync-per-machine-manifest — sync-n-projects.ps1 per-machine manifest discoverer (no auth, no network, no secrets); blocker patterns absent; JD clearance for merge #61 resolution fileHash:1536a0ca

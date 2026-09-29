@@ -6,6 +6,10 @@
     {
       "path": "../mi-api",
       "defaultAgent": "gentle-MK"
+    },
+    {
+      "path": "../mi-web",
+      "defaultAgent": "gentle-MK"
     }
   ]
 }
