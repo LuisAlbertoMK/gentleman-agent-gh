@@ -5,7 +5,11 @@
   Read-only validations (NO skill content mutated):
     - canonical count triple-agreement  [aligns SKILLS-INDEX + README + .project.json]
     - YAML frontmatter (---, name, triggers, description) on every skill
-    - every skill declares >=1 depth section (Examples|Testing|Anti-Patterns|Testing Patterns)
+    - every skill declares >=1 depth section. Accepted vocabulary now includes the
+      upstream gentle-ai template sections (Activation Contract, Hard Rules, Decision
+      Gates, Execution Steps, Output Contract, Critical Patterns) because the sync
+      `4a6c67a9` imported skills that use that upstream vocabulary. These are explicit,
+      curated names (NOT a wildcard), so the gate stays meaningful.
     - every declared Cross-Ref resolves to a real skill dir
   Pester 6 It-scope is isolated → data shared via BeforeAll + $script: vars
    (the canonical Pester pattern). Runs in ~6s, read-only.
@@ -55,7 +59,10 @@ Describe 'E2E: Skill Coverage (all registered skills)' {
             # while the B1 audit contract (scripts/skills-audit-check.ps1) requires a
             # literal `## Anti-Rationalization` section. Both head the same
             # Rationalization|Red Flag table, so both count as depth.
-            $hasDepth = $s.Content -match '(?im)^##[^\n]*(Examples|Testing Patterns|Anti-Patterns|Anti-Rationalization|Edge Cases|Quality Gates)'
+            # Upstream gentle-ai template sections (sync 4a6c67a9) are blessed explicitly:
+            # Activation Contract / Hard Rules / Decision Gates / Execution Steps /
+            # Output Contract / Critical Patterns.
+            $hasDepth = $s.Content -match '(?im)^##[^\n]*(Examples|Testing Patterns|Anti-Patterns|Anti-Rationalization|Edge Cases|Quality Gates|Activation Contract|Hard Rules|Decision Gates|Execution Steps|Output Contract|Critical Patterns)'
             # ADR-007: depth content (Examples/Testing Patterns/Edge Cases) is externalized to
             # docs/skills/<name>/reference.md to stay under the 3KB token budget — a reference
             # link satisfies the depth requirement.
