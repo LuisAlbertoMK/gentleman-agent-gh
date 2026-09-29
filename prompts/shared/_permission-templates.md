@@ -1,102 +1,53 @@
 # Permission Templates — Canonical Reference
 
-These are the canonical permission blocks used across all agents. CI verifies consistency.
+> **DEPRECATED** (2026-09-29): These templates no longer reflect the runtime permission state.
+> SSoT real: `scripts/lib/permission-templates.json` + `opencode.json` generated via `scripts/sync-global.ps1`.
+> See `docs/mejoras/2026-09-25-permission-parity-gentle-ai.md` for the parity migration that eliminated deny-floor.
 
-## Read-Only Specialist (security, seo, infra, frontend, performance, datascience, docs)
-
-```json
-{
-  "bash": {
-    "*": "deny"
-  },
-  "edit": "deny",
-  "read": "allow",
-  "write": "deny"
-}
-```
-
-## Write-Capable Agent (quick, codex, deep, implementer)
-
-```json
-{
-  "bash": {
-    "*": "ask",
-    "rm *": "deny",
-    "rm -rf *": "deny",
-    "curl *": "deny",
-    "wget *": "deny",
-    "Invoke-WebRequest *": "deny",
-    "Invoke-RestMethod *": "deny",
-    "Invoke-Expression *": "deny",
-    "irm *": "deny",
-    "iwr *": "deny",
-    "iex *": "deny",
-    "Remove-Item *": "deny",
-    "Start-BitsTransfer *": "deny",
-    "nc *": "deny",
-    "ncat *": "deny",
-    "telnet *": "deny",
-    "Test-NetConnection *": "deny"
-  },
-  "edit": "allow",
-  "read": "allow",
-  "write": "allow"
-}
-```
-
-## Orchestrator (gentle-MK)
+## Current Runtime Parity (SSoT: opencode.json)
 
 ```json
 {
   "bash": {
     "*": "allow",
-    "python *": "deny",
-    "python3 *": "deny",
-    "node *": "deny",
-    "ruby *": "deny",
-    "perl *": "deny",
-    "php *": "deny",
-    "rm *": "deny",
-    "rm -rf *": "deny",
-    "curl *": "deny",
-    "wget *": "deny",
-    "Invoke-WebRequest *": "deny",
-    "Invoke-RestMethod *": "deny",
-    "Invoke-Expression *": "deny",
-    "irm *": "deny",
-    "iwr *": "deny",
-    "iex *": "deny",
-    "Remove-Item *": "deny",
-    "Start-BitsTransfer *": "deny",
-    "nc *": "deny",
-    "ncat *": "deny",
-    "telnet *": "deny",
-    "Test-NetConnection *": "deny"
+    "git commit *": "ask",
+    "git push *": "ask",
+    "git push": "ask",
+    "git push --force *": "ask",
+    "git rebase *": "ask",
+    "git reset --hard *": "ask",
+    "ssh": "ask",
+    "ssh *": "ask",
+    "scp": "ask",
+    "scp *": "ask",
+    "sftp": "ask",
+    "sftp *": "ask",
+    "rsync": "ask",
+    "rsync *": "ask"
   },
-  "edit": "allow",
-  "write": "allow"
-}
-```
-
-## Global Read/Write/Edit Protection
-
-```json
-{
   "read": {
     "*": "allow",
-    "**/.env": "deny",
-    "**/.env.*": "deny",
-    "**/.env*": "deny",
-    "**/credentials.json": "deny",
-    "**/secrets/**": "deny",
-    "**/*secret*": "deny",
-    "**/.ssh/**": "deny",
     "*.env": "deny",
     "*.env.*": "deny",
-    "*.env*": "deny"
+    "**/.env": "deny",
+    "**/.env.*": "deny",
+    "**/secrets/**": "deny",
+    "**/credentials.json": "deny",
+    "**/.ssh/**": "deny",
+    "**/.credentials/**": "deny",
+    "**/Library/Keychains/**": "deny",
+    "**/.aws/credentials": "deny",
+    "**/.config/gh/hosts.yml": "deny",
+    "**/*.pem": "deny",
+    "**/*.key": "deny"
   }
 }
 ```
 
+**Notes:**
+- No per-agent bash/read/write/edit overrides exist; all agents inherit global.
+- `write` and `edit` keys are NOT defined in opencode.json (inherit platform defaults).
+- Read-only enforcement is prompt-based (`_analyze-only-protocol.md`), not permission-based.
+
 ---
-*Canonical source for CI permission consistency check.*
+*Canonical source: `scripts/lib/permission-templates.json` + `opencode.json`.*
