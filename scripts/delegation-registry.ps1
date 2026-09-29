@@ -47,7 +47,7 @@ param(
     [string]$BaseRef = "HEAD",
     [string]$NewPrompt = "",
     [int]$TtlMinutes = 60,
-    [int]$TimeoutSeconds = 60,
+    [int]$TimeoutSeconds = 300,
     [int]$MaxToolCalls = 25,
     [int]$MonitorPid = 0,
     [string]$SubagentOutputFile = "",
@@ -216,6 +216,9 @@ switch ($Action) {
         $elapsedSeconds = (Get-Date) - $registered | Select-Object -ExpandProperty TotalSeconds
         $timeoutSeconds = if ($entry.timeout_seconds) { $entry.timeout_seconds } else { 300 }
         $budgetExceeded = $elapsedSeconds -gt $timeoutSeconds
+        $maxCalls = if ($entry.max_tool_calls) { [int]$entry.max_tool_calls } else { 25 }
+        $reportedCalls = if ($entry.tool_calls_reported) { [int]$entry.tool_calls_reported } elseif ($entry.quality -and $entry.quality.tool_calls_reported) { [int]$entry.quality.tool_calls_reported } else { 0 }
+        $toolCallsExceeded = ($reportedCalls -gt 0) -and ($reportedCalls -gt $maxCalls)
         $effectiveStatus = if ($budgetExceeded) { "timeout" } else { $entry.status }
         if ($Quiet) {
             @{
@@ -225,10 +228,13 @@ switch ($Action) {
                 budget_exceeded  = $budgetExceeded
                 elapsed_seconds  = [math]::Round($elapsedSeconds, 1)
                 timeout_seconds  = $timeoutSeconds
+                tool_calls_exceeded = $toolCallsExceeded
+                max_tool_calls   = $maxCalls
+                tool_calls_reported = $reportedCalls
             } | ConvertTo-Json -Compress
         } else {
             $icon = if ($budgetExceeded) { "TIMEOUT" } else { "OK   " }
-            Write-Output "[$icon] budget-guard: $($TaskId) elapsed=$([math]::Round($elapsedSeconds,1))s / limit=$($timeoutSeconds)s"
+            Write-Output "[$icon] budget-guard: $($TaskId) elapsed=$([math]::Round($elapsedSeconds,1))s / limit=$($timeoutSeconds)s calls=$reportedCalls/$maxCalls exceeded=$toolCallsExceeded"
         }
     }
 
@@ -306,11 +312,16 @@ switch ($Action) {
         $registered = if ($entry.registered) { [DateTime]$entry.registered } else { Get-Date }
         $elapsedSeconds = (Get-Date) - $registered | Select-Object -ExpandProperty TotalSeconds
         $budgetExceeded = $elapsedSeconds -gt $resolveTimeout
+        $maxCalls = if ($entry.max_tool_calls) { [int]$entry.max_tool_calls } else { 25 }
+        $reportedCalls = if ($json -and $json.tool_calls_reported) { [int]$json.tool_calls_reported } else { 0 }
+        $toolCallsExceeded = ($reportedCalls -gt 0) -and ($reportedCalls -gt $maxCalls)
 
         if ($Quiet) {
             # Quality object from post-delegation-check + budget tracking
             $quality = if ($json) { $json } else { [PSCustomObject]@{ passed = $false } }
             $quality | Add-Member -NotePropertyName budget_exceeded -NotePropertyValue $budgetExceeded -ErrorAction SilentlyContinue
+            $quality | Add-Member -NotePropertyName tool_calls_exceeded -NotePropertyValue $toolCallsExceeded -ErrorAction SilentlyContinue
+            $quality | Add-Member -NotePropertyName max_tool_calls -NotePropertyValue $maxCalls -ErrorAction SilentlyContinue
             $quality | Add-Member -NotePropertyName resolve_duration_s -NotePropertyValue ([math]::Round(((Get-Date) - $resolveStart).TotalSeconds, 1)) -ErrorAction SilentlyContinue
             @{
                 status    = $entry.status

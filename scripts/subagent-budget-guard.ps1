@@ -132,7 +132,7 @@ if ($Action -eq 'enforce') {
     # Read subagent output file if registered
     $subagentOutput = $entryHash['subagent_output']
     $allowedPaths  = $entryHash['allowed_paths']
-    $timeoutSec    = if ($entryHash['timeout_seconds']) { $entryHash['timeout_seconds'] } else { 30 }
+    $timeoutSec    = if ($entryHash['timeout_seconds']) { $entryHash['timeout_seconds'] } else { $MaxDurationSeconds }  # budget único 300s/25 (línea 55-56); timeout usado en quality score abajo
     $baseRef       = if ($entryHash['base_ref']) { $entryHash['base_ref'] } else { $BaseRef }
 
     # Call post-delegation-check via pwsh subprocess (uses & which resolves pwsh from PATH; exit in pdc exits subprocess only)
