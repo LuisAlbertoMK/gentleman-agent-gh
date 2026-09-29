@@ -43,12 +43,16 @@ Describe "post-delegation-check.ps1 -- contract validation wiring (C4d)" {
         $json.PSObject.Properties.Name -contains 'checks' | Should -Be $true
     }
 
-    It "does NOT include contract_validation check when -SubagentOutputFile omitted (backward compat)" {
+    It "FAILS closed with contract_validation check when -SubagentOutputFile omitted (ContractMode enforce)" {
         $r = & pwsh -NoProfile -File $scriptPath -BaseRef HEAD -Quiet 2>&1
         $jsonLine = $r | Where-Object { $_ -match '^\{' } | Select-Object -First 1
         $json = $jsonLine | ConvertFrom-Json -ErrorAction SilentlyContinue
         $checkNames = @($json.checks | ForEach-Object { $_.name })
-        $checkNames -contains 'contract_validation' | Should -Be $false
+        $checkNames -contains 'contract_validation' | Should -Be $true
+        $contractCheck = $json.checks | Where-Object { $_.name -eq 'contract_validation' } | Select-Object -First 1
+        $contractCheck.passed | Should -Be $false
+        $contractCheck.detail | Should -Match 'FAIL-CLOSED'
+        $json.passed | Should -Be $false
     }
 
     It "includes contract_validation check when -SubagentOutputFile is provided (wiring)" {
@@ -117,13 +121,17 @@ Describe "post-delegation-check.ps1 -- contract validation wiring (C4d)" {
         $contractCheck.passed | Should -Be $true
     }
 
-    It "SubagentOutputFile with missing file logs warning but does not crash" {
+    It "SubagentOutputFile with missing file FAILS closed with contract_validation (does not crash)" {
         $missingFile = Join-Path $TestDrive 'nonexistent.txt'
         $r = & pwsh -NoProfile -File $scriptPath -BaseRef HEAD -Quiet -RepoRoot $script:fixtureRepo -AllowedPaths '*' -SubagentOutputFile $missingFile 2>&1
         $jsonLine = $r | Where-Object { $_ -match '^\{' } | Select-Object -First 1
         $json = $jsonLine | ConvertFrom-Json -ErrorAction SilentlyContinue
         $json | Should -Not -BeNullOrEmpty
         $checkNames = @($json.checks | ForEach-Object { $_.name })
-        $checkNames -contains 'contract_validation' | Should -Be $false
+        $checkNames -contains 'contract_validation' | Should -Be $true
+        $contractCheck = $json.checks | Where-Object { $_.name -eq 'contract_validation' } | Select-Object -First 1
+        $contractCheck.passed | Should -Be $false
+        $contractCheck.detail | Should -Match 'FAIL-CLOSED'
+        $json.passed | Should -Be $false
     }
 }

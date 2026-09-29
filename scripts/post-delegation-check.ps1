@@ -32,8 +32,18 @@
 .PARAMETER SubagentOutput
     The subagent's text output (stdout). When provided, the 4-field return contract
     (Decision Taken | Files Changed | Key Findings | Nuance) is validated against
-    _return-contract.md. When omitted, contract validation is skipped (not a failure).
-    For multi-line content, prefer -SubagentOutputFile to avoid command-string escaping issues.
+    _return-contract.md. When omitted, contract validation FAILS closed
+    (passed=false) in ContractMode resolve/enforce (default: enforce).
+    Opt-out only with explicit -SkipContractCheck (backward-compat) or
+    -ContractMode baseline. For multi-line content, prefer -SubagentOutputFile
+    to avoid command-string escaping issues.
+
+.PARAMETER ContractMode
+    Contract strictness: resolve/enforce = missing output FAILS closed;
+    baseline = legacy skipped behavior (requires explicit opt-in).
+
+.PARAMETER SkipContractCheck
+    Explicit backward-compat opt-out: missing output is skipped (not a failure).
 
 .PARAMETER SubagentOutputFile
     Path to a file containing the subagent's text output. Read with Get-Content -Raw.
@@ -75,6 +85,8 @@ param(
     [string[]]$ExpectedFiles = @(),
     [string]$SubagentOutput = "",
     [string]$SubagentOutputFile = "",
+    [string]$ContractMode = "enforce",
+    [switch]$SkipContractCheck,
     [string]$RepoRoot       = $(Split-Path -Parent $PSScriptRoot),
     [int]$TimeoutSeconds    = 30,
     [switch]$Quiet,
@@ -158,9 +170,13 @@ if ($SubagentOutputFile) {
     if (Test-Path $SubagentOutputFile) {
         $SubagentOutput = Get-Content -Raw -Path $SubagentOutputFile
     } else {
-        Write-Warning "SubagentOutputFile not found: $SubagentOutputFile — contract validation skipped"
+        Write-Warning "SubagentOutputFile not found: $SubagentOutputFile [contract validation FAILS closed]"
     }
 }
+
+$contractOutputMissing = [string]::IsNullOrWhiteSpace($SubagentOutput)
+$skipContractLegacy = $SkipContractCheck -or ($ContractMode -eq 'baseline')
+$contractMissingFail = $contractOutputMissing -and (-not $skipContractLegacy)
 
 $results = @{
     baseRef      = $BaseRef
@@ -282,6 +298,13 @@ if ($Async) {
             detail = $contractDetail
         }
         if (-not $contractOk) { $results.passed = $false }
+    } elseif ($contractMissingFail) {
+        $results.checks += [PSCustomObject]@{
+            name   = "contract_validation"
+            passed = $false
+            detail = "FAIL-CLOSED: no SubagentOutput in ContractMode $ContractMode (use -SkipContractCheck for legacy skip)"
+        }
+        $results.passed = $false
     }
 } else {
     Write-Warning "check-subagent-output.ps1 not found at $csoScript — empty-output check skipped"
