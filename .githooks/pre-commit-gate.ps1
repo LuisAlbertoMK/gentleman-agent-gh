@@ -142,7 +142,9 @@ function Test-TokenBudget {
         if (Test-Path -LiteralPath $budgetScript) {
             $budgetOut = & "$RepoRoot/scripts/check-token-budget.ps1" -Json 2>&1 | Out-String
             $budgetResult = try { $budgetOut | ConvertFrom-Json -ErrorAction Stop } catch { $null }
-            if ($budgetResult -and -not $budgetResult.passed) {
+            if ($null -eq $budgetResult) {
+                Warn "token budget check: no se pudo verificar (runner sin resultado)"
+            } elseif (-not $budgetResult.passed) {
                 $skillAvg = if ($budgetResult.stats.skills) { $budgetResult.stats.skills.average } else { 'N/A' }
                 $promptAvg = if ($budgetResult.stats.prompts) { $budgetResult.stats.prompts.average } else { 'N/A' }
                 $overFiles = 0
@@ -304,40 +306,54 @@ if ($stagedSkillMds) {
 # [13/28] Pester tests
 Write-Host "[13/28] Pester tests..."
 if ($stagedTests) {
+    # Only Import-Module failure means "Pester not available" (non-blocking).
+    # Anything after that (config build / Invoke-Pester) is a REAL gate failure.
+    $pesterLoaded = $false
     try {
-        # Strip hook-exported GIT_* overrides before running test suites: git sets
-        # GIT_DIR/GIT_INDEX_FILE/GIT_WORK_TREE in the hook environment, and they are
-        # inherited by every child process (Pester runs IN-PROCESS). Test fixtures
-        # that create hermetic git repos then silently operate on THIS repo instead
-        # — observed corruption: fixture `git init` rewrote core.worktree here,
-        # fixture commits landed on the real branch, and the local identity was
-        # overwritten. Defense-in-depth: suites should also sanitize their own env.
-        foreach ($gitEnvVar in 'GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY') {
-            Remove-Item "Env:$gitEnvVar" -ErrorAction SilentlyContinue
-        }
         Import-Module Pester -ErrorAction Stop
-        $pester = Get-Module Pester
-        $testPaths = @($stagedTests | ForEach-Object { Join-Path $RepoRoot $_ })
-        $cfg = [PesterConfiguration]@{
-            Run = @{
-                Path     = $testPaths
-                Exit     = $false
-                PassThru = $true
+        $pesterLoaded = $true
+    } catch {
+        Warn "Pester not available (Import-Module failed): $_"
+    }
+    if ($pesterLoaded) {
+        try {
+            # Strip hook-exported GIT_* overrides before running test suites: git sets
+            # GIT_DIR/GIT_INDEX_FILE/GIT_WORK_TREE in the hook environment, and they are
+            # inherited by every child process (Pester runs IN-PROCESS). Test fixtures
+            # that create hermetic git repos then silently operate on THIS repo instead
+            # — observed corruption: fixture `git init` rewrote core.worktree here,
+            # fixture commits landed on the real branch, and the local identity was
+            # overwritten. Defense-in-depth: suites should also sanitize their own env.
+            foreach ($gitEnvVar in 'GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY') {
+                Remove-Item "Env:$gitEnvVar" -ErrorAction SilentlyContinue
             }
-        }
-        if ($pester.Version.Major -ge 5 -and $cfg.PSObject.Properties['Filter']) { $cfg.Filter.ExcludeTag = 'E2E' }
-        if ($testPaths.Count -gt 1 -and $pester.Version.Major -ge 5) { $cfg.Run.Parallel = $true }
-        $results = Invoke-Pester -Configuration $cfg
-        if ($null -eq $results) {
-            Warn "Pester: no results returned"
-        } elseif ($null -eq $results.FailedCount) {
-            Warn "Pester: FailedCount property not available (Pester version mismatch)"
-        } elseif ($results.FailedCount -gt 0) {
-            Fail "Pester: $($results.FailedCount) test(s) failed"
-        } else {
-            Pass
-        }
-    } catch { Warn "Pester not available: $_" }
+            $pester = Get-Module Pester
+            $testPaths = @($stagedTests | ForEach-Object { Join-Path $RepoRoot $_ })
+            $cfg = [PesterConfiguration]@{
+                Run = @{
+                    Path     = $testPaths
+                    Exit     = $false
+                    PassThru = $true
+                }
+            }
+            if ($pester.Version.Major -ge 5 -and $cfg.PSObject.Properties['Filter']) { $cfg.Filter.ExcludeTag = 'E2E' }
+            # Pester 5.x Run config has no Parallel property (only Path/ExcludePath/
+            # ScriptBlock/Container/TestExtension/Exit/Throw/PassThru/SkipRun/
+            # SkipRemainingOnFailure): an unconditional set throws and used to be
+            # swallowed by the catch, skipping every test while the gate stayed green.
+            if ($testPaths.Count -gt 1 -and $pester.Version.Major -ge 5 -and $cfg.Run.PSObject.Properties['Parallel']) { $cfg.Run.Parallel = $true }
+            $results = Invoke-Pester -Configuration $cfg
+            if ($null -eq $results) {
+                Warn "Pester: no results returned"
+            } elseif ($null -eq $results.FailedCount) {
+                Warn "Pester: FailedCount property not available (Pester version mismatch)"
+            } elseif ($results.FailedCount -gt 0) {
+                Fail "Pester: $($results.FailedCount) test(s) failed"
+            } else {
+                Pass
+            }
+        } catch { Fail "Pester step error: $_" }
+    }
 } else { Pass }
 
 # [14/28] Config expansion check
@@ -502,10 +518,10 @@ if ($staleResults) {
 Write-Host "[25/28] Token budget regression..."
 $tbrScript = Join-Path $RepoRoot 'scripts\test-token-budget-regression.ps1'
 if (Test-Path -LiteralPath $tbrScript) {
-    $tbrOut = & $tbrScript -SkillsPath (Join-Path $RepoRoot '.agents\skills') -Json -ErrorAction SilentlyContinue 2>&1 | Out-String
+    $tbrOut = & $tbrScript -SkillsPath (Join-Path $RepoRoot '.agents\skills') -Json 2>&1 | Out-String
     $tbrResult = try { $tbrOut | ConvertFrom-Json -ErrorAction Stop } catch { $null }
     if ($null -eq $tbrResult) {
-        Warn "token budget runner unavailable"
+        Fail "token budget regression: runner no produjo resultado (crash o salida no-JSON) — no se pudo verificar"
     } elseif (-not $tbrResult.passed) {
         $tbrResult.violations | ForEach-Object { Write-Host "    $($_.Skill): $($_.Current)B > $($_.Limit)B (budget $($_.Budget)B)" }
         Fail "token budget regression violations"
