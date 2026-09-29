@@ -178,13 +178,22 @@ if (Test-Path $globalSkillsDir) {
 # ── Check 3: global skills junction (hybrid model) ───────────────────────
 # Deliberate real dirs in global: _shared + skills that do NOT exist in repo.
 if (Test-Path $globalSkillsDir) {
-  $repoSkillsSet = @(if (Test-Path $repoSkillsDir) { Get-ChildItem -LiteralPath $repoSkillsDir -Directory | ForEach-Object Name } else { @() })
+  # depende de Check 1 — $globalEntries/$globalByName/$repoSkills pobladas ahí;
+  # re-enumerar igual que Check 1 si no llegaron pobladas (order-independent).
+  if (-not (Test-Path 'variable:globalByName') -or -not $globalByName) {
+    $globalEntries = @(Get-ChildItem -LiteralPath $globalSkillsDir -Force -Directory)
+    $globalByName = @{}
+    foreach ($e in $globalEntries) {
+      $globalByName[$e.Name] = Get-Item $e.FullName -Force
+    }
+    $repoSkills = @(if (Test-Path $repoSkillsDir) { Get-ChildItem -LiteralPath $repoSkillsDir -Directory | ForEach-Object Name } else { @() })
+  }
   $unexpectedReal = @()
-  foreach ($e in @(Get-ChildItem -LiteralPath $globalSkillsDir -Force -Directory)) {
-    $item = Get-Item $e.FullName -Force
+  foreach ($e in $globalEntries) {
+    $item = $globalByName[$e.Name]
     if ($item.LinkType -notin @('Junction', 'SymbolicLink')) {
       # Real dir: allowed only if deliberately real or not a repo skill
-      if ($e.Name -ne '_shared' -and $e.Name -in $repoSkillsSet) {
+      if ($e.Name -ne '_shared' -and $e.Name -in $repoSkills) {
         $unexpectedReal += $e.Name
       }
     }
