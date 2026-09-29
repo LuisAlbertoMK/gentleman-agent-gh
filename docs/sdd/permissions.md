@@ -21,26 +21,26 @@ There is exactly **one mode**. Agent names carry **no suffix**:
 
 ### Deny-Floor Scope (single protection boundary)
 
-There is ONE protection boundary — the deny-floor below. It applies to every agent, no exceptions:
+> **Updated 2026-09-29**: Deny-floor eliminated per parity migration R11 (d06d90de).
+> See `docs/mejoras/2026-09-25-permission-parity-gentle-ai.md:106-140` for tradeoff analysis.
+
+There is ONE protection boundary — the ask-floor below. It applies to every agent, no exceptions:
 
 | Pattern | Why |
 |---------|-----|
-| `git push *` | Destructive remote mutation |
+| `git commit *` | Remote mutation (requires confirmation) |
+| `git push *` / `git push` | Destructive remote mutation |
 | `git push --force *` | History rewriting on remote |
 | `git rebase *` | History rewriting |
-| `git reset *` | State destruction |
-| `git merge *` | Branch mutation |
-| `git branch -D *` | Branch deletion |
-| `docker *` / `docker-compose *` | Container escape risk |
-| `ssh *` / `wsl *` | Lateral movement |
-| `rm *` / `Remove-Item *` | File destruction |
-| `curl *` / `wget *` | Network exfiltration |
-| `Invoke-Expression *` / `iex *` | Arbitrary code execution |
-| `reg *` / `sc *` / `schtasks *` | System mutation |
-| `~/.ssh`, `.env`, credentials | Secret exfiltration (deny-list) |
+| `git reset --hard *` | State destruction |
+| `ssh` / `ssh *` | Lateral movement |
+| `scp` / `scp *` | Lateral movement |
+| `sftp` / `sftp *` | Lateral movement |
+| `rsync` / `rsync *` | Lateral movement |
+| `~/.ssh`, `.env`, credentials | Secret exfiltration (read-deny list) |
 
 See `opencode.json` → `permission.bash` for the complete allow/deny/ask matrix.
-SSoT: `scripts/lib/opencode-base.json` (deny-floor `:8-151`), `scripts/lib/permission-templates.json` (5 templates: `orchestrator`, `readwrite`, `readonly`, `sddorchestrator`, `reviewer`).
+SSoT: `scripts/lib/opencode-base.json` (lines 1-2, base config), `scripts/lib/permission-templates.json` (5 templates: `orchestrator`, `readwrite`, `readonly`, `sddorchestrator`, `reviewer`).
 
 ## Delegation Permission Model
 
