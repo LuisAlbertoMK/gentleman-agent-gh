@@ -13,7 +13,7 @@ Reviewing Dockerfiles, docker-compose, K8s manifests, Helm charts, or "is this c
 | Check | Sev | Pattern |
 |-------|-----|---------|
 | Runs as root | CRIT | Missing USER or `runAsUser: 0` |
-| ADD remote code | CRIT | `ADD http` (matches http/https) |
+| ADD remote code | CRIT | `ADD http` (http/https) |
 | Secrets in ENV/ARG | CRIT | Visible in docker history |
 | Privileged container | CRIT | `privileged: true` |
 | Docker socket mount | CRIT | `/var/run/docker.sock` |
@@ -57,7 +57,7 @@ Image: non-root USER 10001 + runAsNonRoot + readOnlyRootFilesystem
 Priv: privileged false | drop ALL + add min | no cap-add ALL | no hostNetwork/PID/sock
 Secrets: k8s Secret / mounts - never ENV/ARG (history) | tmpfs 0444
 Tags/Scan: pin @sha256 digest - never :latest | trivy/grype in CI fail CRIT/HIGH
-Caps: drop ALL + add min | cap-add individual FORBIDDEN: NET_ADMIN, SYS_MODULE, SYS_RAWIO, DAC_OVERRIDE, SYS_PTRACE, SYS_CHROOT, SYS_BOOT, IPC_LOCK (any=HIGH) | SYS_MODULE = kernel module load = escape vector
+Caps: drop ALL + add min | cap-add individual FORBIDDEN: NET_ADMIN, SYS_MODULE, SYS_RAWIO, DAC_OVERRIDE, SYS_PTRACE, SYS_CHROOT, SYS_BOOT, IPC_LOCK (any=HIGH)
 > changelog: odd/tasks/mejora-security.md (2026-09-18, slice 6)
 > changelog: odd/tasks/mejora-security.md (2026-09-18, slice 4)
 ## Refs
